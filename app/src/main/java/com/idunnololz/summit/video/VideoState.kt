@@ -8,9 +8,11 @@ import kotlinx.parcelize.Parcelize
 data class VideoState(
     val currentTime: Long,
     val volume: Float,
+    val playing: Boolean,
 ) : Parcelable
 
 fun Player.getVideoState(): VideoState = VideoState(
     currentTime = currentPosition,
     volume = volume,
+    playing = isPlaying,
 )

@@ -1,9 +1,6 @@
 package com.idunnololz.summit.lemmy.utils.stateStorage
 
 import android.content.SharedPreferences
-import com.idunnololz.summit.preferences.StateSharedPreference
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Persistent storage for things that are meant to persist state of the app. DO NOT USE for
@@ -40,5 +37,4 @@ class AccountStateStorage(
                     }
                 }.apply()
         }
-
 }

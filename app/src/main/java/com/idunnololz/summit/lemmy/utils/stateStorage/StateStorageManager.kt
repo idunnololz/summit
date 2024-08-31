@@ -31,11 +31,10 @@ class StateStorageManager @Inject constructor(
             accountStateStorageByAccount[stableAccountId] = AccountStateStorage(
                 accountId,
                 accountInstance,
-                preferenceManager.getAccountStateSharedPreferences(stableAccountId)
+                preferenceManager.getAccountStateSharedPreferences(stableAccountId),
             )
         }
 
         return requireNotNull(accountStateStorageByAccount[stableAccountId])
     }
-
 }

@@ -4,5 +4,4 @@ import android.content.SharedPreferences
 
 class GlobalStateStorage(
     private val prefs: SharedPreferences,
-) {
-}
+)

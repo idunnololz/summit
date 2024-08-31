@@ -10,4 +10,4 @@ data class NewConversation(
     val personInstance: String,
     val personName: String,
     val personAvatar: String?,
-): Parcelable
+) : Parcelable

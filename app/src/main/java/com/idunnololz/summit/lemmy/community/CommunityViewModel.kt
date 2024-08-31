@@ -23,6 +23,7 @@ import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -755,6 +756,14 @@ class CommunityViewModel @Inject constructor(
                 .onFailure {
                     // do nothing...
                 }
+        }
+    }
+
+    fun updatePost(postView: PostView) {
+        viewModelScope.launch(Dispatchers.Default) {
+            postListEngine.updatePost(postView)
+            postListEngine.createItems()
+            loadedPostsData.postValue(PostUpdateInfo())
         }
     }
 

@@ -40,7 +40,7 @@ data class DraftEntry(
 class DraftConverters(private val moshi: Moshi) {
 
     companion object {
-        private val TAG = "DraftConverters"
+        private const val TAG = "DraftConverters"
     }
 
     @TypeConverter

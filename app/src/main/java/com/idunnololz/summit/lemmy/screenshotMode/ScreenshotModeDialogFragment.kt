@@ -47,9 +47,6 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.shareUri
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -58,7 +55,9 @@ import java.time.format.FormatStyle
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class ScreenshotModeDialogFragment :
@@ -238,7 +237,7 @@ class ScreenshotModeDialogFragment :
                     RecordScreenshotDialogFragment
                         .show(
                             requireNotNull(viewModel.recordScreenshotConfig.value),
-                            childFragmentManager
+                            childFragmentManager,
                         )
                 }
             }
@@ -248,10 +247,10 @@ class ScreenshotModeDialogFragment :
 
         childFragmentManager.setFragmentResultListener(
             RecordScreenshotDialogFragment.REQUEST_KEY,
-            viewLifecycleOwner
+            viewLifecycleOwner,
         ) { _, result ->
             val result = result.getParcelableCompat<RecordScreenshotDialogFragment.Result>(
-                RecordScreenshotDialogFragment.REQUEST_KEY_RESULT
+                RecordScreenshotDialogFragment.REQUEST_KEY_RESULT,
             )
 
             if (result != null) {
@@ -273,7 +272,7 @@ class ScreenshotModeDialogFragment :
                                     view = infographicsView,
                                     name = "post_recording_$ts",
                                     reason = ScreenshotModeViewModel.UriResult.Reason.Save,
-                                    config = result.config
+                                    config = result.config,
                                 )
                             }
                         }
@@ -309,7 +308,6 @@ class ScreenshotModeDialogFragment :
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-
                     viewModel.generatedImageUri.postIdle()
 
                     binding.loadingOverlay.visibility = View.GONE
@@ -387,7 +385,7 @@ class ScreenshotModeDialogFragment :
         }
 
         adapter.screenshotMaxWidth = screenshotWidth
-        adapter.isScreenshoting = true
+        adapter.isScreenshotting = true
 
         var hasPost = false
         var hasNonPosts = false
@@ -462,7 +460,7 @@ class ScreenshotModeDialogFragment :
 
             Log.d(TAG, "Adding view at position $position")
         }
-        adapter.isScreenshoting = false
+        adapter.isScreenshotting = false
 
         screenshotStage.contentContainer.decorator = threadLinesDecoration
 
@@ -540,8 +538,10 @@ class ScreenshotModeDialogFragment :
                                 df.format(recordingStats.effectiveFrameRate),
                                 df.format(recordingStats.frameTimeMs),
                                 durationToPretty(recordingStats.totalTimeSpent ?: 0L),
-                                FileSizeUtils.convertToStringRepresentation(recordingStats.fileSize ?: 0L),
-                            )
+                                FileSizeUtils.convertToStringRepresentation(
+                                    recordingStats.fileSize ?: 0L,
+                                ),
+                            ),
                         )
                         .createAndShow(childFragmentManager, "recording_stats")
                 } else {

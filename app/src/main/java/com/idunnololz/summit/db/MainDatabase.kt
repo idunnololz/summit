@@ -1,7 +1,6 @@
 package com.idunnololz.summit.db
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
@@ -9,7 +8,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
@@ -252,8 +250,8 @@ val MIGRATION_38_39 = object : Migration(38, 39) {
             val accountId = draftData.accountId
             val accountInstance = draftData.accountInstance
 
-            toExecute += "UPDATE drafts SET account_id = ${accountId}, " +
-                "account_instance = '${accountInstance}' WHERE id = ${id}"
+            toExecute += "UPDATE drafts SET account_id = $accountId, " +
+                "account_instance = '$accountInstance' WHERE id = $id"
         }
 
         db.execSQL("ALTER TABLE drafts ADD COLUMN account_id INTEGER NOT NULL DEFAULT 0")

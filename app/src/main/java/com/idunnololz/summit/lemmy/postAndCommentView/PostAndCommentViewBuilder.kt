@@ -174,6 +174,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var postQuickActions: PostQuickActionsSettings = preferences.postQuickActions
         ?: PostQuickActionsSettings()
     private var showEditedDate: Boolean = preferences.showEditedDate
+    private var autoPlayVideos: Boolean = preferences.autoPlayVideos
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler()
 
@@ -218,6 +219,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
         showProfileIcons = preferences.showProfileIcons
         showEditedDate = preferences.showEditedDate
+        autoPlayVideos = preferences.autoPlayVideos
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
@@ -381,7 +383,20 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLinkLongClick = onLinkLongClick,
         )
 
-        commentButton.text = abbrevNumber(postView.counts.comments.toLong())
+
+        if (postView.counts.comments == postView.unread_comments ||
+            postView.unread_comments <= 0) {
+
+            commentButton.text = LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
+        } else {
+            commentButton.text =
+                context.getString(
+                    R.string.comments_with_new_comments_format,
+                    LemmyUtils.abbrevNumber(postView.counts.comments.toLong()),
+                    LemmyUtils.abbrevNumber(postView.unread_comments.toLong()),
+                )
+        }
+
         commentButton.isEnabled = !postView.post.locked
         commentButton.setOnClickListener {
             onAddCommentClick(Either.Left(postView))
@@ -412,6 +427,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             fullContentContainerView = fullContent,
             lazyUpdate = !updateContent,
             videoState = videoState,
+            autoPlayVideos = autoPlayVideos,
             highlight = if (highlightTextData?.targetSubtype == 1) {
                 highlightTextData
             } else {

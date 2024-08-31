@@ -18,11 +18,14 @@ import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.ActivityNavigator
 import androidx.navigation.FloatingWindow
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavOptions
 import androidx.navigation.ui.NavigationUI
 import androidx.window.layout.WindowMetricsCalculator
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -31,12 +34,14 @@ import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
 import com.google.android.material.navigationrail.NavigationRailView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
+import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
@@ -494,8 +499,15 @@ class NavBarController(
         navBar.setOnItemReselectedListener { menuItem ->
             Log.d(TAG, "Reselected nav item: ${menuItem.itemId}")
 
-            onNavigationItemReselectedListeners.forEach {
-                it.onNavigationItemReselected(menuItem)
+            if (onNavigationItemReselectedListeners.isEmpty()) {
+                if (navController.currentDestination?.id != menuItem.itemId) {
+                    navController.popBackStack(navController.graph.id, true)
+                    navController.navigate(menuItem.itemId)
+                }
+            } else {
+                onNavigationItemReselectedListeners.forEach {
+                    it.onNavigationItemReselected(menuItem)
+                }
             }
         }
     }

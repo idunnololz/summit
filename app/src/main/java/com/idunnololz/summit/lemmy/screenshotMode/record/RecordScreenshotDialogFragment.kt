@@ -14,10 +14,10 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentRecordScreenshotBinding
-import com.idunnololz.summit.util.viewRecorder.RecordScreenshotConfig
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.viewRecorder.RecordScreenshotConfig
 import com.idunnololz.summit.util.viewRecorder.RecordingType
 import kotlinx.parcelize.Parcelize
 
@@ -32,7 +32,7 @@ class RecordScreenshotDialogFragment :
             RecordScreenshotDialogFragment()
                 .apply {
                     arguments = RecordScreenshotDialogFragmentArgs(
-                        config
+                        config,
                     ).toBundle()
                 }
                 .showAllowingStateLoss(fragmentManager, "RecordScreenshotDialogFragment")
@@ -88,11 +88,13 @@ class RecordScreenshotDialogFragment :
 
                 recordingLengthEditText.setText((config.recordingLengthMs / 1000L).toString())
 
-                recordingTypePicker.check(when (config.recordingType) {
-                    RecordingType.Gif -> R.id.gif_button
-                    RecordingType.Mp4 -> R.id.mp4_button
-                    RecordingType.Webm -> R.id.webm_button
-                })
+                recordingTypePicker.check(
+                    when (config.recordingType) {
+                        RecordingType.Gif -> R.id.gif_button
+                        RecordingType.Mp4 -> R.id.mp4_button
+                        RecordingType.Webm -> R.id.webm_button
+                    },
+                )
                 setRecordingType(config.recordingType, resetFps = false)
 
                 fpsSlider.value = config.maxFps.toFloat()
@@ -122,10 +124,7 @@ class RecordScreenshotDialogFragment :
         }
     }
 
-    private fun setRecordingType(
-        recordingType: RecordingType,
-        resetFps: Boolean,
-    ) {
+    private fun setRecordingType(recordingType: RecordingType, resetFps: Boolean) {
         with(binding) {
             if (resetFps) {
                 when (recordingType) {
@@ -160,13 +159,12 @@ class RecordScreenshotDialogFragment :
         }
     }
 
-    private fun getRecordingType(checkedId: Int) =
-        when (checkedId) {
-            R.id.gif_button -> RecordingType.Gif
-            R.id.mp4_button -> RecordingType.Mp4
-            R.id.webm_button -> RecordingType.Webm
-            else -> RecordingType.Mp4
-        }
+    private fun getRecordingType(checkedId: Int) = when (checkedId) {
+        R.id.gif_button -> RecordingType.Gif
+        R.id.mp4_button -> RecordingType.Mp4
+        R.id.webm_button -> RecordingType.Webm
+        else -> RecordingType.Mp4
+    }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
@@ -183,10 +181,12 @@ class RecordScreenshotDialogFragment :
 
         setFragmentResult(
             REQUEST_KEY,
-            bundleOf(REQUEST_KEY_RESULT to Result(
-                config = requireNotNull(viewModel.recordScreenshotConfig.value),
-                startRecording = startRecording,
-            ))
+            bundleOf(
+                REQUEST_KEY_RESULT to Result(
+                    config = requireNotNull(viewModel.recordScreenshotConfig.value),
+                    startRecording = startRecording,
+                ),
+            ),
         )
     }
 }

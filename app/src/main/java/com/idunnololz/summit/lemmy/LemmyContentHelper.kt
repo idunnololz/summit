@@ -90,6 +90,7 @@ class LemmyContentHelper(
         instance: String,
         rootView: View,
         fullContentContainerView: ViewGroup,
+        autoPlayVideos: Boolean,
         lazyUpdate: Boolean = false,
         videoState: VideoState? = null,
         contentMaxLines: Int = -1,
@@ -574,6 +575,7 @@ class LemmyContentHelper(
                                 videoInfo.videoUrl,
                                 videoType,
                                 videoState = videoState,
+                                autoPlay = autoPlayVideos,
                             )
                     } else {
                         playerView.visibility = View.GONE

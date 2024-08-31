@@ -58,6 +58,7 @@ class SlidingPaneController(
     private var activeClosePostJob: Job? = null
     private var lastPostFragment: PostFragment? = null
     var onPageSelectedListener: (isOpen: Boolean) -> Unit = {}
+    var onPostOpen: (accountId: Long?, postView: PostView?) -> Unit = { _, _ -> }
 
     val isSlideable: Boolean
         get() = slidingPaneLayout.isSlideable
@@ -177,6 +178,7 @@ class SlidingPaneController(
                         itemRef = Either.Left(PostRef(instance, id)),
                         postFragmentOverride = lastPostFragment,
                     )
+                    onPostOpen.invoke(accountId, post)
                     return
                 } else {
                     this.lastPostFragment = null
@@ -204,6 +206,8 @@ class SlidingPaneController(
             ).toBundle(),
             itemRef = Either.Left(PostRef(instance, id)),
         )
+
+        onPostOpen.invoke(accountId, post)
     }
 
     fun openComment(instance: String, commentId: CommentId) {

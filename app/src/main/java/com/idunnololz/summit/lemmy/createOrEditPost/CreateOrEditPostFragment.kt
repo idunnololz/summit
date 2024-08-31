@@ -43,6 +43,7 @@ import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
+import com.idunnololz.summit.lemmy.setMarkdown
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.offline.OfflineManager
@@ -147,6 +148,7 @@ class CreateOrEditPostFragment :
             )
             if (result != null) {
                 viewModel.currentDraftEntry.value = result
+                viewModel.currentDraftId.value = result.id
             }
         }
         childFragmentManager.setFragmentResultListener(
@@ -253,7 +255,7 @@ class CreateOrEditPostFragment :
                     true
                 }
                 R.id.drafts -> {
-                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
+                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
                     true
                 }
                 else -> false
@@ -687,6 +689,7 @@ class CreateOrEditPostFragment :
                 binding.postEditText.setText(data.body)
                 binding.urlEditText.setText(data.url)
                 binding.nsfwSwitch.isChecked = data.isNsfw
+                binding.communityEditText.setText(data.targetCommunityFullName)
             }
 
             viewModel.currentDraftEntry.postValue(null)
@@ -871,16 +874,22 @@ class CreateOrEditPostFragment :
                     title != binding.titleEditText.text.toString()
                 ) {
                     binding.titleSuggestionContainer.visibility = View.VISIBLE
-                    binding.titleSuggestion.text = getString(
-                        R.string.use_suggested_title_format,
-                        title,
+                    binding.titleSuggestion.setMarkdown(
+                        getString(
+                            R.string.use_suggested_title_format,
+                            title,
+                        )
                     )
-                    binding.titleSuggestionContainer.setOnClickListener {
+                    binding.titleSuggestionCard.setOnClickListener {
                         binding.titleEditText.setText(title)
                         onLinkMetadataChanged()
                     }
                 } else {
                     binding.titleSuggestionContainer.visibility = View.GONE
+                }
+
+                binding.root.post {
+                    onScrollUpdated()
                 }
             }
         }
@@ -971,20 +980,21 @@ class CreateOrEditPostFragment :
         val url = binding.urlEditText.text?.toString()
         val isNsfw = binding.nsfwSwitch.isChecked
 
-        val currentDraftEntry = viewModel.currentDraftEntry.value
+        val currentDraftId = viewModel.currentDraftId.value
 
         if (!title.isNullOrBlank() || !body.isNullOrBlank() || !url.isNullOrBlank()) {
-            if (currentDraftEntry?.data != null &&
-                currentDraftEntry.data is DraftData.PostDraftData &&
-                overwriteExistingDraft
-            ) {
+            if (currentDraftId != null && overwriteExistingDraft) {
                 viewModel.draftsManager.updateDraftAsync(
-                    currentDraftEntry.id,
-                    currentDraftEntry.data.copy(
+                    currentDraftId,
+                    DraftData.PostDraftData(
+                        originalPost = args.post?.toOriginalPostData(),
                         name = title,
                         body = body,
                         url = url,
                         isNsfw = isNsfw,
+                        accountId = viewModel.currentAccount?.id ?: 0,
+                        accountInstance = viewModel.currentAccount?.instance ?: "",
+                        targetCommunityFullName = binding.communityEditText.text.toString(),
                     ),
                     showToast = true,
                 )

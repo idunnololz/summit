@@ -20,6 +20,7 @@ import com.idunnololz.summit.view.LemmyHeaderView
 class ListingItemViewHolder(
     val rawBinding: ViewBinding,
     val root: View,
+    val contentView: View,
     val headerContainer: LemmyHeaderView,
     val imageView: ImageView?,
     val title: TextView,
@@ -54,6 +55,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemListBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.contentView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -74,6 +76,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: SearchResultPostItemBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.contentView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -94,6 +97,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemLargeListBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.contentView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -118,6 +122,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemCardBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.cardView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -142,6 +147,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemCard2Binding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.cardView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -166,6 +172,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemCard3Binding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.cardView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -190,6 +197,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemFullBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.contentView,
             headerContainer = binding.headerContainer,
             imageView = null,
             title = binding.title,
@@ -210,6 +218,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemCompactBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.contentView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,
@@ -231,6 +240,7 @@ class ListingItemViewHolder(
         fun fromBinding(binding: ListingItemListWithCardsBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
+            contentView = binding.cardView,
             headerContainer = binding.headerContainer,
             imageView = binding.image,
             title = binding.title,

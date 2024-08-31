@@ -1,7 +1,6 @@
 package com.idunnololz.summit.drafts
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory

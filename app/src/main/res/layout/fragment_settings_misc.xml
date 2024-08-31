@@ -119,6 +119,12 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/auto_play_videos"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/rotate_instance_on_upload_fail"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"

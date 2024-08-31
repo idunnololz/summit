@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.Surface
 import com.idunnololz.summit.util.PrettyPrintUtils
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +17,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * This class extends [MediaRecorder] and manages to compose each video frame for recording.
@@ -107,12 +107,11 @@ open class SurfaceMediaRecorder : MediaRecorder() {
             onErrorListener?.onError(
                 this@SurfaceMediaRecorder,
                 MEDIA_RECORDER_ERROR_SURFACE,
-                errorCode
+                errorCode,
             )
         }
 
         renderJob = coroutineScope.launch {
-
             var framesDrawn = 0
             var totalTimeSpentDrawing = 0L
             val startTime = SystemClock.elapsedRealtime()
@@ -188,8 +187,11 @@ open class SurfaceMediaRecorder : MediaRecorder() {
             val totalTimeMs = SystemClock.elapsedRealtime() - startTime
             val fps = (framesDrawn / totalTimeMs.toDouble()) * 1000.0
             val timePerFrame = totalTimeSpentDrawing / framesDrawn.toDouble()
-            Log.d(TAG, "effective fps: ${PrettyPrintUtils.defaultDecimalFormat.format(fps)} " +
-                "timePerFrame: ${PrettyPrintUtils.defaultDecimalFormat.format(timePerFrame)}")
+            Log.d(
+                TAG,
+                "effective fps: ${PrettyPrintUtils.defaultDecimalFormat.format(fps)} " +
+                    "timePerFrame: ${PrettyPrintUtils.defaultDecimalFormat.format(timePerFrame)}",
+            )
 
             lastRecordingStats = SurfaceRecorderStats(
                 effectiveFrameRate = fps,

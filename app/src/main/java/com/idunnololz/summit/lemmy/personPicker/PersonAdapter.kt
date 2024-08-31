@@ -241,10 +241,13 @@ class PersonAdapter(
     }
 
     private fun refreshItems(cb: () -> Unit) {
-        Log.d(TAG, "refreshItems() " +
-            "query: ${serverQueryResults?.query} " +
-            "numResults: ${serverQueryResults?.people?.size} " +
-            "serverResultsInProgress: $serverResultsInProgress")
+        Log.d(
+            TAG,
+            "refreshItems() " +
+                "query: ${serverQueryResults?.query} " +
+                "numResults: ${serverQueryResults?.people?.size} " +
+                "serverResultsInProgress: $serverResultsInProgress",
+        )
 
         val query = query
         val isQueryActive = !query.isNullOrBlank()

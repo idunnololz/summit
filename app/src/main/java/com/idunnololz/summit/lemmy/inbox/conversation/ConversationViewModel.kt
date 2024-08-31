@@ -99,12 +99,14 @@ class ConversationViewModel @Inject constructor(
             return Result.failure(RuntimeException())
         }
 
-        conversationInfoModel.postValue(ConversationInfoModel(
-            otherPersonId = otherPersonId,
-            otherPersonAvatar = otherPersonIcon,
-            otherPersonName = otherPersonName,
-            otherPersonInstance = otherPersonInstance,
-        ))
+        conversationInfoModel.postValue(
+            ConversationInfoModel(
+                otherPersonId = otherPersonId,
+                otherPersonAvatar = otherPersonIcon,
+                otherPersonName = otherPersonName,
+                otherPersonInstance = otherPersonInstance,
+            ),
+        )
 
         personId = otherPersonId
 

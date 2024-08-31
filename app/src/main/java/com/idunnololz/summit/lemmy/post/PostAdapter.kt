@@ -28,6 +28,7 @@ import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
+import com.idunnololz.summit.databinding.PostNoCommentsItemBinding
 import com.idunnololz.summit.databinding.PostNotNativeInstanceItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
@@ -208,6 +209,10 @@ class PostAdapter(
             val screenshotMode: Boolean,
         ) : Item("view_all_yo"), ScreenshotOptions
 
+        data class NoCommentsItem(
+            val postView: PostView,
+        ) : Item("no_comments")
+
         data object FooterItem : Item("footer")
     }
 
@@ -272,7 +277,7 @@ class PostAdapter(
 
     var maxDepth: Int = Int.MAX_VALUE
 
-    var isScreenshoting: Boolean = false
+    var isScreenshotting: Boolean = false
     var screenshotMaxWidth: Int = 0
     var screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null
         set(value) {
@@ -322,6 +327,7 @@ class PostAdapter(
         is Item.ViewAllComments -> R.layout.view_all_comments
         is Item.MissingCommentItem -> R.layout.post_missing_comment_item
         is Item.NotNativeInstanceItem -> R.layout.post_not_native_instance_item
+        is Item.NoCommentsItem -> R.layout.post_no_comments_item
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -397,6 +403,8 @@ class PostAdapter(
                 ViewBindingViewHolder(PostMissingCommentItemBinding.bind(v))
             R.layout.post_not_native_instance_item ->
                 ViewBindingViewHolder(PostNotNativeInstanceItemBinding.bind(v))
+            R.layout.post_no_comments_item ->
+                ViewBindingViewHolder(PostNoCommentsItemBinding.bind(v))
             else -> throw RuntimeException("ViewType: $viewType")
         }
     }
@@ -411,22 +419,22 @@ class PostAdapter(
                     val b = holder.getBinding<PostHeaderItemBinding>()
                     val post = item.postView
                     val postKey = post.getUniqueKey()
-                    val contentMaxWidth = if (isScreenshoting) {
+                    val contentMaxWidth = if (isScreenshotting) {
                         screenshotMaxWidth
                     } else {
                         contentMaxWidth
                     }
-                    val onImageClick = if (isScreenshoting) {
+                    val onImageClick = if (isScreenshotting) {
                         { _, _, _ -> }
                     } else {
                         onImageClick
                     }
-                    val onVideoClick = if (isScreenshoting) {
+                    val onVideoClick = if (isScreenshotting) {
                         { _, _, _ -> }
                     } else {
                         onVideoClick
                     }
-                    val screenshotConfig = if (isScreenshoting) {
+                    val screenshotConfig = if (isScreenshotting) {
                         screenshotConfig
                     } else {
                         null
@@ -496,22 +504,22 @@ class PostAdapter(
                 val b = holder.getBinding<PostHeaderItemBinding>()
                 val post = item.postView
                 val postKey = post.getUniqueKey()
-                val contentMaxWidth = if (isScreenshoting) {
+                val contentMaxWidth = if (isScreenshotting) {
                     screenshotMaxWidth
                 } else {
                     contentMaxWidth
                 }
-                val onImageClick = if (isScreenshoting) {
+                val onImageClick = if (isScreenshotting) {
                     { _, _, _ -> }
                 } else {
                     onImageClick
                 }
-                val onVideoClick = if (isScreenshoting) {
+                val onVideoClick = if (isScreenshotting) {
                     { _, _, _ -> }
                 } else {
                     onVideoClick
                 }
-                val screenshotConfig = if (isScreenshoting) {
+                val screenshotConfig = if (isScreenshotting) {
                     screenshotConfig
                 } else {
                     null
@@ -564,7 +572,7 @@ class PostAdapter(
                     b.bottomDivider.visibility = View.GONE
                 }
 
-                if (isScreenshoting && screenshotConfig?.showPostDivider == false) {
+                if (isScreenshotting && screenshotConfig?.showPostDivider == false) {
                     b.bottomDivider.visibility = View.GONE
                 }
 
@@ -821,6 +829,13 @@ class PostAdapter(
                     refreshItems()
                 }
             }
+            is Item.NoCommentsItem -> {
+                val b = holder.getBinding<PostNoCommentsItemBinding>()
+
+                b.addCommentButton.setOnClickListener {
+                    onAddCommentClick(Either.Left(item.postView))
+                }
+            }
         }
     }
 
@@ -848,7 +863,7 @@ class PostAdapter(
         root: ConstraintLayout,
         item: Item,
     ) {
-        if (isScreenshoting) {
+        if (isScreenshotting) {
             return
         }
 
@@ -1121,6 +1136,10 @@ class PostAdapter(
 
                 if (!isLoaded) {
                     finalItems += listOf(ProgressOrErrorItem())
+                } else {
+                    if (commentItems.isEmpty()) {
+                        finalItems += listOf(Item.NoCommentsItem(postView.post))
+                    }
                 }
 
                 if (useFooter) {
@@ -1249,6 +1268,7 @@ class PostAdapter(
             is Item.ViewAllComments -> false
             is Item.MissingCommentItem -> false
             is Item.NotNativeInstanceItem -> false
+            is Item.NoCommentsItem -> false
         }
     }
 
@@ -1347,6 +1367,7 @@ class PostAdapter(
             is ProgressOrErrorItem,
             is Item.ViewAllComments,
             is Item.NotNativeInstanceItem,
+            is Item.NoCommentsItem,
             -> {}
         }
 
@@ -1367,6 +1388,7 @@ class PostAdapter(
             is ProgressOrErrorItem,
             is Item.ViewAllComments,
             is Item.NotNativeInstanceItem,
+            is Item.NoCommentsItem,
             -> {}
         }
 
@@ -1397,6 +1419,7 @@ class PostAdapter(
             is ProgressOrErrorItem,
             is Item.ViewAllComments,
             is Item.NotNativeInstanceItem,
+            is Item.NoCommentsItem,
             -> null
         }
 
@@ -1514,6 +1537,7 @@ class PostAdapter(
                     is PendingCommentItem -> {}
                     is ProgressOrErrorItem -> {}
                     is Item.ViewAllComments -> {}
+                    is Item.NoCommentsItem -> {}
                 }
             }
 

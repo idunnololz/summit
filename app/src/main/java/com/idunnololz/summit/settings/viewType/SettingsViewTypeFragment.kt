@@ -21,6 +21,7 @@ import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.defaultDimReadPosts
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.PostsFeedAppearanceSettings
@@ -213,6 +214,19 @@ class SettingsViewTypeFragment :
             onChoiceSelected = {
                 viewModel.currentPostUiConfig =
                     viewModel.currentPostUiConfig.copy(contentMaxLines = it)
+
+                updateRendering()
+            },
+        )
+        settings.dimReadPosts.bindTo(
+            binding.dimReadPosts,
+            {
+                viewModel.currentPostUiConfig.dimReadPosts
+                    ?: preferences.getPostsLayout().defaultDimReadPosts
+            },
+            {
+                viewModel.currentPostUiConfig =
+                    viewModel.currentPostUiConfig.copy(dimReadPosts = it)
 
                 updateRendering()
             },

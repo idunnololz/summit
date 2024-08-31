@@ -51,7 +51,8 @@ class PersonPickerViewModel @Inject constructor(
                 )
                 .onSuccess {
                     searchResults.setValue(
-                        PersonSearchResults(it.users, query))
+                        PersonSearchResults(it.users, query),
+                    )
                 }
                 .onFailure {
                     searchResults.setError(it)

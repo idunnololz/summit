@@ -50,13 +50,14 @@ class AddOrEditCommentViewModel @Inject constructor(
     /**
      * Create a new instance so we can change the instance without screwing up app state
      */
-    val lemmyApiClient = lemmyApiClientFactory.create()
+    private val lemmyApiClient = lemmyApiClientFactory.create()
 
     val currentAccount = accountManager.currentAccount.asAccountLiveData()
 
     val commentSentEvent = StatefulLiveData<Unit>()
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
+    val currentDraftId = state.getLiveData<Long>("current_draft_id")
 
     val messages = MutableLiveData<List<Message>>(listOf())
 

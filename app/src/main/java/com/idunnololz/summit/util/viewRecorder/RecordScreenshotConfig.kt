@@ -13,7 +13,7 @@ data class RecordScreenshotConfig(
     val qualityFactor: Double = 0.75,
     @FloatRange(0.2, 1.0)
     val resolutionFactor: Double = 1.0,
-): Parcelable
+) : Parcelable
 
 enum class RecordingType {
     Gif,
