@@ -19,6 +19,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_PLAY_VIDEOS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
@@ -1383,6 +1384,11 @@ class PostsFeedAppearanceSettings @Inject constructor(
             context.getString(R.string.full_content_max_lines),
             "",
         )
+    val dimReadPosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.dim_read_posts),
+        context.getString(R.string.dim_read_posts_desc),
+    )
 
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1396,6 +1402,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
         preferFullImage,
         preferTitleText,
         preferCommunityIcon,
+        dimReadPosts,
     )
 }
 
@@ -1703,6 +1710,12 @@ class MiscSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT),
     )
+    val autoPlayVideos = OnOffSettingItem(
+        null,
+        context.getString(R.string.auto_play_videos),
+        null,
+        relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -1716,6 +1729,7 @@ class MiscSettings @Inject constructor(
         largeScreenSupport,
         showEditedDate,
         imagePreviewHideUiByDefault,
+        autoPlayVideos,
     )
 }
 

@@ -20,6 +20,7 @@ import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.LinkUtils
@@ -50,6 +51,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
+
+    @Inject
+    lateinit var preferenceManager: PreferenceManager
 
     private val playerListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -247,7 +251,12 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             -> {
                 @Suppress("UnsafeOptInUsageError")
                 binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
-                    .getPlayerForUrl(url, videoType, videoState)
+                    .getPlayerForUrl(
+                        url = url,
+                        videoType = videoType,
+                        videoState = videoState,
+                        autoPlay = preferenceManager.currentPreferences.autoPlayVideos
+                    )
                 setupMoreButton(context, url, videoType)
             }
         }

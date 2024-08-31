@@ -182,7 +182,7 @@ class LemmyHeaderHelper(
                 context = context,
                 name = postView.community.name,
                 instance = postInstance,
-                url = LinkUtils.getLinkForCommunity(postView.community.toCommunityRef())
+                url = LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
             )
         } else {
             sb.appendLink(
@@ -378,7 +378,7 @@ class LemmyHeaderHelper(
                 context = context,
                 name = creatorName,
                 instance = creatorInstance,
-                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name)
+                url = LinkUtils.getLinkForPerson(creatorInstance, commentView.creator.name),
             )
         } else {
             sb.appendLink(
@@ -582,4 +582,8 @@ fun TextView.setSingleLineAvoidingRelayout(isSingleLine: Boolean) {
     }
     this.isSingleLine = false
     this.setTag(R.id.is_single_line, isSingleLine)
+}
+
+fun TextView.setMarkdown(markdown: String) {
+    text = LemmyTextHelper.getSpannable(context, markdown)
 }

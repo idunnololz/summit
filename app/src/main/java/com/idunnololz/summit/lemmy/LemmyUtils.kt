@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.Size

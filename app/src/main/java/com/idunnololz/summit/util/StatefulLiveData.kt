@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util
 
 import androidx.annotation.MainThread
-import androidx.datastore.preferences.protobuf.BoolValueOrBuilder
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer

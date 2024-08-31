@@ -201,6 +201,7 @@ object PreferenceUtil {
     const val KEY_SHOW_EDITED_DATE = "KEY_SHOW_EDITED_DATE"
     const val KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT = "KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT"
     const val KEY_PREFETCH_POSTS = "KEY_PREFETCH_POSTS"
+    const val KEY_AUTO_PLAY_VIDEOS = "KEY_AUTO_PLAY_VIDEOS"
 
     const val KEY_PREF_VERSION = "pref_version"
 

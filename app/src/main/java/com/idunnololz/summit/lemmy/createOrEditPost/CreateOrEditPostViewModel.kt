@@ -54,6 +54,7 @@ class CreateOrEditPostViewModel @Inject constructor(
     val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()
 
     val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
+    val currentDraftId = state.getLiveData<Long>("current_draft_id")
 
     val currentAccount: Account?
         get() = accountManager.currentAccount.asAccount

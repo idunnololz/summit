@@ -23,7 +23,11 @@ interface DraftsDao {
     @Query(
         "SELECT * FROM drafts WHERE draft_type = :type AND account_id = :accountId AND account_instance = :accountInstance",
     )
-    suspend fun getAllDraftsByType(type: Int, accountId: Long, accountInstance: String,): List<DraftEntry>
+    suspend fun getAllDraftsByType(
+        type: Int,
+        accountId: Long,
+        accountInstance: String,
+    ): List<DraftEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: DraftEntry): Long

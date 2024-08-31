@@ -54,7 +54,6 @@ import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.lemmy.inbox.conversation.NewConversation
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
@@ -65,7 +64,6 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
@@ -150,7 +148,7 @@ class InboxFragment :
                             result.personRef.instance,
                             result.personRef.name,
                             result.icon,
-                        )
+                        ),
                     ),
                     instance = viewModel.instance,
                 )
@@ -633,7 +631,7 @@ class InboxFragment :
             data object HeaderItem : Item
 
             data class TooManyMessagesWarningItem(
-                val earliestMessageTs: Long
+                val earliestMessageTs: Long,
             ) : Item
 
             data class InboxListItem(
@@ -666,12 +664,16 @@ class InboxFragment :
             },
         ).apply {
             addItemType(Item.HeaderItem::class, ItemInboxHeaderBinding::inflate) { item, b, _ -> }
-            addItemType(Item.TooManyMessagesWarningItem::class, ItemInboxWarningBinding::inflate) { item, b, h ->
+            addItemType(
+                Item.TooManyMessagesWarningItem::class,
+                ItemInboxWarningBinding::inflate,
+            ) { item, b, h ->
                 b.message.text = context.getString(
                     R.string.warn_too_many_messages,
                     PrettyPrintUtils.defaultDecimalFormat.format(
-                        ConversationsManager.CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT),
-                    tsToShortDate(item.earliestMessageTs)
+                        ConversationsManager.CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT,
+                    ),
+                    tsToShortDate(item.earliestMessageTs),
                 )
             }
             addItemType(Item.InboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
@@ -752,7 +754,7 @@ class InboxFragment :
                 b.ts.text = dateStringToPretty(
                     context = context,
                     ts = conversation.ts,
-                    style = PrettyPrintStyles.SHORT_DYNAMIC
+                    style = PrettyPrintStyles.SHORT_DYNAMIC,
                 )
                 b.root.setOnClickListener {
                     onConversationClick(conversation)
@@ -798,10 +800,12 @@ class InboxFragment :
             inboxModel.items.map { item ->
                 when (item) {
                     is InboxListItem.ConversationItem -> {
-                        newItems.add(Item.ConversationItem(
-                            item.conversation,
-                            item.draftMessage,
-                        ))
+                        newItems.add(
+                            Item.ConversationItem(
+                                item.conversation,
+                                item.draftMessage,
+                            ),
+                        )
                     }
                     is InboxListItem.RegularInboxItem -> {
                         newItems.add(Item.InboxListItem(item.item))

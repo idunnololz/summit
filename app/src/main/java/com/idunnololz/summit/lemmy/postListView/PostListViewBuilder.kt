@@ -20,6 +20,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
+import androidx.viewbinding.ViewBinding
 import coil.dispose
 import coil.load
 import com.commit451.coiltransformations.BlurTransformation
@@ -51,6 +52,7 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
@@ -136,6 +138,8 @@ class PostListViewBuilder @Inject constructor(
     private var indicateCurrentUser: Boolean =
         preferences.indicatePostsAndCommentsCreatedByCurrentUser
     private var showEditedDate: Boolean = preferences.showEditedDate
+    private var dimReadPosts: Boolean? = postUiConfig.dimReadPosts
+    private var autoPlayVideos: Boolean = preferences.autoPlayVideos
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -167,6 +171,7 @@ class PostListViewBuilder @Inject constructor(
         lemmyContentHelper.config = postUiConfig.fullContentConfig
         textSizeMultiplier = postUiConfig.textSizeMultiplier
         contentMaxLines = postUiConfig.contentMaxLines
+        dimReadPosts = postUiConfig.dimReadPosts
 
         globalFontSizeMultiplier =
             GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
@@ -180,6 +185,7 @@ class PostListViewBuilder @Inject constructor(
         useMultilinePostHeaders = preferences.useMultilinePostHeaders
         indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
         showEditedDate = preferences.showEditedDate
+        autoPlayVideos = preferences.autoPlayVideos
     }
 
     /**
@@ -280,10 +286,10 @@ class PostListViewBuilder @Inject constructor(
                         }.also {
                             downvoteCount = it
                         }
-                        rb.root.addView(downvoteCount)
+                        rb.contentView.addView(downvoteCount)
                     }
                     is ListingItemListBinding -> {
-                        ensureActionButtons(rb.root, leftHandMode)
+                        ensureActionButtons(rb.contentView, leftHandMode)
                     }
                     is ListingItemListWithCardsBinding -> {
                         ensureActionButtons(rb.constraintLayout, leftHandMode)
@@ -314,7 +320,7 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemLargeListBinding -> {
-                        ensureActionButtons(rb.root, leftHandMode)
+                        ensureActionButtons(rb.contentView, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.image
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -322,7 +328,7 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemFullBinding -> {
-                        ensureActionButtons(rb.root, leftHandMode)
+                        ensureActionButtons(rb.contentView, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -330,7 +336,7 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is SearchResultPostItemBinding -> {
-                        ensureActionButtons(rb.root, leftHandMode)
+                        ensureActionButtons(rb.contentView, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -647,7 +653,11 @@ class PostListViewBuilder @Inject constructor(
                 )
 
                 if (showCommunityIcon) {
-                    headerContainer.iconSize = Utils.convertDpToPixel(32f).toInt()
+                    headerContainer.iconSize = if (rawBinding is ListingItemCompactBinding) {
+                        Utils.convertDpToPixel(24f).toInt()
+                    } else {
+                        Utils.convertDpToPixel(32f).toInt()
+                    }
                     val iconImageView = headerContainer.getIconImageView()
                     avatarHelper.loadIcon(iconImageView, postView.community)
                     iconImageView.setOnClickListener {
@@ -664,15 +674,15 @@ class PostListViewBuilder @Inject constructor(
                 val finalContentMaxWidth =
                     when (val rb = rawBinding) {
                         is ListingItemCardBinding -> {
-                            val lp = rb.root.layoutParams as MarginLayoutParams
+                            val lp = rb.cardView.layoutParams as MarginLayoutParams
                             contentMaxWidth - lp.marginStart - lp.marginEnd
                         }
                         is ListingItemCard2Binding -> {
-                            val lp = rb.root.layoutParams as MarginLayoutParams
+                            val lp = rb.cardView.layoutParams as MarginLayoutParams
                             contentMaxWidth - lp.marginStart - lp.marginEnd
                         }
                         is ListingItemCard3Binding -> {
-                            val lp = rb.root.layoutParams as MarginLayoutParams
+                            val lp = rb.cardView.layoutParams as MarginLayoutParams
                             contentMaxWidth - lp.marginStart - lp.marginEnd
                         }
                         is ListingItemLargeListBinding -> {
@@ -817,6 +827,7 @@ class PostListViewBuilder @Inject constructor(
                         rootView = itemView,
                         fullContentContainerView = fullContentContainerView,
                         contentMaxLines = contentMaxLines,
+                        autoPlayVideos = autoPlayVideos,
                         onFullImageViewClickListener = { v, url ->
                             onImageClick(accountId, postView, v, url)
                         },
@@ -940,18 +951,44 @@ class PostListViewBuilder @Inject constructor(
                 },
             )
 
-            if (postView.read && !alwaysRenderAsUnread) {
-                if (themeManager.isLightTheme) {
-                    title.alpha = 0.41f
+            val renderAsRead = postView.read && !alwaysRenderAsUnread
+            val dimReadPosts = dimReadPosts
+                ?: rawBinding.communityLayout?.defaultDimReadPosts
+                ?: true
+            if (dimReadPosts) {
+                if (renderAsRead) {
+                    if (themeManager.isLightTheme) {
+                        contentView.alpha = 0.5f
+                    } else {
+                        contentView.alpha = 0.6f
+                    }
                 } else {
-                    title.alpha = 0.66f
+                    contentView.alpha = 1f
                 }
             } else {
-                title.alpha = 1f
+                if (renderAsRead) {
+                    if (themeManager.isLightTheme) {
+                        title.alpha = 0.41f
+                    } else {
+                        title.alpha = 0.66f
+                    }
+                } else {
+                    title.alpha = 1f
+                }
             }
 
-            commentText?.text =
-                LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
+            if (postView.counts.comments == postView.unread_comments ||
+                postView.unread_comments <= 0) {
+
+                commentText?.text = LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
+            } else {
+                commentText?.text =
+                    context.getString(
+                        R.string.comments_with_new_comments_format,
+                        LemmyUtils.abbrevNumber(postView.counts.comments.toLong()),
+                        LemmyUtils.abbrevNumber(postView.unread_comments.toLong()),
+                    )
+            }
 
             itemView.setOnClickListener {
                 onItemClick()
@@ -1377,3 +1414,18 @@ class PostListViewBuilder @Inject constructor(
         }
     }
 }
+
+val ViewBinding.communityLayout: CommunityLayout?
+    get() =
+        when(this) {
+            is ListingItemCompactBinding -> CommunityLayout.Compact
+            is ListingItemListBinding -> CommunityLayout.List
+            is ListingItemListWithCardsBinding -> CommunityLayout.ListWithCards
+            is ListingItemCardBinding -> CommunityLayout.Card
+            is ListingItemCard2Binding -> CommunityLayout.Card2
+            is ListingItemCard3Binding -> CommunityLayout.Card3
+            is ListingItemLargeListBinding -> CommunityLayout.LargeList
+            is ListingItemFullBinding -> CommunityLayout.Full
+            is SearchResultPostItemBinding -> null
+            else -> null
+        }

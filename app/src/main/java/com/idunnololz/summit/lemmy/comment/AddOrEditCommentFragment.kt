@@ -121,7 +121,7 @@ class AddOrEditCommentFragment :
         val wasCommentSent: Boolean,
         val didUserTapSend: Boolean,
         val content: String?,
-    ): Parcelable
+    ) : Parcelable
 
     private val args by navArgs<AddOrEditCommentFragmentArgs>()
 
@@ -177,6 +177,7 @@ class AddOrEditCommentFragment :
             )
             if (result != null) {
                 viewModel.currentDraftEntry.value = result
+                viewModel.currentDraftId.value = result.id
             }
         }
         childFragmentManager.setFragmentResultListener(
@@ -372,11 +373,13 @@ class AddOrEditCommentFragment :
 
                     setFragmentResult(
                         requestKey = REQUEST_KEY,
-                        result = bundleOf(REQUEST_KEY_RESULT to Result(
-                            wasCommentSent = true,
-                            didUserTapSend = true,
-                            content = null,
-                        )),
+                        result = bundleOf(
+                            REQUEST_KEY_RESULT to Result(
+                                wasCommentSent = true,
+                                didUserTapSend = true,
+                                content = null,
+                            ),
+                        ),
                     )
 
                     dismiss()
@@ -425,11 +428,13 @@ class AddOrEditCommentFragment :
                         SendAction.ReturnTextAsResult -> {
                             setFragmentResult(
                                 requestKey = REQUEST_KEY,
-                                result = bundleOf(REQUEST_KEY_RESULT to Result(
-                                    wasCommentSent = true,
-                                    didUserTapSend = true,
-                                    content = binding.commentEditText.text?.toString(),
-                                )),
+                                result = bundleOf(
+                                    REQUEST_KEY_RESULT to Result(
+                                        wasCommentSent = true,
+                                        didUserTapSend = true,
+                                        content = binding.commentEditText.text?.toString(),
+                                    ),
+                                ),
                             )
                             dismiss()
                         }
@@ -672,8 +677,8 @@ class AddOrEditCommentFragment :
 
         if (binding.commentEditText.text.isNullOrBlank() &&
             args.message != null &&
-            savedInstanceState == null) {
-
+            savedInstanceState == null
+        ) {
             binding.commentEditText.setText(args.message)
         }
     }
@@ -702,11 +707,13 @@ class AddOrEditCommentFragment :
             if (args.sendAction == SendAction.ReturnTextAsResult) {
                 setFragmentResult(
                     requestKey = REQUEST_KEY,
-                    result = bundleOf(REQUEST_KEY_RESULT to Result(
-                        wasCommentSent = false,
-                        didUserTapSend = false,
-                        content = binding.commentEditText.text?.toString(),
-                    )),
+                    result = bundleOf(
+                        REQUEST_KEY_RESULT to Result(
+                            wasCommentSent = false,
+                            didUserTapSend = false,
+                            content = binding.commentEditText.text?.toString(),
+                        ),
+                    ),
                 )
             } else {
                 if (preferences.saveDraftsAutomatically) {
@@ -724,21 +731,30 @@ class AddOrEditCommentFragment :
     private fun saveDraft(overwriteExistingDraft: Boolean = true) {
         val content = binding.commentEditText.text?.toString()
 
-        val currentDraftEntry = viewModel.currentDraftEntry.value
+        val currentDraftId = viewModel.currentDraftId.value
+
         if (!content.isNullOrBlank()) {
-            if (currentDraftEntry?.data != null &&
-                currentDraftEntry.data is DraftData.CommentDraftData &&
-                overwriteExistingDraft
-            ) {
+            val account = viewModel.currentAccount.value
+
+            if (currentDraftId != null && overwriteExistingDraft) {
                 viewModel.draftsManager.updateDraftAsync(
-                    currentDraftEntry.id,
-                    currentDraftEntry.data.copy(
+                    entryId = currentDraftId,
+                    draftData = DraftData.CommentDraftData(
+                        originalComment = args.editCommentView?.toOriginalCommentData(),
+                        postRef = PostRef(
+                            args.instance,
+                            args.postView?.post?.id
+                                ?: args.commentView?.post?.id
+                                ?: args.editCommentView?.post?.id ?: 0,
+                        ),
+                        parentCommentId = args.commentView?.comment?.id,
                         content = content,
+                        accountId = account?.id ?: 0L,
+                        accountInstance = account?.instance ?: "",
                     ),
                     showToast = true,
                 )
             } else {
-                val account = viewModel.currentAccount.value
                 viewModel.draftsManager.saveDraftAsync(
                     DraftData.CommentDraftData(
                         originalComment = args.editCommentView?.toOriginalCommentData(),

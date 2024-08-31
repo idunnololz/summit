@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.inbox.conversation
 
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.lemmy.inbox.db.ConversationEntry
 import kotlinx.parcelize.Parcelize
 

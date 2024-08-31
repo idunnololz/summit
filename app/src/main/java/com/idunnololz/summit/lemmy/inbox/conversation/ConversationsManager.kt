@@ -19,14 +19,14 @@ import com.idunnololz.summit.lemmy.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.lemmy.utils.stateStorage.AccountStateStorage
 import com.idunnololz.summit.lemmy.utils.stateStorage.StateStorageManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.math.min
 
 @Singleton
 class ConversationsManager @Inject constructor(
@@ -67,7 +67,6 @@ class ConversationsManager @Inject constructor(
     private val conversationContext = Dispatchers.Default.limitedParallelism(1)
 
     fun init() {
-
         currentAccount = accountManager.currentAccount.asAccount
         setupForAccount()
 
@@ -161,11 +160,13 @@ class ConversationsManager @Inject constructor(
             page++
         }
 
-        Log.d(TAG,
-            "lastConversationRefreshTs: ${lastConversationRefreshTs} " +
-            "earliestMessageTs: ${earliestMessage?.lastUpdateTs} " +
-            "messagesLoaded: $messagesLoaded " +
-            "messageLimitTriggered: $messageLimitTriggered")
+        Log.d(
+            TAG,
+            "lastConversationRefreshTs: $lastConversationRefreshTs " +
+                "earliestMessageTs: ${earliestMessage?.lastUpdateTs} " +
+                "messagesLoaded: $messagesLoaded " +
+                "messageLimitTriggered: $messageLimitTriggered",
+        )
 
         withContext(conversationContext) {
             allMessages.forEach {
@@ -369,7 +370,10 @@ class ConversationsManager @Inject constructor(
         val currentAccount = currentAccount ?: return
 
         val allDrafts = draftsManager.getAllDraftsByType(
-            DraftTypes.Message, currentAccount.id, currentAccount.instance)
+            DraftTypes.Message,
+            currentAccount.id,
+            currentAccount.instance,
+        )
         val sortedDrafts = allDrafts
             .sortedBy { it.updatedTs }
 
@@ -407,6 +411,7 @@ class ConversationsManager @Inject constructor(
             ?: return
 
         stateStorage = stateStorageManager.getAccountStateStorage(
-            currentAccount.id, currentAccount.instance)
+            currentAccount.id, currentAccount.instance,
+        )
     }
 }

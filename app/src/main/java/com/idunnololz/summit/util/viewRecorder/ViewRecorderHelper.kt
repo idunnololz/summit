@@ -11,10 +11,16 @@ import android.util.Log
 import android.view.View
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.fileprovider.FileProviderHelper
-import com.idunnololz.summit.util.viewRecorder.RecordingType.*
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.UriResult
 import com.idunnololz.summit.util.gif.AnimatedGifEncoder
+import com.idunnololz.summit.util.viewRecorder.RecordingType.*
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.BufferedOutputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.OutputStream
+import javax.inject.Inject
+import kotlin.math.max
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -22,12 +28,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
-import java.io.BufferedOutputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.OutputStream
-import javax.inject.Inject
-import kotlin.math.max
 
 class ViewRecorderHelper @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -42,27 +42,27 @@ class ViewRecorderHelper @Inject constructor(
 
     sealed interface ViewRecordingState {
         data class RecordingState(
-            val progress: Double
-        ): ViewRecordingState
+            val progress: Double,
+        ) : ViewRecordingState
 
         data class Encoding(
-            val progress: Double
-        ): ViewRecordingState
+            val progress: Double,
+        ) : ViewRecordingState
 
         data class Complete(
             val fileUri: Uri,
-            val recordingStats: RecordingStats
-        ): ViewRecordingState
+            val recordingStats: RecordingStats,
+        ) : ViewRecordingState
 
         data class Error(
-            val error: Throwable
-        ): ViewRecordingState
+            val error: Throwable,
+        ) : ViewRecordingState
     }
 
     fun recordView(
         view: View,
         name: String,
-        config: RecordScreenshotConfig
+        config: RecordScreenshotConfig,
     ): Flow<ViewRecordingState> = flow {
         val statsBuilder = RecordingStatsBuilder()
         var fileWithUri = FileProviderHelper(context)
@@ -129,7 +129,7 @@ class ViewRecorderHelper @Inject constructor(
                     Mp4 -> MediaRecorder.OutputFormat.MPEG_4
                     Webm -> MediaRecorder.OutputFormat.WEBM
                     Gif -> MediaRecorder.OutputFormat.MPEG_4
-                }
+                },
             )
 
             // 3
@@ -153,13 +153,13 @@ class ViewRecorderHelper @Inject constructor(
                     Mp4 -> MediaRecorder.VideoEncoder.H264
                     Webm -> MediaRecorder.VideoEncoder.VP8
                     Gif -> MediaRecorder.VideoEncoder.H264
-                }
+                },
             )
             viewRecorder.setOutputFile(outputFile.path)
 //            viewRecorder.setVideoSize(720, 1280)
             viewRecorder.setVideoFrameRate(fps)
             viewRecorder.setVideoEncodingBitRate(
-                (calculateBitRate(recordW, recordH) * qualityFactor).toInt()
+                (calculateBitRate(recordW, recordH) * qualityFactor).toInt(),
             )
 
             viewRecorder.setOnErrorListener { _, what, _ -> Log.d(TAG, "Error: $what") }
@@ -183,7 +183,7 @@ class ViewRecorderHelper @Inject constructor(
             },
             {
                 Result.failure(it)
-            }
+            },
         )
     }
 
@@ -220,9 +220,11 @@ class ViewRecorderHelper @Inject constructor(
         val startTime = System.currentTimeMillis()
         while (durationMs > System.currentTimeMillis() - startTime) {
             delay(300)
-            emit(ViewRecordingState.RecordingState(
-                (System.currentTimeMillis() - startTime).toDouble() / durationMs
-            ))
+            emit(
+                ViewRecordingState.RecordingState(
+                    (System.currentTimeMillis() - startTime).toDouble() / durationMs,
+                ),
+            )
         }
 
         emit(ViewRecordingState.RecordingState(1.0))
@@ -273,7 +275,9 @@ class ViewRecorderHelper @Inject constructor(
         var i = 0
         while (counter < duration) {
             val b: Bitmap? = mmr.getFrameAtTime(
-                counter * 1000, MediaMetadataRetriever.OPTION_CLOSEST)
+                counter * 1000,
+                MediaMetadataRetriever.OPTION_CLOSEST,
+            )
 
             if (b == null) {
                 Log.d(TAG, "Bitmap was null!")
@@ -301,10 +305,10 @@ class ViewRecorderHelper @Inject constructor(
 
         // bitrates from https://developer.android.com/media/optimize/sharing
         return when {
-            resolution < 306176  /* SD */ -> {
+            resolution < 306176 /* SD */ -> {
                 2_000_000
             }
-            resolution < 921600  /* 720p */ -> {
+            resolution < 921600 /* 720p */ -> {
                 8_000_000
             }
             resolution < 2073600 /* 1080p */ -> {
@@ -358,16 +362,13 @@ class ViewRecorderHelper @Inject constructor(
 
                 Log.d(TAG, "Encoding $index / ${bitmaps.size}")
             }
-
         }.apply {
             start()
         }
 
         thread.join()
 
-
         gifEncoder.finish()
-
 
         val uri = FileProviderHelper(context)
             .openTempFile("Summit_$name.gif") {
@@ -381,15 +382,14 @@ class ViewRecorderHelper @Inject constructor(
         )
     }
 
-    private fun RecordingStatsBuilder.build() =
-        RecordingStats(
-            surfaceRecorderStats?.effectiveFrameRate,
-            surfaceRecorderStats?.frameTimeMs,
-            endTime?.let {
-                it - startTime
-            },
-            fileSize,
-        )
+    private fun RecordingStatsBuilder.build() = RecordingStats(
+        surfaceRecorderStats?.effectiveFrameRate,
+        surfaceRecorderStats?.frameTimeMs,
+        endTime?.let {
+            it - startTime
+        },
+        fileSize,
+    )
 
     private data class RecordingStatsBuilder(
         var surfaceRecorderStats: SurfaceRecorderStats? = null,

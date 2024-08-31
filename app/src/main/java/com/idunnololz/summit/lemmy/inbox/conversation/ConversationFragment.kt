@@ -17,12 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import arrow.core.Either
-import coil.imageLoader
-import coil.request.ImageRequest
 import com.idunnololz.summit.R
-import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ConversationItemBinding
 import com.idunnololz.summit.databinding.FragmentConversationBinding
@@ -32,23 +27,17 @@ import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
-import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -224,11 +213,13 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             }
 
             viewModel.conversationInfoModel.observe(viewLifecycleOwner) { conversationInfoModel ->
-                avatarHelper.loadAvatar(icon,
+                avatarHelper.loadAvatar(
+                    icon,
                     conversationInfoModel.otherPersonAvatar,
                     conversationInfoModel.otherPersonName ?: "",
                     conversationInfoModel.otherPersonId ?: 0L,
-                    conversationInfoModel.otherPersonInstance ?: "",)
+                    conversationInfoModel.otherPersonInstance ?: "",
+                )
 
                 title.text = conversationInfoModel.otherPersonName
                 subtitle.text = conversationInfoModel.otherPersonInstance
@@ -238,7 +229,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                         page = PersonRef.PersonRefByName(
                             conversationInfoModel.otherPersonName ?: "",
                             conversationInfoModel.otherPersonInstance ?: "",
-                        )
+                        ),
                     )
                 }
             }
@@ -355,7 +346,6 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                 ConversationItemBinding::inflate,
             ) { item, b, h ->
 
-
 //                LemmyTextHelper.bindText(
 //                    textView = text,
 //                    text = content,
@@ -411,7 +401,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                 b.info.text = dateStringToPretty(
                     context = context,
                     ts = item.messageItem.lastUpdateTs,
-                    style = PrettyPrintStyles.SHORT_DYNAMIC
+                    style = PrettyPrintStyles.SHORT_DYNAMIC,
                 )
 
                 if (doesTextContainDrawable) {
@@ -445,7 +435,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                     b.text.setLinkTextColor(
                         context.getColorFromAttribute(
                             com.google.android.material.R.attr.colorOnPrimary,
-                        )
+                        ),
                     )
                     b.info.setTextColor(
                         context.getColorFromAttribute(
@@ -477,7 +467,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                     b.text.setLinkTextColor(
                         context.getColorFromAttribute(
                             com.google.android.material.R.attr.colorOnPrimaryContainer,
-                        )
+                        ),
                     )
                     b.info.setTextColor(
                         context.getColorFromAttribute(

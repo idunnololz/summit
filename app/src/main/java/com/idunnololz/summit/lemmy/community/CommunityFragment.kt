@@ -674,6 +674,25 @@ class CommunityFragment :
                 }
             }
 
+            onPostOpen = { accountId, postView ->
+                if (postView != null) {
+                    if (!postView.read) {
+                        moreActionsHelper.onPostRead(
+                            postView = postView,
+                            delayMs = 0,
+                            accountId = accountId,
+                            read = true,
+                        )
+                    }
+
+                    viewModel.updatePost(
+                        postView = postView.copy(
+                            unread_comments = 0,
+                        )
+                    )
+                }
+            }
+
             init()
         }
     }

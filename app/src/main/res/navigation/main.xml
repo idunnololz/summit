@@ -77,7 +77,8 @@
             android:defaultValue="@null"
             app:nullable="true"
             app:argType="com.idunnololz.summit.video.VideoState"/>
-    </fragment><action android:id="@+id/action_global_videoViewerFragment" app:destination="@id/videoViewerFragment"/>
+    </fragment>
+    <action android:id="@+id/action_global_videoViewerFragment" app:destination="@id/videoViewerFragment"/>
     <fragment
         android:id="@+id/inboxTabbedFragment"
         android:name="com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment"

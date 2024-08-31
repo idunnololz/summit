@@ -1336,7 +1336,7 @@
     <!-- Error text. -->
     <string name="error_you_must_sign_in_to_create_a_post">You must sign in to create a post.</string>
     <!-- Button text. -->
-    <string name="use_suggested_title_format">Use suggested title \"%1$s\"</string>
+    <string name="use_suggested_title_format">Use suggested title \"**%1$s**\"</string>
     <!-- Keep short. Button text. -->
     <string name="load_more">Load more</string>
     <!-- Keep short. Button text. -->
@@ -1774,6 +1774,12 @@
     <string name="resolution_scaling">Resolution scaling</string>
     <string name="desc_screenshot_recording_fps">The FPS field indicates the maximum FPS of the recording. Based on the device hardware, it might not be possible to reach the FPS selected.</string>
     <string name="desc_recording_stats">Screenshot recording success!\n\nFPS: %1$s\nFrame time (ms): %2$s\nTime taken: %3$s\nFile size: %4$s</string>
+    <string name="dim_read_posts">Dim read posts</string>
+    <string name="dim_read_posts_desc">When enabled, read posts will be completely dimmed. If disabled, only the title of the post is dimmed.</string>
+    <string name="auto_play_videos">Auto-play videos</string>
+    <string name="comments_with_new_comments_format">%1$s (%2$s New)</string>
+    <string name="desc_no_comments">No comments yet.</string>
+    <string name="add_a_comment">Add a comment</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

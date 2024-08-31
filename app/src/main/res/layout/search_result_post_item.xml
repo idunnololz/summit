@@ -1,140 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?selectableItemBackground">
+    android:layout_height="wrap_content">
 
-    <View
-        android:id="@+id/highlight_bg"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/colorHighlight"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <View
-        android:id="@+id/theme_color_bar"
-        android:layout_width="@dimen/theme_color_bar_width"
-        android:layout_height="0dp"
-        android:background="@color/colorHighlight"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <TextView
-        android:id="@+id/type"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding"
-        android:layout_marginTop="@dimen/padding"
-        android:text="@string/post"
-        android:drawablePadding="@dimen/padding_half"
-        android:textColor="@color/colorTextFaint"
-        android:gravity="center_vertical"
-        android:includeFontPadding="false"
-        android:textAppearance="?textAppearanceLabelMedium"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:drawableStartCompat="@drawable/outline_article_14"
-        app:drawableTint="@color/style_red" />
+        android:background="?selectableItemBackground">
 
-    <HorizontalScrollView
-        android:id="@+id/header_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_half"
-        android:paddingStart="@dimen/reddit_content_horizontal_padding"
-        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
-        android:fadingEdge="horizontal"
-        android:requiresFadingEdge="horizontal"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@+id/type"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        <View
+            android:id="@+id/highlight_bg"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/colorHighlight"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <com.idunnololz.summit.view.LemmyHeaderView
-            android:id="@+id/header_container"
+        <View
+            android:id="@+id/theme_color_bar"
+            android:layout_width="@dimen/theme_color_bar_width"
+            android:layout_height="0dp"
+            android:background="@color/colorHighlight"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding"
+            android:layout_marginTop="@dimen/padding"
+            android:text="@string/post"
+            android:drawablePadding="@dimen/padding_half"
+            android:textColor="@color/colorTextFaint"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:textAppearance="?textAppearanceLabelMedium"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:drawableStartCompat="@drawable/outline_article_14"
+            app:drawableTint="@color/style_red" />
+
+        <HorizontalScrollView
+            android:id="@+id/header_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_half"
+            android:paddingStart="@dimen/reddit_content_horizontal_padding"
+            android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+            android:fadingEdge="horizontal"
+            android:requiresFadingEdge="horizontal"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@+id/type"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.idunnololz.summit.view.LemmyHeaderView
+                android:id="@+id/header_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </HorizontalScrollView>
+
+        <!-- Width set programatically -->
+        <com.idunnololz.summit.view.ReactiveImageView
+            android:id="@+id/image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
+            android:layout_marginTop="@dimen/padding_half"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header_view" />
+
+        <!-- Width set programatically -->
+        <com.idunnololz.summit.view.ReactiveImageView
+            android:id="@+id/icon_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
+            android:layout_marginTop="@dimen/padding_half"
+            android:background="@drawable/border1"
+            android:padding="@dimen/padding_half"
+            app:tint="?attr/colorControlNormal"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header_view" />
+
+        <Space
+            android:id="@+id/icon_gone_spacer"
+            android:layout_width="@dimen/padding_half"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header_view" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/left_barrier"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </HorizontalScrollView>
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="image,icon_image,icon_gone_spacer"
+            app:barrierDirection="end" />
 
-    <!-- Width set programatically -->
-    <com.idunnololz.summit.view.ReactiveImageView
-        android:id="@+id/image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_half"
-        android:scaleType="centerCrop"
-        app:layout_constraintDimensionRatio="H,16:9"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_view" />
+        <com.idunnololz.summit.view.LinkifyTextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceBodyMedium"
+            android:layout_marginStart="@dimen/padding_half"
+            android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
+            android:layout_marginTop="@dimen/padding_quarter"
+            app:layout_constraintTop_toBottomOf="@+id/header_view"
+            app:layout_constraintStart_toEndOf="@+id/left_barrier"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Width set programatically -->
-    <com.idunnololz.summit.view.ReactiveImageView
-        android:id="@+id/icon_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_half"
-        android:background="@drawable/border1"
-        android:padding="@dimen/padding_half"
-        app:tint="?attr/colorControlNormal"
-        app:layout_constraintDimensionRatio="H,16:9"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_view" />
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="title,image,icon_image"
+            app:barrierDirection="bottom" />
 
-    <Space
-        android:id="@+id/icon_gone_spacer"
-        android:layout_width="@dimen/padding_half"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_view" />
+        <LinearLayout
+            android:id="@+id/full_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/barrier"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/left_barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="image,icon_image,icon_gone_spacer"
-        app:barrierDirection="end" />
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/bottom_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="full_content"
+            app:barrierDirection="bottom" />
 
-    <com.idunnololz.summit.view.LinkifyTextView
-        android:id="@+id/title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceBodyMedium"
-        android:layout_marginStart="@dimen/padding_half"
-        android:layout_marginEnd="@dimen/reddit_content_horizontal_padding"
-        android:layout_marginTop="@dimen/padding_quarter"
-        app:layout_constraintTop_toBottomOf="@+id/header_view"
-        app:layout_constraintStart_toEndOf="@+id/left_barrier"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="title,image,icon_image"
-        app:barrierDirection="bottom" />
-
-    <LinearLayout
-        android:id="@+id/full_content"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/barrier"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"></LinearLayout>
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/bottom_barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="full_content"
-        app:barrierDirection="bottom" />
-    
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

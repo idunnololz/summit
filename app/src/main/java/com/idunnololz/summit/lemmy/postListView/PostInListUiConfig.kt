@@ -18,6 +18,7 @@ data class PostInListUiConfig(
     val preferTitleText: Boolean = false,
     val contentMaxLines: Int = -1,
     val showCommunityIcon: Boolean = true,
+    val dimReadPosts: Boolean?,
 ) {
     fun updateTextSizeMultiplier(it: Float): PostInListUiConfig = this.copy(
         textSizeMultiplier = it,
@@ -77,34 +78,55 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig = when (this) {
             imageWidthPercent = 0.2f,
             headerTextSizeSp = 12f,
             footerTextSizeSp = 12f,
+            dimReadPosts = false,
         )
     CommunityLayout.List ->
         PostInListUiConfig(
             imageWidthPercent = 0.2f,
+            dimReadPosts = false,
         )
     CommunityLayout.ListWithCards ->
         PostInListUiConfig(
             imageWidthPercent = 0.2f,
+            dimReadPosts = false,
         )
     CommunityLayout.LargeList ->
         PostInListUiConfig(
             imageWidthPercent = 1f,
+            dimReadPosts = true,
         )
     CommunityLayout.Card ->
         PostInListUiConfig(
             imageWidthPercent = 1f,
+            dimReadPosts = true,
         )
     CommunityLayout.Card2 ->
         PostInListUiConfig(
             imageWidthPercent = 1f,
+            dimReadPosts = true,
         )
     CommunityLayout.Card3 ->
         PostInListUiConfig(
             titleTextSizeSp = 16f,
             imageWidthPercent = 1f,
+            dimReadPosts = true,
         )
     CommunityLayout.Full ->
         PostInListUiConfig(
             imageWidthPercent = 0.2f,
+            dimReadPosts = true,
         )
 }
+
+val CommunityLayout.defaultDimReadPosts
+    get() =
+        when (this) {
+            CommunityLayout.Compact,
+            CommunityLayout.List,
+            CommunityLayout.ListWithCards -> false
+            CommunityLayout.LargeList,
+            CommunityLayout.Card,
+            CommunityLayout.Card2,
+            CommunityLayout.Card3,
+            CommunityLayout.Full -> true
+        }

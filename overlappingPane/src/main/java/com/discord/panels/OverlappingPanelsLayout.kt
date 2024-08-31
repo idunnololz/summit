@@ -176,8 +176,10 @@ open class OverlappingPanelsLayout : FrameLayout {
                     Int.MAX_VALUE.toFloat(),
                 ).toInt()
 
-            nonFullScreenSidePanelWidth = min(nonFullScreenSidePanelWidth,
-                maxSidePanelNonFullScreenWidth)
+            nonFullScreenSidePanelWidth = min(
+                nonFullScreenSidePanelWidth,
+                maxSidePanelNonFullScreenWidth,
+            )
         } finally {
             styledAttrs.recycle()
         }

@@ -137,12 +137,13 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="@dimen/padding"
-                            android:paddingBottom="@dimen/padding_half"
+                            android:paddingBottom="@dimen/padding"
                             app:layout_constraintTop_toBottomOf="@+id/title"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent">
 
                             <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/title_suggestion_card"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 

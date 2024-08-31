@@ -214,7 +214,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     fun openConversation(
         accountId: Long,
         conversation: Either<Conversation, NewConversation>,
-        instance: String
+        instance: String,
     ) {
         childFragmentManager.commit {
             setReorderingAllowed(true)

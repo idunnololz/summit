@@ -198,6 +198,13 @@ class SettingsMiscFragment :
                 preferences.imagePreviewHideUiByDefault = it
             },
         )
+        settings.autoPlayVideos.bindTo(
+            binding.autoPlayVideos,
+            { preferences.autoPlayVideos },
+            {
+                preferences.autoPlayVideos = it
+            },
+        )
 
         if (BuildConfig.DEBUG) {
             settings.rotateInstanceOnUploadFail.bindTo(

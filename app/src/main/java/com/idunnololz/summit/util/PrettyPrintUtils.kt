@@ -53,12 +53,7 @@ object PrettyPrintStyles {
 fun dateStringToPretty(context: Context, dateStr: String): String =
     dateStringToPretty(context, dateStringToTs(dateStr))
 
-fun dateStringToPretty(
-    context: Context,
-    ts: Long,
-    style: Int = PrettyPrintStyles.SHORT
-): String {
-
+fun dateStringToPretty(context: Context, ts: Long, style: Int = PrettyPrintStyles.SHORT): String {
     val now = System.currentTimeMillis()
     val diff: Long = now - ts
     var isRecent = false
