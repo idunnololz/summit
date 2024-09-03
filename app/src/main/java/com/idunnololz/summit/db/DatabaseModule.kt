@@ -3,6 +3,7 @@ package com.idunnololz.summit.db
 import android.content.Context
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfoDao
+import com.idunnololz.summit.actions.db.PostReadDao
 import com.idunnololz.summit.drafts.DraftsDao
 import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.hidePosts.HiddenPostsDao
@@ -61,6 +62,10 @@ class DatabaseModule {
     @Provides
     fun provideConversationEntriesDao(db: MainDatabase): ConversationEntriesDao =
         db.conversationEntriesDao()
+
+    @Provides
+    fun providePostReadDao(db: MainDatabase): PostReadDao =
+        db.postReadDao()
 
     @Provides
     @Singleton
