@@ -10,6 +10,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetSiteResponse
@@ -39,6 +40,7 @@ class MainActivityViewModel @Inject constructor(
     private val accountInfoManager: AccountInfoManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
     val userCommunitiesManager: UserCommunitiesManager,
+    val postReadManager: PostReadManager,
 ) : ViewModel() {
 
     companion object {
@@ -103,6 +105,15 @@ class MainActivityViewModel @Inject constructor(
 
                 withContext(Dispatchers.Main) {
                     Log.d(TAG, "'userCommunitiesManager' ready!")
+                    readyCount.emit(readyCount.value + 1)
+                }
+            }
+
+            launch {
+                postReadManager.init()
+
+                withContext(Dispatchers.Main) {
+                    Log.d(TAG, "'PostReadyManager' ready!")
                     readyCount.emit(readyCount.value + 1)
                 }
             }
@@ -229,6 +240,6 @@ class MainActivityViewModel @Inject constructor(
     private fun Flow<Int>.completeWhenDone(): Flow<Int> = transformWhile { readyCount ->
         emit(readyCount) // always emit progress
 
-        readyCount < 2
+        readyCount < 3
     }
 }

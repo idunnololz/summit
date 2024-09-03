@@ -235,7 +235,11 @@ class PostListViewBuilder @Inject constructor(
         ) -> Unit,
         onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
     ) {
-        recycle(holder)
+//        recycle(holder)
+
+        if (!isExpanded) {
+            recycle(holder)
+        }
 
         val postView = fetchedPost.postView
         val accountId: Long?

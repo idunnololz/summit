@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 40,
-    "identityHash": "bf32685ba3107f45e7ff95d9427ce149",
+    "identityHash": "65ad41b45338d332a2f6dc74e167fa7a",
     "entities": [
       {
         "tableName": "user_communities",
@@ -527,7 +527,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "accountFullName",
+            "fieldPath": "accountStableId",
             "columnName": "account_full_name",
             "affinity": "TEXT",
             "notNull": true
@@ -589,12 +589,38 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "read_posts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`post_key` TEXT NOT NULL, `read` INTEGER NOT NULL, PRIMARY KEY(`post_key`))",
+        "fields": [
+          {
+            "fieldPath": "postKey",
+            "columnName": "post_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "read",
+            "columnName": "read",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "post_key"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bf32685ba3107f45e7ff95d9427ce149')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '65ad41b45338d332a2f6dc74e167fa7a')"
     ]
   }
 }

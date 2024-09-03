@@ -13,6 +13,8 @@ import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.AccountInfoConverters
 import com.idunnololz.summit.account.info.AccountInfoDao
+import com.idunnololz.summit.actions.db.PostReadDao
+import com.idunnololz.summit.actions.db.ReadPostEntry
 import com.idunnololz.summit.drafts.DraftConverters
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
@@ -58,6 +60,7 @@ import com.idunnololz.summit.util.moshi
         DraftEntry::class,
         InboxEntry::class,
         ConversationEntry::class,
+        ReadPostEntry::class,
     ],
     autoMigrations = [
         AutoMigration(from = 20, to = 21),
@@ -67,7 +70,7 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 31, to = 32),
         AutoMigration(from = 32, to = 33),
     ],
-    version = 40,
+    version = 41,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -85,6 +88,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun draftsDao(): DraftsDao
     abstract fun inboxEntriesDao(): InboxEntriesDao
     abstract fun conversationEntriesDao(): ConversationEntriesDao
+    abstract fun postReadDao(): PostReadDao
 
     companion object {
 
@@ -131,6 +135,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_38_39)
                 .addMigrations(MIGRATION_39_38)
                 .addMigrations(MIGRATION_39_40)
+                .addMigrations(MIGRATION_40_41)
                 .build()
         }
     }
@@ -275,6 +280,15 @@ val MIGRATION_39_40 = object : Migration(39, 40) {
         db.execSQL("DROP TABLE IF EXISTS conversation_entries;")
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS `conversation_entries` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ts` INTEGER NOT NULL, `account_full_name` TEXT NOT NULL, `person_id` INTEGER NOT NULL, `person_instance` TEXT NOT NULL, `person_name` TEXT, `title` TEXT NOT NULL, `icon_url` TEXT, `content` TEXT, `is_read` INTEGER NOT NULL, `most_recent_message_id` INTEGER)",
+        )
+    }
+}
+
+val MIGRATION_40_41 = object : Migration(40, 41) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS read_posts;")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `read_posts` (`post_key` TEXT NOT NULL, `read` INTEGER NOT NULL, PRIMARY KEY(`post_key`))",
         )
     }
 }

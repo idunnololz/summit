@@ -1,6 +1,9 @@
 package com.idunnololz.summit.actions
 
+import android.util.Log
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.actions.db.PostReadDao
+import com.idunnololz.summit.actions.db.ReadPostEntry
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
@@ -13,10 +16,14 @@ import kotlinx.coroutines.launch
 class PostReadManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val accountManager: AccountManager,
+    private val postReadDao: PostReadDao,
 ) {
 
     companion object {
-        private const val MAX_READ_POST_LIMIT = 1000
+
+        private const val TAG = "PostReadManager"
+
+        const val MAX_READ_POST_LIMIT = 1000
     }
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -34,8 +41,18 @@ class PostReadManager @Inject constructor(
             accountManager.currentAccountOnChange.collect {
                 readPosts.clear()
                 postReadChanged.emit(Unit)
+                postReadDao.deleteAll()
             }
         }
+    }
+
+    suspend fun init() {
+        val entries = postReadDao.getAll()
+        for (entry in entries) {
+            readPosts[entry.postKey] = entry.read
+        }
+
+        Log.d(TAG, "read posts: ${entries.size}")
     }
 
     fun isPostRead(instance: String, postId: PostId): Boolean? {
@@ -52,14 +69,19 @@ class PostReadManager @Inject constructor(
 
         coroutineScope.launch {
             postReadChanged.emit(Unit)
+
+            postReadDao.insert(ReadPostEntry(key, read))
         }
     }
 
     fun delete(instance: String, id: Int) {
-        readPosts.remove(toKey(instance, id))
+        val key = toKey(instance, id)
+        readPosts.remove(key)
 
         coroutineScope.launch {
             postReadChanged.emit(Unit)
+
+            postReadDao.delete(key)
         }
     }
 
