@@ -21,11 +21,13 @@ import com.idunnololz.summit.databinding.HiddenPostsItemBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
@@ -34,6 +36,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
@@ -43,6 +46,9 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
     }
 
     private val viewModel: HiddenPostsViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,6 +112,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
                 viewModel.loadHiddenPosts()
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)

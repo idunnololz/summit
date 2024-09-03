@@ -32,6 +32,7 @@ import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Compa
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -40,6 +41,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -85,6 +87,9 @@ class MultiCommunityEditorDialogFragment :
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,6 +224,7 @@ class MultiCommunityEditorDialogFragment :
                     showTooManyCommunitiesMessage()
                 },
             )
+            resultsRecyclerView.setup(animationsHelper)
             resultsRecyclerView.adapter = adapter
             resultsRecyclerView.setHasFixedSize(true)
             resultsRecyclerView.layoutManager = LinearLayoutManager(context)

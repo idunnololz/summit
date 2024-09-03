@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.view.CustomTextInputEditText
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -47,6 +48,7 @@ class MentionsController @AssistedInject constructor(
     @Assisted private val editText: CustomTextInputEditText,
     private val apiClient: AccountAwareLemmyClient,
     private val mentionsAdapterFactory: MentionsResultAdapter.Factory,
+    private val animationsHelper: AnimationsHelper,
 ) {
     @AssistedFactory
     interface Factory {
@@ -167,6 +169,7 @@ class MentionsController @AssistedInject constructor(
         currentQueryPopupWindow = MentionsAutoCompletePopupWindow(
             context = anchor.context,
             adapterFactory = mentionsAdapterFactory,
+            animationsHelper = animationsHelper,
             onItemSelected = a@{
                 val query = extractQueryIfExists(editText.text, editText.selectionStart)
                     ?: return@a

@@ -18,12 +18,15 @@ import com.idunnololz.summit.api.dto.Language
 import com.idunnololz.summit.api.dto.LanguageId
 import com.idunnololz.summit.databinding.DialogFragmentLanguageSelectBinding
 import com.idunnololz.summit.databinding.LanguageItemBinding
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
 
 class LanguageSelectDialogFragment :
     BaseDialogFragment<DialogFragmentLanguageSelectBinding>(),
@@ -57,6 +60,9 @@ class LanguageSelectDialogFragment :
     private val args: LanguageSelectDialogFragmentArgs by navArgs()
 
     private var adapter: LanguagesAdapter? = null
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +129,7 @@ class LanguageSelectDialogFragment :
 
             updateMenu(adapter)
 
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter

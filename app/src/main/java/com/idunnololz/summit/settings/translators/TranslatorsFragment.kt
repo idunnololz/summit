@@ -13,18 +13,24 @@ import com.idunnololz.summit.databinding.DialogFragmentTranslatorsBinding
 import com.idunnololz.summit.databinding.TranslatorsLocaleItemBinding
 import com.idunnololz.summit.databinding.TranslatorsTranslatorItemBinding
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
 
     private val viewModel: TranslatorsViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +64,7 @@ class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
         val adapter = TranslatorsAdapter()
 
         with(binding) {
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)

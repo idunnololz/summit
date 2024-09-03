@@ -48,9 +48,11 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.ext.runAfterLayout
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.toErrorMessage
@@ -78,6 +80,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private val lemmyApiClient: AccountAwareLemmyClient,
     private val recentCommunityManager: RecentCommunityManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val animationsHelper: AnimationsHelper,
 ) {
     @AssistedFactory
     interface Factory {
@@ -150,6 +153,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         searchView = binding.searchView
 
+        binding.recyclerView.setup(animationsHelper)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 

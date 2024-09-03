@@ -27,13 +27,16 @@ import com.idunnololz.summit.preferences.PostQuickActionId
 import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionsSettings
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostQuickActionsFragment :
@@ -41,6 +44,9 @@ class PostQuickActionsFragment :
     AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: PostQuickActionsViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -108,6 +114,7 @@ class PostQuickActionsFragment :
                         .actions,
                 )
             }
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter

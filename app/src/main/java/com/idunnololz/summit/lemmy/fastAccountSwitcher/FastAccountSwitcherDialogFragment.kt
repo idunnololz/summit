@@ -14,9 +14,11 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.databinding.DialogFragmentFastAccountSwitchBinding
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,6 +44,9 @@ class FastAccountSwitcherDialogFragment :
 
     @Inject
     lateinit var guestAccountManager: GuestAccountManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,6 +82,7 @@ class FastAccountSwitcherDialogFragment :
             )
 
             recyclerView.setHasFixedSize(true)
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
 

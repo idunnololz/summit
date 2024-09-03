@@ -81,6 +81,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
@@ -89,6 +90,7 @@ import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -114,7 +116,7 @@ class CommunityFragment :
 
     private val viewModel: CommunityViewModel by viewModels()
 
-    private var adapter: ListingItemAdapter? = null
+    private var adapter: PostListAdapter? = null
 
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
@@ -142,6 +144,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var nsfwModeManager: NsfwModeManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     lateinit var preferences: Preferences
 
@@ -293,7 +298,7 @@ class CommunityFragment :
 
         val context = requireContext()
         if (adapter == null) {
-            adapter = ListingItemAdapter(
+            adapter = PostListAdapter(
                 postListViewBuilder = postListViewBuilder,
                 context = context,
                 postListEngine = viewModel.postListEngine,
@@ -760,223 +765,233 @@ class CommunityFragment :
             }
         }
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.fetchCurrentPage(
-                force = true,
-                resetHideRead = true,
-                clearPages = true,
-                scrollToTop = true,
-            )
-        }
-        binding.loadingView.setOnRefreshClickListener {
-            viewModel.fetchCurrentPage(true)
-        }
+        with(binding) {
+            swipeRefreshLayout.setOnRefreshListener {
+                viewModel.fetchCurrentPage(
+                    force = true,
+                    resetHideRead = true,
+                    clearPages = true,
+                    scrollToTop = true,
+                )
+            }
+            loadingView.setOnRefreshClickListener {
+                viewModel.fetchCurrentPage(true)
+            }
 
-        val layoutManager = LinearLayoutManager(context)
-        adapter?.viewLifecycleOwner = viewLifecycleOwner
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = layoutManager
+            val layoutManager = LinearLayoutManager(context)
+            adapter?.viewLifecycleOwner = viewLifecycleOwner
+            recyclerView.adapter = adapter
+            recyclerView.setHasFixedSize(true)
+            recyclerView.setup(animationsHelper)
+            recyclerView.layoutManager = layoutManager
 
-        if (preferences.markPostsAsReadOnScroll) {
-            binding.recyclerView.addOnScrollListener(
+            if (preferences.markPostsAsReadOnScroll) {
+                recyclerView.addOnScrollListener(
+                    object : RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+
+                            val range =
+                                layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
+
+                            range.forEach {
+                                adapter?.seenItemPositions?.add(it)
+                            }
+                        }
+                    },
+                )
+            }
+
+            updateDecoratorAndGestureHandler(recyclerView)
+
+            fastScroller.setRecyclerView(recyclerView)
+
+            fun fetchPageIfLoadItem(vararg positions: Int) {
+                val items = adapter?.items ?: return
+
+                for (p in positions) {
+                    val pageToFetch = (items.getOrNull(p) as? Item.AutoLoadItem)
+                        ?.pageToLoad
+                        ?: continue
+
+                    viewModel.fetchPage(pageToFetch)
+                }
+            }
+
+            recyclerView.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+
+                        val firstPos = layoutManager.findFirstVisibleItemPosition()
+                        val lastPos = layoutManager.findLastVisibleItemPosition()
+                        if (newState == SCROLL_STATE_IDLE) {
+                            fetchPageIfLoadItem(
+                                firstPos,
+                                firstPos - 1,
+                                lastPos - 1,
+                                lastPos,
+                                lastPos + 1,
+                            )
+                        }
+                    }
+
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
 
-                        val range = layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
+                        val adapter = adapter ?: return
+                        val firstPos = layoutManager.findFirstVisibleItemPosition()
+                        val lastPos = layoutManager.findLastVisibleItemPosition()
+                        (adapter.items.getOrNull(firstPos) as? Item.VisiblePostItem)
+                            ?.pageIndex
+                            ?.let { pageIndex ->
+                                if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
+                                    // firstPos != 0 - ensures that the page is scrollable even
+                                    viewModel.setPagePositionAtBottom(pageIndex)
+                                } else {
+                                    val firstView = layoutManager.findViewByPosition(firstPos)
+                                    viewModel.setPagePosition(
+                                        pageIndex,
+                                        firstPos,
+                                        firstView?.top ?: 0
+                                    )
+                                }
+                            }
 
-                        range.forEach {
-                            adapter?.seenItemPositions?.add(it)
+                        if (viewModel.infinity) {
+                            fetchPageIfLoadItem(
+                                firstPos,
+                                firstPos - 1,
+                                lastPos - 1,
+                                lastPos,
+                                lastPos + 1,
+                            )
                         }
+
+                        viewModel.postListEngine.updateViewingPosition(firstPos, lastPos)
                     }
                 },
             )
-        }
 
-        updateDecoratorAndGestureHandler(binding.recyclerView)
-
-        binding.fastScroller.setRecyclerView(binding.recyclerView)
-
-        fun fetchPageIfLoadItem(vararg positions: Int) {
-            val items = adapter?.items ?: return
-
-            for (p in positions) {
-                val pageToFetch = (items.getOrNull(p) as? Item.AutoLoadItem)
-                    ?.pageToLoad
-                    ?: continue
-
-                viewModel.fetchPage(pageToFetch)
+            rootView.post {
+                if (!isBindingAvailable()) return@post
+                scheduleStartPostponedTransition(rootView)
             }
-        }
 
-        binding.recyclerView.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
+            viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
+                when (it) {
+                    is StatefulData.Error -> {
+                        swipeRefreshLayout.isRefreshing = false
 
-                    val firstPos = layoutManager.findFirstVisibleItemPosition()
-                    val lastPos = layoutManager.findLastVisibleItemPosition()
-                    if (newState == SCROLL_STATE_IDLE) {
-                        fetchPageIfLoadItem(
-                            firstPos,
-                            firstPos - 1,
-                            lastPos - 1,
-                            lastPos,
-                            lastPos + 1,
-                        )
+                        if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
+                            recyclerView.visibility = View.GONE
+                            loadingView.showErrorText(
+                                R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden,
+                            )
+                        } else if (it.error is FilterTooAggressiveException) {
+                            recyclerView.visibility = View.GONE
+                            loadingView.showErrorText(R.string.error_filter_too_aggressive)
+                        } else if (it.error is ContentTypeFilterTooAggressiveException) {
+                            recyclerView.visibility = View.GONE
+                            loadingView.showErrorText(
+                                R.string.error_content_type_filter_too_aggressive,
+                            )
+                        } else if (viewModel.infinity) {
+                            loadingView.hideAll()
+                            adapter?.onItemsChanged()
+                        } else {
+                            recyclerView.visibility = View.GONE
+                            loadingView.showDefaultErrorMessageFor(it.error)
+                        }
                     }
-                }
 
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
+                    is StatefulData.Loading -> {
+                        if (!swipeRefreshLayout.isRefreshing) {
+                            loadingView.showProgressBar()
+                        }
+                    }
 
-                    val adapter = adapter ?: return
-                    val firstPos = layoutManager.findFirstVisibleItemPosition()
-                    val lastPos = layoutManager.findLastVisibleItemPosition()
-                    (adapter.items.getOrNull(firstPos) as? Item.VisiblePostItem)
-                        ?.pageIndex
-                        ?.let { pageIndex ->
-                            if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
-                                // firstPos != 0 - ensures that the page is scrollable even
-                                viewModel.setPagePositionAtBottom(pageIndex)
-                            } else {
-                                val firstView = layoutManager.findViewByPosition(firstPos)
-                                viewModel.setPagePosition(pageIndex, firstPos, firstView?.top ?: 0)
-                            }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        loadingView.hideAll()
+
+                        val adapter = adapter ?: return@a
+
+                        if (it.data.hideReadCount != null) {
+                            Snackbar
+                                .make(
+                                    coordinatorLayout,
+                                    getString(
+                                        R.string.posts_hidden_format,
+                                        PrettyPrintUtils.defaultDecimalFormat.format(
+                                            it.data.hideReadCount,
+                                        ),
+                                    ),
+                                    Snackbar.LENGTH_LONG,
+                                )
+                                .show()
                         }
 
-                    if (viewModel.infinity) {
-                        fetchPageIfLoadItem(
-                            firstPos,
-                            firstPos - 1,
-                            lastPos - 1,
-                            lastPos,
-                            lastPos + 1,
-                        )
-                    }
-
-                    viewModel.postListEngine.updateViewingPosition(firstPos, lastPos)
-                }
-            },
-        )
-
-        binding.rootView.post {
-            if (!isBindingAvailable()) return@post
-            scheduleStartPostponedTransition(binding.rootView)
-        }
-
-        viewModel.loadedPostsData.observe(viewLifecycleOwner) a@{
-            when (it) {
-                is StatefulData.Error -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-
-                    if (it.error is LoadNsfwCommunityWhenNsfwDisabled) {
-                        binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showErrorText(
-                            R.string.error_cannot_load_nsfw_community_when_nsfw_posts_are_hidden,
-                        )
-                    } else if (it.error is FilterTooAggressiveException) {
-                        binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showErrorText(R.string.error_filter_too_aggressive)
-                    } else if (it.error is ContentTypeFilterTooAggressiveException) {
-                        binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showErrorText(
-                            R.string.error_content_type_filter_too_aggressive,
-                        )
-                    } else if (viewModel.infinity) {
-                        binding.loadingView.hideAll()
-                        adapter?.onItemsChanged()
-                    } else {
-                        binding.recyclerView.visibility = View.GONE
-                        binding.loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                }
-                is StatefulData.Loading -> {
-                    if (!binding.swipeRefreshLayout.isRefreshing) {
-                        binding.loadingView.showProgressBar()
-                    }
-                }
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    binding.loadingView.hideAll()
-
-                    val adapter = adapter ?: return@a
-
-                    if (it.data.hideReadCount != null) {
-                        Snackbar
-                            .make(
-                                binding.coordinatorLayout,
-                                getString(
-                                    R.string.posts_hidden_format,
-                                    PrettyPrintUtils.defaultDecimalFormat.format(
-                                        it.data.hideReadCount,
-                                    ),
-                                ),
-                                Snackbar.LENGTH_LONG,
-                            )
-                            .show()
-                    }
-
-                    if (it.data.isReadPostUpdate) {
-                        adapter.onItemsChanged(animate = false)
-                    } else {
-                        adapter.seenItemPositions.clear()
-                        adapter.onItemsChanged()
-
-                        if (it.data.scrollToTop) {
-                            binding.recyclerView.scrollToPosition(0)
+                        if (it.data.isReadPostUpdate) {
+                            adapter.onItemsChanged(animate = false)
                         } else {
-                            val biggestPageIndex = viewModel.postListEngine.biggestPageIndex
-                            if (biggestPageIndex != null && !viewModel.infinity) {
-                                val pagePosition = viewModel.getPagePosition(
-                                    biggestPageIndex,
-                                )
-                                if (pagePosition.isAtBottom) {
-                                    (binding.recyclerView.layoutManager as LinearLayoutManager)
-                                        .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
-                                } else if (pagePosition.itemIndex != 0 || pagePosition.offset != 0) {
-                                    (binding.recyclerView.layoutManager as LinearLayoutManager)
-                                        .scrollToPositionWithOffset(
-                                            pagePosition.itemIndex,
-                                            pagePosition.offset,
-                                        )
-                                } else {
-                                    binding.recyclerView.scrollToPosition(0)
-                                    binding.customAppBar.root.setExpanded(true)
+                            adapter.seenItemPositions.clear()
+                            adapter.onItemsChanged()
+
+                            if (it.data.scrollToTop) {
+                                recyclerView.scrollToPosition(0)
+                            } else {
+                                val biggestPageIndex = viewModel.postListEngine.biggestPageIndex
+                                if (biggestPageIndex != null && !viewModel.infinity) {
+                                    val pagePosition = viewModel.getPagePosition(
+                                        biggestPageIndex,
+                                    )
+                                    if (pagePosition.isAtBottom) {
+                                        (recyclerView.layoutManager as LinearLayoutManager)
+                                            .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
+                                    } else if (pagePosition.itemIndex != 0 || pagePosition.offset != 0) {
+                                        (recyclerView.layoutManager as LinearLayoutManager)
+                                            .scrollToPositionWithOffset(
+                                                pagePosition.itemIndex,
+                                                pagePosition.offset,
+                                            )
+                                    } else {
+                                        recyclerView.scrollToPosition(0)
+                                        customAppBar.root.setExpanded(true)
+                                    }
                                 }
                             }
-                        }
 
-                        binding.swipeRefreshLayout.isRefreshing = false
-                        binding.recyclerView.visibility = View.VISIBLE
+                            swipeRefreshLayout.isRefreshing = false
+                            recyclerView.visibility = View.VISIBLE
 
-                        if (viewModel.postListEngine.items.isEmpty()) {
-                            binding.loadingView.showErrorText(R.string.no_posts)
+                            if (viewModel.postListEngine.items.isEmpty()) {
+                                loadingView.showErrorText(R.string.no_posts)
+                            }
                         }
                     }
                 }
             }
-        }
-        viewModel.onHidePost.observe(viewLifecycleOwner) {
-            val hiddenPost = it ?: return@observe
+            viewModel.onHidePost.observe(viewLifecycleOwner) {
+                val hiddenPost = it ?: return@observe
 
-            viewModel.onHidePost.postValue(null)
+                viewModel.onHidePost.postValue(null)
 
-            Snackbar
-                .make(
-                    binding.coordinatorLayout,
-                    R.string.post_hidden,
-                    Snackbar.LENGTH_LONG,
-                )
-                .setAction(R.string.undo) {
-                    viewModel.unhidePost(hiddenPost.postId, hiddenPost.instance)
-                }
-                .show()
-        }
+                Snackbar
+                    .make(
+                        coordinatorLayout,
+                        R.string.post_hidden,
+                        Snackbar.LENGTH_LONG,
+                    )
+                    .setAction(R.string.undo) {
+                        viewModel.unhidePost(hiddenPost.postId, hiddenPost.instance)
+                    }
+                    .show()
+            }
 
-        if (adapter?.items.isNullOrEmpty()) {
-            viewModel.fetchInitialPage()
+            if (adapter?.items.isNullOrEmpty()) {
+                viewModel.fetchInitialPage()
+            }
         }
 
         runAfterLayout {

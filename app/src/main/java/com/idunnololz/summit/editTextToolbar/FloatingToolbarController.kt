@@ -79,7 +79,7 @@ class FloatingToolbarController(
         updateToolbar()
     }
 
-    private fun updateToolbar() {
+    fun updateToolbar() {
         if (isImeOpen) {
             floatingPlaceholder.visibility = View.GONE
             floatingViews.forEach { it.visibility = View.GONE }

@@ -45,7 +45,7 @@ import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.toErrorMessage
 import com.idunnololz.summit.video.VideoState
 
-class ListingItemAdapter(
+class PostListAdapter(
     private val postListViewBuilder: PostListViewBuilder,
     private val context: Context,
     private var postListEngine: PostListEngine,

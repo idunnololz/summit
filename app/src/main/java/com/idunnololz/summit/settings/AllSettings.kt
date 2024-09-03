@@ -16,6 +16,7 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
@@ -83,6 +84,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_UPLOAD_IMAGES_TO_IMGUR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
@@ -1716,6 +1718,40 @@ class MiscSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
     )
+    val uploadImagesToImgur = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_imgur),
+        context.getString(R.string.use_imgur_desc),
+        relatedKeys = listOf(KEY_UPLOAD_IMAGES_TO_IMGUR),
+    )
+    val animationLevel = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.animation_level),
+        context.getString(R.string.animation_level_misc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.animation_level_min,
+                context.getString(R.string.minimum),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.animation_level_low,
+                context.getString(R.string.low),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.animation_level_max,
+                context.getString(R.string.max),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(
+            KEY_ANIMATION_LEVEL,
+        ),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -1730,6 +1766,8 @@ class MiscSettings @Inject constructor(
         showEditedDate,
         imagePreviewHideUiByDefault,
         autoPlayVideos,
+        uploadImagesToImgur,
+        animationLevel,
     )
 }
 

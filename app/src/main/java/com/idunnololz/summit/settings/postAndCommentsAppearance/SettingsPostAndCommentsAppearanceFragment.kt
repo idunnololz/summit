@@ -31,8 +31,10 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -55,6 +57,9 @@ class SettingsPostAndCommentsAppearanceFragment :
 
     @Inject
     lateinit var settings: PostAndCommentsAppearanceSettings
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -133,6 +138,7 @@ class SettingsPostAndCommentsAppearanceFragment :
                 .createAndShow(childFragmentManager, "reset_comment_to_default_styles")
         }
 
+        binding.demoViewContainer.setup(animationsHelper)
         binding.demoViewContainer.adapter = adapter
         binding.demoViewContainer.setHasFixedSize(true)
         binding.demoViewContainer.layoutManager = LinearLayoutManager(context)

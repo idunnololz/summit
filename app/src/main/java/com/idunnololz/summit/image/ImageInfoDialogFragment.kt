@@ -16,13 +16,16 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentImageInfoBinding
 import com.idunnololz.summit.databinding.ImageInfoInfoItemBinding
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ImageInfoDialogFragment :
@@ -43,6 +46,9 @@ class ImageInfoDialogFragment :
     private val args by navArgs<ImageInfoDialogFragmentArgs>()
 
     private val viewModel: ImageInfoViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,6 +82,7 @@ class ImageInfoDialogFragment :
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
+            recyclerView.setup(animationsHelper)
 
             viewModel.model.observe(viewLifecycleOwner) {
                 when (it) {

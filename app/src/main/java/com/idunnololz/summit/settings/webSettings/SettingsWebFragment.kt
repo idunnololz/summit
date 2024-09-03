@@ -25,10 +25,12 @@ import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
@@ -48,6 +50,9 @@ class SettingsWebFragment :
 
     @Inject
     lateinit var lemmyWebSettings: LemmyWebSettings
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private val backPressHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -292,6 +297,7 @@ class SettingsWebFragment :
         }
 
         with(binding) {
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter

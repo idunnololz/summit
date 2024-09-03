@@ -22,10 +22,12 @@ import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +55,9 @@ class SavedCommentsFragment :
 
     @Inject
     lateinit var accountManager: AccountManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -243,6 +248,7 @@ class SavedCommentsFragment :
                 viewLifecycleOwner = this@SavedCommentsFragment.viewLifecycleOwner
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)
             recyclerView.addItemDecoration(

@@ -16,19 +16,25 @@ import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBindi
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel
 import com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListViewModel.BlockedCommunityItem
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsCommunityBlockListFragment :
     BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
 
     private val viewModel: SettingsAccountBlockListViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,6 +74,7 @@ class SettingsCommunityBlockListFragment :
                     viewModel.unblockCommunity(it)
                 },
             )
+            binding.recyclerView.setup(animationsHelper)
             binding.recyclerView.setHasFixedSize(true)
             binding.recyclerView.adapter = adapter
             binding.recyclerView.layoutManager = LinearLayoutManager(context)

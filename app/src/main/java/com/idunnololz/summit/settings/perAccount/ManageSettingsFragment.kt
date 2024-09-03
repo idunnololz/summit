@@ -18,13 +18,16 @@ import com.idunnololz.summit.databinding.ImportSettingItemBinding
 import com.idunnololz.summit.databinding.ManageSettingsInstructionItemBinding
 import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ManageSettingsFragment :
@@ -33,6 +36,9 @@ class ManageSettingsFragment :
 
     private val args: ManageSettingsFragmentArgs by navArgs()
     private val viewModel: ManageSettingsViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,6 +109,7 @@ class ManageSettingsFragment :
                 }
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)

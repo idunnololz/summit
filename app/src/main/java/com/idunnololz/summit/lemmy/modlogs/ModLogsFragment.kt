@@ -29,6 +29,7 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
@@ -38,6 +39,7 @@ import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.escapeMarkdown
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -55,6 +57,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -147,6 +152,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 fetchPageIfLoadItem(lastPos + 1)
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = layoutManager
             recyclerView.adapter = adapter

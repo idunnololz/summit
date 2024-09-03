@@ -1780,6 +1780,13 @@
     <string name="comments_with_new_comments_format">%1$s (%2$s New)</string>
     <string name="desc_no_comments">No comments yet.</string>
     <string name="add_a_comment">Add a comment</string>
+    <string name="use_imgur">Use Imgur</string>
+    <string name="use_imgur_desc">When enabled, images will be uploaded to [Imgur](https://imgur.com/) instead of Lemmy.</string>
+    <string name="animation_level">Animation level</string>
+    <string name="animation_level_misc">Controls which animations play in the app. A higher animation level means more animations are played.</string>
+    <string name="minimum">Minimum</string>
+    <string name="low">Low</string>
+    <string name="max">Max</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

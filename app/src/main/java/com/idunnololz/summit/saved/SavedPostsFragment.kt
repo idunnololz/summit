@@ -14,7 +14,7 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
 import com.idunnololz.summit.lemmy.community.Item
-import com.idunnololz.summit.lemmy.community.ListingItemAdapter
+import com.idunnololz.summit.lemmy.community.PostListAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -22,9 +22,11 @@ import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,7 +34,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavigator {
 
-    private var adapter: ListingItemAdapter? = null
+    private var adapter: PostListAdapter? = null
 
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
@@ -43,13 +45,16 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
 
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val parentFragment = parentFragment as SavedTabbedFragment
         val viewModel = parentFragment.viewModel
 
-        adapter = ListingItemAdapter(
+        adapter = PostListAdapter(
             postListViewBuilder,
             requireContext(),
             viewModel.postListEngine,
@@ -294,6 +299,7 @@ class SavedPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavi
                 viewLifecycleOwner = this@SavedPostsFragment.viewLifecycleOwner
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)
             recyclerView.setupDecoratorsForPostList(preferences)
