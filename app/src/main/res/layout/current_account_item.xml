@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:paddingVertical="@dimen/padding"
     android:paddingHorizontal="@dimen/padding_half"
+    android:background="?selectableItemBackground"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -29,9 +30,11 @@
         android:layout_marginStart="@dimen/padding_half"
         android:layout_marginEnd="@dimen/padding"
         android:layout_marginTop="@dimen/padding_quarter"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/image"
         app:layout_constraintEnd_toStartOf="@+id/settings"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/instance"/>
 
     <TextView
         android:id="@+id/instance"
@@ -44,9 +47,11 @@
         android:ellipsize="end"
         android:layout_marginEnd="@dimen/padding"
         android:layout_marginTop="@dimen/padding_quarter"
+        app:layout_goneMarginBottom="@dimen/padding_quarter"
         app:layout_constraintStart_toStartOf="@+id/name"
         app:layout_constraintEnd_toStartOf="@+id/settings"
-        app:layout_constraintTop_toBottomOf="@+id/name"/>
+        app:layout_constraintTop_toBottomOf="@+id/name"
+        app:layout_constraintBottom_toTopOf="@+id/sign_out"/>
 
     <ImageView
         android:id="@+id/settings"
@@ -70,6 +75,7 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toBottomOf="@+id/instance"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/name"
         app:layout_constraintEnd_toEndOf="parent"/>
 

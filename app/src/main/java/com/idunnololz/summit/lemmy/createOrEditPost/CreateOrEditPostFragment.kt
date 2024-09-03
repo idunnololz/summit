@@ -50,6 +50,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -58,6 +59,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
@@ -96,6 +98,9 @@ class CreateOrEditPostFragment :
 
     @Inject
     lateinit var mentionsHelper: MentionsHelper
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -642,6 +647,7 @@ class CreateOrEditPostFragment :
         binding.communitySuggestionsRecyclerView.apply {
             adapter = this@CreateOrEditPostFragment.adapter
             setHasFixedSize(true)
+            setup(animationsHelper)
             layoutManager = LinearLayoutManager(context)
         }
 

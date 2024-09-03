@@ -22,11 +22,13 @@ import com.idunnololz.summit.databinding.DialogFragmentImportSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingItemBinding
 import com.idunnololz.summit.databinding.ImportSettingsFromBackupsBinding
 import com.idunnololz.summit.settings.backupAndRestore.ImportSettingsViewModel.SettingsDataPreview
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -53,6 +55,9 @@ class ImportSettingsDialogFragment :
 
     @Inject
     lateinit var settingsBackupManager: SettingsBackupManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private val chooseFileLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -184,6 +189,7 @@ class ImportSettingsDialogFragment :
 
         with(b) {
             recyclerView.apply {
+                setup(animationsHelper)
                 adapter = BackupsAdapter(
                     backups,
                     onBackupClick = {

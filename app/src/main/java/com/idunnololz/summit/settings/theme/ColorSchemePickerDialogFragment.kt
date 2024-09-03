@@ -21,9 +21,11 @@ import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.PreferencesViewModel
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -49,6 +51,9 @@ class ColorSchemePickerDialogFragment :
     @Inject
     lateinit var themeManager: ThemeManager
 
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -73,6 +78,7 @@ class ColorSchemePickerDialogFragment :
         val context = requireContext()
 
         with(binding) {
+            recyclerView.setup(animationsHelper)
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = ColorSchemeAdapter(context) {

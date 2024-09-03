@@ -53,6 +53,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -61,6 +62,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
@@ -84,6 +86,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
@@ -301,6 +306,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             if (!wasLoadedBefore && savedInstanceState == null) {
                 title.alpha = 0f
             }
+
+            recyclerView.setup(animationsHelper)
         }
 
         val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)

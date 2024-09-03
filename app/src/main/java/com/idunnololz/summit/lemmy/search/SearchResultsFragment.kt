@@ -63,6 +63,7 @@ import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.CustomLinkMovementMethod
@@ -70,6 +71,7 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.appendLink
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.isLoading
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -98,6 +100,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private var adapter: SearchResultAdapter? = null
 
@@ -251,6 +256,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 fetchPageIfLoadItem(lastPos + 1)
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = layoutManager

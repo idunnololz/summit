@@ -1134,7 +1134,7 @@ class PostAdapter(
                     }
                 }
 
-                if (!isLoaded) {
+                if (!isLoaded || !rawData.isCommentsLoaded) {
                     finalItems += listOf(ProgressOrErrorItem())
                 } else {
                     if (commentItems.isEmpty()) {

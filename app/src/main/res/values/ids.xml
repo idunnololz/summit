@@ -225,4 +225,7 @@
     <item name="make_available_offline" type="id" />
     <item name="pa_mark_post_as_read" type="id" />
     <item name="pa_mark_post_as_unread" type="id" />
+    <item name="animation_level_min" type="id" />
+    <item name="animation_level_low" type="id" />
+    <item name="animation_level_max" type="id" />
 </resources>

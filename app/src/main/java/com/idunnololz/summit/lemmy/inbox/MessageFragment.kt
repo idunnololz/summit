@@ -39,9 +39,11 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -78,6 +80,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     @Inject
     lateinit var preferences: Preferences
 
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -105,7 +110,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
 
         binding.toolbar.setNavigationIcon(
-            com.google.android.material.R.drawable.ic_arrow_back_black_24,
+            R.drawable.baseline_arrow_back_24,
         )
         binding.toolbar.setNavigationIconTint(
             context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
@@ -527,6 +532,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 adapter.contentMaxWidth = recyclerView.measuredWidth
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
             recyclerView.addItemDecoration(
@@ -545,6 +551,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     isSingleComment = false,
                     isNativePost = true,
                     accountInstance = viewModel.apiInstance,
+                    isCommentsLoaded = true,
                 ),
             )
 

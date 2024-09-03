@@ -16,8 +16,10 @@ import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -34,6 +36,9 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +131,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
             }
             binding.fab.setup(preferences)
 
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(context)

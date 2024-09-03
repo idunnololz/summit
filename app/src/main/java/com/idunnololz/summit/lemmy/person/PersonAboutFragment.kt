@@ -25,9 +25,11 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,6 +40,9 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -123,6 +128,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         adapter.setData(data)
 
         binding.recyclerView.apply {
+            setup(animationsHelper)
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
             this.adapter = adapter

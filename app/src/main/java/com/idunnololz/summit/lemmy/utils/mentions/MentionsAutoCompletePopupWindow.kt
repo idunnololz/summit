@@ -10,12 +10,15 @@ import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.MentionsPopupBinding
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.setup
 
 class MentionsAutoCompletePopupWindow(
     context: Context,
     adapterFactory: MentionsResultAdapter.Factory,
+    animationsHelper: AnimationsHelper,
     val onItemSelected: (String) -> Unit,
 ) : PopupWindow(context) {
 
@@ -24,6 +27,7 @@ class MentionsAutoCompletePopupWindow(
 
     init {
         contentView = binding.apply {
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(false)
             recyclerView.adapter = adapter

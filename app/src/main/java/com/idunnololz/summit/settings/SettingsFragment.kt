@@ -17,10 +17,12 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
 import com.idunnololz.summit.settings.SettingPath.getPageName
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -36,6 +38,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     @Inject
     lateinit var mainSettings: MainSettings
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -84,6 +89,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         }
 
         with(binding) {
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
 

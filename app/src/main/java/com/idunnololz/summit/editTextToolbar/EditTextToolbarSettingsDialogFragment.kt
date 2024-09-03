@@ -15,10 +15,12 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentEditTextToolbarSettingsBinding
 import com.idunnololz.summit.databinding.TextFieldToolbarOptionItemBinding
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,6 +45,9 @@ class EditTextToolbarSettingsDialogFragment :
     lateinit var textFieldToolbarManager: TextFieldToolbarManager
 
     private var adapter: ReorderableListAdapter? = null
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,6 +112,7 @@ class EditTextToolbarSettingsDialogFragment :
             this@EditTextToolbarSettingsDialogFragment.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
+            recyclerView.setup(animationsHelper)
             recyclerView.setHasFixedSize(true)
 
             adapter.setRecyclerView(recyclerView)

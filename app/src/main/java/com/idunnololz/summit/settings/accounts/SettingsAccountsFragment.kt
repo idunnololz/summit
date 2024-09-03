@@ -14,9 +14,11 @@ import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.databinding.FragmentSettingsAccountsBinding
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,6 +31,9 @@ class SettingsAccountsFragment : BaseFragment<FragmentSettingsAccountsBinding>()
 
     @Inject
     lateinit var guestAccountManager: GuestAccountManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,6 +98,7 @@ class SettingsAccountsFragment : BaseFragment<FragmentSettingsAccountsBinding>()
                 }
             }
 
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter

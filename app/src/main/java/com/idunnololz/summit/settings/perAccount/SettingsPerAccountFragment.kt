@@ -14,9 +14,11 @@ import com.idunnololz.summit.settings.PerAccountSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.SettingsFragmentDirections
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.summitCommunityPage
@@ -34,6 +36,9 @@ class SettingsPerAccountFragment : BaseFragment<FragmentSettingsPerAccountBindin
 
     @Inject
     lateinit var settings: PerAccountSettings
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,6 +106,7 @@ class SettingsPerAccountFragment : BaseFragment<FragmentSettingsPerAccountBindin
         val context = requireContext()
 
         with(binding) {
+            recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
 

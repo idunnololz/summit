@@ -28,20 +28,24 @@ import com.idunnololz.summit.tabs.isSubscribedCommunity
 import com.idunnololz.summit.tabs.toTab
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import javax.inject.Inject
 
 typealias OnCommunitySelected = (Either<UserCommunityItem, CommunityRef>, resetTab: Boolean) -> Unit
 
 class CommunitiesPaneController @AssistedInject constructor(
     private val offlineManager: OfflineManager,
     private val tabsManager: TabsManager,
+    private val animationsHelper: AnimationsHelper,
     @Assisted private val viewModel: CommunitiesPaneViewModel,
     @Assisted private val binding: CommunitiesPaneBinding,
     @Assisted private val viewLifecycleOwner: LifecycleOwner,
@@ -103,6 +107,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         }
 
         binding.apply {
+            recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)

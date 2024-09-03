@@ -66,6 +66,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragment
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragmentArgs
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
@@ -158,6 +159,9 @@ class MainActivity :
 
     @Inject
     lateinit var linkFixer: LinkFixer
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private val imageViewerLauncher = registerForActivityResult(
         ImageViewerContract(),
@@ -893,11 +897,17 @@ class MainActivity :
         url: String,
         mimeType: String?,
     ) {
-        val transitionName = sharedElement?.transitionName
+        val transitionName =
+            if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Extras)) {
+                sharedElement?.transitionName
+            } else {
+                null
+            }
 
         val args = ImageViewerActivityArgs(title, url, mimeType, transitionName)
 
         if (transitionName != null) {
+
             val sharedElements = mutableListOf<Pair<View, String>>()
             sharedElements += Pair.create(sharedElement, transitionName)
             if (appBar != null) {

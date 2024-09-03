@@ -11,11 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentPendingActionsBinding
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
@@ -26,6 +29,9 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
         Pending,
         Failed,
     }
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -108,6 +114,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
 
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.setup(animationsHelper)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.addItemDecoration(
             CustomDividerItemDecoration(

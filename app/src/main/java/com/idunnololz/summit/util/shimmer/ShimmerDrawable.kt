@@ -125,6 +125,11 @@ class ShimmerDrawable : Drawable() {
         return shimmer?.fixedWidth ?: -1
     }
 
+    fun setSize(width: Int, height: Int) {
+        shimmer?.fixedWidth = width
+        shimmer?.fixedHeight = height
+    }
+
     private fun offset(start: Float, end: Float, percent: Float): Float {
         return start + (end - start) * percent
     }

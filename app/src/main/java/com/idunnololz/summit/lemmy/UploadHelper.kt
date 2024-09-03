@@ -11,6 +11,7 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.UploadImageResult
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.imgur.ImgurApiClient
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +26,7 @@ class UploadHelper @Inject constructor(
     private val apiListenerManager: ApiListenerManager,
     private val preferences: Preferences,
     private val directoryHelper: DirectoryHelper,
+    private val imgurApiClient: ImgurApiClient,
 ) {
 
     companion object {
@@ -102,6 +104,18 @@ class UploadHelper @Inject constructor(
 
             if (!file.exists()) {
                 return Result.failure(RuntimeException("file_not_found"))
+            }
+
+            if (preferences.uploadImagesToImgur) {
+                return imgurApiClient.uploadFile(file)
+                    .fold(
+                        {
+                            Result.success(UploadImageResult(it.link))
+                        },
+                        {
+                            Result.failure(it)
+                        }
+                    )
             }
 
             for (account in allAccounts) {

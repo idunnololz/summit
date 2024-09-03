@@ -775,6 +775,7 @@ class PostViewModel @Inject constructor(
             isSingleComment = postOrCommentRef?.getOrNull() != null,
             isNativePost = isNativePost(),
             accountInstance = currentAccountView.value?.account?.instance,
+            isCommentsLoaded = comments != null,
         )
 
         postData.postValue(postDataValue)
@@ -879,6 +880,7 @@ class PostViewModel @Inject constructor(
         val isSingleComment: Boolean,
         val isNativePost: Boolean,
         val accountInstance: String?,
+        val isCommentsLoaded: Boolean,
     )
 
     sealed interface ListView {

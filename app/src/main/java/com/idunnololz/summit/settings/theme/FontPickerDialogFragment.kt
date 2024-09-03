@@ -19,8 +19,10 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.toFontAsset
 import com.idunnololz.summit.settings.PreferencesViewModel
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.inflationx.calligraphy3.CalligraphyUtils
@@ -45,6 +47,9 @@ class FontPickerDialogFragment :
 
     @Inject
     lateinit var themeManager: ThemeManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +77,7 @@ class FontPickerDialogFragment :
         ViewPump.init(null)
 
         with(binding) {
+            recyclerView.setup(animationsHelper)
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = FontAdapter(context, preferences) {

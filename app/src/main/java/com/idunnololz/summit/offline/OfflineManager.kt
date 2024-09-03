@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.net.toUri
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.Client
@@ -40,6 +41,7 @@ import okio.sink
 class OfflineManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val directoryHelper: DirectoryHelper,
+    private val lemmyApiClient: LemmyApiClient,
 ) {
 
     companion object {
@@ -575,6 +577,8 @@ class OfflineManager @Inject constructor(
         Utils.deleteDir(imagesDir)
         Utils.deleteDir(videosDir)
         Utils.deleteDir(videoCacheDir)
+
+        lemmyApiClient.clearCache()
 
         imagesDir.mkdirs()
         videosDir.mkdirs()

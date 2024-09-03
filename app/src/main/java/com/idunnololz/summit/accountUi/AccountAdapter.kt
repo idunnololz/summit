@@ -9,7 +9,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.account.GuestOrUserAccount
-import com.idunnololz.summit.databinding.AccountItemBinding
 import com.idunnololz.summit.databinding.AddAccountItemBinding
 import com.idunnololz.summit.databinding.CurrentAccountItemBinding
 import com.idunnololz.summit.databinding.GuestAccountItemBinding
@@ -28,11 +27,9 @@ class AccountAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
-        data class CurrentAccountItem(
-            val accountView: AccountView,
-        ) : Item
         data class AccountItem(
             val accountView: AccountView,
+            val isCurrent: Boolean,
         ) : Item
         data class GuestAccountItem(
             val isSelected: Boolean,
@@ -44,56 +41,53 @@ class AccountAdapter(
 
     private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
         old::class == new::class && when (old) {
-            is Item.CurrentAccountItem ->
-                old.accountView.account.id ==
-                    (new as Item.CurrentAccountItem).accountView.account.id
             is Item.AccountItem ->
                 old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
             is Item.AddAccountItem -> true
             is Item.GuestAccountItem -> true
         }
     }).apply {
-        addItemType(
-            clazz = Item.CurrentAccountItem::class,
-            inflateFn = CurrentAccountItemBinding::inflate,
-        ) { item, b, _ ->
+        addItemType(Item.AccountItem::class, CurrentAccountItemBinding::inflate) { item, b, _ ->
             b.image.load(item.accountView.profileImage)
             b.name.text = item.accountView.account.name
             b.instance.text = item.accountView.account.instance
 
-            if (isSimple) {
+            if (!item.isCurrent) {
                 b.signOut.visibility = View.GONE
-                b.settings.setImageResource(R.drawable.baseline_check_24)
+                b.settings.visibility = View.GONE
 
-                b.settings.setOnClickListener {
-                    onAccountClick(item.accountView.account)
-                }
-                b.signOut.setOnClickListener {}
                 b.root.setOnClickListener {
                     onAccountClick(item.accountView.account)
                 }
             } else {
                 b.signOut.visibility = View.VISIBLE
-                b.settings.setImageResource(R.drawable.baseline_settings_24)
+                b.settings.visibility = View.VISIBLE
 
-                b.settings.setOnClickListener {
-                    onSettingClick()
-                }
-                b.signOut.setOnClickListener {
-                    signOut(item.accountView)
-                }
-                b.root.setOnClickListener {
-                    onPersonClick(item.accountView)
-                }
-            }
-        }
-        addItemType(Item.AccountItem::class, AccountItemBinding::inflate) { item, b, _ ->
-            b.image.load(item.accountView.profileImage)
-            b.name.text = item.accountView.account.name
-            b.instance.text = item.accountView.account.instance
+                if (isSimple) {
+                    b.signOut.visibility = View.GONE
+                    b.settings.setImageResource(R.drawable.baseline_check_24)
 
-            b.root.setOnClickListener {
-                onAccountClick(item.accountView.account)
+                    b.settings.setOnClickListener {
+                        onAccountClick(item.accountView.account)
+                    }
+                    b.signOut.setOnClickListener {}
+                    b.root.setOnClickListener {
+                        onAccountClick(item.accountView.account)
+                    }
+                } else {
+                    b.signOut.visibility = View.VISIBLE
+                    b.settings.setImageResource(R.drawable.baseline_settings_24)
+
+                    b.settings.setOnClickListener {
+                        onSettingClick()
+                    }
+                    b.signOut.setOnClickListener {
+                        signOut(item.accountView)
+                    }
+                    b.root.setOnClickListener {
+                        onPersonClick(item.accountView)
+                    }
+                }
             }
         }
         addItemType(Item.AddAccountItem::class, AddAccountItemBinding::inflate) { item, b, _ ->
@@ -135,7 +129,7 @@ class AccountAdapter(
         val showGuestAccount = accounts.isNotEmpty() && showGuestAccount
 
         if (currentAccount != null) {
-            newItems.add(Item.CurrentAccountItem(currentAccount))
+            newItems.add(Item.AccountItem(currentAccount, isCurrent = true))
         }
 
         if (currentAccount == null && showGuestAccount) {
@@ -144,7 +138,7 @@ class AccountAdapter(
 
         accounts.mapNotNullTo(newItems) {
             if (it.account.id != currentAccount?.account?.id) {
-                Item.AccountItem(it)
+                Item.AccountItem(it, isCurrent = false)
             } else {
                 null
             }

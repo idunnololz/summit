@@ -21,8 +21,10 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarConfig
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
+import com.idunnololz.summit.util.PreferenceUtil.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
@@ -107,6 +109,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TEXT_FIELD_TOOLBAR_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_UPLOAD_IMAGES_TO_IMGUR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
@@ -973,6 +976,26 @@ class Preferences(
                 .apply()
         }
 
+    var uploadImagesToImgur: Boolean
+        get() = prefs.getBoolean(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_UPLOAD_IMAGES_TO_IMGUR, value)
+                .apply()
+        }
+
+    var animationLevel: AnimationsHelper.AnimationLevel
+        get() = AnimationsHelper.AnimationLevel.parse(
+                prefs.getInt(
+                    KEY_ANIMATION_LEVEL,
+                    AnimationsHelper.AnimationLevel.Max.animationLevel)
+            )
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_ANIMATION_LEVEL, value.animationLevel)
+                .apply()
+        }
+
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
             ?: 100
@@ -1026,5 +1049,9 @@ class Preferences(
 
     fun clear() {
         prefs.edit().clear().commit()
+    }
+
+    fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 }

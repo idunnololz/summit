@@ -1,6 +1,8 @@
 package com.idunnololz.summit.settings.util
 
+import android.graphics.RectF
 import android.view.View
+import android.widget.TextView
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
@@ -11,6 +13,9 @@ import com.idunnololz.summit.databinding.SettingColorItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
+import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.ColorSettingItem
@@ -20,6 +25,10 @@ import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
+import com.idunnololz.summit.util.ContentUtils.isUrlVideo
+import com.idunnololz.summit.util.CustomLinkMovementMethod
+import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.skydoves.colorpickerview.ColorPickerDialog
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 
@@ -60,7 +69,8 @@ fun OnOffSettingItem.bindTo(
     b.title.text = this.title
     if (this.description != null) {
         b.desc.visibility = View.VISIBLE
-        b.desc.text = this.description
+
+        b.desc.text = LemmyTextHelper.getSpannable(b.root.context, description)
     } else {
         b.desc.visibility = View.GONE
     }

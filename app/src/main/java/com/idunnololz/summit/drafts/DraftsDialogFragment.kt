@@ -26,14 +26,17 @@ import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
 import com.idunnololz.summit.databinding.DraftLoadingItemBinding
 import com.idunnololz.summit.databinding.EmptyDraftItemBinding
 import com.idunnololz.summit.databinding.PostDraftItemBinding
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DraftsDialogFragment :
@@ -56,6 +59,9 @@ class DraftsDialogFragment :
     private val args by navArgs<DraftsDialogFragmentArgs>()
 
     private val viewModel: DraftsViewModel by viewModels()
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -188,6 +194,7 @@ class DraftsDialogFragment :
             val layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = layoutManager
+            recyclerView.setup(animationsHelper)
             recyclerView.setHasFixedSize(true)
 
             fun fetchPageIfLoadItem(position: Int) {

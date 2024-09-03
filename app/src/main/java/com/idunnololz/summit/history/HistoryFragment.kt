@@ -20,8 +20,10 @@ import com.idunnololz.summit.databinding.HistoryEntryItemBinding
 import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
@@ -48,6 +50,9 @@ class HistoryFragment :
 
     @Inject
     lateinit var historyManager: HistoryManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
         override fun onHistoryChanged() {
@@ -145,6 +150,7 @@ class HistoryFragment :
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.setup(animationsHelper)
 
         binding.fastScroller.setRecyclerView(binding.recyclerView)
 

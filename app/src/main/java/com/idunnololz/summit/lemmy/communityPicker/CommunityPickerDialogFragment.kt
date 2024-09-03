@@ -18,10 +18,12 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +55,9 @@ class CommunityPickerDialogFragment :
 
     @Inject
     lateinit var userCommunitiesManager: UserCommunitiesManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     @Parcelize
     data class Result(
@@ -124,6 +129,7 @@ class CommunityPickerDialogFragment :
             resultsRecyclerView.adapter = adapter
             resultsRecyclerView.setHasFixedSize(true)
             resultsRecyclerView.layoutManager = LinearLayoutManager(context)
+            resultsRecyclerView.setup(animationsHelper)
 
             viewModel.searchResults.observe(viewLifecycleOwner) {
                 when (it) {

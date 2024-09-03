@@ -28,6 +28,7 @@ import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
 import com.idunnololz.summit.main.ActivityInsets
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 

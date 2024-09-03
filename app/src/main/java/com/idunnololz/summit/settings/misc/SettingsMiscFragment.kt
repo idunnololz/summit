@@ -1,15 +1,19 @@
 package com.idunnololz.summit.settings.misc
 
+import android.graphics.RectF
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsMiscBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -19,7 +23,10 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.CustomLinkMovementMethod
+import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -27,6 +34,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -205,6 +213,37 @@ class SettingsMiscFragment :
                 preferences.autoPlayVideos = it
             },
         )
+        settings.uploadImagesToImgur.bindTo(
+            binding.uploadImagesToImgur,
+            { preferences.uploadImagesToImgur },
+            {
+                preferences.uploadImagesToImgur = it
+            },
+        )
+        binding.uploadImagesToImgur.desc.movementMethod = CustomLinkMovementMethod().apply {
+            onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                override fun onClick(
+                    textView: TextView,
+                    url: String,
+                    text: String,
+                    rect: RectF,
+                ): Boolean {
+                    onLinkClick(url, text, LinkContext.Text)
+                    return true
+                }
+            }
+            onLinkLongClickListener = DefaultLinkLongClickListener(requireContext()) { url, text ->
+                getMainActivity()?.showMoreLinkOptions(url, text)
+            }
+        }
+        settings.animationLevel.bindTo(
+            binding.animationLevel,
+            { convertAnimationLevelToOptionId(preferences.animationLevel) },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "animationLevel")
+            },
+        )
 
         if (BuildConfig.DEBUG) {
             settings.rotateInstanceOnUploadFail.bindTo(
@@ -243,6 +282,23 @@ class SettingsMiscFragment :
         }
     }
 
+    private fun convertAnimationLevelToOptionId(animationLevel: AnimationsHelper.AnimationLevel): Int {
+        return when(animationLevel) {
+            AnimationsHelper.AnimationLevel.Critical -> R.id.animation_level_min
+            AnimationsHelper.AnimationLevel.Navigation -> R.id.animation_level_low
+            AnimationsHelper.AnimationLevel.Polish -> R.id.animation_level_low
+            AnimationsHelper.AnimationLevel.Extras -> R.id.animation_level_low
+            AnimationsHelper.AnimationLevel.Max -> R.id.animation_level_max
+        }
+    }
+
+    private fun convertOptionIdToAnimationLevel(@IdRes id: Int) = when (id) {
+        R.id.animation_level_min -> AnimationsHelper.AnimationLevel.Critical
+        R.id.animation_level_low -> AnimationsHelper.AnimationLevel.Navigation
+        R.id.animation_level_max -> AnimationsHelper.AnimationLevel.Max
+        else -> AnimationsHelper.AnimationLevel.Max
+    }
+
     private fun convertOptionIdToThresholdMs(@IdRes id: Int) = when (id) {
         R.id.warn_reply_to_old_dont_warn -> 0L
         R.id.warn_reply_to_old_1_day -> A_DAY_MS
@@ -272,6 +328,9 @@ class SettingsMiscFragment :
                     preferences.warnReplyToOldContentThresholdMs = threshold
                 }
                 GlobalSettings.refresh(preferences)
+            }
+            settings.animationLevel.id -> {
+                preferences.animationLevel = convertOptionIdToAnimationLevel(value as Int)
             }
         }
 

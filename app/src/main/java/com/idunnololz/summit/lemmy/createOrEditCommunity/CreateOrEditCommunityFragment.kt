@@ -642,6 +642,10 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     )
                 }
             }
+
+            root.post {
+                floatingToolbarController?.updateToolbar()
+            }
         }
     }
 

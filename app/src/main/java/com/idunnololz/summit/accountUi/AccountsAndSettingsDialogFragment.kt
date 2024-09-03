@@ -15,10 +15,13 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
+import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setSizeDynamically
+import com.idunnololz.summit.util.ext.setup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -43,6 +46,9 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
 
     @Inject
     lateinit var guestAccountManager: GuestAccountManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onStart() {
         super.onStart()
@@ -106,6 +112,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
             recyclerView.setHasFixedSize(false)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
+            recyclerView.setup(animationsHelper)
 
             settings.setOnClickListener {
                 requireMainActivity().openSettings()

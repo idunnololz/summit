@@ -42,6 +42,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.search.SuggestionProvider
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
@@ -49,6 +50,7 @@ import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,6 +79,9 @@ class SearchTabbedFragment :
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private val searchViewBackPressedHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -293,6 +298,7 @@ class SearchTabbedFragment :
 
             this@SearchTabbedFragment.searchSuggestionsAdapter = searchSuggestionsAdapter
 
+            searchSuggestionsRecyclerView.setup(animationsHelper)
             searchSuggestionsRecyclerView.setHasFixedSize(false)
             searchSuggestionsRecyclerView.adapter = searchSuggestionsAdapter
             searchSuggestionsRecyclerView.layoutManager = LinearLayoutManager(context)

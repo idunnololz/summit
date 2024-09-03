@@ -72,6 +72,7 @@ import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.SavedTabbedFragment
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
@@ -82,6 +83,7 @@ import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
@@ -134,6 +136,9 @@ class PostFragment :
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     lateinit var preferences: Preferences
 
@@ -859,6 +864,7 @@ class PostFragment :
                     isSingleComment = false,
                     isNativePost = viewModel.isNativePost(),
                     accountInstance = viewModel.currentAccountView.value?.account?.instance,
+                    isCommentsLoaded = false,
                 ),
             )
             onMainListingItemRetrieved(post)
@@ -938,6 +944,7 @@ class PostFragment :
         }
 
         layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.setup(animationsHelper)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = layoutManager

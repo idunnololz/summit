@@ -27,6 +27,7 @@ import com.idunnololz.summit.lemmy.search.Item
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
@@ -34,6 +35,7 @@ import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -52,6 +54,9 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
     @Inject
     lateinit var offlineManager: OfflineManager
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -166,6 +171,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = layoutManager
             recyclerView.adapter = adapter
+            recyclerView.setup(animationsHelper)
             recyclerView.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
