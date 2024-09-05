@@ -159,21 +159,19 @@ class ImageViewerActivity :
         window.sharedElementReturnTransition = SharedElementTransition()
 //        window.sharedElementsUseOverlay = false
 
-        binding.dummyImageView.visibility = View.VISIBLE
-        binding.imageView.visibility = View.INVISIBLE
+        if (savedInstanceState != null) {
+            onSharedElementEnterTransitionEnd()
+        } else {
+            binding.dummyImageView.visibility = View.VISIBLE
+            binding.imageView.visibility = View.INVISIBLE
+        }
         window.sharedElementEnterTransition.addListener(
             object : Transition.TransitionListener {
                 override fun onTransitionStart(p0: Transition?) {
                 }
 
                 override fun onTransitionEnd(p0: Transition?) {
-                    binding.dummyImageView.post {
-                        binding.dummyImageView.transitionName = null
-                        binding.imageView.transitionName = args.transitionName
-
-                        binding.dummyImageView.visibility = View.GONE
-                        binding.imageView.visibility = View.VISIBLE
-                    }
+                    onSharedElementEnterTransitionEnd()
                 }
 
                 override fun onTransitionCancel(p0: Transition?) {
@@ -234,6 +232,16 @@ class ImageViewerActivity :
                     startActivity(Intent.createChooser(shareIntent, "Share Image"))
                 }
             }
+        }
+    }
+
+    private fun onSharedElementEnterTransitionEnd() {
+        binding.dummyImageView.post {
+            binding.dummyImageView.transitionName = null
+            binding.imageView.transitionName = args.transitionName
+
+            binding.dummyImageView.visibility = View.GONE
+            binding.imageView.visibility = View.VISIBLE
         }
     }
 
