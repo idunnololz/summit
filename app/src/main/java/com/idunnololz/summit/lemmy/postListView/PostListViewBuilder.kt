@@ -235,10 +235,8 @@ class PostListViewBuilder @Inject constructor(
         ) -> Unit,
         onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
     ) {
-//        recycle(holder)
-
         if (!isExpanded) {
-            recycle(holder)
+            recycle(holder, cancelFetch = false)
         }
 
         val postView = fetchedPost.postView
@@ -1122,11 +1120,13 @@ class PostListViewBuilder @Inject constructor(
 
     private fun Float.toTextSize(): Float = this * textSizeMultiplier * globalFontSizeMultiplier
 
-    fun recycle(holder: ListingItemViewHolder) {
+    fun recycle(holder: ListingItemViewHolder, cancelFetch: Boolean = true) {
         if (holder.fullContentContainerView != null) {
             lemmyContentHelper.recycleFullContent(holder.fullContentContainerView)
         }
-        offlineManager.cancelFetch(holder.itemView)
+        if (cancelFetch) {
+            offlineManager.cancelFetch(holder.itemView)
+        }
         holder.upvoteCount?.let {
             voteUiHandler.unbindVoteUi(it)
         }
