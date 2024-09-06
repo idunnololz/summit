@@ -235,7 +235,7 @@ class PostListViewBuilder @Inject constructor(
         ) -> Unit,
         onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
     ) {
-        if (!isExpanded) {
+        if (!isExpanded && !holder.layoutShowsFullContent) {
             recycle(holder, cancelFetch = false)
         }
 
