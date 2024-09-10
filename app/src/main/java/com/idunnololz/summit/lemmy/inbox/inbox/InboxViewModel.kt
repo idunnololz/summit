@@ -73,6 +73,7 @@ class InboxViewModel @Inject constructor(
 
     var pauseUnreadUpdates = false
 
+    private var isLoaded = false
     private val allInboxItems: MutableList<InboxListItem> = mutableListOf()
     private var hasMore = true
     private val fetchingPages = mutableSetOf<Int>()
@@ -191,13 +192,18 @@ class InboxViewModel @Inject constructor(
             return
         }
 
-        if (fetchingPages.contains(pageIndex)) {
+        if (force) {
+            if (fetchingPages.contains(pageIndex)) {
+                fetchingPages.remove(pageIndex)
+            }
+        } else if (fetchingPages.contains(pageIndex)) {
             return
         }
 
         fetchingPages.add(pageIndex)
         fetchInboxJob?.cancel()
-        Log.d(TAG, "Loading inbox page $pageIndex. PageType: $pageType")
+        Log.d(TAG, "Loading inbox page - " +
+            "pageIndex: $pageIndex pageType: $pageType force: $force")
 
         inboxUpdate.setIsLoading()
         fetchInboxJob = viewModelScope.launch {
@@ -223,12 +229,18 @@ class InboxViewModel @Inject constructor(
 
                     publishInboxUpdate(scrollToTop = pageIndex == 0 && force)
 
-                    fetchingPages.remove(pageIndex)
+                    withContext(Dispatchers.Main) {
+                        fetchingPages.clear()
+                        isLoaded = true
+                    }
                 }
                 .onFailure {
                     inboxUpdate.postError(it)
 
-                    fetchingPages.remove(pageIndex)
+                    withContext(Dispatchers.Main) {
+                        fetchingPages.clear()
+                        isLoaded = true
+                    }
                 }
         }
     }
@@ -349,7 +361,9 @@ class InboxViewModel @Inject constructor(
             }
         }
 
-        publishInboxUpdate(scrollToTop = false)
+        if (isLoaded) {
+            publishInboxUpdate(scrollToTop = false)
+        }
     }
 
     private fun addData(data: LemmyListSource.PageResult<InboxItem>) {
@@ -361,11 +375,12 @@ class InboxViewModel @Inject constructor(
 
         allInboxItems.addAll(data.items.map { InboxListItem.RegularInboxItem(it) })
 
-        Log.d(TAG, "Data updated! Total items: ${allInboxItems.size}")
+        Log.d(TAG, "Data updated! Total items: ${allInboxItems.size} hasMore: $hasMore")
     }
 
     private fun clearData() {
         hasMore = true
+        isLoaded = false
         allInboxItems.clear()
         fetchingPages.clear()
         conversations = null

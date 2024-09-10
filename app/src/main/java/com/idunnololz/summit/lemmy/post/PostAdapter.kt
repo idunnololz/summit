@@ -1331,16 +1331,18 @@ class PostAdapter(
         notifyItemChanged(pos, Unit)
     }
 
-    fun highlightCommentForever(commentId: CommentId) {
+    fun highlightCommentForever(commentId: CommentId): Int? {
         val pos = getPositionOfComment(commentId)
         if (pos == -1) {
-            return
+            return null
         }
 
         this.highlightedComment = -1
         this.highlightedCommentForever = commentId
 
         notifyItemChanged(pos, Unit)
+
+        return pos
     }
 
     fun clearHighlightComment() {

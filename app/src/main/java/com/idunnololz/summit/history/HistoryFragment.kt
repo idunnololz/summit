@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
@@ -18,8 +19,14 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.databinding.HistoryEntryItemBinding
 import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
+import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -30,6 +37,8 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -54,9 +63,16 @@ class HistoryFragment :
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var preferences: Preferences
+
+    private var slidingPaneController: SlidingPaneController? = null
+
     private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
         override fun onHistoryChanged() {
-            viewModel.loadHistory(force = true)
+            lifecycleScope.launch(Dispatchers.Main) {
+                viewModel.loadHistory(force = true)
+            }
         }
     }
 
@@ -93,7 +109,32 @@ class HistoryFragment :
                         .setMessage(R.string.error_history_entry_corrupt)
                         .createAndShow(this@HistoryFragment, "asdf")
                 } else {
-                    requireMainActivity().launchPage(pageRef, preferMainFragment = true)
+                    when (pageRef) {
+                        is CommentRef -> {
+                            slidingPaneController?.openComment(
+                                instance = pageRef.instance,
+                                commentId = pageRef.id,
+                            )
+                        }
+                        is PostRef -> {
+                            slidingPaneController?.openPost(
+                                instance = pageRef.instance,
+                                id = pageRef.id,
+                                currentCommunity = null,
+                                accountId = null,
+                            )
+                        }
+                        is PersonRef.PersonRefByName,
+                        is CommunityRef.All,
+                        is CommunityRef.AllSubscribed,
+                        is CommunityRef.CommunityRefByName,
+                        is CommunityRef.Local,
+                        is CommunityRef.ModeratedCommunities,
+                        is CommunityRef.MultiCommunity,
+                        is CommunityRef.Subscribed -> {
+                            requireMainActivity().launchPage(pageRef, preferMainFragment = false)
+                        }
+                    }
                 }
             },
         )
@@ -147,15 +188,50 @@ class HistoryFragment :
             }
         }
 
-        binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.setup(animationsHelper)
+        with(binding) {
+            recyclerView.setHasFixedSize(true)
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.setup(animationsHelper)
 
-        binding.fastScroller.setRecyclerView(binding.recyclerView)
+            fastScroller.setRecyclerView(recyclerView)
 
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.loadHistory(force = true)
+            swipeRefreshLayout.setOnRefreshListener {
+                viewModel.loadHistory(force = true)
+            }
+
+            slidingPaneController = SlidingPaneController(
+                fragment = this@HistoryFragment,
+                slidingPaneLayout = slidingPaneLayout,
+                childFragmentManager = childFragmentManager,
+                viewModel = viewModel,
+                globalLayoutMode = preferences.globalLayoutMode,
+                lockPanes = true,
+                retainClosedPosts = preferences.retainLastPost,
+                emptyScreenText = getString(R.string.select_a_post_or_comment),
+                fragmentContainerId = R.id.post_fragment_container,
+            ).apply {
+                onPageSelectedListener = a@{ isOpen ->
+                    if (!isBindingAvailable()) {
+                        return@a
+                    }
+
+                    if (!isOpen) {
+                        val lastSelectedPost = viewModel.lastSelectedItem
+                        if (lastSelectedPost != null) {
+                            // We came from a post...
+//                        adapter?.highlightPost(lastSelectedPost)
+                            viewModel.lastSelectedItem = null
+                        }
+                    } else {
+                        val lastSelectedPost = viewModel.lastSelectedItem
+                        if (lastSelectedPost != null) {
+//                        adapter?.highlightPostForever(lastSelectedPost)
+                        }
+                    }
+                }
+                init()
+            }
         }
 
         addMenuProvider2(

@@ -49,6 +49,8 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     @Inject
     lateinit var preferences: Preferences
 
+    private var argsHandled: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -151,22 +153,41 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
         viewModel.notificationInboxItem.observe(viewLifecycleOwner) {
             it ?: return@observe
+            viewModel.notificationInboxItem.value = null
 
             openMessage(accountId = it.accountId, item = it.inboxItem, instance = it.instance)
 
-            val inboxFragment = childFragmentManager.findFragmentById(R.id.inbox_fragment_container)
-                as? InboxFragment
+            val inboxFragment = inboxFragment
 
             inboxFragment?.viewModel?.markAsRead(it.inboxItem, read = true)
+
+            if (args.refresh) {
+                binding.root.post {
+                    inboxFragment?.refresh(force = true)
+                }
+            }
         }
 
-        if (args.notificationId > 0) {
-            viewModel.findInboxItemFromNotificationId(args.notificationId)
+        if (!argsHandled && savedInstanceState == null) {
+            argsHandled = true
+
+            if (args.notificationId > 0) {
+                viewModel.findInboxItemFromNotificationId(args.notificationId)
+            } else if (args.refresh) {
+                binding.root.post {
+                    val inboxFragment = inboxFragment
+                    inboxFragment?.refresh(force = true)
+                }
+            }
         }
 
         onPageChanged()
         viewModel.updateUnreadCount()
     }
+
+    private val inboxFragment: InboxFragment?
+        get() = childFragmentManager.findFragmentById(R.id.inbox_fragment_container)
+            as? InboxFragment
 
     override fun onResume() {
         super.onResume()

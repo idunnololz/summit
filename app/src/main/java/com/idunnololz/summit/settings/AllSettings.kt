@@ -3,6 +3,7 @@ package com.idunnololz.summit.settings
 import android.content.Context
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.links.PreviewLinkOptions
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -23,6 +24,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_PLAY_VIDEOS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_CACHE_POLICY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
@@ -1461,6 +1463,39 @@ class CacheSettings @Inject constructor(
         context.getString(R.string.clear_media_cache),
         null,
     )
+    val cachePolicy = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.cache_policy),
+        context.getString(R.string.cache_policy_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                CachePolicy.Aggressive.value,
+                context.getString(R.string.aggressive),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CachePolicy.Moderate.value,
+                context.getString(R.string.moderate),
+                null,
+                null,
+                isDefault = true,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CachePolicy.Lite.value,
+                context.getString(R.string.lite),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                CachePolicy.Minimum.value,
+                context.getString(R.string.minimum),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(KEY_CACHE_POLICY),
+    )
     override val allSettings: List<SettingItem> = listOf(
         clearCache,
     )
@@ -1809,6 +1844,12 @@ class LoggingSettings @Inject constructor(
 class HistorySettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
+
+    val viewHistory = BasicSettingItem(
+        null,
+        context.getString(R.string.view_history),
+        null,
+    )
 
     val recordBrowsingHistory = OnOffSettingItem(
         null,

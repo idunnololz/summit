@@ -4,18 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
+import com.idunnololz.summit.cache.CachePolicy
+import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.databinding.FragmentCacheBinding
 import com.idunnololz.summit.offline.OfflineDownloadProgressListener
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.CacheSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
+import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
@@ -24,7 +31,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>() {
+class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>(),
+    SettingValueUpdateCallback {
 
     private var progressListener: OfflineDownloadProgressListener? = null
 
@@ -36,6 +44,12 @@ class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>() {
 
     @Inject
     lateinit var cacheSettings: CacheSettings
+
+    @Inject
+    lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var cachePolicyManager: CachePolicyManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -83,13 +97,8 @@ class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>() {
 //            OfflineManager.instance.deleteOfflineImages()
 //        }
 
-        cacheSettings.clearCache.bindTo(binding.clearMediaCache) {
-            offlineManager.clearOfflineData()
 
-            refreshUi()
-        }
-
-        refreshUi()
+        updateRendering()
     }
 
     override fun onDestroyView() {
@@ -97,7 +106,7 @@ class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>() {
         super.onDestroyView()
     }
 
-    private fun refreshUi() {
+    private fun updateRendering() {
         if (!isBindingAvailable()) return
 
         val context = requireContext()
@@ -134,5 +143,29 @@ class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>() {
                 ),
             ),
         )
+        cacheSettings.clearCache.bindTo(binding.clearMediaCache) {
+            offlineManager.clearOfflineData()
+
+            updateRendering()
+        }
+        cacheSettings.cachePolicy.bindTo(
+            binding.cachePolicy,
+            { preferences.cachePolicy.value },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "cachePolicy")
+            },
+        )
+    }
+
+    override fun updateValue(key: Int, value: Any?) {
+        when (key) {
+            cacheSettings.cachePolicy.id -> {
+                preferences.cachePolicy = CachePolicy.parse(value as Int)
+                cachePolicyManager.refreshCachePolicy()
+            }
+        }
+
+        updateRendering()
     }
 }

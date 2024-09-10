@@ -26,6 +26,7 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
             error.printStackTrace(pw)
             val stackTrace = sw.toString() // stack trace as a string
 
+
             ErrorDialogFragment()
                 .apply {
                     arguments = ErrorDialogFragmentArgs(

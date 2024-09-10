@@ -11,6 +11,7 @@
 
     <action android:id="@+id/action_global_login" app:destination="@id/login"/>
     <action android:id="@+id/action_global_community" app:destination="@id/community"/>
+    <action android:id="@+id/action_global_history" app:destination="@id/historyFragment"/>
     <action
         android:id="@+id/action_global_personTabbedFragment2"
         app:destination="@id/personTabbedFragment2"
@@ -87,6 +88,10 @@
             android:name="notificationId"
             android:defaultValue="0"
             app:argType="integer" />
+        <argument
+            android:name="refresh"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/inboxFragment"

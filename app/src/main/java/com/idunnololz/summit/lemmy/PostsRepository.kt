@@ -60,7 +60,7 @@ class PostsRepository @AssistedInject constructor(
         listingType = ListingType.All,
     )
 
-    private var allPosts = mutableListOf<PostData>()
+    private var allPosts = listOf<PostData>()
     private var seenPosts = mutableSetOf<String>()
     var persistentErrors: List<Exception> = listOf()
 
@@ -357,7 +357,7 @@ class PostsRepository @AssistedInject constructor(
 
     suspend fun onHiddenPostsChange() {
         val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
-        allPosts.retainAll { !hiddenPosts.contains(it.post.postView.post.id) }
+        allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) }
     }
 
     private fun transformPostWithLocalData(fetchedPost: FetchedPost): FetchedPost {
@@ -422,6 +422,7 @@ class PostsRepository @AssistedInject constructor(
         hiddenPosts: Set<PostId>,
         force: Boolean,
     ) {
+        val mutableAllPosts = allPosts.toMutableList()
         for (fetchedPost in newPosts) {
             val post = fetchedPost.postView
             val uniquePostKey = post.getUniqueKey()
@@ -488,7 +489,7 @@ class PostsRepository @AssistedInject constructor(
             consecutiveFilteredPostsByType = 0
 
             if (seenPosts.add(uniquePostKey)) {
-                allPosts.add(
+                mutableAllPosts.add(
                     PostData(
                         post = fetchedPost,
                         postPageIndexInternal = pageIndex,
@@ -497,10 +498,12 @@ class PostsRepository @AssistedInject constructor(
                 )
             }
         }
+
+        allPosts = mutableAllPosts
     }
 
     private fun deleteFromPage(minPageInternal: Int) {
-        allPosts.retainAll {
+        allPosts = allPosts.filter {
             val keep = it.postPageIndexInternal < minPageInternal
             if (!keep) {
                 seenPosts.remove(it.post.postView.getUniqueKey())
