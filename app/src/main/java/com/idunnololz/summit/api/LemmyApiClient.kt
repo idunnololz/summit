@@ -110,6 +110,7 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils.serializeToMap
@@ -136,6 +137,7 @@ class LemmyApiClient(
     private val apiListenerManager: ApiListenerManager,
     private val userAgent: String,
     private val preferences: Preferences,
+    private val cachePolicyManager: CachePolicyManager,
 ) {
 
     companion object {
@@ -172,36 +174,53 @@ class LemmyApiClient(
     }
 
     private var api = LemmyApi.getInstance(
-        context,
-        preferences.guestAccountSettings?.instance
+        context = context,
+        cachePolicyManager = cachePolicyManager,
+        instance = preferences.guestAccountSettings?.instance
             ?: DEFAULT_INSTANCE,
     )
-    val okHttpClient = LemmyApi.okHttpClient(context, userAgent)
+    val okHttpClient = LemmyApi.okHttpClient(
+        context = context,
+        cachePolicyManager = cachePolicyManager,
+        userAgent = userAgent
+    )
 
     class Factory @Inject constructor(
         @ApplicationContext private val context: Context,
         private val apiListenerManager: ApiListenerManager,
         private val preferences: Preferences,
+        private val cachePolicyManager: CachePolicyManager,
     ) {
-        fun create() = LemmyApiClient(context, apiListenerManager, preferences)
+        fun create() = LemmyApiClient(
+            context = context,
+            apiListenerManager = apiListenerManager,
+            preferences = preferences,
+            cachePolicyManager = cachePolicyManager
+        )
     }
 
     @Inject constructor(
         @ApplicationContext context: Context,
         apiListenerManager: ApiListenerManager,
         preferences: Preferences,
-    ) : this(context, apiListenerManager, LinkUtils.USER_AGENT, preferences)
+        cachePolicyManager: CachePolicyManager,
+    ) : this(context, apiListenerManager, LinkUtils.USER_AGENT, preferences, cachePolicyManager)
 
     fun changeInstance(newInstance: String) {
-        api = LemmyApi.getInstance(context, newInstance)
+        api = LemmyApi.getInstance(
+            context = context,
+            cachePolicyManager = cachePolicyManager,
+            instance = newInstance
+        )
 
         instanceFlow.value = api.instance
     }
 
     fun defaultInstance() {
         api = LemmyApi.getInstance(
-            context,
-            preferences.guestAccountSettings?.instance
+            context = context,
+            cachePolicyManager = cachePolicyManager,
+            instance = preferences.guestAccountSettings?.instance
                 ?: DEFAULT_INSTANCE,
         )
 

@@ -5,24 +5,35 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccountLiveData
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.filterLists.ContentFiltersManager
+import com.idunnololz.summit.lemmy.CommentNodeData
+import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.MessageViewModel.CommentContext
+import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -34,6 +45,7 @@ class AddOrEditCommentViewModel @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val state: SavedStateHandle,
     private val preferences: Preferences,
+    private val contentFiltersManager: ContentFiltersManager,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
@@ -52,6 +64,11 @@ class AddOrEditCommentViewModel @Inject constructor(
      */
     private val lemmyApiClient = lemmyApiClientFactory.create()
 
+    private val commentsFetcher = CommentsFetcher(lemmyApiClient)
+
+    val apiInstance: String
+        get() = lemmyApiClient.instance
+
     val currentAccount = accountManager.currentAccount.asAccountLiveData()
 
     val commentSentEvent = StatefulLiveData<Unit>()
@@ -60,6 +77,8 @@ class AddOrEditCommentViewModel @Inject constructor(
     val currentDraftId = state.getLiveData<Long>("current_draft_id")
 
     val messages = MutableLiveData<List<Message>>(listOf())
+
+    val contextModel = StatefulLiveData<ContextModel>()
 
     fun sendComment(account: Account, postRef: PostRef, parentId: CommentId?, content: String) {
         viewModelScope.launch {
@@ -194,4 +213,85 @@ class AddOrEditCommentViewModel @Inject constructor(
     fun dismissMessage(message: Message) {
         messages.value = (messages.value ?: listOf()).filter { it != message }
     }
+
+    fun showFullContext(commentView: CommentView, force: Boolean) {
+        contextModel.setIsLoading()
+
+        val postId = commentView.post.id
+        val commentPath = commentView.comment.path
+
+        viewModelScope.launch {
+            val finalTopCommentId = if (commentPath != null) {
+                val commentIds = commentPath.split(".").map { it.toInt() }
+                val topCommentId = commentIds.firstOrNull { it != 0 }
+
+                if (topCommentId == null) {
+                    contextModel.setError(RuntimeException("No context found."))
+                    return@launch
+                }
+                topCommentId
+            } else {
+                null
+            }
+
+            val postJob = async {
+                lemmyApiClient.fetchPostWithRetry(Either.Left(postId), force)
+            }
+            val commentJob =
+                if (finalTopCommentId != null) {
+                    async {
+                        commentsFetcher
+                            .fetchCommentsWithRetry(
+                                Either.Right(finalTopCommentId),
+                                CommentSortType.Top,
+                                null,
+                                force,
+                            )
+                    }
+                } else {
+                    null
+                }
+
+            val postResult = postJob.await()
+            val commentResult = commentJob?.await()
+
+            if (postResult.isFailure) {
+                contextModel.setError(requireNotNull(postResult.exceptionOrNull()))
+                return@launch
+            }
+
+            if (commentResult?.isFailure == true) {
+                contextModel.setError(requireNotNull(commentResult.exceptionOrNull()))
+                return@launch
+            }
+
+            val tree = CommentTreeBuilder(
+                accountManager,
+                contentFiltersManager,
+            ).buildCommentsTreeListView(
+                post = null,
+                comments = commentResult?.getOrNull(),
+                parentComment = true,
+                pendingComments = null,
+                supplementaryComments = mapOf(),
+                removedCommentIds = setOf(),
+                fullyLoadedCommentIds = setOf(),
+                targetCommentRef = null,
+            )
+
+            contextModel.postValue(
+                ContextModel(
+                    originalCommentView = commentView,
+                    post = requireNotNull(postResult.getOrNull()),
+                    commentTree = tree.firstOrNull(),
+                ),
+            )
+        }
+    }
+
+    data class ContextModel(
+        val originalCommentView: CommentView,
+        val post: PostView,
+        val commentTree: CommentNodeData?,
+    )
 }

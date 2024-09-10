@@ -34,6 +34,12 @@
                 android:layout_height="wrap_content">
 
                 <include
+                    android:id="@+id/view_history"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/track_browsing_history"
                     layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"

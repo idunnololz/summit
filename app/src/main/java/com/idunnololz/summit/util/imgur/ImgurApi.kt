@@ -3,6 +3,7 @@ package com.idunnololz.summit.util.imgur
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -17,10 +18,11 @@ interface ImgurApi {
      * https://apidocs.imgur.com/?version=latest#c85c9dfc-7487-4de2-9ecd-66f727cf3139
      */
     @Multipart
-    @POST("/3/upload")
+    @POST("/3/image")
     suspend fun uploadFile(
+        @Header("Authorization") authorization: String,
         @Part image: MultipartBody.Part?,
-        @Part("name") name: RequestBody? = null
+        @Part("title") title: RequestBody? = null
     ): Response<UploadResponse>
 }
 

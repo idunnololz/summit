@@ -207,6 +207,7 @@ object PreferenceUtil {
 
     const val KEY_UPLOAD_IMAGES_TO_IMGUR = "KEY_UPLOAD_IMAGES_TO_IMGUR"
     const val KEY_ANIMATION_LEVEL = "KEY_ANIMATION_LEVEL"
+    const val KEY_CACHE_POLICY = "KEY_CACHE_POLICY"
 
     // Unused/dead keys
     const val DEAD_KEY_SHARE_IMAGES_DIRECTLY = "KEY_SHARE_IMAGES_DIRECTLY"

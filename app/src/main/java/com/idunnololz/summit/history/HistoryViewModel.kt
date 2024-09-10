@@ -1,8 +1,13 @@
 package com.idunnololz.summit.history
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -18,7 +23,7 @@ import okhttp3.internal.toImmutableList
 class HistoryViewModel @Inject constructor(
     private val apiClient: LemmyApiClient,
     private val historyManager: HistoryManager,
-) : ViewModel() {
+) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     private val entries = mutableListOf<LiteHistoryEntry>()
     private val seenIds = mutableSetOf<Long>()
@@ -31,6 +36,15 @@ class HistoryViewModel @Inject constructor(
     val historyQueryData = StatefulLiveData<HistoryQueryResult>()
     val instance: String
         get() = apiClient.instance
+
+    override var lastSelectedItem: Either<PostRef, CommentRef>? = null
+        set(value) {
+            field = value
+
+            lastSelectedItemLiveData.postValue(value)
+        }
+
+    val lastSelectedItemLiveData = MutableLiveData<Either<PostRef, CommentRef>?>()
 
     init {
         viewModelScope.launch(Dispatchers.Default) {

@@ -47,6 +47,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.InboxSwipeToActionCallback
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.inbox.InboxTabbedViewModel
 import com.idunnololz.summit.lemmy.inbox.PageType
 import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.inbox.conversation.Conversation
@@ -264,21 +265,16 @@ class InboxFragment :
         val adapter = createAdapter()
         this.adapter = adapter
 
-        fun refresh() {
-            viewModel.pageIndex = 0
-            viewModel.fetchInbox(force = true)
-        }
-
         binding.loadingView.setOnRefreshClickListener {
             if (accountInfoManager.currentFullAccount.value == null) {
                 parentFragment.showLogin()
             } else {
-                refresh()
+                refresh(force = true)
             }
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            refresh()
+            refresh(force = true)
         }
 
         (viewModel.inboxUpdate.value as? StatefulData.Success)?.data?.let {
@@ -542,6 +538,11 @@ class InboxFragment :
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
         )
+    }
+
+    fun refresh(force: Boolean) {
+        viewModel.pageIndex = 0
+        viewModel.fetchInbox(force = force)
     }
 
     private fun onUpdate() {
@@ -845,6 +846,7 @@ class InboxFragment :
             }
 
         fun setData(inboxModel: InboxModel, cb: (() -> Unit)? = null) {
+            Log.d(TAG, "Data set! hasMore: ${inboxModel.hasMore}", RuntimeException())
             this.inboxModel = inboxModel
             refreshItems(cb)
         }

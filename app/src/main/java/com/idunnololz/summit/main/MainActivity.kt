@@ -547,11 +547,18 @@ class MainActivity :
         Log.d("notification", "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
         if (intent.hasExtra(ARG_ACCOUNT_FULL_NAME)) {
             val direction = MainDirections.actionGlobalInboxTabbedFragment(
-                intent.getIntExtra(ARG_NOTIFICATION_ID, 0),
+                notificationId = intent.getIntExtra(ARG_NOTIFICATION_ID, 0),
+                refresh = true,
             )
 
             runOnReady(this) {
-                currentNavController?.navigate(direction)
+                currentNavController?.let { currentNavController ->
+                    navBarController.navigateWithArguments(
+                        R.id.inboxTabbedFragment,
+                        currentNavController,
+                        direction.arguments,
+                    )
+                }
             }
             return
         }
@@ -975,8 +982,17 @@ class MainActivity :
 
     fun navigateTopLevel(menuId: Int) {
         val currentNavController = currentNavController ?: return
-        val menuItem = navBarController.navBar.menu.findItem(menuId) ?: return
-        NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
+        val menuItem = navBarController.navBar.menu.findItem(menuId)
+
+        if (menuItem == null) {
+            navBarController.navigateWithArguments(
+                destinationId = menuId,
+                isTopLevel = true,
+                navController = currentNavController,
+            )
+        } else {
+            NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
+        }
     }
 
     fun showDownloadsSettings() {

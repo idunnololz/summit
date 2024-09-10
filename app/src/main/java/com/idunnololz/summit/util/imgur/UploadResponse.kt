@@ -51,7 +51,7 @@ data class Upload(
     @SerializedName("is_ad")
     val isAd: Boolean,
     @SerializedName("link")
-    val link: String,
+    val link: String?,
     @SerializedName("mp4")
     val mp4: String,
     @SerializedName("name")

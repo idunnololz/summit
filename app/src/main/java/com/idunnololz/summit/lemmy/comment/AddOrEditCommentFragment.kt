@@ -13,10 +13,13 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
@@ -39,11 +42,22 @@ import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadImageViewModel
+import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.MessageViewModel
+import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
+import com.idunnololz.summit.lemmy.post.PostAdapter
+import com.idunnololz.summit.lemmy.post.PostViewModel
+import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -53,10 +67,12 @@ import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
+import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
@@ -149,6 +165,12 @@ class AddOrEditCommentFragment :
 
     @Inject
     lateinit var mentionsHelper: MentionsHelper
+
+    @Inject
+    lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
+    @Inject
+    lateinit var animationsHelper: AnimationsHelper
 
     private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
 
@@ -391,102 +413,158 @@ class AddOrEditCommentFragment :
             refreshMessage()
         }
 
-        binding.toolbar.inflateMenu(R.menu.menu_add_or_edit_comment)
+        with(binding) {
 
-        if (isDm) {
-            binding.toolbar.title = getString(R.string.send_message)
-        } else {
-            binding.toolbar.title = getString(R.string.comment)
-        }
-        if (isEdit()) {
-            binding.toolbar.menu.findItem(R.id.send_comment)?.isVisible = false
-        } else {
-            binding.toolbar.menu.findItem(R.id.update_comment)?.isVisible = false
-        }
-        binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-        binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
-        )
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
-        }
-        binding.toolbar.setOnMenuItemClickListener a@{
-            when (it.itemId) {
-                R.id.send_comment -> {
-                    if (uploadImageViewModel.isUploading) {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.warn_upload_in_progress)
-                            .setPositiveButton(R.string.proceed_anyways)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(this, "send_comment")
-                        return@a true
-                    }
-                    when (args.sendAction as SendAction) {
-                        SendAction.Send -> {
-                            sendComment()
+            toolbar.inflateMenu(R.menu.menu_add_or_edit_comment)
+
+            if (isDm) {
+                toolbar.title = getString(R.string.send_message)
+            } else {
+                toolbar.title = getString(R.string.comment)
+            }
+            if (isEdit()) {
+                toolbar.menu.findItem(R.id.send_comment)?.isVisible = false
+            } else {
+                toolbar.menu.findItem(R.id.update_comment)?.isVisible = false
+            }
+
+            val commentView = args.commentView ?: args.editCommentView
+
+            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+            toolbar.setNavigationIconTint(
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            )
+            toolbar.setNavigationOnClickListener {
+                onBackPressed()
+            }
+            toolbar.setOnMenuItemClickListener a@{
+                when (it.itemId) {
+                    R.id.send_comment -> {
+                        if (uploadImageViewModel.isUploading) {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.warn_upload_in_progress)
+                                .setPositiveButton(R.string.proceed_anyways)
+                                .setNegativeButton(R.string.cancel)
+                                .createAndShow(this@AddOrEditCommentFragment, "send_comment")
+                            return@a true
                         }
-                        SendAction.ReturnTextAsResult -> {
-                            setFragmentResult(
-                                requestKey = REQUEST_KEY,
-                                result = bundleOf(
-                                    REQUEST_KEY_RESULT to Result(
-                                        wasCommentSent = true,
-                                        didUserTapSend = true,
-                                        content = binding.commentEditText.text?.toString(),
+                        when (args.sendAction as SendAction) {
+                            SendAction.Send -> {
+                                sendComment()
+                            }
+                            SendAction.ReturnTextAsResult -> {
+                                setFragmentResult(
+                                    requestKey = REQUEST_KEY,
+                                    result = bundleOf(
+                                        REQUEST_KEY_RESULT to Result(
+                                            wasCommentSent = true,
+                                            didUserTapSend = true,
+                                            content = binding.commentEditText.text?.toString(),
+                                        ),
                                     ),
-                                ),
-                            )
-                            dismiss()
+                                )
+                                dismiss()
+                            }
                         }
+                        true
                     }
-                    true
-                }
-                R.id.update_comment -> {
-                    if (uploadImageViewModel.isUploading) {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.warn_upload_in_progress)
-                            .setPositiveButton(R.string.proceed_anyways)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(this, "update_comment")
-                        return@a true
+                    R.id.update_comment -> {
+                        if (uploadImageViewModel.isUploading) {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.warn_upload_in_progress)
+                                .setPositiveButton(R.string.proceed_anyways)
+                                .setNegativeButton(R.string.cancel)
+                                .createAndShow(this@AddOrEditCommentFragment, "update_comment")
+                            return@a true
+                        }
+                        updateComment()
+                        true
                     }
-                    updateComment()
-                    true
-                }
-                R.id.save_draft -> {
-                    saveDraft(overwriteExistingDraft = false)
-                    true
-                }
-                R.id.drafts -> {
-                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
-                    true
-                }
-                else -> false
-            }
-        }
+                    R.id.save_draft -> {
+                        saveDraft(overwriteExistingDraft = false)
+                        true
+                    }
+                    R.id.drafts -> {
+                        DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
+                        true
+                    }
+                    R.id.show_full_context -> {
+                        if (commentView != null) {
+                            viewModel.showFullContext(
+                                commentView = commentView,
+                                force = true
+                            )
+                        }
+                        true
+                    }
+                    R.id.hide_full_context -> {
+                        viewModel.contextModel.postIdle()
 
-        mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, binding.commentEditText)
-
-        if (savedInstanceState == null) {
-            val replyTargetTs =
-                args.commentView?.let {
-                    dateStringToTs(it.comment.updated ?: it.comment.published)
-                } ?: args.postView?.let {
-                    dateStringToTs(it.post.updated ?: it.post.published)
+                        resetViewState(savedInstanceState)
+                        true
+                    }
+                    else -> false
                 }
-            val thresholdMs = GlobalSettings.warnReplyToOldContentThresholdMs ?: Long.MAX_VALUE
-
-            if (replyTargetTs != null &&
-                (System.currentTimeMillis() - replyTargetTs) > thresholdMs
-            ) {
-                viewModel.addMessage(
-                    AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs),
-                )
             }
 
-            binding.commentEditText.requestFocus()
+            mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, commentEditText)
+
+            viewModel.contextModel.observe(viewLifecycleOwner) {
+                if (commentView == null) {
+                    toolbar.menu.findItem(R.id.show_full_context)?.isVisible = false
+                    toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = false
+                } else {
+                    if (it is StatefulData.NotStarted) {
+                        toolbar.menu.findItem(R.id.show_full_context)?.isVisible = true
+                        toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = false
+                    } else {
+                        toolbar.menu.findItem(R.id.show_full_context)?.isVisible = false
+                        toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = true
+                    }
+                }
+
+                when (it) {
+                    is StatefulData.Error -> {
+                        contextContainer.visibility = View.VISIBLE
+                        contextLoadingView.showDefaultErrorMessageFor(it.error)
+                    }
+                    is StatefulData.Loading -> {
+                        contextContainer.visibility = View.VISIBLE
+                        contextLoadingView.showProgressBar()
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        contextContainer.visibility = View.VISIBLE
+                        contextLoadingView.hideAll()
+                        simpleContextScrollView.visibility = View.GONE
+                        contextRecyclerView.visibility = View.VISIBLE
+
+                        loadRecyclerView(it.data)
+                    }
+                }
+            }
+
+            if (savedInstanceState == null) {
+                val replyTargetTs =
+                    args.commentView?.let {
+                        dateStringToTs(it.comment.updated ?: it.comment.published)
+                    } ?: args.postView?.let {
+                        dateStringToTs(it.post.updated ?: it.post.published)
+                    }
+                val thresholdMs = GlobalSettings.warnReplyToOldContentThresholdMs ?: Long.MAX_VALUE
+
+                if (replyTargetTs != null &&
+                    (System.currentTimeMillis() - replyTargetTs) > thresholdMs
+                ) {
+                    viewModel.addMessage(
+                        AddOrEditCommentViewModel.Message.ReplyTargetTooOld(replyTargetTs),
+                    )
+                }
+
+                commentEditText.requestFocus()
+            }
+            setup(savedInstanceState)
         }
-        setup(savedInstanceState)
     }
 
     private fun updateComment() {
@@ -607,39 +685,8 @@ class AddOrEditCommentFragment :
             return
         }
 
-        val postView = args.postView
-        val commentView = args.commentView
-        val inboxItem = args.inboxItem
+        resetViewState(savedInstanceState)
 
-        val commentEditor = binding.commentEditor
-        if (isEdit()) {
-            val commentToEdit = requireNotNull(args.editCommentView)
-            binding.scrollView.visibility = View.GONE
-            binding.divider.visibility = View.GONE
-
-            if (savedInstanceState == null) {
-                commentEditor.editText?.setText(commentToEdit.comment.content)
-            }
-        } else if (commentView != null) {
-            binding.replyingTo.text = commentView.comment.content
-        } else if (postView != null) {
-            binding.replyingTo.text = SpannableStringBuilder().apply {
-                append(postView.post.name, StyleSpan(Typeface.BOLD), 0)
-                if (!postView.post.body.isNullOrBlank()) {
-                    appendLine()
-                    appendLine()
-                    appendLine(postView.post.body)
-                }
-            }
-        } else if (inboxItem != null) {
-            binding.replyingTo.text = inboxItem.content
-        } else if (isDm) {
-            binding.scrollView.visibility = View.GONE
-            binding.divider.visibility = View.GONE
-        } else {
-            dismiss()
-            return
-        }
         uploadImageViewModel.uploadImageResult.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
@@ -681,6 +728,45 @@ class AddOrEditCommentFragment :
         ) {
             binding.commentEditText.setText(args.message)
         }
+    }
+
+    private fun resetViewState(savedInstanceState: Bundle?) {
+        val postView = args.postView
+        val commentView = args.commentView
+        val inboxItem = args.inboxItem
+
+        val commentEditor = binding.commentEditor
+        if (isEdit()) {
+            val commentToEdit = requireNotNull(args.editCommentView)
+            binding.contextContainer.visibility = View.GONE
+            binding.divider.visibility = View.GONE
+
+            if (savedInstanceState == null) {
+                commentEditor.editText?.setText(commentToEdit.comment.content)
+            }
+        } else if (commentView != null) {
+            binding.replyingTo.text = commentView.comment.content
+        } else if (postView != null) {
+            binding.replyingTo.text = SpannableStringBuilder().apply {
+                append(postView.post.name, StyleSpan(Typeface.BOLD), 0)
+                if (!postView.post.body.isNullOrBlank()) {
+                    appendLine()
+                    appendLine()
+                    appendLine(postView.post.body)
+                }
+            }
+        } else if (inboxItem != null) {
+            binding.replyingTo.text = inboxItem.content
+        } else if (isDm) {
+            binding.contextContainer.visibility = View.GONE
+            binding.divider.visibility = View.GONE
+        } else {
+            dismiss()
+            return
+        }
+        binding.contextRecyclerView.visibility = View.GONE
+        binding.contextLoadingView.visibility = View.GONE
+        binding.simpleContextScrollView.visibility = View.VISIBLE
     }
 
     private fun isEdit(): Boolean {
@@ -781,6 +867,128 @@ class AddOrEditCommentFragment :
         content = this.comment.content,
         parentCommentId = args.commentView?.comment?.id,
     )
+
+    private fun loadRecyclerView(data: AddOrEditCommentViewModel.ContextModel) {
+        if (!isBindingAvailable()) return
+
+        val context = requireContext()
+
+        with(binding) {
+            val recyclerView = contextRecyclerView
+
+            fun showError() {
+                AlertDialogFragment.Builder()
+                    .setTitle(R.string.error_operation_not_permitted)
+                    .setMessage(R.string.error_action_on_comment_context)
+                    .setPositiveButton(android.R.string.ok)
+                    .createAndShow(childFragmentManager, "error_action_on_comment_context")
+            }
+
+            val adapter = PostAdapter(
+                postAndCommentViewBuilder = postAndCommentViewBuilder,
+                context = context,
+                containerView = recyclerView,
+                lifecycleOwner = viewLifecycleOwner,
+                instance = args.instance,
+                accountId = null,
+                revealAll = false,
+                useFooter = false,
+                isEmbedded = true,
+                videoState = null,
+                autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
+                onRefreshClickCb = {
+                    val commentView = args.commentView
+                    if (commentView != null) {
+                        viewModel.showFullContext(commentView, force = true)
+                    }
+                },
+                onSignInRequired = {
+                    PreAuthDialogFragment.newInstance()
+                        .show(childFragmentManager, "asdf")
+                },
+                onInstanceMismatch = { accountInstance, apiInstance ->
+                    AlertDialogFragment.Builder()
+                        .setTitle(R.string.error_account_instance_mismatch_title)
+                        .setMessage(
+                            getString(
+                                R.string.error_account_instance_mismatch,
+                                accountInstance,
+                                apiInstance,
+                            ),
+                        )
+                        .createAndShow(childFragmentManager, "aa")
+                },
+                onAddCommentClick = { postOrComment ->
+                    showError()
+                },
+                onImageClick = { _, view, url ->
+                    showError()
+                },
+                onVideoClick = { url, videoType, state ->
+                    showError()
+                },
+                onVideoLongClickListener = { url ->
+                    showError()
+                },
+                onPageClick = {
+                    showError()
+                },
+                onPostActionClick = { postView, _, actionId ->
+                    showError()
+                },
+                onCommentActionClick = { commentView, _, actionId ->
+                    showError()
+                },
+                onFetchComments = {
+                    showError()
+                },
+                onLoadPost = {},
+                onLinkClick = { url, text, linkType ->
+                    showError()
+                },
+                onLinkLongClick = { url, text ->
+                    showError()
+                },
+                switchToNativeInstance = {},
+            ).apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
+
+            recyclerView.doOnLayout {
+                adapter.contentMaxWidth = recyclerView.measuredWidth
+            }
+
+            recyclerView.setup(animationsHelper)
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.adapter = adapter
+            recyclerView.addItemDecoration(
+                OldThreadLinesDecoration(
+                    context,
+                    postAndCommentViewBuilder.hideCommentActions,
+                ),
+            )
+
+            adapter.setData(
+                PostViewModel.PostData(
+                    postView = PostViewModel.ListView.PostListView(data.post),
+                    commentTree = listOfNotNull(data.commentTree),
+                    newlyPostedCommentId = null,
+                    selectedCommentId = null,
+                    isSingleComment = false,
+                    isNativePost = true,
+                    accountInstance = viewModel.apiInstance,
+                    isCommentsLoaded = true,
+                ),
+            )
+
+            val position =
+                adapter.highlightCommentForever(data.originalCommentView.comment.id)
+
+            if (position != null) {
+                recyclerView.scrollToPosition(position)
+            }
+        }
+    }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
         when (tag) {

@@ -1,9 +1,13 @@
 package com.idunnololz.summit.settings.dialogs
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentBottomMenuBinding
@@ -69,6 +73,7 @@ class MultipleChoiceDialogFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
         val args = requireArguments()
         val settingItem = args.getParcelableCompat<RadioGroupSettingItem>(
             ARG_SETTING_ITEM,
@@ -85,14 +90,37 @@ class MultipleChoiceDialogFragment :
             null
         }
 
+        val faintColor = ContextCompat.getColor(context, R.color.colorTextFaint)
+
         BottomMenu(requireContext())
             .apply {
                 setTitle(settingItem.title)
                 settingItem.options.forEach {
-                    if (it.icon != null) {
-                        addItemWithIcon(it.id, it.title, it.icon)
+                    val title = if (it.isDefault) {
+                        SpannableStringBuilder().apply {
+                            append(it.title)
+
+                            val start = length
+                            append(" (")
+                            append(getString(R.string._default))
+                            append(")")
+                            val end = length
+
+                            setSpan(
+                                ForegroundColorSpan(faintColor),
+                                start,
+                                end,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                            )
+                        }
                     } else {
-                        addItem(it.id, it.title)
+                        it.title
+                    }
+
+                    if (it.icon != null) {
+                        addItemWithIcon(it.id, title, it.icon)
+                    } else {
+                        addItem(it.id, title)
                     }
                 }
                 if (currentValue != null) {

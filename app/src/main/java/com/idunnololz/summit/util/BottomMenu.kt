@@ -79,7 +79,7 @@ class BottomMenu(
         adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title)))
     }
 
-    fun addItem(@IdRes id: Int, title: String) {
+    fun addItem(@IdRes id: Int, title: CharSequence) {
         adapter.menuItems.add(MenuItem.ActionItem(id, title))
     }
 
@@ -97,11 +97,11 @@ class BottomMenu(
         addItemWithIcon(id, context.getString(title), icon)
     }
 
-    fun addItemWithIcon(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
+    fun addItemWithIcon(@IdRes id: Int, title: CharSequence, @DrawableRes icon: Int) {
         adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
     }
 
-    fun addItemWithIcon(@IdRes id: Int, title: String, drawable: Drawable) {
+    fun addItemWithIcon(@IdRes id: Int, title: CharSequence, drawable: Drawable) {
         adapter.menuItems.add(
             MenuItem.ActionItem(id, title, icon = MenuIcon.DrawableIcon(drawable)),
         )
@@ -467,7 +467,7 @@ class BottomMenu(
     sealed interface MenuItem {
         class ActionItem(
             @IdRes val id: Int,
-            val title: String,
+            val title: CharSequence,
             val icon: MenuIcon? = null,
             @DrawableRes val checkIcon: Int = 0,
             val modifier: Int = ModifierIds.NONE,

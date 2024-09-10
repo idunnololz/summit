@@ -1,6 +1,8 @@
 package com.idunnololz.summit.util.imgur
 
 import android.net.Uri
+import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.FileTooLargeError
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -16,14 +18,17 @@ class ImgurApiClient @Inject constructor(
                 "image", file.name, file.asRequestBody())
 
             val response = imgurApi.uploadFile(
-                filePart,
-                name =  file.name.toRequestBody()
+                authorization = "Client-ID ${ApiKeys.CLIENT_ID}",
+                image = filePart,
+                title =  file.name.toRequestBody()
             )
 
-            if(response.isSuccessful){
+            if (response.isSuccessful) {
                 Result.success(response.body()!!.upload)
-            }else{
-                Result.failure(Exception("Unknown network Exception."))
+            } else if (response.code() == 413) {
+                Result.failure(FileTooLargeError())
+            } else {
+                Result.failure(ClientApiException(response.message(), response.code()))
             }
         }catch (e: Exception){
             Result.failure(e)

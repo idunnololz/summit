@@ -9,6 +9,7 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.UploadImageResult
+import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.imgur.ImgurApiClient
@@ -27,6 +28,7 @@ class UploadHelper @Inject constructor(
     private val preferences: Preferences,
     private val directoryHelper: DirectoryHelper,
     private val imgurApiClient: ImgurApiClient,
+    private val cachePolicyManager: CachePolicyManager,
 ) {
 
     companion object {
@@ -37,7 +39,12 @@ class UploadHelper @Inject constructor(
 
     private val id = nextId++
 
-    private val uploaderApiClient = LemmyApiClient(context, apiListenerManager, preferences)
+    private val uploaderApiClient = LemmyApiClient(
+        context = context,
+        apiListenerManager = apiListenerManager,
+        preferences = preferences,
+        cachePolicyManager = cachePolicyManager
+    )
 
     private var uploadJob: Job? = null
 
@@ -110,7 +117,11 @@ class UploadHelper @Inject constructor(
                 return imgurApiClient.uploadFile(file)
                     .fold(
                         {
-                            Result.success(UploadImageResult(it.link))
+                            if (it.link != null) {
+                                Result.success(UploadImageResult(it.link))
+                            } else {
+                                Result.failure(RuntimeException("Upload success but no link returned."))
+                            }
                         },
                         {
                             Result.failure(it)

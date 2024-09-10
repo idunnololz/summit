@@ -37,35 +37,55 @@
                 android:layout_height="match_parent"
                 android:background="?backgroundColor">
 
-                <androidx.core.widget.NestedScrollView
-                    android:id="@+id/scroll_view"
+                <FrameLayout
+                    android:id="@+id/context_container"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:padding="@dimen/padding"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:scrollbars="vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/comment_editor"
                     app:layout_constraintVertical_weight="1">
 
-                    <TextView
-                        android:id="@+id/replying_to"
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/simple_context_scroll_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textIsSelectable="true"
-                        android:scrollbars="vertical"
-                        android:textAppearance="?textAppearanceBodyMedium"/>
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/padding"
+                        android:scrollbarStyle="outsideOverlay"
+                        android:scrollbars="vertical">
 
-                </androidx.core.widget.NestedScrollView>
+                        <TextView
+                            android:id="@+id/replying_to"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textIsSelectable="true"
+                            android:scrollbars="vertical"
+                            android:textAppearance="?textAppearanceBodyMedium"/>
+
+                    </androidx.core.widget.NestedScrollView>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/context_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintTop_toBottomOf="@+id/context"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <com.idunnololz.summit.view.LoadingView
+                        android:id="@+id/context_loading_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/padding"
+                        android:layout_gravity="center"/>
+                </FrameLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/divider"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/scroll_view"
+                    app:layout_constraintTop_toBottomOf="@+id/context_container"
                     app:layout_constraintBottom_toTopOf="@+id/comment_editor"/>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -75,7 +95,7 @@
                     android:background="@null"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/scroll_view"
+                    app:layout_constraintTop_toBottomOf="@+id/context_container"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintVertical_weight="1"
                     app:boxStrokeWidth="0dp"

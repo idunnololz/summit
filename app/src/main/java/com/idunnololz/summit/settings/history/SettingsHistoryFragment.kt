@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsHistoryBinding
 import com.idunnololz.summit.preferences.Preferences
@@ -59,6 +61,11 @@ class SettingsHistoryFragment : BaseFragment<FragmentSettingsHistoryBinding>() {
     }
 
     private fun updateRendering() {
+        settings.viewHistory.bindTo(
+            binding.viewHistory
+        ) {
+            getMainActivity()?.navigateTopLevel(R.id.historyFragment)
+        }
         settings.recordBrowsingHistory.bindTo(
             binding.trackBrowsingHistory,
             { preferences.trackBrowsingHistory },

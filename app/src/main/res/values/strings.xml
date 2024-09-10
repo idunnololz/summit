@@ -1787,6 +1787,16 @@
     <string name="minimum">Minimum</string>
     <string name="low">Low</string>
     <string name="max">Max</string>
+    <string name="view_history">View history</string>
+    <string name="show_full_context">Show full context</string>
+    <string name="error_operation_not_permitted">Operation not permitted</string>
+    <string name="error_action_on_comment_context">You cannot perform actions within the context when composing a comment.</string>
+    <string name="hide_full_context">Hide full context</string>
+    <string name="cache_policy">Cache policy</string>
+    <string name="cache_policy_desc">Controls how aggressively the app will cache network content. A relaxed caching policy will mean that the app will make network calls more frequently but the content may be more fresh. An aggressive cache policy will improve app performance at the cost of possibly stale content.</string>
+    <string name="aggressive">Aggressive</string>
+    <string name="moderate">Moderate</string>
+    <string name="lite">Lite</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

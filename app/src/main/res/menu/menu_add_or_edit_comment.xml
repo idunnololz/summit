@@ -13,7 +13,7 @@
     <item
         android:id="@+id/update_comment"
         android:title="@string/update_comment"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:icon="@drawable/baseline_send_24"
         app:showAsAction="always"
         app:iconTint="?attr/colorControlNormal"/>
@@ -22,7 +22,7 @@
     <item
         android:id="@+id/save_draft"
         android:title="@string/save_draft"
-        android:orderInCategory="100"
+        android:orderInCategory="300"
         android:icon="@drawable/baseline_save_24"
         app:showAsAction="never"
         app:iconTint="?attr/colorControlNormal"/>
@@ -30,7 +30,21 @@
     <item
         android:id="@+id/drafts"
         android:title="@string/drafts"
-        android:orderInCategory="100"
+        android:orderInCategory="400"
+        app:showAsAction="never"
+        app:iconTint="?attr/colorControlNormal"/>
+
+    <item
+        android:id="@+id/show_full_context"
+        android:title="@string/show_full_context"
+        android:orderInCategory="500"
+        app:showAsAction="never"
+        app:iconTint="?attr/colorControlNormal"/>
+
+    <item
+        android:id="@+id/hide_full_context"
+        android:title="@string/hide_full_context"
+        android:orderInCategory="501"
         app:showAsAction="never"
         app:iconTint="?attr/colorControlNormal"/>
 

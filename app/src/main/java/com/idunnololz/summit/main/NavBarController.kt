@@ -582,6 +582,77 @@ class NavBarController(
         )
     }
 
+    fun navigateWithArguments(
+        @IdRes menuItemId: Int,
+        navController: NavController,
+        args: Bundle? = null,
+    ) {
+        val menuItem = navBar.menu.findItem(menuItemId)
+
+        onNavDestinationSelected(
+            menuItem.itemId,
+            menuItem.order and Menu.CATEGORY_SECONDARY == 0,
+            navController,
+            args,
+        )
+    }
+
+    fun navigateWithArguments(
+        destinationId: Int,
+        isTopLevel: Boolean,
+        navController: NavController,
+        args: Bundle? = null,
+    ) {
+        onNavDestinationSelected(
+            destinationId,
+            isTopLevel,
+            navController,
+            args,
+        )
+    }
+
+    /**
+     * This is a copy of NavigationUI.onNavDestinationSelected()
+     */
+    private fun onNavDestinationSelected(
+        destinationId: Int,
+        isTopLevel: Boolean,
+        navController: NavController,
+        args: Bundle? = null,
+    ): Boolean {
+        val builder = NavOptions.Builder().setLaunchSingleTop(true).setRestoreState(true)
+        if (
+            navController.currentDestination!!.parent!!.findNode(destinationId)
+                is ActivityNavigator.Destination
+        ) {
+            builder.setEnterAnim(androidx.navigation.ui.R.anim.nav_default_enter_anim)
+                .setExitAnim(androidx.navigation.ui.R.anim.nav_default_exit_anim)
+                .setPopEnterAnim(androidx.navigation.ui.R.anim.nav_default_pop_enter_anim)
+                .setPopExitAnim(androidx.navigation.ui.R.anim.nav_default_pop_exit_anim)
+        } else {
+            builder.setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+        }
+        if (isTopLevel) {
+            builder.setPopUpTo(
+                navController.graph.findStartDestination().id,
+                inclusive = false,
+                saveState = true
+            )
+        }
+        val options = builder.build()
+        return try {
+            // TODO provide proper API instead of using Exceptions as Control-Flow.
+            navController.navigate(destinationId, args, options)
+            // Return true only if the destination we've navigated to matches the MenuItem
+            navController.currentDestination?.matchDestination(destinationId) == true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
     private fun NavController.backQueueInternal(): ArrayDeque<NavBackStackEntry> {
         return NavController::class.java.getDeclaredField("backQueue").let { field ->
             field.isAccessible = true

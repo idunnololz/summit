@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -31,6 +32,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_PLAY_VIDEOS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BASE_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_BLUR_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_CACHE_POLICY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COLOR_SCHEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENTS_NAVIGATION_FAB
@@ -148,7 +150,7 @@ class Preferences(
         private const val TAG = "Preferences"
     }
 
-    val all
+    val all: MutableMap<String, *>
         get() = prefs.all
 
     fun getDefaultPage(): CommunityRef {
@@ -993,6 +995,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putInt(KEY_ANIMATION_LEVEL, value.animationLevel)
+                .apply()
+        }
+
+    var cachePolicy: CachePolicy
+        get() = CachePolicy.parse(prefs.getInt(KEY_CACHE_POLICY, CachePolicy.Moderate.value))
+        set(value) {
+            prefs.edit()
+                .putInt(KEY_CACHE_POLICY, value.value)
                 .apply()
         }
 

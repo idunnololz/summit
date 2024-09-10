@@ -228,4 +228,8 @@
     <item name="animation_level_min" type="id" />
     <item name="animation_level_low" type="id" />
     <item name="animation_level_max" type="id" />
+    <item name="cache_policy_aggressive" type="id" />
+    <item name="cache_policy_moderate" type="id" />
+    <item name="cache_policy_lite" type="id" />
+    <item name="cache_policy_minimum" type="id" />
 </resources>

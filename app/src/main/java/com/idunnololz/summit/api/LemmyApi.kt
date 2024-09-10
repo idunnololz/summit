@@ -82,6 +82,8 @@ import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.cache.CachePolicy
+import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.hasInternet
 import java.io.File
@@ -732,26 +734,39 @@ interface LemmyApi {
         private const val CACHE_CONTROL_HEADER = "Cache-Control"
         private const val CACHE_CONTROL_NO_CACHE = "no-cache"
 
-        fun getInstance(context: Context, instance: String = DEFAULT_INSTANCE): LemmyApiWithSite {
-            return apis[instance] ?: buildInstance(context, instance).also {
+        fun getInstance(
+            context: Context,
+            cachePolicyManager: CachePolicyManager,
+            instance: String = DEFAULT_INSTANCE,
+        ): LemmyApiWithSite {
+            return apis[instance] ?: buildInstance(context, cachePolicyManager, instance).also {
                 apis[instance] = it
             }
         }
 
-        fun okHttpClient(context: Context, userAgent: String = LinkUtils.USER_AGENT) =
-            okHttpClient ?: getOkHttpClient(context, userAgent).also {
+        fun okHttpClient(
+            context: Context,
+            cachePolicyManager: CachePolicyManager,
+            userAgent: String = LinkUtils.USER_AGENT,
+        ) =
+            okHttpClient ?: getOkHttpClient(context, userAgent, cachePolicyManager).also {
                 okHttpClient = it
             }
 
         private fun buildInstance(
             context: Context,
+            cachePolicyManager: CachePolicyManager,
             instance: String = DEFAULT_INSTANCE,
             userAgent: String = LinkUtils.USER_AGENT,
         ): LemmyApiWithSite {
-            return buildApi(context, instance, userAgent)
+            return buildApi(context, instance, userAgent, cachePolicyManager)
         }
 
-        private fun getOkHttpClient(context: Context, userAgent: String): OkHttpClient {
+        private fun getOkHttpClient(
+            context: Context,
+            userAgent: String,
+            cachePolicyManager: CachePolicyManager,
+        ): OkHttpClient {
             okHttpClient?.let {
                 return it
             }
@@ -783,9 +798,26 @@ interface LemmyApi {
                      *  we initialize the request and change its header depending on whether
                      *  the device is connected to Internet or not.
                      */
-                    request = if (context.hasInternet()) {
+                    val cachePolicy = cachePolicyManager.cachePolicy
+
+                    request = if (cachePolicy == CachePolicy.Minimum) {
+                        request
+                    } else if (context.hasInternet()) {
                         val cacheControl = CacheControl.Builder()
-                            .maxStale(10, TimeUnit.MINUTES)
+                            .apply {
+                                when (cachePolicy) {
+                                    CachePolicy.Aggressive -> {
+                                        maxStale(30, TimeUnit.MINUTES)
+                                    }
+                                    CachePolicy.Moderate -> {
+                                        maxStale(10, TimeUnit.MINUTES)
+                                    }
+                                    CachePolicy.Lite -> {
+                                        maxStale(5, TimeUnit.MINUTES)
+                                    }
+                                    CachePolicy.Minimum -> TODO()
+                                }
+                            }
                             .build()
                             /*
                              *  If there is Internet, get the cache that was stored 5 seconds ago.
@@ -855,12 +887,13 @@ interface LemmyApi {
             context: Context,
             instance: String,
             userAgent: String,
+            cachePolicyManager: CachePolicyManager,
         ): LemmyApiWithSite {
             return LemmyApiWithSite(
                 Retrofit.Builder()
                     .baseUrl("https://$instance/api/$API_VERSION/")
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getOkHttpClient(context, userAgent))
+                    .client(getOkHttpClient(context, userAgent, cachePolicyManager))
                     .build()
                     .create(LemmyApi::class.java),
                 instance,
