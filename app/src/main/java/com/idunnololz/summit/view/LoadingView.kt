@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.scrape.WebsiteAdapterLoader
@@ -66,6 +67,17 @@ class LoadingView : ConstraintLayout {
         rootViewAnimationController.cancelAnimations()
         progressView.visibility = if (progressBar) View.VISIBLE else View.GONE
         errorTextView.visibility = if (errorText) View.VISIBLE else View.GONE
+
+        if (progressBar) {
+            errorTextView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                topToBottom = progressView.id
+            }
+        } else {
+            errorTextView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+            }
+        }
+
         this.positiveButton.visibility = if (positiveButton) View.VISIBLE else View.GONE
         this.negativeButton.visibility = if (negativeButton) View.VISIBLE else View.GONE
         ensureRootVisible()
