@@ -83,6 +83,9 @@ class ImageInfoDialogFragment :
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
             recyclerView.setup(animationsHelper)
+            loadingView.setOnRefreshClickListener {
+                viewModel.loadImageInfo(args.url, force = true)
+            }
 
             viewModel.model.observe(viewLifecycleOwner) {
                 when (it) {

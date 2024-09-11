@@ -312,10 +312,11 @@ class OfflineManager @Inject constructor(
         url: String,
         listener: TaskListener,
         errorListener: TaskFailedListener? = null,
+        force: Boolean = false,
     ): Registration = fetchGeneric(
         url = url,
         destDir = imagesDir,
-        force = false,
+        force = force,
         saveToFileFn = { destFile ->
             val req = try {
                 Request.Builder()

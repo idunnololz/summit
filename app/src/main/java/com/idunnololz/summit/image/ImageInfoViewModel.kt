@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.offline.TaskListener
 import com.idunnololz.summit.util.FileSizeUtils
 import com.idunnololz.summit.util.StatefulLiveData
@@ -27,16 +28,22 @@ class ImageInfoViewModel @Inject constructor(
 
     val model = StatefulLiveData<ImageInfoModel>()
 
-    fun loadImageInfo(url: String) {
+    fun loadImageInfo(url: String, force: Boolean = false) {
         model.setIsLoading()
         viewModelScope.launch {
             offlineManager.fetchImage(
-                url,
-                object : TaskListener {
+                url = url,
+                listener = object : TaskListener {
                     override fun invoke(file: File) {
                         loadExifData(file, url)
                     }
                 },
+                errorListener = object : TaskFailedListener {
+                    override fun invoke(e: Throwable) {
+                        model.postError(e)
+                    }
+                },
+                force = force,
             )
         }
     }
