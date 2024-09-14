@@ -76,6 +76,7 @@ import com.idunnololz.summit.util.ext.getSize
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
+import com.idunnololz.summit.view.LemmyHeaderView.Companion.DEFAULT_ICON_SIZE_DP
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -660,7 +661,7 @@ class PostListViewBuilder @Inject constructor(
                     headerContainer.iconSize = if (rawBinding is ListingItemCompactBinding) {
                         Utils.convertDpToPixel(24f).toInt()
                     } else {
-                        Utils.convertDpToPixel(32f).toInt()
+                        Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
                     }
                     val iconImageView = headerContainer.getIconImageView()
                     avatarHelper.loadIcon(iconImageView, postView.community)

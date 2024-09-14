@@ -7,8 +7,8 @@ import com.idunnololz.summit.util.Utils
 
 class HorizontalDividerSpan : ReplacementSpan() {
 
-    private val dividerTotalSize = Utils.convertDpToPixel(8f).toInt()
-    private val dividerSize = Utils.convertDpToPixel(2f)
+    private val dividerTotalSize = Utils.convertDpToPixel(6f).toInt()
+    private val dividerSize = Utils.convertDpToPixel(1.5f)
 
     override fun getSize(
         paint: Paint,
@@ -30,12 +30,15 @@ class HorizontalDividerSpan : ReplacementSpan() {
         paint: Paint,
     ) {
         val oldStyle = paint.style
+        val oldAlpha = paint.alpha
 
         paint.style = Paint.Style.FILL
+        paint.alpha = (oldAlpha * 0.8f).toInt()
         val cx = x + dividerTotalSize / 2
         val cy = (top + bottom) / 2
         canvas.drawCircle(cx, cy.toFloat(), dividerSize, paint)
 
         paint.style = oldStyle
+        paint.alpha = oldAlpha
     }
 }

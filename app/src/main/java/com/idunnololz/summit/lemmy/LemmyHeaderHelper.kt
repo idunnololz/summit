@@ -42,6 +42,10 @@ class LemmyHeaderHelper(
         private val TAG = "LemmyHeaderHelper"
 
         const val SEPARATOR = " ● "
+
+        private val condensedTypeface: Typeface by lazy {
+            Typeface.create("sans-serif-condensed", Typeface.NORMAL)
+        }
     }
 
     private val unimportantColor: Int = ContextCompat.getColor(context, R.color.colorTextFaint)
@@ -318,6 +322,7 @@ class LemmyHeaderHelper(
         useMultilineHeader: Boolean,
         isCurrentUser: Boolean,
         showEditedDate: Boolean,
+        useCondensedTypeface: Boolean,
         detailed: Boolean = false,
         childrenCount: Int? = null,
         wrapHeader: Boolean = false,
@@ -325,6 +330,12 @@ class LemmyHeaderHelper(
     ) {
         val creatorInstance = commentView.creator.instance
         val currentTextView = headerContainer.textView1
+
+        if (useCondensedTypeface) {
+            headerContainer.setTypeface(condensedTypeface)
+        } else {
+            headerContainer.setTypeface(null)
+        }
 
         val sb = SpannableStringBuilder()
 

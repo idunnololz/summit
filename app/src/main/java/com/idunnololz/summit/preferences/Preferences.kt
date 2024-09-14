@@ -114,6 +114,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BA
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPLOAD_IMAGES_TO_IMGUR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
@@ -128,6 +129,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getIntOrNull
+import com.idunnololz.summit.util.ext.getLongSafe
 import com.idunnololz.summit.util.ext.getMoshiValue
 import com.idunnololz.summit.util.ext.putMoshiValue
 import com.idunnololz.summit.util.ext.toJsonSafe
@@ -766,7 +768,7 @@ class Preferences(
         }
 
     var warnReplyToOldContentThresholdMs: Long
-        get() = prefs.getLong(
+        get() = prefs.getLongSafe(
             KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS,
             Duration.ofDays(2).toMillis(),
         )
@@ -931,7 +933,7 @@ class Preferences(
         }
 
     var notificationsCheckIntervalMs: Long
-        get() = prefs.getLong(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, 1000L * 60L * 15L)
+        get() = prefs.getLongSafe(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, 1000L * 60L * 15L)
         set(value) {
             prefs.edit()
                 .putLong(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, value)
@@ -1003,6 +1005,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putInt(KEY_CACHE_POLICY, value.value)
+                .apply()
+        }
+
+    var useCondensedTypefaceForCommentHeaders: Boolean
+        get() = prefs.getBoolean(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, value)
                 .apply()
         }
 

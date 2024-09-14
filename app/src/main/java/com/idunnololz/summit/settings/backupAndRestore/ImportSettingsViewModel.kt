@@ -1,6 +1,7 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Parcelable
 import android.util.Base64
