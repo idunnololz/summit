@@ -43,7 +43,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
 
     private class SpoilerTextAddedListener : CorePlugin.OnTextAddedListener {
         override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
-            val spoilerTitleRegex = Regex("(:::\\s+spoiler\\s+)(.*)")
+            val spoilerTitleRegex = Regex("(:::\\s*spoiler\\s+)(.*)")
             val spoilerTitles = spoilerTitleRegex.findAll(text)
 
             for (match in spoilerTitles) {
