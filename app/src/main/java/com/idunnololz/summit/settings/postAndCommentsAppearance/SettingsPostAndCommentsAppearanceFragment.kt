@@ -233,6 +233,15 @@ class SettingsPostAndCommentsAppearanceFragment :
                 updateRendering()
             },
         )
+        settings.useCondensedTypefaceForCommentHeader.bindTo(
+            binding.useCondensedTypefaceForCommentHeader,
+            { viewModel.preferences.useCondensedTypefaceForCommentHeaders },
+            {
+                viewModel.preferences.useCondensedTypefaceForCommentHeaders = it
+
+                updateRendering()
+            },
+        )
     }
 
     private fun updateRendering() {

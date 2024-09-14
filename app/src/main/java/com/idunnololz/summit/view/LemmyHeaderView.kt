@@ -2,6 +2,7 @@ package com.idunnololz.summit.view
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
@@ -23,6 +24,12 @@ import kotlin.math.max
 
 class LemmyHeaderView : FrameLayout {
 
+    companion object {
+        const val DEFAULT_ICON_SIZE_DP = 32f
+    }
+
+    private var originalTypeface: Typeface? = null
+
     private var iconImageView: ImageView? = null
     val textView1: TextView
     val textView2: TextView
@@ -40,7 +47,7 @@ class LemmyHeaderView : FrameLayout {
             requestLayout()
         }
 
-    var iconSize = Utils.convertDpToPixel(36f).toInt()
+    var iconSize = Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -58,6 +65,8 @@ class LemmyHeaderView : FrameLayout {
         textView3 = LinkifyTextView(context, null, R.attr.textAppearanceBodySmall)
             .style()
         flairView = FlairView(context)
+
+        originalTypeface = textView1.typeface
 
         addView(textView1)
         addView(flairView)
@@ -109,9 +118,15 @@ class LemmyHeaderView : FrameLayout {
             ),
         )
 
-//        typeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
-
         return this
+    }
+
+    fun setTypeface(typeface: Typeface?) {
+        if (typeface == null) {
+            textView1.typeface = originalTypeface
+        } else {
+            textView1.typeface = typeface
+        }
     }
 
     private fun ensureIconView() {
@@ -267,8 +282,10 @@ class LemmyHeaderView : FrameLayout {
                 start += child.measuredWidth + layoutParams.rightMargin
             }
 
+            val marginBetweenLines = Utils.convertDpToPixel(2f).toInt()
             val textChildrenTotalHeight =
-                textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight)
+                textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight) +
+                    marginBetweenLines
 
             var top: Int
             run {
@@ -284,7 +301,7 @@ class LemmyHeaderView : FrameLayout {
                     start + layoutParams.leftMargin + child.measuredWidth,
                     top + child.measuredHeight,
                 )
-                top += child.measuredHeight
+                top += child.measuredHeight + marginBetweenLines
             }
             run {
                 val child = textView2

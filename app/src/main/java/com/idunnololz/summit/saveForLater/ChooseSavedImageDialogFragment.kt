@@ -11,6 +11,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.dispose
 import coil.load
@@ -20,8 +21,12 @@ import com.idunnololz.summit.databinding.SaveSlotBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
+import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.tsToShortDate
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 
@@ -77,15 +82,19 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupBottomSheetAndShow(
-            bottomSheet = binding.bottomSheet,
-            bottomSheetContainerInner = binding.bottomSheetContainerInner,
-            overlay = binding.overlay,
-            onClose = {
-                dismiss()
-            },
-            expandFully = true,
-        )
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(100)
+
+            setupBottomSheetAndShow(
+                bottomSheet = binding.bottomSheet,
+                bottomSheetContainerInner = binding.bottomSheetContainerInner,
+                overlay = binding.overlay,
+                onClose = {
+                    dismiss()
+                },
+                expandFully = true,
+            )
+        }
 
         requireMainActivity().apply {
             insets.observe(viewLifecycleOwner) { insets ->
@@ -110,7 +119,9 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
                 val b = SaveSlotBinding.inflate(inflater, slotsContainer, false)
 
                 if (file.exists()) {
-                    b.preview.load(file)
+                    b.preview.load(file) {
+                        placeholder(newShimmerDrawable16to9(context))
+                    }
                 } else {
                     b.preview.dispose()
                     b.preview.setImageDrawable(null)

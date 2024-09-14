@@ -90,6 +90,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_UPLOAD_IMAGES_TO_IMGUR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_BOTTOM_NAV_BAR
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
@@ -1125,6 +1126,13 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
         relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
+    val useCondensedTypefaceForCommentHeader = OnOffSettingItem(
+        icon = null,
+        title = context.getString(R.string.use_condensed_style_for_comment_header),
+        description = null,
+        relatedKeys = listOf(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS),
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         resetPostStyles,
         resetCommentStyles,
@@ -1135,6 +1143,7 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
         commentsThreadStyle,
         tapCommentToCollapse,
         alwaysShowLinkBelowPost,
+        useCondensedTypefaceForCommentHeader,
     )
 }
 

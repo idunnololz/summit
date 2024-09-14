@@ -102,6 +102,7 @@ import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.AutoHorizontalScrollView
 import com.idunnololz.summit.view.LemmyHeaderView
+import com.idunnololz.summit.view.LemmyHeaderView.Companion.DEFAULT_ICON_SIZE_DP
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -175,6 +176,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         ?: PostQuickActionsSettings()
     private var showEditedDate: Boolean = preferences.showEditedDate
     private var autoPlayVideos: Boolean = preferences.autoPlayVideos
+    private var useCondensedTypefaceForCommentHeaders: Boolean = preferences.useCondensedTypefaceForCommentHeaders
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler()
 
@@ -220,6 +222,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         showProfileIcons = preferences.showProfileIcons
         showEditedDate = preferences.showEditedDate
         autoPlayVideos = preferences.autoPlayVideos
+        useCondensedTypefaceForCommentHeaders = preferences.useCondensedTypefaceForCommentHeaders
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
@@ -341,7 +344,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
 
         if (showCommunityIcon) {
-            headerContainer.iconSize = Utils.convertDpToPixel(32f).toInt()
+            headerContainer.iconSize = Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
             val iconImageView = headerContainer.getIconImageView()
             avatarHelper.loadIcon(iconImageView, postView.community)
             iconImageView.setOnClickListener {
@@ -664,6 +667,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             displayInstanceStyle = displayInstanceStyle,
             showUpvotePercentage = showCommentUpvotePercentage,
             useMultilineHeader = useMultilineHeader,
+            useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
             wrapHeader = commentHeaderLayout == CommentHeaderLayoutId.Wrap,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == commentView.creator.id &&
@@ -920,6 +924,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                     false
                 },
                 showEditedDate = showEditedDate,
+                useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
                 wrapHeader = true,
                 scoreColor = scoreColor,
             )
@@ -1874,6 +1879,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             displayInstanceStyle = displayInstanceStyle,
             showUpvotePercentage = showCommentUpvotePercentage,
             useMultilineHeader = false,
+            useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
             isCurrentUser = if (indicateCurrentUser) {
                 currentUser?.id == commentView.creator.id &&
                     currentUser?.instance == commentView.creator.instance
@@ -1921,13 +1927,21 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {
-        headerView.textSize = commentUiConfig.headerTextSizeSp.toCommentTextSize()
+        headerView.textSize = if (useCondensedTypefaceForCommentHeaders) {
+            commentUiConfig.headerTextSizeSp.toCommentTextSize() * 0.9f
+        } else {
+            commentUiConfig.headerTextSizeSp.toCommentTextSize()
+        }
         text.textSize = commentUiConfig.contentTextSizeSp.toCommentTextSize()
         scoreCount?.textSize = commentUiConfig.footerTextSizeSp.toCommentTextSize()
     }
 
     private fun PostCommentCollapsedItemBinding.scaleTextSizes() {
-        headerView.textSize = postUiConfig.headerTextSizeSp.toCommentTextSize()
+        headerView.textSize = if (useCondensedTypefaceForCommentHeaders) {
+            commentUiConfig.headerTextSizeSp.toCommentTextSize() * 0.9f
+        } else {
+            commentUiConfig.headerTextSizeSp.toCommentTextSize()
+        }
     }
 
     private fun PostPendingCommentExpandedItemBinding.scaleTextSizes() {
