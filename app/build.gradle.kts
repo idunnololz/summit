@@ -113,6 +113,7 @@ dependencies {
 
     implementation(libs.retrofit2.retrofit)
     implementation(libs.retrofit2.converter.gson)
+    implementation(libs.retrofit2.converter.moshi)
 
     implementation(libs.markwon.core)
     implementation(libs.markwon.ext.tables)

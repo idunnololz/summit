@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -16,8 +18,11 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.databinding.FragmentLoginBinding
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -48,8 +53,18 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         requireMainActivity().apply {
-            insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, view)
+            insetViewAutomaticallyByPadding(viewLifecycleOwner, view)
             setupForFragment<LoginFragment>()
+
+            insets.observe(viewLifecycleOwner) {
+                binding.instanceEditText.post {
+                    if (!isBindingAvailable()) return@post
+                    if (binding.instanceEditText.isPopupShowing) {
+                        binding.instanceEditText.dismissDropDown()
+                        binding.instanceEditText.showDropDown()
+                    }
+                }
+            }
         }
 
         viewModel.state.observe(viewLifecycleOwner) {
@@ -60,10 +75,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                     binding.instance.visibility = View.VISIBLE
                     binding.username.visibility = View.VISIBLE
                     binding.password.visibility = View.VISIBLE
+                    binding.signUpText.visibility = View.VISIBLE
 
                     binding.title2fa.visibility = View.GONE
                     binding.body2fa.visibility = View.GONE
                     binding.twoFactorInput.visibility = View.GONE
+
+                    binding.login.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topToBottom = binding.password.id
+                        bottomToTop = binding.signUpText.id
+                    }
 
                     onBackPressedHandler.remove()
                     updateLoginButtonState()
@@ -73,10 +94,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                     binding.instance.visibility = View.GONE
                     binding.username.visibility = View.GONE
                     binding.password.visibility = View.GONE
+                    binding.signUpText.visibility = View.GONE
 
                     binding.title2fa.visibility = View.VISIBLE
                     binding.body2fa.visibility = View.VISIBLE
                     binding.twoFactorInput.visibility = View.VISIBLE
+
+                    binding.login.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topToBottom = binding.twoFactorInput.id
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
 
                     hideProgressBar()
                     enableAllFields()
@@ -171,6 +198,12 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                     }
                     null -> {}
                 }
+            }
+            signUpText.text =
+                LemmyTextHelper.getSpannable(context, getString(R.string.sign_up_title))
+            signUpText.setOnClickListener {
+                val direction = LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
+                findNavController().navigateSafe(direction)
             }
             updateLoginButtonState()
         }

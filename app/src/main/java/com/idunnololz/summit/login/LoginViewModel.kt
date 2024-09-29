@@ -135,7 +135,7 @@ class LoginViewModel @Inject constructor(
     }
 
     sealed interface State {
-        object Login : State
+        data object Login : State
 
         data class TwoFactorAuth(
             val instance: String,

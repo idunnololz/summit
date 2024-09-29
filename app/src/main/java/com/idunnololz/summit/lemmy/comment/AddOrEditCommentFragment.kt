@@ -250,6 +250,7 @@ class AddOrEditCommentFragment :
         textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
             binding.bottomBar.removeAllViews()
 
+            val replyingTo = binding.replyingTo
             val commentEditText = binding.commentEditText
 
             textFormatterToolbar = textFieldToolbarManager.createTextFormatterToolbar(
@@ -258,7 +259,8 @@ class AddOrEditCommentFragment :
             )
 
             textFormatterToolbar?.setupTextFormatterToolbar(
-                commentEditText,
+                editText = commentEditText,
+                referenceTextView = replyingTo,
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)

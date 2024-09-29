@@ -22,7 +22,7 @@ class DataFiles private constructor(private val context: Context) : IDataCache {
         /**
          * Amount of time a cached file stays fresh for in ms.
          */
-        val DEFAULT_FRESH_TIME_MS = (24 * 60 * 60 * 1000).toLong() // 1 day
+        const val DEFAULT_FRESH_TIME_MS = (24 * 60 * 60 * 1000).toLong() // 1 day
 
         @SuppressLint("StaticFieldLeak") // application context
         lateinit var instance: DataFiles

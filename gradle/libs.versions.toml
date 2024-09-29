@@ -23,6 +23,7 @@ transformations = "2.0.2"
 viewpump = "2.0.3"
 work = "2.9.1"
 coil = "2.5.0"
+retrofit = "2.11.0"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -71,8 +72,9 @@ okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version = "4.10.0" }
 okhttp-okhttp = { module = "com.squareup.okhttp3:okhttp" }
 okhttp-logging-intercepter = { module = "com.squareup.okhttp3:logging-interceptor" }
 
-retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version = "2.11.0" }
-retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version = "2.11.0" }
+retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+retrofit2-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
 
 transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformations" }
 viewpump = { module = "io.github.inflationx:viewpump", version.ref = "viewpump" }
@@ -129,4 +131,3 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android-extensions = { id = "org.jetbrains.kotlin.android.extensions", version.ref = "kotlin" }
 navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.1.0" }
-versions = { id = "com.github.ben-manes.versions", version = "0.47.0" }

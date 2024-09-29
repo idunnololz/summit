@@ -60,8 +60,8 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                 }
                 LoginFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
+                    navBarController.hideNavBar(animate)
+                    hideNotificationBarBg()
                 }
                 SettingsFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()

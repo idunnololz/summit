@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- From C:\Users\idunnololz\.gradle\caches\transforms-3\19138b587a99b8d8a201f2446670269f\transformed\appcompat-1.5.0\res\drawable-v21\abc_dialog_material_background.xml -->
+<shape android:shape="rectangle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="12dp" />
+    <solid android:color="@color/colorSecondaryContainer" />
+</shape>

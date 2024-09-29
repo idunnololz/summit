@@ -10,6 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -20,7 +21,7 @@ class ImgurModule {
         Retrofit.Builder()
             .baseUrl("https://api.imgur.com")
             .client(get())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create())
             .build()
             .create(ImgurApi::class.java)
 }

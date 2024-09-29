@@ -36,6 +36,7 @@ import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
+import com.idunnololz.summit.api.dto.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.GetCommentsResponse
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetModlogResponse
@@ -71,6 +72,7 @@ import com.idunnololz.summit.api.dto.PurgeComment
 import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.api.dto.PurgePerson
 import com.idunnololz.summit.api.dto.PurgePost
+import com.idunnololz.summit.api.dto.Register
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
@@ -724,6 +726,12 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @QueryMap form: Map<String, String>,
     ): Call<GetModlogResponse>
+
+    @POST("user/register")
+    fun register(@Body register: Register): Call<LoginResponse>
+
+    @GET("user/get_captcha")
+    fun getCaptcha(): Call<GetCaptchaResponse>
 
     companion object {
 

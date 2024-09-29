@@ -18,7 +18,7 @@
             <TextView
                 android:id="@+id/title"
                 android:text="@string/login"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?textAppearanceTitleLarge"
                 android:includeFontPadding="false"
@@ -41,6 +41,7 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                 <AutoCompleteTextView
+                    android:id="@+id/instance_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"/>
@@ -91,11 +92,10 @@
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
-
             <TextView
                 android:id="@+id/title_2fa"
                 android:text="@string/please_enter_2fa_code"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?textAppearanceTitleLarge"
                 android:includeFontPadding="false"
@@ -138,13 +138,6 @@
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="password,two_factor_input"/>
-
             <Button
                 android:id="@+id/login"
                 android:layout_width="0dp"
@@ -153,7 +146,22 @@
                 android:layout_marginTop="@dimen/padding"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/barrier"/>
+                app:layout_constraintTop_toBottomOf="@+id/password"
+                app:layout_constraintBottom_toTopOf="@+id/sign_up_text"/>
+
+            <TextView
+                android:id="@+id/sign_up_text"
+                android:text="@string/sign_up_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:includeFontPadding="false"
+                android:paddingVertical="@dimen/padding"
+                android:background="?selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/login"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progress_bar"

@@ -1753,7 +1753,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                         endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
                     }
 
-                    marginEnd = Utils.convertDpToPixel(16f).toInt()
+//                    marginEnd = Utils.convertDpToPixel(16f).toInt()
                 }
 
                 if (endBarrier != null) {

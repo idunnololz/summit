@@ -43,6 +43,7 @@ import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
+import com.idunnololz.summit.api.dto.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
@@ -74,6 +75,7 @@ import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
+import com.idunnololz.summit.api.dto.LoginResponse
 import com.idunnololz.summit.api.dto.MarkAllAsRead
 import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
@@ -95,6 +97,7 @@ import com.idunnololz.summit.api.dto.PurgeComment
 import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.api.dto.PurgePerson
 import com.idunnololz.summit.api.dto.PurgePost
+import com.idunnololz.summit.api.dto.Register
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
@@ -145,6 +148,7 @@ class LemmyApiClient(
 
         const val API_VERSION = "v3"
         const val DEFAULT_INSTANCE = "lemmy.ml"
+        const val INSTANCE_LEMMY_WORLD = "lemmy.world"
 
         val DEFAULT_LEMMY_INSTANCES = listOf(
             "beehaw.org",
@@ -159,7 +163,7 @@ class LemmyApiClient(
             "lemmy.ml",
             "lemmy.one",
             "lemmy.sdf.org",
-            "lemmy.world",
+            INSTANCE_LEMMY_WORLD,
             "lemmy.zip",
             "lemmygrad.ml",
             "lemmynsfw.com",
@@ -1850,6 +1854,61 @@ class LemmyApiClient(
             } else {
                 api.getModLogs(authorization = account?.bearer, form.serializeToMap())
             }
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun register(
+        username: String,
+        password: String,
+        passwordVerify: String,
+        showNsfw: Boolean,
+        /**
+         * email is mandatory if email verification is enabled on the server
+         */
+        email: String? = null,
+        /**
+         * The UUID of the captcha item.
+         */
+        captchaUuid: String? = null,
+        /**
+         * Your captcha answer.
+         */
+        captchaAnswer: String? = null,
+        /**
+         * A form field to trick signup bots. Should be None.
+         */
+        honeypot: String? = null,
+        /**
+         * An answer is mandatory if require application is enabled on the server
+         */
+        answer: String? = null,
+    ): Result<LoginResponse> {
+        val form = Register(
+            username = username,
+            password = password,
+            password_verify = passwordVerify,
+            show_nsfw = showNsfw,
+            email = email,
+            captcha_uuid = captchaUuid,
+            captcha_answer = captchaAnswer,
+            honeypot = honeypot,
+            answer = answer,
+        )
+
+        return retrofitErrorHandler {
+            api.register(form)
+        }.fold(
+            onSuccess = { Result.success(it) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    suspend fun getCaptcha(): Result<GetCaptchaResponse> {
+        return retrofitErrorHandler {
+            api.getCaptcha()
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },

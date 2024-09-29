@@ -307,7 +307,8 @@ class CreateOrEditPostFragment :
 
             val postEditor = binding.postEditor
             textFormatToolbar?.setupTextFormatterToolbar(
-                requireNotNull(postEditor.editText),
+                editText = requireNotNull(postEditor.editText),
+                referenceTextView = null,
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)
