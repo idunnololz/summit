@@ -286,7 +286,7 @@ class NavBarController(
 
     fun showBottomNav(supportOpenness: Boolean = false) {
         if (!useBottomNavBar) return
-        if (enableBottomNavViewScrolling && navBar.visibility == View.VISIBLE) {
+        if (enableBottomNavViewScrolling && navBar.visibility == View.VISIBLE && navBar.alpha == 1f) {
             return
         }
 
@@ -310,35 +310,45 @@ class NavBarController(
         navBarOffsetPercent.value = 0f
 
         if (useNavigationRail) {
-            if (navBarContainer.visibility != View.VISIBLE) {
+            if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
                 navBarContainer.visibility = View.VISIBLE
-                navBarContainer.translationX =
-                    -navBar.width.toFloat()
-
-                navBarContainer.post {
-                    navBarContainer.animate()
-                        .translationX(navigationBarOffset).duration = 250
-                }
-            } else {
-                if (navBarContainer.translationX == 0f) return
+                navBarContainer.translationX = -navBar.width.toFloat()
 
                 navBarContainer.animate()
+                    .translationX(navigationBarOffset)
+                    .alpha(1f)
+                    .apply {
+                        duration = 250
+                    }
+            } else {
+                if (navBarContainer.translationX == 0f) {
+                    navBarContainer.alpha = 1f
+                    return
+                }
+
+                navBarContainer.animate()
+                    .alpha(1f)
                     .translationX(navigationBarOffset).duration = 250
             }
         } else {
-            if (navBarContainer.visibility != View.VISIBLE) {
+            if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
                 navBarContainer.visibility = View.VISIBLE
-                navBarContainer.translationY =
-                    navBarContainer.height.toFloat()
-
-                navBarContainer.post {
-                    navBarContainer.animate()
-                        .translationY(navigationBarOffset).duration = 250
-                }
-            } else {
-                if (navBarContainer.translationY == 0f) return
+                navBarContainer.translationY = navBarContainer.height.toFloat()
 
                 navBarContainer.animate()
+                    .translationY(navigationBarOffset)
+                    .alpha(1f)
+                    .apply {
+                        duration = 250
+                    }
+            } else {
+                if (navBarContainer.translationY == 0f) {
+                    navBarContainer.alpha = 1f
+                    return
+                }
+
+                navBarContainer.animate()
+                    .alpha(1f)
                     .translationY(navigationBarOffset).duration = 250
             }
         }
@@ -352,24 +362,28 @@ class NavBarController(
                 if (navBarContainer.translationX > -navBarContainer.width.toFloat()) {
                     navBarContainer.animate()
                         .translationX(-navBarContainer.width.toFloat())
+                        .alpha(0f)
                         .apply {
                             duration = 250
                         }
                 }
             } else {
                 navBarContainer.translationX = -navBarContainer.width.toFloat()
+                navBarContainer.alpha = 0f
             }
         } else {
             if (animate) {
                 if (navBarContainer.translationY < navBarContainer.height.toFloat()) {
                     navBarContainer.animate()
                         .translationY(navBarContainer.height.toFloat())
+                        .alpha(0f)
                         .apply {
                             duration = 250
                         }
                 }
             } else {
                 navBarContainer.translationY = navBarContainer.height.toFloat()
+                navBarContainer.alpha = 0f
             }
         }
     }

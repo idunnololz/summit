@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.MutableLiveData
@@ -212,8 +213,13 @@ class TextFormatToolbarViewHolder(
             settings.isEnabled = value
         }
 
+    /**
+     * @param referenceTextView A [TextView] where content is shown. For instance the message being
+     * replied to. This is used for certain comment actions such as quoting.
+     */
     fun setupTextFormatterToolbar(
         editText: EditText,
+        referenceTextView: TextView?,
         onChooseImageClick: (() -> Unit)? = null,
         onAddLinkClick: (() -> Unit)? = null,
         onPreviewClick: (() -> Unit)? = null,
@@ -221,6 +227,26 @@ class TextFormatToolbarViewHolder(
         onSettingsClick: (() -> Unit)? = null,
     ) {
         this.editText = editText
+
+        fun getSelectedText(): String? {
+            if (referenceTextView != null) {
+                val start = referenceTextView.selectionStart
+                val end = referenceTextView.selectionEnd
+
+                if (start != -1 && end != -1) {
+                    return referenceTextView.text.toString().substring(start, end)
+                }
+            }
+
+            val start = editText.selectionStart
+            val end = editText.selectionEnd
+
+            if (start != -1 && end != -1) {
+                return editText.text.toString().substring(start, end)
+            }
+
+            return null
+        }
 
         if (preview != null) {
             if (onPreviewClick != null) {
@@ -284,7 +310,7 @@ class TextFormatToolbarViewHolder(
             val start = editText.selectionStart.coerceAtLeast(0)
             val end = editText.selectionEnd.coerceAtLeast(0)
 
-            val text = editText.text.toString().substring(start, end)
+            val text = getSelectedText() ?: ""
             val newText = ">" + text.split("\n").joinToString(separator = "\n>")
 
             editText.text.replace(start, end, newText)
@@ -292,6 +318,7 @@ class TextFormatToolbarViewHolder(
             val finalCursorPos = Integer.min(start, end) + newText.length
 
             editText.setSelection(finalCursorPos)
+            editText.requestFocus()
         }
         link?.setOnClickListener {
             onAddLinkClick?.invoke()

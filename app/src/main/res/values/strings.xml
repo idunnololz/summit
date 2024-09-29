@@ -1798,6 +1798,24 @@
     <string name="moderate">Moderate</string>
     <string name="lite">Lite</string>
     <string name="use_condensed_style_for_comment_header">Use condensed style for comment header</string>
+    <string name="sign_up_title">Don\'t have an account? [Sign Up]()</string>
+    <string name="sign_up">Sign up</string>
+    <string name="button_continue">Continue</string>
+    <string name="sign_up_instance_desc">Choose the instance you want to call home. For more information about the instances of Lemmy, visit [join-lemmy.org](https://join-lemmy.org/instances).\n\n[Don\'t know who to choose? Use the largest instance.](a)</string>
+    <string name="error_unable_to_resolve_instance">Unable to resolve instance. Please double check instance entered.</string>
+    <string name="username">Username</string>
+    <string name="answer">Answer</string>
+    <string name="answer_required_to_sign_up_desc">**To join this server, you need to answer the following question, and wait to be accepted.**</string>
+    <string name="error_invalid_instance_format">Invalid instance format.</string>
+    <string name="error_username_too_short">Username too short. Minimum length %1$s characters.</string>
+    <string name="error_username_cannot_contain_spaces">Username cannot contain spaces.</string>
+    <string name="error_username_too_long">Username too long. Max username length %1$s characters.</string>
+    <string name="error_invalid_email">Invalid email.</string>
+    <string name="error_password_too_short">Password too short. Minimum length %1$s characters.</string>
+    <string name="error_password_too_long">Password too long. Maximum length %1$s characters.</string>
+    <string name="done">Done</string>
+    <string name="error_unable_to_decode_captcha_image">Unable to decode captcha image.</string>
+    <string name="error_no_captcha">Instance requires captcha however no captcha is provided.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

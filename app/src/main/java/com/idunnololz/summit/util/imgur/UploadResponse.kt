@@ -6,66 +6,66 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class UploadResponse(
-    @SerializedName("data")
+    @Json(name = "data")
     val upload: Upload,
-    @SerializedName("status")
+    @Json(name = "status")
     val status: Int,
-    @SerializedName("success")
+    @Json(name = "success")
     val success: Boolean
 )
 
 @JsonClass(generateAdapter = true)
 data class Upload(
-    @SerializedName("account_id")
+    @Json(name = "account_id")
     val accountId: Int?,
-    @SerializedName("account_url")
+    @Json(name = "account_url")
     val accountUrl: String?,
-    @SerializedName("ad_type")
+    @Json(name = "ad_type")
     val adType: Int?,
-    @SerializedName("ad_url")
+    @Json(name = "ad_url")
     val adUrl: String?,
-    @SerializedName("animated")
+    @Json(name = "animated")
     val animated: Boolean,
-    @SerializedName("bandwidth")
+    @Json(name = "bandwidth")
     val bandwidth: Int,
-    @SerializedName("datetime")
+    @Json(name = "datetime")
     val datetime: Long,
-    @SerializedName("deletehash")
+    @Json(name = "deletehash")
     val deletehash: String,
-    @SerializedName("description")
+    @Json(name = "description")
     val description: String?,
-    @SerializedName("favorite")
+    @Json(name = "favorite")
     val favorite: Boolean,
-    @SerializedName("has_sound")
+    @Json(name = "has_sound")
     val hasSound: Boolean,
-    @SerializedName("height")
+    @Json(name = "height")
     val height: Int,
-    @SerializedName("hls")
+    @Json(name = "hls")
     val hls: String,
-    @SerializedName("id")
+    @Json(name = "id")
     val id: String,
-    @SerializedName("in_gallery")
+    @Json(name = "in_gallery")
     val inGallery: Boolean,
-    @SerializedName("in_most_viral")
+    @Json(name = "in_most_viral")
     val inMostViral: Boolean,
-    @SerializedName("is_ad")
+    @Json(name = "is_ad")
     val isAd: Boolean,
-    @SerializedName("link")
+    @Json(name = "link")
     val link: String?,
-    @SerializedName("mp4")
+    @Json(name = "mp4")
     val mp4: String,
-    @SerializedName("name")
+    @Json(name = "name")
     val name: String,
-    @SerializedName("size")
+    @Json(name = "size")
     val size: Int,
-    @SerializedName("tags")
+    @Json(name = "tags")
     val tags: List<String>,
-    @SerializedName("title")
+    @Json(name = "title")
     val title: String?,
-    @SerializedName("type")
+    @Json(name = "type")
     val type: String,
-    @SerializedName("views")
+    @Json(name = "views")
     val views: Int,
-    @SerializedName("width")
+    @Json(name = "width")
     val width: Int
 )

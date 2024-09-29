@@ -7,5 +7,17 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.idunnololz.summit.login.LoginFragment"
-        android:label="LoginFragment" />
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"/>
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.idunnololz.summit.signUp.SignUpFragment"
+        android:label="SignUpFragment" />
 </navigation>

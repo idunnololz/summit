@@ -258,6 +258,7 @@ class CommunityViewModel @Inject constructor(
                 val updatedPages = withContext(Dispatchers.Default) {
                     pagesCopy.map {
                         it.copy(
+                            allPosts = postsRepository.update(it.allPosts),
                             posts = postsRepository.update(it.posts),
                             isReadPostUpdate = false,
                         )

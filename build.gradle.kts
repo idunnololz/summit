@@ -1,8 +1,4 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import java.util.Locale
-
 plugins {
-    alias(libs.plugins.versions)
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -32,15 +28,4 @@ allprojects {
 
 task<Delete>("clean") {
     delete(rootProject.buildDir)
-}
-
-fun isNotStable(version: String): Boolean {
-    val versionLower = version.lowercase(Locale.US).trim()
-    return Regex("-(alpha|rc|beta)[0-9.]*\$").containsMatchIn(versionLower)
-}
-
-tasks.withType<DependencyUpdatesTask> {
-    rejectVersionIf {
-        isNotStable(candidate.version)
-    }
 }
