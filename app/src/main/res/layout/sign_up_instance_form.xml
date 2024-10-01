@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/card_view"
+        app:layout_constraintBottom_toTopOf="@+id/body"
         app:layout_constraintVertical_chainStyle="packed"/>
 
     <TextView
