@@ -43,7 +43,7 @@ jobs:
         run: mv ${{steps.sign_apk.outputs.signedReleaseFile}} release.apk
       - run: echo "Build status report=${{ job.status }}."
       - name: Upload App Bundle
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: release.apk
           path: release.apk
