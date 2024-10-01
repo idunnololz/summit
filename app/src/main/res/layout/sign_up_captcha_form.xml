@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sign_up_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false">
+
+    <TextView
+        android:id="@+id/title_large"
+        android:text="@string/sign_up"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceHeadlineLarge"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/card_view"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_large"
+        app:layout_constraintBottom_toTopOf="@+id/body">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/card_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/server_icon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_margin="@dimen/padding"
+                android:padding="12dp"
+                android:background="@drawable/server_icon_bg"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/server_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:layout_marginStart="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"
+                android:layout_marginEnd="@dimen/padding"
+                app:layout_constraintStart_toEndOf="@+id/server_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/server_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:layout_marginTop="@dimen/padding_half"
+                android:layout_marginBottom="@dimen/padding"
+                app:layout_constraintVertical_bias="0"
+                app:layout_constraintStart_toStartOf="@+id/server_name"
+                app:layout_constraintEnd_toEndOf="@+id/server_name"
+                app:layout_constraintTop_toBottomOf="@+id/server_name"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:includeFontPadding="false"
+        android:layout_marginTop="@dimen/padding"
+        android:text="@string/solve_captcha_desc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card_view"
+        app:layout_constraintBottom_toTopOf="@+id/captcha_image"/>
+
+    <ImageView
+        android:id="@+id/captcha_image"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="180dp"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/body"
+        app:layout_constraintBottom_toTopOf="@+id/captcha_controls"/>
+
+    <TextView
+        android:id="@+id/captcha_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceTitleSmall"
+        android:textColor="?colorError"
+        android:gravity="center"
+        android:layout_gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/captcha_image"
+        app:layout_constraintBottom_toBottomOf="@+id/captcha_image"
+        app:layout_constraintStart_toStartOf="@+id/captcha_image"
+        app:layout_constraintEnd_toEndOf="@+id/captcha_image"/>
+
+    <LinearLayout
+        android:id="@+id/captcha_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/captcha_image"
+        app:layout_constraintBottom_toTopOf="@+id/captcha_answer_input_layout">
+
+        <ImageView
+            android:id="@+id/captcha_play_audio"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/baseline_volume_up_24"
+            android:background="?selectableItemBackgroundBorderless"
+            app:tint="?colorControlNormal" />
+
+        <ImageView
+            android:id="@+id/captcha_refresh"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@drawable/baseline_refresh_24"
+            android:background="?selectableItemBackgroundBorderless"
+            app:tint="?colorControlNormal" />
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/captcha_answer_input_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/answer"
+        android:layout_marginTop="@dimen/padding"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/captcha_controls"
+        app:layout_constraintBottom_toTopOf="@+id/sign_up">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/captcha_answer_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/sign_up"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_up"
+        android:layout_marginTop="@dimen/padding_one_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/captcha_answer_input_layout"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

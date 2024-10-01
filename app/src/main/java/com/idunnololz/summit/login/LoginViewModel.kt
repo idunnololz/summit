@@ -9,6 +9,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.IncorrectLoginException
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
@@ -19,16 +20,15 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val apiClientFactory: AccountAwareLemmyClient.Factory,
-    private val accountManager: AccountManager,
-    private val accountInfoManager: AccountInfoManager,
+    private val lemmyApiClientFactory: LemmyApiClient.Factory,
+    private val loginHelper: LoginHelper,
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "LoginViewModel"
     }
 
-    private val apiClient = apiClientFactory.create()
+    private val apiClient = lemmyApiClientFactory.create()
 
     val accountLiveData = StatefulLiveData<Account>()
     val state = MutableLiveData<State>(State.Login)
@@ -73,40 +73,14 @@ class LoginViewModel @Inject constructor(
                 return@launch
             }
 
-            val siteResult = apiClient.fetchSiteWithRetry(force = true, jwt)
+            loginHelper.loginWithJwt(instance, jwt)
+                .onSuccess {
+                    accountLiveData.postValue(it)
+                }
+                .onFailure {
+                    accountLiveData.postError(it)
+                }
 
-            if (siteResult.isFailure) {
-                Log.e(TAG, "", siteResult.exceptionOrNull())
-                accountLiveData.postError(siteResult.exceptionOrNull() ?: RuntimeException())
-                return@launch
-            }
-
-            val site = siteResult.getOrThrow()
-            val luv = site.my_user?.local_user_view
-
-            if (luv == null) {
-                accountLiveData.postError(
-                    RuntimeException("Login success but local_user_view is null."),
-                )
-                return@launch
-            }
-
-            val account = Account(
-                id = luv.person.id,
-                name = luv.person.name,
-                current = true,
-                instance = instance,
-                jwt = jwt,
-                defaultListingType = luv.local_user.default_listing_type?.ordinal
-                    ?: ListingType.All.ordinal,
-                defaultSortType = luv.local_user.default_sort_type?.ordinal
-                    ?: SortType.Active.ordinal,
-            )
-
-            accountManager.addAccountAndSetCurrent(account)
-            accountInfoManager.updateAccountInfoWith(account, site)
-
-            accountLiveData.postValue(account)
         }
     }
 

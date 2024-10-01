@@ -34,7 +34,6 @@
                 android:id="@+id/icon"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:scaleType="centerCrop"
                 app:border_color="@color/colorOnSurface"
                 app:border_width="1dp"
                 app:fill_color="@color/style_blue"
@@ -53,6 +52,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceHeadlineMedium"
+                android:layout_marginTop="@dimen/padding_half"
+                app:layout_constraintTop_toBottomOf="@+id/name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
             <com.google.android.material.imageview.ShapeableImageView
                 style="@style/RoundImageView"
                 android:id="@+id/image"
@@ -66,7 +75,7 @@
                 app:layout_constraintHeight_max="1000dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/name"
+                app:layout_constraintTop_toBottomOf="@+id/title"
                 />
 
             <TextView

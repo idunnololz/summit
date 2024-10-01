@@ -4,6 +4,9 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.idunnololz.summit.api.dto.ListingType
+import com.idunnololz.summit.api.dto.LocalUserView
+import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.PersonRef
 import kotlinx.parcelize.Parcelize
 
@@ -27,7 +30,23 @@ data class Account(
         defaultValue = "0",
     )
     val defaultSortType: Int,
-) : Parcelable, GuestOrUserAccount
+) : Parcelable, GuestOrUserAccount {
+
+    companion object {
+        fun from(instance: String, localUserView: LocalUserView, jwt: String) =
+            Account(
+                id = localUserView.person.id,
+                name = localUserView.person.name,
+                current = true,
+                instance = instance,
+                jwt = jwt,
+                defaultListingType = localUserView.local_user.default_listing_type?.ordinal
+                    ?: ListingType.All.ordinal,
+                defaultSortType = localUserView.local_user.default_sort_type?.ordinal
+                    ?: SortType.Active.ordinal,
+            )
+    }
+}
 
 /**
  * Only use for display name. This value is not stable as the name of an account can be changed.

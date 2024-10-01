@@ -221,14 +221,40 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 )
             }
 
+            if (o.content.title.isNullOrBlank()) {
+                title.visibility = View.GONE
+            } else {
+                title.visibility = View.VISIBLE
+                LemmyTextHelper.bindText(
+                    textView = title,
+                    text = o.content.title,
+                    instance = args.instance,
+                    onImageClick = { url ->
+//                    getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+                    },
+                    onVideoClick = { url ->
+//                    getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
+                    },
+                    onPageClick = {
+//                    getMainActivity()?.launchPage(it)
+                    },
+                    onLinkClick = { url, text, linkType ->
+//                    onLinkClick(url, text, linkType)
+                    },
+                    onLinkLongClick = { url, text ->
+//                    getMainActivity()?.showBottomMenuForLink(url, text)
+                    },
+                )
+            }
+
             if (o.content.content.isNullOrBlank()) {
                 text.visibility = View.GONE
             } else {
                 text.visibility = View.VISIBLE
                 LemmyTextHelper.bindText(
-                    text,
-                    o.content.content,
-                    args.instance,
+                    textView = text,
+                    text = o.content.content,
+                    instance = args.instance,
                     onImageClick = { url ->
 //                    getMainActivity()?.openImage(null, binding.appBar, null, url, null)
                     },
@@ -313,11 +339,13 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
     )
 
     private fun Comment.toContent(): Content = Content(
+        title = null,
         content = content,
         imageUrl = null,
     )
 
     private fun Post.toContent(): Content = Content(
+        title = name,
         content = body,
         imageUrl = this.thumbnail_url ?: this.url,
     )
@@ -339,6 +367,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
     )
 
     data class Content(
+        val title: String?,
         val content: String?,
         val imageUrl: String?,
     )
