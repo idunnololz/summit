@@ -1,5 +1,9 @@
 package com.idunnololz.summit.api.dto
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class LocalSite(
     val id: LocalSiteId,
     val site_id: SiteId,
@@ -26,4 +30,4 @@ data class LocalSite(
     val updated: String? = null,
     val registration_mode: RegistrationMode /* "Closed" | "RequireApplication" | "Open" */,
     val reports_email_admins: Boolean,
-)
+): Parcelable

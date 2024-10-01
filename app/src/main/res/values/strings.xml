@@ -1816,6 +1816,17 @@
     <string name="done">Done</string>
     <string name="error_unable_to_decode_captcha_image">Unable to decode captcha image.</string>
     <string name="error_no_captcha">Instance requires captcha however no captcha is provided.</string>
+    <string name="submitting_application">Submitting application…</string>
+    <string name="submit">Submit</string>
+    <string name="email_optional">Email (optional)</string>
+    <string name="error_instance_closed_registrations">This instance is currently not accepting new users.</string>
+    <string name="error_sign_up">Sign up failed</string>
+    <string name="sign_up_success">Sign up success</string>
+    <string name="email_verification_required">Email verification required. Please look for the verification email and click on the link within. \n\nIf you do not see the email within 10 minutes, check your spam or trash folders.</string>
+    <string name="finish">Finish</string>
+    <string name="registration_created">Your application as been submitted. You must wait for a site admin will need to approve your application before you can use your account.</string>
+    <string name="error_unknown_sign_up_error">An unexpected error has occurred during registration.</string>
+    <string name="solve_captcha_desc">You must solve a captcha to sign up. Please enter the code from the image below.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

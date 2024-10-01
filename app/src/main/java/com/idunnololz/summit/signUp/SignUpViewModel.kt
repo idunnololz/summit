@@ -6,22 +6,30 @@ import android.util.Log
 import android.util.LruCache
 import android.util.Patterns
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CaptchaResponse
 import com.idunnololz.summit.api.dto.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.RegistrationMode
 import com.idunnololz.summit.links.LinkFixer
+import com.idunnololz.summit.login.LoginHelper
 import com.idunnololz.summit.util.PrettyPrintUtils
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -38,7 +46,8 @@ import kotlin.random.Random
 class SignUpViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val lemmyApiClientFactory: LemmyApiClient.Factory,
-    private val linkFixer: LinkFixer,
+    private val loginHelper: LoginHelper,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
@@ -49,7 +58,7 @@ class SignUpViewModel @Inject constructor(
     private var captchaInfo: CaptchaResponse? = null
     private var site: GetSiteResponse? = null
     private val signUpModelState = MutableStateFlow(SignUpModel())
-    private var instanceError: InstanceError? = null
+    private var instanceError: String? = null
 
     private var siteCache = LruCache<String, GetSiteResponse>(10)
 
@@ -65,6 +74,7 @@ class SignUpViewModel @Inject constructor(
     init {
         viewModelScope.launch(backgroundContext) {
             signUpModelState.collect {
+                savedStateHandle["sign_up_model_state"] = it
                 signUpModel.postValue(it)
             }
         }
@@ -75,16 +85,20 @@ class SignUpViewModel @Inject constructor(
         }
 
         if (BuildConfig.DEBUG) {
-            signUpModelState.value = signUpModelState.value.copy(
-                signUpFormData = SignUpFormData(
-                    instance = "lemmy.idunnololz.com",
-                    username = "signup_test_${(System.currentTimeMillis() / 1000).toString().drop(3)}",
-                    email = "support+signuptest@idunnololz.com",
-                    password = "testestest",
-                    questionnaireAnswer = "This is a test account!",
-                    captchaAnswer = "asdf",
-                )
-            )
+//            signUpModelState.value = signUpModelState.value.copy(
+//                signUpFormData = SignUpFormData(
+//                    instance = "lemmy.idunnololz.com",
+//                    username = "signup_test_${(System.currentTimeMillis() / 1000).toString().drop(3)}",
+//                    email = "",//"support+signuptest@idunnololz.com",
+//                    password = "testestest",
+//                    questionnaireAnswer = "This is a test account!",
+//                    captchaAnswer = "asdf",
+//                )
+//            )
+        }
+
+        savedStateHandle.get<SignUpModel>("sign_up_model_state")?.let {
+            signUpModelState.value = it
         }
     }
 
@@ -109,9 +123,9 @@ class SignUpViewModel @Inject constructor(
         if (instance.isBlank() || !isValidUrl) {
             fetchSiteLiveData.setIdle()
             if (instance.isNotBlank() && !isValidUrl) {
-                instanceError = InstanceError.InvalidUrl
+                instanceError = context.getString(R.string.error_invalid_instance_format)
             } else {
-                instanceError = null
+                instanceError = context.getString(R.string.required)
             }
             updateSignUpModel()
             return
@@ -139,7 +153,7 @@ class SignUpViewModel @Inject constructor(
                     .onFailure {
                         site = null
                         fetchSiteLiveData.setError(it)
-                        instanceError = InstanceError.InvalidInstance
+                        instanceError = context.getString(R.string.error_unable_to_resolve_instance)
                     }
                     .onSuccess {
                         site = it
@@ -148,7 +162,11 @@ class SignUpViewModel @Inject constructor(
 
                         siteCache.put(instance, it)
 
-                        onSiteLoadedAndConfirmed(instance, it)
+                        if (it.site_view.local_site.registration_mode == RegistrationMode.Closed) {
+                            instanceError = context.getString(R.string.error_instance_closed_registrations)
+                        } else {
+                            onSiteLoadedAndConfirmed(instance, it.toSiteModel())
+                        }
                     }
 
                 updateSignUpModel()
@@ -156,19 +174,10 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onSiteLoadedAndConfirmed(instance: String, site: GetSiteResponse) {
+    private fun onSiteLoadedAndConfirmed(instance: String, site: SiteModel) {
         val currentScene = signUpModelState.value.currentScene as? SignUpScene.InstanceForm ?: return
         signUpModelState.value = signUpModelState.value.copy(
-            currentScene = SignUpScene.CredentialsForm(
-                instance = instance,
-                site = site,
-                previousScene = currentScene.copy(
-                    continueClicked = false,
-                    isLoading = false,
-                    // clear all errors
-                    instanceError = null,
-                ),
-            ),
+            currentScene = requireNotNull(currentScene.nextScene(instance, site)),
             signUpFormData = signUpModelState.value.signUpFormData.copy(
                 instance = instance,
             ),
@@ -241,7 +250,7 @@ class SignUpViewModel @Inject constructor(
 
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = currentScene.copy(
-                site = site,
+                site = site?.toSiteModel(),
                 instance = instanceTextState.value,
                 instanceError = instanceError,
                 continueClicked = continueClicked,
@@ -249,6 +258,132 @@ class SignUpViewModel @Inject constructor(
             )
         )
     }
+
+    private fun SignUpScene.nextScene(instance: String, site: SiteModel): SignUpScene? {
+        fun SignUpScene.nextSceneWithoutHasNextOrSkipping() =
+            when (this) {
+                is SignUpScene.InstanceForm ->
+                    SignUpScene.CredentialsForm(
+                        instance = instance,
+                        site = site,
+                        isEmailRequired = site.localSite.require_email_verification,
+                        hasNext = false,
+                        previousScene = this.reset(),
+                    )
+                is SignUpScene.CredentialsForm ->
+                    SignUpScene.AnswerForm(
+                        instance = instance,
+                        site = site,
+                        hasNext = false,
+                        previousScene = this.reset(),
+                    )
+                is SignUpScene.AnswerForm ->
+                    SignUpScene.CaptchaForm(
+                        instance = instance,
+                        site = site,
+                        hasNext = false,
+                        previousScene = this.reset(),
+                    )
+                is SignUpScene.CaptchaForm ->
+                    SignUpScene.SubmitApplication(
+                        instance = instance,
+                        site = site,
+                        hasNext = false,
+                        previousScene = this.reset(),
+                    )
+                is SignUpScene.SubmitApplication ->
+                    SignUpScene.NextSteps(
+                        instance = instance,
+                        site = site,
+                        loginResponse = null,
+                        hasNext = false,
+                        previousScene = this.reset(),
+                    )
+                is SignUpScene.NextSteps ->
+                    null
+            }
+
+        fun SignUpScene.nextSceneWithoutHasNext(): SignUpScene? {
+            var nextScene = this.nextSceneWithoutHasNextOrSkipping()
+
+            while (true) {
+                when (nextScene) {
+                    is SignUpScene.AnswerForm ->
+                        if (site.localSite.registration_mode == RegistrationMode.Open) {
+                            nextScene = nextScene.nextSceneWithoutHasNextOrSkipping()
+                        } else {
+                            break
+                        }
+                    is SignUpScene.CaptchaForm ->
+                        if (!site.localSite.captcha_enabled) {
+                            nextScene = nextScene.nextSceneWithoutHasNextOrSkipping()
+                        } else {
+                            break
+                        }
+                    is SignUpScene.CredentialsForm -> break
+                    is SignUpScene.InstanceForm -> break
+                    is SignUpScene.SubmitApplication -> break
+                    is SignUpScene.NextSteps -> break
+                    null -> break
+                }
+            }
+
+            return nextScene
+        }
+
+        val nextScene = nextSceneWithoutHasNext()
+        val nextNextScene = nextScene?.nextSceneWithoutHasNext()
+        return nextScene?.updateHasNext(
+            hasNext = nextNextScene != null && nextNextScene !is SignUpScene.SubmitApplication
+        )
+    }
+
+    fun SignUpScene.reset() =
+        when (this) {
+            is SignUpScene.InstanceForm ->
+                copy(
+                    continueClicked = false,
+                    isLoading = false,
+                    // clear all errors
+                    instanceError = null,
+                )
+            is SignUpScene.CredentialsForm ->
+                copy(
+                    isLoading = false,
+                    // clear all errors
+                    usernameError = null,
+                    emailError = null,
+                    passwordError = null,
+                )
+            is SignUpScene.AnswerForm ->
+                copy(
+                    isLoading = false,
+                    showAnswerEditor = false,
+                    // clear all errors
+                    answerError = null,
+                )
+            is SignUpScene.CaptchaForm ->
+                copy(
+                    isLoading = false,
+
+                    // clear captcha
+                    captchaUuid = null,
+                    captchaImage = null,
+                    captchaWav = null,
+                    captchaError = null,
+                    captchaAnswer = "",
+                )
+            is SignUpScene.SubmitApplication ->
+                copy(
+                    isLoading = false,
+                    // clear errors
+                    error = null,
+                )
+            is SignUpScene.NextSteps ->
+                copy(
+                    isLoading = false,
+                )
+        }
 
     fun signUp(captchaAnswer: String?) {
         viewModelScope.launch(backgroundContext) {
@@ -281,13 +416,28 @@ class SignUpViewModel @Inject constructor(
         fetchSiteAndGoToNextStep(instance)
     }
 
-    fun submitCredentials(
-        scene: SignUpScene.CredentialsForm,
+
+    fun updateCredentials(
         username: String,
         email: String,
         password: String,
     ) {
-        val localSite = scene.site.site_view.local_site
+        signUpModelState.value = signUpModelState.value.copy(
+            signUpFormData = signUpModelState.value.signUpFormData.copy(
+                username = username,
+                email = email,
+                password = password,
+            ),
+        )
+    }
+
+    fun submitCredentials(
+        currentScene: SignUpScene.CredentialsForm,
+        username: String,
+        email: String,
+        password: String,
+    ) {
+        val localSite = currentScene.site.localSite
         val usernameError = if (username.isBlank()) {
             context.getString(R.string.required)
         } else if (username.length < 3) {
@@ -302,7 +452,11 @@ class SignUpViewModel @Inject constructor(
             null
         }
         val emailError = if (email.isBlank()) {
-            context.getString(R.string.required)
+            if (currentScene.isEmailRequired) {
+                context.getString(R.string.required)
+            } else {
+                null
+            }
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             context.getString(R.string.error_invalid_email)
         } else {
@@ -320,7 +474,7 @@ class SignUpViewModel @Inject constructor(
 
         if (usernameError != null || emailError != null || passwordError != null) {
             signUpModelState.value = signUpModelState.value.copy(
-                currentScene = scene.copy(
+                currentScene = currentScene.copy(
                     usernameError = usernameError,
                     emailError = emailError,
                     passwordError = passwordError,
@@ -328,19 +482,8 @@ class SignUpViewModel @Inject constructor(
             )
         } else {
             signUpModelState.value = signUpModelState.value.copy(
-                currentScene = SignUpScene.AnswerForm(
-                    instance = scene.instance,
-                    site = scene.site,
-                    username = username,
-                    email = email,
-                    password = password,
-                    previousScene = scene.copy(
-                        isLoading = false,
-                        // clear all errors
-                        usernameError = null,
-                        emailError = null,
-                        passwordError = null,
-                    ),
+                currentScene = requireNotNull(
+                    currentScene.nextScene(currentScene.instance, currentScene.site)
                 ),
                 signUpFormData = signUpModelState.value.signUpFormData.copy(
                     username = username,
@@ -381,24 +524,32 @@ class SignUpViewModel @Inject constructor(
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = currentScene.copy(
                 answer = text
+            ),
+            signUpFormData = signUpModelState.value.signUpFormData.copy(
+                questionnaireAnswer = text
             )
         )
     }
 
     fun submitAnswer(answer: String) {
         val currentScene = signUpModelState.value.currentScene as? SignUpScene.AnswerForm ?: return
-        signUpModelState.value = signUpModelState.value.copy(
-            currentScene = SignUpScene.CaptchaForm(
-                instance = currentScene.instance,
-                site = currentScene.site,
-                previousScene = currentScene.copy(
-                    isLoading = false,
-                )
-            ),
-            signUpFormData = signUpModelState.value.signUpFormData.copy(
-                questionnaireAnswer = answer
-            ),
-        )
+
+        if (answer.isBlank()) {
+            signUpModelState.value = signUpModelState.value.copy(
+                currentScene = currentScene.copy(
+                    answerError = context.getString(R.string.required)
+                ),
+            )
+        } else {
+            signUpModelState.value = signUpModelState.value.copy(
+                currentScene = requireNotNull(
+                    currentScene.nextScene(currentScene.instance, currentScene.site)
+                ),
+                signUpFormData = signUpModelState.value.signUpFormData.copy(
+                    questionnaireAnswer = answer
+                ),
+            )
+        }
     }
 
     fun fetchCaptcha(instance: String) {
@@ -426,24 +577,135 @@ class SignUpViewModel @Inject constructor(
     fun submitCaptchaAnswer(uuid: String, answer: String) {
         val currentScene = signUpModelState.value.currentScene as? SignUpScene.CaptchaForm ?: return
         signUpModelState.value = signUpModelState.value.copy(
-            currentScene = SignUpScene.SubmitApplication(
-                instance = currentScene.instance,
-                site = currentScene.site,
-                previousScene = currentScene.copy(
-                    isLoading = false,
-                )
-            ),
+            currentScene = requireNotNull(
+                currentScene.nextScene(currentScene.instance, currentScene.site)),
             signUpFormData = signUpModelState.value.signUpFormData.copy(
                 captchaUuid = uuid,
                 captchaAnswer = answer
             ),
         )
     }
+
+    fun submitApplication(instance: String, signUpFormData: SignUpFormData) {
+        val currentScene = signUpModelState.value.currentScene as? SignUpScene.SubmitApplication
+            ?: return
+
+        viewModelScope.launch {
+            lemmyApiClient.changeInstance(instance)
+
+            val startTime = System.currentTimeMillis()
+
+            val result = withContext(Dispatchers.IO) {
+                lemmyApiClient
+                    .register(
+                        username = signUpFormData.username,
+                        password = signUpFormData.password,
+                        passwordVerify = signUpFormData.password,
+                        showNsfw = true,
+                        email = signUpFormData.email.ifBlank {
+                            null
+                        },
+                        captchaUuid = signUpFormData.captchaUuid.ifBlank {
+                            null
+                        },
+                        captchaAnswer = signUpFormData.captchaAnswer.ifBlank {
+                            null
+                        },
+                        honeypot = null,
+                        answer = signUpFormData.questionnaireAnswer.ifBlank {
+                            null
+                        },
+                    )
+            }
+
+            val elapsedTime = System.currentTimeMillis() - startTime
+
+            if (elapsedTime < 2000) {
+                delay(2000 - elapsedTime)
+            }
+
+            result
+                .onSuccess {
+                    signUpModelState.value = signUpModelState.value.copy(
+                        currentScene = SignUpScene.NextSteps(
+                            instance = currentScene.instance,
+                            site = currentScene.site,
+                            loginResponse = it,
+                            hasNext = false,
+                        ),
+                    )
+                }
+                .onFailure {
+                    signUpModelState.value = signUpModelState.value.copy(
+                        currentScene = currentScene.copy(
+                            error = if (it is ClientApiException) {
+                                it.errorMessage
+                                    ?: it.toErrorMessage(context)
+                            } else {
+                                it.toErrorMessage(context)
+                            }
+                        )
+                    )
+                }
+        }
+
+    }
+
+    fun loginWithJwt(instance: String, jwt: String) {
+        val currentScene = signUpModelState.value.currentScene as? SignUpScene.NextSteps
+            ?: return
+
+        if (currentScene.account != null || currentScene.isAccountLoading) {
+            return
+        }
+
+        signUpModelState.value = signUpModelState.value.copy(
+            currentScene = currentScene.copy(
+                isAccountLoading = true
+            )
+        )
+
+        viewModelScope.launch(backgroundContext) {
+            loginHelper.loginWithJwt(instance, jwt)
+                .onSuccess {
+                    signUpModelState.value = signUpModelState.value.copy(
+                        currentScene = currentScene.copy(
+                            account = it
+                        )
+                    )
+
+                    delay(1500)
+
+                    signUpModelState.value = signUpModelState.value.copy(
+                        currentScene = currentScene.copy(
+                            done = true
+                        )
+                    )
+                }
+                .onFailure {
+                    signUpModelState.value = signUpModelState.value.copy(
+                        currentScene = currentScene.copy(
+                            accountError = it.toErrorMessage(context)
+                        )
+                    )
+                }
+        }
+    }
 }
+
+private fun GetSiteResponse.toSiteModel(): SiteModel =
+    SiteModel(
+        localSite = site_view.local_site,
+        name = site_view.site.name,
+        description = site_view.site.description,
+        icon = site_view.site.icon,
+    )
 
 sealed interface InstanceError {
     data object InvalidInstance: InstanceError
     data object InvalidUrl: InstanceError
+    data object RegistrationClosed: InstanceError
+    data object BlankInstance: InstanceError
     data class InstanceCorrection(val correctedInstance: String): InstanceError
 }
 

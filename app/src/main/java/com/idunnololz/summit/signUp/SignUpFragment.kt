@@ -1,37 +1,40 @@
 package com.idunnololz.summit.signUp
 
-import android.content.Context
 import android.graphics.RectF
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.BOTTOM
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.TOP
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.net.toUri
-import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
+import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import androidx.viewbinding.ViewBinding
 import coil.dispose
 import coil.load
-import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.api.LemmyApiClient.Companion.INSTANCE_LEMMY_WORLD
 import com.idunnololz.summit.databinding.FragmentSignUpBinding
+import com.idunnololz.summit.databinding.SignUpAnswerFormBinding
+import com.idunnololz.summit.databinding.SignUpCaptchaFormBinding
+import com.idunnololz.summit.databinding.SignUpCredentialsFormBinding
 import com.idunnololz.summit.databinding.SignUpInstanceFormBinding
+import com.idunnololz.summit.databinding.SignUpNextStepsBinding
+import com.idunnololz.summit.databinding.SignUpSubmitApplicationBinding
 import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
@@ -48,12 +51,12 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.requestFocusAndShowKeyboard
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
-import com.idunnololz.summit.util.makeTransition
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.shimmer.ShimmerDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
@@ -70,7 +73,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 @AndroidEntryPoint
-class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
+class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SignUpViewModel by viewModels()
 
@@ -85,6 +89,10 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
     private var currentMediaPlayer: MediaPlayer? = null
+
+    private var currentBinding: ViewBinding? = null
+
+    private var submitApplicationErrorDialog: DialogFragment? = null
 
     val backPressHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -111,80 +119,29 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
 
         val context = requireContext()
 
-//        viewModel.fetchSite()
-//
-//        viewModel.signUpModel.observe(viewLifecycleOwner) {
-//            when (it) {
-//                is StatefulData.Error -> TODO()
-//                is StatefulData.Loading -> {} //FIXME
-//                is StatefulData.NotStarted -> TODO()
-//                is StatefulData.Success -> {
-//                    render(it.data)
-//                }
-//            }
-//        }
-
         val shimmerDrawable = newShimmerDrawable16to9(context)
 
         with(binding) {
-
-            serverIcon.transitionName = "server_icon"
-            serverIconExpanded.transitionName = "server_icon"
-
             requireMainActivity().apply {
                 insetViewAutomaticallyByPadding(viewLifecycleOwner, view)
                 setupForFragment<LoginFragment>()
 
                 insets.observe(viewLifecycleOwner) {
-                    instanceEditText.post {
-                        if (!isBindingAvailable()) return@post
-                        if (instanceEditText.isPopupShowing) {
-                            instanceEditText.dismissDropDown()
-                            instanceEditText.showDropDown()
+                    (currentBinding as? SignUpInstanceFormBinding)?.apply {
+                        instanceEditText.post {
+                            if (!isBindingAvailable()) return@post
+                            if (instanceEditText.isPopupShowing) {
+                                instanceEditText.dismissDropDown()
+                                instanceEditText.showDropDown()
+                            }
                         }
                     }
                 }
             }
 
-            instanceEditText.addTextChangedListener(
-                onTextChanged = { text, _, _, _ ->
-                    viewModel.onInstanceTextChanged(text ?: "")
-                },
-            )
             answerExpandedEditText.apply {
                 doOnTextChanged { text, start, before, count ->
                     viewModel.updateAnswer(text?.toString() ?: "")
-                }
-            }
-            captchaAnswerEditText.apply {
-                doOnTextChanged { text, _, _, _ ->
-                    viewModel.updateCaptchaAnswer(text?.toString() ?: "")
-                }
-            }
-
-            body.movementMethod = CustomLinkMovementMethod().apply {
-                onLinkLongClickListener = DefaultLinkLongClickListener(context) { url, text ->
-                    if (url == "a") {
-                        return@DefaultLinkLongClickListener
-                    }
-
-                    getMainActivity()?.showMoreLinkOptions(url, text)
-                }
-                onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
-                    override fun onClick(
-                        textView: TextView,
-                        url: String,
-                        text: String,
-                        rect: RectF,
-                    ): Boolean {
-                        if (url == "a") {
-                            instanceEditText.setText(INSTANCE_LEMMY_WORLD)
-                            return true
-                        }
-
-                        onLinkClick(url, text, LinkContext.Text)
-                        return true
-                    }
                 }
             }
 
@@ -221,9 +178,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                             }
                             .showAllowingStateLoss(childFragmentManager, "AA")
                     },
-                    onDraftsClick = {
-                        DraftsDialogFragment.show(childFragmentManager, DraftTypes.Comment)
-                    },
                     onSettingsClick = {
                         EditTextToolbarSettingsDialogFragment.show(childFragmentManager)
                     },
@@ -235,7 +189,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                 if (isInitialRender) {
                     val animate = currentScene != null
                     currentScene = model.currentScene
-                    layoutScene(model.currentScene, animate = animate)
+                    currentBinding = layoutScene(model.currentScene, animate = animate)
                 }
                 renderCurrentScene(model, isInitialRender, shimmerDrawable)
             }
@@ -257,12 +211,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
     ) = with(binding) {
         val context = requireContext()
         val signUpFormData = data.signUpFormData
-
-        if (data.currentScene.isLoading) {
-            showProgressBar()
-        } else {
-            hideProgressBar()
-        }
 
         if (data.currentScene is SignUpScene.AnswerForm && data.currentScene.showAnswerEditor) {
             answerExpandedContainer.apply {
@@ -291,10 +239,14 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
         backPressHandler.isEnabled = data.currentScene.previousScene != null
 
         when (val scene = data.currentScene) {
-            is SignUpScene.InstanceForm -> {
+            is SignUpScene.InstanceForm -> with(currentBinding as SignUpInstanceFormBinding) {
                 body.text = LemmyTextHelper
                     .getSpannable(context, getString(R.string.sign_up_instance_desc))
-                signUp.text = getString(R.string.button_continue)
+                signUp.text = if (scene.hasNext) {
+                    getString(R.string.button_continue)
+                } else {
+                    getString(R.string.submit)
+                }
                 instanceEditText.apply {
                     if (adapter == null) {
                         setAdapter(
@@ -318,14 +270,10 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                     }
                 }
 
-                when (scene.instanceError) {
-                    is InstanceError.InstanceCorrection ->
-                        instance.error = getString(R.string.error_unable_to_resolve_instance)
-                    InstanceError.InvalidInstance ->
-                        instance.error = getString(R.string.error_unable_to_resolve_instance)
-                    InstanceError.InvalidUrl ->
-                        instance.error = getString(R.string.error_invalid_instance_format)
-                    null -> instance.isErrorEnabled = false
+                if (scene.instanceError != null) {
+                    instance.error = scene.instanceError
+                } else {
+                    instance.isErrorEnabled = false
                 }
 
                 (instanceEditText.adapter as? ArrayAdapter<*>)?.notifyDataSetChanged()
@@ -343,17 +291,39 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                     signUp.isEnabled = true
                     instanceEditText.isEnabled = true
                 }
-            }
-            is SignUpScene.CredentialsForm -> {
-                val siteView = scene.site.site_view
-                serverIcon.load(siteView.site.icon) {
-                    placeholder(newShimmerDrawableSquare(context))
+
+
+                fun showProgressBar() {
+                    progressBar.visibility = View.VISIBLE
+                    signUp.textScaleX = 0f
                 }
-                serverName.text = siteView.site.name
-                serverDesc.text = siteView.site.description
+
+                fun hideProgressBar() {
+                    progressBar.visibility = View.GONE
+                    signUp.textScaleX = 1f
+                }
+
+
+                if (scene.isLoading) {
+                    showProgressBar()
+                } else {
+                    hideProgressBar()
+                }
+            }
+            is SignUpScene.CredentialsForm -> with(currentBinding as SignUpCredentialsFormBinding) {
+                signUp.text = if (scene.hasNext) {
+                    getString(R.string.button_continue)
+                } else {
+                    getString(R.string.submit)
+                }
 
                 signUp.isEnabled = true
-                instanceEditText.isEnabled = true
+
+                if (scene.isEmailRequired) {
+                    email.hint = getString(R.string.email)
+                } else {
+                    email.hint = getString(R.string.email_optional)
+                }
 
                 if (scene.usernameError != null) {
                     username.error = scene.usernameError
@@ -371,39 +341,69 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                     password.isErrorEnabled = false
                 }
 
-                if (isInitialRender) {
-                    usernameEditText.setText(signUpFormData.username)
-                    emailEditText.setText(signUpFormData.email)
-                    passwordEditText.setText(signUpFormData.password)
-                }
-
-                passwordEditText.setOnEditorActionListener { v, actionId, event ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        signUp.performClick()
-                        return@setOnEditorActionListener true
-                    }
-                    false
-                }
-
-                signUp.setOnClickListener {
+                fun updateCreds() {
                     val username = usernameEditText.text?.toString()
                     val email = emailEditText.text?.toString()
                     val password = passwordEditText.text?.toString()
 
                     if (username != null && email != null && password != null) {
-                        Utils.hideKeyboard(requireMainActivity())
-                        viewModel.submitCredentials(scene, username, email, password)
+                        viewModel.updateCredentials(username, email, password)
+                    }
+                }
+
+                usernameEditText.doOnTextChanged { text, start, before, count ->
+                    updateCreds()
+                }
+                emailEditText.doOnTextChanged { text, start, before, count ->
+                    updateCreds()
+                }
+                passwordEditText.doOnTextChanged { text, start, before, count ->
+                    updateCreds()
+                }
+
+                if (isInitialRender) {
+                    serverIcon.load(scene.site.icon) {
+                        placeholder(newShimmerDrawableSquare(context))
+                    }
+                    serverName.text = scene.site.name
+                    serverDesc.text = scene.site.description
+
+                    usernameEditText.setText(signUpFormData.username)
+                    emailEditText.setText(signUpFormData.email)
+                    passwordEditText.setText(signUpFormData.password)
+
+                    passwordEditText.setOnEditorActionListener { v, actionId, event ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            signUp.performClick()
+                            return@setOnEditorActionListener true
+                        }
+                        false
+                    }
+
+                    signUp.setOnClickListener {
+                        val username = usernameEditText.text?.toString()
+                        val email = emailEditText.text?.toString()
+                        val password = passwordEditText.text?.toString()
+
+                        if (username != null && email != null && password != null) {
+                            Utils.hideKeyboard(requireMainActivity())
+                            viewModel.submitCredentials(scene, username, email, password)
+                        }
                     }
                 }
             }
-            is SignUpScene.AnswerForm -> {
-                val siteView = scene.site.site_view
-                val localSite = siteView.local_site
-                serverIcon.load(siteView.site.icon) {
+            is SignUpScene.AnswerForm -> with(currentBinding as SignUpAnswerFormBinding) {
+                val localSite = scene.site.localSite
+                serverIcon.load(scene.site.icon) {
                     placeholder(newShimmerDrawableSquare(context))
                 }
-                serverName.text = siteView.site.name
-                serverDesc.text = siteView.site.description
+                serverName.text = scene.site.name
+                serverDesc.text = scene.site.description
+                signUp.text = if (scene.hasNext) {
+                    getString(R.string.button_continue)
+                } else {
+                    getString(R.string.submit)
+                }
 
                 val questionnaire = LemmyTextHelper
                     .getSpannable(context, localSite.application_question ?: "")
@@ -411,11 +411,20 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                 if (isInitialRender) {
                     answerEditText.setText(signUpFormData.questionnaireAnswer)
                     answerExpandedEditText.setText(signUpFormData.questionnaireAnswer)
+
+                    warning.text = LemmyTextHelper
+                        .getSpannable(context, getString(R.string.answer_required_to_sign_up_desc))
+
+                    body.text = questionnaire
+                    expandedQuestionnaire.text = questionnaire
                 }
 
-                warning.text = LemmyTextHelper
-                    .getSpannable(context, getString(R.string.answer_required_to_sign_up_desc))
-                body.text = questionnaire
+                if (scene.answerError == null) {
+                    answer.isErrorEnabled = false
+                } else {
+                    answer.error = scene.answerError
+                }
+
                 answerEditText.apply {
                     setText(scene.answer)
                     setOnClickListener {
@@ -425,7 +434,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                 answer.setOnClickListener {
                     viewModel.showAnswerEditor()
                 }
-                expandedQuestionnaire.text = questionnaire
                 answerExpandedEditText.apply {
                     setOnEditorActionListener { v, actionId, event ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -436,8 +444,8 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                     }
                 }
                 answerDone.setOnClickListener {
-                    viewModel.showAnswerEditor(show = false)
                     Utils.hideKeyboard(requireMainActivity())
+                    viewModel.showAnswerEditor(show = false)
                 }
 
                 signUp.isEnabled = scene.answer.isNotBlank()
@@ -445,13 +453,17 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                     viewModel.submitAnswer(scene.answer)
                 }
             }
-            is SignUpScene.CaptchaForm -> {
-                val siteView = scene.site.site_view
-                serverIcon.load(siteView.site.icon) {
+            is SignUpScene.CaptchaForm -> with(currentBinding as SignUpCaptchaFormBinding) {
+                serverIcon.load(scene.site.icon) {
                     placeholder(newShimmerDrawableSquare(context))
                 }
-                serverName.text = siteView.site.name
-                serverDesc.text = siteView.site.description
+                serverName.text = scene.site.name
+                serverDesc.text = scene.site.description
+                signUp.text = if (scene.hasNext) {
+                    getString(R.string.button_continue)
+                } else {
+                    getString(R.string.submit)
+                }
 
                 if (isInitialRender) {
                     viewModel.fetchCaptcha(scene.instance)
@@ -535,174 +547,198 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                 signUp.isEnabled = scene.captchaAnswer.isNotBlank()
                 signUp.setOnClickListener {
                     if (scene.captchaUuid != null) {
+                        Utils.hideKeyboard(requireMainActivity())
                         viewModel.submitCaptchaAnswer(scene.captchaUuid, scene.captchaAnswer)
                     }
                 }
             }
-            is SignUpScene.SubmitApplication -> {
-                val siteView = scene.site.site_view
-                serverIcon.load(siteView.site.icon) {
+            is SignUpScene.SubmitApplication -> with(currentBinding as SignUpSubmitApplicationBinding) {
+                serverIconExpanded.load(scene.site.icon) {
                     placeholder(newShimmerDrawableSquare(context))
                 }
-                serverIconExpanded.load(siteView.site.icon) {
+
+                if (isInitialRender) {
+                    viewModel.submitApplication(scene.instance, data.signUpFormData)
+                }
+
+                if (scene.error != null && submitApplicationErrorDialog?.isVisible != true) {
+                    val fm = childFragmentManager
+                    submitApplicationErrorDialog = AlertDialogFragment.Builder()
+                        .setTitle(R.string.error_sign_up)
+                        .setMessage(scene.error)
+                        .setPositiveButton(android.R.string.ok)
+                        .create()
+                        .apply {
+                            fm.beginTransaction()
+                                .add(this, "submit_application_error")
+                                .commitAllowingStateLoss()
+                        }
+                }
+            }
+            is SignUpScene.NextSteps -> with(currentBinding as SignUpNextStepsBinding) {
+                val loginResponse = requireNotNull(scene.loginResponse)
+
+                TransitionManager.beginDelayedTransition(binding.root, AutoTransition().apply {
+                    setDuration(220)
+                })
+
+                serverIconExpanded.load(scene.site.icon) {
                     placeholder(newShimmerDrawableSquare(context))
                 }
-                serverName.text = siteView.site.name
-                serverDesc.text = siteView.site.description
+
+                if (loginResponse.jwt != null) {
+                    viewModel.loginWithJwt(scene.instance, loginResponse.jwt)
+
+                    if (scene.account != null) {
+                        errorMessage.visibility = View.GONE
+                        progressBar.visibility = View.GONE
+                        submittingApplication.text = getString(R.string.sign_up_success)
+                    } else if (scene.accountError != null) {
+                        errorMessage.visibility = View.VISIBLE
+                        progressBar.visibility = View.GONE
+                        errorMessage.text = scene.accountError
+                    } else if (scene.isAccountLoading) {
+                        errorMessage.visibility = View.GONE
+                        progressBar.visibility = View.VISIBLE
+                    }
+                } else if (loginResponse.verify_email_sent) {
+                    errorMessage.visibility = View.GONE
+                    progressBar.visibility = View.GONE
+
+                    submittingApplication.text = getString(R.string.email_verification_required)
+
+                    finish.visibility = View.VISIBLE
+                    finish.setOnClickListener {
+                        findNavController().popBackStack()
+                    }
+                } else if (loginResponse.registration_created) {
+                    errorMessage.visibility = View.GONE
+                    progressBar.visibility = View.GONE
+
+                    submittingApplication.text = getString(R.string.registration_created)
+
+                    finish.visibility = View.VISIBLE
+                    finish.setOnClickListener {
+                        findNavController().popBackStack()
+                    }
+                } else {
+                    errorMessage.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
+                    submittingApplication.visibility = View.GONE
+
+                    errorMessage.text = getString(R.string.error_unknown_sign_up_error)
+
+                    finish.visibility = View.VISIBLE
+                    finish.setOnClickListener {
+                        findNavController().popBackStack()
+                    }
+                }
+
+
+                if (scene.done) {
+                    findNavController().popBackStack()
+                }
             }
         }
     }
 
-    private fun layoutScene(scene: SignUpScene, animate: Boolean) = with(binding) {
+    private fun layoutScene(scene: SignUpScene, animate: Boolean): ViewBinding {
         val context = requireContext()
 
         if (animate) {
-            TransitionManager.beginDelayedTransition(content, makeTransition())
+            TransitionManager.beginDelayedTransition(binding.root, AutoTransition().apply {
+                setDuration(220)
+            })
         }
 
-        val sceneElements = when (scene) {
-            is SignUpScene.InstanceForm -> {
-                SignUpInstanceFormBinding.inflate(LayoutInflater.from(context), content, true)
-                listOf(
-                    title.toView(),
-                    16.toPadding(),
-                    body.toView(),
-                    24.toPadding(),
-                    instance.toView(),
-                    24.toPadding(),
-                    signUp.toView(),
-                )
-            }
-            is SignUpScene.CredentialsForm -> {
-                listOf(
-                    titleLarge.toView(),
-                    16.toPadding(),
-                    cardView.toView(),
-                    16.toPadding(),
-                    username.toView(),
-                    8.toPadding(),
-                    email.toView(),
-                    8.toPadding(),
-                    password.toView(),
-                    24.toPadding(),
-                    signUp.toView(),
-                )
-            }
-            is SignUpScene.AnswerForm -> {
-                listOf(
-                    titleLarge.toView(),
-                    16.toPadding(),
-                    cardView.toView(),
-                    16.toPadding(),
-                    warning.toView(),
-                    16.toPadding(),
-                    body.toView(),
-                    16.toPadding(),
-                    answer.toView(),
-                    24.toPadding(),
-                    signUp.toView(),
-                )
-            }
-            is SignUpScene.CaptchaForm -> {
-                listOf(
-                    titleLarge.toView(),
-                    16.toPadding(),
-                    cardView.toView(),
-                    16.toPadding(),
-                    captchaImageContainer.toView(),
-                    captchaControls.toView(),
-                    16.toPadding(),
-                    captchaAnswerInputLayout.toView(),
-                    24.toPadding(),
-                    signUp.toView(),
-                )
-            }
-            is SignUpScene.SubmitApplication -> {
-                listOf(
-                    serverIconExpanded.toView(),
-                )
-            }
-        }
-        val usedViewIds = sceneElements.mapTo(mutableSetOf<Int>()) {
-            (it as? SceneElement.ViewElement)?.id ?: 0
-        }
+        binding.content.removeAllViews()
 
-        content.children.forEach {
-            if (!usedViewIds.contains(it.id) && it.id != R.id.progress_bar) {
-                it.visibility = View.GONE
-            } else {
-                it.visibility = View.VISIBLE
-            }
-        }
+        val layoutInflater = LayoutInflater.from(context)
 
-        val constraintSet = ConstraintSet()
-        constraintSet.clone(content)
+        return when (scene) {
+            is SignUpScene.InstanceForm ->
+                SignUpInstanceFormBinding.inflate(
+                    layoutInflater,
+                    binding.content,
+                    true,
+                ).apply {
+                    instanceEditText.addTextChangedListener(
+                        onTextChanged = { text, _, _, _ ->
+                            viewModel.onInstanceTextChanged(text ?: "")
+                        },
+                    )
 
-        var pendingViewId = 0
-        var pendingPadding = 0
-        var firstEditText: View? = null
+                    body.movementMethod = CustomLinkMovementMethod().apply {
+                        onLinkLongClickListener = DefaultLinkLongClickListener(context) { url, text ->
+                            if (url == "a") {
+                                return@DefaultLinkLongClickListener
+                            }
 
-        for (element in sceneElements) {
-            when (element) {
-                is SceneElement.Padding -> {
-                    pendingPadding = Utils.convertDpToPixel(element.paddingDp).toInt()
-                }
-                is SceneElement.ViewElement -> {
-                    if (pendingViewId == 0) {
-                        constraintSet.connect(PARENT_ID, TOP, element.id, TOP, pendingPadding)
-                    } else {
-                        constraintSet.connect(pendingViewId, BOTTOM, element.id, TOP, pendingPadding)
-                    }
+                            getMainActivity()?.showMoreLinkOptions(url, text)
+                        }
+                        onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+                            override fun onClick(
+                                textView: TextView,
+                                url: String,
+                                text: String,
+                                rect: RectF,
+                            ): Boolean {
+                                if (url == "a") {
+                                    instanceEditText.setText(INSTANCE_LEMMY_WORLD)
+                                    return true
+                                }
 
-                    pendingViewId = element.id
-                    pendingPadding = 0
-
-                    if (element.view is TextInputLayout) {
-                        firstEditText = element.view.editText
+                                onLinkClick(url, text, LinkContext.Text)
+                                return true
+                            }
+                        }
                     }
                 }
-            }
-        }
-        constraintSet.connect(pendingViewId, BOTTOM, PARENT_ID, BOTTOM)
-        constraintSet.applyTo(content)
-
-        if (firstEditText != null) {
-            val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE)
-                as InputMethodManager
-            inputMethodManager.restartInput(firstEditText)
-        }
-    }
-
-//    private fun render(data: SignUpModel) = with(binding) {
-//        val context = requireContext()
-//
-//        if (data.captchaImage != null) {
-//            captchaImage.load(data.captchaImage) {
-//                placeholder(newShimmerDrawable16to9(context))
-//            }
-//        }
-//    }
-
-    sealed interface SceneElement {
-        data class ViewElement(val id: Int, val view: View): SceneElement
-        data class Padding(val paddingDp: Float): SceneElement
-    }
-
-    private fun showProgressBar() {
-        with(binding) {
-            progressBar.visibility = View.VISIBLE
-            signUp.textScaleX = 0f
-        }
-    }
-
-    private fun hideProgressBar() {
-        with(binding) {
-            progressBar.visibility = View.GONE
-            signUp.textScaleX = 1f
+            is SignUpScene.CredentialsForm ->
+                SignUpCredentialsFormBinding.inflate(
+                    layoutInflater,
+                    binding.content,
+                    true,
+                )
+            is SignUpScene.AnswerForm ->
+                SignUpAnswerFormBinding.inflate(
+                    layoutInflater,
+                    binding.content,
+                    true,
+                )
+            is SignUpScene.CaptchaForm ->
+                SignUpCaptchaFormBinding.inflate(
+                    layoutInflater,
+                    binding.content,
+                    true,
+                ).apply {
+                    captchaAnswerEditText.apply {
+                        doOnTextChanged { text, _, _, _ ->
+                            viewModel.updateCaptchaAnswer(text?.toString() ?: "")
+                        }
+                    }
+                }
+            is SignUpScene.SubmitApplication ->
+                SignUpSubmitApplicationBinding.inflate(
+                    layoutInflater,
+                    binding.content,
+                    true,
+                )
+            is SignUpScene.NextSteps ->
+                SignUpNextStepsBinding.inflate(
+                    layoutInflater,
+                    binding.content,
+                    true,
+                )
         }
     }
 
-    private fun View.toView() = SceneElement.ViewElement(this.id, this)
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "submit_application_error") {
+            viewModel.goBack()
+        }
+    }
 
-    private fun Int.toPadding() = SceneElement.Padding(this.toFloat())
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    }
 }
