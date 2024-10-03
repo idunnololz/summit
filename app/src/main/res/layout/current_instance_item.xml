@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding"
-        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding"
         android:layout_marginBottom="@dimen/padding_half"
-        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
         style="@style/Widget.Material3.CardView.Outlined"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

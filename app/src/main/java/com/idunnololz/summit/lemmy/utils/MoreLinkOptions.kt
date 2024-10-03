@@ -127,7 +127,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                                         R.string.unblock_this_community_format,
                                         pageRef.name,
                                     ),
-                                    icon = R.drawable.ic_community_default,
+                                    icon = R.drawable.ic_default_community,
                                 )
                             } else {
                                 addItemWithIcon(

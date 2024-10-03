@@ -46,10 +46,8 @@ class MentionsResultAdapter @AssistedInject constructor(
             clazz = CommunityResultItem::class,
             inflateFn = MentionQueryResultItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_community_default)
-            offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
-                b.icon.load(it)
-            }
+            avatarHelper.loadCommunityIcon(b.icon, item.communityView.community)
+
             b.text.text = item.communityView.community.fullName
             val mauString = LemmyUtils.abbrevNumber(
                 item.communityView.counts.users_active_month.toLong(),

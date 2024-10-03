@@ -664,7 +664,7 @@ class PostListViewBuilder @Inject constructor(
                         Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
                     }
                     val iconImageView = headerContainer.getIconImageView()
-                    avatarHelper.loadIcon(iconImageView, postView.community)
+                    avatarHelper.loadCommunityIcon(iconImageView, postView.community)
                     iconImageView.setOnClickListener {
                         onPageClick(accountId, postView.community.toCommunityRef())
                     }

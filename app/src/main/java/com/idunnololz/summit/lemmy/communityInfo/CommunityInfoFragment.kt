@@ -29,6 +29,7 @@ import com.idunnololz.summit.api.dto.SiteView
 import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunityInfoCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunityInfoHeaderItemBinding
 import com.idunnololz.summit.databinding.FragmentCommunityInfoBinding
@@ -89,6 +90,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
@@ -360,11 +364,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         with(binding) {
             title.text = data.name
 
-            icon.load(data.iconUrl) {
-                allowHardware(false)
-                placeholder(R.drawable.ic_community_default)
-                fallback(R.drawable.ic_community_default)
-            }
             if (data.iconUrl != null) {
                 ViewCompat.setTransitionName(icon, "profileIcon")
 
@@ -418,16 +417,22 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
 
             if (communityView != null) {
+                avatarHelper.loadCommunityIcon(icon, communityView.community)
+
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
                     showOverflowMenu(communityView, data.mods)
                 }
             } else if (siteView != null) {
+                avatarHelper.loadInstanceIcon(icon, siteView)
+
                 binding.fab.visibility = View.VISIBLE
                 binding.fab.setOnClickListener {
                     showOverflowMenu(siteView)
                 }
             } else {
+                avatarHelper.loadInstanceIcon(icon, null)
+
                 binding.fab.visibility = View.GONE
             }
             binding.fab.setup(preferences)
@@ -464,7 +469,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     R.string.unblock_this_community_format,
                     communityView.community.name,
                 ),
-                icon = R.drawable.ic_community_default,
+                icon = R.drawable.ic_default_community,
             )
             addItemWithIcon(
                 id = R.id.block_instance,
@@ -829,7 +834,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 Item.CommunityItem::class,
                 CommunityInfoCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.load(R.drawable.ic_community_default)
+                b.icon.load(R.drawable.ic_default_community)
                 offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
                     b.icon.load(it)
                 }

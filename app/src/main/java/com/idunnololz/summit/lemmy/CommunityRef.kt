@@ -7,6 +7,13 @@ import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.lemmy.CommunityRef.All
+import com.idunnololz.summit.lemmy.CommunityRef.AllSubscribed
+import com.idunnololz.summit.lemmy.CommunityRef.CommunityRefByName
+import com.idunnololz.summit.lemmy.CommunityRef.Local
+import com.idunnololz.summit.lemmy.CommunityRef.ModeratedCommunities
+import com.idunnololz.summit.lemmy.CommunityRef.MultiCommunity
+import com.idunnololz.summit.lemmy.CommunityRef.Subscribed
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -174,3 +181,14 @@ fun Community.toCommunityRef(): CommunityRef.CommunityRefByName {
 fun AccountSubscription.toCommunityRef(): CommunityRef.CommunityRefByName {
     return CommunityRef.CommunityRefByName(this.name, this.instance)
 }
+
+val CommunityRef.instance: String?
+    get() = when (this) {
+        is All -> this.instance
+        is AllSubscribed -> null
+        is CommunityRefByName -> this.instance
+        is Local -> this.instance
+        is ModeratedCommunities -> this.instance
+        is MultiCommunity -> null
+        is Subscribed -> this.instance
+    }

@@ -11,6 +11,7 @@ import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding
@@ -26,6 +27,7 @@ class CommunityAdapter(
     private val context: Context,
     private val offlineManager: OfflineManager,
     private val canSelectMultipleCommunities: Boolean,
+    private val avatarHelper: AvatarHelper,
     private val onTooManyCommunities: (Int) -> Unit = {},
     private val onSingleCommunitySelected: (
         CommunityRef.CommunityRefByName,
@@ -116,15 +118,11 @@ class CommunityAdapter(
             clazz = Item.SelectedCommunityItem::class,
             inflateFn = CommunitySelectorSelectedCommunityItemBinding::inflate,
         ) { item, b, h ->
-            if (item.icon != null) {
-                b.icon.load(item.icon) {
-                    placeholder(R.drawable.ic_community_default)
-                    fallback(R.drawable.ic_community_default)
-                }
-            } else {
-                b.icon.dispose()
-                b.icon.setImageResource(R.drawable.ic_community_default)
-            }
+            avatarHelper.loadCommunityIcon(
+                imageView = b.icon,
+                communityRef = item.communityRef,
+                iconUrl = item.icon,
+            )
 
             b.title.text = item.communityRef.name
 
@@ -143,10 +141,10 @@ class CommunityAdapter(
             clazz = Item.SearchResultCommunityItem::class,
             inflateFn = CommunitySelectorSearchResultCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_community_default)
-            offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
-                b.icon.load(it)
-            }
+            avatarHelper.loadCommunityIcon(
+                imageView = b.icon,
+                community = item.communityView.community
+            )
 
             b.title.text = item.text
             val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
@@ -186,10 +184,11 @@ class CommunityAdapter(
             clazz = Item.SubscribedCommunityItem::class,
             inflateFn = CommunitySelectorSearchResultCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_community_default)
-            offlineManager.fetchImage(h.itemView, item.subscribedCommunity.icon) {
-                b.icon.load(it)
-            }
+            avatarHelper.loadCommunityIcon(
+                imageView = b.icon,
+                communityRef = item.subscribedCommunity.toCommunityRef(),
+                iconUrl = item.subscribedCommunity.icon
+            )
 
             b.title.text = item.text
 

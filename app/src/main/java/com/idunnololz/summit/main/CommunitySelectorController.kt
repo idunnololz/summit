@@ -2,6 +2,7 @@ package com.idunnololz.summit.main
 
 import android.content.Context
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -32,6 +33,7 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.CommunitySelectorCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorCurrentCommunityItemBinding
@@ -42,10 +44,12 @@ import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBin
 import com.idunnololz.summit.databinding.CommunitySelectorViewBinding
 import com.idunnololz.summit.databinding.CurrentInstanceItemBinding
 import com.idunnololz.summit.databinding.DummyTopItemBinding
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.AnimationsHelper
@@ -55,6 +59,7 @@ import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -81,6 +86,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private val recentCommunityManager: RecentCommunityManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val animationsHelper: AnimationsHelper,
+    private val avatarHelper: AvatarHelper,
 ) {
     @AssistedFactory
     interface Factory {
@@ -132,7 +138,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
     init {
         viewModel.siteOrCommunity.observe(viewLifecycleOwner) {
-            adapter.setCurrentCommunity(currentCommunity, it, {})
+            adapter.setCurrentCommunity(currentCommunity, it) {}
         }
 
         coroutineScope.launch {
@@ -352,7 +358,7 @@ class CommunitySelectorController @AssistedInject constructor(
         ) : Item(text)
 
         class CommunityChildItem(
-            val text: String,
+            val text: CharSequence,
             val community: CommunityView,
             val monthlyActiveUsers: Int,
         ) : Item(community.community.name)
@@ -366,7 +372,10 @@ class CommunitySelectorController @AssistedInject constructor(
         class RecentChildItem(
             val text: String,
             val communityRef: CommunityRef,
+            val iconUrl: String?,
         ) : Item("r:${communityRef.getKey()}")
+
+        data object BottomSpacer : Item("bottom_spacer:")
     }
 
     private inner class CommunitiesAdapter(
@@ -402,6 +411,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     is Item.LoadingItem -> true
                     is Item.CurrentCommunity -> old == new
                     is Item.CurrentInstance -> old == new
+                    Item.BottomSpacer -> true
                 }
             },
         ).apply {
@@ -448,7 +458,8 @@ class CommunitySelectorController @AssistedInject constructor(
                     }
 
                     is CommunityRef.ModeratedCommunities -> {
-                        b.instance.text = item.communityRef.getName(context)
+                        b.instance.text = item.communityRef.instance
+                            ?: item.communityRef.getName(context)
                     }
 
                     is CommunityRef.AllSubscribed -> {
@@ -473,9 +484,9 @@ class CommunitySelectorController @AssistedInject constructor(
                 var icon: String? = null
                 if (item.error != null) {
                     b.instance.text = item.error.toErrorMessage(context)
-                    b.subscribe.visibility = View.VISIBLE
-                    b.subscribe.text = context.getString(R.string.retry)
-                    b.subscribe.setOnClickListener {
+                    b.actionButton.visibility = View.VISIBLE
+                    b.actionButton.text = context.getString(R.string.retry)
+                    b.actionButton.setOnClickListener {
                         viewModel.refetchCommunityOrSite(force = true)
                     }
                     b.progressBar.visibility = View.GONE
@@ -486,27 +497,32 @@ class CommunitySelectorController @AssistedInject constructor(
                         b.progressBar.visibility = View.GONE
                     }
 
-                    b.subscribe.visibility = View.GONE
                     if (item.siteResponse != null) {
                         icon = item.siteResponse.site_view.site.icon
                         b.instance.text = item.siteResponse.site_view.site.instance
                         b.moreInfo.visibility = View.VISIBLE
+
+                        b.actionButton.visibility = View.VISIBLE
+                        b.actionButton.text = context.getString(R.string.instance_info)
+                        b.actionButton.setOnClickListener {
+                            b.cardView.performClick()
+                        }
                     } else if (item.communityView != null) {
                         icon = item.communityView.community.icon
                         b.instance.text = item.communityView.community.instance
 
-                        b.subscribe.visibility = View.VISIBLE
+                        b.actionButton.visibility = View.VISIBLE
                         if (item.communityView.subscribed != SubscribedType.Subscribed) {
-                            b.subscribe.text = context.getString(R.string.subscribe)
-                            b.subscribe.setOnClickListener {
+                            b.actionButton.text = context.getString(R.string.subscribe)
+                            b.actionButton.setOnClickListener {
                                 viewModel.updateSubscriptionStatus(
                                     item.communityView.community.id,
                                     true,
                                 )
                             }
                         } else {
-                            b.subscribe.text = context.getString(R.string.unsubscribe)
-                            b.subscribe.setOnClickListener {
+                            b.actionButton.text = context.getString(R.string.unsubscribe)
+                            b.actionButton.setOnClickListener {
                                 viewModel.updateSubscriptionStatus(
                                     item.communityView.community.id,
                                     false,
@@ -516,13 +532,16 @@ class CommunitySelectorController @AssistedInject constructor(
                         b.moreInfo.visibility = View.VISIBLE
                     } else if (item.communityRef is CommunityRef.MultiCommunity) {
                         icon = item.communityRef.icon
+
+                        b.actionButton.visibility = View.VISIBLE
+                        b.actionButton.text = context.getString(R.string.configure)
+                        b.actionButton.setOnClickListener {
+                            b.cardView.performClick()
+                        }
                     }
                 }
 
-                b.image.load(icon) {
-                    placeholder(R.drawable.ic_community_default)
-                    fallback(R.drawable.ic_community_default)
-                }
+                avatarHelper.loadCommunityIcon(b.image, item.communityRef, icon)
             }
 
             addItemType(
@@ -554,28 +573,14 @@ class CommunitySelectorController @AssistedInject constructor(
             ) { item, b, h ->
                 val community = item.community
 
-                if (community.community.icon == null) {
-                    b.icon.load(R.drawable.ic_community_default)
-                } else {
-                    b.icon.dispose()
-                    offlineManager.fetchImageWithError(
-                        rootView = h.itemView,
-                        url = community.community.icon,
-                        listener = {
-                            b.icon.load(it)
-                        },
-                        errorListener = {
-                            b.icon.load(R.drawable.ic_community_default)
-                        },
-                    )
-                }
+                avatarHelper.loadCommunityIcon(b.icon, community.community)
 
                 b.title.text = item.text
+
                 val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
 
                 @Suppress("SetTextI18n")
-                b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
-                    "(${item.community.community.instance})"
+                b.monthlyActives.text = context.getString(R.string.mau_format, mauString)
 
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
@@ -602,6 +607,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 clazz = Item.RecentChildItem::class,
                 inflateFn = CommunitySelectorRecentItemBinding::inflate,
             ) { item, b, h ->
+                avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
+
                 b.title.text = item.communityRef.getName(b.title.context)
                 b.subtitle.text = item.text
                 h.itemView.setOnClickListener {
@@ -617,6 +624,10 @@ class CommunitySelectorController @AssistedInject constructor(
             ) { item, b, _ ->
                 b.text.text = item.text
             }
+            addItemType(
+                clazz = Item.BottomSpacer::class,
+                inflateFn = GenericSpaceFooterItemBinding::inflate,
+            ) { _, _, _ -> }
         }
 
         private var loadingJob: Job? = null
@@ -634,7 +645,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     if (recents.isNotEmpty()) {
                         add(Item.GroupHeaderItem(context.getString(R.string.recents)))
                         recents.forEach {
-                            add(Item.RecentChildItem(it.key, it.communityRef))
+                            add(Item.RecentChildItem(it.key, it.communityRef, it.iconUrl))
                         }
                     }
                 }
@@ -802,7 +813,13 @@ class CommunitySelectorController @AssistedInject constructor(
                     .sortedByDescending { it.counts.users_active_month }
                     .mapTo(newItems) {
                         Item.CommunityChildItem(
-                            text = it.community.name,
+                            text = SpannableStringBuilder().apply {
+                                appendNameWithInstance(
+                                    context,
+                                    it.community.name,
+                                    it.community.instance,
+                                )
+                            },
                             community = it,
                             monthlyActiveUsers = it.counts.users_active_month,
                         ).also {
@@ -819,7 +836,7 @@ class CommunitySelectorController @AssistedInject constructor(
             if (!query.isNullOrBlank()) {
                 fun getText(item: Item): String = when (item) {
                     is Item.StaticChildItem -> item.text
-                    is Item.CommunityChildItem -> item.text
+                    is Item.CommunityChildItem -> item.text.toString()
                     else -> ""
                 }
 
@@ -855,6 +872,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
                 }
             }
+            newItems.add(Item.BottomSpacer)
             withContext(Dispatchers.Main) {
                 adapterHelper.setItems(newItems, this@CommunitiesAdapter, {})
             }
@@ -917,8 +935,16 @@ class CommunitySelectorController @AssistedInject constructor(
             data: StatefulData<Either<GetSiteResponse, CommunityView>>?,
             cb: () -> Unit,
         ) {
-            this.currentCommunityRef = currentCommunityRef
-            this.currentCommunityData = data
+            if (this.currentCommunityRef == currentCommunityRef) {
+                if (currentCommunityData !is StatefulData.Success) {
+                    this.currentCommunityData = data
+                } else if (data is StatefulData.Success) {
+                    this.currentCommunityData = data
+                }
+            } else {
+                this.currentCommunityRef = currentCommunityRef
+                this.currentCommunityData = data
+            }
 
             refreshItems(cb)
         }

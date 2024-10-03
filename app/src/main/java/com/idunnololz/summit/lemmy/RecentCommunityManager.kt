@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy
 
 import android.util.Log
+import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
@@ -10,9 +12,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Singleton
-class RecentCommunityManager @Inject constructor() {
+class RecentCommunityManager @Inject constructor(
+    private val lemmyApiClientFactory: LemmyApiClient.Factory,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+) {
     companion object {
         private const val TAG = "RecentCommunityManager"
 
@@ -20,7 +26,9 @@ class RecentCommunityManager @Inject constructor() {
         private const val PREF_KEY_RECENT_COMMUNITIES = "PREF_KEY_RECENT_COMMUNITIES"
     }
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val lemmyApiClient = lemmyApiClientFactory.create()
+
+    private val coroutineScope = coroutineScopeFactory.create()
     private val adapter = moshi.adapter(RecentCommunityData::class.java)
 
     /**
@@ -29,9 +37,9 @@ class RecentCommunityManager @Inject constructor() {
     private var _recentSubreddits: LinkedHashMap<String, CommunityHistoryEntry>? = null
 
     fun getRecentCommunities(): List<CommunityHistoryEntry> =
-        getRecents().values.reversed().toList()
+        getRecents().values.sortedByDescending { it.ts }
 
-    fun addRecentCommunity(communityRef: CommunityRef) {
+    fun addRecentCommunity(communityRef: CommunityRef, iconUrl: String? = null) {
         if (communityRef is CommunityRef.All ||
             communityRef is CommunityRef.Subscribed ||
             communityRef is CommunityRef.Local
@@ -47,7 +55,11 @@ class RecentCommunityManager @Inject constructor() {
 
         // move item to front...
         recents.remove(key)
-        recents[key] = CommunityHistoryEntry(communityRef)
+        recents[key] = CommunityHistoryEntry(
+            communityRef,
+            iconUrl,
+            System.currentTimeMillis(),
+        )
 
         if (recents.size > MAX_RECENTS) {
             var toRemove = recents.size - MAX_RECENTS
@@ -72,6 +84,34 @@ class RecentCommunityManager @Inject constructor() {
                 )
                 .apply()
         }
+
+        if (communityRef is CommunityRef.CommunityRefByName && iconUrl == null) {
+            fetchRecentIcon(communityRef)
+        }
+    }
+
+    private fun fetchRecentIcon(communityRef: CommunityRef.CommunityRefByName) {
+        val instance = communityRef.instance
+            ?: return
+
+        coroutineScope.launch {
+            lemmyApiClient.changeInstance(instance)
+            val iconUrl = lemmyApiClient.getCommunity(null, communityRef.name, instance, false)
+                .fold(
+                    {
+                        it.community.icon
+                    },
+                    {
+                        null
+                    }
+                )
+
+            if (iconUrl != null) {
+                withContext(Dispatchers.Main) {
+                    addRecentCommunity(communityRef, iconUrl)
+                }
+            }
+        }
     }
 
     private fun getRecents(): LinkedHashMap<String, CommunityHistoryEntry> {
@@ -87,6 +127,7 @@ class RecentCommunityManager @Inject constructor() {
                 null
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Error loading recents", e)
             null
         }
 
@@ -107,6 +148,8 @@ class RecentCommunityManager @Inject constructor() {
     @JsonClass(generateAdapter = true)
     data class CommunityHistoryEntry(
         val communityRef: CommunityRef,
+        val iconUrl: String?,
+        val ts: Long?,
     ) {
         val key: String
             get() = communityRef.getKey()

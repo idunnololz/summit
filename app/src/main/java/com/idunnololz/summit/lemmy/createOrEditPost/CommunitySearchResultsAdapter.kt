@@ -8,6 +8,7 @@ import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
@@ -18,6 +19,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 class CommunitySearchResultsAdapter(
     private val context: Context,
     private val offlineManager: OfflineManager,
+    private val avatarHelper: AvatarHelper,
     private val onCommunitySelected: (CommunityView) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -74,10 +76,7 @@ class CommunitySearchResultsAdapter(
             clazz = Item.SearchResultCommunityItem::class,
             inflateFn = CommunitySearchResultCommunityItemBinding::inflate,
         ) { item, b, h ->
-            b.icon.load(R.drawable.ic_community_default)
-            offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
-                b.icon.load(it)
-            }
+            avatarHelper.loadCommunityIcon(b.icon, item.communityView.community)
 
             b.title.text = item.text
             val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())

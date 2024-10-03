@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunityIconItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
@@ -90,6 +91,9 @@ class MultiCommunityEditorDialogFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,6 +223,7 @@ class MultiCommunityEditorDialogFragment :
             adapter = CommunityAdapter(
                 context = context,
                 offlineManager = offlineManager,
+                avatarHelper = avatarHelper,
                 canSelectMultipleCommunities = true,
                 onTooManyCommunities = {
                     showTooManyCommunitiesMessage()
@@ -500,7 +505,7 @@ class MultiCommunityEditorDialogFragment :
                 clazz = Item.SelectedCommunityItem::class,
                 inflateFn = MultiCommunitySelectedCommunityBinding::inflate,
             ) { item, b, _ ->
-                b.icon.load(R.drawable.ic_community_default)
+                b.icon.load(R.drawable.ic_default_community)
 
                 b.title.text = item.communityRef.name
 

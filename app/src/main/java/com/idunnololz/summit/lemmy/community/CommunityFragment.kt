@@ -1277,7 +1277,7 @@ class CommunityFragment :
                     addItemWithIcon(
                         id = R.id.community_info,
                         title = R.string.community_info,
-                        icon = R.drawable.ic_community_default,
+                        icon = R.drawable.ic_default_community,
                     )
                 }
                 is CommunityRef.ModeratedCommunities -> {

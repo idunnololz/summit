@@ -9,12 +9,13 @@
     <com.google.android.material.imageview.ShapeableImageView
         style="@style/RoundImageView"
         android:id="@+id/icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="@dimen/padding"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="@dimen/dialog_padding"
         android:layout_marginEnd="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
+        android:background="@drawable/server_icon_bg"
         app:border_color="@color/colorOnSurface"
         app:border_width="1dp"
         app:fill_color="@color/style_blue"
@@ -24,29 +25,35 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding"
-        android:layout_marginEnd="@dimen/padding"
+        android:layout_marginEnd="@dimen/dialog_padding"
         android:textAppearance="?textAppearanceBodyMedium"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
         app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/icon"/>
+        app:layout_constraintBottom_toTopOf="@+id/monthly_actives"
+        app:layout_constraintStart_toEndOf="@+id/icon"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/monthly_actives"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_quarter"
-        android:layout_marginEnd="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_quarter"
+        android:layout_marginEnd="@dimen/dialog_padding"
         android:textAppearance="?textAppearanceBodySmall"
         android:textColor="@color/colorTextFaint"
+        android:includeFontPadding="false"
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/title"
+        app:layout_constraintStart_toStartOf="@+id/title"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

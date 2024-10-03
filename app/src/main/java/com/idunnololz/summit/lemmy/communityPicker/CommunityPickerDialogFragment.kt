@@ -13,6 +13,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.DialogFragmentCommunityPickerBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.multicommunity.CommunityAdapter
@@ -58,6 +59,9 @@ class CommunityPickerDialogFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     @Parcelize
     data class Result(
@@ -116,6 +120,7 @@ class CommunityPickerDialogFragment :
                 context = context,
                 offlineManager = offlineManager,
                 canSelectMultipleCommunities = false,
+                avatarHelper = avatarHelper,
                 onSingleCommunitySelected = { ref, icon, communityId ->
                     setFragmentResult(
                         REQUEST_KEY,
