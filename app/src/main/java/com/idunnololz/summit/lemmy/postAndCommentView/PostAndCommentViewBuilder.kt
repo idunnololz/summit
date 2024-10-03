@@ -90,7 +90,6 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
-import com.idunnololz.summit.util.abbrevNumber
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -346,7 +345,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         if (showCommunityIcon) {
             headerContainer.iconSize = Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
             val iconImageView = headerContainer.getIconImageView()
-            avatarHelper.loadIcon(iconImageView, postView.community)
+            avatarHelper.loadCommunityIcon(iconImageView, postView.community)
             iconImageView.setOnClickListener {
                 onPageClick(postView.community.toCommunityRef())
             }

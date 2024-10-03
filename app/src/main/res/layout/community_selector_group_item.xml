@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
-        android:layout_marginStart="@dimen/padding"
+        android:layout_marginStart="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintHorizontal_chainStyle="packed"

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
 import com.idunnololz.summit.databinding.BookmarkedCommunityHeaderItemBinding
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
@@ -46,6 +47,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     private val offlineManager: OfflineManager,
     private val tabsManager: TabsManager,
     private val animationsHelper: AnimationsHelper,
+    private val avatarHelper: AvatarHelper,
     @Assisted private val viewModel: CommunitiesPaneViewModel,
     @Assisted private val binding: CommunitiesPaneBinding,
     @Assisted private val viewLifecycleOwner: LifecycleOwner,
@@ -76,6 +78,7 @@ class CommunitiesPaneController @AssistedInject constructor(
             offlineManager = offlineManager,
             tabsManager = tabsManager,
             onCommunitySelected = onCommunitySelected,
+            avatarHelper = avatarHelper,
             onDeleteUserCommunity = { id ->
                 viewModel.deleteUserCommunity(id)
             },
@@ -122,6 +125,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         private val offlineManager: OfflineManager,
         private val tabsManager: TabsManager,
         private val onCommunitySelected: OnCommunitySelected,
+        private val avatarHelper: AvatarHelper,
         private val onDeleteUserCommunity: (Long) -> Unit,
         private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
         private val onAddBookmarkClick: () -> Unit,
@@ -225,7 +229,6 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.BookmarkedCommunityItem::class,
                 inflateFn = GenericCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.setImageResource(R.drawable.ic_community_default)
                 b.selectedIndicator.visibility = if (item.isSelected) {
                     View.VISIBLE
                 } else {
@@ -248,7 +251,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                         is CommunityRef.All ->
                             loadIcon(R.drawable.ic_subreddit_all)
                         is CommunityRef.CommunityRefByName ->
-                            loadIcon(R.drawable.ic_community_default)
+                            avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
                         is CommunityRef.Local ->
                             loadIcon(R.drawable.ic_subreddit_home)
                         is CommunityRef.MultiCommunity ->
@@ -261,9 +264,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                             loadIcon(R.drawable.outline_shield_24)
                     }
                 } else {
-                    offlineManager.fetchImage(h.itemView, item.iconUrl) {
-                        b.icon.load(it)
-                    }
+                    avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
                 }
 
                 if (item.communityRef is CommunityRef.MultiCommunity) {
@@ -320,10 +321,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.SubscribedCommunityItem::class,
                 inflateFn = GenericCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.load(R.drawable.ic_community_default)
-                offlineManager.fetchImage(h.itemView, item.iconUrl) {
-                    b.icon.load(it)
-                }
+                avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
+
                 b.selectedIndicator.visibility = if (item.isSelected) {
                     View.VISIBLE
                 } else {

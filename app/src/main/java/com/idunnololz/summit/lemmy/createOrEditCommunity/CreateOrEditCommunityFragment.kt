@@ -546,7 +546,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             }
 
             if (community.icon == null) {
-                icon.load(R.drawable.ic_community_default)
+                icon.load(R.drawable.ic_default_community_with_inset)
                 icon.setOnClickListener(null)
             } else {
                 icon.dispose()
@@ -557,7 +557,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                         icon.load(it)
                     },
                     errorListener = {
-                        icon.load(R.drawable.ic_community_default)
+                        icon.load(R.drawable.ic_default_community_with_inset)
                     },
                 )
                 icon.setOnClickListener {

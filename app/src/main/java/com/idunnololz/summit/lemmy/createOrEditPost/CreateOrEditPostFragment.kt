@@ -28,6 +28,7 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.Post
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
@@ -101,6 +102,9 @@ class CreateOrEditPostFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -640,6 +644,7 @@ class CreateOrEditPostFragment :
         adapter = CommunitySearchResultsAdapter(
             context,
             offlineManager,
+            avatarHelper,
             onCommunitySelected = {
                 binding.communityEditText.setText(it.community.toCommunityRef().fullName)
                 viewModel.showSearch.value = false

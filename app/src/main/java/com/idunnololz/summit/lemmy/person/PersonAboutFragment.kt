@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.person
 
 import android.content.Context
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +14,16 @@ import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding
 import com.idunnololz.summit.databinding.PersonInfoItemBinding
 import com.idunnololz.summit.databinding.PersonInfoModeratesItemBinding
 import com.idunnololz.summit.databinding.PersonInfoTitleBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
@@ -43,6 +47,9 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -102,6 +109,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             context = context,
             instance = parentFragment.viewModel.instance,
             offlineManager = offlineManager,
+            avatarHelper = avatarHelper,
             onImageClick = { url ->
                 getMainActivity()?.openImage(
                     sharedElement = null,
@@ -139,6 +147,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         private val context: Context,
         private val instance: String,
         private val offlineManager: OfflineManager,
+        private val avatarHelper: AvatarHelper,
         private val onImageClick: (url: String) -> Unit,
         private val onVideoClick: (url: String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
@@ -234,23 +243,18 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             ) { item, b, h ->
                 val community = item.community
 
-                if (community.community.icon == null) {
-                    b.icon.load(R.drawable.ic_community_default)
-                } else {
-                    b.icon.dispose()
-                    offlineManager.fetchImageWithError(
-                        rootView = h.itemView,
-                        url = community.community.icon,
-                        listener = {
-                            b.icon.load(it)
-                        },
-                        errorListener = {
-                            b.icon.load(R.drawable.ic_community_default)
-                        },
+                avatarHelper.loadCommunityIcon(
+                    b.icon,
+                    community.community,
+                )
+
+                b.name.text = SpannableStringBuilder().apply {
+                    appendNameWithInstance(
+                        context = context,
+                        name = community.community.name,
+                        instance = community.community.instance
                     )
                 }
-
-                b.name.text = "${community.community.name}@${item.community.community.instance}"
                 b.root.setOnClickListener {
                     onPageClick(community.community.toCommunityRef())
                 }

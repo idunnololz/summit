@@ -20,6 +20,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
+import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.inbox.conversation.Conversation
 import com.idunnololz.summit.lemmy.inbox.conversation.ConversationFragment
@@ -35,6 +36,7 @@ import com.idunnololz.summit.util.TwoPaneOnBackPressedCallback
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -109,7 +111,19 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
                     return@a
                 }
 
-                if (!isOpen) {
+                if (isOpen) {
+                    getMainActivity()?.setNavUiOpenPercent(1f)
+
+                    inboxViewModel.isUserOnInboxScreen.value = false
+                } else {
+                    requireMainActivity().apply {
+                        setupForFragment<CommunityFragment>()
+                        lockUiOpenness = false
+                        if (isSlideable) {
+                            setNavUiOpenPercent(0f)
+                        }
+                    }
+
                     viewModel.removeAllButFirst()
 
                     getMainActivity()?.setNavUiOpenPercent(0f)
@@ -124,10 +138,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
                     }
 
                     inboxViewModel.isUserOnInboxScreen.value = true
-                } else {
-                    getMainActivity()?.setNavUiOpenPercent(1f)
-
-                    inboxViewModel.isUserOnInboxScreen.value = false
                 }
             }
 

@@ -31,6 +31,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
 import com.idunnololz.summit.databinding.CommentListCommentItemBinding
 import com.idunnololz.summit.databinding.CommentListEndItemBinding
@@ -104,6 +105,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
+
     private var adapter: SearchResultAdapter? = null
 
     override fun onCreateView(
@@ -129,12 +133,13 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
         with(binding) {
             adapter = SearchResultAdapter(
-                context,
-                parentFragment.viewModel.instance,
-                viewLifecycleOwner,
-                offlineManager,
-                postAndCommentViewBuilder,
-                postListViewBuilder,
+                context = context,
+                instance = parentFragment.viewModel.instance,
+                viewLifecycleOwner = viewLifecycleOwner,
+                offlineManager = offlineManager,
+                postAndCommentViewBuilder = postAndCommentViewBuilder,
+                postListViewBuilder = postListViewBuilder,
+                avatarHelper = avatarHelper,
                 onLoadPage = {
                     queryEngine?.performQuery(it, force = false)
                 },
@@ -345,6 +350,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         private val offlineManager: OfflineManager,
         private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val postListViewBuilder: PostListViewBuilder,
+        private val avatarHelper: AvatarHelper,
         private val onLoadPage: (Int) -> Unit,
         private val onImageClick: (View?, String) -> Unit,
         private val onPostImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
@@ -571,10 +577,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             addItemType(Item.CommunityItem::class, CommunityItemBinding::inflate) { item, b, h ->
                 val community = item.communityView
 
-                b.icon.load(R.drawable.ic_community_default)
-                offlineManager.fetchImage(h.itemView, community.community.icon) {
-                    b.icon.load(it)
-                }
+                avatarHelper.loadCommunityIcon(b.icon, community.community)
 
                 b.title.text = community.community.name
                 val mauString =
@@ -655,7 +658,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             }
             addItemType(Item.UserItem::class, UserItemBinding::inflate) { item, b, _ ->
                 val person = item.personView.person
-                b.icon.load(person.avatar)
+
+                avatarHelper.loadAvatar(b.icon, person)
+
                 b.name.text = person.name
                 b.instance.text = person.instance
 

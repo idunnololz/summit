@@ -1122,7 +1122,7 @@
     <!-- Keep short. Button text. -->
     <string name="share_source_link">Share source link</string>
     <!-- Hint text for an input field where a community name should be entered. -->
-    <string name="community_hint">community</string>
+    <string name="community_hint">Community</string>
     <!-- Keep short. Title text for screen that displays a list of urls. -->
     <string name="urls">Urls</string>
     <!-- Keep short. Button text. When tapped, opens a link in incognito/private browsing mode. -->
@@ -1266,7 +1266,7 @@
     <!-- Button text. Enables filtering by creator when tapped. -->
     <string name="filter_by_creator">Filter by creator</string>
     <!-- Hint text for input field. -->
-    <string name="user_hint">user</string>
+    <string name="user_hint">User</string>
     <!-- Text shown when the app has been updated to a new version. Eg. App updated to v1.2.0 -->
     <string name="update_complete_message">App updated to v%1$s!</string>
     <!-- Keep short. Button text. Opens the app change log when tapped. -->
@@ -1827,6 +1827,7 @@
     <string name="registration_created">Your application as been submitted. You must wait for a site admin will need to approve your application before you can use your account.</string>
     <string name="error_unknown_sign_up_error">An unexpected error has occurred during registration.</string>
     <string name="solve_captcha_desc">You must solve a captcha to sign up. Please enter the code from the image below.</string>
+    <string name="configure">Configure</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

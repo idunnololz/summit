@@ -9,7 +9,7 @@
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/padding"
+        android:paddingHorizontal="@dimen/dialog_padding"
         android:paddingVertical="@dimen/padding_half"
         android:textColor="@color/colorTextFaint"
         android:textAppearance="?textAppearanceBodyMedium"
