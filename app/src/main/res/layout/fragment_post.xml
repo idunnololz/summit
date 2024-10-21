@@ -23,17 +23,55 @@
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
             app:navigationIconTint="?colorControlNormal">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/account_image_view"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:foreground="@drawable/account_ripple"
-                android:layout_marginStart="@dimen/padding_half"
-                android:layout_marginEnd="@dimen/padding_quarter"
-                android:scaleType="centerCrop"
-                android:layout_gravity="end"
-                android:padding="8dp"
-                style="@style/CircleImageView" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbar_content_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/padding"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:textAppearance="?attr/textAppearanceTitleLarge"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/account_image_view"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/subtitle"/>
+
+                <TextView
+                    android:id="@+id/subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    app:layout_constraintStart_toStartOf="@+id/title"
+                    app:layout_constraintEnd_toEndOf="@id/title"
+                    app:layout_constraintTop_toBottomOf="@+id/title"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/account_image_view"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:foreground="@drawable/account_ripple"
+                    android:layout_marginStart="@dimen/padding_half"
+                    android:layout_marginEnd="@dimen/padding_quarter"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="end"
+                    android:padding="8dp"
+                    style="@style/CircleImageView"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

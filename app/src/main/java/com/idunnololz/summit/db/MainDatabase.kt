@@ -19,6 +19,8 @@ import com.idunnololz.summit.drafts.DraftConverters
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsDao
+import com.idunnololz.summit.emoji.db.TextEmojiDao
+import com.idunnololz.summit.emoji.db.TextEmojiEntry
 import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.filterLists.FilterEntry
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
@@ -61,6 +63,7 @@ import com.idunnololz.summit.util.moshi
         InboxEntry::class,
         ConversationEntry::class,
         ReadPostEntry::class,
+        TextEmojiEntry::class,
     ],
     autoMigrations = [
         AutoMigration(from = 20, to = 21),
@@ -69,8 +72,9 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 29, to = 30),
         AutoMigration(from = 31, to = 32),
         AutoMigration(from = 32, to = 33),
+        AutoMigration(from = 41, to = 42),
     ],
-    version = 41,
+    version = 42,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -89,6 +93,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun inboxEntriesDao(): InboxEntriesDao
     abstract fun conversationEntriesDao(): ConversationEntriesDao
     abstract fun postReadDao(): PostReadDao
+    abstract fun textEmojiDao(): TextEmojiDao
 
     companion object {
 

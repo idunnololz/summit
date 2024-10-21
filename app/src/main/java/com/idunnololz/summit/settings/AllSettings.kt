@@ -2436,67 +2436,100 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
 
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_last_hour,
-        context.getString(R.string.time_frame_last_hour),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_last_hour)
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_last_six_hour,
-        context.getString(R.string.time_frame_last_hours_format, "6"),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_last_hours_format, "6"),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_last_twelve_hour,
-        context.getString(R.string.time_frame_last_hours_format, "12"),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_last_hours_format, "12"),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_day,
-        context.getString(R.string.time_frame_today),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_today),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_week,
-        context.getString(R.string.time_frame_this_week),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_this_week),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_month,
-        context.getString(R.string.time_frame_this_month),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_this_month),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_last_three_month,
-        context.getString(R.string.time_frame_last_months_format, "3"),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_last_months_format, "3"),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_last_six_month,
-        context.getString(R.string.time_frame_last_months_format, "6"),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_last_months_format, "6"),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_last_nine_month,
-        context.getString(R.string.time_frame_last_months_format, "9"),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_last_months_format, "9"),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_year,
-        context.getString(R.string.time_frame_this_year),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_this_year),
+        ),
         null,
         null,
     ),
     RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top_all_time,
-        context.getString(R.string.time_frame_all_time),
+        context.getString(
+            R.string.sort_order_top_format,
+            context.getString(R.string.time_frame_all_time),
+        ),
         null,
         null,
     ),

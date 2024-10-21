@@ -319,4 +319,15 @@ safeargs.
             android:name="config"
             app:argType="com.idunnololz.summit.util.viewRecorder.RecordScreenshotConfig" />
     </dialog>
+    <dialog
+        android:id="@+id/textEmojiEditDialogFragment"
+        android:name="com.idunnololz.summit.emoji.TextEmojiEditDialogFragment"
+        android:label="TextEmojiEditDialogFragment" >
+        <argument
+            android:name="text_emoji"
+            app:argType="string" />
+        <argument
+            android:name="id"
+            app:argType="long" />
+    </dialog>
 </navigation>

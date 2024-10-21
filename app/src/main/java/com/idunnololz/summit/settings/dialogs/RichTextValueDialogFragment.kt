@@ -107,6 +107,8 @@ class RichTextValueDialogFragment :
             textFormatToolbar.setupTextFormatterToolbar(
                 editText = textEditor,
                 referenceTextView = null,
+                lifecycleOwner = viewLifecycleOwner,
+                fragmentManager = childFragmentManager,
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)

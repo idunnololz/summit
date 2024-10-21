@@ -5,6 +5,7 @@ import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfoDao
 import com.idunnololz.summit.actions.db.PostReadDao
 import com.idunnololz.summit.drafts.DraftsDao
+import com.idunnololz.summit.emoji.db.TextEmojiDao
 import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryDao
@@ -66,6 +67,10 @@ class DatabaseModule {
     @Provides
     fun providePostReadDao(db: MainDatabase): PostReadDao =
         db.postReadDao()
+
+    @Provides
+    fun provideTextEmojiDao(db: MainDatabase): TextEmojiDao =
+        db.textEmojiDao()
 
     @Provides
     @Singleton

@@ -160,7 +160,7 @@ class PostFragment :
             addItem(R.id.sort_order_top, R.string.sort_order_top)
             addItem(R.id.sort_order_new, R.string.sort_order_new)
             addItem(R.id.sort_order_old, R.string.sort_order_old)
-            setTitle(R.string.sort_by)
+            setTitle(R.string.comments_sort_order)
 
             setOnMenuItemClickListener { menuItem ->
                 viewModel.setCommentsSortOrder(
@@ -839,7 +839,13 @@ class PostFragment :
                     goBack()
                 }
             }
-            title = viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+        }
+
+        binding.title.text = viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+        binding.subtitle.visibility = View.GONE
+
+        binding.title.setOnClickListener {
+            getMainActivity()?.showBottomMenu(getSortByMenu())
         }
 
         val swipeRefreshLayout = binding.swipeRefreshLayout

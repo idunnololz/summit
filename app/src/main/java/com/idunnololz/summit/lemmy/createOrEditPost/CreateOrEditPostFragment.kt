@@ -313,6 +313,8 @@ class CreateOrEditPostFragment :
             textFormatToolbar?.setupTextFormatterToolbar(
                 editText = requireNotNull(postEditor.editText),
                 referenceTextView = null,
+                lifecycleOwner = viewLifecycleOwner,
+                fragmentManager = childFragmentManager,
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)
