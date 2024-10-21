@@ -8,14 +8,16 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TextFieldToolbarItemBinding
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
+import com.idunnololz.summit.emoji.EmojiPopupWindow
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
 import com.idunnololz.summit.util.BottomMenu
@@ -25,6 +27,7 @@ import javax.inject.Singleton
 @Singleton
 class TextFieldToolbarManager @Inject constructor(
     private val preferences: Preferences,
+    private val emojiPopupWindowFactory: EmojiPopupWindow.Factory
 ) {
 
     val textFieldToolbarSettings = MutableLiveData(preferences.textFieldToolbarSettings)
@@ -128,6 +131,7 @@ class TextFieldToolbarManager @Inject constructor(
                 image = image,
                 linkApp = linkApp,
                 settings = settings,
+                emojiPopupWindowFactory = emojiPopupWindowFactory,
             )
         }
 
@@ -137,7 +141,7 @@ class TextFieldToolbarManager @Inject constructor(
             true,
         )
 
-        return TextFormatToolbarViewHolder(b)
+        return TextFormatToolbarViewHolder(b, emojiPopupWindowFactory)
     }
 }
 
@@ -157,24 +161,15 @@ class TextFormatToolbarViewHolder(
     val image: View?,
     val linkApp: View?,
     val settings: View,
+    private val emojiPopupWindowFactory: EmojiPopupWindow.Factory,
 ) {
-
-    companion object {
-        private val TEXT_EMOJIS = listOf(
-            "( ͡° ͜ʖ ͡° )",
-            "ಠ_ಠ",
-            "(╯°□°）╯︵ ┻━┻",
-            "┬─┬ノ( º _ ºノ)",
-            "¯\\_(ツ)_/¯",
-            "༼ つ ◕_◕ ༽つ",
-            "ᕕ( ᐛ )ᕗ",
-            "(•_•) ( •_•)>⌐■-■ (⌐■_■)",
-        )
-    }
 
     private var editText: EditText? = null
 
-    constructor(b: TextFormatToolbarBinding) : this(
+    constructor(
+        b: TextFormatToolbarBinding,
+        emojiPopupWindowFactory: EmojiPopupWindow.Factory,
+    ) : this(
         b.preview,
         b.drafts,
         b.textEmojis,
@@ -190,6 +185,7 @@ class TextFormatToolbarViewHolder(
         b.image,
         b.linkApp,
         b.settings,
+        emojiPopupWindowFactory,
     )
 
     var isEnabled: Boolean = true
@@ -220,6 +216,8 @@ class TextFormatToolbarViewHolder(
     fun setupTextFormatterToolbar(
         editText: EditText,
         referenceTextView: TextView?,
+        lifecycleOwner: LifecycleOwner,
+        fragmentManager: FragmentManager,
         onChooseImageClick: (() -> Unit)? = null,
         onAddLinkClick: (() -> Unit)? = null,
         onPreviewClick: (() -> Unit)? = null,
@@ -269,18 +267,26 @@ class TextFormatToolbarViewHolder(
             }
         }
         textEmojis?.setOnClickListener {
-            PopupMenu(it.context, it).apply {
-                menu.apply {
-                    TEXT_EMOJIS.withIndex().forEach { (index, str) ->
-                        add(0, index, 0, str)
-                    }
+//            PopupMenu(it.context, it).apply {
+//                menu.apply {
+//                    TEXT_EMOJIS.withIndex().forEach { (index, str) ->
+//                        add(0, index, 0, str)
+//                    }
+//                }
+//                setOnMenuItemClickListener {
+//                    editText.replaceTextAtCursor(TEXT_EMOJIS[it.itemId])
+//                    true
+//                }
+//            }.show()
+            emojiPopupWindowFactory.create(
+                context = it.context,
+                lifecycleOwner = lifecycleOwner,
+                fragmentManager = fragmentManager,
+                onEmojiSelected = {
+                    editText.replaceTextAtCursor(it)
                 }
-                setOnMenuItemClickListener {
-                    editText.replaceTextAtCursor(TEXT_EMOJIS[it.itemId])
-
-                    true
-                }
-            }.show()
+            ).showOnView(it)
+//                .show(fragmentManager, "EmojiDialog")
         }
         spoiler?.setOnClickListener {
             editText.wrapTextAtCursor(

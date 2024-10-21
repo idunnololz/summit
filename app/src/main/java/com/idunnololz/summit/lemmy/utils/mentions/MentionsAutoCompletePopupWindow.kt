@@ -55,6 +55,10 @@ class MentionsAutoCompletePopupWindow(
             }
         }
 
-        setBackgroundDrawable(context.getDrawableCompat(R.drawable.mentions_autocomplete_popup_bg))
+        setBackgroundDrawable(null)
+
+        binding.root.setOnClickListener {
+            dismiss()
+        }
     }
 }

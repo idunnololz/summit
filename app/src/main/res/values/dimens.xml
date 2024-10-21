@@ -44,4 +44,5 @@
     <dimen name="theme_color_bar_width">4dp</dimen>
     <dimen name="conversation_bubble_padding">60dp</dimen>
     <dimen name="icon_size">24dp</dimen>
+    <dimen name="emoji_item_width">200dp</dimen>
 </resources>

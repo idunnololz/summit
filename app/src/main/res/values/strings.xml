@@ -1828,6 +1828,12 @@
     <string name="error_unknown_sign_up_error">An unexpected error has occurred during registration.</string>
     <string name="solve_captcha_desc">You must solve a captcha to sign up. Please enter the code from the image below.</string>
     <string name="configure">Configure</string>
+    <string name="comments_sort_order">Comments sort order</string>
+    <string name="manage_text_emojis">Manage text emojis</string>
+    <string name="add_emoji">Add emoji</string>
+    <string name="emoji">Emoji</string>
+    <string name="text_emoji">Text emoji</string>
+    <string name="edit_text_emoji">Edit text emoji</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

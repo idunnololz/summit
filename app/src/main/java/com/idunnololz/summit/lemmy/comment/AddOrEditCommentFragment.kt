@@ -261,6 +261,8 @@ class AddOrEditCommentFragment :
             textFormatterToolbar?.setupTextFormatterToolbar(
                 editText = commentEditText,
                 referenceTextView = replyingTo,
+                lifecycleOwner = viewLifecycleOwner,
+                fragmentManager = childFragmentManager,
                 onChooseImageClick = {
                     val bottomMenu = BottomMenu(context).apply {
                         setTitle(R.string.insert_image)

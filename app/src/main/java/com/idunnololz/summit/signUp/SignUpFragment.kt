@@ -157,6 +157,8 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
                 textFormatToolbar?.setupTextFormatterToolbar(
                     editText = answerExpandedEditText,
                     referenceTextView = null,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = childFragmentManager,
                     onChooseImageClick = null,
                     onAddLinkClick = {
                         AddLinkDialogFragment.show(
