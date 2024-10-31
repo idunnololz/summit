@@ -1038,4 +1038,6 @@
     <string name="registration_created">Ihr Antrag wurde übermittelt. Sie müssen warten, bis ein Site-Administrator Ihren Antrag genehmigen muss, bevor Sie Ihr Konto verwenden können.</string>
     <string name="error_unknown_sign_up_error">Während der Registrierung ist ein unerwarteter Fehler aufgetreten.</string>
     <string name="solve_captcha_desc">Um dich anzumelden, musst du ein Captcha lösen. Gib dafür bitte den Code aus dem Bild unten ein.</string>
+    <string name="reset_hidden_posts_confirm_title">Ausgeblendete Beiträge zurücksetzen</string>
+    <string name="delete_comment_confirm">Kommentar löschen</string>
 </resources>
