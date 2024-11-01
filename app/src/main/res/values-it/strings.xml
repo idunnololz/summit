@@ -563,7 +563,7 @@
     <string name="delete_all">Elimina tutte</string>
     <string name="filter_by_community">Filtra per comunità</string>
     <string name="filter_by_creator">Filtra per autore</string>
-    <string name="user_hint">utente</string>
+    <string name="user_hint">Utente</string>
     <string name="changelog">Lista modifiche</string>
     <string name="open_link">Apri link</string>
     <string name="error_no_preview_image">Nessuna immagine di anteprima disponibile</string>
@@ -703,7 +703,7 @@
     <string name="link_actions">Azioni link</string>
     <string name="copy_link_text">Copia testo link</string>
     <string name="share_source_link">Condividi sorgente link</string>
-    <string name="community_hint">comunità</string>
+    <string name="community_hint">Comunità</string>
     <string name="urls">URL</string>
     <string name="open_in_incognito">Apri in incognito</string>
     <string name="community">Comunità</string>
@@ -725,7 +725,7 @@
     <string name="pending_actions">Azioni non completate</string>
     <string name="delete_failed_actions_history">Ripulire la cronologia delle azioni fallite?</string>
     <string name="error_you_must_sign_in_to_create_a_post">È necessario effettuare il login per creare un post.</string>
-    <string name="use_suggested_title_format">Usa il titolo suggerito \"%1$s\"</string>
+    <string name="use_suggested_title_format">Usa il titolo suggerito \"** %1$s **\"</string>
     <string name="load_more">Carica altri</string>
     <string name="load_more_page_format">Carica altri (pagina %1$s)</string>
     <string name="no">No</string>
@@ -958,4 +958,109 @@
     <string name="offline_done">Terminato!</string>
     <string name="non_native_post_warning_desc">Stai visualizzando questo post dall\'istanza **%1$s** ma attualmente hai effettuato il login su **%2$s**.</string>
     <string name="error_couldnt_find_object">Non è stato possibile trovare il post/commento in questa istanza.</string>
+    <string name="use_imgur">Usa Imgur</string>
+    <string name="sign_up_title">Non hai un account? [Registrati]()</string>
+    <string name="animation_level_misc">Controlla quali animazioni vengono riprodotte nell\'app. Un livello di animazione più alto significa che vengono riprodotte più animazioni.</string>
+    <string name="record">Documentazione</string>
+    <string name="recording_length_in_seconds">Durata della registrazione (secondi)</string>
+    <string name="save_screenshot_as_recording">Salva lo screenshot come registrazione</string>
+    <string name="error_unable_to_create_screenshot">Impossibile creare uno screenshot.</string>
+    <string name="recording_type">Tipo di registrazione</string>
+    <string name="fps_full">FPS (fotogrammi al secondo)</string>
+    <string name="quality_factor">Fattore di qualità</string>
+    <string name="resolution_scaling">Scala di risoluzione</string>
+    <string name="desc_screenshot_recording_fps">Il campo FPS indica l\'FPS massimo della registrazione. In base all\'hardware del dispositivo, potrebbe non essere possibile raggiungere l\'FPS selezionato.</string>
+    <string name="desc_recording_stats">Registrazione dello screenshot riuscita!
+\n
+\n Frequenza cardiaca: %1$s
+\n Tempo del fotogramma (ms): %2$s
+\n Tempo impiegato: %3$s
+\n Dimensione file: %4$s</string>
+    <string name="use_imgur_desc">Se abilitata, le immagini verranno caricate su [Imgur](https://imgur.com/) anziché su Lemmy.</string>
+    <string name="animation_level">Livello di animazione</string>
+    <string name="sign_up">Iscrizione</string>
+    <string name="button_continue">Continuare</string>
+    <string name="minimum">Minimo</string>
+    <string name="low">Basso</string>
+    <string name="max">Massimo</string>
+    <string name="comments_sort_order">Ordine di ordinamento dei commenti</string>
+    <string name="manage_text_emojis">Gestisci emoji di testo</string>
+    <string name="add_emoji">Aggiungi emoji</string>
+    <string name="emoji">Emoji</string>
+    <string name="desc_no_comments">Nessun commento ancora.</string>
+    <string name="add_a_comment">Aggiungi un commento</string>
+    <string name="no_people_selected">Nessuna persona selezionata</string>
+    <string name="retry">Riprova</string>
+    <string name="aggressive">Aggressivo</string>
+    <string name="moderate">Moderare</string>
+    <string name="lite">Leggero</string>
+    <string name="sign_up_instance_desc">Scegli l\'istanza che vuoi chiamare casa. Per maggiori informazioni sulle istanze di Lemmy, visita [join-lemmy.org](https://join-lemmy.org/instances).
+\n
+\n [Non sai chi scegliere? Utilizza l\'istanza più grande.](a)</string>
+    <string name="error_unable_to_resolve_instance">Impossibile risolvere l\'istanza. Si prega di ricontrollare l\'istanza immessa.</string>
+    <string name="answer">Risposta</string>
+    <string name="answer_required_to_sign_up_desc">**Per unirti a questo server, devi rispondere alla seguente domanda e attendere di essere accettato.**</string>
+    <string name="error_invalid_instance_format">Formato di istanza non valido.</string>
+    <string name="error_username_too_short">Nome utente troppo corto. Lunghezza minima %1$s caratteri.</string>
+    <string name="error_username_cannot_contain_spaces">Il nome utente non può contenere spazi.</string>
+    <string name="error_username_too_long">Nome utente troppo lungo. Lunghezza massima del nome utente %1$s caratteri.</string>
+    <string name="error_invalid_email">Email non valida.</string>
+    <string name="error_password_too_short">Password troppo corta. Lunghezza minima %1$s caratteri.</string>
+    <string name="error_password_too_long">Password troppo lunga. Lunghezza massima %1$s caratteri.</string>
+    <string name="done">Fatto</string>
+    <string name="error_unable_to_decode_captcha_image">Impossibile decodificare l\'immagine captcha.</string>
+    <string name="error_no_captcha">L\'istanza richiede il captcha, ma non viene fornito alcun captcha.</string>
+    <string name="submit">Invia</string>
+    <string name="email_optional">E-mail (facoltativo)</string>
+    <string name="error_instance_closed_registrations">Al momento questa istanza non accetta nuovi utenti.</string>
+    <string name="error_sign_up">Registrazione non riuscita</string>
+    <string name="sign_up_success">Registrazione riuscita</string>
+    <string name="email_verification_required">È richiesta la verifica dell\'email. Cerca l\'email di verifica e clicca sul link al suo interno.
+\n
+\n Se non vedi l\'e-mail entro 10 minuti, controlla la cartella spam o il cestino.</string>
+    <string name="finish">Fine</string>
+    <string name="registration_created">La tua richiesta è stata inoltrata. Devi attendere che un amministratore del sito approvi la tua richiesta prima di poter utilizzare il tuo account.</string>
+    <string name="error_unknown_sign_up_error">Si è verificato un errore imprevisto durante la registrazione.</string>
+    <string name="solve_captcha_desc">Devi risolvere un captcha per registrarti. Inserisci il codice dall\'immagine qui sotto.</string>
+    <string name="go_to_desc">Vai direttamente a una pagina di Lemmy incollando il suo link qui. Se la pagina non può essere analizzata, si aprirà nel browser.</string>
+    <string name="error_invalid_link">Link non valido.</string>
+    <string name="text_emoji">Emoji di testo</string>
+    <string name="edit_text_emoji">Modifica emoji testo</string>
+    <string name="dim_read_posts">Post letti male</string>
+    <string name="dim_read_posts_desc">Se abilitato, i post letti saranno completamente oscurati. Se disabilitato, solo il titolo del post sarà oscurato.</string>
+    <string name="auto_play_videos">Riproduzione automatica dei video</string>
+    <string name="comments_with_new_comments_format">%1$s ( %2$s Nuovo)</string>
+    <string name="draft">Bozza</string>
+    <string name="warn_too_many_messages">Alcune conversazioni potrebbero mancare. Questo account ha più di %1$s messaggi e Summit attualmente recupera solo i %1$s messaggi più recenti. Le conversazioni precedenti %2$s non verranno mostrate.</string>
+    <string name="loading">Caricamento…</string>
+    <string name="selected_people">Persone selezionate</string>
+    <string name="save_as_gif">Salva come GIF</string>
+    <string name="save_as_recording">Salva come registrazione</string>
+    <string name="recording">Registrazione…</string>
+    <string name="encoding">Codifica…</string>
+    <string name="view_history">Visualizza cronologia</string>
+    <string name="show_full_context">Mostra il contesto completo</string>
+    <string name="error_operation_not_permitted">Operazione non consentita</string>
+    <string name="error_action_on_comment_context">Quando scrivi un commento, non puoi eseguire azioni all\'interno del contesto.</string>
+    <string name="hide_full_context">Nascondi il contesto completo</string>
+    <string name="cache_policy">Politica della cache</string>
+    <string name="cache_policy_desc">Controlla quanto aggressivamente l\'app memorizzerà nella cache i contenuti di rete. Una politica di caching rilassata significherà che l\'app effettuerà chiamate di rete più frequentemente ma i contenuti potrebbero essere più recenti. Una politica di cache aggressiva migliorerà le prestazioni dell\'app a costo di contenuti potenzialmente obsoleti.</string>
+    <string name="use_condensed_style_for_comment_header">Usa lo stile condensato per l\'intestazione del commento</string>
+    <string name="username">Nome utente</string>
+    <string name="submitting_application">Invio della domanda…</string>
+    <string name="configure">Configurare</string>
+    <string name="reset_emojis">Reimposta emoji</string>
+    <string name="warn_reset_emojis">Questo eliminerà tutti gli emoji personalizzati e ripristinerà gli emoji originali. Questa azione non può essere annullata.</string>
+    <string name="post_scores">Pubblica i punteggi</string>
+    <string name="show_scores">Mostra punteggi</string>
+    <string name="hide_scores">Nascondi i punteggi</string>
+    <string name="comment_scores">Punteggi dei commenti</string>
+    <string name="parse_markdown_in_post_titles">Post markdown nei titoli dei post</string>
+    <string name="parse_markdown_in_post_titles_desc">Disattivando questa opzione è possibile prevenire problemi con la formattazione del titolo del post</string>
+    <string name="removed">RIMOSSO</string>
+    <string name="copy_text">Copia il testo</string>
+    <string name="go_to">Vai a…</string>
+    <string name="go">Andare</string>
+    <string name="post_scores_desc">Scegli come visualizzare i punteggi nei post</string>
+    <string name="comment_scores_desc">Scegli come visualizzare i punteggi nei commenti</string>
 </resources>
