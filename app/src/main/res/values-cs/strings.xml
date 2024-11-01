@@ -328,7 +328,7 @@
     <string name="elapsed_time_a_year_ago">1r</string>
     <string name="elapsed_time_years_ago">%1$dr</string>
     <string name="copy_link_text">Kopírovat text odkazu</string>
-    <string name="community_hint">komunita</string>
+    <string name="community_hint">Komunita</string>
     <string name="urls">Urls</string>
     <string name="community">Komunita</string>
     <string name="clear_search_history">Vymazat historii vyhledávání</string>
@@ -481,7 +481,7 @@
     <string name="view_hidden_posts">Zobrazit skryté příspevky</string>
     <string name="hide_posts">Skrýt příspěvky</string>
     <string name="show_page_numbers_desc">Přidá \"zápatí\" s číslem stránky.</string>
-    <string name="reset_hidden_posts_confirm_title">Resetovat skryté příspěvky?</string>
+    <string name="reset_hidden_posts_confirm_title">Resetovat skryté příspěvky</string>
     <string name="summit_account_settings">Nastavení účtu Summit</string>
     <string name="summit_account_settings_desc">Nakonfigurujte nastavení místního/klientského účtu</string>
     <string name="less_dark_background_theme_desc">Použije světlejší barvu jako barvu pozadí</string>
@@ -1057,4 +1057,8 @@
     <string name="parse_markdown_in_post_titles">Značení příspěvku v názvech příspěvků</string>
     <string name="parse_markdown_in_post_titles_desc">Vypnutím tohoto nastavení můžete předejít problémům s formátováním názvu příspěvku</string>
     <string name="removed">Odebráno</string>
+    <string name="reset_settings_prompt">Resetovat nastavení</string>
+    <string name="delete_comment_confirm">Smazat komentář</string>
+    <string name="app_restart_required">Je nutné restartovat aplikaci</string>
+    <string name="message_from_format">Od %1$s</string>
 </resources>
