@@ -1053,4 +1053,5 @@
     <string name="go">Gå</string>
     <string name="go_to_desc">Gå direkt till en Lemmy-sida genom att klistra in dess länk här. Om sidan inte kan tolkas öppnas den i webbläsaren istället.</string>
     <string name="error_invalid_link">Ogiltig länk.</string>
+    <string name="delete_comment_confirm">Radera kommentar</string>
 </resources>
