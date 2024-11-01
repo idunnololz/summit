@@ -1054,4 +1054,6 @@
     <string name="configure">कॉन्फ़िगर</string>
     <string name="reset_emojis">इमोजी रीसेट करें</string>
     <string name="post_scores">पोस्ट स्कोर</string>
+    <string name="post_scores_desc">चुनें कि पोस्ट पर स्कोर कैसे प्रदर्शित किए जाएं</string>
+    <string name="comment_scores_desc">चुनें कि टिप्पणियों पर स्कोर कैसे प्रदर्शित किए जाएं</string>
 </resources>
