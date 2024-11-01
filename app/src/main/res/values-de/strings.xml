@@ -1054,4 +1054,6 @@
     <string name="copy_text">Text kopieren</string>
     <string name="go_to">Gehe zu…</string>
     <string name="error_invalid_link">Ungültiger Link.</string>
+    <string name="post_scores_desc">Wählen Sie aus, wie die Punktzahlen für Beiträge angezeigt werden</string>
+    <string name="comment_scores_desc">Auswählen, wie Bewertungen für Kommentare angezeigt werden</string>
 </resources>
