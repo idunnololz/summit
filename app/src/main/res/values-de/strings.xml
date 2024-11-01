@@ -1040,4 +1040,18 @@
     <string name="solve_captcha_desc">Um dich anzumelden, musst du ein Captcha lösen. Gib dafür bitte den Code aus dem Bild unten ein.</string>
     <string name="reset_hidden_posts_confirm_title">Ausgeblendete Beiträge zurücksetzen</string>
     <string name="delete_comment_confirm">Kommentar löschen</string>
+    <string name="go">Gehen</string>
+    <string name="go_to_desc">Gehen Sie direkt zu einer Lemmy-Seite, indem Sie den Link hier einfügen. Wenn die Seite nicht analysiert werden kann, wird sie stattdessen im Browser geöffnet.</string>
+    <string name="reset_emojis">Emojis zurücksetzen</string>
+    <string name="warn_reset_emojis">Dadurch werden alle benutzerdefinierten Emojis gelöscht und die ursprünglichen Emojis wiederhergestellt. Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="post_scores">Ergebnisse veröffentlichen</string>
+    <string name="show_scores">Ergebnisse anzeigen</string>
+    <string name="hide_scores">Ergebnisse ausblenden</string>
+    <string name="comment_scores">Kommentarbewertungen</string>
+    <string name="parse_markdown_in_post_titles">Beitragsabschlag in Beitragstiteln</string>
+    <string name="parse_markdown_in_post_titles_desc">Durch das Ausschalten können Probleme mit der Formatierung von Beitragstiteln vermieden werden</string>
+    <string name="removed">ENTFERNT</string>
+    <string name="copy_text">Text kopieren</string>
+    <string name="go_to">Gehe zu…</string>
+    <string name="error_invalid_link">Ungültiger Link.</string>
 </resources>
