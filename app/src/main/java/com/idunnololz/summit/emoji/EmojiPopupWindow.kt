@@ -49,6 +49,8 @@ class EmojiPopupWindow @AssistedInject constructor(
     val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     init {
+        width = ViewGroup.LayoutParams.MATCH_PARENT
+
         val binding = DialogEmojiBinding.inflate(LayoutInflater.from(context)).also {
             binding = it
         }
@@ -85,6 +87,22 @@ class EmojiPopupWindow @AssistedInject constructor(
             adapter.setItems(allOptions.map { EmojisAdapter.Item.EmojiItem(it.text) }) {
                 update()
             }
+        }
+
+        val onEmojiChangedJob = lifecycleOwner.lifecycleScope.launch {
+            textEmojisManager.emojisChangedFlow.collect {
+                lifecycleOwner.lifecycleScope.launch {
+                    val allOptions = textEmojisManager.getAllEmojis()
+
+                    adapter.setItems(allOptions.map { EmojisAdapter.Item.EmojiItem(it.text) }) {
+                        update()
+                    }
+                }
+            }
+        }
+
+        setOnDismissListener {
+            onEmojiChangedJob.cancel()
         }
     }
 

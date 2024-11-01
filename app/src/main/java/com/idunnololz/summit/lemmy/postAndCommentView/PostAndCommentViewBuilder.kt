@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.Gravity
@@ -71,6 +72,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
@@ -83,6 +85,7 @@ import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionsSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
@@ -97,6 +100,7 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
+import com.idunnololz.summit.util.markwon.BorderedSpan
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.AutoHorizontalScrollView
@@ -159,7 +163,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var downvoteColor = preferences.downvoteColor
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
     private val unimportantTextColor = ContextCompat.getColor(context, R.color.colorTextFaint)
-    private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
+    private var postShowUpAndDownVotes: Boolean = preferences.postShowUpAndDownVotes
+    private var commentShowUpAndDownVotes: Boolean = preferences.commentShowUpAndDownVotes
     private var displayInstanceStyle = preferences.displayInstanceStyle
     private var leftHandMode = preferences.leftHandMode
     private var showPostUpvotePercentage: Boolean = preferences.showPostUpvotePercentage
@@ -176,6 +181,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var showEditedDate: Boolean = preferences.showEditedDate
     private var autoPlayVideos: Boolean = preferences.autoPlayVideos
     private var useCondensedTypefaceForCommentHeaders: Boolean = preferences.useCondensedTypefaceForCommentHeaders
+    private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
 
     private val viewRecycler: ViewRecycler<View> = ViewRecycler()
 
@@ -222,10 +228,12 @@ class PostAndCommentViewBuilder @Inject constructor(
         showEditedDate = preferences.showEditedDate
         autoPlayVideos = preferences.autoPlayVideos
         useCondensedTypefaceForCommentHeaders = preferences.useCondensedTypefaceForCommentHeaders
+        parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
 
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
-        showUpAndDownVotes = preferences.showUpAndDownVotes
+        postShowUpAndDownVotes = preferences.postShowUpAndDownVotes
+        commentShowUpAndDownVotes = preferences.commentShowUpAndDownVotes
         leftHandMode = preferences.leftHandMode
         commentHeaderLayout = preferences.commentHeaderLayout
         commentQuickActions = preferences.commentQuickActions
@@ -302,7 +310,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             viewHolder.ensureActionButtons(
                 root = root,
                 leftHandMode = leftHandMode,
-                showUpAndDownVotes = showUpAndDownVotes,
+                showUpAndDownVotes = postShowUpAndDownVotes,
                 actions = listOf(PostQuickActionIds.Voting),
                 isSaved = postView.saved,
                 fullWidth = false,
@@ -311,7 +319,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             viewHolder.ensureActionButtons(
                 root = root,
                 leftHandMode = leftHandMode,
-                showUpAndDownVotes = showUpAndDownVotes,
+                showUpAndDownVotes = postShowUpAndDownVotes,
                 actions = postQuickActions.actions + PostQuickActionIds.More,
                 isSaved = postView.saved,
                 fullWidth = false,
@@ -365,26 +373,30 @@ class PostAndCommentViewBuilder @Inject constructor(
             title.setTag(R.id.show_community_icon, showCommunityIcon)
         }
 
-        LemmyTextHelper.bindText(
-            title,
-            postView.post.name,
-            instance,
-            highlight = if (highlightTextData?.targetSubtype == 0) {
-                highlightTextData
-            } else {
-                highlightTextData?.copy(matchIndex = null)
-            },
-            onImageClick = {
-                onImageClick(Either.Left(postView), null, it)
-            },
-            onVideoClick = { url ->
-                onVideoClick(url, VideoType.Unknown, null)
-            },
-            onPageClick = onPageClick,
-            onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick,
-        )
-
+        if (parseMarkdownInPostTitles) {
+            LemmyTextHelper.bindText(
+                title,
+                postView.post.name,
+                instance,
+                showMediaAsLinks = true,
+                highlight = if (highlightTextData?.targetSubtype == 0) {
+                    highlightTextData
+                } else {
+                    highlightTextData?.copy(matchIndex = null)
+                },
+                onImageClick = {
+                    onImageClick(Either.Left(postView), null, it)
+                },
+                onVideoClick = { url ->
+                    onVideoClick(url, VideoType.Unknown, null)
+                },
+                onPageClick = onPageClick,
+                onLinkClick = onLinkClick,
+                onLinkLongClick = onLinkLongClick,
+            )
+        } else {
+            title.text = postView.post.name
+        }
 
         if (postView.counts.comments == postView.unread_comments ||
             postView.unread_comments <= 0) {
@@ -589,8 +601,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             showProfileIcons || commentHeaderLayout == CommentHeaderLayoutId.Multiline
 
         with(holder) {
-            if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
-                if (showUpAndDownVotes) {
+            if (holder.state.preferUpAndDownVotes != commentShowUpAndDownVotes) {
+                holder.state.preferUpAndDownVotes = commentShowUpAndDownVotes
+                if (commentShowUpAndDownVotes) {
                     holder.headerView.textView3.visibility = View.VISIBLE
 
                     holder.upvoteCount = holder.headerView.textView2
@@ -686,37 +699,29 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         if (commentView.comment.deleted || isDeleting) {
-            LemmyTextHelper.bindText(
-                textView = text,
-                text = context.getString(R.string.deleted_special),
-                instance = instance,
-                highlight = highlightTextData,
-                onImageClick = {
-                    onImageClick(Either.Right(commentView), null, it)
-                },
-                onVideoClick = { url ->
-                    onVideoClick(url, VideoType.Unknown, null)
-                },
-                onPageClick = onPageClick,
-                onLinkClick = onLinkClick,
-                onLinkLongClick = onLinkLongClick,
-            )
+            text.text = SpannableStringBuilder().apply {
+                val s = length
+                append(context.getString(R.string.deleted))
+                val e = length
+                setSpan(
+                    BorderedSpan(context),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
         } else if (commentView.comment.removed || isRemoved) {
-            LemmyTextHelper.bindText(
-                textView = text,
-                text = context.getString(R.string.removed_special),
-                instance = instance,
-                highlight = highlightTextData,
-                onImageClick = {
-                    onImageClick(Either.Right(commentView), null, it)
-                },
-                onVideoClick = { url ->
-                    onVideoClick(url, VideoType.Unknown, null)
-                },
-                onPageClick = onPageClick,
-                onLinkClick = onLinkClick,
-                onLinkLongClick = onLinkLongClick,
-            )
+            text.text = SpannableStringBuilder().apply {
+                val s = length
+                append(context.getString(R.string.removed))
+                val e = length
+                setSpan(
+                    BorderedSpan(context),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
         } else {
             LemmyTextHelper.bindText(
                 textView = text,
@@ -771,6 +776,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         val scoreCount = scoreCount
+        val upvoteCount = upvoteCount
+        val downvoteCount = downvoteCount
         if (scoreCount != null) {
             val scoreCount2 = qaScoreCount
             val upvoteCount2 = qaUpvoteCount
@@ -794,6 +801,15 @@ class PostAndCommentViewBuilder @Inject constructor(
                             downvoteCount2.setTextColor(downvoteColor)
                             upvoteCount2.setTextColor(context.getColorCompat(R.color.colorText))
                         }
+                        if (upvoteCount == null || downvoteCount == null) {
+                            scoreCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(downvoteColor)
+                        } else {
+                            upvoteCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                            downvoteCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(downvoteColor)
+                        }
                     } else if (vote > 0) {
                         if (downvoteCount2 == null || upvoteCount2 == null) {
                             scoreCount2?.setTextColor(upvoteColor)
@@ -801,12 +817,30 @@ class PostAndCommentViewBuilder @Inject constructor(
                             downvoteCount2.setTextColor(context.getColorCompat(R.color.colorText))
                             upvoteCount2.setTextColor(upvoteColor)
                         }
+                        if (upvoteCount == null || downvoteCount == null) {
+                            scoreCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(upvoteColor)
+                        } else {
+                            upvoteCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(upvoteColor)
+                            downvoteCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                        }
                     } else {
                         if (downvoteCount2 == null || upvoteCount2 == null) {
                             scoreCount2?.setTextColor(context.getColorCompat(R.color.colorText))
                         } else {
                             downvoteCount2.setTextColor(context.getColorCompat(R.color.colorText))
                             upvoteCount2.setTextColor(context.getColorCompat(R.color.colorText))
+                        }
+                        if (upvoteCount == null || downvoteCount == null) {
+                            scoreCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                        } else {
+                            upvoteCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                            downvoteCount.compoundDrawableTintListCompat =
+                                ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
                         }
                     }
 
@@ -1403,7 +1437,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         vh.ensureActionButtons(
             root = root,
             leftHandMode = leftHandMode,
-            showUpAndDownVotes = showUpAndDownVotes,
+            showUpAndDownVotes = commentShowUpAndDownVotes,
             actions = commentQuickActions.actions + CommentQuickActionIds.More,
             removeOnly = removeOnly,
             isSaved = isSaved,

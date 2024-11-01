@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentEmojiPopupEditorBinding
 import com.idunnololz.summit.databinding.EmojiEditorEmojiItemBinding
 import com.idunnololz.summit.util.AnimationsHelper
@@ -25,6 +26,7 @@ import com.idunnololz.summit.util.GridAutofitLayoutManager
 import com.idunnololz.summit.util.GridSpaceItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -32,10 +34,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
 class EmojiPopupEditorDialogFragment :
     BaseDialogFragment<DialogFragmentEmojiPopupEditorBinding>(),
-    FullscreenDialogFragment {
+    FullscreenDialogFragment,
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -87,10 +91,9 @@ class EmojiPopupEditorDialogFragment :
         val context = requireContext()
 
         with(binding) {
-
             childFragmentManager.setFragmentResultListener(
                 TextEmojiEditDialogFragment.REQUEST_KEY,
-                viewLifecycleOwner
+                viewLifecycleOwner,
             ) { requestKey, result ->
                 val result = TextEmojiEditDialogFragment.getResult(result)
 
@@ -98,6 +101,7 @@ class EmojiPopupEditorDialogFragment :
                     viewModel.addOrUpdateTextEmoji(
                         result.id,
                         result.textEmoji,
+                        result.delete,
                     )
                 }
             }
@@ -106,21 +110,56 @@ class EmojiPopupEditorDialogFragment :
                 insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.root)
             }
 
-            toolbar.setTitle(R.string.manage_text_emojis)
+            toolbar.apply {
+                setTitle(R.string.manage_text_emojis)
+                setNavigationIcon(R.drawable.baseline_close_24)
+                setNavigationOnClickListener {
+                    dismiss()
+                }
+                setNavigationIconTint(
+                    context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                )
+
+                inflateMenu(R.menu.menu_emoji_popup_editor)
+                setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.reset -> {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.warn_reset_emojis)
+                                .setPositiveButton(R.string.reset_emojis)
+                                .setNegativeButton(android.R.string.cancel)
+                                .createAndShow(childFragmentManager, "reset_emojis")
+                        }
+                    }
+                    true
+                }
+            }
 
             val adapter = EditEmojisAdapter(context) { id, textEmoji ->
                 TextEmojiEditDialogFragment.show(childFragmentManager, textEmoji, id)
             }
 
             recyclerView.layoutManager = GridAutofitLayoutManager(
-                context, Utils.convertDpToPixel(200f).toInt())
+                context, Utils.convertDpToPixel(200f).toInt(),
+            )
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
-            recyclerView.addItemDecoration(GridSpaceItemDecoration(
-                space = context.resources.getDimensionPixelSize(R.dimen.padding_half),
-                spaceAboveFirstAndBelowLastItem = true,
-                spaceBeforeStartAndAfterEnd = true,
-            ))
+            recyclerView.addItemDecoration(
+                GridSpaceItemDecoration(
+                    space = context.resources.getDimensionPixelSize(R.dimen.padding_half),
+                    spaceAboveFirstAndBelowLastItem = true,
+                    spaceBeforeStartAndAfterEnd = true,
+                ),
+            )
+
+
+            val callback: ItemTouchHelper.Callback = ItemMoveCallback(adapter)
+            val touchHelper = ItemTouchHelper(callback)
+            touchHelper.attachToRecyclerView(recyclerView)
+
+            fab.setOnClickListener {
+                TextEmojiEditDialogFragment.show(childFragmentManager, "", 0)
+            }
 
             viewModel.loadData()
 
@@ -156,10 +195,65 @@ class EmojiPopupEditorDialogFragment :
         }
     }
 
+    class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) :
+        ItemTouchHelper.Callback() {
+        override fun isLongPressDragEnabled(): Boolean {
+            return true
+        }
+
+        override fun isItemViewSwipeEnabled(): Boolean {
+            return false
+        }
+
+
+        override fun onSwiped(viewHolder: ViewHolder, i: Int) {
+        }
+
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
+            val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or
+                ItemTouchHelper.START or ItemTouchHelper.END
+            return makeMovementFlags(dragFlags, 0)
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView, viewHolder: ViewHolder,
+            target: ViewHolder,
+        ): Boolean {
+            mAdapter.onRowMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+            return true
+        }
+
+        override fun onSelectedChanged(
+            viewHolder: ViewHolder?,
+            actionState: Int,
+        ) {
+            if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                mAdapter.onRowSelected(viewHolder)
+            }
+
+            super.onSelectedChanged(viewHolder, actionState)
+        }
+
+        override fun clearView(
+            recyclerView: RecyclerView,
+            viewHolder: ViewHolder,
+        ) {
+            super.clearView(recyclerView, viewHolder)
+
+            mAdapter.onRowClear(viewHolder)
+        }
+
+        interface ItemTouchHelperContract {
+            fun onRowMoved(fromPosition: Int, toPosition: Int)
+            fun onRowSelected(myViewHolder: ViewHolder?)
+            fun onRowClear(myViewHolder: ViewHolder?)
+        }
+    }
+
     private class EditEmojisAdapter(
         private val context: Context,
         private val onEditClick: (id: Long, textEmoji: String) -> Unit,
-    ) : Adapter<ViewHolder>() {
+    ) : Adapter<ViewHolder>(), ItemMoveCallback.ItemTouchHelperContract {
 
         sealed interface Item {
             data class Emoji(
@@ -169,87 +263,25 @@ class EmojiPopupEditorDialogFragment :
             ): Item
         }
 
-        private val ith: ItemTouchHelper
+        private val adapterHelper = AdapterHelper<Item>(
+            { old, new ->
+                old::class == new::class && when (old) {
+                    is Item.Emoji -> old.emoji == (new as Item.Emoji).emoji
+                }
+            },
+        )
 
-        private val adapterHelper = AdapterHelper<Item>({ old, new ->
-            old::class == new::class && when (old) {
-                is Item.Emoji -> old.emoji == (new as Item.Emoji).emoji
-            }
-        })
-
-        private var data: List<TextEmoji> = null
+        private var data: List<TextEmoji> = listOf()
 
         init {
-
-
-            val callback = object : ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                0,
-            ) {
-
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: ViewHolder,
-                    target: ViewHolder,
-                ): Boolean {
-                    swap(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
-                    return true
-                }
-
-                override fun canDropOver(
-                    recyclerView: RecyclerView,
-                    current: ViewHolder,
-                    target: ViewHolder,
-                ): Boolean = data[target.bindingAdapterPosition] is TextEmoji
-
-                override fun isLongPressDragEnabled(): Boolean {
-                    return false
-                }
-
-                override fun onSwiped(viewHolder: ViewHolder, direction: Int) {}
-            }
-
-            ith = ItemTouchHelper(callback)
-
             adapterHelper.apply {
                 addItemType(Item.Emoji::class, EmojiEditorEmojiItemBinding::inflate) { item, b, h ->
-
-                    val gestureDetector = GestureDetector(context, object : SimpleOnGestureListener() {
-                        override fun onScroll(
-                            e1: MotionEvent?,
-                            e2: MotionEvent,
-                            distanceX: Float,
-                            distanceY: Float,
-                        ): Boolean {
-                            ith.startDrag(h)
-                            return super.onScroll(e1, e2, distanceX, distanceY)
-                        }
-                    })
-
                     b.text.text = item.emoji
-                    b.root.setOnTouchListener { _, event ->
-                        gestureDetector.onTouchEvent(event)
-                    }
                     b.root.setOnClickListener {
                         onEditClick(item.id, item.emoji)
                     }
                 }
             }
-        }
-
-        private fun swap(fromPosition: Int, toPosition: Int) {
-            val mutableItems = data.toMutableList()
-
-            if (fromPosition < toPosition) {
-                for (i in fromPosition until toPosition) {
-                    Collections.swap(mutableItems, i, i + 1)
-                }
-            } else {
-                for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(mutableItems, i, i - 1)
-                }
-            }
-            refresh()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
@@ -272,19 +304,46 @@ class EmojiPopupEditorDialogFragment :
                     Item.Emoji(
                         isModifiable = it is TextEmoji,
                         emoji = it.text,
-                        id = it.id
+                        id = it.id,
                     )
                 },
                 this,
             )
         }
 
-        fun setRecyclerView(v: RecyclerView) {
-            ith.attachToRecyclerView(v)
-        }
-
         fun getEntries() =
             data
 
+        override fun onRowMoved(fromPosition: Int, toPosition: Int) {
+            val mutableItems = data.toMutableList()
+
+            if (fromPosition < toPosition) {
+                for (i in fromPosition until toPosition) {
+                    Collections.swap(mutableItems, i, i + 1)
+                }
+            } else {
+                for (i in fromPosition downTo toPosition + 1) {
+                    Collections.swap(mutableItems, i, i - 1)
+                }
+            }
+            data = mutableItems
+            notifyItemMoved(fromPosition, toPosition)
+        }
+
+        override fun onRowSelected(myViewHolder: ViewHolder?) {
+        }
+
+        override fun onRowClear(myViewHolder: ViewHolder?) {
+        }
+
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "reset_emojis") {
+            viewModel.resetEmojis()
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 }

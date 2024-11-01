@@ -45,6 +45,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
+import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -114,6 +115,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        isAnimatingTitleIn = false
+        isAnimatingTitleOut = false
+
         val context = binding.root.context
 
         parentFragmentManager.setFragmentResultListener(
@@ -133,11 +137,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
         requireMainActivity().apply {
             setupForFragment<CommunityInfoFragment>()
-
-            setSupportActionBar(binding.toolbar)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = ""
 
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
@@ -312,6 +311,16 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
 
             recyclerView.setup(animationsHelper)
+
+            toolbar.apply {
+                setTitle("")
+                setNavigationIcon(
+                    R.drawable.baseline_arrow_back_24,
+                )
+                setNavigationOnClickListener {
+                    findNavController().navigateUp()
+                }
+            }
         }
 
         val actionBarHeight = context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize)
@@ -334,7 +343,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 if (!isAnimatingTitleOut) {
                     isAnimatingTitleOut = true
                     isAnimatingTitleIn = false
-                    binding.title.animate().alpha(0f)
+
+                    if (binding.title.isLaidOut) {
+                        binding.title.animate().alpha(0f)
+                    } else {
+                        binding.title.alpha = 0f
+                    }
                 }
             }
         }

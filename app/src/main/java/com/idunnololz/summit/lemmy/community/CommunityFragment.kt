@@ -36,6 +36,7 @@ import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
+import com.idunnololz.summit.goTo.GoToDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -1427,6 +1428,12 @@ class CommunityFragment :
                 icon = R.drawable.baseline_download_for_offline_24,
             )
 
+            addItemWithIcon(
+                id = R.id.go_to,
+                title = getString(R.string.go_to),
+                icon = R.drawable.baseline_arrow_forward_24,
+            )
+
             if (currentCommunityRef != null) {
                 addDivider()
                 addItemWithIcon(
@@ -1695,6 +1702,9 @@ class CommunityFragment :
                     MakeOfflineDialogFragment.newInstance(currentCommunityRef)
                         .show(childFragmentManager, "MakeOfflineDialogFragment")
                 }
+            }
+            R.id.go_to -> {
+                GoToDialogFragment.show(childFragmentManager)
             }
         }
     }

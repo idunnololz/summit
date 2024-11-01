@@ -48,6 +48,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLO
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_HEADER_LAYOUT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_QUICK_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DATE_SCREENSHOTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
@@ -78,6 +79,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
@@ -105,7 +107,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TEXT_FIELD_TOOLBAR_SETTINGS
@@ -586,11 +588,18 @@ class Preferences(
                 .putBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, value)
                 .apply()
         }
-    var showUpAndDownVotes: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, false)
+    var postShowUpAndDownVotes: Boolean
+        get() = prefs.getBoolean(KEY_POST_SHOW_UP_AND_DOWN_VOTES, false)
         set(value) {
             prefs.edit()
-                .putBoolean(KEY_SHOW_UP_AND_DOWN_VOTES, value)
+                .putBoolean(KEY_POST_SHOW_UP_AND_DOWN_VOTES, value)
+                .apply()
+        }
+    var commentShowUpAndDownVotes: Boolean
+        get() = prefs.getBoolean(KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES, value)
                 .apply()
         }
 
@@ -1013,6 +1022,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, value)
+                .apply()
+        }
+
+    var parseMarkdownInPostTitles: Boolean
+        get() = prefs.getBoolean(KEY_PARSE_MARKDOWN_IN_POST_TITLES, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_PARSE_MARKDOWN_IN_POST_TITLES, value)
                 .apply()
         }
 

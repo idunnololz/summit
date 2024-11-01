@@ -147,6 +147,22 @@ class SettingsPostAndCommentsFragment :
                 preferences.commentsShowInlineMediaAsLinks = it
             },
         )
+        settings.commentScores.bindTo(
+            binding.commentScores,
+            {
+                if (preferences.hideCommentScores) {
+                    R.id.hide_scores
+                } else if (preferences.commentShowUpAndDownVotes) {
+                    R.id.show_up_and_down_votes
+                } else {
+                    R.id.show_scores
+                }
+            },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            },
+        )
 
         binding.commentHeader.title.text = getString(R.string.comment_header)
         settings.showProfileIcons.bindTo(
@@ -260,6 +276,22 @@ class SettingsPostAndCommentsFragment :
             }
             settings.commentHeaderLayout.id -> {
                 preferences.commentHeaderLayout = value as Int
+            }
+            settings.commentScores.id -> {
+                when (value as Int) {
+                    R.id.hide_scores -> {
+                        preferences.hideCommentScores = true
+                        preferences.commentShowUpAndDownVotes = false
+                    }
+                    R.id.show_up_and_down_votes -> {
+                        preferences.hideCommentScores = false
+                        preferences.commentShowUpAndDownVotes = true
+                    }
+                    R.id.show_scores -> {
+                        preferences.hideCommentScores = false
+                        preferences.commentShowUpAndDownVotes = false
+                    }
+                }
             }
         }
 

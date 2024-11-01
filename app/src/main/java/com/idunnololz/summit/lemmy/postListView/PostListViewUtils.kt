@@ -183,6 +183,11 @@ fun BaseFragment<*>.showMorePostOptions(
             getString(R.string.community_info),
             R.drawable.ic_community_24,
         )
+        addItemWithIcon(
+            R.id.pa_copy_text,
+            getString(R.string.copy_text),
+            R.drawable.baseline_content_copy_24,
+        )
 
         addDivider()
         addItemWithIcon(
@@ -414,6 +419,23 @@ fun BaseFragment<*>.createPostActionHandler(
                 delayMs = 0,
                 read = true,
                 accountId = accountId,
+            )
+        }
+        R.id.pa_copy_text -> {
+            Utils.copyToClipboard(
+                context,
+                buildString {
+                    appendLine(postView.post.name)
+                    appendLine()
+                    if (postView.post.body != null) {
+                        appendLine(postView.post.body)
+                        appendLine()
+                    }
+                    if (postView.post.url != null) {
+                        appendLine(postView.post.url)
+                        appendLine()
+                    }
+                }
             )
         }
     }

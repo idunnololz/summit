@@ -6,10 +6,22 @@ import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewAllLinks
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewNoLinks
 import com.idunnololz.summit.util.BaseActivity
+import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
+    onLinkClick(
+        context ?: return,
+        (activity?.application as? MainApplication) ?: return,
+        childFragmentManager,
+        url,
+        text,
+        linkContext,
+    )
+}
+
+fun BaseDialogFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
     onLinkClick(
         context ?: return,
         (activity?.application as? MainApplication) ?: return,

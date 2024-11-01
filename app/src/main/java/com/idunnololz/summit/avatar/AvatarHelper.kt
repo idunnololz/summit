@@ -145,19 +145,35 @@ class AvatarHelper @Inject constructor(
         }
     }
 
-    fun loadInstanceIcon(imageView: ShapeableImageView, siteView: SiteView?) {
-        (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
-        val job = coroutineScope.launch {
-            val d = accountImageGenerator.generateDrawableForGeneric(
-                siteView?.site?.public_key ?: "",
-                context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
-            )
+    fun loadInstanceIcon(imageView: ImageView, siteView: SiteView?) {
+        loadInstanceIcon(imageView, siteView, siteView?.site?.icon)
+    }
 
-            withContext(Dispatchers.Main) {
-                imageView.dispose()
-                imageView.setImageDrawable(d)
+    fun loadInstanceIcon(imageView: ImageView, siteView: SiteView?, iconUrl: String?) {
+        (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
+        if (iconUrl.isNullOrBlank()) {
+            val job = coroutineScope.launch {
+                val d = accountImageGenerator.generateDrawableForGeneric(
+                    key = siteView?.site?.public_key ?: "",
+                    drawable = context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
+                )
+
+                withContext(Dispatchers.Main) {
+                    imageView.dispose()
+                    imageView.setImageDrawable(d)
+                }
+            }
+            imageView.setTag(R.id.generate_profile_icon_job, job)
+        } else {
+            imageView.load(iconUrl) {
+                allowHardware(false)
+                placeholder(newShimmerDrawableSquare(context))
+                listener(
+                    onError = { _, _ ->
+                        loadInstanceIcon(imageView, siteView, null)
+                    }
+                )
             }
         }
-        imageView.setTag(R.id.generate_profile_icon_job, job)
     }
 }

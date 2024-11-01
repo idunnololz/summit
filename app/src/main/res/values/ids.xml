@@ -232,4 +232,10 @@
     <item name="cache_policy_moderate" type="id" />
     <item name="cache_policy_lite" type="id" />
     <item name="cache_policy_minimum" type="id" />
+    <item name="show_scores" type="id" />
+    <item name="hide_scores" type="id" />
+    <item name="show_up_and_down_votes" type="id" />
+    <item name="ca_copy_text" type="id" />
+    <item name="pa_copy_text" type="id" />
+    <item name="go_to" type="id" />
 </resources>

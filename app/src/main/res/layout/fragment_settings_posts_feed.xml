@@ -77,8 +77,8 @@
                     android:layout_height="wrap_content"/>
 
                 <include
-                    android:id="@+id/hide_post_scores"
-                    layout="@layout/on_off_setting_item"
+                    android:id="@+id/post_scores"
+                    layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -109,6 +109,12 @@
                 <include
                     android:id="@+id/home_fab_quick_action"
                     layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/parse_markdown_in_post_titles"
+                    layout="@layout/on_off_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

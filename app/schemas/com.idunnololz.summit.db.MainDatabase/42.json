@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 42,
-    "identityHash": "47d5b9261296594052cc08b2b2772248",
+    "identityHash": "720df8de5e5d4f79649bb00848b76229",
     "entities": [
       {
         "tableName": "user_communities",
@@ -618,7 +618,7 @@
       },
       {
         "tableName": "text_emojis",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `created_ts` INTEGER NOT NULL, `modified_ts` INTEGER NOT NULL, `read` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `created_ts` INTEGER NOT NULL, `modified_ts` INTEGER NOT NULL, `read` TEXT NOT NULL, `order` INTEGER NOT NULL, `modifiable` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -643,6 +643,18 @@
             "columnName": "read",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modifiable",
+            "columnName": "modifiable",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -658,7 +670,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '47d5b9261296594052cc08b2b2772248')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '720df8de5e5d4f79649bb00848b76229')"
     ]
   }
 }
