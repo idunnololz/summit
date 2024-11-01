@@ -13,6 +13,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentTextEmojiEditBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getPlainTextFromClipboard
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 import kotlinx.parcelize.Parcelize
@@ -69,6 +70,8 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val context = requireContext()
+
         with(binding) {
             toolbar.apply {
                 title = getString(R.string.edit_text_emoji)
@@ -82,6 +85,12 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
             }
 
             textEmojiEditText.setText(args.textEmoji)
+            textEmojiInputLayout.setEndIconOnClickListener {
+                val pasteData: String? = context.getPlainTextFromClipboard()
+                if (pasteData != null) {
+                    textEmojiEditText.setText(pasteData)
+                }
+            }
 
             if (args.id != 0L) {
                 neutralButton.setOnClickListener {

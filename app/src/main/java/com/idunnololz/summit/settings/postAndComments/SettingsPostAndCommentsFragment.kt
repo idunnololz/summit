@@ -118,13 +118,6 @@ class SettingsPostAndCommentsFragment :
             { preferences.collapseChildCommentsByDefault },
             { preferences.collapseChildCommentsByDefault = it },
         )
-        settings.hideCommentScores.bindTo(
-            binding.hideCommentScores,
-            { preferences.hideCommentScores },
-            {
-                preferences.hideCommentScores = it
-            },
-        )
         settings.autoCollapseCommentThreshold.bindTo(
             binding.autoCollapseComments,
             { convertAutoCollapseCommentToOptionId(preferences.autoCollapseCommentThreshold) },

@@ -681,7 +681,7 @@ class PostsFeedSettings @Inject constructor(
     val postScores = RadioGroupSettingItem(
         null,
         context.getString(R.string.post_scores),
-        null,
+        context.getString(R.string.post_scores_desc),
         listOf(
             RadioGroupSettingItem.RadioGroupOption(
                 R.id.show_scores,
@@ -919,12 +919,6 @@ class PostAndCommentsSettings @Inject constructor(
         context.getString(R.string.relay_style_navigation_desc),
         relatedKeys = listOf(KEY_COMMENTS_NAVIGATION_FAB),
     )
-    val hideCommentScores = OnOffSettingItem(
-        null,
-        context.getString(R.string.hide_comment_scores),
-        null,
-        relatedKeys = listOf(KEY_HIDE_COMMENT_SCORES),
-    )
     val useVolumeButtonNavigation = OnOffSettingItem(
         null,
         context.getString(R.string.use_volume_button_navigation),
@@ -1047,7 +1041,7 @@ class PostAndCommentsSettings @Inject constructor(
     val commentScores = RadioGroupSettingItem(
         null,
         context.getString(R.string.comment_scores),
-        null,
+        context.getString(R.string.comment_scores_desc),
         listOf(
             RadioGroupSettingItem.RadioGroupOption(
                 R.id.show_scores,
@@ -1074,7 +1068,6 @@ class PostAndCommentsSettings @Inject constructor(
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
         relayStyleNavigation,
-        hideCommentScores,
         useVolumeButtonNavigation,
         commentHeaderLayout,
         settingPostAndCommentsAppearance,
