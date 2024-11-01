@@ -110,13 +110,6 @@ class SettingsMiscFragment :
                 LemmyTextHelper.resetMarkwon(context)
             },
         )
-        settings.showUpAndDownVotes.bindTo(
-            binding.showUpAndDownVotes,
-            { preferences.showUpAndDownVotes },
-            {
-                preferences.showUpAndDownVotes = it
-            },
-        )
         settings.instanceNameStyle.bindTo(
             binding.instanceNameStyle,
             { preferences.displayInstanceStyle },

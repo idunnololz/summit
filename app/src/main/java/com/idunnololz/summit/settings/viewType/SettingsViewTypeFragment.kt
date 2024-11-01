@@ -153,6 +153,18 @@ class SettingsViewTypeFragment :
                 updateRendering()
             },
         )
+        settings.imageSize.bindTo(
+            binding.imageScalingSetting,
+            { viewModel.currentPostUiConfig.imageWidthPercent },
+            {
+                viewModel.currentPostUiConfig =
+                    viewModel.currentPostUiConfig.copy(
+                        imageWidthPercent = it
+                    )
+
+                updateRendering()
+            },
+        )
         settings.preferImageAtEnd.bindTo(
             binding.preferImageAtTheEnd,
             { viewModel.currentPostUiConfig.preferImagesAtEnd },

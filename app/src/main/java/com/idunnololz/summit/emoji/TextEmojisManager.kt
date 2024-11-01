@@ -1,13 +1,18 @@
 package com.idunnololz.summit.emoji
 
+import android.util.Log
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.emoji.db.TextEmojiDao
 import com.idunnololz.summit.emoji.db.TextEmojiEntry
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TextEmojisManager @Inject constructor(
-    private val textEmojiDao: TextEmojiDao
+    private val textEmojiDao: TextEmojiDao,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
     companion object {
@@ -23,7 +28,10 @@ class TextEmojisManager @Inject constructor(
         )
     }
 
+    private val coroutineScope = coroutineScopeFactory.create()
     private var allEmojis: List<TextEmoji>? = null
+
+    val emojisChangedFlow = MutableSharedFlow<Unit>()
 
     private suspend fun loadEmojis() {
         var allEntries = textEmojiDao.getAll()
@@ -49,7 +57,7 @@ class TextEmojisManager @Inject constructor(
             TextEmoji(it)
         }
 
-        allEmojis = emojis
+        allEmojis = emojis.sortedBy { it.order }
     }
 
     suspend fun getAllEmojis(reload: Boolean = false): List<TextEmoji> {
@@ -86,6 +94,42 @@ class TextEmojisManager @Inject constructor(
                 )
             )
         }
+        emojisChangedFlow.emit(Unit)
+    }
+
+    suspend fun delete(id: Long) {
+        textEmojiDao.delete(id)
+        emojisChangedFlow.emit(Unit)
+    }
+
+    suspend fun reset() {
+        textEmojiDao.deleteAll()
+
+        for ((index, emoji) in TEXT_EMOJIS.withIndex()) {
+            textEmojiDao.insert(
+                TextEmojiEntry(
+                    id = 0,
+                    createdTs = System.currentTimeMillis(),
+                    modifiedTs = System.currentTimeMillis(),
+                    emoji = emoji,
+                    order = index,
+                    modifiable = false,
+                )
+            )
+        }
+        emojisChangedFlow.emit(Unit)
+    }
+
+    suspend fun updateItems(items: List<TextEmojiEntry>) {
+        coroutineScope.launch {
+            for ((index, item) in items.withIndex()) {
+                val newItem = item.copy(order = index)
+                textEmojiDao.insert(newItem)
+                Log.d("HAHA", "Insert $newItem")
+            }
+            allEmojis = null
+            emojisChangedFlow.emit(Unit)
+        }.join()
     }
 }
 

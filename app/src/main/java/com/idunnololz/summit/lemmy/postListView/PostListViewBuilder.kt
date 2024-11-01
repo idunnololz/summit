@@ -131,7 +131,7 @@ class PostListViewBuilder @Inject constructor(
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
     private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
     private var contentMaxLines: Int = postUiConfig.contentMaxLines
-    private var showUpAndDownVotes: Boolean = preferences.showUpAndDownVotes
+    private var showUpAndDownVotes: Boolean = preferences.postShowUpAndDownVotes
     private var displayInstanceStyle = preferences.displayInstanceStyle
     private var leftHandMode: Boolean = preferences.leftHandMode
     private var showPostUpvotePercentage: Boolean = preferences.showPostUpvotePercentage
@@ -141,6 +141,7 @@ class PostListViewBuilder @Inject constructor(
     private var showEditedDate: Boolean = preferences.showEditedDate
     private var dimReadPosts: Boolean? = postUiConfig.dimReadPosts
     private var autoPlayVideos: Boolean = preferences.autoPlayVideos
+    private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -179,7 +180,7 @@ class PostListViewBuilder @Inject constructor(
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
         singleTapToViewImage = preferences.postListViewImageOnSingleTap
-        showUpAndDownVotes = preferences.showUpAndDownVotes
+        showUpAndDownVotes = preferences.postShowUpAndDownVotes
         displayInstanceStyle = preferences.displayInstanceStyle
         leftHandMode = preferences.leftHandMode
         showPostUpvotePercentage = preferences.showPostUpvotePercentage
@@ -187,6 +188,7 @@ class PostListViewBuilder @Inject constructor(
         indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
         showEditedDate = preferences.showEditedDate
         autoPlayVideos = preferences.autoPlayVideos
+        parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
     }
 
     /**
@@ -935,26 +937,31 @@ class PostListViewBuilder @Inject constructor(
                 }
             }
 
-            LemmyTextHelper.bindText(
-                title,
-                postView.post.name,
-                instance,
-                onImageClick = {
-                    onImageClick(accountId, postView, null, it)
-                },
-                onVideoClick = {
-                    onVideoClick(it, VideoType.Unknown, null)
-                },
-                onPageClick = {
-                    onPageClick(accountId, it)
-                },
-                onLinkClick = { url, text, linkContext ->
-                    onLinkClick(accountId, url, text, linkContext)
-                },
-                onLinkLongClick = { url, text ->
-                    onLinkLongClick(accountId, url, text)
-                },
-            )
+            if (parseMarkdownInPostTitles) {
+                LemmyTextHelper.bindText(
+                    title,
+                    postView.post.name,
+                    instance,
+                    showMediaAsLinks = true,
+                    onImageClick = {
+                        onImageClick(accountId, postView, null, it)
+                    },
+                    onVideoClick = {
+                        onVideoClick(it, VideoType.Unknown, null)
+                    },
+                    onPageClick = {
+                        onPageClick(accountId, it)
+                    },
+                    onLinkClick = { url, text, linkContext ->
+                        onLinkClick(accountId, url, text, linkContext)
+                    },
+                    onLinkLongClick = { url, text ->
+                        onLinkLongClick(accountId, url, text)
+                    },
+                )
+            } else {
+                title.text = postView.post.name
+            }
 
             val renderAsRead = postView.read && !alwaysRenderAsUnread
             val dimReadPosts = dimReadPosts

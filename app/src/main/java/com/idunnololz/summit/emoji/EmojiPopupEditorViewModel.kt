@@ -24,21 +24,33 @@ class EmojiPopupEditorViewModel @Inject constructor(
                     emojis = textEmojisManager.getAllEmojis(reload = force)
                 )
             )
-
         }
     }
 
-    fun addOrUpdateTextEmoji(id: Long, textEmoji: String) {
+    fun addOrUpdateTextEmoji(id: Long, textEmoji: String, delete: Boolean) {
         viewModelScope.launch {
-            textEmojisManager.addOrUpdateTextEmoji(id, textEmoji)
+            if (delete) {
+                textEmojisManager.delete(id)
+            } else {
+                textEmojisManager.addOrUpdateTextEmoji(id, textEmoji)
+            }
             loadData(force = true)
         }
     }
 
-    fun commitChanges(map: List<TextEmojiEntry>) {
-
+    fun resetEmojis() {
+        viewModelScope.launch {
+            textEmojisManager.reset()
+            loadData(force = true)
+        }
     }
 
+    fun commitChanges(items: List<TextEmojiEntry>) {
+        viewModelScope.launch {
+            textEmojisManager.updateItems(items)
+            loadData(force = true)
+        }
+    }
 }
 
 data class EmojiPopupEditorModel(

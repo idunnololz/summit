@@ -12,6 +12,8 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentTextEmojiEditBinding
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 import kotlinx.parcelize.Parcelize
 
@@ -41,9 +43,15 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
     data class Result(
         val textEmoji: String,
         val id: Long,
+        val delete: Boolean,
     ): Parcelable
 
     private val args by navArgs<TextEmojiEditDialogFragmentArgs>()
+
+    override fun onStart() {
+        super.onStart()
+        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,15 +71,35 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
 
         with(binding) {
             toolbar.apply {
-                setTitle(getString(R.string.edit_text_emoji))
+                title = getString(R.string.edit_text_emoji)
                 setNavigationIcon(R.drawable.baseline_close_24)
                 setNavigationOnClickListener {
                     dismiss()
                 }
+                setNavigationIconTint(
+                    context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                )
             }
 
             textEmojiEditText.setText(args.textEmoji)
 
+            if (args.id != 0L) {
+                neutralButton.setOnClickListener {
+                    setFragmentResult(
+                        requestKey = REQUEST_KEY,
+                        result = bundleOf(
+                            KEY_RESULT to Result(
+                                textEmoji = textEmojiEditText.text.toString(),
+                                id = args.id,
+                                delete = true,
+                            )
+                        )
+                    )
+                    dismiss()
+                }
+            } else {
+                neutralButton.visibility = View.GONE
+            }
             negativeButton.setOnClickListener {
                 dismiss()
             }
@@ -82,6 +110,7 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
                         KEY_RESULT to Result(
                             textEmoji = textEmojiEditText.text.toString(),
                             id = args.id,
+                            delete = false,
                         )
                     )
                 )

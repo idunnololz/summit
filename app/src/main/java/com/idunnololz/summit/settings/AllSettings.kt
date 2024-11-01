@@ -35,6 +35,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLO
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_GESTURE_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_DISPLAY_INSTANCE_STYLE
@@ -59,6 +60,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_MARK_POSTS_AS_READ_ON_SCROL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
@@ -82,7 +84,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
@@ -676,11 +678,31 @@ class PostsFeedSettings @Inject constructor(
         relatedKeys = listOf(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP),
     )
 
-    val hidePostScores = OnOffSettingItem(
+    val postScores = RadioGroupSettingItem(
         null,
-        context.getString(R.string.hide_post_scores),
+        context.getString(R.string.post_scores),
         null,
-        relatedKeys = listOf(KEY_HIDE_POST_SCORES),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.show_scores,
+                context.getString(R.string.show_scores),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.show_up_and_down_votes,
+                context.getString(R.string.show_up_and_down_votes),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.hide_scores,
+                context.getString(R.string.hide_scores),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(KEY_HIDE_POST_SCORES, KEY_POST_SHOW_UP_AND_DOWN_VOTES),
     )
     val keywordFilters = BasicSettingItem(
         null,
@@ -806,6 +828,12 @@ class PostsFeedSettings @Inject constructor(
         ),
         relatedKeys = listOf(KEY_HOME_FAB_QUICK_ACTION),
     )
+    val parseMarkdownInPostTitles = OnOffSettingItem(
+        null,
+        context.getString(R.string.parse_markdown_in_post_titles),
+        context.getString(R.string.parse_markdown_in_post_titles_desc),
+        relatedKeys = listOf(KEY_PARSE_MARKDOWN_IN_POST_TITLES),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -813,7 +841,7 @@ class PostsFeedSettings @Inject constructor(
         blurNsfwPosts,
         defaultCommunitySortOrder,
         viewImageOnSingleTap,
-        hidePostScores,
+        postScores,
         keywordFilters,
         instanceFilters,
         communityFilters,
@@ -1016,6 +1044,32 @@ class PostAndCommentsSettings @Inject constructor(
         context.getString(R.string.show_inline_media_as_links),
         context.getString(R.string.show_inline_media_as_links_desc),
     )
+    val commentScores = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.comment_scores),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.show_scores,
+                context.getString(R.string.show_scores),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.show_up_and_down_votes,
+                context.getString(R.string.show_up_and_down_votes),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                R.id.hide_scores,
+                context.getString(R.string.hide_scores),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(KEY_HIDE_COMMENT_SCORES, KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
@@ -1024,6 +1078,7 @@ class PostAndCommentsSettings @Inject constructor(
         useVolumeButtonNavigation,
         commentHeaderLayout,
         settingPostAndCommentsAppearance,
+        commentScores,
     )
 }
 
@@ -1368,6 +1423,13 @@ class PostsFeedAppearanceSettings @Inject constructor(
         0.1f,
     )
 
+    val imageSize = SliderSettingItem(
+        context.getString(R.string.image_size),
+        0.1f,
+        1f,
+        0.05f,
+    )
+
     val preferImageAtEnd = OnOffSettingItem(
         null,
         context.getString(R.string.prefer_image_at_the_end),
@@ -1563,12 +1625,6 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.auto_convert_phone_numbers_to_links),
         null,
         relatedKeys = listOf(KEY_AUTO_LINK_PHONE_NUMBERS),
-    )
-    val showUpAndDownVotes = OnOffSettingItem(
-        null,
-        context.getString(R.string.show_up_and_down_votes),
-        context.getString(R.string.show_up_and_down_votes_desc),
-        relatedKeys = listOf(KEY_SHOW_UP_AND_DOWN_VOTES),
     )
     val instanceNameStyle = RadioGroupSettingItem(
         null,
@@ -1800,7 +1856,6 @@ class MiscSettings @Inject constructor(
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
         autoLinkPhoneNumbers,
-        showUpAndDownVotes,
         retainLastPost,
         leftHandMode,
         previewLinks,

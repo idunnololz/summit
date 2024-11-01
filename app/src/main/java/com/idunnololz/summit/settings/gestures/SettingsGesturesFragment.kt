@@ -46,7 +46,7 @@ class SettingsGesturesFragment :
         super.onCreateView(inflater, container, savedInstanceState)
 
         requireMainActivity().apply {
-            setupForFragment<SettingsCacheFragment>()
+            setupForFragment<SettingsFragment>()
         }
 
         setBinding(FragmentSettingsGesturesBinding.inflate(inflater, container, false))

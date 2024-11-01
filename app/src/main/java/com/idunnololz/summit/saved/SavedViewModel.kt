@@ -155,6 +155,9 @@ class SavedViewModel @Inject constructor(
         fetchingPostPages.add(pageIndex)
 
         viewModelScope.launch(Dispatchers.Default) {
+
+            postsState.postIsLoading()
+
             apiClient.fetchSavedPostsWithRetry(pageIndex.toLemmyPageIndex(), PAGE_SIZE, force)
                 .onSuccess {
                     if (postListEngine.hasMore || force) {
@@ -214,6 +217,8 @@ class SavedViewModel @Inject constructor(
         fetchingCommentPages.add(pageIndex)
 
         viewModelScope.launch(Dispatchers.Default) {
+            commentsState.postIsLoading()
+
             apiClient.fetchSavedCommentsWithRetry(pageIndex.toLemmyPageIndex(), PAGE_SIZE, force)
                 .onSuccess {
                     if (commentListEngine.hasMore || force) {

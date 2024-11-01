@@ -1834,6 +1834,20 @@
     <string name="emoji">Emoji</string>
     <string name="text_emoji">Text emoji</string>
     <string name="edit_text_emoji">Edit text emoji</string>
+    <string name="reset_emojis">Reset emojis</string>
+    <string name="warn_reset_emojis">This will delete all custom emojis and restore the original emojis. This action cannot be undone.</string>
+    <string name="post_scores">Post scores</string>
+    <string name="show_scores">Show scores</string>
+    <string name="hide_scores">Hide scores</string>
+    <string name="comment_scores">Comment scores</string>
+    <string name="parse_markdown_in_post_titles">Post markdown in post titles</string>
+    <string name="parse_markdown_in_post_titles_desc">Turning this off can prevent issues with post title formatting</string>
+    <string name="removed">Removed</string>
+    <string name="copy_text">Copy text</string>
+    <string name="go_to">Go to…</string>
+    <string name="go">Go</string>
+    <string name="go_to_desc">Go to a Lemmy page directly by pasting its link here. If the page cannot be parsed, it will open in the browser instead.</string>
+    <string name="error_invalid_link">Invalid link.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

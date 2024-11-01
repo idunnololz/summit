@@ -401,6 +401,8 @@ object Utils {
 
                 intent.launchUrl(context, Uri.parse(url))
             } catch (e: ActivityNotFoundException) {
+                Log.e(TAG, "Unable to open link.", e)
+
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     data = Uri.parse(url)
                 }

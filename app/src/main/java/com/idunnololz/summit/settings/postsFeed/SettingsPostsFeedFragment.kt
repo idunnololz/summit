@@ -117,11 +117,20 @@ class SettingsPostsFeedFragment :
                 preferences.blurNsfwPosts = it
             },
         )
-        settings.hidePostScores.bindTo(
-            binding.hidePostScores,
-            { preferences.hidePostScores },
+        settings.postScores.bindTo(
+            binding.postScores,
             {
-                preferences.hidePostScores = it
+                if (preferences.hidePostScores) {
+                    R.id.hide_scores
+                } else if (preferences.postShowUpAndDownVotes) {
+                    R.id.show_up_and_down_votes
+                } else {
+                    R.id.show_scores
+                }
+            },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
         settings.defaultCommunitySortOrder.bindTo(
@@ -286,6 +295,13 @@ class SettingsPostsFeedFragment :
                     .showAllowingStateLoss(childFragmentManager, "homeFabQuickAction")
             },
         )
+        settings.parseMarkdownInPostTitles.bindTo(
+            binding.parseMarkdownInPostTitles,
+            { preferences.parseMarkdownInPostTitles },
+            {
+                preferences.parseMarkdownInPostTitles = it
+            }
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {
@@ -295,6 +311,22 @@ class SettingsPostsFeedFragment :
             }
             settings.homeFabQuickAction.id -> {
                 preferences.homeFabQuickAction = value as Int
+            }
+            settings.postScores.id -> {
+                when (value as Int) {
+                    R.id.hide_scores -> {
+                        preferences.hidePostScores = true
+                        preferences.postShowUpAndDownVotes = false
+                    }
+                    R.id.show_up_and_down_votes -> {
+                        preferences.hidePostScores = false
+                        preferences.postShowUpAndDownVotes = true
+                    }
+                    R.id.show_scores -> {
+                        preferences.hidePostScores = false
+                        preferences.postShowUpAndDownVotes = false
+                    }
+                }
             }
         }
 

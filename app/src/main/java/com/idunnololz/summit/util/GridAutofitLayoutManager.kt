@@ -13,8 +13,8 @@ class GridAutofitLayoutManager : GridLayoutManager {
         private val TAG = GridAutofitLayoutManager::class.java.simpleName
     }
 
-    private var mColumnWidth: Int = 0
-    private var mColumnWidthChanged = true
+    private var columnWidth: Int = 0
+    private var columnWidthChanged = true
 
     private var lastTotalSpace: Int = 0
 
@@ -50,9 +50,9 @@ class GridAutofitLayoutManager : GridLayoutManager {
     }
 
     private fun setColumnWidth(newColumnWidth: Int) {
-        if (newColumnWidth > 0 && newColumnWidth != mColumnWidth) {
-            mColumnWidth = newColumnWidth
-            mColumnWidthChanged = true
+        if (newColumnWidth > 0 && newColumnWidth != columnWidth) {
+            columnWidth = newColumnWidth
+            columnWidthChanged = true
         }
     }
 
@@ -62,10 +62,10 @@ class GridAutofitLayoutManager : GridLayoutManager {
         } else {
             height - paddingTop - paddingBottom
         }
-        if (mColumnWidthChanged && mColumnWidth > 0 || totalSpace != lastTotalSpace) {
-            val spanCount = 1.coerceAtLeast(totalSpace / mColumnWidth)
+        if (columnWidthChanged && columnWidth > 0 || totalSpace != lastTotalSpace) {
+            val spanCount = 1.coerceAtLeast(totalSpace / columnWidth)
             setSpanCount(spanCount)
-            mColumnWidthChanged = false
+            columnWidthChanged = false
             lastTotalSpace = totalSpace
         }
         super.onLayoutChildren(recycler, state)

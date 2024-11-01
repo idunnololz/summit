@@ -478,8 +478,8 @@ class LemmyHeaderHelper(
         if (detailed) {
             sb.appendSeparator()
 
+            val scoreStart = sb.length
             if (score != null) {
-                val scoreStart = sb.length
                 sb.append(
                     headerContainer.context.resources.getQuantityString(
                         R.plurals.point_count_format,
@@ -487,15 +487,17 @@ class LemmyHeaderHelper(
                         LemmyUtils.abbrevNumber(score.toLong()),
                     ),
                 )
+            } else {
+                sb.append("⬤")
+            }
 
-                if (scoreColor != null) {
-                    sb.setSpan(
-                        ForegroundColorSpan(scoreColor),
-                        scoreStart,
-                        sb.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
-                }
+            if (scoreColor != null) {
+                sb.setSpan(
+                    ForegroundColorSpan(scoreColor),
+                    scoreStart,
+                    sb.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
             }
 
             if (childrenCount != null) {

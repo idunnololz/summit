@@ -148,6 +148,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
                 R.drawable.baseline_open_in_new_24,
             )
         }
+        addItemWithIcon(
+            R.id.ca_copy_text,
+            getString(R.string.copy_text),
+            R.drawable.baseline_content_copy_24,
+        )
 
         addDivider()
         addItemWithIcon(
@@ -326,6 +331,9 @@ fun BaseFragment<*>.createCommentActionHandler(
                 onLoadComment = onLoadComment,
                 onScreenshotClick = onScreenshotClick,
             )
+        }
+        R.id.ca_copy_text -> {
+            Utils.copyToClipboard(context, commentView.comment.content)
         }
     }
 }
