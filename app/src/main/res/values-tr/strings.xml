@@ -1054,4 +1054,6 @@
     <string name="parse_markdown_in_post_titles_desc">Bunu kapatmak, gönderi başlığı biçimlendirmeyle ilgili sorunları önleyebilir</string>
     <string name="removed">Kaldırıldı</string>
     <string name="copy_text">Metni kopyala</string>
+    <string name="post_scores_desc">Gönderilerdeki puanların nasıl görüntüleneceğini seçin</string>
+    <string name="comment_scores_desc">Yorumlardaki puanların nasıl görüntüleneceğini seçin</string>
 </resources>
