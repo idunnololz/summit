@@ -686,7 +686,7 @@
     <string name="drafts">मसौदे</string>
     <string name="warn_delete_all_drafts">सभी मसौदे मिटाएं?</string>
     <string name="filter_by_community">समुदाय द्वारा फिल्टर करें</string>
-    <string name="user_hint">उपयोक्ता</string>
+    <string name="user_hint">उपयोगकर्ता</string>
     <string name="update_complete_message">ऐप को v%1$s पर अपडेट किया गया!</string>
     <string name="changelog">चेंजलॉग</string>
     <string name="open_link">लिंक खोलें</string>
@@ -719,7 +719,7 @@
     <string name="clear_pending_actions">कृपया सभी लंबित कार्रवाइयां हटाएं?</string>
     <string name="delete_failed_actions_history">विफल कार्रवाई का इतिहास साफ करें?</string>
     <string name="error_you_must_sign_in_to_create_a_post">पोस्ट बनाने के लिए आपको साइन इन करना होगा।</string>
-    <string name="use_suggested_title_format">सुझाए गए शीर्षक \"%1$s\" का उपयोग करें</string>
+    <string name="use_suggested_title_format">सुझाया गया शीर्षक \"** %1$s **\" का उपयोग करें</string>
     <string name="purge_user">उपयोक्ता मिटायें</string>
     <string name="purge_post">पोस्ट मिटायें</string>
     <string name="purge_community">समुदाय मिटायें</string>
@@ -957,4 +957,101 @@
     <string name="no_people_selected">कोई लोग चयनित नहीं</string>
     <string name="retry">पुन: प्रयास करें</string>
     <string name="warn_too_many_messages">कुछ वार्तालाप गायब हो सकते हैं। इस खाते में %1$s से ज़्यादा संदेश हैं और Summit वर्तमान में केवल सबसे हाल के %1$s संदेश ही प्राप्त करता है। %2$s से पहले के वार्तालाप नहीं दिखाए जाएंगे।</string>
+    <string name="animation_level_misc">यह नियंत्रित करता है कि ऐप में कौन से एनिमेशन चलाए जाएं। उच्चतर एनिमेशन स्तर का अर्थ है कि अधिक एनिमेशन चलाए जाएंगे।</string>
+    <string name="error_invalid_email">अमान्य ईमेल।</string>
+    <string name="error_password_too_short">पासवर्ड बहुत छोटा है. न्यूनतम लंबाई %1$s वर्ण।</string>
+    <string name="error_password_too_long">पासवर्ड बहुत लंबा है. अधिकतम लंबाई %1$s वर्ण।</string>
+    <string name="done">हो गया</string>
+    <string name="add_emoji">इमोजी जोड़ें</string>
+    <string name="edit_text_emoji">टेक्स्ट इमोजी संपादित करें</string>
+    <string name="use_imgur">Imgur का उपयोग करें</string>
+    <string name="use_imgur_desc">सक्षम होने पर, छवियाँ Lemmy के बजाय [Imgur](https://imgur.com/) पर अपलोड की जाएंगी।</string>
+    <string name="animation_level">एनीमेशन स्तर</string>
+    <string name="minimum">न्यूनतम</string>
+    <string name="low">कम</string>
+    <string name="max">अधिकतम</string>
+    <string name="error_unable_to_decode_captcha_image">कैप्चा छवि को डिकोड करने में असमर्थ।</string>
+    <string name="error_no_captcha">उदाहरण के लिए कैप्चा की आवश्यकता है, लेकिन कोई कैप्चा प्रदान नहीं किया गया है।</string>
+    <string name="comments_sort_order">टिप्पणियाँ क्रमबद्ध करें</string>
+    <string name="manage_text_emojis">टेक्स्ट इमोजी प्रबंधित करें</string>
+    <string name="emoji">इमोजी</string>
+    <string name="text_emoji">टेक्स्ट इमोजी</string>
+    <string name="desc_screenshot_recording_fps">FPS फ़ील्ड रिकॉर्डिंग के अधिकतम FPS को इंगित करता है। डिवाइस हार्डवेयर के आधार पर, चयनित FPS तक पहुंचना संभव नहीं हो सकता है।</string>
+    <string name="desc_recording_stats">स्क्रीनशॉट रिकॉर्डिंग सफल!
+\n
+\n एफपीएस: %1$s
+\n फ़्रेम समय (एमएस): %2$s
+\n समय लगा: %3$s
+\n फ़ाइल का आकार: %4$s</string>
+    <string name="cache_policy_desc">यह नियंत्रित करता है कि ऐप नेटवर्क सामग्री को कितनी आक्रामकता से कैश करेगा। एक शिथिल कैशिंग नीति का मतलब होगा कि ऐप अधिक बार नेटवर्क कॉल करेगा लेकिन सामग्री अधिक ताज़ा हो सकती है। एक आक्रामक कैश नीति संभवतः बासी सामग्री की कीमत पर ऐप के प्रदर्शन में सुधार करेगी।</string>
+    <string name="error_invalid_instance_format">अमान्य इंस्टेंस प्रारूप।</string>
+    <string name="error_username_too_short">उपयोगकर्ता नाम बहुत छोटा है. न्यूनतम लंबाई %1$s वर्ण।</string>
+    <string name="error_username_cannot_contain_spaces">उपयोगकर्ता नाम में रिक्त स्थान नहीं हो सकते।</string>
+    <string name="error_username_too_long">उपयोगकर्ता नाम बहुत लंबा है. उपयोगकर्ता नाम की अधिकतम लंबाई %1$s वर्ण है।</string>
+    <string name="registration_created">आपका आवेदन जमा हो गया है। आपको अपने खाते का उपयोग करने से पहले साइट व्यवस्थापक द्वारा आपके आवेदन को स्वीकृत करने की प्रतीक्षा करनी होगी।</string>
+    <string name="error_unknown_sign_up_error">पंजीकरण के दौरान एक अप्रत्याशित त्रुटि घटित हुई है।</string>
+    <string name="solve_captcha_desc">साइन अप करने के लिए आपको कैप्चा हल करना होगा। कृपया नीचे दी गई छवि से कोड दर्ज करें।</string>
+    <string name="warn_reset_emojis">इससे सभी कस्टम इमोजी मिट जाएंगे और मूल इमोजी बहाल हो जाएंगे। इस क्रिया को पूर्ववत नहीं किया जा सकता।</string>
+    <string name="show_scores">स्कोर दिखाएं</string>
+    <string name="hide_scores">स्कोर छिपाएं</string>
+    <string name="comment_scores">टिप्पणी स्कोर</string>
+    <string name="parse_markdown_in_post_titles">पोस्ट शीर्षकों में पोस्ट मार्कडाउन</string>
+    <string name="parse_markdown_in_post_titles_desc">इसे बंद करने से पोस्ट शीर्षक फ़ॉर्मेटिंग से जुड़ी समस्याओं को रोका जा सकता है</string>
+    <string name="removed">निकाला गया</string>
+    <string name="copy_text">पाठ कॉपी करें</string>
+    <string name="go_to">जाओ…</string>
+    <string name="go">जाना</string>
+    <string name="go_to_desc">यहाँ लिंक चिपकाकर सीधे लेमी पेज पर जाएँ। अगर पेज पार्स नहीं किया जा सकता है, तो यह ब्राउज़र में खुलेगा।</string>
+    <string name="error_invalid_link">अवैध लिंक।</string>
+    <string name="dim_read_posts">मंद पढ़े गए पोस्ट</string>
+    <string name="dim_read_posts_desc">सक्षम होने पर, पढ़ी गई पोस्ट पूरी तरह से मंद हो जाएंगी। अक्षम होने पर, केवल पोस्ट का शीर्षक मंद हो जाएगा।</string>
+    <string name="auto_play_videos">ऑटो-प्ले वीडियो</string>
+    <string name="comments_with_new_comments_format">%1$s ( %2$s नया)</string>
+    <string name="desc_no_comments">अब तक कोई टिप्पणी नहीं।</string>
+    <string name="add_a_comment">एक टिप्पणी जोड़ने</string>
+    <string name="save_as_gif">GIF के रूप में सहेजें</string>
+    <string name="save_as_recording">रिकॉर्डिंग के रूप में सहेजें</string>
+    <string name="recording">रिकॉर्डिंग…</string>
+    <string name="encoding">एनकोडिंग…</string>
+    <string name="record">अभिलेख</string>
+    <string name="recording_length_in_seconds">रिकॉर्डिंग की लंबाई (सेकंड में)</string>
+    <string name="save_screenshot_as_recording">स्क्रीनशॉट को रिकॉर्डिंग के रूप में सहेजें</string>
+    <string name="error_unable_to_create_screenshot">स्क्रीनशॉट बनाने में असमर्थ।</string>
+    <string name="recording_type">रिकॉर्डिंग का प्रकार</string>
+    <string name="fps_full">एफपीएस (फ्रेम प्रति सेकंड)</string>
+    <string name="quality_factor">गुणवत्ता कारक</string>
+    <string name="resolution_scaling">रिज़ॉल्यूशन स्केलिंग</string>
+    <string name="view_history">इतिहास देखें</string>
+    <string name="show_full_context">संपूर्ण संदर्भ दिखाएं</string>
+    <string name="error_operation_not_permitted">संचालन की अनुमति नहीं है</string>
+    <string name="error_action_on_comment_context">टिप्पणी लिखते समय आप संदर्भ के भीतर कोई कार्रवाई नहीं कर सकते।</string>
+    <string name="hide_full_context">संपूर्ण संदर्भ छिपाएं</string>
+    <string name="cache_policy">कैश नीति</string>
+    <string name="aggressive">आक्रामक</string>
+    <string name="moderate">मध्यम</string>
+    <string name="lite">लाइट</string>
+    <string name="use_condensed_style_for_comment_header">टिप्पणी शीर्षक के लिए संक्षिप्त शैली का उपयोग करें</string>
+    <string name="sign_up_title">आपके पास खाता नहीं है? [साइन अप करें]()</string>
+    <string name="sign_up">साइन अप करें</string>
+    <string name="button_continue">जारी रखना</string>
+    <string name="sign_up_instance_desc">वह इंस्टेंस चुनें जिसे आप होम कहना चाहते हैं। Lemmy के इंस्टेंस के बारे में ज़्यादा जानकारी के लिए, [join-lemmy.org](https://join-lemmy.org/instances) पर जाएँ।
+\n
+\n [पता नहीं किसे चुनें? सबसे बड़ा उदाहरण चुनें।](a)</string>
+    <string name="error_unable_to_resolve_instance">इंस्टेंस हल करने में असमर्थ। कृपया दर्ज किए गए इंस्टेंस की दोबारा जांच करें।</string>
+    <string name="username">उपयोगकर्ता नाम</string>
+    <string name="answer">उत्तर</string>
+    <string name="answer_required_to_sign_up_desc">**इस सर्वर में शामिल होने के लिए, आपको निम्नलिखित प्रश्न का उत्तर देना होगा, और स्वीकृत होने की प्रतीक्षा करनी होगी।**</string>
+    <string name="submitting_application">आवेदन प्रस्तुत किया जा रहा है…</string>
+    <string name="submit">जमा करना</string>
+    <string name="email_optional">ईमेल वैकल्पिक)</string>
+    <string name="error_instance_closed_registrations">यह इंस्टैंस वर्तमान में नए उपयोगकर्ताओं को स्वीकार नहीं कर रहा है।</string>
+    <string name="error_sign_up">साइन अप करने में विफल रहा</string>
+    <string name="sign_up_success">साइन अप सफल</string>
+    <string name="email_verification_required">ईमेल सत्यापन आवश्यक है। कृपया सत्यापन ईमेल देखें और उसमें दिए गए लिंक पर क्लिक करें।
+\n
+\n यदि आपको 10 मिनट के भीतर ईमेल नहीं मिलता है, तो अपने स्पैम या ट्रैश फ़ोल्डर की जांच करें।</string>
+    <string name="finish">खत्म करना</string>
+    <string name="configure">कॉन्फ़िगर</string>
+    <string name="reset_emojis">इमोजी रीसेट करें</string>
+    <string name="post_scores">पोस्ट स्कोर</string>
 </resources>
