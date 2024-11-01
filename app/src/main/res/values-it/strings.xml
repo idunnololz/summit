@@ -1061,4 +1061,6 @@
     <string name="copy_text">Copia il testo</string>
     <string name="go_to">Vai a…</string>
     <string name="go">Andare</string>
+    <string name="post_scores_desc">Scegli come visualizzare i punteggi nei post</string>
+    <string name="comment_scores_desc">Scegli come visualizzare i punteggi nei commenti</string>
 </resources>
