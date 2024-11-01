@@ -524,17 +524,17 @@
     <string name="offline_fetching_post_feed">Načítání zdroje příspěvků…</string>
     <plurals name="children_count_format">
         <item quantity="one">( %1$d dítě)</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">( %1$d dětí)</item>
     </plurals>
     <plurals name="point_count_format">
         <item quantity="one">%1$s bod</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">%1$s bodů</item>
     </plurals>
     <plurals name="more_replies_format">
         <item quantity="one">%1$d další odpověď</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">Další odpovědi %1$d</item>
     </plurals>
     <string name="feed_info">Informace o zdroji</string>
@@ -568,7 +568,7 @@
     <string name="error_couldnt_find_object">Nepodařilo se najít příspěvek/komentář k této instanci.</string>
     <plurals name="new_items_in_inbox_format">
         <item quantity="one">%1$s nová položka ve vaší doručené poště</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">Nové položky ve vaší doručené poště: %1$s</item>
     </plurals>
     <string name="comments_with_new_comments_format">%1$s ( %2$s nové)</string>
@@ -952,12 +952,12 @@
     <string name="solve_captcha_desc">Abyste se mohli zaregistrovat, musíte vyřešit captcha. Zadejte prosím kód z obrázku níže.</string>
     <plurals name="posts_format">
         <item quantity="one">%1$s příspěvek</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">%1$s příspěvků</item>
     </plurals>
     <plurals name="comments_format">
         <item quantity="one">%1$s komentář</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">Komentáře: %1$s</item>
     </plurals>
     <string name="text_emoji">Textové emotikony</string>
@@ -1011,7 +1011,7 @@
     <string name="lite">Lite</string>
     <plurals name="day_format">
         <item quantity="one">%1$s den</item>
-        <item quantity="few"></item>
+        <item quantity="few"/>
         <item quantity="other">%1$s dnů</item>
     </plurals>
     <string name="use_condensed_style_for_comment_header">Použijte zhuštěný styl pro záhlaví komentáře</string>
@@ -1061,4 +1061,6 @@
     <string name="delete_comment_confirm">Smazat komentář</string>
     <string name="app_restart_required">Je nutné restartovat aplikaci</string>
     <string name="message_from_format">Od %1$s</string>
+    <string name="post_scores_desc">Vyberte způsob zobrazení skóre u příspěvků</string>
+    <string name="comment_scores_desc">Vyberte, jak se zobrazí skóre u komentářů</string>
 </resources>
