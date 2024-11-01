@@ -1848,6 +1848,8 @@
     <string name="go">Go</string>
     <string name="go_to_desc">Go to a Lemmy page directly by pasting its link here. If the page cannot be parsed, it will open in the browser instead.</string>
     <string name="error_invalid_link">Invalid link.</string>
+    <string name="post_scores_desc">Choose how scores on posts are displayed</string>
+    <string name="comment_scores_desc">Choose how scores on comments are displayed</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

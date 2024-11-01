@@ -70,7 +70,7 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
             linkInputLayout.setEndIconOnClickListener {
                 val pasteData: String? = context.getPlainTextFromClipboard()
                 if (pasteData != null) {
-                    binding.linkEditText.setText(pasteData)
+                    linkEditText.setText(pasteData)
                 }
             }
 
