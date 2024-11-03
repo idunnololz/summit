@@ -614,49 +614,49 @@ class PostAndCommentViewBuilder @Inject constructor(
                     holder.upvoteCount = null
                     holder.downvoteCount = null
                 }
+            }
 
-                if (useMultilineHeader) {
-                    // We are displaying the score on it's own line so no padding needed.
-                    headerView.textView2.updatePaddingRelative(
-                        start = 0,
-                    )
-                    headerView.updatePaddingRelative(
-                        bottom = Utils.convertDpToPixel(8f).toInt(),
-                    )
-                    collapseSectionButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        bottomMargin = Utils.convertDpToPixel(8f).toInt()
-                    }
-                } else {
-                    headerView.textView2.updatePaddingRelative(
-                        start = Utils.convertDpToPixel(8f).toInt(),
+            if (useMultilineHeader) {
+                // We are displaying the score on it's own line so no padding needed.
+                headerView.textView2.updatePaddingRelative(
+                    start = 0,
+                )
+                headerView.updatePaddingRelative(
+                    bottom = Utils.convertDpToPixel(8f).toInt(),
+                )
+                collapseSectionButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    bottomMargin = Utils.convertDpToPixel(8f).toInt()
+                }
+            } else {
+                headerView.textView2.updatePaddingRelative(
+                    start = Utils.convertDpToPixel(8f).toInt(),
+                )
+            }
+
+            when (val rb = rawBinding) {
+                is PostCommentExpandedItemBinding -> {
+                    ensureCommentsActionButtons(
+                        vh = this,
+                        root = rb.root,
+                        isSaved = commentView.saved,
+                        fullWidth = false,
                     )
                 }
-
-                when (val rb = rawBinding) {
-                    is PostCommentExpandedItemBinding -> {
+                is PostCommentExpandedCompactItemBinding -> {
+                    if (isActionsExpanded) {
                         ensureCommentsActionButtons(
                             vh = this,
-                            root = rb.root,
+                            root = root,
                             isSaved = commentView.saved,
                             fullWidth = false,
                         )
-                    }
-                    is PostCommentExpandedCompactItemBinding -> {
-                        if (isActionsExpanded) {
-                            ensureCommentsActionButtons(
-                                vh = this,
-                                root = root,
-                                isSaved = commentView.saved,
-                                fullWidth = false,
-                            )
-                        } else {
-                            ensureCommentsActionButtons(
-                                vh = this,
-                                root = root,
-                                isSaved = commentView.saved,
-                                removeOnly = true,
-                            )
-                        }
+                    } else {
+                        ensureCommentsActionButtons(
+                            vh = this,
+                            root = root,
+                            isSaved = commentView.saved,
+                            removeOnly = true,
+                        )
                     }
                 }
             }
