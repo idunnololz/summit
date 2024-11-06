@@ -11,15 +11,15 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "com.idunnololz.summit"
 
     defaultConfig {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
-        targetSdk = 34
-        versionCode = 190
-        versionName = "1.44.1"
+        targetSdk = 35
+        versionCode = 191
+        versionName = "1.44.2"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
