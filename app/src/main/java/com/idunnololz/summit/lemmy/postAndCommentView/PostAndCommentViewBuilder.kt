@@ -6,6 +6,7 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.Gravity
@@ -577,6 +578,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         isDeleting: Boolean,
         isRemoved: Boolean,
         content: String,
+        contentSpannable: Spanned?,
         instance: String,
         isPostLocked: Boolean,
         isUpdating: Boolean,
@@ -595,6 +597,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onLinkLongClick: (url: String, text: String) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
+        onTextBound: (Spanned?) -> Unit = {},
     ) = with(holder) {
         val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
         val useMultilineHeader =
@@ -723,9 +726,10 @@ class PostAndCommentViewBuilder @Inject constructor(
                 )
             }
         } else {
-            LemmyTextHelper.bindText(
+            val spannable = LemmyTextHelper.bindText(
                 textView = text,
                 text = content,
+                spannedText = contentSpannable,
                 instance = instance,
                 highlight = highlightTextData,
                 onImageClick = {
@@ -739,6 +743,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onLinkLongClick = onLinkLongClick,
                 showMediaAsLinks = commentsShowInlineMediaAsLinks,
             )
+            onTextBound(spannable)
         }
 
         if (mediaContainer.childCount > 0) {

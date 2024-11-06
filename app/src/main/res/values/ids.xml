@@ -238,4 +238,6 @@
     <item name="ca_copy_text" type="id" />
     <item name="pa_copy_text" type="id" />
     <item name="go_to" type="id" />
+    <item name="bind_text_cache_key" type="id" />
+    <item name="bind_text_cached_span" type="id" />
 </resources>

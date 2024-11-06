@@ -70,6 +70,10 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
     }
 
     override fun afterSetText(textView: TextView) {
+        processSpoilers(textView, resetProcessed = true)
+    }
+
+    private fun processSpoilers(textView: TextView, resetProcessed: Boolean) {
         try {
             val spanned = SpannableStringBuilder(textView.text)
             val detailsStartSpans =
@@ -80,9 +84,15 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
             detailsStartSpans.sortBy { spanned.getSpanStart(it) }
             detailsEndSpans.sortBy { spanned.getSpanStart(it) }
 
-            detailsStartSpans.forEachIndexed { index, detailsStartSpan ->
+            if (resetProcessed) {
+                detailsStartSpans.forEach {
+                    it.isProcessed = false
+                }
+            }
+
+            for ((index, detailsStartSpan) in detailsStartSpans.withIndex()) {
                 if (detailsStartSpan.isProcessed) {
-                    return@forEachIndexed
+                    continue
                 }
 
                 val spoilerStart = spanned.getSpanStart(detailsStartSpan)
@@ -123,6 +133,16 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                     detailsStartSpan.spoilerText = spoilerContent
                 }
 
+                // Remove spoiler content from span
+                spanned.replace(spoilerStart, spoilerEnd - 1, spoilerTitle)
+                // Set span block title
+                spanned.setSpan(
+                    detailsStartSpan,
+                    spoilerStart,
+                    spoilerStart + spoilerTitle.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+
                 if (detailsStartSpan.isExpanded) {
                     spanned.replace(
                         spoilerStart,
@@ -139,16 +159,6 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                         spoilerStart + spoilerTitle.length,
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                     )
-                } else {
-                    // Remove spoiler content from span
-                    spanned.replace(spoilerStart, spoilerEnd - 1, spoilerTitle)
-                    // Set span block title
-                    spanned.setSpan(
-                        detailsStartSpan,
-                        spoilerStart,
-                        spoilerStart + spoilerTitle.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
                 }
 
                 val wrapper =
@@ -156,7 +166,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                         override fun onClick(p0: View) {
                             detailsStartSpan.isExpanded = !detailsStartSpan.isExpanded
                             detailsStartSpan.isProcessed = false
-                            afterSetText(textView)
+                            processSpoilers(textView, resetProcessed = false)
                             AsyncDrawableScheduler.schedule(textView)
                         }
 

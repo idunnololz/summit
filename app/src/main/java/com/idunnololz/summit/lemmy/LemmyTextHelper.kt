@@ -52,6 +52,7 @@ object LemmyTextHelper {
         textView: TextView,
         text: String,
         instance: String,
+        spannedText: Spanned? = null,
         highlight: HighlightTextData? = null,
         showMediaAsLinks: Boolean = false,
         onImageClick: (url: String) -> Unit,
@@ -59,8 +60,9 @@ object LemmyTextHelper {
         onPageClick: (PageRef) -> Unit,
         onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
-    ): SpannableStringBuilder? {
-        val spannable = bindLemmyText(textView, text, highlight, showMediaAsLinks)
+    ): Spanned? {
+        val spannable = bindLemmyText(textView, text, spannedText, highlight, showMediaAsLinks)
+
         textView.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(
@@ -111,9 +113,10 @@ object LemmyTextHelper {
     private fun bindLemmyText(
         textView: TextView,
         text: String,
+        spannableText: Spanned? = null,
         highlight: HighlightTextData?,
         showMediaAsLinks: Boolean,
-    ): SpannableStringBuilder? {
+    ): Spanned? {
         val markwon = if (showMediaAsLinks) {
             getNoMediaMarkwon(textView.context)
         } else {
@@ -121,7 +124,8 @@ object LemmyTextHelper {
         }
 
         return try {
-            val spanned = SpannableStringBuilder(markwon.toMarkdown(text))
+            val _spanned = spannableText ?: markwon.toMarkdown(text)
+            val spanned = SpannableStringBuilder(_spanned)
 
             if (highlight != null) {
                 val highlightColor = textView.context.getColorFromAttribute(
@@ -174,7 +178,7 @@ object LemmyTextHelper {
 
             markwon.setParsedMarkdown(textView, spanned)
 
-            spanned
+            _spanned
         } catch (e: Exception) {
             Log.w(TAG, "Error parsing markdown. Falling back to plain text", e)
             textView.text = text

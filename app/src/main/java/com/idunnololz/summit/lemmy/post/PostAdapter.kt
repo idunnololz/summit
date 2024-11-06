@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -239,6 +241,8 @@ class PostAdapter(
     private var seenCommentIds = mutableSetOf<CommentId>()
 
     private var collapsedItemIds = mutableSetOf<Long>()
+
+    private var contentCache = mutableMapOf<String, Spanned?>()
 
     private var query: String? = null
     var currentMatch: QueryResult? = null
@@ -583,6 +587,7 @@ class PostAdapter(
                     val b = holder as CommentExpandedViewHolder
                     val highlight = highlightedComment == item.commentId
                     val highlightForever = highlightedCommentForever == item.commentId
+                    val k = "${item.comment.comment.id}:${item.comment.comment.updated ?: item.comment.comment.published}"
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = holder,
@@ -595,6 +600,7 @@ class PostAdapter(
                         isDeleting = item.isDeleting,
                         isRemoved = item.isRemoved,
                         content = item.content,
+                        contentSpannable = contentCache[k],
                         instance = instance,
                         isPostLocked = item.isPostLocked,
                         isUpdating = item.isUpdating,
@@ -627,6 +633,9 @@ class PostAdapter(
                         onSignInRequired = onSignInRequired,
                         onLinkClick = onLinkClick,
                         onInstanceMismatch = onInstanceMismatch,
+                        onTextBound = {
+                            contentCache[k] = it
+                        },
                     )
 
                     updateScreenshotMode(
