@@ -328,7 +328,7 @@ class CommentTreeBuilder(
     private fun getCommentParentId(comment: Comment?): Int? {
         val split = comment?.path?.split(".")?.toMutableList()
         // remove the 0
-        split?.removeFirst()
+        split?.removeAt(0)
         return if (split !== null && split.size > 1) {
             split[split.size - 2].toInt()
         } else {

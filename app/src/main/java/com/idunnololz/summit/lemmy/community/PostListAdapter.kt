@@ -436,15 +436,12 @@ class PostListAdapter(
         }
     }
 
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
         val position = holder.absoluteAdapterPosition
-        super.onViewRecycled(holder)
+
+        super.onViewDetachedFromWindow(holder)
 
         if (holder is ListingItemViewHolder) {
-            postListViewBuilder.recycle(
-                holder,
-            )
-
             if (markPostsAsReadOnScroll) {
                 val fetchedPost = holder.root.getTag(R.id.fetched_post) as? FetchedPost
                 if (fetchedPost != null && seenItemPositions.contains(position)) {
@@ -454,6 +451,16 @@ class PostListAdapter(
                     )
                 }
             }
+        }
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
+
+        if (holder is ListingItemViewHolder) {
+            postListViewBuilder.recycle(
+                holder,
+            )
         }
     }
 
