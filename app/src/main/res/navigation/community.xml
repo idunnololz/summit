@@ -6,7 +6,13 @@
 
     <include app:graph="@navigation/login" />
 
-    <action android:id="@+id/action_global_login" app:destination="@id/login"/>
+    <action
+        android:id="@+id/action_global_login"
+        app:destination="@id/login"
+        app:enterAnim="@animator/slide_in"
+        app:exitAnim="@animator/fade_out"
+        app:popEnterAnim="@animator/fade_in"
+        app:popExitAnim="@animator/fade_out"/>
 
     <fragment
         android:id="@+id/communityFragment"
@@ -28,10 +34,10 @@
         <action
             android:id="@+id/action_mainFragment_to_postFragment"
             app:destination="@id/postFragment"
-            app:enterAnim="@anim/slide_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/slide_out" />
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
         <action
             android:id="@+id/action_subredditFragment_self"
             app:destination="@id/communityFragment"
@@ -190,9 +196,11 @@
             app:argType="com.idunnololz.summit.lemmy.PersonRef"
             app:nullable="true"/>
     </fragment>
-    <action android:id="@+id/action_global_personTabbedFragment" app:destination="@id/personTabbedFragment"
-        app:enterAnim="@anim/slide_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/slide_out"/>
+    <action
+        android:id="@+id/action_global_personTabbedFragment"
+        app:destination="@id/personTabbedFragment"
+        app:enterAnim="@animator/slide_in"
+        app:exitAnim="@animator/fade_out"
+        app:popEnterAnim="@animator/fade_in"
+        app:popExitAnim="@animator/fade_out"/>
 </navigation>

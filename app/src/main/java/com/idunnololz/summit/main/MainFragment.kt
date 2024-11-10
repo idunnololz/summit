@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -23,6 +24,7 @@ import androidx.navigation.fragment.navArgs
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.transition.MaterialSharedAxis
 import com.idunnololz.summit.CommunityDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentMainBinding
@@ -419,6 +421,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         isSinglePage = true,
                         switchToNativeInstance = switchToNativeInstance,
                     ).toBundle(),
+                    NavOptions.Builder()
+                        .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                        .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+                        .build(),
                 )
             }
             is CommentRef -> {
@@ -431,6 +439,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                         currentCommunity = null,
                         isSinglePage = true,
                     ).toBundle(),
+                    NavOptions.Builder()
+                        .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                        .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+                        .build(),
                 )
             }
             is PersonRef -> {
@@ -537,10 +551,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         // to it, creating the fixed started destination.
         fragmentManager.beginTransaction()
             .setCustomAnimations(
-                R.anim.fade_in,
-                R.anim.fade_out,
-                androidx.navigation.ui.R.anim.nav_default_pop_enter_anim,
-                androidx.navigation.ui.R.anim.nav_default_pop_exit_anim,
+                R.animator.fade_in,
+                R.animator.fade_out,
+                androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                androidx.navigation.ui.R.animator.nav_default_pop_exit_anim,
             )
             .attach(selectedFragment)
             .setPrimaryNavigationFragment(selectedFragment)

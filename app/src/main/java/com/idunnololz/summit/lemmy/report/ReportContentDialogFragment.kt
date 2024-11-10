@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -13,7 +14,6 @@ import com.idunnololz.summit.databinding.DialogFragmentReportContentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setSizeDynamically
@@ -22,8 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ReportContentDialogFragment :
-    BaseDialogFragment<DialogFragmentReportContentBinding>(),
-    BackPressHandler {
+    BaseDialogFragment<DialogFragmentReportContentBinding>() {
 
     companion object {
         fun show(fragmentManager: FragmentManager, postRef: PostRef?, commentRef: CommentRef?) {
@@ -38,6 +37,12 @@ class ReportContentDialogFragment :
     private val args by navArgs<ReportContentDialogFragmentArgs>()
 
     private val viewModel: ReportContentViewModel by viewModels()
+
+    private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.cancelSendReport()
+        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -95,19 +100,32 @@ class ReportContentDialogFragment :
                         it.error,
                         childFragmentManager,
                     )
+
+                    unsavedChangesBackPressedHandler.isEnabled = false
                 }
                 is StatefulData.Loading -> {
                     onSendReportStateChange(isSending = true)
+
+                    unsavedChangesBackPressedHandler.isEnabled = true
                 }
                 is StatefulData.NotStarted -> {
                     onSendReportStateChange(isSending = false)
+
+                    unsavedChangesBackPressedHandler.isEnabled = false
                 }
                 is StatefulData.Success -> {
+                    unsavedChangesBackPressedHandler.isEnabled = false
+
                     onSendReportStateChange(isSending = false)
                     dismiss()
                 }
             }
         }
+
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            unsavedChangesBackPressedHandler,
+        )
     }
 
     private fun onSendReportStateChange(isSending: Boolean) {
@@ -123,14 +141,5 @@ class ReportContentDialogFragment :
                 loadingView.hideAll()
             }
         }
-    }
-
-    override fun onBackPressed(): Boolean {
-        if (viewModel.reportState.isLoading) {
-            viewModel.cancelSendReport()
-            return true
-        }
-
-        return false
     }
 }

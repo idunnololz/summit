@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
+import com.idunnololz.summit.databinding.ItemPersonSelectorGroupHeaderBinding
 import com.idunnololz.summit.databinding.PersonSelectorSearchResultPersonItemBinding
 import com.idunnololz.summit.databinding.PersonSelectorSelectedPersonItemBinding
 import com.idunnololz.summit.lemmy.PersonRef
@@ -93,7 +94,7 @@ class PersonAdapter(
     ).apply {
         addItemType(
             clazz = Item.GroupHeaderItem::class,
-            inflateFn = CommunitySelectorGroupItemBinding::inflate,
+            inflateFn = ItemPersonSelectorGroupHeaderBinding::inflate,
         ) { item, b, _ ->
             b.titleTextView.text = item.text
 

@@ -25,6 +25,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
@@ -277,6 +278,10 @@ class HistoryFragment :
     override fun onDestroyView() {
         historyManager.unregisterOnHistoryChangedListener(onHistoryChangedListener)
         super.onDestroyView()
+    }
+
+    fun closePost(postFragment: PostFragment) {
+        slidingPaneController?.closePost(postFragment)
     }
 
     private class HistoryEntryAdapter(

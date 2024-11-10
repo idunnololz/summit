@@ -20,6 +20,7 @@ class LemmyAppBarController(
     private val mainActivity: MainActivity,
     private val binding: CustomAppBarBinding,
     private val accountInfoManager: AccountInfoManager,
+    state: State? = null,
 ) {
 
     companion object {
@@ -27,14 +28,18 @@ class LemmyAppBarController(
         private const val TAG = "RedditAppBarController"
     }
 
+    data class State(
+        var currentCommunity: CommunityRef? = null,
+        var defaultCommunity: CommunityRef? = null,
+    )
+
     private val context = mainActivity
 
     private val customActionBar: ViewGroup = binding.customActionBar
     private val communityTextView: Chip = binding.communityTextView
     private val pageTextView: TextView = binding.pageTextView
 
-    private var currentCommunity: CommunityRef? = null
-    private var defaultCommunity: CommunityRef? = null
+    val state: State = state ?: State()
 
     fun setup(
         communitySelectedListener: CommunitySelectedListener,
@@ -44,7 +49,7 @@ class LemmyAppBarController(
         onCommunityLongClick: (currentCommunity: CommunityRef?, text: String?) -> Boolean,
     ) {
         fun showCommunitySelectorInternal() {
-            val controller = mainActivity.showCommunitySelector(currentCommunity)
+            val controller = mainActivity.showCommunitySelector(state.currentCommunity)
             controller.onCommunitySelectedListener = communitySelectedListener
             controller.onChangeInstanceClick = onChangeInstanceClick
         }
@@ -57,7 +62,7 @@ class LemmyAppBarController(
             showCommunitySelectorInternal()
         }
         communityTextView.setOnLongClickListener {
-            onCommunityLongClick(currentCommunity, communityTextView.text?.toString())
+            onCommunityLongClick(state.currentCommunity, communityTextView.text?.toString())
         }
         customActionBar.setOnClickListener {
             showCommunitySelectorInternal()
@@ -72,28 +77,28 @@ class LemmyAppBarController(
     }
 
     fun setCommunity(communityRef: CommunityRef?) {
-        currentCommunity = communityRef
+        state.currentCommunity = communityRef
 
         updateCommunityButton()
     }
 
     fun setDefaultCommunity(defaultCommunity: CommunityRef?) {
-        this.defaultCommunity = defaultCommunity
+        state.defaultCommunity = defaultCommunity
 
         updateCommunityButton()
     }
 
     private fun updateCommunityButton() {
-        communityTextView.text = currentCommunity?.getName(context) ?: ""
-        val isHome = currentCommunity == defaultCommunity
+        communityTextView.text = state.currentCommunity?.getName(context) ?: ""
+        val isHome = state.currentCommunity == state.defaultCommunity
         val isSubscribed = accountInfoManager.currentFullAccount.value?.accountInfo?.subscriptions?.any {
-            it.toCommunityRef() == currentCommunity
+            it.toCommunityRef() == state.currentCommunity
         } == true
 
         if (isHome) {
             communityTextView.isChipIconVisible = true
             communityTextView.setChipIconResource(R.drawable.baseline_home_18)
-        } else if (currentCommunity is CommunityRef.MultiCommunity) {
+        } else if (state.currentCommunity is CommunityRef.MultiCommunity) {
             communityTextView.isChipIconVisible = true
             communityTextView.setChipIconResource(R.drawable.baseline_dynamic_feed_24)
         } else if (isSubscribed) {

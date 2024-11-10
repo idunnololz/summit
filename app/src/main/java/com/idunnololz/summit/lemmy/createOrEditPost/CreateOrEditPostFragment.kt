@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.createOrEditPost
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.ViewTreeObserver.OnPreDrawListener
 import android.webkit.URLUtil
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
@@ -52,7 +54,6 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -71,7 +72,6 @@ import javax.inject.Inject
 class CreateOrEditPostFragment :
     BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -85,8 +85,6 @@ class CreateOrEditPostFragment :
     private val uploadImageViewModel: UploadImageViewModel by viewModels()
 
     private var adapter: CommunitySearchResultsAdapter? = null
-
-    private var currentBottomMenu: BottomMenu? = null
 
     @Inject
     lateinit var textFieldToolbarManager: TextFieldToolbarManager
@@ -131,6 +129,12 @@ class CreateOrEditPostFragment :
                 }
             }
         }
+
+    private val showSearchBackPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.showSearch.value = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -229,7 +233,7 @@ class CreateOrEditPostFragment :
             context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
         )
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
         binding.toolbar.setOnMenuItemClickListener a@{
             when (it.itemId) {
@@ -508,10 +512,9 @@ class CreateOrEditPostFragment :
                 bottomMenuContainer = requireMainActivity(),
                 bottomSheetContainer = binding.root,
                 expandFully = true,
-                handleBackPress = false,
+                handleBackPress = true,
+                onBackPressedDispatcher = onBackPressedDispatcher,
             )
-
-            currentBottomMenu = bottomMenu
         }
         viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
             updateEnableState()
@@ -674,13 +677,15 @@ class CreateOrEditPostFragment :
             }
         }
 
-        viewModel.showSearchLiveData.observe(viewLifecycleOwner) {
-            if (it) {
+        viewModel.showSearchLiveData.observe(viewLifecycleOwner) { showSearch ->
+            if (showSearch) {
                 showSearch()
             } else {
                 hideSearch()
             }
             updateToolbar()
+
+            showSearchBackPressedHandler.isEnabled = showSearch
         }
 
         binding.communityEditText.addTextChangedListener {
@@ -755,6 +760,11 @@ class CreateOrEditPostFragment :
 
         hideSearch(animate = false)
         updateEnableState()
+
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            showSearchBackPressedHandler,
+        )
     }
 
     private var isImeOpen: Boolean = false
@@ -964,28 +974,12 @@ class CreateOrEditPostFragment :
 
     private fun isEdit() = args.post != null
 
-    override fun onBackPressed(): Boolean {
-        if (isBindingAvailable()) {
-            if (currentBottomMenu?.close() == true) {
-                currentBottomMenu = null
-                return true
-            }
-        }
-        if (viewModel.showSearch.value) {
-            viewModel.showSearch.value = false
-            return true
-        }
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
 
-        try {
-            if (preferences.saveDraftsAutomatically) {
-                saveDraft()
-            }
-
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
+        if (preferences.saveDraftsAutomatically) {
+            saveDraft()
         }
-        return true
     }
 
     private fun saveDraft(overwriteExistingDraft: Boolean = true) {

@@ -54,7 +54,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
         requireMainActivity().apply {
             insetViewAutomaticallyByPadding(viewLifecycleOwner, view)
-            setupForFragment<LoginFragment>()
 
             insets.observe(viewLifecycleOwner) {
                 binding.instanceEditText.post {
@@ -209,6 +208,12 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         }
 
         hideProgressBar()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setupForFragment<LoginFragment>()
     }
 
     private fun disableAllFields() {

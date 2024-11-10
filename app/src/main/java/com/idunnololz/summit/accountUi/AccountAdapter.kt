@@ -12,6 +12,7 @@ import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.databinding.AddAccountItemBinding
 import com.idunnololz.summit.databinding.CurrentAccountItemBinding
 import com.idunnololz.summit.databinding.GuestAccountItemBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
 class AccountAdapter(
@@ -27,6 +28,7 @@ class AccountAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
+        data object HeaderItem : Item
         data class AccountItem(
             val accountView: AccountView,
             val isCurrent: Boolean,
@@ -41,12 +43,14 @@ class AccountAdapter(
 
     private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
         old::class == new::class && when (old) {
+            Item.HeaderItem -> true
             is Item.AccountItem ->
                 old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
             is Item.AddAccountItem -> true
             is Item.GuestAccountItem -> true
         }
     }).apply {
+        addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { _, _, _ -> }
         addItemType(Item.AccountItem::class, CurrentAccountItemBinding::inflate) { item, b, _ ->
             b.image.load(item.accountView.profileImage)
             b.name.text = item.accountView.account.name
@@ -127,6 +131,8 @@ class AccountAdapter(
         val currentAccount = accounts.firstOrNull { it.account.current }
         val newItems = mutableListOf<Item>()
         val showGuestAccount = accounts.isNotEmpty() && showGuestAccount
+
+        newItems.add(Item.HeaderItem)
 
         if (currentAccount != null) {
             newItems.add(Item.AccountItem(currentAccount, isCurrent = true))

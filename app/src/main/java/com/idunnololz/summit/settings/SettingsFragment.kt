@@ -2,10 +2,15 @@ package com.idunnololz.summit.settings
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.window.BackEvent
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
+import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -14,6 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSeekController
+import com.google.android.material.transition.platform.MaterialFadeThrough
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -77,8 +86,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         val context = requireContext()
 
         requireMainActivity().apply {
-            setupForFragment<SettingsFragment>()
-
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
@@ -241,6 +248,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
         handleLinkIfNeeded()
         hideSearch(animate = false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setupForFragment<SettingsFragment>()
     }
 
     private fun setupSearchRecyclerView() {

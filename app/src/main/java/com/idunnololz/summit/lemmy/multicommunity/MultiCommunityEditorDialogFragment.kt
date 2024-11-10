@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.widget.addTextChangedListener
@@ -34,7 +35,6 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
@@ -56,7 +56,6 @@ import javax.inject.Inject
 class MultiCommunityEditorDialogFragment :
     BaseDialogFragment<DialogFragmentMultiCommunityEditorBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -94,6 +93,23 @@ class MultiCommunityEditorDialogFragment :
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    private val showSearchBackPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.showSearch.value = false
+        }
+    }
+
+    private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            AlertDialogFragment.Builder()
+                .setTitle(R.string.error_unsaved_changes)
+                .setMessage(R.string.error_multi_community_unsaved_changes)
+                .setPositiveButton(R.string.proceed_anyways)
+                .setNegativeButton(R.string.cancel)
+                .createAndShow(childFragmentManager, "UnsavedChanges")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -246,12 +262,13 @@ class MultiCommunityEditorDialogFragment :
             recyclerView.layoutManager = LinearLayoutManager(context)
         }
 
-        viewModel.showSearch.observe(viewLifecycleOwner) {
+        viewModel.showSearch.observe(viewLifecycleOwner) { it ->
             if (it) {
                 showSearch()
             } else {
                 hideSearch()
             }
+            showSearchBackPressedHandler.isEnabled = it
         }
 
         viewModel.searchResults.observe(viewLifecycleOwner) {
@@ -274,6 +291,15 @@ class MultiCommunityEditorDialogFragment :
         }
 
         fun updateAdapter() {
+            if (viewModel.communityName.value != args.multiCommunity.name ||
+                viewModel.selectedIcon.value != args.multiCommunity.icon ||
+                viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities) {
+
+                unsavedChangesBackPressedHandler.isEnabled = true
+            } else {
+                unsavedChangesBackPressedHandler.isEnabled = false
+            }
+
             val selectedCommunities = viewModel.selectedCommunitiesLiveData.value
             val communityIcons = viewModel.communityIcons.valueOrNull
             val communityName = viewModel.communityName.value
@@ -304,6 +330,16 @@ class MultiCommunityEditorDialogFragment :
 
         hideSearch(animate = false)
         updateAdapter()
+
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            showSearchBackPressedHandler,
+        )
+
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            unsavedChangesBackPressedHandler,
+        )
     }
 
     private fun showTooManyCommunitiesMessage() {
@@ -315,33 +351,6 @@ class MultiCommunityEditorDialogFragment :
                 ),
             )
             .createAndShow(childFragmentManager, "asdfss")
-    }
-
-    override fun onBackPressed(): Boolean {
-        if (viewModel.showSearch.value == true) {
-            viewModel.showSearch.value = false
-            return true
-        }
-
-        if (viewModel.communityName.value != args.multiCommunity.name ||
-            viewModel.selectedIcon.value != args.multiCommunity.icon ||
-            viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities
-        ) {
-            AlertDialogFragment.Builder()
-                .setTitle(R.string.error_unsaved_changes)
-                .setMessage(R.string.error_multi_community_unsaved_changes)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(childFragmentManager, "UnsavedChanges")
-            return true
-        }
-
-        try {
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
-        }
-        return true
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

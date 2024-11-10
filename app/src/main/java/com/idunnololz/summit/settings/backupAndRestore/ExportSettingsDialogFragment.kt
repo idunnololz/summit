@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentBackupSettingsBinding
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
@@ -31,8 +30,7 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class ExportSettingsDialogFragment :
     BaseDialogFragment<DialogFragmentBackupSettingsBinding>(),
-    FullscreenDialogFragment,
-    BackPressHandler {
+    FullscreenDialogFragment {
 
     companion object {
 
@@ -185,7 +183,7 @@ class ExportSettingsDialogFragment :
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
 
             share.setOnClickListener {
@@ -209,14 +207,5 @@ class ExportSettingsDialogFragment :
                 viewModel.saveToInternalBackups()
             }
         }
-    }
-
-    override fun onBackPressed(): Boolean {
-        try {
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
-        }
-        return true
     }
 }

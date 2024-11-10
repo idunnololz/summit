@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
@@ -662,6 +663,12 @@ class MainActivity :
                         isSinglePage = true,
                         switchToNativeInstance = switchToNativeInstance,
                     ).toBundle(),
+                    NavOptions.Builder()
+                        .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                        .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+                        .build(),
                 )
             }
             is CommentRef -> {
@@ -674,6 +681,12 @@ class MainActivity :
                         currentCommunity = null,
                         isSinglePage = true,
                     ).toBundle(),
+                    NavOptions.Builder()
+                        .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                        .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+                        .build(),
                 )
             }
             is PersonRef -> {

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.comment
 
 import android.app.Activity
+import android.content.DialogInterface
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Parcelable
@@ -58,7 +59,6 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -82,7 +82,6 @@ class AddOrEditCommentFragment :
     BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
     FullscreenDialogFragment,
     SignInNavigator,
-    BackPressHandler,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -143,8 +142,6 @@ class AddOrEditCommentFragment :
 
     private val viewModel: AddOrEditCommentViewModel by viewModels()
     private val uploadImageViewModel: UploadImageViewModel by viewModels()
-
-    private var currentBottomMenu: BottomMenu? = null
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -345,10 +342,9 @@ class AddOrEditCommentFragment :
                         bottomMenuContainer = requireMainActivity(),
                         bottomSheetContainer = binding.root,
                         expandFully = true,
-                        handleBackPress = false,
+                        handleBackPress = true,
+                        onBackPressedDispatcher = onBackPressedDispatcher,
                     )
-
-                    currentBottomMenu = bottomMenu
                 },
                 onAddLinkClick = {
                     AddLinkDialogFragment.show(
@@ -439,7 +435,7 @@ class AddOrEditCommentFragment :
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             toolbar.setOnMenuItemClickListener a@{
                 when (it.itemId) {
@@ -785,13 +781,8 @@ class AddOrEditCommentFragment :
     override fun proceedAnyways(tag: Int) {
     }
 
-    override fun onBackPressed(): Boolean {
-        if (isBindingAvailable()) {
-            if (currentBottomMenu?.close() == true) {
-                currentBottomMenu = null
-                return true
-            }
-        }
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
 
         try {
             if (args.sendAction == SendAction.ReturnTextAsResult) {
@@ -810,12 +801,9 @@ class AddOrEditCommentFragment :
                     saveDraft()
                 }
             }
-
-            dismiss()
         } catch (e: IllegalStateException) {
             // do nothing... very rare
         }
-        return true
     }
 
     private fun saveDraft(overwriteExistingDraft: Boolean = true) {
