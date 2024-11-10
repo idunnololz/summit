@@ -98,14 +98,17 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
                 onAddAccountClick = {
                     val direction = CommunityDirections.actionGlobalLogin()
                     findNavController().navigateSafe(direction)
+                    dismiss()
                 },
                 onSettingClick = {
                     requireMainActivity().openAccountSettings()
+                    dismiss()
                 },
                 onPersonClick = {
                     requireMainActivity().launchPage(
                         it.account.toPersonRef(),
                     )
+                    dismiss()
                 },
             )
 
@@ -116,6 +119,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
 
             settings.setOnClickListener {
                 requireMainActivity().openSettings()
+                dismiss()
             }
 
             viewModel.accounts.observe(viewLifecycleOwner) {

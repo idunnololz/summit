@@ -27,7 +27,6 @@ import com.idunnololz.summit.databinding.DraftLoadingItemBinding
 import com.idunnololz.summit.databinding.EmptyDraftItemBinding
 import com.idunnololz.summit.databinding.PostDraftItemBinding
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -42,7 +41,6 @@ import javax.inject.Inject
 class DraftsDialogFragment :
     BaseDialogFragment<DialogFragmentDraftsBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -253,11 +251,6 @@ class DraftsDialogFragment :
                 },
             )
         }
-    }
-
-    override fun onBackPressed(): Boolean {
-        dismiss()
-        return true
     }
 
     private class DraftsAdapter(

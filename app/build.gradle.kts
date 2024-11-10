@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 193
-        versionName = "1.44.4"
+        versionCode = 194
+        versionName = "1.45.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -75,6 +75,9 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.jsoup)
     implementation(libs.swiperefreshlayout)
+    implementation(libs.transition.ktx)
+    implementation(libs.kotlinx.coroutine.android)
+    implementation(libs.disklrucache)
 
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.extensions)
@@ -98,10 +101,6 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
     implementation(libs.coil.video)
-
-    implementation(libs.kotlinx.coroutine.android)
-
-    implementation(libs.disklrucache)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)

@@ -15,16 +15,17 @@
     <action
         android:id="@+id/action_global_personTabbedFragment2"
         app:destination="@id/personTabbedFragment2"
-        app:enterAnim="@anim/slide_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/slide_out" />
-    <action android:id="@+id/action_global_settingsFragment"
+        app:enterAnim="@animator/slide_in"
+        app:exitAnim="@animator/fade_out"
+        app:popEnterAnim="@animator/fade_in"
+        app:popExitAnim="@animator/fade_out" />
+    <action
+        android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settings"
-        app:enterAnim="@anim/slide_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/slide_out">
+        app:enterAnim="@animator/slide_in"
+        app:exitAnim="@animator/fade_out"
+        app:popEnterAnim="@animator/fade_in"
+        app:popExitAnim="@animator/fade_out">
         <argument
             android:name="link"
             app:argType="string"
@@ -197,7 +198,13 @@
             android:id="@+id/action_communityInfoFragment_to_createOrEditCommunityFragment"
             app:destination="@id/createOrEditCommunityFragment" />
     </fragment>
-    <action android:id="@+id/action_global_communityInfoFragment" app:destination="@id/communityInfoFragment"/>
+    <action
+        android:id="@+id/action_global_communityInfoFragment"
+        app:destination="@id/communityInfoFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
     <include app:graph="@navigation/settings"/>
     <fragment
         android:id="@+id/searchFragment"

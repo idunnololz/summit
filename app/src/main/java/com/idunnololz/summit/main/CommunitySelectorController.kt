@@ -58,6 +58,7 @@ import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
+import com.idunnololz.summit.util.newBottomSheetPredictiveBackBackPressHandler
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.toErrorMessage
@@ -120,12 +121,6 @@ class CommunitySelectorController @AssistedInject constructor(
     var onCommunityInfoClick: ((CommunityRef) -> Unit)? = null
     var onChangeInstanceClick: (() -> Unit)? = null
 
-    private val onBackPressedHandler = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            onBackPressed()
-        }
-    }
-
     private val insetObserver: Observer<ActivityInsets> = Observer { insets ->
         binding.csBottomSheetContainerInner.updateLayoutParams<MarginLayoutParams> {
             topMargin = insets.topInset
@@ -135,6 +130,14 @@ class CommunitySelectorController @AssistedInject constructor(
     }
 
     private var removeView: (() -> Unit)? = null
+
+    private val onBackPressedHandler =
+        newBottomSheetPredictiveBackBackPressHandler(
+            context,
+            { binding.csBottomSheetContainerInner }
+        ) {
+            onBackPressed()
+        }
 
     init {
         viewModel.siteOrCommunity.observe(viewLifecycleOwner) {

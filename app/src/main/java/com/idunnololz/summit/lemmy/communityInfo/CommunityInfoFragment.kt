@@ -136,8 +136,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         }
 
         requireMainActivity().apply {
-            setupForFragment<CommunityInfoFragment>()
-
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
                 binding.coordinatorLayout,
@@ -363,6 +361,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         if (savedInstanceState == null && !wasLoadedBefore) {
             wasLoadedBefore = true
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setupForFragment<CommunityInfoFragment>()
     }
 
     private fun loadPage(data: CommunityInfoData) {

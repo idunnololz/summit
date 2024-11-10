@@ -6,15 +6,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.activity.BackEventCompat
+import androidx.activity.ComponentDialog
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
+import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
+import kotlin.math.max
 
 open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
+
+    companion object {
+        val gestureInterpolator = PathInterpolatorCompat
+            .create(0f, 0f, 0f, 1f)
+    }
+
     fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
 
@@ -24,6 +37,9 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     val binding get() = _binding!!
 
     private val isFullscreen: Boolean = this is FullscreenDialogFragment
+
+    private var _onBackPressedDispatcher: OnBackPressedDispatcher? = null
+    val onBackPressedDispatcher get() = _onBackPressedDispatcher!!
 
     fun isBindingAvailable(): Boolean = _binding != null
 
@@ -68,17 +84,9 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        if (this is BackPressHandler) {
-            val dialog = object : Dialog(requireActivity(), theme) {
-                override fun onBackPressed() {
-                    (this@BaseDialogFragment as BackPressHandler).onBackPressed()
-                }
-            }
-
-            return dialog
+        return super.onCreateDialog(savedInstanceState).also {
+            _onBackPressedDispatcher = (it as ComponentDialog).onBackPressedDispatcher
         }
-
-        return super.onCreateDialog(savedInstanceState)
     }
 
     @CallSuper
@@ -117,6 +125,62 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         MyLog.d(logTag, "Lifecycle: onViewCreated()")
         super.onViewCreated(view, savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            getPredictiveBackBackPressCallback(),
+        )
+    }
+
+    open fun getPredictiveBackBackPressCallback() : OnBackPressedCallback {
+        val predictiveBackMargin = resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
+        var initialTouchY = -1f
+        return object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // This invokes the sharedElementReturnTransition, which is
+                // MaterialContainerTransform.
+                dismiss()
+            }
+
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                val background = dialog?.window?.decorView ?: return
+                val progress = gestureInterpolator.getInterpolation(backEvent.progress)
+                if (initialTouchY < 0f) {
+                    initialTouchY = backEvent.touchY
+                }
+                val progressY = gestureInterpolator.getInterpolation(
+                    (backEvent.touchY - initialTouchY) / background.height
+                )
+
+                // See the motion spec about the calculations below.
+                // https://developer.android.com/design/ui/mobile/guides/patterns/predictive-back#motion-specs
+
+                // Shift horizontally.
+                val maxTranslationX = (background.width / 20) - predictiveBackMargin
+                background.translationX = progress * maxTranslationX *
+                    (if (backEvent.swipeEdge == BackEventCompat.EDGE_LEFT) 1 else -1)
+
+                // Shift vertically.
+                val maxTranslationY = (background.height / 20) - predictiveBackMargin
+                background.translationY = progressY * maxTranslationY
+
+                // Scale down from 100% to 90%.
+                val scale = 1f - (0.1f * progress)
+                background.scaleX = scale
+                background.scaleY = scale
+            }
+
+            override fun handleOnBackCancelled() {
+                val background = dialog?.window?.decorView ?: return
+                initialTouchY = -1f
+                background.run {
+                    translationX = 0f
+                    translationY = 0f
+                    scaleX = 1f
+                    scaleY = 1f
+                }
+            }
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -149,3 +213,13 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 }
+
+fun BaseDialogFragment<*>.newPredictiveBackBackPressHandler(
+    getBottomMenu: () -> BottomMenu?,
+): OnBackPressedCallback =
+    newBottomSheetPredictiveBackBackPressHandler(
+        requireContext(),
+        { getBottomMenu()?.bottomSheetView }
+    ) {
+        dismiss()
+    }

@@ -7,21 +7,23 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.BackEventCompat
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentBottomMenuBinding
 import com.idunnololz.summit.settings.RadioGroupSettingItem
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.newPredictiveBackBackPressHandler
+import kotlin.math.max
 
 class MultipleChoiceDialogFragment :
     BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
-    FullscreenDialogFragment,
-    BackPressHandler {
+    FullscreenDialogFragment {
 
     companion object {
         private const val ARG_SETTING_ITEM = "ARG_SETTING_ITEM"
@@ -159,14 +161,7 @@ class MultipleChoiceDialogFragment :
         bottomMenu?.close()
     }
 
-    override fun onBackPressed(): Boolean {
-        bottomMenu?.close()
+    override fun getPredictiveBackBackPressCallback(): OnBackPressedCallback =
+        newPredictiveBackBackPressHandler { bottomMenu }
 
-        return true
-    }
-
-    //    override fun onDismiss(dialog: DialogInterface) {
-//        super.onDismiss(dialog)
-//
-//    }
 }

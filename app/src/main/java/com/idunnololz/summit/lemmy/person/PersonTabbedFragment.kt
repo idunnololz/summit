@@ -112,8 +112,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         val mainActivity = requireMainActivity()
 
         requireMainActivity().apply {
-            setupForFragment<PersonTabbedFragment>()
-
             setSupportActionBar(binding.toolbar)
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -347,6 +345,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     override fun onResume() {
         super.onResume()
+
+        setupForFragment<PersonTabbedFragment>()
 
         if (binding.viewPager.currentItem == 0) {
             getMainActivity()?.setNavUiOpenPercent(0f)

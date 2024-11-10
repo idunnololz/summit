@@ -45,4 +45,5 @@
     <dimen name="conversation_bubble_padding">60dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="emoji_item_width">140dp</dimen>
+    <dimen name="predictive_back_margin">16dp</dimen>
 </resources>

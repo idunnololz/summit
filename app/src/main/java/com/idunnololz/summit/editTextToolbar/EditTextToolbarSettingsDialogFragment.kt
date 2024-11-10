@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +18,6 @@ import com.idunnololz.summit.databinding.DialogFragmentEditTextToolbarSettingsBi
 import com.idunnololz.summit.databinding.TextFieldToolbarOptionItemBinding
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -24,6 +25,9 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.Collections
 import javax.inject.Inject
 
@@ -31,7 +35,6 @@ import javax.inject.Inject
 class EditTextToolbarSettingsDialogFragment :
     BaseDialogFragment<DialogFragmentEditTextToolbarSettingsBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -48,6 +51,17 @@ class EditTextToolbarSettingsDialogFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            AlertDialogFragment.Builder()
+                .setTitle(R.string.error_unsaved_changes)
+                .setMessage(R.string.error_multi_community_unsaved_changes)
+                .setPositiveButton(R.string.proceed_anyways)
+                .setNegativeButton(R.string.cancel)
+                .createAndShow(childFragmentManager, "UnsavedChanges")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +107,7 @@ class EditTextToolbarSettingsDialogFragment :
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
 
             val textFieldToolbarSettings = textFieldToolbarManager.textFieldToolbarSettings.value
@@ -139,26 +153,18 @@ class EditTextToolbarSettingsDialogFragment :
                 )
                 dismiss()
             }
-        }
-    }
 
-    override fun onBackPressed(): Boolean {
-        if (adapter?.changed == true) {
-            AlertDialogFragment.Builder()
-                .setTitle(R.string.error_unsaved_changes)
-                .setMessage(R.string.error_multi_community_unsaved_changes)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(childFragmentManager, "UnsavedChanges")
-            return true
+            viewLifecycleOwner.lifecycleScope.launch {
+                adapter.changed.collect { unsavedChanges ->
+                    unsavedChangesBackPressedHandler.isEnabled = unsavedChanges
+                }
+            }
         }
 
-        try {
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
-        }
-        return true
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            unsavedChangesBackPressedHandler,
+        )
     }
 
     sealed interface Item {
@@ -177,7 +183,7 @@ class EditTextToolbarSettingsDialogFragment :
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var items: List<Item> = listOf()
-        var changed: Boolean = false
+        var changed = MutableStateFlow(false)
         private val ith: ItemTouchHelper
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -190,7 +196,6 @@ class EditTextToolbarSettingsDialogFragment :
         )
 
         init {
-
             refreshItems()
 
             val callback = object : ItemTouchHelper.SimpleCallback(
@@ -274,7 +279,7 @@ class EditTextToolbarSettingsDialogFragment :
             items = mutableItems
             adapterHelper.setItems(items, this)
 
-            changed = true
+            changed.value = true
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =

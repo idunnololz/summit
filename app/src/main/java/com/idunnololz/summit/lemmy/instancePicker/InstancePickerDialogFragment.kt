@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
 import androidx.core.widget.addTextChangedListener
@@ -18,7 +19,6 @@ import com.idunnololz.summit.databinding.DialogFragmentInstancePickerBinding
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
@@ -32,8 +32,7 @@ import kotlinx.parcelize.Parcelize
 @AndroidEntryPoint
 class InstancePickerDialogFragment :
     BaseDialogFragment<DialogFragmentInstancePickerBinding>(),
-    FullscreenDialogFragment,
-    BackPressHandler {
+    FullscreenDialogFragment {
 
     companion object {
         const val REQUEST_KEY = "InstancePickerDialogFragment_req_key"
@@ -57,6 +56,12 @@ class InstancePickerDialogFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    private val searchEditTextPressedHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            binding.searchEditText.setText("")
+        }
+    }
 
     @Parcelize
     data class Result(
@@ -107,6 +112,8 @@ class InstancePickerDialogFragment :
                     resultsRecyclerView.scrollToPosition(0)
                 }
                 viewModel.doQuery(query)
+
+                searchEditTextPressedHandler.isEnabled = query.isNotEmpty()
             }
             searchBar.hint = viewModel.instance
             searchEditText.hint = viewModel.instance
@@ -165,19 +172,10 @@ class InstancePickerDialogFragment :
                 }
             }
         }
-    }
 
-    override fun onBackPressed(): Boolean {
-        if (!binding.searchEditText.text.isNullOrBlank()) {
-            binding.searchEditText.setText("")
-            return true
-        }
-
-        try {
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
-        }
-        return true
+        onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            searchEditTextPressedHandler,
+        )
     }
 }

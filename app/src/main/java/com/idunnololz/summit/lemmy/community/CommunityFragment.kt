@@ -25,6 +25,7 @@ import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialSharedAxis
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -155,7 +156,7 @@ class CommunityFragment :
 
     private var isCustomAppBarExpandedPercent = 0f
 
-    private lateinit var lemmyAppBarController: LemmyAppBarController
+    private var lemmyAppBarController: LemmyAppBarController? = null
 
     private var swipeActionCallback: LemmySwipeActionCallback? = null
     private var itemTouchHelper: ItemTouchHelper? = null
@@ -493,16 +494,17 @@ class CommunityFragment :
             mainActivity = requireMainActivity(),
             binding = binding.customAppBar,
             accountInfoManager = accountInfoManager,
+            state = lemmyAppBarController?.state,
         )
 
         viewModel.defaultCommunity.observe(viewLifecycleOwner) {
-            lemmyAppBarController.setDefaultCommunity(it)
+            lemmyAppBarController?.setDefaultCommunity(it)
         }
         viewModel.currentAccount.observe(viewLifecycleOwner) {
-            lemmyAppBarController.onAccountChanged(it)
+            lemmyAppBarController?.onAccountChanged(it)
         }
         viewModel.sortOrder.observe(viewLifecycleOwner) {
-            lemmyAppBarController.setSortOrder(it)
+            lemmyAppBarController?.setSortOrder(it)
         }
 
         installOnActionResultHandler(
@@ -546,7 +548,7 @@ class CommunityFragment :
 
                 updateFabState()
             }
-            lemmyAppBarController.setup(
+            lemmyAppBarController?.setup(
                 communitySelectedListener = { controller, communityRef ->
                     val action = CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
                         communityRef = communityRef,
@@ -1091,7 +1093,7 @@ class CommunityFragment :
         viewModel.changeCommunity(args.communityRef)
 
         runOnReady {
-            val customAppBarController = lemmyAppBarController
+            val customAppBarController = lemmyAppBarController ?: return@runOnReady
 
             viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
                 customAppBarController.setCommunity(it)
@@ -1633,7 +1635,7 @@ class CommunityFragment :
                 }
             }
             R.id.browse_communities -> {
-                lemmyAppBarController.showCommunitySelector()
+                lemmyAppBarController?.showCommunitySelector()
             }
             R.id.settings -> {
                 requireMainActivity().openSettings()

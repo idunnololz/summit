@@ -8,6 +8,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnPreDraw
@@ -39,6 +40,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
+import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -73,6 +75,7 @@ import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.util.AnimationsHelper
+import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
@@ -100,6 +103,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.max
 
 @AndroidEntryPoint
 class PostFragment :
@@ -167,6 +171,17 @@ class PostFragment :
                     idToCommentsSortOrder(menuItem.id) ?: CommentsSortOrder.Hot,
                 )
             }
+        }
+    }
+
+    private val findInPageBackPressHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.findInPageVisible.value = false
+        }
+    }
+    private val screenshotModeBackPressHandler = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            viewModel.screenshotMode.value = false
         }
     }
 
@@ -271,26 +286,53 @@ class PostFragment :
         }
 
         if (!args.isSinglePage) {
+            val predictiveBackMargin = resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
+            var initialTouchY = -1f
+
             requireMainActivity().onBackPressedDispatcher
                 .addCallback(
                     this,
                     object : OnBackPressedCallback(true) {
                         override fun handleOnBackPressed() {
-                            if (viewModel.findInPageVisible.value == true) {
-                                viewModel.findInPageVisible.value = false
-                                return
-                            }
-                            if (viewModel.screenshotMode.value == true) {
-                                viewModel.screenshotMode.value = false
-                                return
-                            }
-
                             goBack()
+                        }
+
+                        override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                            val background = binding.root
+                            val progress = gestureInterpolator.getInterpolation(backEvent.progress)
+                            if (initialTouchY < 0f) {
+                                initialTouchY = backEvent.touchY
+                            }
+                            // See the motion spec about the calculations below.
+                            // https://developer.android.com/design/ui/mobile/guides/patterns/predictive-back#motion-specs
+
+                            // Shift horizontally.
+                            val maxTranslationX = (background.width / 20) - predictiveBackMargin
+                            background.translationX = progress * maxTranslationX
+                        }
+
+                        override fun handleOnBackCancelled() {
+                            val background = binding.root
+                            initialTouchY = -1f
+                            background.run {
+                                translationX = 0f
+                            }
                         }
                     },
                 )
         } else {
             // do things if this is a single page
+        }
+
+        requireMainActivity().onBackPressedDispatcher.apply {
+            addCallback(
+                this@PostFragment,
+                findInPageBackPressHandler
+            )
+            addCallback(
+                this@PostFragment,
+                screenshotModeBackPressHandler
+            )
         }
 
         moreActionsHelper.setPageInstance(getInstance())
@@ -308,6 +350,9 @@ class PostFragment :
                 fragment.closePost(this@PostFragment)
             }
             is SearchTabbedFragment -> {
+                fragment.closePost(this@PostFragment)
+            }
+            is HistoryFragment -> {
                 fragment.closePost(this@PostFragment)
             }
         }
@@ -658,6 +703,8 @@ class PostFragment :
                 viewModel.findInPageQuery.value = ""
                 Utils.hideKeyboard(activity)
             }
+
+            findInPageBackPressHandler.isEnabled = showFindInPage
         }
         viewModel.findInPageQuery.observe(viewLifecycleOwner) {
             adapter?.setQuery(it) {
@@ -676,8 +723,9 @@ class PostFragment :
                     "${viewModel.queryMatchHelper.matchCount}"
             }
         }
-        viewModel.screenshotMode.observe(viewLifecycleOwner) {
-            updateScreenshotMode(it)
+        viewModel.screenshotMode.observe(viewLifecycleOwner) { showScreenshotMode ->
+            updateScreenshotMode(showScreenshotMode)
+            screenshotModeBackPressHandler.isEnabled = showScreenshotMode
         }
 
         binding.nextResult.setOnClickListener {

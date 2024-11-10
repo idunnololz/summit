@@ -23,7 +23,6 @@ import com.idunnololz.summit.databinding.ImportSettingItemBinding
 import com.idunnololz.summit.databinding.ImportSettingsFromBackupsBinding
 import com.idunnololz.summit.settings.backupAndRestore.ImportSettingsViewModel.SettingsDataPreview
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.Utils
@@ -40,7 +39,6 @@ import javax.inject.Inject
 class ImportSettingsDialogFragment :
     BaseDialogFragment<DialogFragmentImportSettingsBinding>(),
     FullscreenDialogFragment,
-    BackPressHandler,
     AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
@@ -110,7 +108,7 @@ class ImportSettingsDialogFragment :
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
 
             importFromCode.setOnClickListener {
@@ -256,15 +254,6 @@ class ImportSettingsDialogFragment :
                 viewModel.confirmImport(adapter.excludeKeys)
             }
         }
-    }
-
-    override fun onBackPressed(): Boolean {
-        try {
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
-        }
-        return true
     }
 
     private class SettingDataAdapter(

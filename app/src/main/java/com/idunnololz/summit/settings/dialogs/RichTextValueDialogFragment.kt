@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.github.drjacky.imagepicker.ImagePicker
@@ -16,7 +17,6 @@ import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.util.BackPressHandler
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
@@ -27,8 +27,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RichTextValueDialogFragment :
-    BaseDialogFragment<DialogFragmentRichTextValueBinding>(),
-    BackPressHandler {
+    BaseDialogFragment<DialogFragmentRichTextValueBinding>() {
 
     companion object {
         private const val ARG_TITLE = "ARG_TITLE"
@@ -60,8 +59,6 @@ class RichTextValueDialogFragment :
                 }
             }
         }
-
-    private var currentBottomMenu: BottomMenu? = null
 
     @Inject
     lateinit var preferences: Preferences
@@ -171,10 +168,10 @@ class RichTextValueDialogFragment :
                         bottomMenuContainer = requireMainActivity(),
                         bottomSheetContainer = binding.root,
                         expandFully = true,
-                        handleBackPress = false,
+                        handleBackPress = true,
                         handleInsets = false,
+                        onBackPressedDispatcher = onBackPressedDispatcher,
                     )
-                    currentBottomMenu = bottomMenu
                 },
                 onPreviewClick = {
                     PreviewCommentDialogFragment()
@@ -232,21 +229,5 @@ class RichTextValueDialogFragment :
                 dismiss()
             }
         }
-    }
-
-    override fun onBackPressed(): Boolean {
-        if (isBindingAvailable()) {
-            if (currentBottomMenu?.close() == true) {
-                currentBottomMenu = null
-                return true
-            }
-        }
-
-        try {
-            dismiss()
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
-        }
-        return true
     }
 }
