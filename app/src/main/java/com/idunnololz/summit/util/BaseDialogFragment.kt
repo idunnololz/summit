@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,29 +46,6 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
     fun setBinding(binding: T) {
         _binding = binding
-    }
-
-    fun runOnUiThread(r: () -> Unit) {
-        runOnUiThread(
-            Runnable {
-                r()
-            },
-        )
-    }
-
-    fun runOnUiThread(r: Runnable) {
-        if (isAdded) {
-            activity?.runOnUiThread(fun() {
-                val act = activity
-                if (act == null || act.isFinishing) return
-
-                try {
-                    r.run()
-                } catch (e: IllegalStateException) {
-                    /* do nothing */
-                }
-            })
-        }
     }
 
     override fun onStart() {
@@ -135,11 +113,21 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     open fun getPredictiveBackBackPressCallback() : OnBackPressedCallback {
         val predictiveBackMargin = resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
         var initialTouchY = -1f
+
         return object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 // This invokes the sharedElementReturnTransition, which is
                 // MaterialContainerTransform.
                 dismiss()
+            }
+
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+                super.handleOnBackStarted(backEvent)
+
+                val background = dialog?.window?.decorView ?: return
+                val focus = background.findFocus()
+
+                focus?.clearFocus()
             }
 
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {

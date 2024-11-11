@@ -136,6 +136,8 @@ class CreateOrEditPostFragment :
         }
     }
 
+    private var isSent: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -248,6 +250,7 @@ class CreateOrEditPostFragment :
                     }
 
                     createPost()
+
                     true
                 }
                 R.id.update_post -> {
@@ -548,6 +551,7 @@ class CreateOrEditPostFragment :
                         ),
                     )
 
+                    isSent = true
                     dismiss()
                 }
             }
@@ -977,8 +981,10 @@ class CreateOrEditPostFragment :
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
-        if (preferences.saveDraftsAutomatically) {
-            saveDraft()
+        if (!isSent) {
+            if (preferences.saveDraftsAutomatically) {
+                saveDraft()
+            }
         }
     }
 

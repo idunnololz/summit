@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback

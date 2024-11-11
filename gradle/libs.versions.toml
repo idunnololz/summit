@@ -24,6 +24,7 @@ viewpump = "2.0.3"
 work = "2.10.0"
 coil = "2.5.0"
 retrofit = "2.11.0"
+jetbrainsKotlinJvm = "2.0.21"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -133,3 +134,4 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android-extensions = { id = "org.jetbrains.kotlin.android.extensions", version.ref = "kotlin" }
 navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.1.0" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

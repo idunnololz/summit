@@ -8,16 +8,21 @@ import android.os.Parcelable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -74,8 +79,11 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
+import kotlin.math.max
 
 @AndroidEntryPoint
 class AddOrEditCommentFragment :
@@ -170,6 +178,10 @@ class AddOrEditCommentFragment :
     lateinit var animationsHelper: AnimationsHelper
 
     private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
+
+    private var isSent: Boolean = false
+
+    private val keyboardHiddenState = MutableStateFlow(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -404,6 +416,7 @@ class AddOrEditCommentFragment :
                         ),
                     )
 
+                    isSent = true
                     dismiss()
                 }
             }
@@ -414,6 +427,13 @@ class AddOrEditCommentFragment :
         }
 
         with(binding) {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+                val imeInset = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
+
+                keyboardHiddenState.value = imeInset.bottom == 0
+
+                WindowInsetsCompat.CONSUMED
+            }
 
             toolbar.inflateMenu(R.menu.menu_add_or_edit_comment)
 
@@ -448,7 +468,7 @@ class AddOrEditCommentFragment :
                                 .createAndShow(this@AddOrEditCommentFragment, "send_comment")
                             return@a true
                         }
-                        when (args.sendAction as SendAction) {
+                        when (args.sendAction) {
                             SendAction.Send -> {
                                 sendComment()
                             }
@@ -463,6 +483,8 @@ class AddOrEditCommentFragment :
                                         ),
                                     ),
                                 )
+
+                                isSent = true
                                 dismiss()
                             }
                         }
@@ -564,6 +586,16 @@ class AddOrEditCommentFragment :
                 commentEditText.requestFocus()
             }
             setup(savedInstanceState)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                keyboardHiddenState.collect {
+                    if (it) {
+                        if (commentEditText.isFocused) {
+                            commentEditText.clearFocus()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -590,7 +622,7 @@ class AddOrEditCommentFragment :
                 },
             ),
             requireNotNull(args.editCommentView?.comment?.id),
-            binding.commentEditor.editText?.text.toString(),
+            binding.commentEditText.text.toString(),
         )
     }
 
@@ -615,20 +647,20 @@ class AddOrEditCommentFragment :
             viewModel.sendComment(
                 account,
                 personId,
-                binding.commentEditor.editText?.text.toString(),
+                binding.commentEditText.text.toString(),
             )
         } else if (personRef != null) {
             viewModel.sendComment(
                 account,
                 personRef,
-                binding.commentEditor.editText?.text.toString(),
+                binding.commentEditText.text.toString(),
             )
         } else if (inboxItem != null) {
             viewModel.sendComment(
                 account,
                 args.instance,
                 inboxItem,
-                binding.commentEditor.editText?.text.toString(),
+                binding.commentEditText.text.toString(),
             )
         } else {
             viewModel.sendComment(
@@ -642,7 +674,7 @@ class AddOrEditCommentFragment :
                     },
                 ),
                 args.commentView?.comment?.id,
-                binding.commentEditor.editText?.text.toString(),
+                binding.commentEditText.text.toString(),
             )
         }
     }
@@ -735,14 +767,14 @@ class AddOrEditCommentFragment :
         val commentView = args.commentView
         val inboxItem = args.inboxItem
 
-        val commentEditor = binding.commentEditor
+        val commentEditor = binding.commentEditText
         if (isEdit()) {
             val commentToEdit = requireNotNull(args.editCommentView)
             binding.contextContainer.visibility = View.GONE
             binding.divider.visibility = View.GONE
 
             if (savedInstanceState == null) {
-                commentEditor.editText?.setText(commentToEdit.comment.content)
+                commentEditor.setText(commentToEdit.comment.content)
             }
         } else if (commentView != null) {
             binding.replyingTo.text = commentView.comment.content
@@ -784,25 +816,27 @@ class AddOrEditCommentFragment :
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
 
-        try {
-            if (args.sendAction == SendAction.ReturnTextAsResult) {
-                setFragmentResult(
-                    requestKey = REQUEST_KEY,
-                    result = bundleOf(
-                        REQUEST_KEY_RESULT to Result(
-                            wasCommentSent = false,
-                            didUserTapSend = false,
-                            content = binding.commentEditText.text?.toString(),
+        if (!isSent) {
+            try {
+                if (args.sendAction == SendAction.ReturnTextAsResult) {
+                    setFragmentResult(
+                        requestKey = REQUEST_KEY,
+                        result = bundleOf(
+                            REQUEST_KEY_RESULT to Result(
+                                wasCommentSent = false,
+                                didUserTapSend = false,
+                                content = binding.commentEditText.text?.toString(),
+                            ),
                         ),
-                    ),
-                )
-            } else {
-                if (preferences.saveDraftsAutomatically) {
-                    saveDraft()
+                    )
+                } else {
+                    if (preferences.saveDraftsAutomatically) {
+                        saveDraft()
+                    }
                 }
+            } catch (e: IllegalStateException) {
+                // do nothing... very rare
             }
-        } catch (e: IllegalStateException) {
-            // do nothing... very rare
         }
     }
 
