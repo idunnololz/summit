@@ -82,7 +82,6 @@
                 app:layout_constraintBottom_toTopOf="@+id/login"
                 app:passwordToggleEnabled="true">
 
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_edit_text"
                     android:layout_width="match_parent"
