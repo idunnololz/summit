@@ -131,15 +131,14 @@
         </provider>
 
         <provider
-            android:name="com.idunnololz.summit.search.SuggestionProvider"
-            android:authorities="com.idunnololz.summit.search.SuggestionProvider"
+            android:name=".search.SuggestionProvider"
+            android:authorities=".search.SuggestionProvider"
             android:exported="false"
             android:enabled="true" />
 
-
         <provider
-            android:name="com.idunnololz.summit.SummitFileProvider"
-            android:authorities="com.idunnololz.summit.fileprovider"
+            android:name=".SummitFileProvider"
+            android:authorities=".fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data
