@@ -3,7 +3,6 @@ package com.idunnololz.summit.scrape
 import android.os.Process
 import android.util.Log
 import androidx.annotation.StringRes
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.NETWORK_ERROR
@@ -15,6 +14,7 @@ import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.IDataCache
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.crashlytics
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
@@ -293,9 +293,8 @@ class WebsiteAdapterLoader {
                                             response.code,
                                             request.url.toString(),
                                         )
-                                        FirebaseCrashlytics.getInstance()
-                                            .setCustomKey(KEY_URL, tl.url)
-                                        FirebaseCrashlytics.getInstance().recordException(ex)
+                                        crashlytics?.setCustomKey(KEY_URL, tl.url)
+                                        crashlytics?.recordException(ex)
 
                                         Log.d(
                                             TAG,
@@ -305,7 +304,7 @@ class WebsiteAdapterLoader {
                                         tl.adapter.setError(
                                             when (response.code) {
                                                 HttpURLConnection.HTTP_UNAVAILABLE -> {
-                                                    WebsiteAdapter.SERVICE_UNAVAILABLE_ERROR
+                                                    SERVICE_UNAVAILABLE_ERROR
                                                 }
                                                 HttpURLConnection.HTTP_NOT_FOUND,
                                                 HttpURLConnection.HTTP_FORBIDDEN,
@@ -329,8 +328,7 @@ class WebsiteAdapterLoader {
                                         tl.adapter.isRedirected = response.isRedirect
                                         tl.adapter.redirectUrl = url.toString()
                                         if (tl.adapter.isRedirected) {
-                                            FirebaseCrashlytics.getInstance()
-                                                .log("Redirected to: $url")
+                                            crashlytics?.log("Redirected to: $url")
                                         }
                                     }
                                 }
@@ -349,7 +347,7 @@ class WebsiteAdapterLoader {
                                         )
                                     }
 
-                                    FirebaseCrashlytics.getInstance().setCustomKey(
+                                    crashlytics?.setCustomKey(
                                         "TL",
                                         tl.adapter.javaClass.canonicalName ?: "",
                                     )
@@ -390,8 +388,8 @@ class WebsiteAdapterLoader {
             } catch (e: Exception) {
                 tl.adapter.setError(WebsiteAdapter.UNKNOWN_ERROR)
                 Log.e(TAG, "", e)
-                FirebaseCrashlytics.getInstance().setCustomKey(KEY_URL, tl.url)
-                FirebaseCrashlytics.getInstance().recordException(e)
+                crashlytics?.setCustomKey(KEY_URL, tl.url)
+                crashlytics?.recordException(e)
                 iterator.remove()
             }
         } // while (iterator)
@@ -418,7 +416,7 @@ class WebsiteAdapterLoader {
                         if (result != null) {
                             adaptersLoaded.getAndIncrement()
                             Log.d(TAG, "Processing " + tl.url + " Size: " + result.length)
-                            FirebaseCrashlytics.getInstance().setCustomKey("website_url", tl.url)
+                            crashlytics?.setCustomKey("website_url", tl.url)
                             if (!result.isEmpty()) {
                                 processDocument(
                                     tl,

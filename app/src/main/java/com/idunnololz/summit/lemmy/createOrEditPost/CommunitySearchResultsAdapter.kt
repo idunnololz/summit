@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance

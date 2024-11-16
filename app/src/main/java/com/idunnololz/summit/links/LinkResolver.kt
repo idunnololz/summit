@@ -1,12 +1,12 @@
 package com.idunnololz.summit.links
 
 import android.net.Uri
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.moshi
 
 object LinkResolver {
@@ -147,7 +147,7 @@ object LinkResolver {
             }
             else -> {
                 if (mustHandle) {
-                    FirebaseCrashlytics.getInstance().recordException(
+                    crashlytics?.recordException(
                         RuntimeException("Unrecognized url format: $url"),
                     )
                     return defaultResult

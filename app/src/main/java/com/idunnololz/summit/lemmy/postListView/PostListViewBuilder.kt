@@ -990,8 +990,8 @@ class PostListViewBuilder @Inject constructor(
             }
 
             if (postView.counts.comments == postView.unread_comments ||
-                postView.unread_comments <= 0) {
-
+                postView.unread_comments <= 0
+            ) {
                 commentText?.text = LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
             } else {
                 commentText?.text =
@@ -1431,7 +1431,7 @@ class PostListViewBuilder @Inject constructor(
 
 val ViewBinding.communityLayout: CommunityLayout?
     get() =
-        when(this) {
+        when (this) {
             is ListingItemCompactBinding -> CommunityLayout.Compact
             is ListingItemListBinding -> CommunityLayout.List
             is ListingItemListWithCardsBinding -> CommunityLayout.ListWithCards

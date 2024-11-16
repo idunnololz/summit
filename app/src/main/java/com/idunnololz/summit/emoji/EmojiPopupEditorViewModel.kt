@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.emoji.db.TextEmojiEntry
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EmojiPopupEditorViewModel @Inject constructor(
-    private val textEmojisManager: TextEmojisManager
+    private val textEmojisManager: TextEmojisManager,
 ) : ViewModel() {
 
     val model = StatefulLiveData<EmojiPopupEditorModel>()
@@ -21,8 +21,8 @@ class EmojiPopupEditorViewModel @Inject constructor(
         viewModelScope.launch {
             model.postValue(
                 EmojiPopupEditorModel(
-                    emojis = textEmojisManager.getAllEmojis(reload = force)
-                )
+                    emojis = textEmojisManager.getAllEmojis(reload = force),
+                ),
             )
         }
     }
@@ -54,6 +54,5 @@ class EmojiPopupEditorViewModel @Inject constructor(
 }
 
 data class EmojiPopupEditorModel(
-    val emojis: List<TextEmoji>
-) {
-}
+    val emojis: List<TextEmoji>,
+)

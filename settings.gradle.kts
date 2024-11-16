@@ -1,6 +1,7 @@
 include(":app")
-include(":overlappingPane")
 include(":calligraphy")
+include(":gravitySnapHelper")
+include(":overlappingPane")
 
 rootProject.name = "summit"
 

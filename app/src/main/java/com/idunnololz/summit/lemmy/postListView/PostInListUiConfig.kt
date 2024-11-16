@@ -123,10 +123,12 @@ val CommunityLayout.defaultDimReadPosts
         when (this) {
             CommunityLayout.Compact,
             CommunityLayout.List,
-            CommunityLayout.ListWithCards -> false
+            CommunityLayout.ListWithCards,
+            -> false
             CommunityLayout.LargeList,
             CommunityLayout.Card,
             CommunityLayout.Card2,
             CommunityLayout.Card3,
-            CommunityLayout.Full -> true
+            CommunityLayout.Full,
+            -> true
         }

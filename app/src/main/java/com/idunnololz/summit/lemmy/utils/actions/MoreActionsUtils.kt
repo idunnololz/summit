@@ -4,7 +4,6 @@ import android.content.Intent
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
@@ -14,6 +13,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.getParcelableCompat
 import java.io.IOException
 import kotlinx.coroutines.flow.collect
@@ -327,7 +327,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
                                 }
                                 .show()
                         } else {
-                            FirebaseCrashlytics.getInstance().recordException(it)
+                            crashlytics?.recordException(it)
                             Snackbar
                                 .make(
                                     snackbarContainer,

@@ -255,7 +255,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                         url = url,
                         videoType = videoType,
                         videoState = videoState,
-                        autoPlay = preferenceManager.currentPreferences.autoPlayVideos
+                        autoPlay = preferenceManager.currentPreferences.autoPlayVideos,
                     )
                 setupMoreButton(context, url, videoType)
             }

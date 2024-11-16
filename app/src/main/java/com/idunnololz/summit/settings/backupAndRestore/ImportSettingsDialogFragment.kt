@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.app.Dialog
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +18,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.BackupItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentImportSettingsBinding
-import com.idunnololz.summit.databinding.ImportSettingItemBinding
 import com.idunnololz.summit.databinding.ImportSettingsFromBackupsBinding
-import com.idunnololz.summit.settings.backupAndRestore.ImportSettingsViewModel.SettingsDataPreview
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -235,7 +232,6 @@ class ImportSettingsDialogFragment :
             confirmImportView.visibility = View.VISIBLE
 
             val adapter = SettingDataAdapter(
-                data,
                 onSettingPreviewClick = { settingKey, settingsDataPreview ->
                     ImportSettingItemPreviewDialogFragment.show(
                         childFragmentManager,
@@ -244,7 +240,12 @@ class ImportSettingsDialogFragment :
                         settingsDataPreview.keyToType[settingKey] ?: "?",
                     )
                 },
-            )
+                onDeleteClick = {
+                    excludeKeys.add(it)
+                },
+            ).apply {
+                setData(data)
+            }
 
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(context)
@@ -253,113 +254,6 @@ class ImportSettingsDialogFragment :
             confirmImport.setOnClickListener {
                 viewModel.confirmImport(adapter.excludeKeys)
             }
-        }
-    }
-
-    private class SettingDataAdapter(
-        private val settingsDataPreview: SettingsDataPreview,
-        private val onSettingPreviewClick: (
-            settingKey: String,
-            settingsDataPreview: SettingsDataPreview,
-        ) -> Unit,
-    ) : Adapter<ViewHolder>() {
-
-        private sealed interface Item {
-            /**
-             * A single setting within the imported setting data.
-             */
-            data class ImportSettingItem(
-                val settingKey: String,
-                val value: Any,
-                val isExcluded: Boolean,
-            ) : Item
-        }
-
-        var excludeKeys = mutableSetOf<String>()
-
-        private val adapterHelper = AdapterHelper<Item>(
-            areItemsTheSame = { oldItem, newItem ->
-                oldItem::class == newItem::class && when (oldItem) {
-                    is Item.ImportSettingItem ->
-                        oldItem.settingKey == (newItem as Item.ImportSettingItem).settingKey
-                }
-            },
-        ).apply {
-            addItemType(
-                clazz = Item.ImportSettingItem::class,
-                inflateFn = ImportSettingItemBinding::inflate,
-            ) { item, b, h ->
-                b.settingTitle.visibility = View.GONE
-                b.settingKey.text = item.settingKey.lowercase()
-                b.settingValue.text = item.value.toString()
-                b.root.setOnClickListener {
-                    onSettingPreviewClick(item.settingKey, settingsDataPreview)
-                }
-
-                if (item.isExcluded) {
-                    b.settingKey.apply {
-                        paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        alpha = 0.5f
-                        invalidate()
-                    }
-                    b.settingValue.apply {
-                        paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                        alpha = 0.5f
-                        invalidate()
-                    }
-
-                    b.remove.setImageResource(R.drawable.baseline_add_24)
-                    b.remove.setOnClickListener {
-                        excludeKeys.remove(item.settingKey)
-                        updateItems()
-                    }
-                } else {
-                    b.settingKey.apply {
-                        paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                        alpha = 1f
-                        invalidate()
-                    }
-                    b.settingValue.apply {
-                        paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                        alpha = 1f
-                        invalidate()
-                    }
-                    b.remove.setImageResource(R.drawable.baseline_close_24)
-                    b.remove.setOnClickListener {
-                        excludeKeys.add(item.settingKey)
-                        updateItems()
-                    }
-                }
-            }
-        }
-
-        init {
-            updateItems()
-        }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        private fun updateItems() {
-            val newItems = mutableListOf<Item>()
-            val newData = settingsDataPreview
-
-            newData.settingsPreview.mapTo(newItems) {
-                Item.ImportSettingItem(
-                    settingKey = it.key,
-                    value = it.value,
-                    isExcluded = excludeKeys.contains(it.key),
-                )
-            }
-
-            adapterHelper.setItems(newItems, this)
         }
     }
 

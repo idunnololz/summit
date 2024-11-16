@@ -22,12 +22,11 @@ import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
-import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.tsToShortDate
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint

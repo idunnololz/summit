@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.idunnololz.summit.R
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.MentionsPopupBinding
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.setup
 
 class MentionsAutoCompletePopupWindow(

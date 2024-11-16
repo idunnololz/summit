@@ -7,8 +7,8 @@ import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.util.crashlytics
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.MarkwonVisitor
@@ -187,8 +187,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
             }
         } catch (e: Exception) {
             Log.d(TAG, "Spoiler error", e)
-            FirebaseCrashlytics.getInstance().recordException(
-                RuntimeException("Spoiler error", e),
+            crashlytics?.recordException(RuntimeException("Spoiler error", e),
             )
         }
     }

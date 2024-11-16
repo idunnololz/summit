@@ -43,7 +43,7 @@ class UploadHelper @Inject constructor(
         context = context,
         apiListenerManager = apiListenerManager,
         preferences = preferences,
-        cachePolicyManager = cachePolicyManager
+        cachePolicyManager = cachePolicyManager,
     )
 
     private var uploadJob: Job? = null
@@ -120,12 +120,14 @@ class UploadHelper @Inject constructor(
                             if (it.link != null) {
                                 Result.success(UploadImageResult(it.link))
                             } else {
-                                Result.failure(RuntimeException("Upload success but no link returned."))
+                                Result.failure(
+                                    RuntimeException("Upload success but no link returned."),
+                                )
                             }
                         },
                         {
                             Result.failure(it)
-                        }
+                        },
                     )
             }
 

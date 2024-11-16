@@ -25,6 +25,11 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove"
+            />
 
         <activity
             android:configChanges="layoutDirection|locale"
@@ -131,14 +136,14 @@
         </provider>
 
         <provider
-            android:name=".search.SuggestionProvider"
-            android:authorities=".search.SuggestionProvider"
+            android:name="com.idunnololz.summit.search.SuggestionProvider"
+            android:authorities="com.idunnololz.summit.search.SuggestionProvider"
             android:exported="false"
             android:enabled="true" />
 
         <provider
-            android:name=".SummitFileProvider"
-            android:authorities=".fileprovider"
+            android:name="com.idunnololz.summit.SummitFileProvider"
+            android:authorities="com.idunnololz.summit.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data

@@ -46,4 +46,5 @@
     <dimen name="icon_size">24dp</dimen>
     <dimen name="emoji_item_width">140dp</dimen>
     <dimen name="predictive_back_margin">16dp</dimen>
+    <dimen name="search_home_items_width">140dp</dimen>
 </resources>

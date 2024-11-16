@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.idunnololz.overlappingpane"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21

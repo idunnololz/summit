@@ -1,11 +1,11 @@
 package com.idunnololz.summit.filterLists
 
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.util.crashlytics
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,7 +41,7 @@ class ContentFiltersManager @Inject constructor(
                     val e = TooManyFiltersException(filterCount)
 
                     Log.e(TAG, "", e)
-                    FirebaseCrashlytics.getInstance().recordException(e)
+                    crashlytics?.recordException(e)
                 }
             }
         }

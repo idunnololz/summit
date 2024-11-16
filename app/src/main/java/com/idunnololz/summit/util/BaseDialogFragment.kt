@@ -2,7 +2,6 @@ package com.idunnololz.summit.util
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,6 @@ import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
-import kotlin.math.max
 
 open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
@@ -110,7 +108,7 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         )
     }
 
-    open fun getPredictiveBackBackPressCallback() : OnBackPressedCallback {
+    open fun getPredictiveBackBackPressCallback(): OnBackPressedCallback {
         val predictiveBackMargin = resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
         var initialTouchY = -1f
 
@@ -137,7 +135,7 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
                     initialTouchY = backEvent.touchY
                 }
                 val progressY = gestureInterpolator.getInterpolation(
-                    (backEvent.touchY - initialTouchY) / background.height
+                    (backEvent.touchY - initialTouchY) / background.height,
                 )
 
                 // See the motion spec about the calculations below.
@@ -204,10 +202,9 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
 fun BaseDialogFragment<*>.newPredictiveBackBackPressHandler(
     getBottomMenu: () -> BottomMenu?,
-): OnBackPressedCallback =
-    newBottomSheetPredictiveBackBackPressHandler(
-        requireContext(),
-        { getBottomMenu()?.bottomSheetView }
-    ) {
-        dismiss()
-    }
+): OnBackPressedCallback = newBottomSheetPredictiveBackBackPressHandler(
+    requireContext(),
+    { getBottomMenu()?.bottomSheetView },
+) {
+    dismiss()
+}

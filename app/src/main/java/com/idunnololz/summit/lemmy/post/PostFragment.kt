@@ -103,7 +103,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.max
 
 @AndroidEntryPoint
 class PostFragment :
@@ -286,7 +285,9 @@ class PostFragment :
         }
 
         if (!args.isSinglePage) {
-            val predictiveBackMargin = resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
+            val predictiveBackMargin = resources.getDimensionPixelSize(
+                R.dimen.predictive_back_margin,
+            )
             var initialTouchY = -1f
 
             requireMainActivity().onBackPressedDispatcher
@@ -327,11 +328,11 @@ class PostFragment :
         requireMainActivity().onBackPressedDispatcher.apply {
             addCallback(
                 this@PostFragment,
-                findInPageBackPressHandler
+                findInPageBackPressHandler,
             )
             addCallback(
                 this@PostFragment,
-                screenshotModeBackPressHandler
+                screenshotModeBackPressHandler,
             )
         }
 

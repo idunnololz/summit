@@ -19,10 +19,7 @@ class LoginHelper @Inject constructor(
 
     private val apiClient = lemmyApiClientFactory.create()
 
-    suspend fun loginWithJwt(
-        instance: String,
-        jwt: String,
-    ): Result<Account> {
+    suspend fun loginWithJwt(instance: String, jwt: String): Result<Account> {
         apiClient.changeInstance(instance)
 
         val siteResult = apiClient.fetchSiteWithRetry(auth = jwt, force = true)

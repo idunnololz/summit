@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View

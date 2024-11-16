@@ -30,4 +30,4 @@ data class LocalSite(
     val updated: String? = null,
     val registration_mode: RegistrationMode /* "Closed" | "RequireApplication" | "Open" */,
     val reports_email_admins: Boolean,
-): Parcelable
+) : Parcelable

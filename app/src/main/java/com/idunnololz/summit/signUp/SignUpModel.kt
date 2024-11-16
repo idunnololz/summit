@@ -3,17 +3,15 @@ package com.idunnololz.summit.signUp
 import android.graphics.Bitmap
 import android.os.Parcelable
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.LocalSite
 import com.idunnololz.summit.api.dto.LoginResponse
-import com.idunnololz.summit.util.StatefulData
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SignUpModel(
     val currentScene: SignUpScene = SignUpScene.InstanceForm(),
     val signUpFormData: SignUpFormData = SignUpFormData(),
-): Parcelable
+) : Parcelable
 
 @Parcelize
 data class SignUpFormData(
@@ -24,7 +22,7 @@ data class SignUpFormData(
     val questionnaireAnswer: String = "",
     val captchaUuid: String = "",
     val captchaAnswer: String = "",
-): Parcelable
+) : Parcelable
 
 sealed interface SignUpScene : Parcelable {
     val previousScene: SignUpScene?
@@ -40,7 +38,7 @@ sealed interface SignUpScene : Parcelable {
         val site: SiteModel? = null,
         val instanceError: String? = null,
         val continueClicked: Boolean = false,
-    ): SignUpScene
+    ) : SignUpScene
 
     @Parcelize
     data class CredentialsForm(
@@ -53,7 +51,7 @@ sealed interface SignUpScene : Parcelable {
         val usernameError: String? = null,
         val emailError: String? = null,
         val passwordError: String? = null,
-    ): SignUpScene
+    ) : SignUpScene
 
     @Parcelize
     data class AnswerForm(
@@ -65,7 +63,7 @@ sealed interface SignUpScene : Parcelable {
         val showAnswerEditor: Boolean = false,
         val answer: String = "",
         val answerError: String? = null,
-    ): SignUpScene
+    ) : SignUpScene
 
     @Parcelize
     data class CaptchaForm(
@@ -79,7 +77,7 @@ sealed interface SignUpScene : Parcelable {
         val captchaWav: String? = null,
         val captchaError: Throwable? = null,
         val captchaAnswer: String = "",
-    ): SignUpScene
+    ) : SignUpScene
 
     @Parcelize
     data class SubmitApplication(
@@ -89,7 +87,7 @@ sealed interface SignUpScene : Parcelable {
         override val previousScene: SignUpScene? = null,
         override val isLoading: Boolean = false,
         val error: String? = null,
-    ): SignUpScene
+    ) : SignUpScene
 
     @Parcelize
     data class NextSteps(
@@ -103,7 +101,7 @@ sealed interface SignUpScene : Parcelable {
         val account: Account? = null,
         val accountError: String? = null,
         val isAccountLoading: Boolean = false,
-    ): SignUpScene
+    ) : SignUpScene
 }
 
 @Parcelize
@@ -112,7 +110,7 @@ data class SiteModel(
     val name: String,
     val description: String?,
     val icon: String?,
-): Parcelable
+) : Parcelable
 
 fun SignUpScene.updateHasNext(hasNext: Boolean): SignUpScene = when (this) {
     is SignUpScene.AnswerForm -> copy(hasNext = hasNext)

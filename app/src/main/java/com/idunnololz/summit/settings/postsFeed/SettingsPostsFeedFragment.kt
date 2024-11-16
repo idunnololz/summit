@@ -300,7 +300,7 @@ class SettingsPostsFeedFragment :
             { preferences.parseMarkdownInPostTitles },
             {
                 preferences.parseMarkdownInPostTitles = it
-            }
+            },
         )
     }
 

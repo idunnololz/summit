@@ -24,7 +24,6 @@ import androidx.navigation.fragment.navArgs
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.google.android.material.navigation.NavigationBarView
-import com.google.android.material.transition.MaterialSharedAxis
 import com.idunnololz.summit.CommunityDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentMainBinding
@@ -424,7 +423,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
                         .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
-                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopEnterAnim(
+                            androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                        )
                         .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
                         .build(),
                 )
@@ -442,7 +443,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                     NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
                         .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
-                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopEnterAnim(
+                            androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                        )
                         .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
                         .build(),
                 )

@@ -34,14 +34,12 @@ import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED
 import com.google.android.material.navigationrail.NavigationRailView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
-import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
@@ -452,7 +450,7 @@ class NavBarController(
                         NavBarDestinations.Search -> {
                             add(
                                 Menu.NONE,
-                                R.id.searchFragment,
+                                R.id.searchHomeFragment,
                                 Menu.NONE,
                                 context.getString(R.string.search),
                             ).apply {
@@ -653,7 +651,7 @@ class NavBarController(
             builder.setPopUpTo(
                 navController.graph.findStartDestination().id,
                 inclusive = false,
-                saveState = true
+                saveState = true,
             )
         }
         val options = builder.build()

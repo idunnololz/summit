@@ -4,9 +4,6 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.idunnololz.summit.drafts.DraftConverters
-import com.idunnololz.summit.drafts.DraftData
 import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "read_posts")

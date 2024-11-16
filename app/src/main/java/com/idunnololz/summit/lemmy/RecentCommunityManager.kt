@@ -1,21 +1,22 @@
 package com.idunnololz.summit.lemmy
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.preferences.StateSharedPreference
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Singleton
 class RecentCommunityManager @Inject constructor(
+    @StateSharedPreference private val preferences: SharedPreferences,
     private val lemmyApiClientFactory: LemmyApiClient.Factory,
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
@@ -35,6 +36,19 @@ class RecentCommunityManager @Inject constructor(
      * Priority queue where the last item is the most recent recent.
      */
     private var _recentSubreddits: LinkedHashMap<String, CommunityHistoryEntry>? = null
+
+    init {
+        if (PreferenceUtil.preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
+            val str = PreferenceUtil.preferences.getString(PREF_KEY_RECENT_COMMUNITIES, "")
+
+            preferences.edit()
+                .putString(PREF_KEY_RECENT_COMMUNITIES, str)
+                .apply()
+            PreferenceUtil.preferences.edit()
+                .remove(PREF_KEY_RECENT_COMMUNITIES)
+                .apply()
+        }
+    }
 
     fun getRecentCommunities(): List<CommunityHistoryEntry> =
         getRecents().values.sortedByDescending { it.ts }
@@ -75,7 +89,7 @@ class RecentCommunityManager @Inject constructor(
 
         coroutineScope.launch(Dispatchers.Default) {
             // serialize
-            PreferenceUtil.preferences.edit()
+            preferences.edit()
                 .putString(
                     PREF_KEY_RECENT_COMMUNITIES,
                     adapter.toJson(
@@ -103,7 +117,7 @@ class RecentCommunityManager @Inject constructor(
                     },
                     {
                         null
-                    }
+                    },
                 )
 
             if (iconUrl != null) {
@@ -119,7 +133,7 @@ class RecentCommunityManager @Inject constructor(
         if (recentSubreddits != null) {
             return recentSubreddits
         }
-        val jsonStr = PreferenceUtil.preferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
+        val jsonStr = preferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
         val data = try {
             if (jsonStr != null) {
                 adapter.fromJson(jsonStr)

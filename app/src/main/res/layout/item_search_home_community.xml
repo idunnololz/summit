@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="196dp"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/padding_half"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Material3.CardView.Filled"
+        app:cardBackgroundColor="?colorSurface"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
+                android:adjustViewBounds="false"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintDimensionRatio="H,30:9"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                style="@style/RoundImageView"
+                android:id="@+id/icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="@dimen/padding_half"
+                android:layout_marginEnd="@dimen/padding"
+                android:layout_marginTop="@dimen/padding_half"
+                android:layout_marginBottom="@dimen/padding_half"
+                android:background="@drawable/server_icon_bg"
+                app:border_color="@color/colorOnSurface"
+                app:border_width="1dp"
+                app:fill_color="@color/style_blue"
+                app:layout_constraintTop_toBottomOf="@+id/image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/footer"/>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleSmall"
+                android:layout_marginHorizontal="@dimen/padding_half"
+                android:layout_marginTop="@dimen/padding_half"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toBottomOf="@+id/image"
+                app:layout_constraintBottom_toTopOf="@+id/subtitle"
+                app:layout_constraintStart_toEndOf="@+id/icon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/subtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceLabelSmall"
+                android:layout_marginBottom="@dimen/padding_half"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintEnd_toEndOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintBottom_toTopOf="@+id/footer"/>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="@dimen/padding_quarter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/footer"/>
+
+            <LinearLayout
+                android:id="@+id/footer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/mau"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceLabelSmall"
+                    android:layout_marginVertical="@dimen/padding_half"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    android:layout_weight="1"
+                    android:gravity="center"/>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/pane_divider1"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="@dimen/padding_quarter"/>
+
+                <TextView
+                    android:id="@+id/subs"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceLabelSmall"
+                    android:layout_marginVertical="@dimen/padding_half"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    android:layout_weight="1"
+                    android:gravity="center"/>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/pane_divider2"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="@dimen/padding_quarter"/>
+
+                <TextView
+                    android:id="@+id/posts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceLabelSmall"
+                    android:layout_marginVertical="@dimen/padding_half"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    android:layout_weight="1"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

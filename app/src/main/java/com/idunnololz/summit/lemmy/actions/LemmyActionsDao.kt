@@ -13,12 +13,12 @@ import androidx.room.Query
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import arrow.core.Either
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.util.crashlytics
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -73,7 +73,7 @@ class LemmyActionConverters(private val moshi: Moshi) {
         moshi.adapter(ActionInfo::class.java).fromJson(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        FirebaseCrashlytics.getInstance().recordException(e)
+        crashlytics?.recordException(e)
         null
     }
 
@@ -87,7 +87,7 @@ class LemmyActionConverters(private val moshi: Moshi) {
         moshi.adapter(LemmyActionFailureReason::class.java).fromJson(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        FirebaseCrashlytics.getInstance().recordException(e)
+        crashlytics?.recordException(e)
         null
     }
 }

@@ -69,7 +69,7 @@ class SearchTabbedFragment :
 
     private val args by navArgs<SearchTabbedFragmentArgs>()
 
-    val viewModel: SearchViewModel by viewModels()
+    val viewModel: SearchTabbedViewModel by viewModels()
     var slidingPaneController: SlidingPaneController? = null
 
     private var searchSuggestionsAdapter: CustomSearchSuggestionsAdapter? = null
@@ -88,11 +88,6 @@ class SearchTabbedFragment :
             viewModel.showSearch.value = false
         }
     }
-    private val queryBackPressHandler = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            resetQuery()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,7 +100,7 @@ class SearchTabbedFragment :
                 CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
             )
             if (result != null) {
-                viewModel.nextCommunityFilter.value = SearchViewModel.CommunityFilter(
+                viewModel.nextCommunityFilter.value = SearchTabbedViewModel.CommunityFilter(
                     result.communityId,
                     result.communityRef,
                 )
@@ -119,7 +114,7 @@ class SearchTabbedFragment :
                 PersonPickerDialogFragment.REQUEST_KEY_RESULT,
             )
             if (result != null) {
-                viewModel.nextPersonFilter.value = SearchViewModel.PersonFilter(
+                viewModel.nextPersonFilter.value = SearchTabbedViewModel.PersonFilter(
                     result.personId,
                     result.personRef,
                 )
@@ -142,10 +137,12 @@ class SearchTabbedFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            searchViewBackPressedHandler,
-        )
+        requireActivity().onBackPressedDispatcher.apply {
+            addCallback(
+                viewLifecycleOwner,
+                searchViewBackPressedHandler,
+            )
+        }
 
         val context = requireContext()
 
@@ -330,8 +327,6 @@ class SearchTabbedFragment :
 
             searchEditText.addTextChangedListener {
                 searchSuggestionsAdapter.setQuery(it?.toString() ?: "")
-
-                updateQueryBackHandler()
             }
 
             searchEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -366,7 +361,6 @@ class SearchTabbedFragment :
             }
             viewModel.currentQueryLiveData.observe(viewLifecycleOwner) {
                 searchEditTextDummy.setText(it)
-                updateQueryBackHandler()
             }
             viewModel.nextPersonFilter.observe(viewLifecycleOwner) {
                 binding.filterByCreator.let { chip ->
@@ -543,15 +537,6 @@ class SearchTabbedFragment :
         viewModel.updateCurrentQuery("")
         binding.searchEditText.setText("")
         binding.searchEditTextDummy.setText("")
-    }
-
-    private fun updateQueryBackHandler() {
-        if (!isBindingAvailable()) return
-
-        queryBackPressHandler.isEnabled = !(
-            binding.searchEditText.text.isNullOrBlank() &&
-                binding.searchEditTextDummy.text.isNullOrBlank()
-            )
     }
 
     fun closePost(postFragment: PostFragment) {

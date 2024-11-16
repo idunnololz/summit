@@ -14,6 +14,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
+import com.idunnololz.summit.databinding.ItemCustomSearchSuggestionBinding
+import com.idunnololz.summit.util.INVALID_INDEX
+import com.idunnololz.summit.util.getStringOrNull
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,33 +38,13 @@ class CustomSearchSuggestionsAdapter(
         private val TAG = CustomSearchSuggestionsAdapter::class.java.simpleName
 
         private const val QUERY_LIMIT = 40
-
-        private const val INVALID_INDEX = -1
-
-        private fun getStringOrNull(cursor: Cursor, col: Int): String? {
-            if (col == INVALID_INDEX) {
-                return null
-            }
-
-            return try {
-                cursor.getString(col)
-            } catch (e: Exception) {
-                Log.e(
-                    TAG,
-                    "unexpected error retrieving valid column from cursor, " +
-                        "did the remote process die?",
-                    e,
-                )
-                null
-            }
-        }
     }
 
     private sealed class Item {
         data class SuggestionItem(
             val suggestion: String,
         ) : Item()
-        object FooterItem : Item()
+        data object FooterItem : Item()
     }
 
     private var query: String? = null
@@ -68,13 +53,41 @@ class CustomSearchSuggestionsAdapter(
     private var text1Col = INVALID_INDEX
 
     private var suggestions: List<String> = ArrayList(QUERY_LIMIT)
-    private var items: List<Item> = listOf()
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var listener: OnSuggestionListener? = null
 
     var copyTextToSearchViewClickedListener: ((String) -> Unit)? = null
 
     private var refreshSuggestionsJob: Job? = null
+
+    private val adapterHelper = AdapterHelper<Item>(
+        { old, new ->
+            old::class == new::class && when (old) {
+                is Item.SuggestionItem ->
+                    old.suggestion == (new as Item.SuggestionItem).suggestion
+                Item.FooterItem -> true
+            }
+        }
+    ).apply {
+        addItemType(
+            clazz = Item.SuggestionItem::class,
+            inflateFn = ItemCustomSearchSuggestionBinding::inflate
+        ) { item, b, h ->
+            val s = item.suggestion
+
+            b.text.text = s
+            b.copyTextToSearchView.setOnClickListener {
+                copyTextToSearchViewClickedListener?.invoke(s)
+            }
+            h.itemView.setOnClickListener {
+                listener?.onSuggestionSelected(s)
+            }
+            h.itemView.setOnLongClickListener {
+                listener?.onSuggestionLongClicked(s)
+                true
+            }
+        }
+        addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { _, _, _ -> }
+    }
 
     private fun getSearchManagerSuggestions(
         searchable: SearchableInfo?,
@@ -166,7 +179,7 @@ class CustomSearchSuggestionsAdapter(
                         }
 
                         while (c.moveToNext()) {
-                            getStringOrNull(c, text1Col)?.let {
+                            c.getStringOrNull(text1Col)?.let {
                                 if (seen.add(it.lowercase(Locale.US))) {
                                     newSuggestions.add(it)
                                     Log.d(TAG, "Got suggestion $it")
@@ -191,78 +204,20 @@ class CustomSearchSuggestionsAdapter(
     }
 
     private fun setNewItems(newItems: List<Item>) {
-        val oldItems = items
-
-        val diff = DiffUtil.calculateDiff(
-            object : DiffUtil.Callback() {
-                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    val oldItem = oldItems[oldItemPosition]
-                    val newItem = newItems[newItemPosition]
-
-                    if (oldItem::class != newItem::class) {
-                        return false
-                    }
-
-                    return when (oldItem) {
-                        Item.FooterItem -> true
-                        is Item.SuggestionItem ->
-                            oldItem.suggestion == (newItem as Item.SuggestionItem).suggestion
-                    }
-                }
-
-                override fun getOldListSize(): Int = oldItems.size
-
-                override fun getNewListSize(): Int = newItems.size
-
-                override fun areContentsTheSame(
-                    oldItemPosition: Int,
-                    newItemPosition: Int,
-                ): Boolean {
-                    return oldItems[oldItemPosition] == newItems[newItemPosition]
-                }
-            },
-        )
-        items = newItems
-        diff.dispatchUpdatesTo(this)
+        adapterHelper.setItems(newItems, this)
     }
 
-    override fun getItemViewType(position: Int): Int = when (items[position]) {
-        Item.FooterItem -> R.layout.generic_space_footer_item
-        is Item.SuggestionItem -> R.layout.custom_search_suggestion
-    }
+    override fun getItemViewType(position: Int): Int =
+        adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val v = inflater.inflate(viewType, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        adapterHelper.onCreateViewHolder(parent, viewType)
 
-        return when (viewType) {
-            R.layout.custom_search_suggestion -> SuggestionViewHolder(v)
-            else -> object : RecyclerView.ViewHolder(v) {}
-        }
-    }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+        adapterHelper.onBindViewHolder(holder, position)
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = items[position]) {
-            Item.FooterItem -> {}
-            is Item.SuggestionItem -> {
-                val h = holder as SuggestionViewHolder
-                val s = item.suggestion
-
-                h.text.text = s
-                h.copyTextToSearchView.setOnClickListener {
-                    copyTextToSearchViewClickedListener?.invoke(s)
-                }
-                h.itemView.setOnClickListener {
-                    listener?.onSuggestionSelected(s)
-                }
-                h.itemView.setOnLongClickListener {
-                    listener?.onSuggestionLongClicked(s)
-                    true
-                }
-            }
-        }
-    }
-
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int =
+        adapterHelper.itemCount
 
     fun setListener(listener: OnSuggestionListener) {
         this.listener = listener

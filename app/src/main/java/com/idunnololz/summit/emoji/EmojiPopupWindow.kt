@@ -25,7 +25,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class EmojiPopupWindow @AssistedInject constructor(
     private val textEmojisManager: TextEmojisManager,
@@ -64,11 +63,13 @@ class EmojiPopupWindow @AssistedInject constructor(
         binding.recyclerView.apply {
             this.adapter = adapter
             layoutManager = GridAutofitLayoutManager(context, context.resources.getDimensionPixelSize(R.dimen.emoji_item_width))
-            addItemDecoration(GridSpaceItemDecoration(
-                space = context.resources.getDimensionPixelSize(R.dimen.padding_half),
-                spaceAboveFirstAndBelowLastItem = false,
-                spaceBeforeStartAndAfterEnd = false
-            ))
+            addItemDecoration(
+                GridSpaceItemDecoration(
+                    space = context.resources.getDimensionPixelSize(R.dimen.padding_half),
+                    spaceAboveFirstAndBelowLastItem = false,
+                    horizontalSpaceOnFirstAndLastItem = false,
+                ),
+            )
         }
         binding.settings.setOnClickListener {
             EmojiPopupEditorDialogFragment.show(fragmentManager)
@@ -131,7 +132,6 @@ class EmojiPopupWindow @AssistedInject constructor(
         if (distanceToBottom > distanceToTop) {
 //            showAsDropDown(anchor, 0, 0)
         } else {
-
 //            showAtLocation(anchor, Gravity.TOP, 0, 0)
             showAsDropDown(anchor, 0, -distanceToTop, Gravity.TOP or Gravity.START)
         }
@@ -143,18 +143,17 @@ class EmojiPopupWindow @AssistedInject constructor(
         }
     }
 
-
     private class EmojisAdapter(
-        private val onEmojiSelected: (String) -> Unit
+        private val onEmojiSelected: (String) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         sealed interface Item {
             data class EmojiItem(
-                val text: String
+                val text: String,
             ) : Item
         }
 
-        private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = {old, new ->
+        private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
             old::class == new::class && when (old) {
                 is Item.EmojiItem ->
                     old.text == (new as Item.EmojiItem).text
@@ -171,8 +170,7 @@ class EmojiPopupWindow @AssistedInject constructor(
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -180,6 +178,5 @@ class EmojiPopupWindow @AssistedInject constructor(
         fun setItems(items: List<Item>, cb: () -> Unit) {
             adapterHelper.setItems(items, this) { cb() }
         }
-
     }
 }

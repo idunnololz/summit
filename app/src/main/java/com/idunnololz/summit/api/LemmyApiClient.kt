@@ -186,7 +186,7 @@ class LemmyApiClient(
     val okHttpClient = LemmyApi.okHttpClient(
         context = context,
         cachePolicyManager = cachePolicyManager,
-        userAgent = userAgent
+        userAgent = userAgent,
     )
 
     class Factory @Inject constructor(
@@ -199,7 +199,7 @@ class LemmyApiClient(
             context = context,
             apiListenerManager = apiListenerManager,
             preferences = preferences,
-            cachePolicyManager = cachePolicyManager
+            cachePolicyManager = cachePolicyManager,
         )
     }
 
@@ -214,7 +214,7 @@ class LemmyApiClient(
         api = LemmyApi.getInstance(
             context = context,
             cachePolicyManager = cachePolicyManager,
-            instance = newInstance
+            instance = newInstance,
         )
 
         instanceFlow.value = api.instance

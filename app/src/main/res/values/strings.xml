@@ -1850,6 +1850,15 @@
     <string name="error_invalid_link">Invalid link.</string>
     <string name="post_scores_desc">Choose how scores on posts are displayed</string>
     <string name="comment_scores_desc">Choose how scores on comments are displayed</string>
+    <string name="recent_searches">Recent searches</string>
+    <string name="view_current_settings">View current settings</string>
+    <string name="warn_reset_setting">Resetting a setting cannot be undone. Are you sure you want to proceed?</string>
+    <string name="reset">Reset</string>
+    <string name="your_communities">Your communities</string>
+    <string name="trending_communities">Trending communities</string>
+    <string name="rising_communities">Rising communities</string>
+    <string name="top_communities_this_week">Top communities this week</string>
+    <string name="error_community_blocked">You have blocked this community.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

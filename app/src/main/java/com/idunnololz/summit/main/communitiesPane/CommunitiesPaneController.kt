@@ -39,7 +39,6 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import javax.inject.Inject
 
 typealias OnCommunitySelected = (Either<UserCommunityItem, CommunityRef>, resetTab: Boolean) -> Unit
 

@@ -2,10 +2,7 @@ package com.idunnololz.summit.emoji
 
 import android.content.Context
 import android.os.Bundle
-import android.view.GestureDetector
-import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.WindowCompat
@@ -33,7 +30,6 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class EmojiPopupEditorDialogFragment :
@@ -148,10 +144,9 @@ class EmojiPopupEditorDialogFragment :
                 GridSpaceItemDecoration(
                     space = context.resources.getDimensionPixelSize(R.dimen.padding_half),
                     spaceAboveFirstAndBelowLastItem = true,
-                    spaceBeforeStartAndAfterEnd = true,
+                    horizontalSpaceOnFirstAndLastItem = true,
                 ),
             )
-
 
             val callback: ItemTouchHelper.Callback = ItemMoveCallback(adapter)
             val touchHelper = ItemTouchHelper(callback)
@@ -205,7 +200,6 @@ class EmojiPopupEditorDialogFragment :
             return false
         }
 
-
         override fun onSwiped(viewHolder: ViewHolder, i: Int) {
         }
 
@@ -216,17 +210,15 @@ class EmojiPopupEditorDialogFragment :
         }
 
         override fun onMove(
-            recyclerView: RecyclerView, viewHolder: ViewHolder,
+            recyclerView: RecyclerView,
+            viewHolder: ViewHolder,
             target: ViewHolder,
         ): Boolean {
             mAdapter.onRowMoved(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true
         }
 
-        override fun onSelectedChanged(
-            viewHolder: ViewHolder?,
-            actionState: Int,
-        ) {
+        override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
             if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
                 mAdapter.onRowSelected(viewHolder)
             }
@@ -234,10 +226,7 @@ class EmojiPopupEditorDialogFragment :
             super.onSelectedChanged(viewHolder, actionState)
         }
 
-        override fun clearView(
-            recyclerView: RecyclerView,
-            viewHolder: ViewHolder,
-        ) {
+        override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
             super.clearView(recyclerView, viewHolder)
 
             mAdapter.onRowClear(viewHolder)
@@ -260,7 +249,7 @@ class EmojiPopupEditorDialogFragment :
                 val isModifiable: Boolean,
                 val emoji: String,
                 val id: Long,
-            ): Item
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -287,8 +276,7 @@ class EmojiPopupEditorDialogFragment :
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -311,8 +299,7 @@ class EmojiPopupEditorDialogFragment :
             )
         }
 
-        fun getEntries() =
-            data
+        fun getEntries() = data
 
         override fun onRowMoved(fromPosition: Int, toPosition: Int) {
             val mutableItems = data.toMutableList()
@@ -335,7 +322,6 @@ class EmojiPopupEditorDialogFragment :
 
         override fun onRowClear(myViewHolder: ViewHolder?) {
         }
-
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

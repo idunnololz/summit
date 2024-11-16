@@ -43,7 +43,7 @@ class LemmyHeaderHelper(
 
         const val SEPARATOR = " ● "
 
-        private val condensedTypeface: Typeface by lazy {
+        val condensedTypeface: Typeface by lazy {
             Typeface.create("sans-serif-condensed", Typeface.NORMAL)
         }
     }

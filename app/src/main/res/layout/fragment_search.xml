@@ -44,8 +44,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/subreddit_filter_bg"
                             android:layout_marginHorizontal="@dimen/padding"
-                            android:layout_marginTop="@dimen/padding"
-                            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+                            android:layout_marginTop="@dimen/padding_half"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
                             app:hintEnabled="false"
@@ -132,7 +131,8 @@
                 android:layout_height="match_parent"
                 android:background="?backgroundColor"
                 android:orientation="vertical"
-                android:elevation="24dp">
+                android:elevation="24dp"
+                android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/search_input_layout"
@@ -140,7 +140,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/subreddit_filter_bg"
                     android:layout_marginHorizontal="@dimen/padding"
-                    android:layout_marginTop="@dimen/padding"
+                    android:layout_marginTop="@dimen/padding_half"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                     app:boxStrokeWidth="0dp"
                     app:boxStrokeWidthFocused="0dp"

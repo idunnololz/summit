@@ -275,8 +275,10 @@ class SettingsMiscFragment :
         }
     }
 
-    private fun convertAnimationLevelToOptionId(animationLevel: AnimationsHelper.AnimationLevel): Int {
-        return when(animationLevel) {
+    private fun convertAnimationLevelToOptionId(
+        animationLevel: AnimationsHelper.AnimationLevel,
+    ): Int {
+        return when (animationLevel) {
             AnimationsHelper.AnimationLevel.Critical -> R.id.animation_level_min
             AnimationsHelper.AnimationLevel.Navigation -> R.id.animation_level_low
             AnimationsHelper.AnimationLevel.Polish -> R.id.animation_level_low

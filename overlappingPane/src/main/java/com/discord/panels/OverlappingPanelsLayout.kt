@@ -312,7 +312,9 @@ open class OverlappingPanelsLayout : FrameLayout {
                 true
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                val isClosedCenterPanelClick = if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
+                val isClosedCenterPanelClick = if (
+                    event.actionMasked == MotionEvent.ACTION_CANCEL
+                ) {
                     false
                 } else {
                     wasActionDownOnClosedCenterPanel &&
@@ -585,7 +587,7 @@ open class OverlappingPanelsLayout : FrameLayout {
         val targetedX = getTargetedX(event)
 
         // Setting [units] to 1000 provides pixels per second.
-        velocityTracker?.computeCurrentVelocity(1000 /* units */)
+        velocityTracker?.computeCurrentVelocity(1000)
         val pxPerSecond =
             if (event.actionMasked == MotionEvent.ACTION_CANCEL) {
                 0f

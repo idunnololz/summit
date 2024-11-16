@@ -5,14 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account.info.AccountInfoManager
-import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.IncorrectLoginException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -80,7 +75,6 @@ class LoginViewModel @Inject constructor(
                 .onFailure {
                     accountLiveData.postError(it)
                 }
-
         }
     }
 

@@ -9,7 +9,7 @@
         android:icon="@drawable/baseline_bookmark_24"
         android:title="@string/saved" />
     <item
-        android:id="@+id/searchFragment"
+        android:id="@+id/searchHomeFragment"
         android:icon="@drawable/baseline_search_24"
         android:title="@string/search" />
     <item

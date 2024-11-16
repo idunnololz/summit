@@ -18,7 +18,6 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.emptyScreen.EmptyScreenFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs

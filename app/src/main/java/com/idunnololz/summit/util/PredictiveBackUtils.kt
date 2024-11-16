@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
@@ -14,7 +13,9 @@ fun newBottomSheetPredictiveBackBackPressHandler(
     getBottomSheetView: () -> View?,
     onBackPress: () -> Unit,
 ): OnBackPressedCallback {
-    val predictiveBackMargin = context.resources.getDimensionPixelSize(R.dimen.predictive_back_margin)
+    val predictiveBackMargin = context.resources.getDimensionPixelSize(
+        R.dimen.predictive_back_margin,
+    )
     var initialTouchY = -1f
 
     return object : OnBackPressedCallback(true) {
@@ -31,7 +32,7 @@ fun newBottomSheetPredictiveBackBackPressHandler(
                 initialTouchY = backEvent.touchY
             }
             val progressY = gestureInterpolator.getInterpolation(
-                (backEvent.touchY - initialTouchY) / background.height
+                (backEvent.touchY - initialTouchY) / background.height,
             )
 
             // See the motion spec about the calculations below.
@@ -46,7 +47,7 @@ fun newBottomSheetPredictiveBackBackPressHandler(
             val maxTranslationY = (background.height / 20) - predictiveBackMargin
             background.translationY = max(
                 progressY * maxTranslationY,
-                background.height * (0.1f * progress)
+                background.height * (0.1f * progress),
             )
 
             // Scale down from 100% to 90%.
