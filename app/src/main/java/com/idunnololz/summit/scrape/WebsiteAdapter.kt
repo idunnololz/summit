@@ -1,7 +1,7 @@
 package com.idunnololz.summit.scrape
 
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.idunnololz.summit.util.crashlytics
 import java.io.IOException
 import java.util.ArrayList
 import org.json.JSONException
@@ -60,8 +60,8 @@ abstract class WebsiteAdapter<T : Any> {
 
             if (!isRedirected) {
                 // Only log an error if there was not a redirect
-                FirebaseCrashlytics.getInstance().log(s)
-                FirebaseCrashlytics.getInstance().recordException(e)
+                crashlytics?.log(s)
+                crashlytics?.recordException(e)
             }
             consumeSuccess = false
         }
@@ -85,7 +85,7 @@ abstract class WebsiteAdapter<T : Any> {
             restore(s)
         } catch (e: Exception) {
             Log.e(TAG, "", e)
-            FirebaseCrashlytics.getInstance().recordException(e)
+            crashlytics?.recordException(e)
             consumeSuccess = false
         }
 

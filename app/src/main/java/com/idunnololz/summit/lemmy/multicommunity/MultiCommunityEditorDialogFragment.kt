@@ -293,8 +293,8 @@ class MultiCommunityEditorDialogFragment :
         fun updateAdapter() {
             if (viewModel.communityName.value != args.multiCommunity.name ||
                 viewModel.selectedIcon.value != args.multiCommunity.icon ||
-                viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities) {
-
+                viewModel.selectedCommunitiesFlow.value != args.multiCommunity.communities
+            ) {
                 unsavedChangesBackPressedHandler.isEnabled = true
             } else {
                 unsavedChangesBackPressedHandler.isEnabled = false

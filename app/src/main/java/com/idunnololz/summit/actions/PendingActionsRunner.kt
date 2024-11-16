@@ -7,7 +7,6 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import arrow.core.Either
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult.Failure
 import com.idunnololz.summit.api.ApiException
@@ -28,6 +27,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
+import com.idunnololz.summit.util.crashlytics
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -197,7 +197,7 @@ class PendingActionsRunner @AssistedInject constructor(
                 }
             }
         } catch (e: Exception) {
-            FirebaseCrashlytics.getInstance().recordException(e)
+            crashlytics?.recordException(e)
             Log.e(TAG, "Error executing pending action.", e)
         }
     }

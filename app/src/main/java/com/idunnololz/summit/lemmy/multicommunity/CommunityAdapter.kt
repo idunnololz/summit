@@ -4,8 +4,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.dispose
-import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
@@ -16,6 +14,8 @@ import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
+import com.idunnololz.summit.databinding.ItemCommunityGroupHeaderBinding
+import com.idunnololz.summit.databinding.ItemCommunityNoResultsBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
@@ -103,7 +103,7 @@ class CommunityAdapter(
     ).apply {
         addItemType(
             clazz = Item.GroupHeaderItem::class,
-            inflateFn = CommunitySelectorGroupItemBinding::inflate,
+            inflateFn = ItemCommunityGroupHeaderBinding::inflate,
         ) { item, b, _ ->
             b.titleTextView.text = item.text
 
@@ -143,7 +143,7 @@ class CommunityAdapter(
         ) { item, b, h ->
             avatarHelper.loadCommunityIcon(
                 imageView = b.icon,
-                community = item.communityView.community
+                community = item.communityView.community,
             )
 
             b.title.text = item.text
@@ -187,7 +187,7 @@ class CommunityAdapter(
             avatarHelper.loadCommunityIcon(
                 imageView = b.icon,
                 communityRef = item.subscribedCommunity.toCommunityRef(),
-                iconUrl = item.subscribedCommunity.icon
+                iconUrl = item.subscribedCommunity.icon,
             )
 
             b.title.text = item.text
@@ -223,7 +223,7 @@ class CommunityAdapter(
         }
         addItemType(
             clazz = Item.NoResultsItem::class,
-            inflateFn = CommunitySelectorNoResultsItemBinding::inflate,
+            inflateFn = ItemCommunityNoResultsBinding::inflate,
         ) { item, b, _ ->
             b.text.text = item.text
         }

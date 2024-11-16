@@ -16,6 +16,8 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.SettingDescriptionItemBinding
 import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingOnOffBinding
@@ -38,50 +40,56 @@ class SettingItemsAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed interface Item {
-        val settingItem: SettingItem
+
+        sealed interface SettingItem : Item {
+            val settingItem: com.idunnololz.summit.settings.SettingItem
+        }
 
         data class BasicItem(
             override val settingItem: BasicSettingItem,
-        ) : Item
+        ) : SettingItem
 
         data class TextValueItem(
             override val settingItem: TextValueSettingItem,
             val value: String?,
-        ) : Item
+        ) : SettingItem
 
         data class TitleItem(
             override val settingItem: SubgroupItem,
             val hasTopMargin: Boolean,
-        ) : Item
+        ) : SettingItem
 
         data class DescriptionItem(
             override val settingItem: DescriptionSettingItem,
-        ) : Item
+        ) : SettingItem
 
         data class RadioGroupItem(
             override val settingItem: RadioGroupSettingItem,
             @IdRes val value: Int?,
-        ) : Item
+        ) : SettingItem
 
         data class OnOffItem(
             override val settingItem: OnOffSettingItem,
             val value: Boolean?,
-        ) : Item
+        ) : SettingItem
 
         data class ImageValueItem(
             override val settingItem: ImageValueSettingItem,
             val value: String?,
-        ) : Item
+        ) : SettingItem
 
         data class SliderItem(
             override val settingItem: SliderSettingItem,
             val value: Float?,
-        ) : Item
+        ) : SettingItem
 
         data class ColorItem(
             override val settingItem: ColorSettingItem,
             @IdRes val value: Int?,
-        ) : Item
+        ) : SettingItem
+
+        data object HeaderItem : Item
+        data object FooterItem : Item
     }
 
     var data: List<SettingItem> = listOf()
@@ -152,7 +160,12 @@ class SettingItemsAdapter(
 
     private val adapterHelper = AdapterHelper<Item>(
         areItemsTheSame = { old, new ->
-            old.settingItem.id == new.settingItem.id
+            old::class == new::class && when (old) {
+                Item.HeaderItem -> true
+                Item.FooterItem -> true
+                is Item.SettingItem ->
+                    old.settingItem.id == (new as Item.SettingItem).settingItem.id
+            }
         },
     ).apply {
         addItemType(Item.BasicItem::class, BasicSettingItemBinding::inflate) { item, b, h ->
@@ -285,6 +298,14 @@ class SettingItemsAdapter(
                 b.desc.text = settingItem.description
             }
         }
+        addItemType(
+            Item.HeaderItem::class,
+            ItemGenericHeaderBinding::inflate,
+        ) { item, b, h -> }
+        addItemType(
+            Item.FooterItem::class,
+            GenericSpaceFooterItemBinding::inflate,
+        ) { item, b, h -> }
     }
 
     init {
@@ -307,6 +328,11 @@ class SettingItemsAdapter(
         data.forEach {
             addRecursive(it, newItems)
         }
+
+        // We need to insert this after since some logic depends on the list to be empty
+        newItems.add(0, Item.HeaderItem)
+
+        newItems.add(Item.FooterItem)
 
         adapterHelper.setItems(newItems, this, onItemsUpdated)
     }

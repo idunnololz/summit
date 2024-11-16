@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 195
-        versionName = "1.45.1"
+        versionCode = 196
+        versionName = "1.46.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -61,6 +61,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":overlappingPane"))
     implementation(project(":calligraphy"))
+    implementation(project(":gravitySnapHelper"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)

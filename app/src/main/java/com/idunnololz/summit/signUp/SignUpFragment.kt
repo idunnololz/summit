@@ -3,7 +3,6 @@ package com.idunnololz.summit.signUp
 import android.graphics.RectF
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -35,8 +33,6 @@ import com.idunnololz.summit.databinding.SignUpCredentialsFormBinding
 import com.idunnololz.summit.databinding.SignUpInstanceFormBinding
 import com.idunnololz.summit.databinding.SignUpNextStepsBinding
 import com.idunnololz.summit.databinding.SignUpSubmitApplicationBinding
-import com.idunnololz.summit.drafts.DraftTypes
-import com.idunnololz.summit.drafts.DraftsDialogFragment
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
@@ -51,7 +47,6 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.DirectoryHelper
-import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.requestFocusAndShowKeyboard
@@ -64,16 +59,16 @@ import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runInterruptible
 import java.io.File
 import javax.inject.Inject
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 
 @AndroidEntryPoint
-class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
+class SignUpFragment :
+    BaseFragment<FragmentSignUpBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SignUpViewModel by viewModels()
@@ -144,7 +139,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
                     viewModel.updateAnswer(text?.toString() ?: "")
                 }
             }
-
 
             textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
                 binding.formattingOptionsContainer.removeAllViews()
@@ -294,7 +288,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
                     instanceEditText.isEnabled = true
                 }
 
-
                 fun showProgressBar() {
                     progressBar.visibility = View.VISIBLE
                     signUp.textScaleX = 0f
@@ -304,7 +297,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
                     progressBar.visibility = View.GONE
                     signUp.textScaleX = 1f
                 }
-
 
                 if (scene.isLoading) {
                     showProgressBar()
@@ -554,7 +546,9 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
                     }
                 }
             }
-            is SignUpScene.SubmitApplication -> with(currentBinding as SignUpSubmitApplicationBinding) {
+            is SignUpScene.SubmitApplication -> with(
+                currentBinding as SignUpSubmitApplicationBinding,
+            ) {
                 serverIconExpanded.load(scene.site.icon) {
                     placeholder(newShimmerDrawableSquare(context))
                 }
@@ -580,9 +574,12 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
             is SignUpScene.NextSteps -> with(currentBinding as SignUpNextStepsBinding) {
                 val loginResponse = requireNotNull(scene.loginResponse)
 
-                TransitionManager.beginDelayedTransition(binding.root, AutoTransition().apply {
-                    setDuration(220)
-                })
+                TransitionManager.beginDelayedTransition(
+                    binding.root,
+                    AutoTransition().apply {
+                        setDuration(220)
+                    },
+                )
 
                 serverIconExpanded.load(scene.site.icon) {
                     placeholder(newShimmerDrawableSquare(context))
@@ -636,7 +633,6 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
                     }
                 }
 
-
                 if (scene.done) {
                     findNavController().popBackStack()
                 }
@@ -648,9 +644,12 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>(),
         val context = requireContext()
 
         if (animate) {
-            TransitionManager.beginDelayedTransition(binding.root, AutoTransition().apply {
-                setDuration(220)
-            })
+            TransitionManager.beginDelayedTransition(
+                binding.root,
+                AutoTransition().apply {
+                    setDuration(220)
+                },
+            )
         }
 
         binding.content.removeAllViews()

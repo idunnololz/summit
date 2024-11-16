@@ -161,7 +161,7 @@ class CommunityPickerDialogFragment :
 
         onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
-            searchEditTextBackPressedHandler
+            searchEditTextBackPressedHandler,
         )
     }
 }

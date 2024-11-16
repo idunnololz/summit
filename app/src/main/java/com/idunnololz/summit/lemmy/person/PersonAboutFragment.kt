@@ -9,12 +9,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.dispose
-import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding
@@ -252,7 +249,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                     appendNameWithInstance(
                         context = context,
                         name = community.community.name,
-                        instance = community.community.instance
+                        instance = community.community.instance,
                     )
                 }
                 b.root.setOnClickListener {

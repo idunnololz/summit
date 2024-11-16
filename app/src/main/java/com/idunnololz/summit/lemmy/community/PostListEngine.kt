@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
+import com.idunnololz.summit.api.CommunityBlockedError
+import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -130,6 +132,8 @@ class PostListEngine(
     private var key: String? = null
     private var secondaryKey: String? = null
 
+    var isCommunityBlocked: Boolean = false
+
     val biggestPageIndex: Int?
         get() = pages.lastOrNull()?.pageIndex
 
@@ -141,7 +145,8 @@ class PostListEngine(
             // We need to use let here because Google's lint rule doesn't support smart cast
             Log.d(
                 TAG,
-                "Restoration successful! Restored ${cachedPages.size} page(s) totalling ${it.sumOf { it.posts.size }} posts.",
+                "Restoration successful! Restored ${cachedPages.size} page(s) totalling " +
+                    "${it.sumOf { it.posts.size }} posts.",
             )
             _pages = it
         }
@@ -186,6 +191,10 @@ class PostListEngine(
 
         val firstPage = pages.first()
         val lastPage = pages.last()
+
+        if (isCommunityBlocked) {
+            items.add(Item.PersistentErrorItem(CommunityBlockedError()))
+        }
 
         items.addAll(persistentErrors)
 
@@ -382,8 +391,9 @@ class PostListEngine(
         return (firstPost.pageIndex..lastPost.pageIndex).toList()
     }
 
-    fun clearPages() {
+    fun clear() {
         _pages = listOf()
+        isCommunityBlocked = false
         coroutineScope.launch(Dispatchers.IO) {
             directoryHelper.clearPages(key, secondaryKey)
         }

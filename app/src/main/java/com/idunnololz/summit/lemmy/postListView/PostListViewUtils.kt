@@ -435,7 +435,7 @@ fun BaseFragment<*>.createPostActionHandler(
                         appendLine(postView.post.url)
                         appendLine()
                     }
-                }
+                },
             )
         }
     }

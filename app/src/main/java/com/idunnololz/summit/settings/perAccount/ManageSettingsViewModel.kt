@@ -7,7 +7,8 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.settings.SettingItem
-import com.idunnololz.summit.settings.backupAndRestore.ImportSettingsViewModel
+import com.idunnololz.summit.settings.backupAndRestore.Diff
+import com.idunnololz.summit.settings.backupAndRestore.DiffType
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -40,39 +41,39 @@ class ManageSettingsViewModel @Inject constructor(
             allKeys.addAll(currentSettingsJson.keys().asSequence())
 
             // diff current vs the json we are importing
-            val diffs = mutableListOf<ImportSettingsViewModel.Diff>()
+            val diffs = mutableListOf<Diff>()
             for (key in allKeys) {
                 val currentValue = currentSettingsJson.opt(key)
                 val importValue = currentSettingsJson.opt(key)
 
                 if (currentValue == null && importValue != null) {
                     diffs.add(
-                        ImportSettingsViewModel.Diff(
-                            ImportSettingsViewModel.DiffType.Added,
+                        Diff(
+                            DiffType.Added,
                             "null",
                             importValue.toString(),
                         ),
                     )
                 } else if (currentValue != null && importValue == null) {
                     diffs.add(
-                        ImportSettingsViewModel.Diff(
-                            ImportSettingsViewModel.DiffType.Removed,
+                        Diff(
+                            DiffType.Removed,
                             currentValue.toString(),
                             "null",
                         ),
                     )
                 } else if (currentValue != importValue) {
                     diffs.add(
-                        ImportSettingsViewModel.Diff(
-                            type = ImportSettingsViewModel.DiffType.Changed,
+                        Diff(
+                            type = DiffType.Changed,
                             currentValue = currentValue?.toString() ?: "null",
                             importValue = importValue?.toString() ?: "null",
                         ),
                     )
                 } else {
                     diffs.add(
-                        ImportSettingsViewModel.Diff(
-                            type = ImportSettingsViewModel.DiffType.Unchanged,
+                        Diff(
+                            type = DiffType.Unchanged,
                             currentValue = currentValue?.toString() ?: "null",
                             importValue = importValue?.toString() ?: "null",
                         ),

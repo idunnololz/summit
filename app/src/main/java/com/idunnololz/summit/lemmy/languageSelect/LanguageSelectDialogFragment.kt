@@ -25,8 +25,8 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
 
 class LanguageSelectDialogFragment :
     BaseDialogFragment<DialogFragmentLanguageSelectBinding>(),

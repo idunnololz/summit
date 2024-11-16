@@ -4,10 +4,10 @@ import android.util.Log
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.emoji.db.TextEmojiDao
 import com.idunnololz.summit.emoji.db.TextEmojiEntry
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 @Singleton
 class TextEmojisManager @Inject constructor(
@@ -46,7 +46,7 @@ class TextEmojisManager @Inject constructor(
                         emoji = emoji,
                         order = index,
                         modifiable = false,
-                    )
+                    ),
                 )
             }
 
@@ -84,14 +84,14 @@ class TextEmojisManager @Inject constructor(
                     emoji = textEmoji,
                     order = getAllEmojis(true).maxOfOrNull { it.order } ?: 0,
                     modifiable = true,
-                )
+                ),
             )
         } else {
             textEmojiDao.insert(
                 entry.copy(
                     modifiedTs = System.currentTimeMillis(),
                     emoji = textEmoji,
-                )
+                ),
             )
         }
         emojisChangedFlow.emit(Unit)
@@ -114,7 +114,7 @@ class TextEmojisManager @Inject constructor(
                     emoji = emoji,
                     order = index,
                     modifiable = false,
-                )
+                ),
             )
         }
         emojisChangedFlow.emit(Unit)
@@ -134,7 +134,7 @@ class TextEmojisManager @Inject constructor(
 }
 
 data class TextEmoji(
-    val entry: TextEmojiEntry
+    val entry: TextEmojiEntry,
 ) {
 
     val text: String

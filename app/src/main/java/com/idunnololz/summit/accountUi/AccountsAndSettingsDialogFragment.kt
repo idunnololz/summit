@@ -15,7 +15,6 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.databinding.DialogFragmentAccountsBinding
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData

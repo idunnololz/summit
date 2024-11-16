@@ -11,21 +11,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CaptchaResponse
 import com.idunnololz.summit.api.dto.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.RegistrationMode
-import com.idunnololz.summit.links.LinkFixer
 import com.idunnololz.summit.login.LoginHelper
 import com.idunnololz.summit.util.PrettyPrintUtils
-import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.UUID
+import javax.inject.Inject
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -35,11 +37,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
-import javax.inject.Inject
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.random.Random
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -103,7 +100,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun prefetchSite(instance: String) {
-        val isValidUrl = Patterns.WEB_URL.matcher("https://${instance}").matches()
+        val isValidUrl = Patterns.WEB_URL.matcher("https://$instance").matches()
         if (instance.isBlank() || !isValidUrl) {
             return
         }
@@ -119,7 +116,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun fetchSiteAndGoToNextStep(instance: String) {
-        val isValidUrl = Patterns.WEB_URL.matcher("https://${instance}").matches()
+        val isValidUrl = Patterns.WEB_URL.matcher("https://$instance").matches()
         if (instance.isBlank() || !isValidUrl) {
             fetchSiteLiveData.setIdle()
             if (instance.isNotBlank() && !isValidUrl) {
@@ -193,8 +190,8 @@ class SignUpViewModel @Inject constructor(
                 if (it.ok == null) {
                     signUpModelState.value = signUpModelState.value.copy(
                         currentScene = currentScene.copy(
-                            captchaError = CaptchaError.NoImageError()
-                        )
+                            captchaError = CaptchaError.NoImageError(),
+                        ),
                     )
                     return
                 }
@@ -210,8 +207,8 @@ class SignUpViewModel @Inject constructor(
                 if (bitmap == null) {
                     signUpModelState.value = signUpModelState.value.copy(
                         currentScene = currentScene.copy(
-                            captchaError = CaptchaError.DecodeImageError()
-                        )
+                            captchaError = CaptchaError.DecodeImageError(),
+                        ),
                     )
                     return
                 }
@@ -222,7 +219,7 @@ class SignUpViewModel @Inject constructor(
                         captchaImage = bitmap,
                         captchaWav = it.ok.wav,
                         captchaError = null,
-                    )
+                    ),
                 )
             }
             .onFailure {
@@ -232,7 +229,7 @@ class SignUpViewModel @Inject constructor(
                         captchaImage = null,
                         captchaWav = null,
                         captchaError = it,
-                    )
+                    ),
                 )
             }
     }
@@ -255,53 +252,52 @@ class SignUpViewModel @Inject constructor(
                 instanceError = instanceError,
                 continueClicked = continueClicked,
                 isLoading = fetchSiteLiveData.isLoading && continueClicked,
-            )
+            ),
         )
     }
 
     private fun SignUpScene.nextScene(instance: String, site: SiteModel): SignUpScene? {
-        fun SignUpScene.nextSceneWithoutHasNextOrSkipping() =
-            when (this) {
-                is SignUpScene.InstanceForm ->
-                    SignUpScene.CredentialsForm(
-                        instance = instance,
-                        site = site,
-                        isEmailRequired = site.localSite.require_email_verification,
-                        hasNext = false,
-                        previousScene = this.reset(),
-                    )
-                is SignUpScene.CredentialsForm ->
-                    SignUpScene.AnswerForm(
-                        instance = instance,
-                        site = site,
-                        hasNext = false,
-                        previousScene = this.reset(),
-                    )
-                is SignUpScene.AnswerForm ->
-                    SignUpScene.CaptchaForm(
-                        instance = instance,
-                        site = site,
-                        hasNext = false,
-                        previousScene = this.reset(),
-                    )
-                is SignUpScene.CaptchaForm ->
-                    SignUpScene.SubmitApplication(
-                        instance = instance,
-                        site = site,
-                        hasNext = false,
-                        previousScene = this.reset(),
-                    )
-                is SignUpScene.SubmitApplication ->
-                    SignUpScene.NextSteps(
-                        instance = instance,
-                        site = site,
-                        loginResponse = null,
-                        hasNext = false,
-                        previousScene = this.reset(),
-                    )
-                is SignUpScene.NextSteps ->
-                    null
-            }
+        fun SignUpScene.nextSceneWithoutHasNextOrSkipping() = when (this) {
+            is SignUpScene.InstanceForm ->
+                SignUpScene.CredentialsForm(
+                    instance = instance,
+                    site = site,
+                    isEmailRequired = site.localSite.require_email_verification,
+                    hasNext = false,
+                    previousScene = this.reset(),
+                )
+            is SignUpScene.CredentialsForm ->
+                SignUpScene.AnswerForm(
+                    instance = instance,
+                    site = site,
+                    hasNext = false,
+                    previousScene = this.reset(),
+                )
+            is SignUpScene.AnswerForm ->
+                SignUpScene.CaptchaForm(
+                    instance = instance,
+                    site = site,
+                    hasNext = false,
+                    previousScene = this.reset(),
+                )
+            is SignUpScene.CaptchaForm ->
+                SignUpScene.SubmitApplication(
+                    instance = instance,
+                    site = site,
+                    hasNext = false,
+                    previousScene = this.reset(),
+                )
+            is SignUpScene.SubmitApplication ->
+                SignUpScene.NextSteps(
+                    instance = instance,
+                    site = site,
+                    loginResponse = null,
+                    hasNext = false,
+                    previousScene = this.reset(),
+                )
+            is SignUpScene.NextSteps ->
+                null
+        }
 
         fun SignUpScene.nextSceneWithoutHasNext(): SignUpScene? {
             var nextScene = this.nextSceneWithoutHasNextOrSkipping()
@@ -334,56 +330,55 @@ class SignUpViewModel @Inject constructor(
         val nextScene = nextSceneWithoutHasNext()
         val nextNextScene = nextScene?.nextSceneWithoutHasNext()
         return nextScene?.updateHasNext(
-            hasNext = nextNextScene != null && nextNextScene !is SignUpScene.SubmitApplication
+            hasNext = nextNextScene != null && nextNextScene !is SignUpScene.SubmitApplication,
         )
     }
 
-    fun SignUpScene.reset() =
-        when (this) {
-            is SignUpScene.InstanceForm ->
-                copy(
-                    continueClicked = false,
-                    isLoading = false,
-                    // clear all errors
-                    instanceError = null,
-                )
-            is SignUpScene.CredentialsForm ->
-                copy(
-                    isLoading = false,
-                    // clear all errors
-                    usernameError = null,
-                    emailError = null,
-                    passwordError = null,
-                )
-            is SignUpScene.AnswerForm ->
-                copy(
-                    isLoading = false,
-                    showAnswerEditor = false,
-                    // clear all errors
-                    answerError = null,
-                )
-            is SignUpScene.CaptchaForm ->
-                copy(
-                    isLoading = false,
+    fun SignUpScene.reset() = when (this) {
+        is SignUpScene.InstanceForm ->
+            copy(
+                continueClicked = false,
+                isLoading = false,
+                // clear all errors
+                instanceError = null,
+            )
+        is SignUpScene.CredentialsForm ->
+            copy(
+                isLoading = false,
+                // clear all errors
+                usernameError = null,
+                emailError = null,
+                passwordError = null,
+            )
+        is SignUpScene.AnswerForm ->
+            copy(
+                isLoading = false,
+                showAnswerEditor = false,
+                // clear all errors
+                answerError = null,
+            )
+        is SignUpScene.CaptchaForm ->
+            copy(
+                isLoading = false,
 
-                    // clear captcha
-                    captchaUuid = null,
-                    captchaImage = null,
-                    captchaWav = null,
-                    captchaError = null,
-                    captchaAnswer = "",
-                )
-            is SignUpScene.SubmitApplication ->
-                copy(
-                    isLoading = false,
-                    // clear errors
-                    error = null,
-                )
-            is SignUpScene.NextSteps ->
-                copy(
-                    isLoading = false,
-                )
-        }
+                // clear captcha
+                captchaUuid = null,
+                captchaImage = null,
+                captchaWav = null,
+                captchaError = null,
+                captchaAnswer = "",
+            )
+        is SignUpScene.SubmitApplication ->
+            copy(
+                isLoading = false,
+                // clear errors
+                error = null,
+            )
+        is SignUpScene.NextSteps ->
+            copy(
+                isLoading = false,
+            )
+    }
 
     fun signUp(captchaAnswer: String?) {
         viewModelScope.launch(backgroundContext) {
@@ -416,12 +411,7 @@ class SignUpViewModel @Inject constructor(
         fetchSiteAndGoToNextStep(instance)
     }
 
-
-    fun updateCredentials(
-        username: String,
-        email: String,
-        password: String,
-    ) {
+    fun updateCredentials(username: String, email: String, password: String) {
         signUpModelState.value = signUpModelState.value.copy(
             signUpFormData = signUpModelState.value.signUpFormData.copy(
                 username = username,
@@ -447,7 +437,8 @@ class SignUpViewModel @Inject constructor(
         } else if (username.length > localSite.actor_name_max_length) {
             context.getString(
                 R.string.error_username_too_long,
-                PrettyPrintUtils.defaultDecimalFormat.format(localSite.actor_name_max_length))
+                PrettyPrintUtils.defaultDecimalFormat.format(localSite.actor_name_max_length),
+            )
         } else {
             null
         }
@@ -478,12 +469,12 @@ class SignUpViewModel @Inject constructor(
                     usernameError = usernameError,
                     emailError = emailError,
                     passwordError = passwordError,
-                )
+                ),
             )
         } else {
             signUpModelState.value = signUpModelState.value.copy(
                 currentScene = requireNotNull(
-                    currentScene.nextScene(currentScene.instance, currentScene.site)
+                    currentScene.nextScene(currentScene.instance, currentScene.site),
                 ),
                 signUpFormData = signUpModelState.value.signUpFormData.copy(
                     username = username,
@@ -501,7 +492,7 @@ class SignUpViewModel @Inject constructor(
         } else {
             signUpModelState.value = signUpModelState.value.copy(
                 currentScene = currentScene.previousScene
-                    ?: currentScene
+                    ?: currentScene,
             )
         }
     }
@@ -514,8 +505,8 @@ class SignUpViewModel @Inject constructor(
         val currentScene = signUpModelState.value.currentScene as? SignUpScene.AnswerForm ?: return
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = currentScene.copy(
-                showAnswerEditor = show
-            )
+                showAnswerEditor = show,
+            ),
         )
     }
 
@@ -523,11 +514,11 @@ class SignUpViewModel @Inject constructor(
         val currentScene = signUpModelState.value.currentScene as? SignUpScene.AnswerForm ?: return
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = currentScene.copy(
-                answer = text
+                answer = text,
             ),
             signUpFormData = signUpModelState.value.signUpFormData.copy(
-                questionnaireAnswer = text
-            )
+                questionnaireAnswer = text,
+            ),
         )
     }
 
@@ -537,16 +528,16 @@ class SignUpViewModel @Inject constructor(
         if (answer.isBlank()) {
             signUpModelState.value = signUpModelState.value.copy(
                 currentScene = currentScene.copy(
-                    answerError = context.getString(R.string.required)
+                    answerError = context.getString(R.string.required),
                 ),
             )
         } else {
             signUpModelState.value = signUpModelState.value.copy(
                 currentScene = requireNotNull(
-                    currentScene.nextScene(currentScene.instance, currentScene.site)
+                    currentScene.nextScene(currentScene.instance, currentScene.site),
                 ),
                 signUpFormData = signUpModelState.value.signUpFormData.copy(
-                    questionnaireAnswer = answer
+                    questionnaireAnswer = answer,
                 ),
             )
         }
@@ -578,10 +569,11 @@ class SignUpViewModel @Inject constructor(
         val currentScene = signUpModelState.value.currentScene as? SignUpScene.CaptchaForm ?: return
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = requireNotNull(
-                currentScene.nextScene(currentScene.instance, currentScene.site)),
+                currentScene.nextScene(currentScene.instance, currentScene.site),
+            ),
             signUpFormData = signUpModelState.value.signUpFormData.copy(
                 captchaUuid = uuid,
-                captchaAnswer = answer
+                captchaAnswer = answer,
             ),
         )
     }
@@ -643,12 +635,11 @@ class SignUpViewModel @Inject constructor(
                                     ?: it.toErrorMessage(context)
                             } else {
                                 it.toErrorMessage(context)
-                            }
-                        )
+                            },
+                        ),
                     )
                 }
         }
-
     }
 
     fun loginWithJwt(instance: String, jwt: String) {
@@ -661,8 +652,8 @@ class SignUpViewModel @Inject constructor(
 
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = currentScene.copy(
-                isAccountLoading = true
-            )
+                isAccountLoading = true,
+            ),
         )
 
         viewModelScope.launch(backgroundContext) {
@@ -670,43 +661,42 @@ class SignUpViewModel @Inject constructor(
                 .onSuccess {
                     signUpModelState.value = signUpModelState.value.copy(
                         currentScene = currentScene.copy(
-                            account = it
-                        )
+                            account = it,
+                        ),
                     )
 
                     delay(1500)
 
                     signUpModelState.value = signUpModelState.value.copy(
                         currentScene = currentScene.copy(
-                            done = true
-                        )
+                            done = true,
+                        ),
                     )
                 }
                 .onFailure {
                     signUpModelState.value = signUpModelState.value.copy(
                         currentScene = currentScene.copy(
-                            accountError = it.toErrorMessage(context)
-                        )
+                            accountError = it.toErrorMessage(context),
+                        ),
                     )
                 }
         }
     }
 }
 
-private fun GetSiteResponse.toSiteModel(): SiteModel =
-    SiteModel(
-        localSite = site_view.local_site,
-        name = site_view.site.name,
-        description = site_view.site.description,
-        icon = site_view.site.icon,
-    )
+private fun GetSiteResponse.toSiteModel(): SiteModel = SiteModel(
+    localSite = site_view.local_site,
+    name = site_view.site.name,
+    description = site_view.site.description,
+    icon = site_view.site.icon,
+)
 
 sealed interface InstanceError {
-    data object InvalidInstance: InstanceError
-    data object InvalidUrl: InstanceError
-    data object RegistrationClosed: InstanceError
-    data object BlankInstance: InstanceError
-    data class InstanceCorrection(val correctedInstance: String): InstanceError
+    data object InvalidInstance : InstanceError
+    data object InvalidUrl : InstanceError
+    data object RegistrationClosed : InstanceError
+    data object BlankInstance : InstanceError
+    data class InstanceCorrection(val correctedInstance: String) : InstanceError
 }
 
 sealed class CaptchaError : Exception() {

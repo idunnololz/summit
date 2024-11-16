@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -19,6 +18,7 @@ import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
+import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
@@ -36,7 +36,6 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
-import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -50,6 +49,7 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
+import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.toErrorMessage
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -118,7 +118,9 @@ class CommunityViewModel @Inject constructor(
 
         recentCommunityManager.addRecentCommunity(it)
         updateSortOrder()
+        loadCommunityInfo()
     }
+
     val loadedPostsData = StatefulLiveData<PostUpdateInfo>()
     private val personRefOfLastAccountPreferencesLoaded = state.getLiveData<PersonRef?>(
         "accountIdOfLastAccountPreferencesLoaded",
@@ -224,6 +226,7 @@ class CommunityViewModel @Inject constructor(
                     )
 
                     currentAccount.postValue(accountView)
+                    loadCommunityInfo()
                 }
 
                 loadAccountPreferences(fullAccount)
@@ -233,7 +236,7 @@ class CommunityViewModel @Inject constructor(
         viewModelScope.launch {
             accountManager.currentAccountOnChange.collect {
                 withContext(Dispatchers.Main) {
-                    postListEngine.clearPages()
+                    postListEngine.clear()
                     postListEngine.createItems()
                     pagePositions.clear()
 
@@ -453,7 +456,8 @@ class CommunityViewModel @Inject constructor(
                             hasMore = it.hasMore,
                         )
                     if (clearPagesOnSuccess) {
-                        postListEngine.clearPages()
+                        postListEngine.clear()
+                        loadCommunityInfo(createItems = false)
                     }
                     postListEngine.setPersistentErrors(postsRepository.persistentErrors)
                     postListEngine.addPage(pageData)
@@ -565,7 +569,7 @@ class CommunityViewModel @Inject constructor(
 
         initialPageFetched.value = false
 
-        FirebaseCrashlytics.getInstance().apply {
+        crashlytics?.apply {
             setCustomKey("community", communityRef.toString())
             setCustomKey("view_type", preferences.getPostsLayout().name)
             setCustomKey(
@@ -738,6 +742,7 @@ class CommunityViewModel @Inject constructor(
             postsRepository.resetCacheForCommunity()
 
             withContext(Dispatchers.Main) {
+                loadCommunityInfo(createItems = false)
                 fetchCurrentPage()
             }
         }
@@ -781,7 +786,8 @@ class CommunityViewModel @Inject constructor(
     ) {
         assertMainThread()
 
-        postListEngine.clearPages()
+        postListEngine.clear()
+        loadCommunityInfo(createItems = false)
         postListEngine.setPersistentErrors(postsRepository.persistentErrors)
         postListEngine.addPage(
             LoadedPostsData(
@@ -910,7 +916,7 @@ class CommunityViewModel @Inject constructor(
                     }
 
                     if (infinity) {
-                        postListEngine.clearPages()
+                        postListEngine.clear()
                         for (index in 0..it.pageIndex) {
                             fetchPageInternal(
                                 index,
@@ -970,6 +976,22 @@ class CommunityViewModel @Inject constructor(
 
         if (sortOrder != null) {
             setSortOrder(sortOrder)
+        }
+    }
+
+    private fun loadCommunityInfo(createItems: Boolean = true) {
+        val communityRef = currentCommunityRef.value as? CommunityRef.CommunityRefByName
+            ?: return
+        val fullAccount = accountInfoManager.currentFullAccount.value
+            ?: return
+
+        postListEngine.isCommunityBlocked = fullAccount.isCommunityBlocked(communityRef)
+
+        if (createItems) {
+            viewModelScope.launch {
+                postListEngine.createItems()
+                loadedPostsData.setValue(PostUpdateInfo())
+            }
         }
     }
 }

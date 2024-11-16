@@ -76,6 +76,7 @@ import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -666,7 +667,9 @@ class MainActivity :
                     NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
                         .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
-                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopEnterAnim(
+                            androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                        )
                         .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
                         .build(),
                 )
@@ -684,7 +687,9 @@ class MainActivity :
                     NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
                         .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
-                        .setPopEnterAnim(androidx.navigation.ui.R.animator.nav_default_pop_enter_anim)
+                        .setPopEnterAnim(
+                            androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                        )
                         .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
                         .build(),
                 )
@@ -927,7 +932,6 @@ class MainActivity :
         val args = ImageViewerActivityArgs(title, url, mimeType, transitionName)
 
         if (transitionName != null) {
-
             val sharedElements = mutableListOf<Pair<View, String>>()
             sharedElements += Pair.create(sharedElement, transitionName)
             if (appBar != null) {

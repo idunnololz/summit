@@ -12,13 +12,13 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.util.crashlytics
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -128,7 +128,7 @@ class AccountInfoConverters(private val moshi: Moshi) {
             .fromJson(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        FirebaseCrashlytics.getInstance().recordException(e)
+        crashlytics?.recordException(e)
         null
     }
 
@@ -144,7 +144,7 @@ class AccountInfoConverters(private val moshi: Moshi) {
             .fromJson(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        FirebaseCrashlytics.getInstance().recordException(e)
+        crashlytics?.recordException(e)
         null
     }
 }

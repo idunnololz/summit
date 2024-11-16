@@ -2,10 +2,10 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.CouldntFindObjectError
 import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NewApiException
@@ -46,11 +46,15 @@ fun Throwable.toErrorMessage(context: Context): String {
                             context.getString(R.string.error_couldnt_find_object)
                         }
 
+                        is CommunityBlockedError -> {
+                            context.getString(R.string.error_community_blocked)
+                        }
+
                         else -> {
                             if (t.errorCode == 404) {
                                 context.getString(R.string.error_page_not_found)
                             } else {
-                                FirebaseCrashlytics.getInstance().recordException(t)
+                                crashlytics?.recordException(t)
                                 context.getString(R.string.error_unknown)
                             }
                         }

@@ -159,7 +159,7 @@ class SettingsViewTypeFragment :
             {
                 viewModel.currentPostUiConfig =
                     viewModel.currentPostUiConfig.copy(
-                        imageWidthPercent = it
+                        imageWidthPercent = it,
                     )
 
                 updateRendering()

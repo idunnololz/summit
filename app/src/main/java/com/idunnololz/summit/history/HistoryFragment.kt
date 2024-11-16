@@ -1,5 +1,6 @@
 package com.idunnololz.summit.history
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.doOnLayout
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +35,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -38,12 +43,12 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HistoryFragment :
@@ -132,29 +137,14 @@ class HistoryFragment :
                         is CommunityRef.Local,
                         is CommunityRef.ModeratedCommunities,
                         is CommunityRef.MultiCommunity,
-                        is CommunityRef.Subscribed -> {
+                        is CommunityRef.Subscribed,
+                        -> {
                             requireMainActivity().launchPage(pageRef, preferMainFragment = false)
                         }
                     }
                 }
             },
         )
-
-        requireMainActivity().apply {
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-            insetViewStartAndEndByPadding(viewLifecycleOwner, binding.fastScroller)
-
-            if (navBarController.useNavigationRail) {
-                navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
-            }
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.history)
-        }
 
         historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
 
@@ -190,6 +180,24 @@ class HistoryFragment :
         }
 
         with(binding) {
+            requireMainActivity().apply {
+                insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+                insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+                insetViewStartAndEndByPadding(viewLifecycleOwner, binding.fastScroller)
+
+                if (navBarController.useNavigationRail) {
+                    navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
+                }
+
+                setSupportActionBar(binding.toolbar)
+
+                supportActionBar?.setDisplayShowHomeEnabled(true)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                supportActionBar?.title = getString(R.string.history)
+            }
+
+            toolbar.excludeRegionFromSystemGestures()
+
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(context)

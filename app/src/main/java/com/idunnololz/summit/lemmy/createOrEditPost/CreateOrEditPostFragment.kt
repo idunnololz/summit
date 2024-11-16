@@ -906,7 +906,7 @@ class CreateOrEditPostFragment :
                         getString(
                             R.string.use_suggested_title_format,
                             title,
-                        )
+                        ),
                     )
                     binding.titleSuggestionCard.setOnClickListener {
                         binding.titleEditText.setText(title)

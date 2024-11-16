@@ -1,0 +1,110 @@
+package com.idunnololz.summit.settings.backupAndRestore
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.databinding.FragmentViewCurrentSettingsBinding
+import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewStartAndEndByPadding
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class ViewCurrentSettingsFragment :
+    BaseFragment<FragmentViewCurrentSettingsBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
+
+    private val viewModel: ViewCurrentSettingsViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
+        super.onCreateView(inflater, container, savedInstanceState)
+
+        setBinding(FragmentViewCurrentSettingsBinding.inflate(inflater, container, false))
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val context = requireContext()
+
+        requireMainActivity().apply {
+            insetViewStartAndEndByPadding(viewLifecycleOwner, binding.recyclerView)
+            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+        }
+
+        with(binding) {
+            toolbar.title = getString(R.string.view_current_settings)
+            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+            toolbar.setNavigationIconTint(
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            )
+            toolbar.setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
+
+            val adapter = SettingDataAdapter(
+                onSettingPreviewClick = { settingKey, settingsDataPreview ->
+                    ImportSettingItemPreviewDialogFragment.show(
+                        childFragmentManager,
+                        settingKey,
+                        settingsDataPreview.settingsPreview[settingKey] ?: "",
+                        settingsDataPreview.keyToType[settingKey] ?: "?",
+                    )
+                },
+                onDeleteClick = {
+                    AlertDialogFragment.Builder()
+                        .setMessage(R.string.warn_reset_setting)
+                        .setPositiveButton(R.string.reset)
+                        .setNegativeButton(R.string.cancel)
+                        .setExtra("key", it)
+                        .create()
+                        .show(childFragmentManager, "reset_setting")
+                },
+            )
+            recyclerView.adapter = adapter
+            recyclerView.setHasFixedSize(true)
+            recyclerView.layoutManager = LinearLayoutManager(context)
+
+            viewModel.model.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error ->
+                        loadingView.showDefaultErrorMessageFor(it.error)
+                    is StatefulData.Loading ->
+                        loadingView.showProgressBar()
+                    is StatefulData.NotStarted ->
+                        loadingView.hideAll()
+                    is StatefulData.Success -> {
+                        loadingView.hideAll()
+
+                        adapter.setData(it.data.settingsDataPreview)
+                    }
+                }
+            }
+
+            viewModel.generatePreviewFromSettingsJson()
+        }
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        if (tag == "reset_setting") {
+            val settingKey = dialog.getExtra("key")
+            viewModel.resetSetting(settingKey)
+        }
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {}
+}

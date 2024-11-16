@@ -14,8 +14,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
+import com.idunnololz.summit.databinding.ItemCommunityNoResultsBinding
+import com.idunnololz.summit.databinding.ItemPersonNoResultsBinding
 import com.idunnololz.summit.databinding.ItemPersonSelectorGroupHeaderBinding
 import com.idunnololz.summit.databinding.PersonSelectorSearchResultPersonItemBinding
 import com.idunnololz.summit.databinding.PersonSelectorSelectedPersonItemBinding
@@ -198,7 +199,7 @@ class PersonAdapter(
         }
         addItemType(
             clazz = Item.NoResultsItem::class,
-            inflateFn = CommunitySelectorNoResultsItemBinding::inflate,
+            inflateFn = ItemPersonNoResultsBinding::inflate,
         ) { item, b, _ ->
             b.text.text = item.text
         }

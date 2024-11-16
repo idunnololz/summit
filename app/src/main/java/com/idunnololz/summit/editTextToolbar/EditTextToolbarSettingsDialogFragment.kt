@@ -25,11 +25,11 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Collections
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Collections
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditTextToolbarSettingsDialogFragment :

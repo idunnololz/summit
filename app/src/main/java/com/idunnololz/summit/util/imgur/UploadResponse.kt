@@ -1,6 +1,5 @@
 package com.idunnololz.summit.util.imgur
 
-import com.google.gson.annotations.SerializedName
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -11,7 +10,7 @@ data class UploadResponse(
     @Json(name = "status")
     val status: Int,
     @Json(name = "success")
-    val success: Boolean
+    val success: Boolean,
 )
 
 @JsonClass(generateAdapter = true)
@@ -67,5 +66,5 @@ data class Upload(
     @Json(name = "views")
     val views: Int,
     @Json(name = "width")
-    val width: Int
+    val width: Int,
 )

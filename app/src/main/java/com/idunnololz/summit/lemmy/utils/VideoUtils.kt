@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
@@ -15,6 +14,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.crashlytics
 import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
@@ -94,7 +94,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
                         }
                         .show()
                 } else {
-                    FirebaseCrashlytics.getInstance().recordException(it.error)
+                    crashlytics?.recordException(it.error)
                     Snackbar
                         .make(
                             parent.getSnackbarContainer(),

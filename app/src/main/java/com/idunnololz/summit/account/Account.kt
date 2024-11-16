@@ -33,18 +33,17 @@ data class Account(
 ) : Parcelable, GuestOrUserAccount {
 
     companion object {
-        fun from(instance: String, localUserView: LocalUserView, jwt: String) =
-            Account(
-                id = localUserView.person.id,
-                name = localUserView.person.name,
-                current = true,
-                instance = instance,
-                jwt = jwt,
-                defaultListingType = localUserView.local_user.default_listing_type?.ordinal
-                    ?: ListingType.All.ordinal,
-                defaultSortType = localUserView.local_user.default_sort_type?.ordinal
-                    ?: SortType.Active.ordinal,
-            )
+        fun from(instance: String, localUserView: LocalUserView, jwt: String) = Account(
+            id = localUserView.person.id,
+            name = localUserView.person.name,
+            current = true,
+            instance = instance,
+            jwt = jwt,
+            defaultListingType = localUserView.local_user.default_listing_type?.ordinal
+                ?: ListingType.All.ordinal,
+            defaultSortType = localUserView.local_user.default_sort_type?.ordinal
+                ?: SortType.Active.ordinal,
+        )
     }
 }
 

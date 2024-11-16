@@ -8,8 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.BackEventCompat
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
@@ -30,11 +28,8 @@ import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
 import com.idunnololz.summit.main.ActivityInsets
-import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import kotlin.math.max
 
 class BottomMenu(
     private val context: Context,
@@ -64,7 +59,7 @@ class BottomMenu(
     private val onBackPressedCallback =
         newBottomSheetPredictiveBackBackPressHandler(
             context,
-            { bottomSheetView }
+            { bottomSheetView },
         ) {
             close()
         }

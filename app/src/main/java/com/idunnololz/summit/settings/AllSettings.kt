@@ -70,6 +70,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
@@ -84,7 +85,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TRANSPARENT_NOTIFICATION_BAR
@@ -2101,6 +2101,12 @@ class ImportAndExportSettings @Inject constructor(
         null,
     )
 
+    val viewCurrentSettings = BasicSettingItem(
+        null,
+        context.getString(R.string.view_current_settings),
+        null,
+    )
+
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )
@@ -2486,7 +2492,7 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
         R.id.sort_order_top_last_hour,
         context.getString(
             R.string.sort_order_top_format,
-            context.getString(R.string.time_frame_last_hour)
+            context.getString(R.string.time_frame_last_hour),
         ),
         null,
         null,

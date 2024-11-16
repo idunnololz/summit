@@ -7,7 +7,6 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.BackEventCompat
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -19,7 +18,6 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.newPredictiveBackBackPressHandler
-import kotlin.math.max
 
 class MultipleChoiceDialogFragment :
     BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
@@ -163,5 +161,4 @@ class MultipleChoiceDialogFragment :
 
     override fun getPredictiveBackBackPressCallback(): OnBackPressedCallback =
         newPredictiveBackBackPressHandler { bottomMenu }
-
 }

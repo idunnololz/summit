@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.util.crashlytics
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -53,7 +53,7 @@ class DraftConverters(private val moshi: Moshi) {
         moshi.adapter(DraftData::class.java).fromJson(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        FirebaseCrashlytics.getInstance().recordException(e)
+        crashlytics?.recordException(e)
         null
     }
 }

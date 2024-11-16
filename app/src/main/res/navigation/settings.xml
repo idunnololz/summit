@@ -425,6 +425,13 @@
             app:exitAnim="@animator/fade_out"
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingBackupAndRestoreFragment_to_viewCurrentSettingsFragment"
+            app:destination="@id/viewCurrentSettingsFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/manageInternalSettingsBackupsDialogFragment"
@@ -475,4 +482,8 @@
         app:exitAnim="@animator/fade_out"
         app:popEnterAnim="@animator/fade_in"
         app:popExitAnim="@animator/fade_out" />
+    <fragment
+        android:id="@+id/viewCurrentSettingsFragment"
+        android:name="com.idunnololz.summit.settings.backupAndRestore.ViewCurrentSettingsFragment"
+        android:label="ViewCurrentSettingsFragment" />
 </navigation>

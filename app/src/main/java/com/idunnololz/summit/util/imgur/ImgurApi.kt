@@ -22,11 +22,11 @@ interface ImgurApi {
     suspend fun uploadFile(
         @Header("Authorization") authorization: String,
         @Part image: MultipartBody.Part?,
-        @Part("title") title: RequestBody? = null
+        @Part("title") title: RequestBody? = null,
     ): Response<UploadResponse>
 }
 
-object ApiKeys{
+object ApiKeys {
     /**
      * Fill in your imgur client id below. Don't have a client id? Get one here: https://api.imgur.com/oauth2/addclient
      */

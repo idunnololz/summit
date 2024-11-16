@@ -27,7 +27,7 @@ import javax.inject.Singleton
 @Singleton
 class TextFieldToolbarManager @Inject constructor(
     private val preferences: Preferences,
-    private val emojiPopupWindowFactory: EmojiPopupWindow.Factory
+    private val emojiPopupWindowFactory: EmojiPopupWindow.Factory,
 ) {
 
     val textFieldToolbarSettings = MutableLiveData(preferences.textFieldToolbarSettings)
@@ -230,8 +230,9 @@ class TextFormatToolbarViewHolder(
             if (referenceTextView != null) {
                 val start = referenceTextView.selectionStart
                 val end = referenceTextView.selectionEnd
+                val count = end - start
 
-                if (start != -1 && end != -1) {
+                if (start != -1 && end != -1 && count > 0) {
                     return referenceTextView.text.toString().substring(start, end)
                 }
             }
@@ -284,7 +285,7 @@ class TextFormatToolbarViewHolder(
                 fragmentManager = fragmentManager,
                 onEmojiSelected = {
                     editText.replaceTextAtCursor(it)
-                }
+                },
             ).showOnView(it)
 //                .show(fragmentManager, "EmojiDialog")
         }
@@ -317,7 +318,7 @@ class TextFormatToolbarViewHolder(
             val end = editText.selectionEnd.coerceAtLeast(0)
 
             val text = getSelectedText() ?: ""
-            val newText = ">" + text.split("\n").joinToString(separator = "\n>")
+            val newText = "> " + text.split("\n").joinToString(separator = "\n>")
 
             editText.text.replace(start, end, newText)
 

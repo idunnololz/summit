@@ -86,7 +86,6 @@ import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionsSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
@@ -400,8 +399,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
 
         if (postView.counts.comments == postView.unread_comments ||
-            postView.unread_comments <= 0) {
-
+            postView.unread_comments <= 0
+        ) {
             commentButton.text = LemmyUtils.abbrevNumber(postView.counts.comments.toLong())
         } else {
             commentButton.text =

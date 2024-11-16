@@ -36,8 +36,7 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
                 }
                 .show(fragmentManager, "TextEmojiEditDialogFragment")
 
-        fun getResult(bundle: Bundle): Result? =
-            bundle.getParcelableCompat(KEY_RESULT)
+        fun getResult(bundle: Bundle): Result? = bundle.getParcelableCompat(KEY_RESULT)
     }
 
     @Parcelize
@@ -45,7 +44,7 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
         val textEmoji: String,
         val id: Long,
         val delete: Boolean,
-    ): Parcelable
+    ) : Parcelable
 
     private val args by navArgs<TextEmojiEditDialogFragmentArgs>()
 
@@ -62,7 +61,8 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
         super.onCreateView(inflater, container, savedInstanceState)
 
         setBinding(
-            DialogFragmentTextEmojiEditBinding.inflate(inflater, container, false))
+            DialogFragmentTextEmojiEditBinding.inflate(inflater, container, false),
+        )
 
         return binding.root
     }
@@ -101,8 +101,8 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
                                 textEmoji = textEmojiEditText.text.toString(),
                                 id = args.id,
                                 delete = true,
-                            )
-                        )
+                            ),
+                        ),
                     )
                     dismiss()
                 }
@@ -120,12 +120,11 @@ class TextEmojiEditDialogFragment : BaseDialogFragment<DialogFragmentTextEmojiEd
                             textEmoji = textEmojiEditText.text.toString(),
                             id = args.id,
                             delete = false,
-                        )
-                    )
+                        ),
+                    ),
                 )
                 dismiss()
             }
         }
-
     }
 }

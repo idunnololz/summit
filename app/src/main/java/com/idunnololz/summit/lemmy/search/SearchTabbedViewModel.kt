@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
 @HiltViewModel
-class SearchViewModel @Inject constructor(
+class SearchTabbedViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val coroutineScopeFactory: CoroutineScopeFactory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {

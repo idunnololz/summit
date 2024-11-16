@@ -92,7 +92,7 @@ class SavedViewModel @Inject constructor(
                 fetchingPostPages.clear()
                 fetchingCommentPages.clear()
 
-                postListEngine.clearPages()
+                postListEngine.clear()
                 commentListEngine.clear()
 
                 fetchPostPage(0, false)
@@ -121,7 +121,7 @@ class SavedViewModel @Inject constructor(
 
                     fetchingPostPages.clear()
 
-                    postListEngine.clearPages()
+                    postListEngine.clear()
 
                     fetchPostPage(0, true)
                 }
@@ -155,7 +155,6 @@ class SavedViewModel @Inject constructor(
         fetchingPostPages.add(pageIndex)
 
         viewModelScope.launch(Dispatchers.Default) {
-
             postsState.postIsLoading()
 
             apiClient.fetchSavedPostsWithRetry(pageIndex.toLemmyPageIndex(), PAGE_SIZE, force)

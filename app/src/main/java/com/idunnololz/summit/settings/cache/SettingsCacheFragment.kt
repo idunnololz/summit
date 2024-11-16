@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
@@ -31,7 +30,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>(),
+class SettingsCacheFragment :
+    BaseFragment<FragmentCacheBinding>(),
     SettingValueUpdateCallback {
 
     private var progressListener: OfflineDownloadProgressListener? = null
@@ -96,7 +96,6 @@ class SettingsCacheFragment : BaseFragment<FragmentCacheBinding>(),
 //        deleteImages.setOnClickListener {
 //            OfflineManager.instance.deleteOfflineImages()
 //        }
-
 
         updateRendering()
     }

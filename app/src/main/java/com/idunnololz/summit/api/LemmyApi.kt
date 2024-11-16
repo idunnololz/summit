@@ -739,8 +739,8 @@ interface LemmyApi {
 
         private var okHttpClient: OkHttpClient? = null
 
-        private const val CACHE_CONTROL_HEADER = "Cache-Control"
-        private const val CACHE_CONTROL_NO_CACHE = "no-cache"
+        internal const val CACHE_CONTROL_HEADER = "Cache-Control"
+        internal const val CACHE_CONTROL_NO_CACHE = "no-cache"
 
         fun getInstance(
             context: Context,
@@ -756,10 +756,9 @@ interface LemmyApi {
             context: Context,
             cachePolicyManager: CachePolicyManager,
             userAgent: String = LinkUtils.USER_AGENT,
-        ) =
-            okHttpClient ?: getOkHttpClient(context, userAgent, cachePolicyManager).also {
-                okHttpClient = it
-            }
+        ) = okHttpClient ?: getOkHttpClient(context, userAgent, cachePolicyManager).also {
+            okHttpClient = it
+        }
 
         private fun buildInstance(
             context: Context,
@@ -770,7 +769,7 @@ interface LemmyApi {
             return buildApi(context, instance, userAgent, cachePolicyManager)
         }
 
-        private fun getOkHttpClient(
+        internal fun getOkHttpClient(
             context: Context,
             userAgent: String,
             cachePolicyManager: CachePolicyManager,

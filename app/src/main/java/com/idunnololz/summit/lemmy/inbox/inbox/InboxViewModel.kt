@@ -202,8 +202,11 @@ class InboxViewModel @Inject constructor(
 
         fetchingPages.add(pageIndex)
         fetchInboxJob?.cancel()
-        Log.d(TAG, "Loading inbox page - " +
-            "pageIndex: $pageIndex pageType: $pageType force: $force")
+        Log.d(
+            TAG,
+            "Loading inbox page - " +
+                "pageIndex: $pageIndex pageType: $pageType force: $force",
+        )
 
         inboxUpdate.setIsLoading()
         fetchInboxJob = viewModelScope.launch {

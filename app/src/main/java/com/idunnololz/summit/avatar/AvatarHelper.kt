@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageView
 import coil.dispose
 import coil.load
-import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.api.dto.Community
@@ -139,7 +138,7 @@ class AvatarHelper @Inject constructor(
                 listener(
                     onError = { _, _ ->
                         loadCommunityIcon(imageView, communityRef, null)
-                    }
+                    },
                 )
             }
         }
@@ -155,7 +154,9 @@ class AvatarHelper @Inject constructor(
             val job = coroutineScope.launch {
                 val d = accountImageGenerator.generateDrawableForGeneric(
                     key = siteView?.site?.public_key ?: "",
-                    drawable = context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
+                    drawable = context.getDrawableCompat(
+                        R.drawable.ic_lemmy_outline_community_icon_24,
+                    ),
                 )
 
                 withContext(Dispatchers.Main) {
@@ -171,7 +172,7 @@ class AvatarHelper @Inject constructor(
                 listener(
                     onError = { _, _ ->
                         loadInstanceIcon(imageView, siteView, null)
-                    }
+                    },
                 )
             }
         }

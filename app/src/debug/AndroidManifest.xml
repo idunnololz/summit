@@ -1,0 +1,23 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <provider
+            android:name=".search.SuggestionProvider"
+            android:authorities="com.idunnololz.summit.debug.search.SuggestionProvider"
+            android:exported="false"
+            android:enabled="true"
+            tools:replace="android:authorities"/>
+
+        <provider
+            android:name="com.idunnololz.summit.SummitFileProvider"
+            android:authorities="com.idunnololz.summit.debug.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+    </application>
+</manifest>

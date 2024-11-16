@@ -65,12 +65,10 @@ class DatabaseModule {
         db.conversationEntriesDao()
 
     @Provides
-    fun providePostReadDao(db: MainDatabase): PostReadDao =
-        db.postReadDao()
+    fun providePostReadDao(db: MainDatabase): PostReadDao = db.postReadDao()
 
     @Provides
-    fun provideTextEmojiDao(db: MainDatabase): TextEmojiDao =
-        db.textEmojiDao()
+    fun provideTextEmojiDao(db: MainDatabase): TextEmojiDao = db.textEmojiDao()
 
     @Provides
     @Singleton

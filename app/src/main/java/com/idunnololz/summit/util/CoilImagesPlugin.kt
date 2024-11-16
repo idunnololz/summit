@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util
 
 import android.content.Context
-import android.graphics.Rect
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.text.Spanned
@@ -11,9 +10,6 @@ import coil.ImageLoader
 import coil.request.Disposable
 import coil.request.ImageRequest
 import coil.target.Target
-import com.idunnololz.summit.R
-import com.idunnololz.summit.util.ext.getDimen
-import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory

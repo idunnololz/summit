@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.EditText
-import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
@@ -18,8 +17,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
-import coil.dispose
-import coil.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
@@ -60,7 +57,6 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.newBottomSheetPredictiveBackBackPressHandler
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -134,7 +130,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private val onBackPressedHandler =
         newBottomSheetPredictiveBackBackPressHandler(
             context,
-            { binding.csBottomSheetContainerInner }
+            { binding.csBottomSheetContainerInner },
         ) {
             onBackPressed()
         }
@@ -581,7 +577,6 @@ class CommunitySelectorController @AssistedInject constructor(
                 b.title.text = item.text
 
                 val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
-
                 @Suppress("SetTextI18n")
                 b.monthlyActives.text = context.getString(R.string.mau_format, mauString)
 

@@ -47,7 +47,6 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.InboxSwipeToActionCallback
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
-import com.idunnololz.summit.lemmy.inbox.InboxTabbedViewModel
 import com.idunnololz.summit.lemmy.inbox.PageType
 import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.inbox.conversation.Conversation

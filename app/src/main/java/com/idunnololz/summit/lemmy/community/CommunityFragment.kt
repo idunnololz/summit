@@ -25,10 +25,10 @@ import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.MaterialSharedAxis
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
@@ -91,6 +91,7 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
@@ -471,237 +472,246 @@ class CommunityFragment :
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
-        var job: Job? = null
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.apiInstanceFlow.collect { instance ->
-                    job?.cancel()
-                    job = viewLifecycleOwner.lifecycleScope.launch {
-                        val instanceFlows =
-                            viewModel.hiddenPostsManager.getInstanceFlows(instance)
-                        instanceFlows.onHidePostFlow.collect {
-                            viewModel.onHidePost.postValue(it)
+
+        with(binding) {
+            var job: Job? = null
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.apiInstanceFlow.collect { instance ->
+                        job?.cancel()
+                        job = viewLifecycleOwner.lifecycleScope.launch {
+                            val instanceFlows =
+                                viewModel.hiddenPostsManager.getInstanceFlows(instance)
+                            instanceFlows.onHidePostFlow.collect {
+                                viewModel.onHidePost.postValue(it)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        viewModel.updatePreferences()
-        binding.loadingView.hideAll()
+            customAppBar.root.excludeRegionFromSystemGestures()
 
-        lemmyAppBarController = LemmyAppBarController(
-            mainActivity = requireMainActivity(),
-            binding = binding.customAppBar,
-            accountInfoManager = accountInfoManager,
-            state = lemmyAppBarController?.state,
-        )
+            viewModel.updatePreferences()
+            loadingView.hideAll()
 
-        viewModel.defaultCommunity.observe(viewLifecycleOwner) {
-            lemmyAppBarController?.setDefaultCommunity(it)
-        }
-        viewModel.currentAccount.observe(viewLifecycleOwner) {
-            lemmyAppBarController?.onAccountChanged(it)
-        }
-        viewModel.sortOrder.observe(viewLifecycleOwner) {
-            lemmyAppBarController?.setSortOrder(it)
-        }
-
-        installOnActionResultHandler(
-            moreActionsHelper = moreActionsHelper,
-            snackbarContainer = binding.coordinatorLayout,
-            onPostUpdated = { postId, accountId ->
-                updatePost(postId, accountId)
-            },
-            onBlockInstanceChanged = {
-                viewModel.onBlockSettingsChanged()
-            },
-            onBlockCommunityChanged = {
-                viewModel.onBlockSettingsChanged()
-            },
-            onBlockPersonChanged = {
-                viewModel.onBlockSettingsChanged()
-            },
-        )
-
-        requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByMargins(
-                lifecycleOwner = viewLifecycleOwner,
-                view = binding.customAppBar.customActionBar,
+            lemmyAppBarController = LemmyAppBarController(
+                mainActivity = requireMainActivity(),
+                binding = customAppBar,
+                accountInfoManager = accountInfoManager,
+                state = lemmyAppBarController?.state,
             )
 
-            if (navBarController.useNavigationRail) {
-                navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
+            viewModel.defaultCommunity.observe(viewLifecycleOwner) {
+                lemmyAppBarController?.setDefaultCommunity(it)
             }
-            binding.customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
-                if (!isBindingAvailable() || viewModel.lockBottomBar) {
-                    return@addOnOffsetChangedListener
-                }
-
-                val percentShown = -verticalOffset.toFloat() / binding.customAppBar.root.height
-
-                if (!navBarController.useNavigationRail) {
-                    navBarController.navBarOffsetPercent.value = percentShown
-                }
-
-                isCustomAppBarExpandedPercent = 1f - percentShown
-
-                updateFabState()
+            viewModel.currentAccount.observe(viewLifecycleOwner) {
+                lemmyAppBarController?.onAccountChanged(it)
             }
-            lemmyAppBarController?.setup(
-                communitySelectedListener = { controller, communityRef ->
-                    val action = CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
-                        communityRef = communityRef,
-                        tab = args.tab,
-                    )
-                    findNavController().navigate(action)
-                    Utils.hideKeyboard(activity)
-                    controller.hide()
+            viewModel.sortOrder.observe(viewLifecycleOwner) {
+                lemmyAppBarController?.setSortOrder(it)
+            }
+
+            installOnActionResultHandler(
+                moreActionsHelper = moreActionsHelper,
+                snackbarContainer = coordinatorLayout,
+                onPostUpdated = { postId, accountId ->
+                    updatePost(postId, accountId)
                 },
-                onAccountClick = {
-                    AccountsAndSettingsDialogFragment.newInstance()
-                        .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+                onBlockInstanceChanged = {
+                    viewModel.onBlockSettingsChanged()
                 },
-                onSortOrderClick = {
-                    getMainActivity()?.showBottomMenu(getSortByMenu())
+                onBlockCommunityChanged = {
+                    viewModel.onBlockSettingsChanged()
                 },
-                onChangeInstanceClick = {
-                    InstancePickerDialogFragment.show(childFragmentManager)
+                onBlockPersonChanged = {
+                    viewModel.onBlockSettingsChanged()
                 },
-                onCommunityLongClick = { communityRef, text ->
-                    val url = communityRef?.toUrl(viewModel.apiInstance)
-                    if (url != null) {
-                        showMoreLinkOptions(url, text)
+            )
+
+            requireMainActivity().apply {
+                insetViewExceptBottomAutomaticallyByMargins(
+                    lifecycleOwner = viewLifecycleOwner,
+                    view = customAppBar.customActionBar,
+                )
+
+                if (navBarController.useNavigationRail) {
+                    navBarController.updatePaddingForNavBar(coordinatorLayout)
+                }
+                customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
+                    if (!isBindingAvailable() || viewModel.lockBottomBar) {
+                        return@addOnOffsetChangedListener
+                    }
+
+                    val percentShown = -verticalOffset.toFloat() / customAppBar.root.height
+
+                    if (!navBarController.useNavigationRail) {
+                        navBarController.navBarOffsetPercent.value = percentShown
+                    }
+
+                    isCustomAppBarExpandedPercent = 1f - percentShown
+
+                    updateFabState()
+                }
+                lemmyAppBarController?.setup(
+                    communitySelectedListener = { controller, communityRef ->
+                        val action =
+                            CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
+                                communityRef = communityRef,
+                                tab = args.tab,
+                            )
+                        findNavController().navigate(action)
+                        Utils.hideKeyboard(activity)
+                        controller.hide()
+                    },
+                    onAccountClick = {
+                        AccountsAndSettingsDialogFragment.newInstance()
+                            .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+                    },
+                    onSortOrderClick = {
+                        getMainActivity()?.showBottomMenu(getSortByMenu())
+                    },
+                    onChangeInstanceClick = {
+                        InstancePickerDialogFragment.show(childFragmentManager)
+                    },
+                    onCommunityLongClick = { communityRef, text ->
+                        val url = communityRef?.toUrl(viewModel.apiInstance)
+                        if (url != null) {
+                            showMoreLinkOptions(url, text)
+                            true
+                        } else {
+                            false
+                        }
+                    },
+                )
+            }
+
+            runAfterLayout {
+                if (!isBindingAvailable()) return@runAfterLayout
+
+                adapter?.contentMaxWidth = recyclerView.measuredWidth
+                adapter?.contentPreferredHeight = recyclerView.measuredHeight
+            }
+
+            runOnReady {
+                onReady()
+            }
+
+            fab.setup(preferences)
+            fab.setOnClickListener a@{
+                showOverflowMenu()
+            }
+            fab.setOnLongClickListener {
+                when (preferences.homeFabQuickAction) {
+                    HomeFabQuickActionIds.CreatePost -> {
+                        createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+                            R.id.create_post,
+                        )
                         true
+                    }
+
+                    HomeFabQuickActionIds.HideRead -> {
+                        createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+                            R.id.hide_read,
+                        )
+                        true
+                    }
+
+                    HomeFabQuickActionIds.ToggleNsfwMode -> {
+                        createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+                            R.id.toggle_nsfw_mode,
+                        )
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            requireActivity().onBackPressedDispatcher
+                .addCallback(viewLifecycleOwner, onBackPressedHandler)
+
+            slidingPaneController = SlidingPaneController(
+                fragment = this@CommunityFragment,
+                slidingPaneLayout = slidingPaneLayout,
+                childFragmentManager = childFragmentManager,
+                viewModel = viewModel,
+                globalLayoutMode = preferences.globalLayoutMode,
+                retainClosedPosts = preferences.retainLastPost,
+                emptyScreenText = getString(R.string.select_a_post),
+                fragmentContainerId = R.id.post_fragment_container,
+            ).apply {
+                onPageSelectedListener = a@{ isOpen ->
+                    if (!isBindingAvailable()) {
+                        return@a
+                    }
+
+                    if (!isOpen) {
+                        val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
+                        if (lastSelectedPost != null) {
+                            // We came from a post...
+                            adapter?.highlightPost(lastSelectedPost)
+                            viewModel.lastSelectedItem = null
+                        }
                     } else {
-                        false
+                        val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
+                        if (lastSelectedPost != null) {
+                            adapter?.highlightPostForever(lastSelectedPost)
+                        }
                     }
-                },
-            )
-        }
 
-        runAfterLayout {
-            if (!isBindingAvailable()) return@runAfterLayout
+                    if (isOpen) {
+                        requireMainActivity().apply {
+                            setupForFragment<PostFragment>()
+                            if (isSlideable) {
+                                navBarController.hideNavBar(true)
+                                setNavUiOpenPercent(1f)
+                                lockUiOpenness = true
+                            }
+                        }
 
-            adapter?.contentMaxWidth = binding.recyclerView.measuredWidth
-            adapter?.contentPreferredHeight = binding.recyclerView.measuredHeight
-        }
-
-        runOnReady {
-            onReady()
-        }
-
-        binding.fab.setup(preferences)
-        binding.fab.setOnClickListener a@{
-            showOverflowMenu()
-        }
-        binding.fab.setOnLongClickListener {
-            when (preferences.homeFabQuickAction) {
-                HomeFabQuickActionIds.CreatePost -> {
-                    createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
-                        R.id.create_post,
-                    )
-                    true
-                }
-                HomeFabQuickActionIds.HideRead -> {
-                    createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
-                        R.id.hide_read,
-                    )
-                    true
-                }
-                HomeFabQuickActionIds.ToggleNsfwMode -> {
-                    createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
-                        R.id.toggle_nsfw_mode,
-                    )
-                    true
-                }
-                else -> false
-            }
-        }
-
-        requireActivity().onBackPressedDispatcher
-            .addCallback(viewLifecycleOwner, onBackPressedHandler)
-
-        slidingPaneController = SlidingPaneController(
-            fragment = this,
-            slidingPaneLayout = binding.slidingPaneLayout,
-            childFragmentManager = childFragmentManager,
-            viewModel = viewModel,
-            globalLayoutMode = preferences.globalLayoutMode,
-            retainClosedPosts = preferences.retainLastPost,
-            emptyScreenText = getString(R.string.select_a_post),
-            fragmentContainerId = R.id.post_fragment_container,
-        ).apply {
-            onPageSelectedListener = a@{ isOpen ->
-                if (!isBindingAvailable()) {
-                    return@a
-                }
-
-                if (!isOpen) {
-                    val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
-                    if (lastSelectedPost != null) {
-                        // We came from a post...
-                        adapter?.highlightPost(lastSelectedPost)
-                        viewModel.lastSelectedItem = null
-                    }
-                } else {
-                    val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
-                    if (lastSelectedPost != null) {
-                        adapter?.highlightPostForever(lastSelectedPost)
-                    }
-                }
-
-                if (isOpen) {
-                    requireMainActivity().apply {
-                        setupForFragment<PostFragment>()
                         if (isSlideable) {
-                            navBarController.hideNavBar(true)
-                            setNavUiOpenPercent(1f)
-                            lockUiOpenness = true
+                            val mainFragment = parentFragment?.parentFragment as? MainFragment
+                            mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
                         }
-                    }
-
-                    if (isSlideable) {
-                        val mainFragment = parentFragment?.parentFragment as? MainFragment
-                        mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
-                    }
-                } else {
-                    requireMainActivity().apply {
-                        setupForFragment<CommunityFragment>()
-                        lockUiOpenness = false
+                    } else {
+                        requireMainActivity().apply {
+                            setupForFragment<CommunityFragment>()
+                            lockUiOpenness = false
+                            if (isSlideable) {
+                                setNavUiOpenPercent(0f)
+                            }
+                        }
                         if (isSlideable) {
-                            setNavUiOpenPercent(0f)
-                        }
-                    }
-                    if (isSlideable) {
-                        val mainFragment = parentFragment?.parentFragment as? MainFragment
-                        if (!lockPanes) {
-                            mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+                            val mainFragment = parentFragment?.parentFragment as? MainFragment
+                            if (!lockPanes) {
+                                mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+                            }
                         }
                     }
                 }
-            }
 
-            onPostOpen = { accountId, postView ->
-                if (postView != null) {
-                    if (!postView.read) {
-                        moreActionsHelper.onPostRead(
-                            postView = postView,
-                            delayMs = 0,
-                            accountId = accountId,
-                            read = true,
+                onPostOpen = { accountId, postView ->
+                    if (postView != null) {
+                        if (!postView.read) {
+                            moreActionsHelper.onPostRead(
+                                postView = postView,
+                                delayMs = 0,
+                                accountId = accountId,
+                                read = true,
+                            )
+                        }
+
+                        viewModel.updatePost(
+                            postView = postView.copy(
+                                unread_comments = 0,
+                            ),
                         )
                     }
-
-                    viewModel.updatePost(
-                        postView = postView.copy(
-                            unread_comments = 0,
-                        )
-                    )
                 }
-            }
 
-            init()
+                init()
+            }
         }
     }
 
@@ -856,7 +866,7 @@ class CommunityFragment :
                                     viewModel.setPagePosition(
                                         pageIndex,
                                         firstPos,
-                                        firstView?.top ?: 0
+                                        firstView?.top ?: 0,
                                     )
                                 }
                             }
@@ -1249,6 +1259,7 @@ class CommunityFragment :
     private fun showOverflowMenu() {
         val context = context ?: return
 
+        val fullAccount = moreActionsHelper.fullAccount
         val currentCommunityRef = viewModel.currentCommunityRef.value
         val currentDefaultPage = preferences.getDefaultPage()
         val isBookmarked =
@@ -1261,6 +1272,7 @@ class CommunityFragment :
 
         val bottomMenu = BottomMenu(context).apply {
             val isCommunityMenu = currentCommunityRef is CommunityRef.CommunityRefByName
+            val communityRefByName = currentCommunityRef as? CommunityRef.CommunityRefByName
 
             if (isCommunityMenu) {
                 setTitle(R.string.community_options)
@@ -1373,6 +1385,27 @@ class CommunityFragment :
                     )
                 }
             }
+            if (communityRefByName != null && fullAccount != null) {
+                if (fullAccount.isCommunityBlocked(communityRefByName)) {
+                    addItemWithIcon(
+                        id = R.id.unblock_community,
+                        title = getString(
+                            R.string.unblock_this_community_format,
+                            communityRefByName.getName(context)
+                        ),
+                        icon = R.drawable.ic_default_community,
+                    )
+                } else {
+                    addItemWithIcon(
+                        id = R.id.block_community,
+                        title = context.getString(
+                            R.string.block_this_community_format,
+                            communityRefByName.getName(context),
+                        ),
+                        icon = R.drawable.baseline_block_24,
+                    )
+                }
+            }
 
             addDivider()
 
@@ -1469,7 +1502,7 @@ class CommunityFragment :
                         }
                         NavBarDestinations.Search -> {
                             addItemWithIcon(
-                                R.id.searchFragment,
+                                R.id.searchHomeFragment,
                                 getString(R.string.search),
                                 R.drawable.baseline_search_24,
                             )
@@ -1656,7 +1689,7 @@ class CommunityFragment :
             R.id.savedFragment -> {
                 getMainActivity()?.navigateTopLevel(actionId)
             }
-            R.id.searchFragment -> {
+            R.id.searchHomeFragment -> {
                 getMainActivity()?.navigateTopLevel(actionId)
             }
             R.id.historyFragment -> {
@@ -1707,6 +1740,16 @@ class CommunityFragment :
             }
             R.id.go_to -> {
                 GoToDialogFragment.show(childFragmentManager)
+            }
+            R.id.block_community -> {
+                if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+                    moreActionsHelper.blockCommunity(currentCommunityRef, true)
+                }
+            }
+            R.id.unblock_community -> {
+                if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+                    moreActionsHelper.blockCommunity(currentCommunityRef, false)
+                }
             }
         }
     }

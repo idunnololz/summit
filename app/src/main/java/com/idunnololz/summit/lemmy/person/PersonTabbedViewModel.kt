@@ -238,7 +238,7 @@ class PersonTabbedViewModel @Inject constructor(
     }
 
     private fun reset() {
-        postListEngine.clearPages()
+        postListEngine.clear()
         commentListEngine.clear()
     }
 

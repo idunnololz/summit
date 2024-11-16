@@ -18,6 +18,10 @@
     <string name="mp4">MP4</string>
     <string name="webm">WEBM</string>
 
+    <string name="subs_format">%1$s SUBS</string>
+    <string name="posts_format">%1$s POSTS</string>
+    <string name="mau_format2">%1$s MAU</string>
+
 
     <string name="pref_key_app_language">app_language</string>
 

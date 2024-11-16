@@ -3,7 +3,6 @@ package com.idunnololz.summit.util
 import android.content.Context
 import android.util.TypedValue
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class GridAutofitLayoutManager : GridLayoutManager {
@@ -57,7 +56,7 @@ class GridAutofitLayoutManager : GridLayoutManager {
     }
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State) {
-        val totalSpace: Int = if (orientation == LinearLayoutManager.VERTICAL) {
+        val totalSpace: Int = if (orientation == VERTICAL) {
             width - paddingRight - paddingLeft
         } else {
             height - paddingTop - paddingBottom

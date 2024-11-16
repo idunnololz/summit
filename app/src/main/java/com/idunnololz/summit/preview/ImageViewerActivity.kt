@@ -27,7 +27,6 @@ import coil.request.ImageRequest
 import coil.size.Dimension
 import coil.target.Target
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
@@ -50,6 +49,7 @@ import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.view.GalleryImageView
@@ -331,7 +331,7 @@ class ImageViewerActivity :
                                     .setAnchorView(binding.bottomBar)
                                     .show()
                             } else {
-                                FirebaseCrashlytics.getInstance().recordException(it)
+                                crashlytics?.recordException(it)
                                 Snackbar
                                     .make(
                                         getSnackbarContainer(),

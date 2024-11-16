@@ -32,6 +32,7 @@ import com.idunnololz.summit.util.LocaleHelper
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
+import com.idunnololz.summit.util.isFirebaseInitialized
 import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
@@ -229,7 +230,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         if (hiltEntryPoint.preferences().useFirebase) {
             FirebaseApp.initializeApp(this)
-            Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+            Firebase.crashlytics.isCrashlyticsCollectionEnabled = true
+
+            isFirebaseInitialized = true
         }
     }
 

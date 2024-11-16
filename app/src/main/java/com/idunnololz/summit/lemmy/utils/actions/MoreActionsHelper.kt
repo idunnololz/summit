@@ -448,6 +448,7 @@ class MoreActionsHelper @Inject constructor(
                         communityId = id,
                     ),
                 )
+                accountInfoManager.refreshAccountInfo()
             }
             .onFailure {
                 blockCommunityResult.postErrorAndClear(it)

@@ -90,6 +90,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_QUICK_ACTIONS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
@@ -107,7 +108,6 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_TEXT_POSTS
-import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_TEXT_FIELD_TOOLBAR_SETTINGS
@@ -999,10 +999,11 @@ class Preferences(
 
     var animationLevel: AnimationsHelper.AnimationLevel
         get() = AnimationsHelper.AnimationLevel.parse(
-                prefs.getInt(
-                    KEY_ANIMATION_LEVEL,
-                    AnimationsHelper.AnimationLevel.Max.animationLevel)
-            )
+            prefs.getInt(
+                KEY_ANIMATION_LEVEL,
+                AnimationsHelper.AnimationLevel.Max.animationLevel,
+            ),
+        )
         set(value) {
             prefs.edit()
                 .putInt(KEY_ANIMATION_LEVEL, value.animationLevel)

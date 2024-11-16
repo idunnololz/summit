@@ -106,18 +106,17 @@ class ExoPlayerManager(
         videoType: VideoType,
         videoState: VideoState?,
         autoPlay: Boolean = true,
-    ): ExoPlayer =
-        getPlayer().also {
-            val config = ExoPlayerConfig(
-                url = url,
-                videoType = videoType,
-                videoState = videoState,
-                autoPlay = videoState?.playing ?: autoPlay,
-                playing = videoState?.playing ?: autoPlay,
-            )
-            setupPlayer(it, config)
-            savedState[it] = config
-        }
+    ): ExoPlayer = getPlayer().also {
+        val config = ExoPlayerConfig(
+            url = url,
+            videoType = videoType,
+            videoState = videoState,
+            autoPlay = videoState?.playing ?: autoPlay,
+            playing = videoState?.playing ?: autoPlay,
+        )
+        setupPlayer(it, config)
+        savedState[it] = config
+    }
 
     fun release(player: Player?) {
         player ?: return

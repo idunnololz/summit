@@ -96,6 +96,14 @@ class SettingsBackupAndRestoreFragment :
                     .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()
                 findNavController().navigateSafe(direction)
             }
+
+            settings.viewCurrentSettings.bindTo(
+                viewCurrentSettings,
+            ) {
+                val direction = SettingsBackupAndRestoreFragmentDirections
+                    .actionSettingBackupAndRestoreFragmentToViewCurrentSettingsFragment()
+                findNavController().navigateSafe(direction)
+            }
         }
     }
 

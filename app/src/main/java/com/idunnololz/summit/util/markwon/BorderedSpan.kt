@@ -3,7 +3,6 @@ package com.idunnololz.summit.util.markwon
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.text.style.ReplacementSpan
 import com.idunnololz.summit.R
@@ -12,13 +11,14 @@ import com.idunnololz.summit.util.ext.getColorCompat
 
 class BorderedSpan(context: Context) : ReplacementSpan() {
     val paintBorder: Paint
+
 //    val mPaintBackground: Paint
     var width: Int = 0
     var r: Resources
     val textColor = context.getColorCompat(R.color.colorTextInverted)
     val padding = Utils.convertDpToPixel(4f)
 
-        init {
+    init {
         paintBorder = Paint()
         paintBorder.style = Paint.Style.FILL
         paintBorder.isAntiAlias = true
@@ -40,9 +40,9 @@ class BorderedSpan(context: Context) : ReplacementSpan() {
         text: CharSequence,
         start: Int,
         end: Int,
-        fm: Paint.FontMetricsInt?
+        fm: Paint.FontMetricsInt?,
     ): Int {
-        //return text with relative to the Paint
+        // return text with relative to the Paint
         width = paint.measureText(text, start, end).toInt()
         return (width + padding * 2).toInt()
     }
@@ -56,7 +56,7 @@ class BorderedSpan(context: Context) : ReplacementSpan() {
         top: Int,
         y: Int,
         bottom: Int,
-        paint: Paint
+        paint: Paint,
     ) {
 //        canvas.drawRect(x, top.toFloat(), x + mWidth, bottom.toFloat(), mPaintBackground)
         canvas.drawRect(
@@ -66,7 +66,7 @@ class BorderedSpan(context: Context) : ReplacementSpan() {
             bottom.toFloat(),
             paintBorder,
         )
-        paint.setColor(textColor) //use the default text paint to preserve font size/style
+        paint.setColor(textColor) // use the default text paint to preserve font size/style
         canvas.drawText(text, start, end, x + padding, y.toFloat(), paint)
     }
 }

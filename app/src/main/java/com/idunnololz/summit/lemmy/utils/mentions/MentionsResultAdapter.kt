@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.utils.mentions
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.avatar.AvatarHelper
