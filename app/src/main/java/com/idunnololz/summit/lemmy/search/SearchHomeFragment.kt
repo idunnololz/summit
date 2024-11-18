@@ -7,6 +7,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
@@ -25,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.window.layout.WindowMetricsCalculator
 import coil.decode.SvgDecoder
 import coil.load
@@ -110,6 +112,8 @@ class SearchHomeFragment :
 
     @Inject
     lateinit var preferences: Preferences
+
+    private var adapter: SearchHomeAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -314,7 +318,7 @@ class SearchHomeFragment :
                 }
             }
 
-            val adapter = SearchHomeAdapter(
+            val adapter = adapter ?: SearchHomeAdapter(
                 context = context,
                 avatarHelper = avatarHelper,
                 searchHomeConfig = preferences.searchHomeConfig,
@@ -344,7 +348,11 @@ class SearchHomeFragment :
                 },
             ).apply {
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                restoreState(savedInstanceState)
+            }.also {
+                adapter = it
             }
+
             val layoutManager = GridAutofitLayoutManager(
                 context,
                 context.resources.getDimensionPixelSize(R.dimen.search_home_items_width),
@@ -503,6 +511,12 @@ class SearchHomeFragment :
     override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        adapter?.saveState(outState)
+    }
+
     private class SearchHomeAdapter(
         private val context: Context,
         private val avatarHelper: AvatarHelper,
@@ -549,6 +563,12 @@ class SearchHomeFragment :
             ) : Item
         }
 
+        class RecyclerViewSectionData(
+            val name: String,
+            val adapter: SuggestedCommunitiesAdapter,
+            var layoutManager: LayoutManager,
+        )
+
         var searchHomeConfig: SearchHomeConfig = searchHomeConfig
             set(value) {
                 field = value
@@ -557,23 +577,14 @@ class SearchHomeFragment :
 
         private var model: SearchHomeModel? = null
 
-        private val topCommunitiesAdapter = SuggestedCommunitiesAdapter(
-            context = context,
-            avatarHelper = avatarHelper,
-            onCommunityClick = onCommunityClick,
-            onCommunityLongClick = onCommunityLongClick,
-        )
-        private val trendingCommunitiesAdapter = SuggestedCommunitiesAdapter(
-            context = context,
-            avatarHelper = avatarHelper,
-            onCommunityClick = onCommunityClick,
-            onCommunityLongClick = onCommunityLongClick,
-        )
-        private val hotCommunitiesAdapter = SuggestedCommunitiesAdapter(
-            context = context,
-            avatarHelper = avatarHelper,
-            onCommunityClick = onCommunityClick,
-            onCommunityLongClick = onCommunityLongClick,
+        private val topCommunitiesSectionData = newRecyclerViewSection("top")
+        private val trendingCommunitiesSectionData = newRecyclerViewSection("trending")
+        private val hotCommunitiesSectionData = newRecyclerViewSection("hot")
+
+        private val sections = listOf(
+            topCommunitiesSectionData,
+            trendingCommunitiesSectionData,
+            hotCommunitiesSectionData,
         )
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -658,10 +669,15 @@ class SearchHomeFragment :
                 clazz = Item.TopCommunitiesItem::class,
                 inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
                 onViewCreated = { b ->
+                    val sectionData = topCommunitiesSectionData
                     b.recyclerView.layoutManager = LinearLayoutManager(
                         context, LinearLayoutManager.HORIZONTAL, false,
-                    )
-                    b.recyclerView.adapter = topCommunitiesAdapter
+                    ).apply {
+                        onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
+                    }.also {
+                        sectionData.layoutManager = it
+                    }
+                    b.recyclerView.adapter = sectionData.adapter
                     b.recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
                             context.resources.getDimensionPixelSize(R.dimen.padding_half),
@@ -688,10 +704,15 @@ class SearchHomeFragment :
                 clazz = Item.TrendingCommunitiesItem::class,
                 inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
                 onViewCreated = { b ->
+                    val sectionData = trendingCommunitiesSectionData
                     b.recyclerView.layoutManager = LinearLayoutManager(
                         context, LinearLayoutManager.HORIZONTAL, false,
-                    )
-                    b.recyclerView.adapter = trendingCommunitiesAdapter
+                    ).apply {
+                        onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
+                    }.also {
+                        sectionData.layoutManager = it
+                    }
+                    b.recyclerView.adapter = sectionData.adapter
                     b.recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
                             context.resources.getDimensionPixelSize(R.dimen.padding_half),
@@ -718,10 +739,15 @@ class SearchHomeFragment :
                 clazz = Item.HotCommunitiesItem::class,
                 inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
                 onViewCreated = { b ->
+                    val sectionData = hotCommunitiesSectionData
                     b.recyclerView.layoutManager = LinearLayoutManager(
                         context, LinearLayoutManager.HORIZONTAL, false,
-                    )
-                    b.recyclerView.adapter = hotCommunitiesAdapter
+                    ).apply {
+                        onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
+                    }.also {
+                        sectionData.layoutManager = it
+                    }
+                    b.recyclerView.adapter = sectionData.adapter
                     b.recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
                             context.resources.getDimensionPixelSize(R.dimen.padding_half),
@@ -815,7 +841,8 @@ class SearchHomeFragment :
                             isLoading = false,
                         ),
                     )
-                    topCommunitiesAdapter.setData(communitySuggestions.popularLast7Days)
+                    topCommunitiesSectionData.adapter
+                        .setData(communitySuggestions.popularLast7Days)
                     sectionIndex++
                 }
 
@@ -834,7 +861,8 @@ class SearchHomeFragment :
                             isLoading = false,
                         ),
                     )
-                    trendingCommunitiesAdapter.setData(communitySuggestions.trendingLast7Days)
+                    trendingCommunitiesSectionData.adapter
+                        .setData(communitySuggestions.trendingLast7Days)
                     sectionIndex++
                 }
 
@@ -853,7 +881,8 @@ class SearchHomeFragment :
                             isLoading = false,
                         ),
                     )
-                    hotCommunitiesAdapter.setData(communitySuggestions.hot)
+                    hotCommunitiesSectionData.adapter
+                        .setData(communitySuggestions.hot)
                     sectionIndex++
                 }
             } else if (model.isCommunitySuggestionsLoading) {
@@ -909,6 +938,39 @@ class SearchHomeFragment :
             }
 
             adapterHelper.setItems(newItems, this) {}
+        }
+
+        fun saveState(bundle: Bundle) {
+            sections.forEach {
+                bundle.putParcelable("summit.${it.name}", it.layoutManager.onSaveInstanceState())
+            }
+        }
+
+        fun restoreState(bundle: Bundle?) {
+            bundle ?: return
+
+            sections.forEach { section ->
+                bundle.getParcelableCompat<Parcelable>("summit.${section.name}")?.let {
+                    section.layoutManager.onRestoreInstanceState(it)
+                }
+            }
+        }
+
+        private fun newRecyclerViewSection(name: String): RecyclerViewSectionData {
+            return RecyclerViewSectionData(
+                name = name,
+                SuggestedCommunitiesAdapter(
+                    context = context,
+                    avatarHelper = avatarHelper,
+                    onCommunityClick = onCommunityClick,
+                    onCommunityLongClick = onCommunityLongClick,
+                ).apply {
+                    stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                },
+                LinearLayoutManager(
+                    context, LinearLayoutManager.HORIZONTAL, false,
+                ),
+            )
         }
     }
 
