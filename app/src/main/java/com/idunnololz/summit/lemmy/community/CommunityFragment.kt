@@ -1391,7 +1391,7 @@ class CommunityFragment :
                         id = R.id.unblock_community,
                         title = getString(
                             R.string.unblock_this_community_format,
-                            communityRefByName.getName(context)
+                            communityRefByName.getName(context),
                         ),
                         icon = R.drawable.ic_default_community,
                     )

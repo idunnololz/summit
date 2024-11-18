@@ -1858,7 +1858,10 @@
     <string name="trending_communities">Trending communities</string>
     <string name="rising_communities">Rising communities</string>
     <string name="top_communities_this_week">Top communities this week</string>
-    <string name="error_community_blocked">You have blocked this community.</string>
+    <string name="error_community_blocked">Community is blocked by you. Please unblock this community to see it\'s posts.</string>
+    <string name="search_suggestions">Search suggestions</string>
+    <string name="search_screen_settings">Search screen settings</string>
+    <string name="error_search_home_no_sections_selected">You\'ve disabled all sections on this screen. Enable some sections to see them here.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

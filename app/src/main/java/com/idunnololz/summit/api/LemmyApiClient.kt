@@ -434,10 +434,6 @@ class LemmyApiClient(
                 auth = account?.jwt,
             )
         })
-        Log.d(
-            "HAHA",
-            "fetchCommentsWithRetry($this): ${account?.id}, $id, $sort, $maxDepth, $force",
-        )
 
         return retrofitErrorHandler {
             if (force) {

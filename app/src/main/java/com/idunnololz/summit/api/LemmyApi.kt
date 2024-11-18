@@ -790,11 +790,11 @@ interface LemmyApi {
                 .cache(myCache)
                 // Add an Interceptor to the OkHttpClient.
                 .addInterceptor a@{ chain ->
-
                     // Get the request from the chain.
                     var request = chain.request()
 
-                    val shouldUseCache = request.header(CACHE_CONTROL_HEADER) != CACHE_CONTROL_NO_CACHE
+                    val shouldUseCache =
+                        request.header(CACHE_CONTROL_HEADER) != CACHE_CONTROL_NO_CACHE
                     if (!shouldUseCache) {
                         Log.d(TAG, "headers: ${request.headers} url ${request.url}")
                         return@a chain.proceed(request)
@@ -845,7 +845,8 @@ interface LemmyApi {
                          *  If the cache is older than 7 days, then discard it,
                          *  and indicate an error in fetching the response.
                          *  The 'max-stale' attribute is responsible for this behavior.
-                         *  The 'only-if-cached' attribute indicates to not retrieve new data; fetch the cache only instead.
+                         *  The 'only-if-cached' attribute indicates to not retrieve new data;
+                         *  fetch the cache only instead.
                          */
                         request.newBuilder()
                             .cacheControl(CacheControl.FORCE_CACHE)

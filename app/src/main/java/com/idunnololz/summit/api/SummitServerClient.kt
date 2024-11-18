@@ -3,21 +3,18 @@ package com.idunnololz.summit.api
 import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.BuildConfig
-import com.idunnololz.summit.api.LemmyApiClient.Companion
 import com.idunnololz.summit.api.summit.CommunitySuggestionsDto
-import com.idunnololz.summit.cache.CachePolicyManager
-import com.idunnololz.summit.preferences.Preferences
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runInterruptible
-import org.json.JSONObject
-import retrofit2.Call
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
+import org.json.JSONObject
+import retrofit2.Call
 
 @Singleton
 class SummitServerClient @Inject constructor(
@@ -29,9 +26,7 @@ class SummitServerClient @Inject constructor(
         private const val TAG = "SummitServerClient"
     }
 
-    suspend fun communitySuggestions(
-        force: Boolean,
-    ): Result<CommunitySuggestionsDto> {
+    suspend fun communitySuggestions(force: Boolean): Result<CommunitySuggestionsDto> {
         return retrofitErrorHandler {
             if (force) {
                 summitServerApi.communitySuggestionsNoCache()

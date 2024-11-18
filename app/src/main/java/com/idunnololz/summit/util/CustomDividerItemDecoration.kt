@@ -28,11 +28,11 @@ class CustomDividerItemDecoration
  *
  * @param context Current context, it will be used to access resources.
  * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL].
- */
-constructor(
+ */(
     val context: Context,
     orientation: Int,
     val dividerAfterLastItem: Boolean = false,
+    val drawDividerAfter: ((Int) -> Boolean)? = null
 ) : ItemDecoration() {
     /**
      * @return the [Drawable] for this divider.
@@ -109,6 +109,9 @@ constructor(
             if (i == childCount - 1 && !dividerAfterLastItem) {
                 continue
             }
+            if (drawDividerAfter != null && !drawDividerAfter.invoke(i)) {
+                continue
+            }
 
             val child = parent.getChildAt(i)
             parent.getDecoratedBoundsWithMargins(child, mBounds)
@@ -140,6 +143,9 @@ constructor(
         val childCount = parent.childCount
         for (i in 0 until childCount) {
             if (i == childCount - 1 && !dividerAfterLastItem) {
+                continue
+            }
+            if (drawDividerAfter != null && !drawDividerAfter.invoke(i)) {
                 continue
             }
 

@@ -368,6 +368,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                         }
 
+                        is SearchHomeSettings -> TODO()
+
                         null -> {
                             // do nothing
                         }

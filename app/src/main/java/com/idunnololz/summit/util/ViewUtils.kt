@@ -18,3 +18,13 @@ fun View.excludeRegionFromSystemGestures() {
         )
     }
 }
+
+fun View.clearExcludeRegionFromSystemGestures() {
+    val that = this
+    doOnLayout {
+        ViewCompat.setSystemGestureExclusionRects(
+            that,
+            listOf()
+        )
+    }
+}

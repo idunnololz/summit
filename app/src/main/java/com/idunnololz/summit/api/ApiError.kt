@@ -49,4 +49,7 @@ class CouldntFindObjectError() : ClientApiException("Couldn't find object", 400)
 
 class FileTooLargeError() : ClientApiException("File is over the size limit", 413)
 
-class CommunityBlockedError() : ClientApiException("The community you are trying to access is blocked", 400)
+class CommunityBlockedError() : ClientApiException(
+    "The community you are trying to access is blocked",
+    400,
+)

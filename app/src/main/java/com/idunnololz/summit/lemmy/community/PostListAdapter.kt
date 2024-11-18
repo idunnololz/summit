@@ -14,6 +14,7 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
 import com.idunnololz.summit.databinding.FilteredPostItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
@@ -142,6 +143,7 @@ class PostListAdapter(
         is Item.PersistentErrorItem -> R.layout.persistent_error_item
         is Item.ManualLoadItem -> R.layout.manual_load_item
         is Item.PageTitle -> R.layout.page_title_item
+        Item.HeaderItem -> R.layout.item_generic_header
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -179,6 +181,8 @@ class PostListAdapter(
                 ViewBindingViewHolder(ManualLoadItemBinding.bind(v))
             R.layout.page_title_item ->
                 ViewBindingViewHolder(PageTitleItemBinding.bind(v))
+            R.layout.item_generic_header ->
+                ViewBindingViewHolder(ItemGenericHeaderBinding.bind(v))
             else -> throw RuntimeException("Unknown view type: $viewType")
         }
     }
@@ -350,21 +354,11 @@ class PostListAdapter(
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
+                h.root.setTag(R.id.post_item, true)
             }
 
             is Item.FilteredPostItem -> {
                 val b = holder.getBinding<FilteredPostItemBinding>()
-
-                val source = item.fetchedPost.source
-                val themeColor = if (source is Source.AccountSource) {
-                    accountImageGenerator.getColorForPerson(
-                        source.name,
-                        source.id,
-                        source.instance,
-                    )
-                } else {
-                    null
-                }
 
                 b.text.text = context.getString(R.string.post_filtered_format, item.filterReason)
                 b.root.setOnClickListener {
@@ -372,6 +366,7 @@ class PostListAdapter(
                     postListEngine.createItems()
                     refreshItems(true)
                 }
+                b.root.setTag(R.id.post_item, true)
             }
 
             is Item.AutoLoadItem -> {
@@ -433,6 +428,7 @@ class PostListAdapter(
                     (item.pageIndex + 1).toString(),
                 )
             }
+            Item.HeaderItem -> {}
         }
     }
 
@@ -552,6 +548,8 @@ class PostListAdapter(
                         is Item.PageTitle ->
                             oldItem.pageIndex ==
                                 (newItem as Item.PageTitle).pageIndex
+
+                        Item.HeaderItem -> true
                     }
                 }
 
