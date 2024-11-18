@@ -98,18 +98,31 @@ class SearchHomeViewModel @Inject constructor(
         }
     }
 
-    fun generateModel(componentName: ComponentName? = null, force: Boolean = false) {
+    fun generateModel(
+        componentName: ComponentName? = null,
+        force: Boolean = false
+    ) {
         if (componentName != null) {
             this.componentName = componentName
         }
 
         val componentName = this.componentName ?: return
 
+        val currentModel = model.valueOrNull
+        if (currentModel != null &&
+            !currentModel.isCommunitySuggestionsLoading &&
+            currentModel.errors.isEmpty() &&
+            !force) {
+
+            return
+        }
+
         model.setIsLoading()
 
         viewModelScope.launch {
             val seen = mutableSetOf<String>()
             val searchSuggestions = ArrayList<String>()
+            val errors = mutableListOf<Throwable>()
 
             val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
             val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
@@ -152,11 +165,17 @@ class SearchHomeViewModel @Inject constructor(
                         },
                         communitySuggestionsDto = null,
                         isCommunitySuggestionsLoading = true,
+                        errors = errors,
                     ),
                 )
             }
 
             val communitySessions = summitServerClient.communitySuggestions(force)
+
+            communitySessions
+                .onFailure {
+                    errors.add(it)
+                }
 
             withContext(Dispatchers.Main) {
                 model.setValue(
@@ -170,6 +189,7 @@ class SearchHomeViewModel @Inject constructor(
                         },
                         communitySuggestionsDto = communitySessions.getOrNull(),
                         isCommunitySuggestionsLoading = false,
+                        errors = errors
                     ),
                 )
             }

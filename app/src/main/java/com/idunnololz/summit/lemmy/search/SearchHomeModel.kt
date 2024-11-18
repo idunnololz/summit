@@ -9,6 +9,7 @@ data class SearchHomeModel(
     val myCommunities: List<MyCommunity>,
     val communitySuggestionsDto: CommunitySuggestionsDto?,
     val isCommunitySuggestionsLoading: Boolean,
+    val errors: List<Throwable>,
 )
 
 data class MyCommunity(

@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 197
-        versionName = "1.46.1"
+        versionCode = 198
+        versionName = "1.46.2"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -62,6 +62,7 @@ dependencies {
     implementation(project(":overlappingPane"))
     implementation(project(":calligraphy"))
     implementation(project(":gravitySnapHelper"))
+    implementation(project(":imagepicker"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
@@ -143,7 +144,6 @@ dependencies {
     ksp(libs.moshi.sealed.codegen)
 
     implementation(libs.transformations)
-    implementation(libs.imagepicker)
     implementation(libs.java.string.similarity)
     implementation(libs.viewpump)
     implementation(libs.colorpickerview)

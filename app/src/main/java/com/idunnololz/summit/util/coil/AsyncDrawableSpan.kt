@@ -5,9 +5,12 @@ import android.graphics.Paint
 import android.text.style.ReplacementSpan
 import androidx.annotation.IntDef
 import androidx.annotation.IntRange
+import com.idunnololz.summit.util.Utils
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.utils.SpanUtils
+import kotlin.math.max
+import kotlin.math.min
 
 // @since 4.2.1 we do not set intrinsic bounds
 //  at this point they will always be 0,0-1,1, but this
@@ -18,6 +21,8 @@ class AsyncDrawableSpan(
     @param:Alignment private val alignment: Int,
     private val replacementTextIsLink: Boolean,
 ) : ReplacementSpan() {
+
+    private val minImageWidth = Utils.convertDpToPixel(64f).toInt()
 
     @IntDef(ALIGN_BOTTOM, ALIGN_BASELINE, ALIGN_CENTER)
     @Retention(
@@ -75,8 +80,11 @@ class AsyncDrawableSpan(
     ) {
         // @since 4.4.0 use SpanUtils instead of `canvas.getWidth`
 
+        val canvasWidth = SpanUtils.width(canvas, text)
+        val minWidth = min(minImageWidth, canvasWidth)
+
         drawable.initWithKnownDimensions(
-            SpanUtils.width(canvas, text) - x.toInt(),
+            max(canvasWidth - x.toInt(), minWidth),
             paint.textSize,
         )
 
