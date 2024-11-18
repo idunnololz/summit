@@ -38,7 +38,9 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.summit.TrendingCommunityData
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentSearchHomeBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeCommunityBinding
+import com.idunnololz.summit.databinding.ItemSearchHomeEmptyNoSectionsSelectedItemBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeMyCommunityBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeSearchSuggestionBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeTitleBinding
@@ -51,6 +53,9 @@ import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchHomeFragment.SearchHomeAdapter.Item
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.SearchHomeConfig
+import com.idunnololz.summit.preferences.anySectionsEnabled
 import com.idunnololz.summit.saved.SavedTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
@@ -59,6 +64,8 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.GridAutofitLayoutManager
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.clearExcludeRegionFromSystemGestures
+import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
@@ -72,7 +79,6 @@ import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class SearchHomeFragment :
@@ -101,6 +107,9 @@ class SearchHomeFragment :
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,7 +148,7 @@ class SearchHomeFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         setBinding(FragmentSearchHomeBinding.inflate(inflater, container, false))
@@ -166,6 +175,14 @@ class SearchHomeFragment :
         }
 
         with(binding) {
+            childFragmentManager.setFragmentResultListener(
+                SearchHomeConfigDialogFragment.REQUEST_KEY,
+                viewLifecycleOwner,
+            ) { _, _ ->
+                (recyclerView.adapter as? SearchHomeAdapter)?.searchHomeConfig =
+                    preferences.searchHomeConfig
+            }
+
             viewModel.currentAccountView.observe(viewLifecycleOwner) {
                 it.loadProfileImageOrDefault(binding.accountImageView)
             }
@@ -235,7 +252,9 @@ class SearchHomeFragment :
                 object : View.OnKeyListener {
                     override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
                         // If the event is a key-down event on the "enter" button
-                        if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (event.action == KeyEvent.ACTION_DOWN &&
+                            keyCode == KeyEvent.KEYCODE_ENTER
+                        ) {
                             launchSearch()
                             return true
                         }
@@ -298,6 +317,7 @@ class SearchHomeFragment :
             val adapter = SearchHomeAdapter(
                 context = context,
                 avatarHelper = avatarHelper,
+                searchHomeConfig = preferences.searchHomeConfig,
                 onSuggestionClick = {
                     launchSearch(it)
                 },
@@ -316,7 +336,12 @@ class SearchHomeFragment :
                 onCommunityLongClick = {
                     val url = it.toUrl(viewModel.apiInstance)
                     getMainActivity()?.showMoreLinkOptions(url, null)
-                }
+                },
+                onSettingsClick = {
+                    SearchHomeConfigDialogFragment.show(
+                        childFragmentManager,
+                    )
+                },
             ).apply {
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -327,12 +352,14 @@ class SearchHomeFragment :
                 spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
                         return when (adapter.getItem(position)) {
+                            is Item.HeaderItem -> spanCount
                             is Item.TitleItem -> spanCount
                             is Item.SearchSuggestionItem -> 1
                             is Item.MyCommunityItem -> 1
                             is Item.TopCommunitiesItem -> spanCount
                             is Item.HotCommunitiesItem -> spanCount
                             is Item.TrendingCommunitiesItem -> spanCount
+                            Item.EmptyNoSectionsEnabledItem -> spanCount
                         }
                     }
                 }
@@ -345,7 +372,7 @@ class SearchHomeFragment :
                     adapter,
                     Utils.convertDpToPixel(12f).toInt(),
                     layoutManager,
-                )
+                ),
             )
 
             swipeRefreshLayout.setOnRefreshListener {
@@ -479,15 +506,22 @@ class SearchHomeFragment :
     private class SearchHomeAdapter(
         private val context: Context,
         private val avatarHelper: AvatarHelper,
+        searchHomeConfig: SearchHomeConfig,
         private val onSuggestionClick: (String) -> Unit,
         private val onRemoveSuggestionClick: (String) -> Unit,
         private val onCommunityClick: (CommunityRef) -> Unit,
         private val onCommunityLongClick: (CommunityRef) -> Unit,
+        private val onSettingsClick: () -> Unit,
     ) : Adapter<RecyclerView.ViewHolder>() {
 
         sealed interface Item {
+            data object HeaderItem : Item
+
+            data object EmptyNoSectionsEnabledItem : Item
+
             data class TitleItem(
                 val title: String,
+                val showSettingsButton: Boolean,
             ) : Item
 
             data class SearchSuggestionItem(
@@ -515,6 +549,14 @@ class SearchHomeFragment :
             ) : Item
         }
 
+        var searchHomeConfig: SearchHomeConfig = searchHomeConfig
+            set(value) {
+                field = value
+                refreshItems()
+            }
+
+        private var model: SearchHomeModel? = null
+
         private val topCommunitiesAdapter = SuggestedCommunitiesAdapter(
             context = context,
             avatarHelper = avatarHelper,
@@ -537,6 +579,7 @@ class SearchHomeFragment :
         private val adapterHelper = AdapterHelper<Item>(
             { oldItem, newItem ->
                 oldItem::class == newItem::class && when (oldItem) {
+                    is Item.HeaderItem -> true
                     is Item.TitleItem ->
                         oldItem.title == (newItem as Item.TitleItem).title
                     is Item.SearchSuggestionItem ->
@@ -546,14 +589,37 @@ class SearchHomeFragment :
                     is Item.HotCommunitiesItem -> true
                     is Item.TrendingCommunitiesItem -> true
                     is Item.TopCommunitiesItem -> true
+                    Item.EmptyNoSectionsEnabledItem -> true
                 }
             },
         ).apply {
+            addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { _, _, _ -> }
+            addItemType(
+                clazz = Item.EmptyNoSectionsEnabledItem::class,
+                inflateFn = ItemSearchHomeEmptyNoSectionsSelectedItemBinding::inflate,
+            ) { item, b, _ ->
+                b.loadingView.showErrorWithButton(
+                    context.getString(R.string.error_search_home_no_sections_selected),
+                    context.getString(R.string.search_screen_settings),
+                ) {
+                    onSettingsClick()
+                }
+            }
             addItemType(
                 clazz = Item.TitleItem::class,
                 inflateFn = ItemSearchHomeTitleBinding::inflate,
             ) { item, b, _ ->
                 b.title.text = item.title
+                if (item.showSettingsButton) {
+                    b.settings.excludeRegionFromSystemGestures()
+                    b.settings.visibility = View.VISIBLE
+                    b.settings.setOnClickListener {
+                        onSettingsClick()
+                    }
+                } else {
+                    b.settings.clearExcludeRegionFromSystemGestures()
+                    b.settings.visibility = View.INVISIBLE
+                }
             }
             addItemType(
                 clazz = Item.SearchSuggestionItem::class,
@@ -592,7 +658,9 @@ class SearchHomeFragment :
                 clazz = Item.TopCommunitiesItem::class,
                 inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
                 onViewCreated = { b ->
-                    b.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                    b.recyclerView.layoutManager = LinearLayoutManager(
+                        context, LinearLayoutManager.HORIZONTAL, false,
+                    )
                     b.recyclerView.adapter = topCommunitiesAdapter
                     b.recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
@@ -608,8 +676,6 @@ class SearchHomeFragment :
                         .attachToRecyclerView(b.recyclerView)
                 },
             ) { item, b, _ ->
-                b.title.text = context.getString(R.string.top_communities_this_week)
-
                 if (item.isLoading) {
                     b.progressBar.visibility = View.VISIBLE
                     b.recyclerView.visibility = View.GONE
@@ -622,7 +688,9 @@ class SearchHomeFragment :
                 clazz = Item.TrendingCommunitiesItem::class,
                 inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
                 onViewCreated = { b ->
-                    b.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                    b.recyclerView.layoutManager = LinearLayoutManager(
+                        context, LinearLayoutManager.HORIZONTAL, false,
+                    )
                     b.recyclerView.adapter = trendingCommunitiesAdapter
                     b.recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
@@ -638,8 +706,6 @@ class SearchHomeFragment :
                         .attachToRecyclerView(b.recyclerView)
                 },
             ) { item, b, _ ->
-                b.title.text = context.getString(R.string.trending_communities)
-
                 if (item.isLoading) {
                     b.progressBar.visibility = View.VISIBLE
                     b.recyclerView.visibility = View.GONE
@@ -652,7 +718,9 @@ class SearchHomeFragment :
                 clazz = Item.HotCommunitiesItem::class,
                 inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
                 onViewCreated = { b ->
-                    b.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                    b.recyclerView.layoutManager = LinearLayoutManager(
+                        context, LinearLayoutManager.HORIZONTAL, false,
+                    )
                     b.recyclerView.adapter = hotCommunitiesAdapter
                     b.recyclerView.addItemDecoration(
                         HorizontalSpaceItemDecoration(
@@ -668,8 +736,6 @@ class SearchHomeFragment :
                         .attachToRecyclerView(b.recyclerView)
                 },
             ) { item, b, _ ->
-                b.title.text = context.getString(R.string.rising_communities)
-
                 if (item.isLoading) {
                     b.progressBar.visibility = View.VISIBLE
                     b.recyclerView.visibility = View.GONE
@@ -695,25 +761,54 @@ class SearchHomeFragment :
         fun getItem(i: Int) = adapterHelper.items[i]
 
         fun setData(model: SearchHomeModel) {
+            this.model = model
+            refreshItems()
+        }
+
+        private fun refreshItems() {
+            val model = model ?: return
             val newItems = mutableListOf<Item>()
             val communitySuggestions = model.communitySuggestionsDto
+            var sectionIndex = 0
 
-            if (model.suggestions.isNotEmpty()) {
-                newItems.add(Item.TitleItem(context.getString(R.string.recent_searches)))
+            newItems.add(Item.HeaderItem)
+
+            if (model.suggestions.isNotEmpty() && searchHomeConfig.showSearchSuggestions) {
+                newItems.add(
+                    Item.TitleItem(
+                        title = context.getString(R.string.recent_searches),
+                        showSettingsButton = sectionIndex == 0,
+                    ),
+                )
                 model.suggestions.mapTo(newItems) {
                     Item.SearchSuggestionItem(it)
                 }
+                sectionIndex++
             }
 
-            if (model.myCommunities.isNotEmpty()) {
-                newItems.add(Item.TitleItem(context.getString(R.string.your_communities)))
+            if (model.myCommunities.isNotEmpty() && searchHomeConfig.showSubscribedCommunities) {
+                newItems.add(
+                    Item.TitleItem(
+                        title = context.getString(R.string.your_communities),
+                        showSettingsButton = sectionIndex == 0,
+                    ),
+                )
                 model.myCommunities.mapTo(newItems) {
                     Item.MyCommunityItem(it.communityRef, it.sub)
                 }
+                sectionIndex++
             }
 
             if (communitySuggestions != null) {
-                if (communitySuggestions.popularLast7Days.isNotEmpty()) {
+                if (communitySuggestions.popularLast7Days.isNotEmpty() &&
+                    searchHomeConfig.showTopCommunity7DaysSuggestions
+                ) {
+                    newItems.add(
+                        Item.TitleItem(
+                            title = context.getString(R.string.top_communities_this_week),
+                            showSettingsButton = sectionIndex == 0,
+                        ),
+                    )
                     newItems.add(
                         Item.TopCommunitiesItem(
                             communitySuggestions.popularLast7Days,
@@ -721,9 +816,18 @@ class SearchHomeFragment :
                         ),
                     )
                     topCommunitiesAdapter.setData(communitySuggestions.popularLast7Days)
+                    sectionIndex++
                 }
 
-                if (communitySuggestions.trendingLast7Days.isNotEmpty()) {
+                if (communitySuggestions.trendingLast7Days.isNotEmpty() &&
+                    searchHomeConfig.showTrendingCommunitySuggestions
+                ) {
+                    newItems.add(
+                        Item.TitleItem(
+                            title = context.getString(R.string.trending_communities),
+                            showSettingsButton = sectionIndex == 0,
+                        ),
+                    )
                     newItems.add(
                         Item.TrendingCommunitiesItem(
                             communitySuggestions.trendingLast7Days,
@@ -731,9 +835,18 @@ class SearchHomeFragment :
                         ),
                     )
                     trendingCommunitiesAdapter.setData(communitySuggestions.trendingLast7Days)
+                    sectionIndex++
                 }
 
-                if (communitySuggestions.hot.isNotEmpty()) {
+                if (communitySuggestions.hot.isNotEmpty() &&
+                    searchHomeConfig.showRisingCommunitySuggestions
+                ) {
+                    newItems.add(
+                        Item.TitleItem(
+                            title = context.getString(R.string.rising_communities),
+                            showSettingsButton = sectionIndex == 0,
+                        ),
+                    )
                     newItems.add(
                         Item.HotCommunitiesItem(
                             communitySuggestions.hot,
@@ -741,26 +854,58 @@ class SearchHomeFragment :
                         ),
                     )
                     hotCommunitiesAdapter.setData(communitySuggestions.hot)
+                    sectionIndex++
                 }
             } else if (model.isCommunitySuggestionsLoading) {
-                newItems.add(
-                    Item.TopCommunitiesItem(
-                        listOf(),
-                        isLoading = true,
-                    ),
-                )
-                newItems.add(
-                    Item.TrendingCommunitiesItem(
-                        listOf(),
-                        isLoading = true,
-                    ),
-                )
-                newItems.add(
-                    Item.HotCommunitiesItem(
-                        listOf(),
-                        isLoading = true,
-                    ),
-                )
+                if (searchHomeConfig.showTopCommunity7DaysSuggestions) {
+                    newItems.add(
+                        Item.TitleItem(
+                            title = context.getString(R.string.top_communities_this_week),
+                            showSettingsButton = sectionIndex == 0,
+                        ),
+                    )
+                    newItems.add(
+                        Item.TopCommunitiesItem(
+                            listOf(),
+                            isLoading = true,
+                        ),
+                    )
+                    sectionIndex++
+                }
+                if (searchHomeConfig.showTrendingCommunitySuggestions) {
+                    newItems.add(
+                        Item.TitleItem(
+                            title = context.getString(R.string.trending_communities),
+                            showSettingsButton = sectionIndex == 0,
+                        ),
+                    )
+                    newItems.add(
+                        Item.TrendingCommunitiesItem(
+                            listOf(),
+                            isLoading = true,
+                        ),
+                    )
+                    sectionIndex++
+                }
+                if (searchHomeConfig.showRisingCommunitySuggestions) {
+                    newItems.add(
+                        Item.TitleItem(
+                            title = context.getString(R.string.rising_communities),
+                            showSettingsButton = sectionIndex == 0,
+                        ),
+                    )
+                    newItems.add(
+                        Item.HotCommunitiesItem(
+                            listOf(),
+                            isLoading = true,
+                        ),
+                    )
+                    sectionIndex++
+                }
+            }
+
+            if (!searchHomeConfig.anySectionsEnabled) {
+                newItems.add(Item.EmptyNoSectionsEnabledItem)
             }
 
             adapterHelper.setItems(newItems, this) {}
@@ -778,7 +923,7 @@ class SearchHomeFragment :
             data class SuggestedCommunityItem(
                 val communityRef: CommunityRef,
                 val community: TrendingCommunityData,
-            ): Item
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -819,7 +964,8 @@ class SearchHomeFragment :
                 b.title.text = item.community.name
                 b.subtitle.text = item.community.baseurl
 
-                val mauString = LemmyUtils.abbrevNumber(item.community.counts.usersActiveMonth.toLong())
+                val mauString =
+                    LemmyUtils.abbrevNumber(item.community.counts.usersActiveMonth.toLong())
                 @Suppress("SetTextI18n")
                 b.mau.text = context.getString(R.string.mau_format2, mauString)
                 b.mau.typeface = LemmyHeaderHelper.condensedTypeface
@@ -884,8 +1030,26 @@ class SearchHomeFragment :
         init {
             adapter.registerAdapterDataObserver(object : AdapterDataObserver() {
                 override fun onChanged() {
-                    super.onChanged()
+                    itemFlags.clear()
+                }
 
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                    itemFlags.clear()
+                }
+
+                override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                    itemFlags.clear()
+                }
+
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    itemFlags.clear()
+                }
+
+                override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                    itemFlags.clear()
+                }
+
+                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
                     itemFlags.clear()
                 }
             })
@@ -910,6 +1074,8 @@ class SearchHomeFragment :
             val isEnd = spanData and 0x1 != 0
 
             if (isStart && isEnd) {
+                outRect.left = 0
+                outRect.right = 0
                 return
             }
 
@@ -929,12 +1095,16 @@ class SearchHomeFragment :
             var rowSpanCount = 0
 
             for (i in 0 until adapter.itemCount) {
-                val isStart = rowSpanCount == 0
+                var isStart = rowSpanCount == 0
                 val isEnd: Boolean
 
                 rowSpanCount += spanSizeLookup.getSpanSize(i)
 
                 if (rowSpanCount >= spanCount) {
+                    if (rowSpanCount > spanCount) {
+                        isStart = true
+                    }
+
                     rowSpanCount = 0
                     isEnd = true
                 } else {
@@ -950,7 +1120,7 @@ class SearchHomeFragment :
                         0x1
                     } else {
                         0x0
-                    }
+                    },
                 )
             }
         }

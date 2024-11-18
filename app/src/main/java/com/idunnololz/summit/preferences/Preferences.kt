@@ -99,6 +99,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_F
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SCREENSHOT_WIDTH_DP
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
@@ -1032,6 +1033,14 @@ class Preferences(
             prefs.edit()
                 .putBoolean(KEY_PARSE_MARKDOWN_IN_POST_TITLES, value)
                 .apply()
+        }
+
+    var searchHomeConfig: SearchHomeConfig
+        get() =
+            prefs.getMoshiValue<SearchHomeConfig>(KEY_SEARCH_HOME_CONFIG)
+                ?: SearchHomeConfig()
+        set(value) {
+            prefs.putMoshiValue(KEY_SEARCH_HOME_CONFIG, value)
         }
 
     suspend fun getOfflinePostCount(): Int =

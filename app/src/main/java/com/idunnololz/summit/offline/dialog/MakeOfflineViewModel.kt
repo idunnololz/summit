@@ -1,7 +1,6 @@
 package com.idunnololz.summit.offline.dialog
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -34,7 +33,6 @@ class MakeOfflineViewModel @Inject constructor(
 
             workManager.getWorkInfoByIdLiveData(requestId)
                 .observeForever { workInfo ->
-                    Log.d("HAHA", "workInfo: $workInfo")
                     if (workInfo != null) {
                         if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                             progress.postValue(

@@ -240,4 +240,5 @@
     <item name="go_to" type="id" />
     <item name="bind_text_cache_key" type="id" />
     <item name="bind_text_cached_span" type="id" />
+    <item name="post_item" type="id" />
 </resources>

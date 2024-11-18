@@ -30,6 +30,9 @@ fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
             CustomDividerItemDecoration(
                 this.context,
                 DividerItemDecoration.VERTICAL,
+                drawDividerAfter = { position ->
+                    getChildAt(position).getTag(R.id.post_item) == true
+                },
             ).apply {
                 setDrawable(
                     checkNotNull(

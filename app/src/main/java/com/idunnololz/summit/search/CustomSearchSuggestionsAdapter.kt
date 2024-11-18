@@ -7,11 +7,9 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
@@ -66,11 +64,11 @@ class CustomSearchSuggestionsAdapter(
                     old.suggestion == (new as Item.SuggestionItem).suggestion
                 Item.FooterItem -> true
             }
-        }
+        },
     ).apply {
         addItemType(
             clazz = Item.SuggestionItem::class,
-            inflateFn = ItemCustomSearchSuggestionBinding::inflate
+            inflateFn = ItemCustomSearchSuggestionBinding::inflate,
         ) { item, b, h ->
             val s = item.suggestion
 
@@ -207,8 +205,7 @@ class CustomSearchSuggestionsAdapter(
         adapterHelper.setItems(newItems, this)
     }
 
-    override fun getItemViewType(position: Int): Int =
-        adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         adapterHelper.onCreateViewHolder(parent, viewType)
@@ -216,8 +213,7 @@ class CustomSearchSuggestionsAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
         adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-        adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     fun setListener(listener: OnSuggestionListener) {
         this.listener = listener

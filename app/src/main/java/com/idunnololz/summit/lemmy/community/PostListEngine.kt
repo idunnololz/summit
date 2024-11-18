@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
 import com.idunnololz.summit.api.CommunityBlockedError
-import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -15,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 sealed interface Item {
+
+    data object HeaderItem : Item
 
     sealed interface PostItem : Item {
         val fetchedPost: FetchedPost
@@ -192,6 +193,8 @@ class PostListEngine(
         val firstPage = pages.first()
         val lastPage = pages.last()
 
+        items.add(Item.HeaderItem)
+
         if (isCommunityBlocked) {
             items.add(Item.PersistentErrorItem(CommunityBlockedError()))
         }
@@ -309,6 +312,7 @@ class PostListEngine(
 
         return _items.indexOfFirst {
             when (it) {
+                is Item.HeaderItem -> false
                 is Item.FooterItem -> false
                 is Item.AutoLoadItem -> false
                 Item.EndItem -> false
@@ -328,6 +332,7 @@ class PostListEngine(
         this.postToHighlightForever = postToHighlight
         return _items.indexOfFirst {
             when (it) {
+                is Item.HeaderItem -> false
                 is Item.FooterItem -> false
                 is Item.AutoLoadItem -> false
                 Item.EndItem -> false

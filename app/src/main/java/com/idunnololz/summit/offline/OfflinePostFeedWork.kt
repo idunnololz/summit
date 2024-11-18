@@ -90,7 +90,6 @@ class OfflinePostFeedWork @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun doWork(): Result {
-        Log.d("HAHA", "doWork()")
         val progressTracker = ProgressTracker()
 
         setProgress(progressTracker.getProgressData())

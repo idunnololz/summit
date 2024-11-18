@@ -372,373 +372,375 @@ class PostFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireMainActivity().apply {
-            insetViewExceptBottomAutomaticallyByPadding(
-                viewLifecycleOwner,
-                binding.findInPageToolbar,
-            )
-        }
-
-        fun onMoreClick() {
-            val data = viewModel.postData.valueOrNull
-            val postView = data?.postView?.post ?: args.post
-
-            if (postView != null) {
-                showMorePostOptions(
-                    instance = viewModel.apiInstance,
-                    accountId = accountId,
-                    postView = postView,
-                    moreActionsHelper = moreActionsHelper,
-                    fragmentManager = childFragmentManager,
-                    isPostMenu = true,
-                    onSortOrderClick = {
-                        getMainActivity()?.showBottomMenu(getSortByMenu())
-                    },
-                    onRefreshClick = {
-                        viewModel.fetchPostData(force = true)
-                    },
-                    onFindInPageClick = {
-                        viewModel.findInPageVisible.value = true
-                    },
-                    onScreenshotClick = {
-                        viewModel.screenshotMode.value = true
-                    },
+        with(binding) {
+            requireMainActivity().apply {
+                insetViewExceptBottomAutomaticallyByPadding(
+                    viewLifecycleOwner,
+                    binding.findInPageToolbar,
                 )
             }
-        }
 
-        val context = requireContext()
-        if (adapter == null) {
-            adapter = PostAdapter(
-                postAndCommentViewBuilder = postAndCommentViewBuilder,
-                context = context,
-                containerView = binding.recyclerView,
-                lifecycleOwner = this,
-                instance = getInstance(),
-                accountId = accountId,
-                revealAll = args.reveal,
-                useFooter = false,
-                isEmbedded = false,
-                videoState = args.videoState,
-                autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
-                onRefreshClickCb = {
-                    forceRefresh()
-                },
-                onSignInRequired = {
-                    PreAuthDialogFragment.newInstance()
-                        .show(childFragmentManager, "asdf")
-                },
-                onInstanceMismatch = { accountInstance, apiInstance ->
-                    onInstanceMismatch(accountInstance, apiInstance)
-                },
-                onAddCommentClick = { postOrComment ->
-                    if (accountManager.currentAccount.value == null) {
-                        PreAuthDialogFragment.newInstance(R.id.action_add_comment)
-                            .show(childFragmentManager, "asdf")
-                        return@PostAdapter
-                    }
+            fun onMoreClick() {
+                val data = viewModel.postData.valueOrNull
+                val postView = data?.postView?.post ?: args.post
 
-                    AddOrEditCommentFragment.showReplyDialog(
-                        instance = getInstance(),
-                        postOrCommentView = postOrComment,
-                        fragmentManager = childFragmentManager,
-                        accountId = accountId,
-                    )
-                },
-                onImageClick = { postOrCommentView, imageView, url ->
-                    getMainActivity()?.openImage(
-                        sharedElement = imageView,
-                        appBar = binding.appBar,
-                        title = postOrCommentView?.fold(
-                            {
-                                it.post.name
-                            },
-                            {
-                                null
-                            },
-                        ),
-                        url = url,
-                        mimeType = null,
-                    )
-                },
-                onVideoClick = { url, videoType, state ->
-                    getMainActivity()?.openVideo(url, videoType, state)
-                },
-                onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
-                },
-                onPageClick = {
-                    getMainActivity()?.launchPage(it)
-                },
-                onPostActionClick = { postView, itemId, actionId ->
-                    createPostActionHandler(
+                if (postView != null) {
+                    showMorePostOptions(
                         instance = viewModel.apiInstance,
                         accountId = accountId,
                         postView = postView,
                         moreActionsHelper = moreActionsHelper,
                         fragmentManager = childFragmentManager,
-                        onScreenshotClick = {
-                            getAdapter()?.selectItemForScreenshot(itemId)
-                            viewModel.screenshotMode.value = true
+                        isPostMenu = true,
+                        onSortOrderClick = {
+                            getMainActivity()?.showBottomMenu(getSortByMenu())
                         },
-                    )(actionId)
-                },
-                onCommentActionClick = { commentView, itemId, actionId ->
-                    createCommentActionHandler(
-                        apiInstance = viewModel.apiInstance,
-                        commentView = commentView,
-                        moreActionsHelper = moreActionsHelper,
-                        fragmentManager = childFragmentManager,
-                        onLoadComment = {
-                            viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
-                            viewModel.fetchPostData()
+                        onRefreshClick = {
+                            viewModel.fetchPostData(force = true)
+                        },
+                        onFindInPageClick = {
+                            viewModel.findInPageVisible.value = true
                         },
                         onScreenshotClick = {
-                            getAdapter()?.selectItemForScreenshot(itemId)
                             viewModel.screenshotMode.value = true
                         },
-                    )(actionId)
-                },
-                onFetchComments = {
-                    viewModel.fetchMoreComments(it)
-                },
-                onLoadPost = {
-                    viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
-                    viewModel.fetchPostData()
-                },
-                onLinkClick = { url, text, linkType ->
-                    onLinkClick(url, text, linkType)
-                },
-                onLinkLongClick = { url, text ->
-                    getMainActivity()?.showMoreLinkOptions(url, text)
-                },
-                switchToNativeInstance = {
-                    viewModel.switchToNativeInstance()
-                },
-            ).apply {
-                stateRestorationPolicy =
-                    RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                    )
+                }
             }
-        }
 
-        installOnActionResultHandler(
-            moreActionsHelper = moreActionsHelper,
-            snackbarContainer = binding.fabSnackbarCoordinatorLayout,
-            onPostUpdated = { postId, accountId ->
-                viewModel.fetchPostData(force = true)
-                (parentFragment as? CommunityFragment)?.updatePost(
-                    postId = postId,
+            val context = requireContext()
+            if (adapter == null) {
+                adapter = PostAdapter(
+                    postAndCommentViewBuilder = postAndCommentViewBuilder,
+                    context = context,
+                    containerView = binding.recyclerView,
+                    lifecycleOwner = this@PostFragment,
+                    instance = getInstance(),
                     accountId = accountId,
-                )
-            },
-            onCommentUpdated = {
-                viewModel.fetchMoreComments(it, 1, true)
-            },
-        )
-
-        runAfterLayout {
-            if (!isBindingAvailable()) return@runAfterLayout
-
-            adapter?.contentMaxWidth = binding.recyclerView.width
-
-            setup()
-        }
-
-        binding.fab.setup(preferences)
-        if (preferences.commentsNavigationFab) {
-            binding.fab.setImageResource(R.drawable.outline_navigation_24)
-            binding.fab.show()
-            binding.fab.setOnClickListener {
-                viewModel.toggleCommentNavControls()
-            }
-        } else {
-            binding.fab.setImageResource(R.drawable.baseline_more_horiz_24)
-            binding.fab.show()
-            binding.fab.setOnClickListener {
-                onMoreClick()
-            }
-        }
-
-        commentNavViewController = CommentNavViewController(
-            binding.fabSnackbarCoordinatorLayout,
-            preferences,
-        )
-        smoothScroller = object : LinearSmoothScroller(context) {
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_START
-            }
-
-            override fun calculateDtToFit(
-                viewStart: Int,
-                viewEnd: Int,
-                boxStart: Int,
-                boxEnd: Int,
-                snapPreference: Int,
-            ): Int {
-                return boxStart - viewStart + (getMainActivity()?.insets?.value?.topInset ?: 0)
-            }
-        }
-        viewModel.commentNavControlsState.observe(viewLifecycleOwner) {
-            if (!preferences.commentsNavigationFab) {
-                return@observe
-            }
-
-            if (it != null) {
-                binding.fab.setImageDrawable(
-                    context.getDrawableCompat(R.drawable.baseline_close_24),
-                )
-                commentNavViewController?.show(
-                    it,
-                    onNextClick = {
-                        goToNextComment()
+                    revealAll = args.reveal,
+                    useFooter = false,
+                    isEmbedded = false,
+                    videoState = args.videoState,
+                    autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
+                    onRefreshClickCb = {
+                        forceRefresh()
                     },
-                    onPrevClick = {
-                        goToPreviousComment()
+                    onSignInRequired = {
+                        PreAuthDialogFragment.newInstance()
+                            .show(childFragmentManager, "asdf")
                     },
-                    onMoreClick = {
-                        val data = viewModel.postData.valueOrNull
-                        val postView = data?.postView?.post ?: args.post
-
-                        if (postView != null) {
-                            onMoreClick()
-                        }
+                    onInstanceMismatch = { accountInstance, apiInstance ->
+                        onInstanceMismatch(accountInstance, apiInstance)
                     },
-                )
-            } else {
-                commentNavViewController?.hide()
-                binding.fab.setImageDrawable(
-                    context.getDrawableCompat(R.drawable.outline_navigation_24),
-                )
-            }
-        }
-
-        if (preferences.useVolumeButtonNavigation) {
-            requireMainActivity().keyPressRegistrationManager.register(
-                viewLifecycleOwner,
-                object : KeyPressRegistrationManager.OnKeyPressHandler {
-                    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-                        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                            goToNextComment()
-
-                            return true
-                        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                            goToPreviousComment()
-
-                            return true
+                    onAddCommentClick = { postOrComment ->
+                        if (accountManager.currentAccount.value == null) {
+                            PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                                .show(childFragmentManager, "asdf")
+                            return@PostAdapter
                         }
 
-                        return false
-                    }
+                        AddOrEditCommentFragment.showReplyDialog(
+                            instance = getInstance(),
+                            postOrCommentView = postOrComment,
+                            fragmentManager = childFragmentManager,
+                            accountId = accountId,
+                        )
+                    },
+                    onImageClick = { postOrCommentView, imageView, url ->
+                        getMainActivity()?.openImage(
+                            sharedElement = imageView,
+                            appBar = binding.appBar,
+                            title = postOrCommentView?.fold(
+                                {
+                                    it.post.name
+                                },
+                                {
+                                    null
+                                },
+                            ),
+                            url = url,
+                            mimeType = null,
+                        )
+                    },
+                    onVideoClick = { url, videoType, state ->
+                        getMainActivity()?.openVideo(url, videoType, state)
+                    },
+                    onVideoLongClickListener = { url ->
+                        showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+                    },
+                    onPageClick = {
+                        getMainActivity()?.launchPage(it)
+                    },
+                    onPostActionClick = { postView, itemId, actionId ->
+                        createPostActionHandler(
+                            instance = viewModel.apiInstance,
+                            accountId = accountId,
+                            postView = postView,
+                            moreActionsHelper = moreActionsHelper,
+                            fragmentManager = childFragmentManager,
+                            onScreenshotClick = {
+                                getAdapter()?.selectItemForScreenshot(itemId)
+                                viewModel.screenshotMode.value = true
+                            },
+                        )(actionId)
+                    },
+                    onCommentActionClick = { commentView, itemId, actionId ->
+                        createCommentActionHandler(
+                            apiInstance = viewModel.apiInstance,
+                            commentView = commentView,
+                            moreActionsHelper = moreActionsHelper,
+                            fragmentManager = childFragmentManager,
+                            onLoadComment = {
+                                viewModel.updatePostOrCommentRef(Either.Right(CommentRef(getInstance(), it)))
+                                viewModel.fetchPostData()
+                            },
+                            onScreenshotClick = {
+                                getAdapter()?.selectItemForScreenshot(itemId)
+                                viewModel.screenshotMode.value = true
+                            },
+                        )(actionId)
+                    },
+                    onFetchComments = {
+                        viewModel.fetchMoreComments(it)
+                    },
+                    onLoadPost = {
+                        viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
+                        viewModel.fetchPostData()
+                    },
+                    onLinkClick = { url, text, linkType ->
+                        onLinkClick(url, text, linkType)
+                    },
+                    onLinkLongClick = { url, text ->
+                        getMainActivity()?.showMoreLinkOptions(url, text)
+                    },
+                    switchToNativeInstance = {
+                        viewModel.switchToNativeInstance()
+                    },
+                ).apply {
+                    stateRestorationPolicy =
+                        RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                }
+            }
+
+            installOnActionResultHandler(
+                moreActionsHelper = moreActionsHelper,
+                snackbarContainer = binding.fabSnackbarCoordinatorLayout,
+                onPostUpdated = { postId, accountId ->
+                    viewModel.fetchPostData(force = true)
+                    (parentFragment as? CommunityFragment)?.updatePost(
+                        postId = postId,
+                        accountId = accountId,
+                    )
+                },
+                onCommentUpdated = {
+                    viewModel.fetchMoreComments(it, 1, true)
                 },
             )
-        }
 
-        viewModel.currentAccountView.observe(viewLifecycleOwner) {
-            it.loadProfileImageOrDefault(binding.accountImageView)
-        }
-        binding.accountImageView.setOnClickListener {
-            if (accountId != null) {
-                AlertDialogFragment.Builder()
-                    .setTitle(R.string.account_switching_disabled)
-                    .setMessage(R.string.account_switching_disabled_desc)
-                    .createAndShow(childFragmentManager, "asfg")
-                return@setOnClickListener
-            }
-
-            AccountsAndSettingsDialogFragment.newInstance(dontSwitchAccount = true)
-                .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
-        }
-        viewModel.switchAccountState.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    binding.loadingViewFullscreen.visibility = View.GONE
-                    binding.loadingView2.hideAll()
-
-                    Snackbar
-                        .make(
-                            binding.coordinatorLayout,
-                            getString(
-                                R.string.error_switch_instance_failed_format,
-                                it.error.toErrorMessage(context),
-                            ),
-                            Snackbar.LENGTH_LONG,
-                        )
-                        .show()
+            binding.fab.setup(preferences)
+            if (preferences.commentsNavigationFab) {
+                binding.fab.setImageResource(R.drawable.outline_navigation_24)
+                binding.fab.show()
+                binding.fab.setOnClickListener {
+                    viewModel.toggleCommentNavControls()
                 }
-                is StatefulData.Loading -> {
-                    binding.loadingViewFullscreen.visibility = View.VISIBLE
-                    binding.loadingView2.showProgressBarWithMessage(it.statusDesc)
-                }
-                is StatefulData.NotStarted -> {
-                    binding.loadingViewFullscreen.visibility = View.GONE
-                    binding.loadingView2.hideAll()
-                }
-                is StatefulData.Success -> {
-                    binding.loadingViewFullscreen.visibility = View.GONE
-                    binding.loadingView2.hideAll()
+            } else {
+                binding.fab.setImageResource(R.drawable.baseline_more_horiz_24)
+                binding.fab.show()
+                binding.fab.setOnClickListener {
+                    onMoreClick()
                 }
             }
-        }
-        viewModel.onPostOrCommentRefChange.observe(viewLifecycleOwner) {
-            adapter?.instance = getInstance()
-            moreActionsHelper.setPageInstance(getInstance())
-        }
 
-        binding.searchEditText.addTextChangedListener {
-            viewModel.setFindInPageQuery(it?.toString() ?: "")
-        }
-        binding.searchEditText.setOnKeyListener { _, actionId, keyEvent ->
-            if (keyEvent.action == KeyEvent.ACTION_DOWN && actionId == KeyEvent.KEYCODE_ENTER) {
+            commentNavViewController = CommentNavViewController(
+                binding.fabSnackbarCoordinatorLayout,
+                preferences,
+            )
+            smoothScroller = object : LinearSmoothScroller(context) {
+                override fun getVerticalSnapPreference(): Int {
+                    return SNAP_TO_START
+                }
+
+                override fun calculateDtToFit(
+                    viewStart: Int,
+                    viewEnd: Int,
+                    boxStart: Int,
+                    boxEnd: Int,
+                    snapPreference: Int,
+                ): Int {
+                    return boxStart - viewStart + (getMainActivity()?.insets?.value?.topInset ?: 0)
+                }
+            }
+            viewModel.commentNavControlsState.observe(viewLifecycleOwner) {
+                if (!preferences.commentsNavigationFab) {
+                    return@observe
+                }
+
+                if (it != null) {
+                    binding.fab.setImageDrawable(
+                        context.getDrawableCompat(R.drawable.baseline_close_24),
+                    )
+                    commentNavViewController?.show(
+                        it,
+                        onNextClick = {
+                            goToNextComment()
+                        },
+                        onPrevClick = {
+                            goToPreviousComment()
+                        },
+                        onMoreClick = {
+                            val data = viewModel.postData.valueOrNull
+                            val postView = data?.postView?.post ?: args.post
+
+                            if (postView != null) {
+                                onMoreClick()
+                            }
+                        },
+                    )
+                } else {
+                    commentNavViewController?.hide()
+                    binding.fab.setImageDrawable(
+                        context.getDrawableCompat(R.drawable.outline_navigation_24),
+                    )
+                }
+            }
+
+            if (preferences.useVolumeButtonNavigation) {
+                requireMainActivity().keyPressRegistrationManager.register(
+                    viewLifecycleOwner,
+                    object : KeyPressRegistrationManager.OnKeyPressHandler {
+                        override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+                            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                                goToNextComment()
+
+                                return true
+                            } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                                goToPreviousComment()
+
+                                return true
+                            }
+
+                            return false
+                        }
+                    },
+                )
+            }
+
+            viewModel.currentAccountView.observe(viewLifecycleOwner) {
+                it.loadProfileImageOrDefault(binding.accountImageView)
+            }
+            binding.accountImageView.setOnClickListener {
+                if (accountId != null) {
+                    AlertDialogFragment.Builder()
+                        .setTitle(R.string.account_switching_disabled)
+                        .setMessage(R.string.account_switching_disabled_desc)
+                        .createAndShow(childFragmentManager, "asfg")
+                    return@setOnClickListener
+                }
+
+                AccountsAndSettingsDialogFragment.newInstance(dontSwitchAccount = true)
+                    .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+            }
+            viewModel.switchAccountState.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        binding.loadingViewFullscreen.visibility = View.GONE
+                        binding.loadingView2.hideAll()
+
+                        Snackbar
+                            .make(
+                                binding.coordinatorLayout,
+                                getString(
+                                    R.string.error_switch_instance_failed_format,
+                                    it.error.toErrorMessage(context),
+                                ),
+                                Snackbar.LENGTH_LONG,
+                            )
+                            .show()
+                    }
+                    is StatefulData.Loading -> {
+                        binding.loadingViewFullscreen.visibility = View.VISIBLE
+                        binding.loadingView2.showProgressBarWithMessage(it.statusDesc)
+                    }
+                    is StatefulData.NotStarted -> {
+                        binding.loadingViewFullscreen.visibility = View.GONE
+                        binding.loadingView2.hideAll()
+                    }
+                    is StatefulData.Success -> {
+                        binding.loadingViewFullscreen.visibility = View.GONE
+                        binding.loadingView2.hideAll()
+                    }
+                }
+            }
+            viewModel.onPostOrCommentRefChange.observe(viewLifecycleOwner) {
+                adapter?.instance = getInstance()
+                moreActionsHelper.setPageInstance(getInstance())
+            }
+
+            binding.searchEditText.addTextChangedListener {
+                viewModel.setFindInPageQuery(it?.toString() ?: "")
+            }
+            binding.searchEditText.setOnKeyListener { _, actionId, keyEvent ->
+                if (keyEvent.action == KeyEvent.ACTION_DOWN && actionId == KeyEvent.KEYCODE_ENTER) {
+                    Utils.hideKeyboard(activity)
+                    true
+                } else {
+                    false
+                }
+            }
+            viewModel.findInPageVisible.observe(viewLifecycleOwner) { showFindInPage ->
+                if (showFindInPage) {
+                    binding.findInPageToolbar.visibility = View.VISIBLE
+                    binding.searchEditText.focusAndShowKeyboard()
+                } else {
+                    binding.findInPageToolbar.visibility = View.GONE
+                    viewModel.findInPageQuery.value = ""
+                    Utils.hideKeyboard(activity)
+                }
+
+                findInPageBackPressHandler.isEnabled = showFindInPage
+            }
+            viewModel.findInPageQuery.observe(viewLifecycleOwner) {
+                adapter?.setQuery(it) {
+                    viewModel.queryMatchHelper.setMatches(it)
+                }
+            }
+            viewModel.queryMatchHelper.currentQueryMatch.observe(viewLifecycleOwner) { match ->
+                if (viewModel.queryMatchHelper.matchCount == 0) {
+                    binding.foundCount.text = "0 / 0"
+                } else {
+                    match ?: return@observe
+
+                    highlightMatch(match)
+                    adapter?.currentMatch = match
+                    binding.foundCount.text = "${match.matchIndex + 1} / " +
+                        "${viewModel.queryMatchHelper.matchCount}"
+                }
+            }
+            viewModel.screenshotMode.observe(viewLifecycleOwner) { showScreenshotMode ->
+                updateScreenshotMode(showScreenshotMode)
+                screenshotModeBackPressHandler.isEnabled = showScreenshotMode
+            }
+
+            nextResult.setOnClickListener {
+                viewModel.queryMatchHelper.nextMatch()
                 Utils.hideKeyboard(activity)
-                true
-            } else {
-                false
             }
-        }
-        viewModel.findInPageVisible.observe(viewLifecycleOwner) { showFindInPage ->
-            if (showFindInPage) {
-                binding.findInPageToolbar.visibility = View.VISIBLE
-                binding.searchEditText.focusAndShowKeyboard()
-            } else {
-                binding.findInPageToolbar.visibility = View.GONE
-                viewModel.findInPageQuery.value = ""
+            prevResult.setOnClickListener {
+                viewModel.queryMatchHelper.prevMatch()
                 Utils.hideKeyboard(activity)
             }
-
-            findInPageBackPressHandler.isEnabled = showFindInPage
-        }
-        viewModel.findInPageQuery.observe(viewLifecycleOwner) {
-            adapter?.setQuery(it) {
-                viewModel.queryMatchHelper.setMatches(it)
+            clear.setOnClickListener {
+                viewModel.findInPageVisible.value = false
             }
-        }
-        viewModel.queryMatchHelper.currentQueryMatch.observe(viewLifecycleOwner) { match ->
-            if (viewModel.queryMatchHelper.matchCount == 0) {
-                binding.foundCount.text = "0 / 0"
-            } else {
-                match ?: return@observe
 
-                highlightMatch(match)
-                adapter?.currentMatch = match
-                binding.foundCount.text = "${match.matchIndex + 1} / " +
-                    "${viewModel.queryMatchHelper.matchCount}"
+            runAfterLayout {
+                if (!isBindingAvailable()) return@runAfterLayout
+
+                adapter?.contentMaxWidth = binding.recyclerView.width
+
+                setup()
             }
-        }
-        viewModel.screenshotMode.observe(viewLifecycleOwner) { showScreenshotMode ->
-            updateScreenshotMode(showScreenshotMode)
-            screenshotModeBackPressHandler.isEnabled = showScreenshotMode
-        }
-
-        binding.nextResult.setOnClickListener {
-            viewModel.queryMatchHelper.nextMatch()
-            Utils.hideKeyboard(activity)
-        }
-        binding.prevResult.setOnClickListener {
-            viewModel.queryMatchHelper.prevMatch()
-            Utils.hideKeyboard(activity)
-        }
-        binding.clear.setOnClickListener {
-            viewModel.findInPageVisible.value = false
         }
     }
 

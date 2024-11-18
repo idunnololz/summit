@@ -1,6 +1,5 @@
 package com.idunnololz.summit.emoji
 
-import android.util.Log
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.emoji.db.TextEmojiDao
 import com.idunnololz.summit.emoji.db.TextEmojiEntry
@@ -125,7 +124,6 @@ class TextEmojisManager @Inject constructor(
             for ((index, item) in items.withIndex()) {
                 val newItem = item.copy(order = index)
                 textEmojiDao.insert(newItem)
-                Log.d("HAHA", "Insert $newItem")
             }
             allEmojis = null
             emojisChangedFlow.emit(Unit)

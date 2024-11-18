@@ -76,6 +76,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SAVE_DRAFTS_AUTOMATICALLY
+import com.idunnololz.summit.util.PreferenceUtil.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_SHOW_FILTERED_POSTS
@@ -161,6 +162,9 @@ object SettingPath {
                 context.getString(R.string.user_actions)
             NotificationSettings::class ->
                 context.getString(R.string.notifications)
+
+            SearchHomeSettings::class ->
+                context.getString(R.string.search_screen_settings)
 
             else -> error("No name for $this")
         }
@@ -2357,6 +2361,59 @@ class NotificationSettings @Inject constructor(
     )
 }
 
+@Singleton
+class SearchHomeSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+
+    val searchSuggestions = OnOffSettingItem(
+        null,
+        context.getString(R.string.search_suggestions),
+        null,
+        relatedKeys = listOf(KEY_SEARCH_HOME_CONFIG),
+    )
+
+    val subscribedCommunities = OnOffSettingItem(
+        null,
+        context.getString(R.string.subscribed_communities),
+        null,
+        relatedKeys = listOf(KEY_SEARCH_HOME_CONFIG),
+    )
+
+    val topCommunities = OnOffSettingItem(
+        null,
+        context.getString(R.string.top_communities_this_week),
+        null,
+        relatedKeys = listOf(KEY_SEARCH_HOME_CONFIG),
+    )
+
+    val trendingCommunities = OnOffSettingItem(
+        null,
+        context.getString(R.string.trending_communities),
+        null,
+        relatedKeys = listOf(KEY_SEARCH_HOME_CONFIG),
+    )
+
+    val risingCommunities = OnOffSettingItem(
+        null,
+        context.getString(R.string.rising_communities),
+        null,
+        relatedKeys = listOf(KEY_SEARCH_HOME_CONFIG),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        searchSuggestions,
+        subscribedCommunities,
+        topCommunities,
+        trendingCommunities,
+        risingCommunities,
+    )
+}
+
 class AllSettings @Inject constructor(
     @ApplicationContext private val context: Context,
     mainSettings: MainSettings,
@@ -2380,6 +2437,7 @@ class AllSettings @Inject constructor(
     downloadSettings: DownloadSettings,
     perCommunitySettings: PerCommunitySettings,
     notificationSettings: NotificationSettings,
+    searchHomeSettings: SearchHomeSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -2403,6 +2461,7 @@ class AllSettings @Inject constructor(
         downloadSettings,
         perCommunitySettings,
         notificationSettings,
+        searchHomeSettings,
     )
 
     init {

@@ -22,6 +22,7 @@ import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
@@ -337,6 +338,8 @@ class PostAdapter(
         val v = inflater.inflate(viewType, parent, false)
 
         return when (viewType) {
+            R.layout.item_generic_header ->
+                ViewBindingViewHolder(ItemGenericHeaderBinding.bind(v))
             R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))
             R.layout.post_comment_expanded_item ->
                 CommentExpandedViewHolder.fromBinding(PostCommentExpandedItemBinding.bind(v))
@@ -418,7 +421,8 @@ class PostAdapter(
                 if (payloads.isEmpty()) {
                     super.onBindViewHolder(holder, position, payloads)
                 } else {
-                    // this is an incremental update... Only update the stats, do not update content...
+                    // this is an incremental update... Only update the stats, do not update
+                    // content...
                     val b = holder.getBinding<PostHeaderItemBinding>()
                     val post = item.postView
                     val postKey = post.getUniqueKey()
@@ -586,7 +590,8 @@ class PostAdapter(
                     val b = holder as CommentExpandedViewHolder
                     val highlight = highlightedComment == item.commentId
                     val highlightForever = highlightedCommentForever == item.commentId
-                    val k = "${item.comment.comment.id}:${item.comment.comment.updated ?: item.comment.comment.published}"
+                    val k = "${item.comment.comment.id}:${item.comment.comment.updated
+                        ?: item.comment.comment.published}"
 
                     postAndCommentViewBuilder.bindCommentViewExpanded(
                         h = holder,
@@ -760,7 +765,7 @@ class PostAdapter(
                 val b = holder.getBinding<GenericLoadingItemBinding>()
                 if (item.error != null) {
                     b.loadingView.showDefaultErrorMessageFor(item.error)
-                } else if (!isLoaded) {
+                } else {
                     b.loadingView.showProgressBar()
                 }
                 b.loadingView.setOnRefreshClickListener {
@@ -1102,7 +1107,8 @@ class PostAdapter(
                                 query = query,
                                 screenshotMode,
                             )
-                            absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+                            absolutionPositionToTopLevelCommentPosition +=
+                                lastTopLevelCommentPosition
                         }
                         is PostViewModel.ListView.PostListView -> {
                             // should never happen
@@ -1208,6 +1214,7 @@ class PostAdapter(
                 }
             },
         )
+
         this.items = newItems
         diff.dispatchUpdatesTo(this)
         if (refreshHeader) {

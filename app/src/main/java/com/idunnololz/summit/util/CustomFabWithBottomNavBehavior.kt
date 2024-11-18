@@ -54,7 +54,6 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
         dependency: View,
     ): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
-            Log.d("HAHA", "anim: ${dependency.alpha} vis: ${dependency.visibility}")
             val alpha = if (dependency.visibility == View.VISIBLE) {
                 dependency.alpha
             } else {

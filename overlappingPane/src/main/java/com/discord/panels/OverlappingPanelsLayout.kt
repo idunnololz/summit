@@ -245,7 +245,9 @@ open class OverlappingPanelsLayout : FrameLayout {
                     val isTouchingChildGestureRegion = isTouchingChildGestureRegion(event)
                     val isFullyLocked = startPanelLockState != LockState.UNLOCKED &&
                         endPanelLockState != LockState.UNLOCKED
-                    val isDirectionLocked = if (startPanelLockState != LockState.UNLOCKED && xDiff > 0) {
+                    val isDirectionLocked = if (startPanelLockState != LockState.UNLOCKED &&
+                        xDiff > 0
+                    ) {
                         endPanelState != PanelState.Opened
                     } else if (endPanelLockState != LockState.UNLOCKED && xDiff < 0) {
                         startPanelState != PanelState.Opened
@@ -274,8 +276,8 @@ open class OverlappingPanelsLayout : FrameLayout {
             }
             else -> {
                 // When the center panel is closed (but still visible at the edges of the screen)
-                // intercept all touch events so that the user cannot interact with the child views of
-                // the center panel.
+                // intercept all touch events so that the user cannot interact with the child views
+                // of the center panel.
                 wasActionDownOnClosedCenterPanel
             }
         }
@@ -299,7 +301,11 @@ open class OverlappingPanelsLayout : FrameLayout {
 
                 if (abs(xDiff) > scrollingSlopPx) {
                     if (swipeDirection == null) {
-                        swipeDirection = if (xDiff > 0) SwipeDirection.RIGHT else SwipeDirection.LEFT
+                        swipeDirection = if (xDiff > 0) {
+                            SwipeDirection.RIGHT
+                        } else {
+                            SwipeDirection.LEFT
+                        }
                     }
                 }
 
@@ -367,8 +373,8 @@ open class OverlappingPanelsLayout : FrameLayout {
      * Set the lock panel state for the start panel. [LockState.OPEN] means the start panel stays
      * opened, and the center panel cannot be moved. [LockState.CLOSE] means the start panel stays
      * closed, and the selected panel can either be the center panel or the end panel.
-     * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move freely
-     * to open either of the two side panels.
+     * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move
+     * freely to open either of the two side panels.
      */
     fun setStartPanelLockState(lockState: LockState) {
         startPanelLockState = lockState
@@ -381,8 +387,8 @@ open class OverlappingPanelsLayout : FrameLayout {
      * Set the lock panel state for the end panel. [LockState.OPEN] means the end panel stays
      * opened, and the center panel cannot be moved. [LockState.CLOSE] means the end panel stays
      * closed, and the selected panel can either be the center panel or the start panel.
-     * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move freely
-     * to open either of the two side panels.
+     * [LockState.UNLOCKED] is the default [LockState] and means that the center panel can move
+     * freely to open either of the two side panels.
      */
     fun setEndPanelLockState(lockState: LockState) {
         endPanelLockState = lockState
@@ -393,8 +399,8 @@ open class OverlappingPanelsLayout : FrameLayout {
 
     /**
      * By default, [OverlappingPanelsLayout] sets the start panel width so that when the start panel
-     * is opened, it leaves room to show the partially visible closed center panel. To make the start
-     * panel fill the full screen width, call [setStartPanelUseFullPortraitWidth] with
+     * is opened, it leaves room to show the partially visible closed center panel. To make the
+     * start panel fill the full screen width, call [setStartPanelUseFullPortraitWidth] with
      * [useFullPortraitWidth] set to true.
      */
     fun setStartPanelUseFullPortraitWidth(useFullPortraitWidth: Boolean) {
@@ -686,12 +692,12 @@ open class OverlappingPanelsLayout : FrameLayout {
 
     /**
      * This method is necessary because users can't keep their fingers perfectly still on
-     * the phone screen. If the user is trying to hold a finger in one place, but the finger actually
-     * deviates to the left or right by a pixel, it will trigger a drawer state change between
-     * Opening and Closing. We generally want the drawer state to stay the same in this situation,
-     * so we only handle the ACTION_MOVE event if it is either one of the fully opened or closed
-     * positions or if it the targeted x position is greater than 1dp different from the current
-     * x position.
+     * the phone screen. If the user is trying to hold a finger in one place, but the finger
+     * actually deviates to the left or right by a pixel, it will trigger a drawer state change
+     * between Opening and Closing. We generally want the drawer state to stay the same in this
+     * situation, so we only handle the ACTION_MOVE event if it is either one of the fully opened
+     * or closed positions or if it the targeted x position is greater than 1dp different from the
+     * current x position.
      */
     private fun shouldHandleActionMoveEvent(event: MotionEvent): Boolean {
         val targetedX = getTargetedX(event)
@@ -846,8 +852,10 @@ open class OverlappingPanelsLayout : FrameLayout {
             isLeftToRight && x >= 0F -> PanelState.Closed
             !isLeftToRight && x <= 0f -> PanelState.Closed
             x == endPanelOpenedCenterPanelX -> PanelState.Opened
-            isLeftToRight && x < previousX -> PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
-            !isLeftToRight && x > previousX -> PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
+            isLeftToRight && x < previousX ->
+                PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
+            !isLeftToRight && x > previousX ->
+                PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
             else -> PanelState.Closing(x, x / endPanelOpenedCenterPanelX)
         }
     }
@@ -948,8 +956,9 @@ open class OverlappingPanelsLayout : FrameLayout {
         startPanelOpenedCenterPanelX =
             if (isLeftToRight) startPanelOpenedCenterPanelX else -startPanelOpenedCenterPanelX
 
-        // If the start panel was in a fully opened state based on the previous startPanelOpenedCenterPanelX,
-        // then translate the center panel to the new startPanelOpenedCenterPanelX
+        // If the start panel was in a fully opened state based on the previous
+        // startPanelOpenedCenterPanelX, then translate the center panel to the new
+        // startPanelOpenedCenterPanelX
         if (centerPanel.x == previousStartPanelOpenedCenterPanelX ||
             centerPanelAnimationEndX == previousStartPanelOpenedCenterPanelX
         ) {
@@ -968,8 +977,9 @@ open class OverlappingPanelsLayout : FrameLayout {
             -endPanelOpenedCenterPanelX
         }
 
-        // If the end panel was in a fully opened state based on the previous endPanelOpenedCenterPanelX,
-        // then translate the center panel to the new endPanelOpenedCenterPanelX
+        // If the end panel was in a fully opened state based on the previous
+        // endPanelOpenedCenterPanelX, then translate the center panel to the new
+        // endPanelOpenedCenterPanelX
         if (
             centerPanel.x == previousEndPanelOpenedCenterPanelX ||
             centerPanelAnimationEndX == previousEndPanelOpenedCenterPanelX

@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.utils.mentions
 import android.graphics.Rect
 import android.text.Editable
 import android.text.Layout
-import android.util.Log
 import android.view.Gravity
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -85,7 +84,6 @@ class MentionsController @AssistedInject constructor(
             val cursorPosition = selectionStart
 
             if (selectionEnd != cursorPosition) {
-                Log.d("HAHA", "end not eq to start.. exiting")
                 return@a
             }
 
@@ -268,7 +266,6 @@ class MentionsAutoCompleteRepository(
         coroutineScope.launch {
             internalResult.collect { result ->
                 withContext(Dispatchers.Main) {
-                    Log.d("HAHA", "query: ${result?.rawQuery}")
                     queryResult.value = result
                 }
             }
