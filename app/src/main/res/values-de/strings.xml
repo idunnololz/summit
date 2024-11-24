@@ -247,7 +247,7 @@
     <string name="comment_actions">Kommentaraktionen</string>
     <string name="comments_thread_style">Thread-Stil für Kommentare</string>
     <string name="modern">Modern</string>
-    <string name="classic">Klassiker</string>
+    <string name="classic">Klassisch</string>
     <string name="show_comment_actions">Kommentaraktionen immer anzeigen</string>
     <string name="email">E-Mail</string>
     <string name="matrix_user">Matrix-Benutzer</string>
@@ -259,11 +259,11 @@
     <string name="look_and_feel">Aussehen und Gefühl</string>
     <string name="account_settings">Kontoeinstellungen</string>
     <string name="tap_comment_to_collapse">Zum Ausblenden auf den Kommentar tippen</string>
-    <string name="tap_comment_to_collapse_desc">Standardmäßig wird ein Kommentar ausgeblendet, wenn Sie auf eine Kommentarüberschrift tippen. Wenn „Aktionen immer anzeigen“ deaktiviert ist, werden durch Tippen auf den Text eines Kommentars Aktionen ausgeblendet/ausgeblendet. Wenn Sie diese Einstellung aktivieren, wird der Kommentar ausgeblendet, wenn Sie auf einen beliebigen Teil eines Kommentars tippen. Aktionen können durch langes Drücken umgeschaltet werden.</string>
+    <string name="tap_comment_to_collapse_desc">Standardmäßig wird ein Kommentar ausgeblendet, wenn Sie auf eine Kommentarüberschrift tippen. Wenn „Aktionen immer anzeigen“ deaktiviert ist, werden durch Tippen auf den Text eines Kommentars Aktionen ein-/ausgeblendet. Wenn Sie diese Einstellung aktivieren, wird der Kommentar ausgeblendet, wenn Sie auf einen beliebigen Teil eines Kommentars tippen. Aktionen können durch langes Drücken umgeschaltet werden.</string>
     <string name="indentation_per_level">Einrückung pro Ebene</string>
     <string name="post_list">Beiträge-Feed</string>
     <string name="about_summit">Über Summit</string>
-    <string name="about_summit_desc">Informationen zum Summit für Lemmy</string>
+    <string name="about_summit_desc">Informationen über Summit für Lemmy</string>
     <string name="summit_community_desc">Treten Sie der Summit-Community bei!</string>
     <string name="version_code">Versionscode %1$s</string>
     <string name="view_on_the_play_store">Auf Google Play ansehen</string>
