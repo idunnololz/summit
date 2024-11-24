@@ -9,5 +9,8 @@ data class GetPosts(
     val community_id: CommunityId? = null,
     val community_name: String? = null,
     val saved_only: Boolean? = null,
+    val liked_only: Boolean? = null,
+    val disliked_only: Boolean? = null,
     val auth: String? = null,
+    val cursor: String? = null,
 )

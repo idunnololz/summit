@@ -26,6 +26,7 @@ import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetModlogResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
@@ -145,11 +146,14 @@ class AccountAwareLemmyClient @Inject constructor(
         communityIdOrName: Either<Int, String>? = null,
         sortType: SortType? = null,
         listingType: ListingType? = null,
-        page: Int,
+        page: Int?,
+        cursor: String?,
         limit: Int? = null,
         force: Boolean,
+        upvotedOnly: Boolean? = null,
+        downvotedOnly: Boolean? = null,
         account: Account? = accountForInstance(),
-    ): Result<List<PostView>> {
+    ): Result<GetPostsResponse> {
         return apiClient.fetchPosts(
             account = account,
             communityIdOrName = communityIdOrName,
@@ -167,6 +171,9 @@ class AccountAwareLemmyClient @Inject constructor(
                 },
             limit = limit,
             page = page,
+            cursor = cursor,
+            upvotedOnly = upvotedOnly,
+            downvotedOnly = downvotedOnly,
             force = force,
         ).autoSignOut(account)
     }
@@ -192,13 +199,27 @@ class AccountAwareLemmyClient @Inject constructor(
     }
 
     suspend fun fetchCommentsWithRetry(
-        id: Either<PostId, CommentId>,
+        id: Either<PostId, CommentId>?,
         sort: CommentSortType,
         force: Boolean,
+        limit: Int? = null,
+        page: Int? = null,
         maxDepth: Int? = null,
+        upvotedOnly: Boolean? = null,
+        downvotedOnly: Boolean? = null,
         account: Account? = accountForInstance(),
     ): Result<List<CommentView>> = retry {
-        apiClient.fetchComments(account, id, sort, maxDepth, force)
+        apiClient.fetchComments(
+            account = account,
+            id = id,
+            sort = sort,
+            limit = limit,
+            page = page,
+            maxDepth = maxDepth,
+            upvotedOnly = upvotedOnly,
+            downvotedOnly = downvotedOnly,
+            force = force,
+        )
             .autoSignOut(account)
     }
 

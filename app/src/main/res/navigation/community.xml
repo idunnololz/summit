@@ -120,6 +120,11 @@
             app:argType="com.idunnololz.summit.api.dto.PostView"
             app:nullable="true" />
         <argument
+            android:name="draft"
+            app:argType="com.idunnololz.summit.drafts.DraftEntry"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
             android:name="editCommentView"
             app:argType="com.idunnololz.summit.api.dto.CommentView"
             app:nullable="true" />
@@ -168,6 +173,11 @@
         <argument
             android:name="post"
             app:argType="com.idunnololz.summit.api.dto.Post"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="draft"
+            app:argType="com.idunnololz.summit.drafts.DraftEntry"
             app:nullable="true"
             android:defaultValue="@null" />
         <argument

@@ -1862,6 +1862,13 @@
     <string name="search_suggestions">Search suggestions</string>
     <string name="search_screen_settings">Search screen settings</string>
     <string name="error_search_home_no_sections_selected">You\'ve disabled all sections on this screen. Enable some sections to see them here.</string>
+    <string name="switch_account">Switch account</string>
+    <string name="account_age">Account age</string>
+    <string name="blocked">Blocked</string>
+    <string name="guest">Guest</string>
+    <string name="downvoted">Downvoted</string>
+    <string name="warn_delete_draft">Delete draft?</string>
+    <string name="save_comment">Save comment</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

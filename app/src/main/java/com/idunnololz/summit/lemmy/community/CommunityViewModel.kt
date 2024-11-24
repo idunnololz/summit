@@ -244,8 +244,10 @@ class CommunityViewModel @Inject constructor(
                 }
                 // We need to "reset" the community because it can change how we fetch the community
                 // Eg.
-                // user idunnololz@lemmy.world accessing c/summit@lemmy.world = https://lemmy.world/c/summit
-                // user idunnololz@lemmy.ca accessing c/summit@lemmy.world = https://lemmy.ca/c/summit@lemmy.world
+                // user idunnololz@lemmy.world accessing c/summit@lemmy.world =
+                //  https://lemmy.world/c/summit
+                // user idunnololz@lemmy.ca accessing c/summit@lemmy.world =
+                //  https://lemmy.ca/c/summit@lemmy.world
                 postsRepository.setCommunity(currentCommunityRef.value)
 
                 fetchInitialPage(force = true, clearPagesOnSuccess = true, scrollToTop = true)
@@ -453,6 +455,7 @@ class CommunityViewModel @Inject constructor(
                             posts = it.posts,
                             instance = it.instance,
                             pageIndex = pageToFetch,
+                            dedupingKey = pageToFetch.toString(),
                             hasMore = it.hasMore,
                         )
                     if (clearPagesOnSuccess) {
@@ -486,6 +489,7 @@ class CommunityViewModel @Inject constructor(
                             posts = listOf(),
                             instance = postsRepository.apiInstance,
                             pageIndex = pageToFetch,
+                            dedupingKey = pageToFetch.toString(),
                             hasMore = true,
                             error = PostLoadError(
                                 errorCode = 0,
@@ -522,7 +526,8 @@ class CommunityViewModel @Inject constructor(
 //                            )
 //                        )
 //                    },
-//                    sortOrder = (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
+//                    sortOrder = (preferences.defaultCommentsSortOrder ?:
+//                        CommentsSortOrder.Top).toApiSortOrder(),
 //                    maxDepth = if (preferences.collapseChildCommentsByDefault) {
 //                        1
 //                    } else {
@@ -795,6 +800,7 @@ class CommunityViewModel @Inject constructor(
                 posts = listOf(),
                 instance = postsRepository.apiInstance,
                 pageIndex = 0,
+                dedupingKey = 0.toString(),
                 hasMore = false,
             ),
         )

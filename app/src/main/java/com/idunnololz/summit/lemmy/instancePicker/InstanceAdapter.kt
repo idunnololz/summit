@@ -8,6 +8,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.InstanceSelectorSearchResultInstanceItemBinding
+import com.idunnololz.summit.databinding.ItemInstanceSelectorGroupTitleBinding
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -70,7 +71,7 @@ class InstanceAdapter(
     ).apply {
         addItemType(
             clazz = Item.GroupHeaderItem::class,
-            inflateFn = CommunitySelectorGroupItemBinding::inflate,
+            inflateFn = ItemInstanceSelectorGroupTitleBinding::inflate,
         ) { item, b, _ ->
             b.titleTextView.text = item.text
 

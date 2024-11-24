@@ -241,4 +241,10 @@
     <item name="bind_text_cache_key" type="id" />
     <item name="bind_text_cached_span" type="id" />
     <item name="post_item" type="id" />
+    <item name="saved" type="id" />
+    <item name="history" type="id" />
+    <item name="profile" type="id" />
+    <item name="blocked" type="id" />
+    <item name="downvoted" type="id" />
+    <item name="account_settings" type="id" />
 </resources>

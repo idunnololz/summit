@@ -20,7 +20,7 @@
         android:largeHeap="true"
         android:theme="@style/Theme.App.Splash"
         android:usesCleartextTraffic="true"
-        android:enableOnBackInvokedCallback="true">
+        android:enableOnBackInvokedCallback="@bool/enableOnBackInvokedCallback">
 
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"

@@ -403,24 +403,32 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         when (page) {
             is CommunityRef -> {
                 currentNavController?.navigate(
-                    R.id.communityFragment,
-                    CommunityFragmentArgs(
+                    resId = R.id.communityFragment,
+                    args = CommunityFragmentArgs(
                         tab = tabsManager.currentTab.value,
-                        page,
+                        communityRef = page,
                     ).toBundle(),
+                    navOptions = NavOptions.Builder()
+                        .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                        .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                        .setPopEnterAnim(
+                            androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                        )
+                        .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+                        .build(),
                 )
             }
             is PostRef -> {
                 currentNavController?.navigate(
-                    R.id.postFragment,
-                    PostFragmentArgs(
-                        page.instance,
-                        page.id,
-                        null,
+                    resId = R.id.postFragment,
+                    args = PostFragmentArgs(
+                        instance = page.instance,
+                        id = page.id,
+                        currentCommunity = null,
                         isSinglePage = true,
                         switchToNativeInstance = switchToNativeInstance,
                     ).toBundle(),
-                    NavOptions.Builder()
+                    navOptions = NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
                         .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
                         .setPopEnterAnim(
@@ -432,15 +440,15 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             }
             is CommentRef -> {
                 currentNavController?.navigate(
-                    R.id.postFragment,
-                    PostFragmentArgs(
+                    resId = R.id.postFragment,
+                    args = PostFragmentArgs(
                         instance = page.instance,
                         id = 0,
                         commentId = page.id,
                         currentCommunity = null,
                         isSinglePage = true,
                     ).toBundle(),
-                    NavOptions.Builder()
+                    navOptions = NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
                         .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
                         .setPopEnterAnim(

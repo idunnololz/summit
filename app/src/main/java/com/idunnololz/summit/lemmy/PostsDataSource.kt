@@ -40,10 +40,11 @@ class SinglePostsDataSource @AssistedInject constructor(
             sortType,
             listingType ?: ListingType.All,
             page.toLemmyPageIndex(),
+            cursor = null,
             DEFAULT_PAGE_SIZE,
             force,
         )
         .map {
-            it.map { FetchedPost(it, Source.StandardSource()) }
+            it.posts.map { FetchedPost(it, Source.StandardSource()) }
         }
 }

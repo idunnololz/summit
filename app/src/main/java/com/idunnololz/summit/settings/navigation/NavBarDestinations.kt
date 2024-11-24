@@ -9,6 +9,7 @@ object NavBarDestinations {
     const val History: NavBarDestId = 4
     const val Inbox: NavBarDestId = 5
     const val Profile: NavBarDestId = 6
+    const val You: NavBarDestId = 7
 
     const val None: NavBarDestId = -1
 }

@@ -732,6 +732,7 @@ class CreateOrEditPostFragment :
 
             val post = args.post
             val crossPost = args.crosspost
+            val draft = args.draft
             if (crossPost != null) {
                 binding.url.editText?.setText(crossPost.url)
                 binding.title.editText?.setText(crossPost.name)
@@ -742,6 +743,9 @@ class CreateOrEditPostFragment :
                 binding.title.editText?.setText(post.name)
                 binding.postEditor.editText?.setText(post.body)
                 binding.nsfwSwitch.isChecked = post.nsfw
+            } else if (draft != null) {
+                viewModel.currentDraftEntry.value = draft
+                viewModel.currentDraftId.value = draft.id
             }
         }
 
@@ -955,6 +959,8 @@ class CreateOrEditPostFragment :
         binding.communitySuggestionsRecyclerView.alpha = 0f
         binding.communitySuggestionsRecyclerView.animate()
             .alpha(1f)
+
+        binding.postBodyToolbar.visibility = View.INVISIBLE
     }
 
     private fun hideSearch(animate: Boolean = true) {
@@ -974,6 +980,7 @@ class CreateOrEditPostFragment :
         if (!binding.communityEditText.text.isNullOrBlank()) {
             Utils.hideKeyboard(requireMainActivity())
         }
+        binding.postBodyToolbar.visibility = View.VISIBLE
     }
 
     private fun isEdit() = args.post != null

@@ -39,7 +39,7 @@ import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showSortTypeMenu
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.saved.SavedTabbedFragment
+import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.search.SuggestionProvider
 import com.idunnololz.summit.util.AnimationsHelper
@@ -160,7 +160,7 @@ class SearchTabbedFragment :
         }
 
         requireMainActivity().apply {
-            setupForFragment<SavedTabbedFragment>()
+            setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
 
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,

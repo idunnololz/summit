@@ -4,8 +4,13 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
+import androidx.media3.exoplayer.source.ExternalLoader.LoadRequest
 import coil.dispose
+import coil.imageLoader
 import coil.load
+import coil.request.ImageRequest
+import coil.target.Target
+import coil.transform.CircleCropTransformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.api.dto.Community
@@ -94,6 +99,41 @@ class AvatarHelper @Inject constructor(
             imageView.load(imageUrl) {
                 placeholder(newShimmerDrawableSquare(context))
                 allowHardware(false)
+            }
+        }
+    }
+
+    fun loadAvatar(
+        target: Target,
+        imageUrl: String?,
+        personName: String,
+        personId: PersonId,
+        personInstance: String,
+    ): Job {
+        return if (imageUrl.isNullOrBlank()) {
+            coroutineScope.launch {
+                val d = accountImageGenerator.generateDrawableForPerson(
+                    personName = personName,
+                    personId = personId,
+                    personInstance = personInstance,
+                    circleClip = true,
+                )
+
+                withContext(Dispatchers.Main) {
+                    target.onSuccess(d)
+                }
+            }
+        } else {
+            coroutineScope.launch {
+                context.imageLoader.execute(
+                    ImageRequest.Builder(context)
+                        .data(imageUrl)
+                        .transformations(CircleCropTransformation())
+                        .target(target)
+                        .placeholder(newShimmerDrawableSquare(context))
+                        .allowHardware(false)
+                        .build()
+                )
             }
         }
     }

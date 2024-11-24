@@ -54,6 +54,7 @@ import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPost
 import com.idunnololz.summit.api.dto.GetPosts
+import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.GetPrivateMessages
 import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetRepliesResponse
@@ -240,10 +241,13 @@ class LemmyApiClient(
         communityIdOrName: Either<Int, String>? = null,
         sortType: SortType,
         listingType: ListingType,
-        page: Int,
+        page: Int?,
+        cursor: String?,
         limit: Int? = null,
+        upvotedOnly: Boolean? = null,
+        downvotedOnly: Boolean? = null,
         force: Boolean,
-    ): Result<List<PostView>> {
+    ): Result<GetPostsResponse> {
         val communityId = communityIdOrName?.fold({ it }, { null })
         val communityName = communityIdOrName?.fold({ null }, { it })
 
@@ -254,7 +258,10 @@ class LemmyApiClient(
                 sort = sortType,
                 type_ = listingType,
                 page = page,
+                cursor = cursor,
                 limit = limit,
+                liked_only = upvotedOnly,
+                disliked_only = downvotedOnly,
                 auth = account?.jwt,
             )
         } catch (e: Exception) {
@@ -270,7 +277,7 @@ class LemmyApiClient(
             }
         }.fold(
             onSuccess = {
-                Result.success(it.posts)
+                Result.success(it)
             },
             onFailure = {
                 Result.failure(it)
@@ -412,18 +419,24 @@ class LemmyApiClient(
 
     suspend fun fetchComments(
         account: Account?,
-        id: Either<PostId, CommentId>,
+        id: Either<PostId, CommentId>?,
         sort: CommentSortType,
         maxDepth: Int?,
+        limit: Int? = null,
+        page: Int? = null,
+        upvotedOnly: Boolean? = null,
+        downvotedOnly: Boolean? = null,
         force: Boolean = false,
     ): Result<List<CommentView>> {
-        val commentsForm = id.fold({
+        val commentsForm = id?.fold({
             GetComments(
                 max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
                 type_ = ListingType.All,
                 post_id = it,
                 sort = sort,
                 auth = account?.jwt,
+                limit = limit,
+                page = page,
             )
         }, {
             GetComments(
@@ -432,8 +445,21 @@ class LemmyApiClient(
                 parent_id = it,
                 sort = sort,
                 auth = account?.jwt,
+                limit = limit,
+                page = page,
             )
-        })
+        }) ?:
+        GetComments(
+            max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
+            type_ = ListingType.All,
+            post_id = null,
+            sort = sort,
+            auth = account?.jwt,
+            liked_only = upvotedOnly,
+            disliked_only = downvotedOnly,
+            limit = limit,
+            page = page,
+        )
 
         return retrofitErrorHandler {
             if (force) {

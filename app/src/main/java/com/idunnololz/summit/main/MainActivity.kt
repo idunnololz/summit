@@ -3,6 +3,7 @@ package com.idunnololz.summit.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +21,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Pair
+import androidx.core.view.MenuItemCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
@@ -31,6 +33,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import coil.target.Target
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
@@ -39,9 +42,12 @@ import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -78,6 +84,7 @@ import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
@@ -164,6 +171,9 @@ class MainActivity :
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
+
     private val imageViewerLauncher = registerForActivityResult(
         ImageViewerContract(),
     ) { resultCode ->
@@ -246,6 +256,12 @@ class MainActivity :
             }
         }
 
+        viewModel.currentAccount.observe(this) {
+            if (!navBarController.useBottomNavBar) return@observe
+
+            updateUserAvatar()
+        }
+
         runOnReady(this) {
             viewModel.loadCommunities()
 
@@ -300,6 +316,26 @@ class MainActivity :
         }
     }
 
+    private fun updateUserAvatar() {
+        val accountView = viewModel.currentAccount.value ?: return
+        val account = accountView.account
+
+        navBarController.navBar.menu.findItem(R.id.youFragment)?.apply {
+            navBarController.navBar.itemIconTintList = null
+            avatarHelper.loadAvatar(
+                object : Target {
+                    override fun onSuccess(result: Drawable) {
+                        icon = result
+                    }
+                },
+                imageUrl = accountView.profileImage.toString(),
+                personName = account.name,
+                personId = account.id,
+                personInstance = account.instance,
+            )
+        }
+    }
+
     fun onPreferencesChanged() {
         if (preferences.transparentNotificationBar) {
             binding.notificationBarBgContainer.visibility = View.GONE
@@ -308,6 +344,8 @@ class MainActivity :
         }
 
         navBarController.onPreferencesChanged(preferences)
+
+        updateUserAvatar()
     }
 
     private fun isVersionUpdate(): Boolean {

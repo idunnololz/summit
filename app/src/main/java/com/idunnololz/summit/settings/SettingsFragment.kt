@@ -8,12 +8,14 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -403,7 +405,18 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     private fun launchWebSettings() {
         val directions = SettingsFragmentDirections
             .actionSettingsFragmentToSettingWebFragment()
-        findNavController().navigateSafe(directions)
+        findNavController().navigateSafe(
+            directions,
+            NavOptions.Builder()
+                .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+                .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+                .setPopEnterAnim(
+                    androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+                )
+                .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+                .setPopUpTo(R.id.settingsFragment, true)
+                .build()
+        )
     }
 
     private fun launchDownloadsSettings() {

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_block_list"
+    app:startDestination="@id/settingsAccountBlockListFragment">
+    <fragment
+        android:id="@+id/settingsAccountBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.SettingsAccountBlockListFragment"
+        android:label="SettingsAccountBlockListFragment">
+        <action
+            android:id="@+id/action_settingsAccountBlockListFragment_to_settingsCommunityBlockListFragment"
+            app:destination="@id/settingsCommunityBlockListFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
+        <action
+            android:id="@+id/action_settingsAccountBlockListFragment_to_settingsUserBlockListFragment"
+            app:destination="@id/settingsUserBlockListFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
+        <action
+            android:id="@+id/action_settingsAccountBlockListFragment_to_settingsInstanceBlockListFragment"
+            app:destination="@id/settingsInstanceBlockListFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsCommunityBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.community.SettingsCommunityBlockListFragment"
+        android:label="SettingsCommunityBlockListFragment" />
+    <fragment
+        android:id="@+id/settingsUserBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.user.SettingsUserBlockListFragment"
+        android:label="SettingsUserBlockListFragment" />
+    <fragment
+        android:id="@+id/settingsInstanceBlockListFragment"
+        android:name="com.idunnololz.summit.settings.webSettings.blockList.instance.SettingsInstanceBlockListFragment"
+        android:label="SettingsInstanceBlockListFragment" />
+</navigation>

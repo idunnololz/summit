@@ -162,7 +162,7 @@ class CommunityFragment :
     private var swipeActionCallback: LemmySwipeActionCallback? = null
     private var itemTouchHelper: ItemTouchHelper? = null
 
-    private val onBackPressedHandler = object : OnBackPressedCallback(true) {
+    private val onBackPressedHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             if (!viewModel.infinity && viewModel.currentPageIndex.value != 0) {
                 viewModel.fetchPrevPage()
@@ -292,12 +292,6 @@ class CommunityFragment :
         preferences = viewModel.preferences
 
         viewModel.setTag(parentFragment?.tag)
-
-        if (savedInstanceState == null) {
-            requireMainActivity().apply {
-                setupForFragment<CommunityFragment>()
-            }
-        }
 
         val context = requireContext()
         if (adapter == null) {
@@ -489,8 +483,6 @@ class CommunityFragment :
                     }
                 }
             }
-
-            customAppBar.root.excludeRegionFromSystemGestures()
 
             viewModel.updatePreferences()
             loadingView.hideAll()
@@ -756,7 +748,8 @@ class CommunityFragment :
             )
 
             val customFabBehavior =
-                (binding.fab.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior as? CustomFabWithBottomNavBehavior
+                (binding.fab.layoutParams as? CoordinatorLayout.LayoutParams)
+                    ?.behavior as? CustomFabWithBottomNavBehavior
 
             customFabBehavior?.apply {
                 updateBottomNavHeight(getBottomNavHeight().toFloat())
@@ -1099,6 +1092,10 @@ class CommunityFragment :
 
     override fun onResume() {
         super.onResume()
+
+        requireMainActivity().apply {
+            setupForFragment<CommunityFragment>()
+        }
 
         viewModel.changeCommunity(args.communityRef)
 
@@ -1519,6 +1516,13 @@ class CommunityFragment :
                                 R.id.inboxTabbedFragment,
                                 getString(R.string.inbox),
                                 R.drawable.baseline_inbox_24,
+                            )
+                        }
+                        NavBarDestinations.You -> {
+                            addItemWithIcon(
+                                R.id.youFragment,
+                                getString(R.string.you),
+                                R.drawable.outline_account_circle_24,
                             )
                         }
                         NavBarDestinations.Profile -> {

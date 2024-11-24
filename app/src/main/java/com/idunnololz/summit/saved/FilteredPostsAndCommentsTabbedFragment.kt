@@ -1,11 +1,15 @@
 package com.idunnololz.summit.saved
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.loadProfileImageOrDefault
@@ -28,10 +32,16 @@ import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+/**
+ * Displays a list of posts and comments with some filtering criteria
+ */
 @AndroidEntryPoint
-class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
+class FilteredPostsAndCommentsTabbedFragment :
+    BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
 
-    val viewModel: SavedViewModel by viewModels()
+    private val args: FilteredPostsAndCommentsTabbedFragmentArgs by navArgs()
+
+    val viewModel: FilteredPostAndCommentsViewModel by viewModels()
     var slidingPaneController: SlidingPaneController? = null
 
     @Inject
@@ -58,15 +68,18 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
         val context = requireContext()
 
         requireMainActivity().apply {
-            setupForFragment<SavedTabbedFragment>()
+            setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
 
             setSupportActionBar(binding.toolbar)
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.saved)
+            supportActionBar?.title =
+                when (args.type) {
+                    FilteredPostAndCommentsType.Saved -> getString(R.string.saved)
+                    FilteredPostAndCommentsType.Upvoted -> getString(R.string.upvoted)
+                    FilteredPostAndCommentsType.Downvoted -> getString(R.string.downvoted)
+                }
 
-//            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-//            insetViewExceptTopAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.viewPager)
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
                 binding.coordinatorLayoutContainer,
@@ -89,8 +102,8 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 viewPager.offscreenPageLimit = 5
                 val adapter =
                     ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
-                adapter.addFrag(SavedPostsFragment::class.java, getString(R.string.posts))
-                adapter.addFrag(SavedCommentsFragment::class.java, getString(R.string.comments))
+                adapter.addFrag(FilteredPostsFragment::class.java, getString(R.string.posts))
+                adapter.addFrag(FilteredCommentsFragment::class.java, getString(R.string.comments))
                 viewPager.adapter = adapter
             }
 
@@ -101,7 +114,7 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
             ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
 
             slidingPaneController = SlidingPaneController(
-                fragment = this@SavedTabbedFragment,
+                fragment = this@FilteredPostsAndCommentsTabbedFragment,
                 slidingPaneLayout = slidingPaneLayout,
                 childFragmentManager = childFragmentManager,
                 viewModel = viewModel,
@@ -144,6 +157,8 @@ class SavedTabbedFragment : BaseFragment<TabbedFragmentSavedBinding>(), SignInNa
                 },
             )
         }
+
+        viewModel.initializeIfNeeded(args.type)
     }
 
     override fun navigateToSignInScreen() {

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/padding">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profile_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:foreground="@drawable/account_ripple"
+        android:background="?backgroundColor"
+        android:scaleType="centerCrop"
+        android:padding="2dp"
+        style="@style/CircleImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="?colorOnSurface"
+        app:strokeWidth="2dp"/>
+
+    <View
+        android:id="@+id/switch_account_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@+id/profile_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/title"
+        app:layout_constraintBottom_toBottomOf="@+id/switch_account_text"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceTitleLarge"
+        android:layout_marginHorizontal="@dimen/padding"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="@+id/profile_icon"
+        app:layout_constraintBottom_toTopOf="@+id/subtitle"
+        app:layout_constraintStart_toEndOf="@+id/profile_icon"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintBottom_toTopOf="@+id/switch_account_text"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintEnd_toEndOf="@+id/title"/>
+
+    <TextView
+        android:id="@+id/switch_account_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:text="@string/switch_account"
+        android:drawablePadding="@dimen/padding_half"
+        android:textColor="@color/colorTextFaint"
+        android:layout_marginTop="@dimen/padding_half"
+        app:layout_constraintHorizontal_bias="0"
+        app:drawableEndCompat="@drawable/baseline_chevron_right_16"
+        app:drawableTint="@color/colorTextFaint"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle"
+        app:layout_constraintBottom_toBottomOf="@+id/profile_icon"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintEnd_toEndOf="@+id/title"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/stat_card1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginHorizontal="@dimen/padding"
+        app:layout_constraintTop_toBottomOf="@+id/profile_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/stat_card2">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/padding">
+
+            <TextView
+                android:id="@+id/posts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleLarge"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toTopOf="@+id/profile_icon"
+                app:layout_constraintBaseline_toTopOf="@+id/subtitle"
+                app:layout_constraintStart_toEndOf="@+id/profile_icon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:text="@string/posts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceLabelSmall"
+                android:layout_marginTop="@dimen/padding_quarter"
+                android:textAllCaps="true"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintBottom_toTopOf="@+id/switch_account_text"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintEnd_toEndOf="@+id/title"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/stat_card2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toTopOf="@+id/stat_card1"
+        app:layout_constraintStart_toEndOf="@+id/stat_card1"
+        app:layout_constraintEnd_toStartOf="@+id/stat_card3">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/padding">
+
+            <TextView
+                android:id="@+id/comments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleLarge"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toTopOf="@+id/profile_icon"
+                app:layout_constraintBaseline_toTopOf="@+id/subtitle"
+                app:layout_constraintStart_toEndOf="@+id/profile_icon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:text="@string/comments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceLabelSmall"
+                android:layout_marginTop="@dimen/padding_quarter"
+                android:textAllCaps="true"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintBottom_toTopOf="@+id/switch_account_text"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintEnd_toEndOf="@+id/title"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/stat_card3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toTopOf="@+id/stat_card1"
+        app:layout_constraintStart_toEndOf="@+id/stat_card2"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/padding">
+
+            <TextView
+                android:id="@+id/account_age"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleLarge"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toTopOf="@+id/profile_icon"
+                app:layout_constraintBaseline_toTopOf="@+id/subtitle"
+                app:layout_constraintStart_toEndOf="@+id/profile_icon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:text="@string/account_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceLabelSmall"
+                android:layout_marginTop="@dimen/padding_quarter"
+                android:textAllCaps="true"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:lines="1"
+                android:ellipsize="end"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintBottom_toTopOf="@+id/switch_account_text"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintEnd_toEndOf="@+id/title"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

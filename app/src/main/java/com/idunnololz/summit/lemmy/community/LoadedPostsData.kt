@@ -13,6 +13,7 @@ data class LoadedPostsData(
     val posts: List<LocalPostView>,
     val instance: String,
     val pageIndex: Int,
+    val dedupingKey: String,
     val hasMore: Boolean,
     val isReadPostUpdate: Boolean = true,
     val error: PostLoadError? = null,
