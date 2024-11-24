@@ -6,9 +6,9 @@ import com.squareup.moshi.JsonClass
 data class NavBarConfig(
     val navBarDestinations: List<NavBarDestId> = listOf(
         NavBarDestinations.Home,
-        NavBarDestinations.Saved,
         NavBarDestinations.Search,
-        NavBarDestinations.History,
         NavBarDestinations.Inbox,
+        NavBarDestinations.You,
+        NavBarDestinations.None,
     ),
 )

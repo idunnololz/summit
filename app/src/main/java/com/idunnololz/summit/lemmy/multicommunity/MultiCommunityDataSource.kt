@@ -65,10 +65,11 @@ class MultiCommunityDataSource(
                                 listingType = ListingType.All,
                                 page = page,
                                 limit = limit,
+                                cursor = null,
                                 force = force,
                             )
                             .map {
-                                it.map {
+                                it.posts.map {
                                     FetchedPost(
                                         it,
                                         Source.StandardSource(),
@@ -103,11 +104,12 @@ class MultiCommunityDataSource(
                                 sortType = sortOrder,
                                 listingType = ListingType.Subscribed,
                                 page = page,
+                                cursor = null,
                                 limit = limit,
                                 force = force,
                             )
                             .map {
-                                it.map {
+                                it.posts.map {
                                     FetchedPost(
                                         it,
                                         Source.AccountSource(

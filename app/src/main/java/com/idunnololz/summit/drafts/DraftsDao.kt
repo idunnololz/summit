@@ -29,6 +29,9 @@ interface DraftsDao {
         accountInstance: String,
     ): List<DraftEntry>
 
+    @Query("SELECT * FROM drafts WHERE id = :id")
+    suspend fun getDraft(id: Long): List<DraftEntry>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: DraftEntry): Long
 

@@ -73,7 +73,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.saved.SavedTabbedFragment
+import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 import com.idunnololz.summit.util.BaseFragment
@@ -347,7 +347,7 @@ class PostFragment :
             is PersonTabbedFragment -> {
                 fragment.closePost(this@PostFragment)
             }
-            is SavedTabbedFragment -> {
+            is FilteredPostsAndCommentsTabbedFragment -> {
                 fragment.closePost(this@PostFragment)
             }
             is SearchTabbedFragment -> {

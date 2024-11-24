@@ -12,6 +12,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityModeratorView
+import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
@@ -21,10 +22,12 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.SinglePostDataSourceWithCursor
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
@@ -44,6 +47,7 @@ class PersonTabbedViewModel @Inject constructor(
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
     private val commentListEngineFactory: CommentListEngine.Factory,
+    private val singlePostDataSourceWithCursorFactory: SinglePostDataSourceWithCursor.Factory
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -61,7 +65,9 @@ class PersonTabbedViewModel @Inject constructor(
         autoLoadMoreItems = true,
         coroutineScopeFactory = coroutineScopeFactory,
         directoryHelper = directoryHelper,
-    )
+    ).apply {
+        setKey("person")
+    }
     var commentListEngine = commentListEngineFactory.create()
 
     var sortType: SortType = SortType.New
@@ -160,6 +166,7 @@ class PersonTabbedViewModel @Inject constructor(
                                 posts = posts,
                                 instance = apiClient.instance,
                                 pageIndex = pageIndex,
+                                dedupingKey = pageIndex.toString(),
                                 hasMore = result.posts.size == PAGE_SIZE,
                             ),
                         )
@@ -196,6 +203,7 @@ class PersonTabbedViewModel @Inject constructor(
                                 posts = listOf(),
                                 instance = apiClient.instance,
                                 pageIndex = pageIndex,
+                                dedupingKey = pageIndex.toString(),
                                 hasMore = false,
                                 error = PostLoadError(
                                     errorCode = 0,

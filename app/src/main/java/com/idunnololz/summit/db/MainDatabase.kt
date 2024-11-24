@@ -141,6 +141,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_39_38)
                 .addMigrations(MIGRATION_39_40)
                 .addMigrations(MIGRATION_40_41)
+                .addMigrations(MIGRATION_42_43)
                 .build()
         }
     }
@@ -294,6 +295,14 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
         db.execSQL("DROP TABLE IF EXISTS read_posts;")
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS `read_posts` (`post_key` TEXT NOT NULL, `read` INTEGER NOT NULL, PRIMARY KEY(`post_key`))",
+        )
+    }
+}
+
+val MIGRATION_42_43 = object : Migration(42, 43) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "ALTER TABLE `account` ADD COLUMN `image_url` TEXT",
         )
     }
 }

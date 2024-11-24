@@ -4,6 +4,10 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.api.AccountAwareLemmyClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +18,9 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class DraftsViewModel @Inject constructor(
+    private val lemmyClient: AccountAwareLemmyClient,
     private val draftsManager: DraftsManager,
+    private val accountManager: AccountManager,
 ) : ViewModel() {
 
     companion object {
@@ -25,7 +31,12 @@ class DraftsViewModel @Inject constructor(
 
     var draftType: Int? = DraftTypes.Post
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    val apiInstance: String
+        get() = lemmyClient.instance
+
+    val currentAccount: Account?
+        get() = accountManager.currentAccount.asAccount
+
     private val draftEntriesContext = Dispatchers.IO.limitedParallelism(1)
 
     private val draftEntries = mutableListOf<DraftEntry>()
@@ -35,6 +46,15 @@ class DraftsViewModel @Inject constructor(
     private var loadingJob: Job? = null
 
     val viewModelItems = MutableLiveData<List<ViewModelItem>>(listOf(ViewModelItem.LoadingItem))
+
+    init {
+        viewModelScope.launch {
+            draftsManager.onDraftChanged.collect {
+                Log.d("HAHA", "onDraftChanged")
+                loadMoreDrafts(force = true)
+            }
+        }
+    }
 
     fun loadMoreDrafts(force: Boolean = false) {
         if (force) {
@@ -89,6 +109,8 @@ class DraftsViewModel @Inject constructor(
     private suspend fun generateItems() {
         val items = mutableListOf<ViewModelItem>()
 
+        items += ViewModelItem.HeaderItem
+
         withContext(draftEntriesContext) {
             for (draft in draftEntries) {
                 when (draft.data) {
@@ -129,9 +151,25 @@ class DraftsViewModel @Inject constructor(
         }
     }
 
-    fun deleteAll(draftType: Int) {
+    fun deleteDraft(draftId: Long) {
         viewModelScope.launch {
-            draftsManager.deleteAll(draftType)
+            draftsManager.deleteDraftWithId(draftId)
+
+            withContext(draftEntriesContext) {
+                draftEntries.filter { it.id != draftId }
+            }
+
+            generateItems()
+        }
+    }
+
+    fun deleteAll(draftType: Int?) {
+        viewModelScope.launch {
+            if (draftType != null) {
+                draftsManager.deleteAll(draftType)
+            } else {
+                draftsManager.deleteAll()
+            }
 
             reset()
         }
@@ -147,6 +185,9 @@ class DraftsViewModel @Inject constructor(
     }
 
     sealed interface ViewModelItem {
+
+        data object HeaderItem : ViewModelItem
+
         data class PostDraftItem(
             val draftEntry: DraftEntry,
             val postData: DraftData.PostDraftData,

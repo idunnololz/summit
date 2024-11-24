@@ -36,7 +36,6 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
         val context = requireContext()
 
         requireMainActivity().apply {
-            setupForFragment<SettingsFragment>()
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
@@ -87,5 +86,11 @@ class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlo
                 },
             )
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setupForFragment<SettingsFragment>()
     }
 }

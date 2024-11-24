@@ -162,14 +162,14 @@ class PostListEngine(
     fun addPage(data: LoadedPostsData) {
         if (infinity) {
             val pages = pages.toMutableList()
-            val pageIndexInPages = pages.indexOfFirst { it.pageIndex == data.pageIndex }
+            val pageIndexInPages = pages.indexOfFirst { it.dedupingKey == data.dedupingKey }
             if (pageIndexInPages != -1) {
                 // replace!
                 pages[pageIndexInPages] = data
             } else {
                 pages.add(data)
-                pages.sortBy { it.pageIndex }
             }
+            pages.sortBy { it.pageIndex }
             _pages = pages
         } else {
             _pages = listOf(data)

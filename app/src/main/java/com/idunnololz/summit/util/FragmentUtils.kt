@@ -14,9 +14,10 @@ import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.login.LoginFragment
 import com.idunnololz.summit.preview.ImageViewerActivity
 import com.idunnololz.summit.preview.VideoViewerFragment
-import com.idunnololz.summit.saved.SavedTabbedFragment
+import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.cache.SettingsCacheFragment
+import com.idunnololz.summit.you.YouFragment
 import kotlin.reflect.KClass
 
 inline fun <reified T> BaseFragment<*>.setupForFragment(animate: Boolean = true) {
@@ -78,7 +79,7 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                     navBarController.showBottomNav()
                     hideNotificationBarBg()
                 }
-                SavedTabbedFragment::class -> {
+                FilteredPostsAndCommentsTabbedFragment::class -> {
                     navBarController.disableBottomNavViewScrolling()
                     navBarController.showBottomNav()
                     showNotificationBarBg()
@@ -107,6 +108,11 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
                     navBarController.disableBottomNavViewScrolling()
                     navBarController.hideNavBar(animate)
                     hideNotificationBarBg()
+                }
+                YouFragment::class -> {
+                    navBarController.disableBottomNavViewScrolling()
+                    navBarController.showBottomNav()
+                    showNotificationBarBg()
                 }
                 else ->
                     throw RuntimeException(

@@ -11,5 +11,7 @@ data class GetComments(
     val post_id: PostId? = null,
     val parent_id: CommentId? = null,
     val saved_only: Boolean? = null,
+    val liked_only: Boolean? = null,
+    val disliked_only: Boolean? = null,
     val auth: String? = null,
 )

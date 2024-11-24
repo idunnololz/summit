@@ -1,6 +1,7 @@
 package com.idunnololz.summit.drafts
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -9,6 +10,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -24,8 +30,10 @@ class DraftsManager @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dbContext = Dispatchers.IO.limitedParallelism(1)
 
-    init {
-    }
+    private val _onDraftChanged = MutableSharedFlow<Unit>()
+
+    val onDraftChanged
+        get() = _onDraftChanged.asSharedFlow()
 
     fun saveDraftAsync(draftData: DraftData, showToast: Boolean) {
         coroutineScope.launch {
@@ -52,6 +60,10 @@ class DraftsManager @Inject constructor(
                 Toast.makeText(context, context.getString(R.string.draft_saved), Toast.LENGTH_LONG)
                     .show()
             }
+        }
+
+        coroutineScope.launch {
+            _onDraftChanged.emit(Unit)
         }
 
         return id
@@ -91,6 +103,10 @@ class DraftsManager @Inject constructor(
                     .show()
             }
         }
+
+        coroutineScope.launch {
+            _onDraftChanged.emit(Unit)
+        }
     }
 
     suspend fun getDraftsByType(draftType: Int, limit: Int, updateTs: Long) =
@@ -101,13 +117,39 @@ class DraftsManager @Inject constructor(
 
     suspend fun getAllDrafts(limit: Int, updateTs: Long) = draftsDao.getAllDrafts(limit, updateTs)
 
-    suspend fun deleteAll(draftType: Int) = draftsDao.deleteAll(draftType)
+    suspend fun getDraft(id: Long) = withContext(dbContext) {
+        draftsDao.getDraft(id)
+    }
+
+    suspend fun deleteAll(draftType: Int) {
+        draftsDao.deleteAll(draftType)
+
+        coroutineScope.launch {
+            _onDraftChanged.emit(Unit)
+        }
+    }
+
+    suspend fun deleteAll() {
+        draftsDao.deleteAll()
+
+        coroutineScope.launch {
+            _onDraftChanged.emit(Unit)
+        }
+    }
 
     suspend fun deleteDraft(entry: DraftEntry) = withContext(dbContext) {
         draftsDao.delete(entry)
+
+        coroutineScope.launch {
+            _onDraftChanged.emit(Unit)
+        }
     }
 
     suspend fun deleteDraftWithId(entryId: Long) = withContext(dbContext) {
         draftsDao.deleteWithId(entryId)
+
+        coroutineScope.launch {
+            _onDraftChanged.emit(Unit)
+        }
     }
 }

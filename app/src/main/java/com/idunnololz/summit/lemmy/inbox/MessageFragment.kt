@@ -253,11 +253,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 AddOrEditCommentFragment().apply {
                     arguments =
                         AddOrEditCommentFragmentArgs(
-                            args.instance,
-                            null,
-                            null,
-                            null,
-                            inboxItem,
+                            instance = args.instance,
+                            commentView = null,
+                            postView = null,
+                            editCommentView = null,
+                            inboxItem = inboxItem,
                         ).toBundle()
                 }.show(childFragmentManager, "asdf")
             }

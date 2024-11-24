@@ -13,7 +13,8 @@
         android:textColor="@color/colorTextFaint"
         android:text="@string/there_doesnt_seem_to_be_anything_here"
         android:gravity="center"
-        android:padding="@dimen/padding"
+        android:paddingTop="@dimen/padding_two"
+        android:paddingBottom="@dimen/padding_three"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

@@ -2,22 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/mainFragment"
-        android:icon="@drawable/baseline_home_24"
+        android:icon="@drawable/ic_home_selector"
         android:title="@string/home" />
     <item
-        android:id="@+id/savedFragment"
-        android:icon="@drawable/baseline_bookmark_24"
-        android:title="@string/saved" />
-    <item
         android:id="@+id/searchHomeFragment"
-        android:icon="@drawable/baseline_search_24"
+        android:icon="@drawable/ic_search_selector"
         android:title="@string/search" />
     <item
-        android:id="@+id/historyFragment"
-        android:icon="@drawable/baseline_history_24"
-        android:title="@string/history" />
-    <item
         android:id="@+id/inboxTabbedFragment"
-        android:icon="@drawable/baseline_inbox_24"
+        android:icon="@drawable/ic_inbox_selector"
         android:title="@string/inbox" />
+    <item
+        android:id="@+id/youFragment"
+        android:icon="@drawable/outline_account_circle_24"
+        android:title="@string/you" />
 </menu>

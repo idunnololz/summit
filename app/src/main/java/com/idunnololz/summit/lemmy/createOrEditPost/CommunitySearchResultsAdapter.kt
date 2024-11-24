@@ -11,6 +11,8 @@ import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
+import com.idunnololz.summit.databinding.ItemCommunitySearchHeaderBinding
+import com.idunnololz.summit.databinding.ItemCommunitySearchNoResultsBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -61,7 +63,7 @@ class CommunitySearchResultsAdapter(
     ).apply {
         addItemType(
             clazz = Item.GroupHeaderItem::class,
-            inflateFn = CommunitySelectorGroupItemBinding::inflate,
+            inflateFn = ItemCommunitySearchHeaderBinding::inflate,
         ) { item, b, _ ->
             b.titleTextView.text = item.text
 
@@ -90,7 +92,7 @@ class CommunitySearchResultsAdapter(
         }
         addItemType(
             clazz = Item.NoResultsItem::class,
-            inflateFn = CommunitySelectorNoResultsItemBinding::inflate,
+            inflateFn = ItemCommunitySearchNoResultsBinding::inflate,
         ) { item, b, _ ->
             b.text.text = item.text
         }

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="isLightTheme">true</bool>
+    <bool name="enableOnBackInvokedCallback">false</bool>
 </resources>

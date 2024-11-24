@@ -58,7 +58,7 @@ import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.SearchHomeConfig
 import com.idunnololz.summit.preferences.anySectionsEnabled
-import com.idunnololz.summit.saved.SavedTabbedFragment
+import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.util.AnimationsHelper
@@ -415,7 +415,7 @@ class SearchHomeFragment :
     override fun onResume() {
         super.onResume()
 
-        setupForFragment<SavedTabbedFragment>()
+        setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
     }
 
     private fun showSearch() {

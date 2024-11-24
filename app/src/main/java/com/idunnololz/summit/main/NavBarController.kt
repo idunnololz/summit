@@ -1,6 +1,7 @@
 package com.idunnololz.summit.main
 
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -290,7 +291,8 @@ class NavBarController(
 
         Log.d(
             TAG,
-            "showBottomNav() bottomNavigationView.height: ${navBarContainer.height} bottomNavOpenness: $bottomNavOpenPercent",
+            "showBottomNav() bottomNavigationView.height: ${navBarContainer.height} " +
+                "bottomNavOpenness: $bottomNavOpenPercent",
         )
 
         val navigationBarOffset =
@@ -424,6 +426,10 @@ class NavBarController(
             navBar.setTag(R.id.custom_nav_bar, true)
             navBar.menu.apply {
                 clear()
+
+                navBar.itemIconTintList = ColorStateList.valueOf(
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+
                 val navBarDestinations = navBarConfig.navBarDestinations
                 for (dest in navBarDestinations) {
                     when (dest) {
@@ -434,7 +440,8 @@ class NavBarController(
                                 Menu.NONE,
                                 context.getString(R.string.home),
                             ).apply {
-                                setIcon(R.drawable.baseline_home_24)
+                                setIcon(R.drawable.ic_home_selector)
+//                                setIconTintList(ColorStateList.valueOf(getC))
                             }
                         }
                         NavBarDestinations.Saved -> {
@@ -444,7 +451,7 @@ class NavBarController(
                                 Menu.NONE,
                                 context.getString(R.string.saved),
                             ).apply {
-                                setIcon(R.drawable.baseline_bookmark_24)
+                                setIcon(R.drawable.ic_bookmarks_selector)
                             }
                         }
                         NavBarDestinations.Search -> {
@@ -454,7 +461,7 @@ class NavBarController(
                                 Menu.NONE,
                                 context.getString(R.string.search),
                             ).apply {
-                                setIcon(R.drawable.baseline_search_24)
+                                setIcon(R.drawable.ic_search_selector)
                             }
                         }
                         NavBarDestinations.History -> {
@@ -474,7 +481,7 @@ class NavBarController(
                                 Menu.NONE,
                                 context.getString(R.string.inbox),
                             ).apply {
-                                setIcon(R.drawable.baseline_inbox_24)
+                                setIcon(R.drawable.ic_inbox_selector)
                             }
                         }
                         NavBarDestinations.Profile -> {
@@ -483,6 +490,16 @@ class NavBarController(
                                 R.id.personTabbedFragment2,
                                 Menu.NONE,
                                 context.getString(R.string.user_profile),
+                            ).apply {
+                                setIcon(R.drawable.ic_account_selector)
+                            }
+                        }
+                        NavBarDestinations.You -> {
+                            add(
+                                Menu.NONE,
+                                R.id.youFragment,
+                                Menu.NONE,
+                                context.getString(R.string.you),
                             ).apply {
                                 setIcon(R.drawable.outline_account_circle_24)
                             }
@@ -494,6 +511,9 @@ class NavBarController(
             }
         } else {
             if (navBar.getTag(R.id.custom_nav_bar) == true) {
+                navBar.itemIconTintList = ColorStateList.valueOf(
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+
                 navBar.menu.clear()
                 navBar.inflateMenu(R.menu.bottom_navigation_menu)
                 navBar.setTag(R.id.custom_nav_bar, false)

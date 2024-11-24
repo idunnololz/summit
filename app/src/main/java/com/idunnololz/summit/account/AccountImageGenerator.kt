@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -50,6 +51,7 @@ class AccountImageGenerator @Inject constructor(
         personName: String,
         personId: PersonId,
         personInstance: String,
+        circleClip: Boolean = false,
     ): Drawable {
         val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
         val bitmap = Bitmap.createBitmap(
@@ -65,6 +67,19 @@ class AccountImageGenerator @Inject constructor(
                     personName,
                     personId,
                     personInstance,
+                )
+            }
+
+            if (circleClip) {
+                clipPath(
+                    Path().apply {
+                        addCircle(
+                            accountImageSize.toFloat() / 2f,
+                            accountImageSize.toFloat() / 2,
+                            accountImageSize.toFloat() / 2f,
+                            Path.Direction.CW
+                        )
+                    }
                 )
             }
 

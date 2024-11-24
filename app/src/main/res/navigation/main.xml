@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     app:startDestination="@id/mainFragment">
 
     <include app:graph="@navigation/community" />
 
     <include app:graph="@navigation/login" />
+
+    <include app:graph="@navigation/block_list" />
 
     <action android:id="@+id/action_global_login" app:destination="@id/login"/>
     <action android:id="@+id/action_global_community" app:destination="@id/community"/>
@@ -58,8 +59,13 @@
     </fragment>
     <fragment
         android:id="@+id/savedFragment"
-        android:name="com.idunnololz.summit.saved.SavedTabbedFragment"
-        android:label="SavedFragment" />
+        android:name="com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment"
+        android:label="FilteredPostsAndCommentsTabbedFragment" >
+        <argument
+            android:name="type"
+            app:argType="com.idunnololz.summit.saved.FilteredPostAndCommentsType"
+            android:defaultValue="Saved" />
+    </fragment>
     <fragment
         android:id="@+id/historyFragment"
         android:name="com.idunnololz.summit.history.HistoryFragment"
@@ -274,4 +280,79 @@
             android:id="@+id/action_searchHomeFragment_to_searchFragment"
             app:destination="@id/searchTabbedFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/youFragment"
+        android:name="com.idunnololz.summit.you.YouFragment"
+        android:label="YouFragment" >
+        <action
+            android:id="@+id/action_youFragment_to_savedFragment"
+            app:destination="@id/savedFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_historyFragment"
+            app:destination="@id/historyFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_personTabbedFragment2"
+            app:destination="@id/personTabbedFragment2"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_hiddenPostsFragment2"
+            app:destination="@id/hiddenPostsFragment2"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_settingsAccountBlockListFragment2"
+            app:destination="@id/nav_block_list"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_votedTabbedFragment"
+            app:destination="@id/votedTabbedFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_draftsTabbedFragment"
+            app:destination="@id/draftsTabbedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/hiddenPostsFragment2"
+        android:name="com.idunnololz.summit.settings.hiddenPosts.HiddenPostsFragment"
+        android:label="HiddenPostsFragment" />
+    <fragment
+        android:id="@+id/votedTabbedFragment"
+        android:name="com.idunnololz.summit.you.voted.VotedTabbedFragment"
+        android:label="VotedTabbedFragment" >
+        <argument
+            android:name="isDownvote"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/draftsFragment"
+        android:name="com.idunnololz.summit.drafts.DraftsFragment"
+        android:label="DraftsFragment">
+        <argument
+            android:name="draftType"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/draftsTabbedFragment"
+        android:name="com.idunnololz.summit.drafts.DraftsTabbedFragment"
+        android:label="DraftsTabbedFragment" />
 </navigation>

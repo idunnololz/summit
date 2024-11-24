@@ -1972,6 +1972,12 @@ class NavigationSettings @Inject constructor(
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
+                NavBarDestinations.You,
+                context.getString(R.string.you),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
                 NavBarDestinations.None,
                 context.getString(R.string.none),
                 null,

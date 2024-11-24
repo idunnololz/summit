@@ -435,8 +435,13 @@ class AddOrEditCommentFragment :
             }
             if (isEdit()) {
                 toolbar.menu.findItem(R.id.send_comment)?.isVisible = false
+                toolbar.menu.findItem(R.id.save_comment)?.isVisible = false
+            } else if (args.draft != null) {
+                toolbar.menu.findItem(R.id.send_comment)?.isVisible = false
+                toolbar.menu.findItem(R.id.update_comment)?.isVisible = false
             } else {
                 toolbar.menu.findItem(R.id.update_comment)?.isVisible = false
+                toolbar.menu.findItem(R.id.save_comment)?.isVisible = false
             }
 
             val commentView = args.commentView ?: args.editCommentView
@@ -491,6 +496,10 @@ class AddOrEditCommentFragment :
                             return@a true
                         }
                         updateComment()
+                        true
+                    }
+                    R.id.save_comment -> {
+                        dismiss()
                         true
                     }
                     R.id.save_draft -> {
@@ -574,6 +583,12 @@ class AddOrEditCommentFragment :
                     )
                 }
 
+                val draft = args.draft
+                if (draft != null) {
+                    viewModel.currentDraftEntry.value = draft
+                    viewModel.currentDraftId.value = draft.id
+                }
+
                 commentEditText.requestFocus()
             }
             setup(savedInstanceState)
@@ -634,6 +649,7 @@ class AddOrEditCommentFragment :
         val inboxItem = args.inboxItem
         val personId = args.personId
         val personRef = args.personRef
+        val draft = args.draft
         if (personId != 0L) {
             viewModel.sendComment(
                 account,
@@ -653,6 +669,8 @@ class AddOrEditCommentFragment :
                 inboxItem,
                 binding.commentEditText.text.toString(),
             )
+        } else if (draft != null) {
+            dismiss()
         } else {
             viewModel.sendComment(
                 account,
@@ -757,6 +775,7 @@ class AddOrEditCommentFragment :
         val postView = args.postView
         val commentView = args.commentView
         val inboxItem = args.inboxItem
+        val draft = args.draft
 
         val commentEditor = binding.commentEditText
         if (isEdit()) {
@@ -781,6 +800,9 @@ class AddOrEditCommentFragment :
         } else if (inboxItem != null) {
             binding.replyingTo.text = inboxItem.content
         } else if (isDm) {
+            binding.contextContainer.visibility = View.GONE
+            binding.divider.visibility = View.GONE
+        } else if (draft != null) {
             binding.contextContainer.visibility = View.GONE
             binding.divider.visibility = View.GONE
         } else {

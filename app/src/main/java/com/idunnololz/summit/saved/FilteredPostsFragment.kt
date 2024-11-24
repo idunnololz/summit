@@ -4,57 +4,46 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.databinding.FragmentSavedCommentsBinding
-import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
-import com.idunnololz.summit.lemmy.utils.CommentListAdapter
+import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
+import com.idunnololz.summit.lemmy.community.Item
+import com.idunnololz.summit.lemmy.community.PostListAdapter
+import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
-import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SavedCommentsFragment :
-    BaseFragment<FragmentSavedCommentsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener,
-    SignInNavigator {
+class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInNavigator {
 
-    companion object {
-        private const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
-        private const val EXTRA_POST_REF = "EXTRA_POST_REF"
-        private const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
-    }
+    private var adapter: PostListAdapter? = null
 
-    private var adapter: CommentListAdapter? = null
+    @Inject
+    lateinit var postListViewBuilder: PostListViewBuilder
+
+    @Inject
+    lateinit var preferences: Preferences
 
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
-
-    @Inject
-    lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
-
-    @Inject
-    lateinit var accountManager: AccountManager
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
@@ -62,11 +51,19 @@ class SavedCommentsFragment :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val parentFragment = parentFragment as SavedTabbedFragment
+        val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
+        val viewModel = parentFragment.viewModel
 
-        adapter = CommentListAdapter(
-            context = requireContext(),
-            postAndCommentViewBuilder = postAndCommentViewBuilder,
+        adapter = PostListAdapter(
+            postListViewBuilder,
+            requireContext(),
+            viewModel.postListEngine,
+            onNextClick = {
+//                viewModel.fetchNextPage(clearPagePosition = true)
+            },
+            onPrevClick = {
+//                viewModel.fetchPrevPage()
+            },
             onSignInRequired = {
                 PreAuthDialogFragment.newInstance()
                     .show(childFragmentManager, "asdf")
@@ -81,43 +78,73 @@ class SavedCommentsFragment :
                             apiInstance,
                         ),
                     )
-                    .createAndShow(childFragmentManager, "aa")
+                    .setNegativeButton(R.string.go_to_account_instance)
+                    .createAndShow(childFragmentManager, "onInstanceMismatch")
             },
-            onImageClick = { view, url ->
-                getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
+            onImageClick = { _, postView, sharedElementView, url ->
+                getMainActivity()?.openImage(
+                    sharedElement = sharedElementView,
+                    appBar = parentFragment.binding.appBar,
+                    title = postView.post.name,
+                    url = url,
+                    mimeType = null,
+                )
             },
             onVideoClick = { url, videoType, state ->
                 getMainActivity()?.openVideo(url, videoType, state)
             },
-            onPageClick = {
-                getMainActivity()?.launchPage(it)
+            onVideoLongClickListener = { url ->
+                showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
             },
-            onCommentClick = {
-                parentFragment.slidingPaneController?.openComment(
-                    it.instance,
-                    it.id,
+            onPageClick = { accountId, pageRef ->
+                getMainActivity()?.launchPage(pageRef)
+            },
+            onItemClick = {
+                    accountId,
+                    instance,
+                    id,
+                    currentCommunity,
+                    post,
+                    jumpToComments,
+                    reveal,
+                    videoState, ->
+
+                parentFragment.slidingPaneController?.openPost(
+                    instance = instance,
+                    id = id,
+                    reveal = reveal,
+                    post = post,
+                    jumpToComments = jumpToComments,
+                    currentCommunity = currentCommunity,
+                    accountId = accountId,
+                    videoState = videoState,
                 )
             },
-            onLoadPage = {
-                parentFragment.viewModel.fetchCommentPage(it, false)
-            },
-            onCommentActionClick = { commentView, actionId ->
-                createCommentActionHandler(
-                    apiInstance = parentFragment.viewModel.instance,
-                    commentView = commentView,
-                    moreActionsHelper = moreActionsHelper,
+            onShowMoreActions = { accountId, postView ->
+                showMorePostOptions(
+                    instance = parentFragment.viewModel.instance,
+                    accountId = null,
+                    postView = postView,
+                    moreActionsHelper = parentFragment.moreActionsHelper,
                     fragmentManager = childFragmentManager,
-                )(actionId)
+                )
             },
-            onLinkClick = { url, text, linkType ->
+            onPostRead = { _, _ -> },
+            onLoadPage = {
+                viewModel.fetchPostPage(it, false)
+            },
+            onLinkClick = { accountId, url, text, linkType ->
                 onLinkClick(url, text, linkType)
             },
-            onLinkLongClick = { url, text ->
+            onLinkLongClick = { accountId, url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
         ).apply {
-            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            alwaysRenderAsUnread = true
+
+            updateWithPreferences(preferences)
         }
+        onSelectedLayoutChanged()
     }
 
     override fun onCreateView(
@@ -127,7 +154,7 @@ class SavedCommentsFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSavedCommentsBinding.inflate(inflater, container, false))
+        setBinding(FragmentSavedPostsBinding.inflate(inflater, container, false))
 
         return binding.root
     }
@@ -135,17 +162,17 @@ class SavedCommentsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val parentFragment = parentFragment as SavedTabbedFragment
-
-        val viewModel = parentFragment.viewModel
+        val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
 
         val layoutManager = LinearLayoutManager(context)
 
+        val viewModel = parentFragment.viewModel
+
         fun fetchPageIfLoadItem(position: Int) {
-            (adapter?.items?.getOrNull(position) as? CommentListAdapter.Item.AutoLoadItem)
+            (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
                 ?.pageToLoad
                 ?.let {
-                    viewModel.fetchCommentPage(it)
+                    viewModel.fetchPostPage(it, false)
                 }
         }
 
@@ -159,24 +186,25 @@ class SavedCommentsFragment :
             fetchPageIfLoadItem(lastPos + 1)
         }
 
-        viewModel.commentsState.observe(viewLifecycleOwner) {
+        viewModel.postsState.observe(viewLifecycleOwner) {
             when (it) {
                 is StatefulData.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
 
                     if (it.error is NotAuthenticatedException) {
                         binding.loadingView.showErrorWithRetry(
-                            getString(R.string.please_login_to_view_your_inbox),
+                            getString(R.string.error_not_signed_in),
                             getString(R.string.login),
                         )
                         binding.loadingView.setOnRefreshClickListener {
-                            val direction = SavedTabbedFragmentDirections.actionGlobalLogin()
+                            val direction = FilteredPostsAndCommentsTabbedFragmentDirections
+                                .actionGlobalLogin()
                             findNavController().navigateSafe(direction)
                         }
                     } else {
                         binding.loadingView.showDefaultErrorMessageFor(it.error)
                         binding.loadingView.setOnRefreshClickListener {
-                            viewModel.fetchCommentPage(0, true)
+                            viewModel.fetchPostPage(0, true)
                         }
                     }
                 }
@@ -187,9 +215,9 @@ class SavedCommentsFragment :
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.loadingView.hideAll()
 
-                    adapter?.setData(viewModel.commentListEngine.commentPages)
+                    adapter?.onItemsChanged()
 
-                    binding.root.post {
+                    binding.recyclerView.post {
                         checkIfFetchNeeded()
                     }
                 }
@@ -198,8 +226,7 @@ class SavedCommentsFragment :
 
         with(binding) {
             recyclerView.layoutManager = layoutManager
-
-            binding.recyclerView.addOnScrollListener(
+            recyclerView.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
@@ -210,7 +237,7 @@ class SavedCommentsFragment :
             )
 
             swipeRefreshLayout.setOnRefreshListener {
-                viewModel.fetchCommentPage(0, true)
+                viewModel.fetchPostPage(0, true)
             }
         }
 
@@ -218,10 +245,10 @@ class SavedCommentsFragment :
             if (lastSelectedPost != null) {
                 lastSelectedPost.fold(
                     {
-                        adapter?.onHighlightComplete()
+                        adapter?.highlightPostForever(it)
                     },
                     {
-                        adapter?.highlightForever(it)
+                        adapter?.clearHighlight()
                     },
                 )
             } else {
@@ -236,8 +263,31 @@ class SavedCommentsFragment :
 
     override fun onResume() {
         super.onResume()
+        onSelectedLayoutChanged()
+    }
 
-        postAndCommentViewBuilder.onPreferencesChanged()
+    private fun onSelectedLayoutChanged() {
+        val newPostUiConfig = preferences.getPostInListUiConfig()
+        val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
+        val didLayoutChange = adapter?.layout != preferences.getPostsLayout()
+
+        if (didLayoutChange) {
+            if (isBindingAvailable()) {
+                updateDecorator(binding.recyclerView)
+            }
+        }
+
+        if (didUiConfigChange) {
+            postListViewBuilder.postUiConfig = newPostUiConfig
+        }
+
+        if (didLayoutChange || didUiConfigChange) {
+            adapter?.layout = preferences.getPostsLayout()
+        }
+    }
+
+    private fun updateDecorator(recyclerView: RecyclerView) {
+        recyclerView.setupDecoratorsForPostList(preferences)
     }
 
     private fun setupView() {
@@ -245,43 +295,16 @@ class SavedCommentsFragment :
 
         with(binding) {
             adapter?.apply {
-                viewLifecycleOwner = this@SavedCommentsFragment.viewLifecycleOwner
+                contentMaxWidth = recyclerView.width
+                contentPreferredHeight = recyclerView.height
+                viewLifecycleOwner = this@FilteredPostsFragment.viewLifecycleOwner
             }
 
             recyclerView.setup(animationsHelper)
             recyclerView.adapter = adapter
             recyclerView.setHasFixedSize(true)
-            recyclerView.addItemDecoration(
-                CustomDividerItemDecoration(
-                    recyclerView.context,
-                    DividerItemDecoration.VERTICAL,
-                ).apply {
-                    setDrawable(
-                        checkNotNull(
-                            ContextCompat.getDrawable(
-                                context,
-                                R.drawable.vertical_divider,
-                            ),
-                        ),
-                    )
-                },
-            )
+            recyclerView.setupDecoratorsForPostList(preferences)
         }
-    }
-
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
-        when (tag) {
-            CONFIRM_DELETE_COMMENT_TAG -> {
-                val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
-                val postRef = dialog.arguments?.getParcelableCompat<PostRef>(EXTRA_POST_REF)
-                if (commentId != null && postRef != null) {
-                    moreActionsHelper.deleteComment(postRef, commentId.toInt())
-                }
-            }
-        }
-    }
-
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 
     override fun navigateToSignInScreen() {
