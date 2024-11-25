@@ -3,8 +3,13 @@ package com.idunnololz.summit.lemmy.multicommunity
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.api.dto.CommunityView
@@ -12,27 +17,55 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
+import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.databinding.ItemCommunityGroupHeaderBinding
 import com.idunnololz.summit.databinding.ItemCommunityNoResultsBinding
+import com.idunnololz.summit.databinding.ItemCommunityStaticCommunityBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class CommunityAdapter(
-    private val context: Context,
-    private val offlineManager: OfflineManager,
+class CommunityAdapter @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted("canSelectMultipleCommunities")
     private val canSelectMultipleCommunities: Boolean,
-    private val avatarHelper: AvatarHelper,
-    private val onTooManyCommunities: (Int) -> Unit = {},
-    private val onSingleCommunitySelected: (
-        CommunityRef.CommunityRefByName,
+    @Assisted("showFeeds")
+    private val showFeeds: Boolean,
+    @Assisted private val onTooManyCommunities: (Int) -> Unit = {},
+    @Assisted private val onSingleCommunitySelected: (
+        CommunityRef,
         icon: String?,
         communityId: Int,
     ) -> Unit = { _, _, _ -> },
+    private val avatarHelper: AvatarHelper,
+    private val offlineManager: OfflineManager,
+    private val accountManager: AccountManager,
+    private val accountInfoManager: AccountInfoManager,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            context: Context,
+            @Assisted("canSelectMultipleCommunities")
+            canSelectMultipleCommunities: Boolean,
+            @Assisted("showFeeds")
+            showFeeds: Boolean,
+            onTooManyCommunities: (Int) -> Unit = {},
+            onSingleCommunitySelected: (
+                CommunityRef,
+                icon: String?,
+                communityId: Int,
+            ) -> Unit = { _, _, _ -> },
+        ): CommunityAdapter
+    }
 
     private sealed interface Item {
 
@@ -61,6 +94,12 @@ class CommunityAdapter(
             val text: String,
             val subscribedCommunity: AccountSubscription,
             val isChecked: Boolean,
+        ) : Item
+
+        class StaticChildItem(
+            val text: String,
+            @DrawableRes val iconResId: Int,
+            val communityRef: CommunityRef,
         ) : Item
     }
 
@@ -96,6 +135,8 @@ class CommunityAdapter(
                     old.subscribedCommunity.id ==
                         (new as Item.SubscribedCommunityItem).subscribedCommunity.id
                 }
+                is Item.StaticChildItem ->
+                    old.communityRef == (new as Item.StaticChildItem).communityRef
             }
         },
     ).apply {
@@ -220,6 +261,17 @@ class CommunityAdapter(
             }
         }
         addItemType(
+            clazz = Item.StaticChildItem::class,
+            inflateFn = ItemCommunityStaticCommunityBinding::inflate,
+        ) { item, b, h ->
+            b.icon.setImageResource(item.iconResId)
+            b.textView.text = item.text
+
+            h.itemView.setOnClickListener {
+                onSingleCommunitySelected(item.communityRef, null, 0)
+            }
+        }
+        addItemType(
             clazz = Item.NoResultsItem::class,
             inflateFn = ItemCommunityNoResultsBinding::inflate,
         ) { item, b, _ ->
@@ -310,6 +362,65 @@ class CommunityAdapter(
                 }
             }
         } else {
+            if (showFeeds) {
+                newItems.add(Item.GroupHeaderItem(context.getString(R.string.feeds)))
+                newItems.add(
+                    Item.StaticChildItem(
+                        context.getString(R.string.all),
+                        R.drawable.ic_subreddit_all,
+                        CommunityRef.All(),
+                    ),
+                )
+
+                val account = accountManager.currentAccount.asAccount
+                if (account != null) {
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.subscribed),
+                            R.drawable.baseline_subscriptions_24,
+                            CommunityRef.Subscribed(null),
+                        ),
+                    )
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.local),
+                            R.drawable.ic_subreddit_home,
+                            CommunityRef.Local(null),
+                        ),
+                    )
+                    if (accountInfoManager.currentFullAccount.value
+                            ?.accountInfo
+                            ?.miscAccountInfo
+                            ?.modCommunityIds
+                            ?.isNotEmpty() == true
+                    ) {
+                        newItems.add(
+                            Item.StaticChildItem(
+                                context.getString(R.string.moderated_communities),
+                                R.drawable.outline_shield_24,
+                                CommunityRef.ModeratedCommunities(null),
+                            ),
+                        )
+                    }
+
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.all_subscribed),
+                            R.drawable.baseline_groups_24,
+                            CommunityRef.AllSubscribed(),
+                        ),
+                    )
+                } else {
+                    newItems.add(
+                        Item.StaticChildItem(
+                            context.getString(R.string.local),
+                            R.drawable.ic_subreddit_home,
+                            CommunityRef.Local(null),
+                        ),
+                    )
+                }
+            }
+
             val subscribedCommunities = subscribedCommunities
             if (!subscribedCommunities.isNullOrEmpty()) {
                 newItems.add(

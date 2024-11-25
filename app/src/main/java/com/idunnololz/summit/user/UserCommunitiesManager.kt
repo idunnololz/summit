@@ -22,12 +22,9 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class UserCommunitiesManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val preferences: Preferences,
-    private val moshi: Moshi,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val userCommunitiesDao: UserCommunitiesDao,
-    private val lemmyApiClient: LemmyApiClient,
 ) {
     companion object {
         private const val TAG = "UserCommunitiesManager"
@@ -44,7 +41,6 @@ class UserCommunitiesManager @Inject constructor(
 
     private val coroutineScope = coroutineScopeFactory.create()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val dbContext = Dispatchers.Default.limitedParallelism(1)
 
     private var nextAvailableSortId: Long = 1

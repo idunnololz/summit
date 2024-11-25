@@ -12,7 +12,9 @@ import com.idunnololz.summit.databinding.DraftLoadingItemBinding
 import com.idunnololz.summit.databinding.EmptyDraftItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.PostDraftItemBinding
+import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.tsToShortDate
 
 class DraftsAdapter(
     private val onDraftClick: (DraftEntry) -> Unit,
@@ -64,6 +66,8 @@ class DraftsAdapter(
                 item.postData.body
             }
 
+            b.date.text = tsToShortDate(item.draftEntry.updatedTs)
+
             b.delete.setOnClickListener {
                 onDeleteClick(item.draftEntry)
             }
@@ -77,6 +81,8 @@ class DraftsAdapter(
             inflateFn = CommentDraftItemBinding::inflate,
         ) { item, b, h ->
             b.text.text = item.commentData.content
+
+            b.date.text = tsToShortDate(item.draftEntry.updatedTs)
 
             b.delete.setOnClickListener {
                 onDeleteClick(item.draftEntry)

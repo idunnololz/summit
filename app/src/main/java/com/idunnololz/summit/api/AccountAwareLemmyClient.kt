@@ -286,6 +286,19 @@ class AccountAwareLemmyClient @Inject constructor(
             .autoSignOut(account)
     }
 
+    suspend fun changePassword(
+        newPassword: String,
+        newPasswordVerify: String,
+        oldPassword: String,
+        account: Account? = accountForInstance(),
+    ) =
+        if (account == null) {
+            createAccountErrorResult()
+        } else {
+            apiClient.changePassword(newPassword, newPasswordVerify, oldPassword, account)
+                .autoSignOut(account)
+        }
+
     suspend fun search(
         communityId: Int? = null,
         communityName: String? = null,

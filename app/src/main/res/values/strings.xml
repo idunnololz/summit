@@ -1869,6 +1869,9 @@
     <string name="downvoted">Downvoted</string>
     <string name="warn_delete_draft">Delete draft?</string>
     <string name="save_comment">Save comment</string>
+    <string name="home_page">Home page</string>
+    <string name="home_page_desc">What you see when you launch the app</string>
+    <string name="change_password">Change password</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

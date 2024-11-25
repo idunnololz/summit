@@ -15,6 +15,7 @@ import com.idunnololz.summit.api.dto.BlockCommunity
 import com.idunnololz.summit.api.dto.BlockInstance
 import com.idunnololz.summit.api.dto.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.BlockPerson
+import com.idunnololz.summit.api.dto.ChangePassword
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentReplyId
 import com.idunnololz.summit.api.dto.CommentReplyView
@@ -1240,6 +1241,31 @@ class LemmyApiClient(
             } else {
                 api.getPersonDetails(authorization = account?.bearer, form.serializeToMap())
             }
+        }.fold(
+            onSuccess = {
+                Result.success(it)
+            },
+            onFailure = {
+                Result.failure(it)
+            },
+        )
+    }
+
+    suspend fun changePassword(
+        newPassword: String,
+        newPasswordVerify: String,
+        oldPassword: String,
+        account: Account,
+    ): Result<LoginResponse> {
+        val changePassword = ChangePassword(
+            new_password = newPassword,
+            new_password_verify = newPasswordVerify,
+            old_password = oldPassword,
+            auth = account.jwt,
+        )
+
+        return retrofitErrorHandler {
+            api.changePassword(authorization = account.bearer, changePassword)
         }.fold(
             onSuccess = {
                 Result.success(it)

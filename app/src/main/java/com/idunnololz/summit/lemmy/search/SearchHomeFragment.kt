@@ -128,7 +128,7 @@ class SearchHomeFragment :
             if (result != null) {
                 viewModel.nextCommunityFilter.value = SearchTabbedViewModel.CommunityFilter(
                     result.communityId,
-                    result.communityRef,
+                    result.communityRef as CommunityRef.CommunityRefByName,
                 )
             }
         }

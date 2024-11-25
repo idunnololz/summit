@@ -129,14 +129,32 @@ sealed interface CommunityRef : PageRef, Parcelable {
     }
 
     fun getLocalizedFullName(context: Context): String = when (this) {
-        is Local -> "${context.getString(R.string.local)}@${this.instance}"
-        is All -> "${context.getString(R.string.all)}@${this.instance}"
+        is Local ->
+            if (this.instance != null) {
+                "${context.getString(R.string.local)}@${this.instance}"
+            } else {
+                context.getString(R.string.local)
+            }
+        is All ->
+            if (this.instance != null) {
+                "${context.getString(R.string.all)}@${this.instance}"
+            } else {
+                context.getString(R.string.all)
+            }
         is CommunityRefByName -> this.fullName
-        is Subscribed -> "${context.getString(R.string.subscribed)}@${this.instance}"
+        is Subscribed ->
+            if (this.instance != null) {
+                "${context.getString(R.string.subscribed)}@${this.instance}"
+            } else {
+                context.getString(R.string.subscribed)
+            }
         is MultiCommunity -> this.name
-        is ModeratedCommunities -> "${context.getString(
-            R.string.moderated_communities,
-        )}@${this.instance}"
+        is ModeratedCommunities ->
+            if (this.instance != null) {
+                "${context.getString(R.string.moderated_communities)}@${this.instance}"
+            } else {
+                context.getString(R.string.moderated_communities)
+            }
         is AllSubscribed -> context.getString(R.string.all_subscribed)
     }
 

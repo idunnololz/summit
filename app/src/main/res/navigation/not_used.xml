@@ -330,4 +330,12 @@ safeargs.
             android:name="id"
             app:argType="long" />
     </dialog>
+    <dialog
+        android:id="@+id/communityPickerDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment"
+        android:label="CommunityPickerDialogFragment" >
+        <argument
+            android:name="showFeeds"
+            app:argType="boolean" />
+    </dialog>
 </navigation>

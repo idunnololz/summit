@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.dto.BlockInstance
 import com.idunnololz.summit.api.dto.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.BlockPerson
 import com.idunnololz.summit.api.dto.BlockPersonResponse
+import com.idunnololz.summit.api.dto.ChangePassword
 import com.idunnololz.summit.api.dto.CommentReportResponse
 import com.idunnololz.summit.api.dto.CommentResponse
 import com.idunnololz.summit.api.dto.CommunityResponse
@@ -328,6 +329,12 @@ interface LemmyApi {
         @Header("Authorization") authorization: String?,
         @QueryMap form: Map<String, String>,
     ): Call<GetPersonDetailsResponse>
+
+    @PUT("user/change_password")
+    fun changePassword(
+        @Header("Authorization") authorization: String?,
+        @Body form: ChangePassword,
+    ): Call<LoginResponse>
 
     /**
      * Get comment replies.

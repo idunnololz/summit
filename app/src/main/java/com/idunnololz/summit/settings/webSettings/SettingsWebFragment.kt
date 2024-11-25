@@ -206,10 +206,16 @@ class SettingsWebFragment :
                         findNavController().navigateSafe(direction)
                         true
                     }
+                    lemmyWebSettings.changePassword.id -> {
+                        val direction = SettingsWebFragmentDirections
+                            .actionSettingWebFragmentToSettingsAccountBlockListFragment()
+                        findNavController().navigateSafe(direction)
+                        true
+                    }
                     else -> false
                 }
             },
-            childFragmentManager,
+            fragmentManager = childFragmentManager,
             onImagePickerClick = { settingItem ->
                 viewModel.imagePickerKey.value = settingItem.id
 
@@ -287,7 +293,9 @@ class SettingsWebFragment :
         ).apply {
             this.stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             this.defaultSettingValues = data.defaultValues
-            this.setData(data.settings)
+            this.setData(
+                data.settings.filter { it.id != lemmyWebSettings.changePassword.id }
+            )
 
             this.settingsChanged = {
                 backPressHandler.isEnabled = this.updatedSettingValues.isNotEmpty()
