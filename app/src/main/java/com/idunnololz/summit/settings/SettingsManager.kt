@@ -52,13 +52,12 @@ data class DescriptionSettingItem(
 @Parcelize
 data class TextValueSettingItem(
     override val title: String,
+    override val description: String?,
     val supportsRichText: Boolean,
     override val isEnabled: Boolean = true,
     val hint: String? = null,
     override val relatedKeys: List<String> = listOf(),
-) : SettingItem() {
-    override val description: String? = null
-}
+) : SettingItem()
 
 @Parcelize
 data class SliderSettingItem(

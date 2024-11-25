@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.MenuItemCompat
 import androidx.core.view.forEach
 import androidx.core.view.iterator
 import androidx.core.view.updateLayoutParams
@@ -427,9 +428,6 @@ class NavBarController(
             navBar.menu.apply {
                 clear()
 
-                navBar.itemIconTintList = ColorStateList.valueOf(
-                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
-
                 val navBarDestinations = navBarConfig.navBarDestinations
                 for (dest in navBarDestinations) {
                     when (dest) {
@@ -441,7 +439,6 @@ class NavBarController(
                                 context.getString(R.string.home),
                             ).apply {
                                 setIcon(R.drawable.ic_home_selector)
-//                                setIconTintList(ColorStateList.valueOf(getC))
                             }
                         }
                         NavBarDestinations.Saved -> {
@@ -511,9 +508,6 @@ class NavBarController(
             }
         } else {
             if (navBar.getTag(R.id.custom_nav_bar) == true) {
-                navBar.itemIconTintList = ColorStateList.valueOf(
-                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
-
                 navBar.menu.clear()
                 navBar.inflateMenu(R.menu.bottom_navigation_menu)
                 navBar.setTag(R.id.custom_nav_bar, false)

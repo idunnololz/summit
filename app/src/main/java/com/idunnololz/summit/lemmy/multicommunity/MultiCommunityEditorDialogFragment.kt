@@ -83,6 +83,9 @@ class MultiCommunityEditorDialogFragment :
     private var adapter: CommunityAdapter? = null
 
     @Inject
+    lateinit var communityAdapterFactory: CommunityAdapter.Factory
+
+    @Inject
     lateinit var offlineManager: OfflineManager
 
     @Inject
@@ -236,11 +239,10 @@ class MultiCommunityEditorDialogFragment :
                 viewModel.doQuery(query)
             }
 
-            adapter = CommunityAdapter(
+            adapter = communityAdapterFactory.create(
                 context = context,
-                offlineManager = offlineManager,
-                avatarHelper = avatarHelper,
                 canSelectMultipleCommunities = true,
+                showFeeds = false,
                 onTooManyCommunities = {
                     showTooManyCommunitiesMessage()
                 },
@@ -262,7 +264,7 @@ class MultiCommunityEditorDialogFragment :
             recyclerView.layoutManager = LinearLayoutManager(context)
         }
 
-        viewModel.showSearch.observe(viewLifecycleOwner) { it ->
+        viewModel.showSearch.observe(viewLifecycleOwner) {
             if (it) {
                 showSearch()
             } else {
@@ -567,10 +569,6 @@ class MultiCommunityEditorDialogFragment :
             payloads: MutableList<Any>,
         ) {
             if (holder.isBinding<MultiCommunityHeaderItemBinding>() && payloads.isNotEmpty()) {
-//                val currentValue = holder.getBinding<MultiCommunityHeaderItemBinding>().nameEditText.text.toString()
-//                val newValue = (adapterHelper.items[position] as Item.HeaderItem).communityName
-//                Log.d("HAHA", "cur: '$currentValue' new: '$newValue'")
-
                 val nameEditText = holder.getBinding<MultiCommunityHeaderItemBinding>().nameEditText
                 if (nameEditText.text.isNullOrBlank()) {
                     nameEditText

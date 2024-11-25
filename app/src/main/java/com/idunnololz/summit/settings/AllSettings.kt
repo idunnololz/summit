@@ -329,27 +329,32 @@ class LemmyWebSettings @Inject constructor(
 
     val instanceSetting = TextValueSettingItem(
         title = context.getString(R.string.instance),
+        description = null,
         supportsRichText = false,
         isEnabled = false,
     )
 
     val displayNameSetting = TextValueSettingItem(
         title = context.getString(R.string.display_name),
+        description = null,
         supportsRichText = false,
     )
 
     val bioSetting = TextValueSettingItem(
         title = context.getString(R.string.biography),
+        description = null,
         supportsRichText = true,
     )
 
     val emailSetting = TextValueSettingItem(
         title = context.getString(R.string.email),
+        description = null,
         supportsRichText = false,
     )
 
     val matrixSetting = TextValueSettingItem(
         title = context.getString(R.string.matrix_user),
+        description = null,
         supportsRichText = false,
         hint = "@user:example.com",
     )
@@ -408,6 +413,13 @@ class LemmyWebSettings @Inject constructor(
         context.getString(R.string.account_block_settings),
         context.getString(R.string.account_block_settings_desc),
     )
+
+    val changePassword = BasicSettingItem(
+        null,
+        context.getString(R.string.change_password),
+        null,
+    )
+
     override val allSettings: List<SettingItem> = listOf(
         instanceSetting,
         displayNameSetting,
@@ -423,6 +435,7 @@ class LemmyWebSettings @Inject constructor(
         showBotAccountsSetting,
         sendNotificationsToEmailSetting,
         blockSettings,
+        changePassword,
     )
 }
 
@@ -838,6 +851,11 @@ class PostsFeedSettings @Inject constructor(
         context.getString(R.string.parse_markdown_in_post_titles_desc),
         relatedKeys = listOf(KEY_PARSE_MARKDOWN_IN_POST_TITLES),
     )
+    val homePage = TextValueSettingItem(
+        context.getString(R.string.home_page),
+        context.getString(R.string.home_page_desc),
+        false,
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -859,6 +877,7 @@ class PostsFeedSettings @Inject constructor(
         showFilteredPosts,
         homeFabQuickAction,
         prefetchPosts,
+        homePage,
     )
 }
 
@@ -2249,6 +2268,7 @@ class DownloadSettings @Inject constructor(
 
     val downloadDirectory = TextValueSettingItem(
         title = context.getString(R.string.download_location),
+        description = null,
         supportsRichText = false,
         relatedKeys = listOf(KEY_DOWNLOAD_DIRECTORY),
     )

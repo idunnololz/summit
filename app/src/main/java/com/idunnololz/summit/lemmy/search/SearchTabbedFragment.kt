@@ -27,6 +27,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
@@ -102,7 +103,7 @@ class SearchTabbedFragment :
             if (result != null) {
                 viewModel.nextCommunityFilter.value = SearchTabbedViewModel.CommunityFilter(
                     result.communityId,
-                    result.communityRef,
+                    result.communityRef as CommunityRef.CommunityRefByName,
                 )
             }
         }

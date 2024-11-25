@@ -5,14 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.databinding.FragmentSettingsPostsFeedBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
+import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.idToSortOrder
+import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
@@ -23,13 +28,16 @@ import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
+import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,6 +52,9 @@ class SettingsPostsFeedFragment :
 
     @Inject
     lateinit var settings: PostsFeedSettings
+
+    @Inject
+    lateinit var userCommunitiesManager: UserCommunitiesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,12 +94,36 @@ class SettingsPostsFeedFragment :
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title = settings.getPageName(context)
             supportActionBar?.subtitle = args.account?.fullName
+
+            childFragmentManager.setFragmentResultListener(
+                CommunityPickerDialogFragment.REQUEST_KEY,
+                viewLifecycleOwner,
+            ) { requestKey, bundle ->
+                val result = bundle.getParcelableCompat<CommunityPickerDialogFragment.Result>(
+                    CommunityPickerDialogFragment.REQUEST_KEY_RESULT,
+                )
+                if (result != null) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        userCommunitiesManager.setDefaultPage(result.communityRef)
+
+                        updateRendering()
+
+                        Snackbar.make(
+                            binding.coordinatorLayout,
+                            R.string.home_page_set,
+                            Snackbar.LENGTH_LONG,
+                        ).show()
+                    }
+                }
+            }
         }
 
         updateRendering()
     }
 
     private fun updateRendering() {
+        val context = context ?: return
+
         settings.settingsPostFeedAppearance.bindTo(
             binding.postsFeedAppearance,
         ) {
@@ -300,6 +335,15 @@ class SettingsPostsFeedFragment :
             { preferences.parseMarkdownInPostTitles },
             {
                 preferences.parseMarkdownInPostTitles = it
+            },
+        )
+        settings.homePage.bindTo(
+            binding.homePage,
+            {
+                userCommunitiesManager.defaultCommunity.value.getLocalizedFullName(context)
+            },
+            { setting, currentValue ->
+                CommunityPickerDialogFragment.show(childFragmentManager, showFeeds = true)
             },
         )
     }

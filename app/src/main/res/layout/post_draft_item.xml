@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/type"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding"
@@ -20,9 +20,23 @@
         android:textAppearance="?textAppearanceLabelMedium"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:drawableStartCompat="@drawable/outline_article_14"
         app:drawableTint="@color/style_red" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
+        android:drawablePadding="@dimen/padding_half"
+        android:textColor="@color/colorTextFaint"
+        android:gravity="center_vertical|end"
+        android:includeFontPadding="false"
+        android:textAppearance="?textAppearanceLabelMedium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/type"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/title"
@@ -60,7 +74,6 @@
         android:padding="12dp"
         android:background="?selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:tint="?colorControlNormal" />
 

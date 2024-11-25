@@ -12,8 +12,10 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.DialogFragmentCommunityPickerBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -40,15 +42,28 @@ class CommunityPickerDialogFragment :
         const val REQUEST_KEY = "CommunityPickerDialogFragment_req_key"
         const val REQUEST_KEY_RESULT = "result"
 
-        fun show(fragmentManager: FragmentManager) {
+        fun show(
+            fragmentManager: FragmentManager,
+            showFeeds: Boolean = false,
+        ) {
             CommunityPickerDialogFragment()
+                .apply {
+                    arguments = CommunityPickerDialogFragmentArgs(
+                        showFeeds
+                    ).toBundle()
+                }
                 .showAllowingStateLoss(fragmentManager, "CommunityPickerDialogFragment")
         }
     }
 
+    private val args: CommunityPickerDialogFragmentArgs by navArgs()
+
     private var adapter: CommunityAdapter? = null
 
     private val viewModel: CommunityPickerViewModel by viewModels()
+
+    @Inject
+    lateinit var communityAdapterFactory: CommunityAdapter.Factory
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -70,7 +85,7 @@ class CommunityPickerDialogFragment :
 
     @Parcelize
     data class Result(
-        val communityRef: CommunityRef.CommunityRefByName,
+        val communityRef: CommunityRef,
         val icon: String?,
         val communityId: Int,
     ) : Parcelable
@@ -98,7 +113,8 @@ class CommunityPickerDialogFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentCommunityPickerBinding.inflate(inflater, container, false))
+        setBinding(DialogFragmentCommunityPickerBinding.inflate(
+            inflater, container, false))
 
         return binding.root
     }
@@ -123,11 +139,10 @@ class CommunityPickerDialogFragment :
                 searchEditTextBackPressedHandler.isEnabled = !query.isEmpty()
             }
 
-            adapter = CommunityAdapter(
+            adapter = communityAdapterFactory.create(
                 context = context,
-                offlineManager = offlineManager,
                 canSelectMultipleCommunities = false,
-                avatarHelper = avatarHelper,
+                showFeeds = args.showFeeds,
                 onSingleCommunitySelected = { ref, icon, communityId ->
                     setFragmentResult(
                         REQUEST_KEY,
@@ -142,6 +157,8 @@ class CommunityPickerDialogFragment :
             resultsRecyclerView.setHasFixedSize(true)
             resultsRecyclerView.layoutManager = LinearLayoutManager(context)
             resultsRecyclerView.setup(animationsHelper)
+
+            adapter?.setQueryServerResults(listOf())
 
             viewModel.searchResults.observe(viewLifecycleOwner) {
                 when (it) {

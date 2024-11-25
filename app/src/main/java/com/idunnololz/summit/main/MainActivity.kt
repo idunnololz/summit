@@ -3,6 +3,7 @@ package com.idunnololz.summit.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -91,6 +92,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -321,7 +323,12 @@ class MainActivity :
         val account = accountView.account
 
         navBarController.navBar.menu.findItem(R.id.youFragment)?.apply {
-            navBarController.navBar.itemIconTintList = null
+            MenuItemCompat.setIconTintMode(this, PorterDuff.Mode.DST)
+
+            lifecycleScope.launch {
+                delay(1000)
+                MenuItemCompat.setIconTintList(this@apply, null)
+            }
             avatarHelper.loadAvatar(
                 object : Target {
                     override fun onSuccess(result: Drawable) {

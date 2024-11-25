@@ -176,6 +176,8 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             return
         }
 
+        val type = type ?: return
+
         Log.d(TAG, "Fetching page $pageIndex")
 
         fetchingPostPages.add(pageIndex)
