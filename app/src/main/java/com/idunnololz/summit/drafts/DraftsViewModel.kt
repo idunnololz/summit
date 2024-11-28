@@ -37,7 +37,7 @@ class DraftsViewModel @Inject constructor(
     val currentAccount: Account?
         get() = accountManager.currentAccount.asAccount
 
-    private val draftEntriesContext = Dispatchers.IO.limitedParallelism(1)
+    private val draftEntriesContext = Dispatchers.Default.limitedParallelism(1)
 
     private val draftEntries = mutableListOf<DraftEntry>()
     private val seenDrafts = mutableSetOf<Long>()
@@ -50,25 +50,24 @@ class DraftsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             draftsManager.onDraftChanged.collect {
-                Log.d("HAHA", "onDraftChanged")
                 loadMoreDrafts(force = true)
             }
         }
     }
 
     fun loadMoreDrafts(force: Boolean = false) {
-        if (force) {
-            reset()
-        }
-
-        if (isLoading) {
+        if (isLoading && !force) {
             return
         }
 
         isLoading = true
 
         loadingJob?.cancel()
-        loadingJob = viewModelScope.launch {
+        loadingJob = viewModelScope.launch(draftEntriesContext) {
+            if (force) {
+                reset()
+            }
+
             val lastDraftEntry = draftEntries.lastOrNull()
             val ts = lastDraftEntry?.updatedTs ?: Long.MAX_VALUE
 
@@ -87,11 +86,9 @@ class DraftsViewModel @Inject constructor(
                     updateTs = ts,
                 )
             }
-            withContext(draftEntriesContext) {
-                for (draft in drafts) {
-                    if (seenDrafts.add(draft.id)) {
-                        draftEntries.add(draft)
-                    }
+            for (draft in drafts) {
+                if (seenDrafts.add(draft.id)) {
+                    draftEntries.add(draft)
                 }
             }
             hasMore = drafts.size == LIMIT
@@ -139,49 +136,31 @@ class DraftsViewModel @Inject constructor(
         viewModelItems.postValue(items)
     }
 
-    fun deleteDraft(entry: DraftEntry) {
-        viewModelScope.launch {
-            draftsManager.deleteDraft(entry)
-
-            withContext(draftEntriesContext) {
-                draftEntries.remove(entry)
-            }
-
-            generateItems()
-        }
-    }
-
     fun deleteDraft(draftId: Long) {
         viewModelScope.launch {
             draftsManager.deleteDraftWithId(draftId)
-
-            withContext(draftEntriesContext) {
-                draftEntries.filter { it.id != draftId }
-            }
-
-            generateItems()
         }
     }
 
     fun deleteAll(draftType: Int?) {
         viewModelScope.launch {
+            reset()
+
             if (draftType != null) {
                 draftsManager.deleteAll(draftType)
             } else {
                 draftsManager.deleteAll()
             }
-
-            reset()
         }
     }
 
-    private fun reset() {
-        draftEntries.clear()
-        seenDrafts.clear()
-        isLoading = false
-        hasMore = true
-
-        loadMoreDrafts()
+    private suspend fun reset() {
+        withContext(draftEntriesContext) {
+            draftEntries.clear()
+            seenDrafts.clear()
+            isLoading = false
+            hasMore = true
+        }
     }
 
     sealed interface ViewModelItem {

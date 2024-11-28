@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 200
-        versionName = "1.47.1"
+        versionCode = 202
+        versionName = "1.47.3"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.transition.ktx)
     implementation(libs.kotlinx.coroutine.android)
     implementation(libs.disklrucache)
+    implementation(libs.slidingpanelayout)
 
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.extensions)

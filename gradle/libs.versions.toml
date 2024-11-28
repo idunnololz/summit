@@ -32,6 +32,7 @@ desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref 
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+slidingpanelayout = { module = "androidx.slidingpanelayout:slidingpanelayout", version = "1.2.0" }
 
 java-string-similarity = { module = "info.debatty:java-string-similarity", version.ref = "javaStringSimilarity" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }

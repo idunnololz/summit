@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.slidingpanelayout.widget.SlidingPaneLayout
+<com.idunnololz.summit.view.FixedSlidingPaneLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/sliding_pane_layout"
@@ -88,4 +88,4 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="?backgroundColor"/>
-</androidx.slidingpanelayout.widget.SlidingPaneLayout>
+</com.idunnololz.summit.view.FixedSlidingPaneLayout>
