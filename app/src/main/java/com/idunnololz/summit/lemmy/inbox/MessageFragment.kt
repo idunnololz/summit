@@ -104,6 +104,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomAppBar)
+
             insets.observe(viewLifecycleOwner) { insets ->
                 binding.dummyAppBar.updatePadding(bottom = insets.bottomInset * 2)
             }
