@@ -2005,10 +2005,6 @@ class LemmyApiClient(
                 return Result.failure(ServerApiException(errorCode))
             }
 
-            if (errorCode == 401) {
-                return Result.failure(NotAuthenticatedException())
-            }
-
             val errorBody = res.errorBody()?.string()
             val errMsg = try {
                 errorBody?.let {
@@ -2019,6 +2015,14 @@ class LemmyApiClient(
             } catch (e: Exception) {
                 Log.e(TAG, "Exception parsing body", e)
                 errorBody
+            }
+
+            if (errMsg?.equals("incorrect_login", ignoreCase = true) == true) {
+                return Result.failure(ClientApiException(errMsg, errorCode))
+            }
+
+            if (errorCode == 401) {
+                return Result.failure(NotAuthenticatedException())
             }
 
             if (errMsg?.contains("not_logged_in", ignoreCase = true) == true) {

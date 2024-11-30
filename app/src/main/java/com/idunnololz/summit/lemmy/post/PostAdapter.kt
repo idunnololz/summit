@@ -23,6 +23,7 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
+import com.idunnololz.summit.databinding.ItemPostViewParentCommentsBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
@@ -53,6 +54,7 @@ import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.count
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
 import com.idunnololz.summit.util.recyclerView.getBinding
@@ -87,6 +89,7 @@ class PostAdapter(
     private val onCommentActionClick: (CommentView, String, actionId: Int) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
     private val onLoadPost: (PostId) -> Unit,
+    private val onLoadCommentPath: (String) -> Unit,
     private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
     private val switchToNativeInstance: (instance: String) -> Unit,
@@ -209,7 +212,13 @@ class PostAdapter(
         data class ViewAllComments(
             val postId: PostId,
             val screenshotMode: Boolean,
-        ) : Item("view_all_yo"), ScreenshotOptions
+        ) : Item("view_all_comments"), ScreenshotOptions
+
+        data class ViewParentComments(
+            val postId: PostId,
+            val commentPath: String,
+            val screenshotMode: Boolean,
+        ) : Item("view_parent_comments"), ScreenshotOptions
 
         data class NoCommentsItem(
             val postView: PostView,
@@ -332,6 +341,7 @@ class PostAdapter(
         is Item.MissingCommentItem -> R.layout.post_missing_comment_item
         is Item.NotNativeInstanceItem -> R.layout.post_not_native_instance_item
         is Item.NoCommentsItem -> R.layout.post_no_comments_item
+        is Item.ViewParentComments -> R.layout.item_post_view_parent_comments
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -411,6 +421,8 @@ class PostAdapter(
                 ViewBindingViewHolder(PostNotNativeInstanceItemBinding.bind(v))
             R.layout.post_no_comments_item ->
                 ViewBindingViewHolder(PostNoCommentsItemBinding.bind(v))
+            R.layout.item_post_view_parent_comments ->
+                ViewBindingViewHolder(ItemPostViewParentCommentsBinding.bind(v))
             else -> throw RuntimeException("ViewType: $viewType")
         }
     }
@@ -589,7 +601,8 @@ class PostAdapter(
                 if (item.isExpanded) {
                     val b = holder as CommentExpandedViewHolder
                     val highlight = highlightedComment == item.commentId
-                    val highlightForever = highlightedCommentForever == item.commentId
+                    val highlightForever = highlightedCommentForever == item.commentId ||
+                        item.isHighlighted
                     val k = "${item.comment.comment.id}:${item.comment.comment.updated
                         ?: item.comment.comment.published}"
 
@@ -653,7 +666,8 @@ class PostAdapter(
                     // collapsed
                     val b = holder.getBinding<PostCommentCollapsedItemBinding>()
                     val highlight = highlightedComment == item.commentId
-                    val highlightForever = highlightedCommentForever == item.commentId
+                    val highlightForever = highlightedCommentForever == item.commentId ||
+                        item.isHighlighted
 
                     postAndCommentViewBuilder.bindCommentViewCollapsed(
                         h = holder,
@@ -849,6 +863,13 @@ class PostAdapter(
                     onAddCommentClick(Either.Left(item.postView))
                 }
             }
+            is Item.ViewParentComments -> {
+                val b = holder.getBinding<ItemPostViewParentCommentsBinding>()
+
+                b.button.setOnClickListener {
+                    onLoadCommentPath(item.commentPath)
+                }
+            }
         }
     }
 
@@ -1002,6 +1023,14 @@ class PostAdapter(
 
                 if (rawData.isSingleComment) {
                     finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
+
+                    if (rawData.commentPath != null && rawData.commentPath.count(".") > 1) {
+                        finalItems += Item.ViewParentComments(
+                            postId = postView.post.post.id,
+                            commentPath = rawData.commentPath,
+                            screenshotMode = screenshotMode,
+                        )
+                    }
                     absolutionPositionToTopLevelCommentPosition += -1
                 }
 
@@ -1284,6 +1313,7 @@ class PostAdapter(
             is Item.MissingCommentItem -> false
             is Item.NotNativeInstanceItem -> false
             is Item.NoCommentsItem -> false
+            is Item.ViewParentComments -> false
         }
     }
 
@@ -1385,6 +1415,7 @@ class PostAdapter(
             is Item.ViewAllComments,
             is Item.NotNativeInstanceItem,
             is Item.NoCommentsItem,
+            is Item.ViewParentComments,
             -> {}
         }
 
@@ -1406,6 +1437,7 @@ class PostAdapter(
             is Item.ViewAllComments,
             is Item.NotNativeInstanceItem,
             is Item.NoCommentsItem,
+            is Item.ViewParentComments,
             -> {}
         }
 
@@ -1437,6 +1469,7 @@ class PostAdapter(
             is Item.ViewAllComments,
             is Item.NotNativeInstanceItem,
             is Item.NoCommentsItem,
+            is Item.ViewParentComments,
             -> null
         }
 
@@ -1555,6 +1588,7 @@ class PostAdapter(
                     is ProgressOrErrorItem -> {}
                     is Item.ViewAllComments -> {}
                     is Item.NoCommentsItem -> {}
+                    is Item.ViewParentComments -> {}
                 }
             }
 

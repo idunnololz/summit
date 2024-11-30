@@ -55,6 +55,7 @@ class AccountActionsManager @Inject constructor(
     private val preferenceManager: PreferenceManager,
     private val apiListenerManager: ApiListenerManager,
     private val colorManager: ColorManager,
+    private val pendingCommentsManager: PendingCommentsManager,
 ) {
 
     companion object {
@@ -63,7 +64,6 @@ class AccountActionsManager @Inject constructor(
 
     private var preferences = preferenceManager.currentPreferences
     private val votesManager = VotesManager(context, preferences)
-    private val pendingCommentsManager = PendingCommentsManager()
     private var nextId: Long = 1
 
     interface Registration {

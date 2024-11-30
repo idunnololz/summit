@@ -25,6 +25,7 @@ import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.settings.webSettings.changePassword.ChangePasswordDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -207,9 +208,8 @@ class SettingsWebFragment :
                         true
                     }
                     lemmyWebSettings.changePassword.id -> {
-                        val direction = SettingsWebFragmentDirections
-                            .actionSettingWebFragmentToSettingsAccountBlockListFragment()
-                        findNavController().navigateSafe(direction)
+                        ChangePasswordDialogFragment
+                            .show(childFragmentManager)
                         true
                     }
                     else -> false
@@ -258,7 +258,8 @@ class SettingsWebFragment :
                                         1024,
                                         1024,
                                         true,
-                                    )	// Final image resolution will be less than 1080 x 1080(Optional)
+                                    )
+                                    // Final image resolution will be less than 1080 x 1080
                                     .createIntent()
                                 launcher.launch(intent)
                             }
@@ -277,7 +278,8 @@ class SettingsWebFragment :
                                         1024,
                                         1024,
                                         true,
-                                    )	// Final image resolution will be less than 1080 x 1080(Optional)
+                                    )
+                                    // Final image resolution will be less than 1080 x 1080
                                     .createIntent()
                                 launcher.launch(intent)
                             }
@@ -293,9 +295,7 @@ class SettingsWebFragment :
         ).apply {
             this.stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             this.defaultSettingValues = data.defaultValues
-            this.setData(
-                data.settings.filter { it.id != lemmyWebSettings.changePassword.id }
-            )
+            this.setData(data.settings)
 
             this.settingsChanged = {
                 backPressHandler.isEnabled = this.updatedSettingValues.isNotEmpty()

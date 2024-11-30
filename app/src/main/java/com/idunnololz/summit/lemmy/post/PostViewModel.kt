@@ -76,6 +76,13 @@ class PostViewModel @Inject constructor(
      */
     val lemmyApiClient = lemmyApiClientFactory.create()
 
+    var originalPostOrCommentRef: Either<PostRef, CommentRef>? = null
+        set(value) {
+            field = value
+
+            state["originalPostRef"] = value?.leftOrNull()
+            state["originalCommentRef"] = value?.getOrNull()
+        }
     var postOrCommentRef: Either<PostRef, CommentRef>? = null
         set(value) {
             field = value
@@ -131,6 +138,12 @@ class PostViewModel @Inject constructor(
             postOrCommentRef = Either.Left(it)
         }
         state.get<CommentRef>("commentRef")?.let {
+            postOrCommentRef = Either.Right(it)
+        }
+        state.get<PostRef>("originalPostRef")?.let {
+            postOrCommentRef = Either.Left(it)
+        }
+        state.get<CommentRef>("originalCommentRef")?.let {
             postOrCommentRef = Either.Right(it)
         }
 
@@ -196,6 +209,10 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             onAccountChanged(accountManager.getAccountById(accountId))
         }
+    }
+
+    fun updateOriginalPostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
+        originalPostOrCommentRef = postOrCommentRef
     }
 
     fun updatePostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
@@ -750,6 +767,7 @@ class PostViewModel @Inject constructor(
         val pendingComments = pendingComments
         val supplementaryComments = supplementaryComments
         val postOrCommentRef = postOrCommentRef
+        val originalPostOrCommentRef = originalPostOrCommentRef
 
         val postDataValue = PostData(
             postView = ListView.PostListView(post),
@@ -771,11 +789,13 @@ class PostViewModel @Inject constructor(
                     ),
             ),
             newlyPostedCommentId = newlyPostedCommentId,
-            selectedCommentId = postOrCommentRef?.getOrNull()?.id,
+            selectedCommentId = originalPostOrCommentRef?.getOrNull()?.id
+                ?: postOrCommentRef?.getOrNull()?.id,
             isSingleComment = postOrCommentRef?.getOrNull() != null,
             isNativePost = isNativePost(),
             accountInstance = currentAccountView.value?.account?.instance,
             isCommentsLoaded = comments != null,
+            commentPath = comments?.first()?.comment?.path,
         )
 
         postData.postValue(postDataValue)
@@ -881,6 +901,7 @@ class PostViewModel @Inject constructor(
         val isNativePost: Boolean,
         val accountInstance: String?,
         val isCommentsLoaded: Boolean,
+        val commentPath: String?,
     )
 
     sealed interface ListView {
@@ -974,6 +995,20 @@ class PostViewModel @Inject constructor(
     fun updatePostViewIfNeeded(post: PostView?) {
         post ?: return
         postView = post
+    }
+
+    fun fetchCommentPath(instance: String, commentPath: String) {
+        val commentIds = commentPath.split(".").map { it.toIntOrNull() }
+        val topCommentId = if (commentIds.size > 1) {
+            commentIds[1]
+        } else {
+            return
+        } ?: return
+
+        this.postOrCommentRef = Either.Right(CommentRef(instance, topCommentId))
+
+        onPostOrCommentRefChange.postValue(postOrCommentRef)
+        fetchPostData()
     }
 
     class ObjectResolverFailedException : Exception()

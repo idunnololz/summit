@@ -982,6 +982,7 @@ class AddOrEditCommentFragment :
                     showError()
                 },
                 onLoadPost = {},
+                onLoadCommentPath = {},
                 onLinkClick = { url, text, linkType ->
                     showError()
                 },
@@ -1017,6 +1018,7 @@ class AddOrEditCommentFragment :
                     isNativePost = true,
                     accountInstance = viewModel.apiInstance,
                     isCommentsLoaded = true,
+                    commentPath = null,
                 ),
             )
 
