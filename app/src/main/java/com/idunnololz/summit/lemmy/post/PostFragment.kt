@@ -196,6 +196,7 @@ class PostFragment :
 
         if (savedInstanceState == null) {
             viewModel.updatePostViewIfNeeded(args.post)
+            viewModel.updateOriginalPostOrCommentRef(args.postOrCommentRef())
             viewModel.updatePostOrCommentRef(args.postOrCommentRef())
         }
 
@@ -506,6 +507,9 @@ class PostFragment :
                     onLoadPost = {
                         viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
                         viewModel.fetchPostData()
+                    },
+                    onLoadCommentPath = {
+                        viewModel.fetchCommentPath(getInstance(), it)
                     },
                     onLinkClick = { url, text, linkType ->
                         onLinkClick(url, text, linkType)
@@ -922,6 +926,7 @@ class PostFragment :
                     isNativePost = viewModel.isNativePost(),
                     accountInstance = viewModel.currentAccountView.value?.account?.instance,
                     isCommentsLoaded = false,
+                    commentPath = null,
                 ),
             )
             onMainListingItemRetrieved(post)

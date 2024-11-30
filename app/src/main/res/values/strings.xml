@@ -1872,6 +1872,13 @@
     <string name="home_page">Home page</string>
     <string name="home_page_desc">What you see when you launch the app</string>
     <string name="change_password">Change password</string>
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
+    <string name="new_password_again">New password again</string>
+    <string name="error_cannot_be_blank">Cannot be blank</string>
+    <string name="error_passwords_do_not_match">Passwords do not match</string>
+    <string name="password_changed">Password changed</string>
+    <string name="view_parent_comments">View comment thread</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

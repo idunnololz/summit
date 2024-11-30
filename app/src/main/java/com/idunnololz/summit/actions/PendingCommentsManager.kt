@@ -4,8 +4,11 @@ import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PendingCommentsManager {
+@Singleton
+class PendingCommentsManager @Inject constructor() {
 
     private val idToPendingCommentView = mutableMapOf<Long, PendingCommentView>()
     private val pendingCommentsDict = hashMapOf<PostRef, MutableList<PendingCommentView>>()

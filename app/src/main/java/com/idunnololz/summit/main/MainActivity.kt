@@ -319,27 +319,27 @@ class MainActivity :
     }
 
     private fun updateUserAvatar() {
-        val accountView = viewModel.currentAccount.value ?: return
-        val account = accountView.account
+        val accountView = viewModel.currentAccount.value
 
         navBarController.navBar.menu.findItem(R.id.youFragment)?.apply {
             MenuItemCompat.setIconTintMode(this, PorterDuff.Mode.DST)
 
-            lifecycleScope.launch {
-                delay(1000)
-                MenuItemCompat.setIconTintList(this@apply, null)
+            if (accountView != null) {
+                val account = accountView.account
+                avatarHelper.loadAvatar(
+                    object : Target {
+                        override fun onSuccess(result: Drawable) {
+                            icon = result
+                        }
+                    },
+                    imageUrl = accountView.profileImage.toString(),
+                    personName = account.name,
+                    personId = account.id,
+                    personInstance = account.instance,
+                )
+            } else {
+                setIcon(R.drawable.outline_account_circle_24)
             }
-            avatarHelper.loadAvatar(
-                object : Target {
-                    override fun onSuccess(result: Drawable) {
-                        icon = result
-                    }
-                },
-                imageUrl = accountView.profileImage.toString(),
-                personName = account.name,
-                personId = account.id,
-                personInstance = account.instance,
-            )
         }
     }
 

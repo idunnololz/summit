@@ -184,8 +184,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         binding.author.setOnClickListener {
             getMainActivity()?.launchPage(
                 PersonRef.PersonRefByName(
-                    args.inboxItem.authorName,
-                    args.inboxItem.authorInstance,
+                    name = args.inboxItem.authorName,
+                    instance = args.inboxItem.authorInstance,
                 ),
             )
         }
@@ -429,119 +429,122 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         val context = requireContext()
 
         with(binding) {
-            val adapter = PostAdapter(
-                postAndCommentViewBuilder = postAndCommentViewBuilder,
-                context = context,
-                containerView = binding.recyclerView,
-                lifecycleOwner = viewLifecycleOwner,
-                instance = args.instance,
-                accountId = null,
-                revealAll = false,
-                useFooter = false,
-                isEmbedded = true,
-                videoState = null,
-                autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
-                onRefreshClickCb = {
-                    loadContext(force = true)
-                },
-                onSignInRequired = {
-                    PreAuthDialogFragment.newInstance()
-                        .show(childFragmentManager, "asdf")
-                },
-                onInstanceMismatch = { accountInstance, apiInstance ->
-                    AlertDialogFragment.Builder()
-                        .setTitle(R.string.error_account_instance_mismatch_title)
-                        .setMessage(
-                            getString(
-                                R.string.error_account_instance_mismatch,
-                                accountInstance,
-                                apiInstance,
-                            ),
-                        )
-                        .createAndShow(childFragmentManager, "aa")
-                },
-                onAddCommentClick = { postOrComment ->
-                    if (viewModel.accountManager.currentAccount.value == null) {
-                        PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+            var adapter = recyclerView.adapter as? PostAdapter
+
+            if (adapter == null) {
+                adapter = PostAdapter(
+                    postAndCommentViewBuilder = postAndCommentViewBuilder,
+                    context = context,
+                    containerView = binding.recyclerView,
+                    lifecycleOwner = viewLifecycleOwner,
+                    instance = args.instance,
+                    accountId = null,
+                    revealAll = false,
+                    useFooter = false,
+                    isEmbedded = true,
+                    videoState = null,
+                    autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
+                    onRefreshClickCb = {
+                        loadContext(force = true)
+                    },
+                    onSignInRequired = {
+                        PreAuthDialogFragment.newInstance()
                             .show(childFragmentManager, "asdf")
-                        return@PostAdapter
-                    }
+                    },
+                    onInstanceMismatch = { accountInstance, apiInstance ->
+                        AlertDialogFragment.Builder()
+                            .setTitle(R.string.error_account_instance_mismatch_title)
+                            .setMessage(
+                                getString(
+                                    R.string.error_account_instance_mismatch,
+                                    accountInstance,
+                                    apiInstance,
+                                ),
+                            )
+                            .createAndShow(childFragmentManager, "aa")
+                    },
+                    onAddCommentClick = { postOrComment ->
+                        if (viewModel.accountManager.currentAccount.value == null) {
+                            PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                                .show(childFragmentManager, "asdf")
+                            return@PostAdapter
+                        }
 
-                    AddOrEditCommentFragment.showReplyDialog(
-                        instance = args.instance,
-                        postOrCommentView = postOrComment,
-                        fragmentManager = childFragmentManager,
-                        accountId = null,
-                    )
-                },
-                onImageClick = { _, view, url ->
-                    getMainActivity()?.openImage(view, binding.appBar, null, url, null)
-                },
-                onVideoClick = { url, videoType, state ->
-                    getMainActivity()?.openVideo(url, videoType, state)
-                },
-                onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
-                },
-                onPageClick = {
-                    getMainActivity()?.launchPage(it)
-                },
-                onPostActionClick = { postView, _, actionId ->
-                    showMorePostOptions(
-                        instance = viewModel.apiInstance,
-                        accountId = null,
-                        postView = postView,
-                        moreActionsHelper = moreActionsHelper,
-                        fragmentManager = childFragmentManager,
-                    )
-                },
-                onCommentActionClick = { commentView, _, actionId ->
-                    createCommentActionHandler(
-                        apiInstance = viewModel.apiInstance,
-                        commentView = commentView,
-                        moreActionsHelper = moreActionsHelper,
-                        fragmentManager = childFragmentManager,
-                    )(actionId)
-                },
-                onFetchComments = {
-                    val postId = when (val inboxItem = args.inboxItem) {
-                        is InboxItem.MentionInboxItem -> inboxItem.postId
-                        is InboxItem.MessageInboxItem -> return@PostAdapter
-                        is InboxItem.ReplyInboxItem -> inboxItem.postId
-                        is InboxItem.ReportMessageInboxItem -> TODO()
-                        is InboxItem.ReportCommentInboxItem -> inboxItem.postId
-                        is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
-                    }
+                        AddOrEditCommentFragment.showReplyDialog(
+                            instance = args.instance,
+                            postOrCommentView = postOrComment,
+                            fragmentManager = childFragmentManager,
+                            accountId = null,
+                        )
+                    },
+                    onImageClick = { _, view, url ->
+                        getMainActivity()?.openImage(view, binding.appBar, null, url, null)
+                    },
+                    onVideoClick = { url, videoType, state ->
+                        getMainActivity()?.openVideo(url, videoType, state)
+                    },
+                    onVideoLongClickListener = { url ->
+                        showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+                    },
+                    onPageClick = {
+                        getMainActivity()?.launchPage(it)
+                    },
+                    onPostActionClick = { postView, _, actionId ->
+                        showMorePostOptions(
+                            instance = viewModel.apiInstance,
+                            accountId = null,
+                            postView = postView,
+                            moreActionsHelper = moreActionsHelper,
+                            fragmentManager = childFragmentManager,
+                        )
+                    },
+                    onCommentActionClick = { commentView, _, actionId ->
+                        createCommentActionHandler(
+                            apiInstance = viewModel.apiInstance,
+                            commentView = commentView,
+                            moreActionsHelper = moreActionsHelper,
+                            fragmentManager = childFragmentManager,
+                        )(actionId)
+                    },
+                    onFetchComments = {
+                        val postId = when (val inboxItem = args.inboxItem) {
+                            is InboxItem.MentionInboxItem -> inboxItem.postId
+                            is InboxItem.MessageInboxItem -> return@PostAdapter
+                            is InboxItem.ReplyInboxItem -> inboxItem.postId
+                            is InboxItem.ReportMessageInboxItem -> TODO()
+                            is InboxItem.ReportCommentInboxItem -> inboxItem.postId
+                            is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
+                        }
 
-                    getMainActivity()?.launchPage(
-                        PostRef(args.instance, postId),
-                    )
-                },
-                onLoadPost = {},
-                onLinkClick = { url, text, linkType ->
-                    onLinkClick(url, text, linkType)
-                },
-                onLinkLongClick = { url, text ->
-                    getMainActivity()?.showMoreLinkOptions(url, text)
-                },
-                switchToNativeInstance = {},
-            ).apply {
-                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                        getMainActivity()?.launchPage(
+                            PostRef(args.instance, postId),
+                        )
+                    },
+                    onLoadPost = {},
+                    onLoadCommentPath = {},
+                    onLinkClick = { url, text, linkType ->
+                        onLinkClick(url, text, linkType)
+                    },
+                    onLinkLongClick = { url, text ->
+                        getMainActivity()?.showMoreLinkOptions(url, text)
+                    },
+                    switchToNativeInstance = {},
+                ).apply {
+                    stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                }
+                recyclerView.adapter = adapter
+                recyclerView.doOnLayout {
+                    adapter.contentMaxWidth = recyclerView.measuredWidth
+                }
+                recyclerView.setup(animationsHelper)
+                recyclerView.layoutManager = LinearLayoutManager(context)
+                recyclerView.addItemDecoration(
+                    OldThreadLinesDecoration(
+                        context,
+                        postAndCommentViewBuilder.hideCommentActions,
+                    ),
+                )
             }
-
-            recyclerView.doOnLayout {
-                adapter.contentMaxWidth = recyclerView.measuredWidth
-            }
-
-            recyclerView.setup(animationsHelper)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = adapter
-            recyclerView.addItemDecoration(
-                OldThreadLinesDecoration(
-                    context,
-                    postAndCommentViewBuilder.hideCommentActions,
-                ),
-            )
 
             adapter.setData(
                 PostViewModel.PostData(
@@ -553,6 +556,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     isNativePost = true,
                     accountInstance = viewModel.apiInstance,
                     isCommentsLoaded = true,
+                    commentPath = null,
                 ),
             )
 
