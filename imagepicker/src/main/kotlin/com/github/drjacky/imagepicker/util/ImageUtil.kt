@@ -15,7 +15,11 @@
  */
 package com.github.drjacky.imagepicker.util
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.Paint
 import android.os.Build
 import java.io.File
 import java.io.FileOutputStream
@@ -38,7 +42,7 @@ object ImageUtil {
         reqHeight: Float,
         compressFormat: Bitmap.CompressFormat,
         quality: Int,
-        destinationPath: String
+        destinationPath: String,
     ): File {
         var fileOutputStream: FileOutputStream? = null
         val file = File(destinationPath).parentFile
@@ -51,7 +55,7 @@ object ImageUtil {
             decodeSampledBitmapFromFile(imageFile, reqWidth, reqHeight)!!.compress(
                 compressFormat,
                 quality,
-                fileOutputStream
+                fileOutputStream,
             )
         } finally {
             if (fileOutputStream != null) {
@@ -67,7 +71,7 @@ object ImageUtil {
     private fun decodeSampledBitmapFromFile(
         imageFile: File,
         reqWidth: Float,
-        reqHeight: Float
+        reqHeight: Float,
     ): Bitmap? {
         // First decode with inJustDecodeBounds=true to check dimensions
 
@@ -137,7 +141,7 @@ object ImageUtil {
             bmp!!,
             middleX - bmp.width / 2,
             middleY - bmp.height / 2,
-            Paint(Paint.FILTER_BITMAP_FLAG)
+            Paint(Paint.FILTER_BITMAP_FLAG),
         )
         bmp.recycle()
 
@@ -149,7 +153,7 @@ object ImageUtil {
             scaledBitmap.width,
             scaledBitmap.height,
             matrix,
-            true
+            true,
         )
 
         return scaledBitmap
@@ -158,7 +162,7 @@ object ImageUtil {
     private fun calculateInSampleSize(
         options: BitmapFactory.Options,
         reqWidth: Int,
-        reqHeight: Int
+        reqHeight: Int,
     ): Int {
         // Raw height and width of image
         val height = options.outHeight
@@ -185,7 +189,7 @@ object ImageUtil {
      */
     private fun canUseForInBitmap(
         candidate: Bitmap,
-        targetOptions: BitmapFactory.Options
+        targetOptions: BitmapFactory.Options,
     ): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // From Android 4.4 (KitKat) onward we can re-use if the byte size of

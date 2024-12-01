@@ -98,10 +98,7 @@ class SearchHomeViewModel @Inject constructor(
         }
     }
 
-    fun generateModel(
-        componentName: ComponentName? = null,
-        force: Boolean = false
-    ) {
+    fun generateModel(componentName: ComponentName? = null, force: Boolean = false) {
         if (componentName != null) {
             this.componentName = componentName
         }
@@ -112,8 +109,8 @@ class SearchHomeViewModel @Inject constructor(
         if (currentModel != null &&
             !currentModel.isCommunitySuggestionsLoading &&
             currentModel.errors.isEmpty() &&
-            !force) {
-
+            !force
+        ) {
             return
         }
 
@@ -189,7 +186,7 @@ class SearchHomeViewModel @Inject constructor(
                         },
                         communitySuggestionsDto = communitySessions.getOrNull(),
                         isCommunitySuggestionsLoading = false,
-                        errors = errors
+                        errors = errors,
                     ),
                 )
             }

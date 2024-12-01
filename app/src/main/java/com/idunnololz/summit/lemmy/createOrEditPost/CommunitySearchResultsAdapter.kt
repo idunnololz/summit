@@ -9,8 +9,6 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchHeaderBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchNoResultsBinding
 import com.idunnololz.summit.lemmy.LemmyUtils

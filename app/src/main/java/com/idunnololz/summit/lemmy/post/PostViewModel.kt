@@ -767,6 +767,7 @@ class PostViewModel @Inject constructor(
         val pendingComments = pendingComments
         val supplementaryComments = supplementaryComments
         val postOrCommentRef = postOrCommentRef
+        val commentRef: CommentRef? = postOrCommentRef?.getOrNull()
         val originalPostOrCommentRef = originalPostOrCommentRef
 
         val postDataValue = PostData(
@@ -790,12 +791,12 @@ class PostViewModel @Inject constructor(
             ),
             newlyPostedCommentId = newlyPostedCommentId,
             selectedCommentId = originalPostOrCommentRef?.getOrNull()?.id
-                ?: postOrCommentRef?.getOrNull()?.id,
-            isSingleComment = postOrCommentRef?.getOrNull() != null,
+                ?: commentRef?.id,
+            isSingleComment = commentRef != null,
             isNativePost = isNativePost(),
             accountInstance = currentAccountView.value?.account?.instance,
             isCommentsLoaded = comments != null,
-            commentPath = comments?.first()?.comment?.path,
+            commentPath = comments?.firstOrNull()?.comment?.path,
         )
 
         postData.postValue(postDataValue)

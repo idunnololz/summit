@@ -145,7 +145,7 @@ class ImagePickerActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         mCameraProvider?.onRequestPermissionsResult(requestCode)
@@ -167,11 +167,11 @@ class ImagePickerActivity : AppCompatActivity() {
                 cropFreeStyle = mCropProvider.isCropFreeStyleEnabled(),
                 isCamera = isCamera,
                 isMultipleFiles = false,
-                outputFormat = mCropProvider.outputFormat()
+                outputFormat = mCropProvider.outputFormat(),
             )
             mCompressionProvider.isResizeRequired(uri) -> mCompressionProvider.compress(
                 uri = uri,
-                outputFormat = mCropProvider.outputFormat()
+                outputFormat = mCropProvider.outputFormat(),
             )
             else -> setResult(uri)
         }
@@ -200,11 +200,11 @@ class ImagePickerActivity : AppCompatActivity() {
                 cropFreeStyle = mCropProvider.isCropFreeStyleEnabled(),
                 isCamera = false,
                 isMultipleFiles = true,
-                outputFormat = mCropProvider.outputFormat()
+                outputFormat = mCropProvider.outputFormat(),
             )
             mCompressionProvider.isResizeRequired(uri) -> mCompressionProvider.compress(
                 uri = uri,
-                outputFormat = mCropProvider.outputFormat()
+                outputFormat = mCropProvider.outputFormat(),
             )
         }
     }
@@ -307,5 +307,4 @@ class ImagePickerActivity : AppCompatActivity() {
         setResult(ImagePicker.RESULT_ERROR, intent)
         finish()
     }
-
 }

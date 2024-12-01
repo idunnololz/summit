@@ -43,7 +43,6 @@ import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -85,14 +84,12 @@ import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

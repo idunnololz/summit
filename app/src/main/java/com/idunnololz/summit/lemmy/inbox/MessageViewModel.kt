@@ -16,8 +16,8 @@ import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,7 +48,8 @@ class MessageViewModel @Inject constructor(
                 val currentMessageContext = currentMessageContext
                 if (currentMessageContext != null) {
                     if (pendingCommentsManager
-                        .getPendingComments(currentMessageContext.postRef).isNotEmpty()) {
+                            .getPendingComments(currentMessageContext.postRef).isNotEmpty()
+                    ) {
 
                         withContext(Dispatchers.Main) {
                             fetchCommentContext(

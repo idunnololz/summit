@@ -15,24 +15,21 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
  * between items of a [LinearLayoutManager]. It supports both [.HORIZONTAL] and
  * [.VERTICAL] orientations.
  *
- * <pre>
  * mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
  * mLayoutManager.getOrientation());
  * recyclerView.addItemDecoration(mDividerItemDecoration);
-</pre> *
- */
-class CustomDividerItemDecoration
-/**
+ *
  * Creates a divider [RecyclerView.ItemDecoration] that can be used with a
  * [LinearLayoutManager].
  *
  * @param context Current context, it will be used to access resources.
  * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL].
- */(
+ */
+class CustomDividerItemDecoration(
     val context: Context,
     orientation: Int,
     val dividerAfterLastItem: Boolean = false,
-    val drawDividerAfter: ((Int) -> Boolean)? = null
+    val drawDividerAfter: ((Int) -> Boolean)? = null,
 ) : ItemDecoration() {
     /**
      * @return the [Drawable] for this divider.

@@ -78,27 +78,27 @@ object IntentUtils {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
                     intent.putExtra(
                         CAMERA_FACING_EXTRA,
-                        CameraCharacteristics.LENS_FACING_FRONT
+                        CameraCharacteristics.LENS_FACING_FRONT,
                     ) // Tested on API 27 Android version 8.0(Nexus 6P)
                     intent.putExtra(
                         "android.intent.extra.USE_FRONT_CAMERA",
-                        true
+                        true,
                     ) // tested on android 11
                     intent.putExtra(
                         "android.intent.extras.CAMERA_FACING",
-                        CameraCharacteristics.LENS_FACING_FRONT
+                        CameraCharacteristics.LENS_FACING_FRONT,
                     ) // tested on android 11
                     intent.putExtra(
                         "android.intent.extras.CAMERA_FACING",
-                        android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT
+                        android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT,
                     ) // tested on android 11
                     intent.putExtra(
                         "com.google.assistant.extra.USE_FRONT_CAMERA",
-                        true
+                        true,
                     )
                     intent.putExtra(
                         "android.intent.extras.LENS_FACING_FRONT",
-                        1
+                        1,
                     )
                     // Samsung
                     intent.putExtra("camerafacing", "front")
@@ -110,12 +110,12 @@ object IntentUtils {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> {
                     intent.putExtra(
                         CAMERA_FACING_EXTRA,
-                        CameraCharacteristics.LENS_FACING_FRONT
+                        CameraCharacteristics.LENS_FACING_FRONT,
                     ) // Tested on API 24 Android version 7.0(Samsung S6)
                 }
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1 -> intent.putExtra(
                     CAMERA_FACING_EXTRA,
-                    1
+                    1,
                 ) // Tested API 21 Android version 5.0.1(Samsung S4)
             }
         }

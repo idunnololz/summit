@@ -11,5 +11,5 @@ enum class ImageProvider {
     GALLERY,
     CAMERA,
     FRONT_CAMERA,
-    BOTH
+    BOTH,
 }

@@ -2,7 +2,6 @@ package com.idunnololz.summit.you
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -75,7 +74,6 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
         val context = requireContext()
 
         with(binding) {
-
             requireMainActivity().apply {
                 insetViewAutomaticallyByPaddingAndNavUi(
                     lifecycleOwner = viewLifecycleOwner,
@@ -109,7 +107,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         AlertDialogFragment.Builder()
                             .setMessage(R.string.error_user_has_no_profile_image)
                             .createAndShow(
-                                childFragmentManager, "error_user_has_no_profile_image")
+                                childFragmentManager,
+                                "error_user_has_no_profile_image",
+                            )
                     } else {
                         getMainActivity()?.openImage(
                             profileIcon,
@@ -147,13 +147,13 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     }
                     R.id.upvoted -> {
                         val direction = YouFragmentDirections.actionYouFragmentToSavedFragment(
-                            type = FilteredPostAndCommentsType.Upvoted
+                            type = FilteredPostAndCommentsType.Upvoted,
                         )
                         findNavController().navigateSafe(direction)
                     }
                     R.id.downvoted -> {
                         val direction = YouFragmentDirections.actionYouFragmentToSavedFragment(
-                            type = FilteredPostAndCommentsType.Downvoted
+                            type = FilteredPostAndCommentsType.Downvoted,
                         )
                         findNavController().navigateSafe(direction)
                     }
@@ -244,19 +244,19 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     is Item.Divider ->
                         old.key == (new as Item.Divider).key
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.HeaderItem::class,
-                inflateFn = ItemGenericHeaderBinding::inflate
+                inflateFn = ItemGenericHeaderBinding::inflate,
             ) { _, _, _ -> }
             addItemType(
                 clazz = Item.FooterItem::class,
-                inflateFn = GenericSpaceFooterItemBinding::inflate
+                inflateFn = GenericSpaceFooterItemBinding::inflate,
             ) { _, _, _ -> }
             addItemType(
                 clazz = Item.Divider::class,
-                inflateFn = ItemYouDividerBinding::inflate
+                inflateFn = ItemYouDividerBinding::inflate,
             ) { _, _, _ ->
             }
             addItemType(Item.ProfileItem::class, ItemYouProfileBinding::inflate) { item, b, h ->
@@ -275,7 +275,8 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 } else {
                     b.profileIcon.dispose()
                     b.profileIcon.imageTintList = ColorStateList.valueOf(
-                        context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal))
+                        context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                    )
                     b.profileIcon.setImageResource(R.drawable.outline_account_circle_24)
                 }
                 ViewCompat.setTransitionName(b.profileIcon, "profileIcon")
@@ -303,7 +304,8 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 if (item.person != null) {
                     b.posts.text = LemmyUtils.abbrevNumber(item.person.counts.post_count.toLong())
                     b.comments.text = LemmyUtils.abbrevNumber(
-                        item.person.counts.comment_count.toLong())
+                        item.person.counts.comment_count.toLong(),
+                    )
 
                     val ts = dateStringToTs(item.person.person.published)
                     val accountCreationTime = LocalDateTime
@@ -340,7 +342,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     item.iconRes,
                     0,
                     R.drawable.baseline_chevron_right_24,
-                    0
+                    0,
                 )
                 b.text.setText(item.text)
                 b.root.setOnClickListener {
@@ -349,14 +351,12 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -372,7 +372,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 newItems += Item.ProfileItem(
                     name = model.name,
                     account = account,
-                    person = model.personResult.getOrNull()?.person_view
+                    person = model.personResult.getOrNull()?.person_view,
                 )
 
                 if (account != null) {

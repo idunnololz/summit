@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
-import androidx.lifecycle.SavedStateHandle
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
@@ -17,13 +16,11 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorSelectedCommunityItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorStaticCommunityItemBinding
 import com.idunnololz.summit.databinding.ItemCommunityGroupHeaderBinding
 import com.idunnololz.summit.databinding.ItemCommunityNoResultsBinding
 import com.idunnololz.summit.databinding.ItemCommunityStaticCommunityBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager

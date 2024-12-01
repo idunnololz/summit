@@ -12,7 +12,6 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityModeratorView
-import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
@@ -27,7 +26,6 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
@@ -47,7 +45,7 @@ class PersonTabbedViewModel @Inject constructor(
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
     private val commentListEngineFactory: CommentListEngine.Factory,
-    private val singlePostDataSourceWithCursorFactory: SinglePostDataSourceWithCursor.Factory
+    private val singlePostDataSourceWithCursorFactory: SinglePostDataSourceWithCursor.Factory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {

@@ -449,18 +449,18 @@ class LemmyApiClient(
                 limit = limit,
                 page = page,
             )
-        }) ?:
-        GetComments(
-            max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
-            type_ = ListingType.All,
-            post_id = null,
-            sort = sort,
-            auth = account?.jwt,
-            liked_only = upvotedOnly,
-            disliked_only = downvotedOnly,
-            limit = limit,
-            page = page,
-        )
+        })
+            ?: GetComments(
+                max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
+                type_ = ListingType.All,
+                post_id = null,
+                sort = sort,
+                auth = account?.jwt,
+                liked_only = upvotedOnly,
+                disliked_only = downvotedOnly,
+                limit = limit,
+                page = page,
+            )
 
         return retrofitErrorHandler {
             if (force) {

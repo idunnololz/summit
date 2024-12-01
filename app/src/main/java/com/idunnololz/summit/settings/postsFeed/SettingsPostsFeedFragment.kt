@@ -14,10 +14,8 @@ import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.databinding.FragmentSettingsPostsFeedBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.idToSortOrder
-import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
@@ -37,8 +35,8 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SettingsPostsFeedFragment :

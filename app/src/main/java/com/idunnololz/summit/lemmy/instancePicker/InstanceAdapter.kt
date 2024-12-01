@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.InstanceSelectorSearchResultInstanceItemBinding
 import com.idunnololz.summit.databinding.ItemInstanceSelectorGroupTitleBinding

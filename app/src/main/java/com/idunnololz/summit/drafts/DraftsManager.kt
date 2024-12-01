@@ -1,7 +1,6 @@
 package com.idunnololz.summit.drafts
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -10,11 +9,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

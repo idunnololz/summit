@@ -1,12 +1,9 @@
 package com.idunnololz.summit.lemmy
 
 import android.util.Log
-import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.GetPostsResponse
-import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 import dagger.assisted.Assisted
@@ -39,7 +36,7 @@ class SinglePostDataSourceWithCursor @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            fetchPosts: suspend (cursor: String?, force: Boolean) -> Result<GetPostsResponse>
+            fetchPosts: suspend (cursor: String?, force: Boolean) -> Result<GetPostsResponse>,
         ): SinglePostDataSourceWithCursor
     }
 
@@ -55,17 +52,17 @@ class SinglePostDataSourceWithCursor @AssistedInject constructor(
         val curCursor = nextCursor
 
         return fetchPosts(cursor, force)
-                .map {
-                    cursor = it.next_page
+            .map {
+                cursor = it.next_page
 
-                    Log.d("VotedViewModel", "it.next_page ${it.next_page}")
+                Log.d("VotedViewModel", "it.next_page ${it.next_page}")
 
-                    PageWithCursorResult(
-                        posts = it.posts.map { FetchedPost(it, Source.StandardSource()) },
-                        cursor = curCursor,
-                        hasMore = curCursor != it.next_page,
-                    )
-                }
+                PageWithCursorResult(
+                    posts = it.posts.map { FetchedPost(it, Source.StandardSource()) },
+                    cursor = curCursor,
+                    hasMore = curCursor != it.next_page,
+                )
+            }
     }
 
     override suspend fun reset() {

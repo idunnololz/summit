@@ -1,7 +1,6 @@
 package com.idunnololz.summit.main
 
 import android.app.Activity
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -12,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.MenuItemCompat
 import androidx.core.view.forEach
 import androidx.core.view.iterator
 import androidx.core.view.updateLayoutParams
