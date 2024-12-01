@@ -50,7 +50,7 @@ object PermissionUtil {
     fun isPermissionInManifest(context: Context, permission: String): Boolean {
         val packageInfo = context.packageManager.getPackageInfo(
             context.packageName,
-            PackageManager.GET_PERMISSIONS
+            PackageManager.GET_PERMISSIONS,
         )
         val permissions = packageInfo.requestedPermissions
 

@@ -11,10 +11,10 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class YouViewModel @Inject constructor(
@@ -69,7 +69,7 @@ class YouViewModel @Inject constructor(
                     name = personResult.getOrNull()?.person_view?.person?.display_name ?: account?.account?.name,
                     account,
                     personResult,
-                )
+                ),
             )
         }
     }

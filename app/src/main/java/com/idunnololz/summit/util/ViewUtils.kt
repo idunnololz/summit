@@ -13,8 +13,8 @@ fun View.excludeRegionFromSystemGestures() {
             listOf(
                 Rect().apply {
                     that.getDrawingRect(this)
-                }
-            )
+                },
+            ),
         )
     }
 }
@@ -24,7 +24,7 @@ fun View.clearExcludeRegionFromSystemGestures() {
     doOnLayout {
         ViewCompat.setSystemGestureExclusionRects(
             that,
-            listOf()
+            listOf(),
         )
     }
 }

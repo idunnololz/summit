@@ -79,11 +79,12 @@ object FileUtil {
             file.createNewFile()
 
             val authority =
-                context.packageName + context.getString(R.string.image_picker_provider_authority_suffix)
+                context.packageName +
+                    context.getString(R.string.image_picker_provider_authority_suffix)
             val uriForFile = FileProvider.getUriForFile(
                 context,
                 authority,
-                file
+                file,
             )
             return uriForFile
         } catch (ex: IOException) {
@@ -99,7 +100,9 @@ object FileUtil {
      */
     private fun getCameraDirectory(context: Context): File {
         val dir =
-            context.getExternalFilesDir(Environment.DIRECTORY_DCIM) // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            context.getExternalFilesDir(
+                Environment.DIRECTORY_DCIM,
+            ) // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
         return File(dir, "Camera")
     }
 
@@ -219,7 +222,7 @@ object FileUtil {
         val withoutDotExtension = extension.replace(".", "")
         return safeValueOf<Bitmap.CompressFormat>(
             name = withoutDotExtension.uppercase(),
-            defaultValue = Bitmap.CompressFormat.JPEG
+            defaultValue = Bitmap.CompressFormat.JPEG,
         )
     }
 

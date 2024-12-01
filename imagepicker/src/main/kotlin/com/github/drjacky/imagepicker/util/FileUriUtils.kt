@@ -11,7 +11,11 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * This file was taken from
@@ -71,7 +75,7 @@ object FileUriUtils {
                         return try {
                             val contentUri = ContentUris.withAppendedId(
                                 Uri.parse("content://downloads/public_downloads"),
-                                java.lang.Long.valueOf(id)
+                                java.lang.Long.valueOf(id),
                             )
                             getDataColumn(context, contentUri, null, null)
                         } catch (e: NumberFormatException) {
@@ -111,7 +115,7 @@ object FileUriUtils {
                     context,
                     uri,
                     null,
-                    null
+                    null,
                 )
             }
         } else if ("file".equals(uri.scheme!!, ignoreCase = true)) {
@@ -126,7 +130,7 @@ object FileUriUtils {
         context: Context,
         uri: Uri?,
         selection: String?,
-        selectionArgs: Array<String>?
+        selectionArgs: Array<String>?,
     ): String? {
         var cursor: Cursor? = null
         val column = "_data"

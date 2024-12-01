@@ -24,7 +24,6 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.utils.actions.SaveCommentResult
 import com.idunnololz.summit.lemmy.utils.actions.SavePostResult
@@ -32,11 +31,11 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class FilteredPostAndCommentsViewModel @Inject constructor(
@@ -190,7 +189,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
                     apiClient.fetchSavedPostsWithRetry(
                         page = pageIndex.toLemmyPageIndex(),
                         limit = pageSize,
-                        force = force
+                        force = force,
                     )
                 }
                 FilteredPostAndCommentsType.Upvoted -> {

@@ -18,8 +18,9 @@ import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ChangePasswordDialogFragment : BaseDialogFragment<DialogFragmentChangePasswordBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener{
+class ChangePasswordDialogFragment :
+    BaseDialogFragment<DialogFragmentChangePasswordBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         fun show(fragmentManager: FragmentManager) {

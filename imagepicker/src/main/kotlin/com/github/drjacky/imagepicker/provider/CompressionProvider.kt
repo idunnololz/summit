@@ -10,9 +10,9 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.github.drjacky.imagepicker.ImagePickerActivity
 import com.github.drjacky.imagepicker.util.ExifDataCopier
 import com.github.drjacky.imagepicker.util.FileUriUtils
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import kotlinx.coroutines.launch
 
 /**
  * Compress Selected/Captured Image

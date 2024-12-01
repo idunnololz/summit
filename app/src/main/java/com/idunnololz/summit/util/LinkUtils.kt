@@ -50,8 +50,7 @@ object LinkUtils {
         return Client.get().newCall(request).execute()
     }
 
-    fun getLinkForCommunity(communityRef: CommunityRef): String =
-        communityRef.toUrl("lemmy.world")
+    fun getLinkForCommunity(communityRef: CommunityRef): String = communityRef.toUrl("lemmy.world")
 
     fun convertToHttps(url: String): String {
         val uri = Uri.parse(url)

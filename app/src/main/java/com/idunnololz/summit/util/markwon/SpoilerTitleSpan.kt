@@ -187,7 +187,8 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
             }
         } catch (e: Exception) {
             Log.d(TAG, "Spoiler error", e)
-            crashlytics?.recordException(RuntimeException("Spoiler error", e),
+            crashlytics?.recordException(
+                RuntimeException("Spoiler error", e),
             )
         }
     }

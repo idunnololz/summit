@@ -26,7 +26,7 @@ import java.io.IOException
 class CameraProvider(
     activity: ImagePickerActivity,
     private val tryFrontCamera: Boolean = false,
-    private val launcher: (Intent) -> Unit
+    private val launcher: (Intent) -> Unit,
 ) :
     BaseProvider(activity) {
 
@@ -40,7 +40,7 @@ class CameraProvider(
          * Permission Require for Image Capture using Camera
          */
         private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA
+            Manifest.permission.CAMERA,
         )
 
         private const val PERMISSION_INTENT_REQ_CODE = 4282
@@ -199,5 +199,4 @@ class CameraProvider(
             PermissionUtil.isPermissionInManifest(context, it)
         }.toTypedArray()
     }
-
 }

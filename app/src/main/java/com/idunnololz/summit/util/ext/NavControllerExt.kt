@@ -8,7 +8,10 @@ import androidx.navigation.Navigator
 
 private const val TAG = "NavControllerExt"
 
-fun NavController.navigateSafe(navDirections: NavDirections? = null, navOptions: NavOptions? = null) {
+fun NavController.navigateSafe(
+    navDirections: NavDirections? = null,
+    navOptions: NavOptions? = null,
+) {
     try {
         navDirections?.let {
             this.navigate(navDirections, navOptions)

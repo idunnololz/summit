@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
-import androidx.media3.exoplayer.source.ExternalLoader.LoadRequest
 import coil.dispose
 import coil.imageLoader
 import coil.load
@@ -132,7 +131,7 @@ class AvatarHelper @Inject constructor(
                         .target(target)
                         .placeholder(newShimmerDrawableSquare(context))
                         .allowHardware(false)
-                        .build()
+                        .build(),
                 )
             }
         }

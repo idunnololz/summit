@@ -1,39 +1,26 @@
 package com.idunnololz.summit.drafts
 
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.text.buildSpannedString
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.CommentDraftItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
-import com.idunnololz.summit.databinding.DraftLoadingItemBinding
-import com.idunnololz.summit.databinding.EmptyDraftItemBinding
-import com.idunnololz.summit.databinding.PostDraftItemBinding
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -228,23 +215,6 @@ class DraftsDialogFragment :
                     }
                 }
             }
-
-            recyclerView.addItemDecoration(
-                CustomDividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL,
-                    dividerAfterLastItem = false,
-                ).apply {
-                    setDrawable(
-                        checkNotNull(
-                            ContextCompat.getDrawable(
-                                context,
-                                R.drawable.vertical_divider,
-                            ),
-                        ),
-                    )
-                },
-            )
 
             recyclerView.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {

@@ -1,20 +1,15 @@
 package com.idunnololz.summit.user
 
-import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.tabs.isHomeTab
-import com.squareup.moshi.Moshi
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.HashMap
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

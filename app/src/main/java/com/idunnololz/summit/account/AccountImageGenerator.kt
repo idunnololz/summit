@@ -77,9 +77,9 @@ class AccountImageGenerator @Inject constructor(
                             accountImageSize.toFloat() / 2f,
                             accountImageSize.toFloat() / 2,
                             accountImageSize.toFloat() / 2f,
-                            Path.Direction.CW
+                            Path.Direction.CW,
                         )
-                    }
+                    },
                 )
             }
 

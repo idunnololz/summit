@@ -968,7 +968,9 @@ class SearchHomeFragment :
                     stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 },
                 LinearLayoutManager(
-                    context, LinearLayoutManager.HORIZONTAL, false,
+                    context,
+                    LinearLayoutManager.HORIZONTAL,
+                    false,
                 ),
             )
         }

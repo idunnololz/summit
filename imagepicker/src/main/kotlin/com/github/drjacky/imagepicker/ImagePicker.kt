@@ -277,9 +277,7 @@ open class ImagePicker {
         fun createIntent(): Intent =
             Intent(activity, ImagePickerActivity::class.java).apply { putExtras(getBundle()) }
 
-        fun createIntentFromDialog(
-            onResult: (Intent) -> Unit
-        ) {
+        fun createIntentFromDialog(onResult: (Intent) -> Unit) {
             if (imageProvider == ImageProvider.BOTH) {
                 DialogHelper.showChooseAppDialog(
                     context = activity,
@@ -292,7 +290,7 @@ open class ImagePicker {
                             }
                         }
                     },
-                    dismissListener
+                    dismissListener,
                 )
             }
         }
@@ -320,5 +318,4 @@ open class ImagePicker {
             }
         }
     }
-
 }

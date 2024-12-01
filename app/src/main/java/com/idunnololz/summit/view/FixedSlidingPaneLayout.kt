@@ -19,7 +19,8 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
 
     // We only construct a drag helper to get the width of the drag region.
     private val dragHelper = ViewDragHelper.create(
-        this, 0.5f,
+        this,
+        0.5f,
         object : ViewDragHelper.Callback() {
             override fun tryCaptureView(child: View, pointerId: Int): Boolean {
                 return false

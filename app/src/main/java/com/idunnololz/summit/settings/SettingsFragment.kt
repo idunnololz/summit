@@ -415,7 +415,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 )
                 .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
                 .setPopUpTo(R.id.settingsFragment, true)
-                .build()
+                .build(),
         )
     }
 

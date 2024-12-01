@@ -12,7 +12,6 @@ import com.idunnololz.summit.databinding.DraftLoadingItemBinding
 import com.idunnololz.summit.databinding.EmptyDraftItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.PostDraftItemBinding
-import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.tsToShortDate
 
@@ -43,7 +42,7 @@ class DraftsAdapter(
     ).apply {
         addItemType(
             clazz = DraftsViewModel.ViewModelItem.HeaderItem::class,
-            inflateFn = ItemGenericHeaderBinding::inflate
+            inflateFn = ItemGenericHeaderBinding::inflate,
         ) { _, _, _ -> }
         addItemType(
             clazz = DraftsViewModel.ViewModelItem.PostDraftItem::class,

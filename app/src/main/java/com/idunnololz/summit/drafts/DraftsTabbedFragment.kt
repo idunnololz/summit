@@ -4,30 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
 import com.idunnololz.summit.databinding.FragmentDraftsTabbedBinding
-import com.idunnololz.summit.saved.FilteredCommentsFragment
-import com.idunnololz.summit.saved.FilteredPostsFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -91,12 +78,12 @@ class DraftsTabbedFragment :
                 adapter.addFrag(
                     DraftsFragment::class.java,
                     getString(R.string.posts),
-                    DraftsFragmentArgs(DraftTypes.Post).toBundle()
+                    DraftsFragmentArgs(DraftTypes.Post).toBundle(),
                 )
                 adapter.addFrag(
                     DraftsFragment::class.java,
                     getString(R.string.comments),
-                    DraftsFragmentArgs(DraftTypes.Comment).toBundle()
+                    DraftsFragmentArgs(DraftTypes.Comment).toBundle(),
                 )
                 viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                     override fun onPageSelected(position: Int) {

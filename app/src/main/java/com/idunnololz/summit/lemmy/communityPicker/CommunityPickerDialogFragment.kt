@@ -15,7 +15,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.DialogFragmentCommunityPickerBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -42,14 +41,11 @@ class CommunityPickerDialogFragment :
         const val REQUEST_KEY = "CommunityPickerDialogFragment_req_key"
         const val REQUEST_KEY_RESULT = "result"
 
-        fun show(
-            fragmentManager: FragmentManager,
-            showFeeds: Boolean = false,
-        ) {
+        fun show(fragmentManager: FragmentManager, showFeeds: Boolean = false) {
             CommunityPickerDialogFragment()
                 .apply {
                     arguments = CommunityPickerDialogFragmentArgs(
-                        showFeeds
+                        showFeeds,
                     ).toBundle()
                 }
                 .showAllowingStateLoss(fragmentManager, "CommunityPickerDialogFragment")
@@ -113,8 +109,13 @@ class CommunityPickerDialogFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentCommunityPickerBinding.inflate(
-            inflater, container, false))
+        setBinding(
+            DialogFragmentCommunityPickerBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }

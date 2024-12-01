@@ -1,41 +1,30 @@
 package com.idunnololz.summit.drafts
 
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.databinding.DialogFragmentDraftsBinding
 import com.idunnololz.summit.databinding.FragmentDraftsBinding
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.FullscreenDialogFragment
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DraftsFragment :
@@ -130,23 +119,6 @@ class DraftsFragment :
                 }
             }
 
-            recyclerView.addItemDecoration(
-                CustomDividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL,
-                    dividerAfterLastItem = false,
-                ).apply {
-                    setDrawable(
-                        checkNotNull(
-                            ContextCompat.getDrawable(
-                                context,
-                                R.drawable.vertical_divider,
-                            ),
-                        ),
-                    )
-                },
-            )
-
             recyclerView.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -185,15 +157,15 @@ class DraftsFragment :
                     val draftData = when (viewModel.draftType) {
                         DraftTypes.Post ->
                             DraftData.PostDraftData(
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    false,
-                                    currentAccount.id,
-                                    currentAccount.instance,
-                                    "",
-                                )
+                                null,
+                                null,
+                                null,
+                                null,
+                                false,
+                                currentAccount.id,
+                                currentAccount.instance,
+                                "",
+                            )
                         DraftTypes.Comment ->
                             DraftData.CommentDraftData(
                                 originalComment = null,
@@ -220,9 +192,7 @@ class DraftsFragment :
         }
     }
 
-    private fun openDraft(
-        draftEntry: DraftEntry,
-    ) {
+    private fun openDraft(draftEntry: DraftEntry) {
         when (draftEntry.data) {
             is DraftData.CommentDraftData -> {
                 AddOrEditCommentFragment()
@@ -238,7 +208,7 @@ class DraftsFragment :
                     }
                     .showAllowingStateLoss(
                         childFragmentManager,
-                        "AddOrEditCommentFragment"
+                        "AddOrEditCommentFragment",
                     )
             }
             is DraftData.PostDraftData -> {
@@ -253,7 +223,7 @@ class DraftsFragment :
                     }
                     .showAllowingStateLoss(
                         childFragmentManager,
-                        "CreateOrEditPostFragment"
+                        "CreateOrEditPostFragment",
                     )
             }
             is DraftData.MessageDraftData -> {}

@@ -430,8 +430,8 @@ class PostsRepository @AssistedInject constructor(
             val instance = fetchedPost.source.instance ?: apiInstance
 
             if (hideRead &&
-                (post.read || postReadManager.isPostRead(instance, post.post.id) == true)) {
-
+                (post.read || postReadManager.isPostRead(instance, post.post.id) == true)
+            ) {
                 hideReadCount++
                 continue
             }
