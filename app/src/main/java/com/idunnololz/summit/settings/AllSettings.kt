@@ -62,6 +62,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_NOTIFICATIONS_CHECK_INTERVA
 import com.idunnololz.summit.util.PreferenceUtil.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_AND_COMMENTS_UI_CONFIG
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_FEED_SHOW_SCROLL_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_3
@@ -856,6 +857,12 @@ class PostsFeedSettings @Inject constructor(
         context.getString(R.string.home_page_desc),
         false,
     )
+    val postFeedShowScrollBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_scroll_bar),
+        null,
+        relatedKeys = listOf(KEY_POST_FEED_SHOW_SCROLL_BAR),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -878,6 +885,7 @@ class PostsFeedSettings @Inject constructor(
         homeFabQuickAction,
         prefetchPosts,
         homePage,
+        postFeedShowScrollBar,
     )
 }
 

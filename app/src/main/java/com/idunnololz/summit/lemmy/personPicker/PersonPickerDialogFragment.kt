@@ -12,6 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentPersonPickerBinding
@@ -37,15 +38,24 @@ class PersonPickerDialogFragment :
         const val REQUEST_KEY = "PersonPickerDialogFragment_req_key"
         const val REQUEST_KEY_RESULT = "result"
 
-        fun show(fragmentManager: FragmentManager) {
+        fun show(fragmentManager: FragmentManager, prefill: String? = null) {
             PersonPickerDialogFragment()
+                .apply {
+                    arguments = PersonPickerDialogFragmentArgs(
+                        prefill
+                    ).toBundle()
+                }
                 .showAllowingStateLoss(fragmentManager, "PersonPickerDialogFragment")
         }
     }
 
+    private val args: PersonPickerDialogFragmentArgs by navArgs()
+
     private var adapter: PersonAdapter? = null
 
     private val viewModel: PersonPickerViewModel by viewModels()
+
+    private var isPrefillUsed: Boolean = false
 
     @Inject
     lateinit var offlineManager: OfflineManager
@@ -104,6 +114,17 @@ class PersonPickerDialogFragment :
         val context = requireContext()
 
         with(binding) {
+            val prefill = args.prefill
+
+            if (prefill != null &&
+                !isPrefillUsed &&
+                searchEditText.text.isNullOrBlank() &&
+                savedInstanceState == null) {
+
+                isPrefillUsed = true
+                searchEditText.setText(prefill)
+            }
+
             searchEditText.addTextChangedListener {
                 val query = it?.toString() ?: ""
                 adapter?.setQuery(query) {

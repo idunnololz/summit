@@ -88,6 +88,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_1
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_2
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_GESTURE_SIZE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_FEED_SHOW_SCROLL_BAR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_POST_SHOW_UP_AND_DOWN_VOTES
@@ -1041,6 +1042,14 @@ class Preferences(
                 ?: SearchHomeConfig()
         set(value) {
             prefs.putMoshiValue(KEY_SEARCH_HOME_CONFIG, value)
+        }
+
+    var postFeedShowScrollBar: Boolean
+        get() = prefs.getBoolean(KEY_POST_FEED_SHOW_SCROLL_BAR, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_POST_FEED_SHOW_SCROLL_BAR, value)
+                .apply()
         }
 
     suspend fun getOfflinePostCount(): Int =

@@ -16,7 +16,9 @@ import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
@@ -33,10 +35,21 @@ import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.view.LemmyHeaderView
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class LemmyHeaderHelper(
-    private val context: Context,
+class LemmyHeaderHelper @AssistedInject constructor(
+    @Assisted private val context: Context,
+    private val userTagsManager: UserTagsManager,
 ) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            context: Context,
+        ): LemmyHeaderHelper
+    }
 
     companion object {
         private val TAG = "LemmyHeaderHelper"
@@ -459,6 +472,20 @@ class LemmyHeaderHelper(
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
+        }
+
+        val tag = userTagsManager.getUserTag(commentView.creator.fullName)
+        if (tag != null) {
+            val s = sb.length
+            sb.append(tag.tagName)
+            val e = sb.length
+
+            sb.setSpan(
+                RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
         }
 
         if (sb.isNotEmpty()) {

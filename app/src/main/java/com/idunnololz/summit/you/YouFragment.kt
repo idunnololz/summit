@@ -165,6 +165,10 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     R.id.account_settings -> {
                         requireMainActivity().openAccountSettings()
                     }
+                    R.id.user_tags -> {
+                        val direction = YouFragmentDirections.actionYouFragmentToUserTagsFragment()
+                        findNavController().navigateSafe(direction)
+                    }
                 }
             }
 
@@ -429,6 +433,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         R.string.account_settings,
                     )
                 }
+                newItems += Item.MenuItem(
+                    R.id.user_tags,
+                    R.drawable.outline_sell_24,
+                    R.string.user_tags,
+                )
                 newItems += Item.FooterItem
             }
 

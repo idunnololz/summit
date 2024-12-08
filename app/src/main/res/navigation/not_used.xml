@@ -338,4 +338,22 @@ safeargs.
             android:name="showFeeds"
             app:argType="boolean" />
     </dialog>
+    <dialog
+        android:id="@+id/addOrEditUserTagDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment"
+        android:label="AddOrEditUserTagDialogFragment" >
+        <argument
+            android:name="person"
+            app:nullable="true"
+            app:argType="com.idunnololz.summit.api.dto.Person" />
+    </dialog>
+    <dialog
+        android:id="@+id/personPickerDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment"
+        android:label="PersonPickerDialogFragment" >
+        <argument
+            android:name="prefill"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

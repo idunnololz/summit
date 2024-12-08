@@ -1879,6 +1879,14 @@
     <string name="error_passwords_do_not_match">Passwords do not match</string>
     <string name="password_changed">Password changed</string>
     <string name="view_parent_comments">View comment thread</string>
+    <string name="tag_user_format">Tag user (%1$s)</string>
+    <string name="tag_fill_color">Tag fill color</string>
+    <string name="tag_stroke_color">Tag stroke color</string>
+    <string name="add_user_tag">Add user tag</string>
+    <string name="user">User</string>
+    <string name="tag">Tag</string>
+    <string name="user_tags">User tags</string>
+    <string name="show_scroll_bar">Show scroll bar</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

@@ -93,6 +93,7 @@ class PostListViewBuilder @Inject constructor(
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val avatarHelper: AvatarHelper,
+    private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -115,7 +116,7 @@ class PostListViewBuilder @Inject constructor(
     private var globalFontSizeMultiplier: Float =
         GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
 
-    private val lemmyHeaderHelper = LemmyHeaderHelper(context)
+    private val lemmyHeaderHelper = lemmyHeaderHelperFactory.create(context)
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,

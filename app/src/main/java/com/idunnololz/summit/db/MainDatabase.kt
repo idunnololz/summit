@@ -40,6 +40,9 @@ import com.idunnololz.summit.lemmy.inbox.InboxEntry
 import com.idunnololz.summit.lemmy.inbox.InboxEntryConverters
 import com.idunnololz.summit.lemmy.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.lemmy.inbox.db.ConversationEntry
+import com.idunnololz.summit.lemmy.userTags.UserTagConverters
+import com.idunnololz.summit.lemmy.userTags.UserTagEntry
+import com.idunnololz.summit.lemmy.userTags.UserTagsDao
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
 import com.idunnololz.summit.user.UserCommunityEntry
@@ -64,6 +67,7 @@ import com.idunnololz.summit.util.moshi
         ConversationEntry::class,
         ReadPostEntry::class,
         TextEmojiEntry::class,
+        UserTagEntry::class,
     ],
     autoMigrations = [
         AutoMigration(from = 20, to = 21),
@@ -73,8 +77,9 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 31, to = 32),
         AutoMigration(from = 32, to = 33),
         AutoMigration(from = 41, to = 42),
+        AutoMigration(from = 42, to = 43),
     ],
-    version = 42,
+    version = 43,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -94,6 +99,7 @@ abstract class MainDatabase : RoomDatabase() {
     abstract fun conversationEntriesDao(): ConversationEntriesDao
     abstract fun postReadDao(): PostReadDao
     abstract fun textEmojiDao(): TextEmojiDao
+    abstract fun userTagsDao(): UserTagsDao
 
     companion object {
 
@@ -125,6 +131,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .addTypeConverter(AccountInfoConverters(moshi))
                 .addTypeConverter(DraftConverters(moshi))
                 .addTypeConverter(InboxEntryConverters(moshi))
+                .addTypeConverter(UserTagConverters(moshi))
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_24)
@@ -141,7 +148,6 @@ abstract class MainDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_39_38)
                 .addMigrations(MIGRATION_39_40)
                 .addMigrations(MIGRATION_40_41)
-                .addMigrations(MIGRATION_42_43)
                 .build()
         }
     }
@@ -295,14 +301,6 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
         db.execSQL("DROP TABLE IF EXISTS read_posts;")
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS `read_posts` (`post_key` TEXT NOT NULL, `read` INTEGER NOT NULL, PRIMARY KEY(`post_key`))",
-        )
-    }
-}
-
-val MIGRATION_42_43 = object : Migration(42, 43) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL(
-            "ALTER TABLE `account` ADD COLUMN `image_url` TEXT",
         )
     }
 }
