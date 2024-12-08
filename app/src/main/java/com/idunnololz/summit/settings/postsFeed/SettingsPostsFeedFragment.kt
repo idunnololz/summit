@@ -344,6 +344,13 @@ class SettingsPostsFeedFragment :
                 CommunityPickerDialogFragment.show(childFragmentManager, showFeeds = true)
             },
         )
+        settings.postFeedShowScrollBar.bindTo(
+            binding.showScrollBar,
+            { preferences.postFeedShowScrollBar },
+            {
+                preferences.postFeedShowScrollBar = it
+            },
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

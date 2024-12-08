@@ -1138,6 +1138,12 @@ class CommunityFragment :
 
             viewModel.recheckPreferences()
             viewModel.recheckNsfwMode()
+
+            binding.fastScroller.visibility = if (preferences.postFeedShowScrollBar) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         }
 
         runAfterLayout {

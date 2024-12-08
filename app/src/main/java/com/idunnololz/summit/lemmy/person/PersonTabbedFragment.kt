@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -65,6 +66,10 @@ import kotlin.math.min
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
+
+    companion object {
+        private const val TAG = "PersonTabbedFragment"
+    }
 
     private val args by navArgs<PersonTabbedFragmentArgs>()
 
@@ -358,6 +363,10 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
         val data = viewModel.personData.valueOrNull ?: return
         val context = requireContext()
+
+
+        Log.d(TAG, "user id: ${data.personView.person.id}")
+        Log.d(TAG, "actor id: ${data.personView.person.actor_id}")
 
         TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 

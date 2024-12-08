@@ -192,8 +192,6 @@ class HistoryFragment :
                 supportActionBar?.title = getString(R.string.history)
             }
 
-            toolbar.excludeRegionFromSystemGestures()
-
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(context)

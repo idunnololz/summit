@@ -59,10 +59,11 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":overlappingPane"))
     implementation(project(":calligraphy"))
+    implementation(project(":colorpickerview"))
     implementation(project(":gravitySnapHelper"))
     implementation(project(":imagepicker"))
+    implementation(project(":overlappingPane"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
@@ -147,7 +148,6 @@ dependencies {
     implementation(libs.transformations)
     implementation(libs.java.string.similarity)
     implementation(libs.viewpump)
-    implementation(libs.colorpickerview)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)

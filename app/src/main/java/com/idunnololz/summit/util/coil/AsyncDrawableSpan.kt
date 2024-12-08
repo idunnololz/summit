@@ -81,7 +81,7 @@ class AsyncDrawableSpan(
         // @since 4.4.0 use SpanUtils instead of `canvas.getWidth`
 
         val canvasWidth = SpanUtils.width(canvas, text)
-        val minWidth = min(minImageWidth, canvasWidth)
+        val minWidth = minImageWidth
 
         drawable.initWithKnownDimensions(
             max(canvasWidth - x.toInt(), minWidth),

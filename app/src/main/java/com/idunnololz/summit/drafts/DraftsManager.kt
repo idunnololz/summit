@@ -23,7 +23,6 @@ class DraftsManager @Inject constructor(
 
     private val coroutineScope = coroutineScopeFactory.create()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val dbContext = Dispatchers.IO.limitedParallelism(1)
 
     private val _onDraftChanged = MutableSharedFlow<Unit>()

@@ -329,6 +329,9 @@
         <action
             android:id="@+id/action_youFragment_to_draftsTabbedFragment"
             app:destination="@id/draftsTabbedFragment" />
+        <action
+            android:id="@+id/action_youFragment_to_userTagsFragment"
+            app:destination="@id/userTagsFragment" />
     </fragment>
     <fragment
         android:id="@+id/hiddenPostsFragment2"
@@ -355,4 +358,8 @@
         android:id="@+id/draftsTabbedFragment"
         android:name="com.idunnololz.summit.drafts.DraftsTabbedFragment"
         android:label="DraftsTabbedFragment" />
+    <fragment
+        android:id="@+id/userTagsFragment"
+        android:name="com.idunnololz.summit.lemmy.userTags.UserTagsFragment"
+        android:label="UserTagsFragment" />
 </navigation>

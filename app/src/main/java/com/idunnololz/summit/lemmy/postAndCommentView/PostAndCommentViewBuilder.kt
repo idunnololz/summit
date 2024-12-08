@@ -121,6 +121,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val avatarHelper: AvatarHelper,
+    private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -149,7 +150,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var globalFontSizeMultiplier: Float =
         GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
 
-    val lemmyHeaderHelper = LemmyHeaderHelper(context)
+    val lemmyHeaderHelper = lemmyHeaderHelperFactory.create(context)
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
@@ -375,9 +376,9 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (parseMarkdownInPostTitles) {
             LemmyTextHelper.bindText(
-                title,
-                postView.post.name,
-                instance,
+                textView = title,
+                text = postView.post.name,
+                instance = instance,
                 showMediaAsLinks = true,
                 highlight = if (highlightTextData?.targetSubtype == 0) {
                     highlightTextData

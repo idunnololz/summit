@@ -247,4 +247,6 @@
     <item name="blocked" type="id" />
     <item name="downvoted" type="id" />
     <item name="account_settings" type="id" />
+    <item name="pa_tag_user" type="id" />
+    <item name="user_tags" type="id" />
 </resources>
