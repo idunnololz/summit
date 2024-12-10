@@ -763,6 +763,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         headerView.setOnClickListener {
             collapseSection(h.absoluteAdapterPosition)
         }
+        headerView.dim(dim = true)
 
         actionButtons.forEach {
             it.setOnClickListener {

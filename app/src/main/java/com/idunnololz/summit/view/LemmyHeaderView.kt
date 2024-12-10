@@ -119,9 +119,20 @@ class LemmyHeaderView : FrameLayout {
             ),
         )
         ellipsize = TextUtils.TruncateAt.END
-        alpha = 0.8f
 
         return this
+    }
+
+    fun dim(dim: Boolean) {
+        val alpha = if (dim) {
+            0.8f
+        } else {
+            1f
+        }
+
+        textView1.alpha = alpha
+        textView2.alpha = alpha
+        textView3.alpha = alpha
     }
 
     fun setTypeface(typeface: Typeface?) {
