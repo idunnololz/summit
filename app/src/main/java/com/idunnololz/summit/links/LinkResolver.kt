@@ -130,7 +130,13 @@ object LinkResolver {
                     ?: return defaultResult
                 val postId = postIdStr.toIntOrNull()
 
-                if (uri.pathSegments.size > 2) {
+                if (uri.pathSegments.size == 3) {
+                    val commentId = uri.pathSegments.getOrNull(2)?.toIntOrNull()
+
+                    if (commentId != null) {
+                        return CommentRef(instance, commentId)
+                    }
+                } else if (uri.pathSegments.size > 3) {
                     return null
                 }
 

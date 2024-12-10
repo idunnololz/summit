@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
+import android.text.Spannable
 import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
@@ -36,12 +38,15 @@ import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
+import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
@@ -55,6 +60,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -87,6 +93,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
+
+    @Inject
+    lateinit var userTagsManager: UserTagsManager
 
     val viewModel: PersonTabbedViewModel by viewModels()
     var slidingPaneController: SlidingPaneController? = null
@@ -252,6 +261,12 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         binding.fab.setOnClickListener {
             showOverflowMenu()
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            userTagsManager.onChangedFlow.collect {
+                onUserTagChanged()
+            }
+        }
     }
 
     private fun onPersonChanged() {
@@ -304,6 +319,13 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 icon = R.drawable.baseline_message_24,
             )
 
+
+            addItemWithIcon(
+                id = R.id.tag_user,
+                title = getString(R.string.tag_user_format, personRef.name),
+                icon = R.drawable.outline_sell_24,
+            )
+
             if (moreActionsHelper.fullAccount?.isPersonBlocked(personRef) == true) {
                 addItemWithIcon(
                     id = R.id.unblock_user,
@@ -339,6 +361,12 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                             childFragmentManager,
                             viewModel.instance,
                             person.id,
+                        )
+                    }
+                    R.id.tag_user -> {
+                        AddOrEditUserTagDialogFragment.show(
+                            fragmentManager = childFragmentManager,
+                            person = person,
                         )
                     }
                 }
@@ -422,7 +450,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 }
             }
             name.text = displayName
-            subtitle.text = data.personView.person.fullName
             subtitle2.text = buildSpannedString {
                 append(
                     context.resources.getQuantityString(
@@ -468,6 +495,30 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 binding.viewPager,
                 binding.viewPager.adapter as ViewPagerAdapter,
             ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
+        }
+        onUserTagChanged()
+    }
+
+    private fun onUserTagChanged() {
+        val data = viewModel.personData.valueOrNull ?: return
+
+        binding.subtitle.text = buildSpannedString {
+            append(data.personView.person.fullName)
+
+            val tag = userTagsManager.getUserTag(data.personView.person.fullName)
+            if (tag != null) {
+                append(" ")
+                val s = length
+                append(tag.tagName)
+                val e = length
+
+                setSpan(
+                    RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
         }
     }
 

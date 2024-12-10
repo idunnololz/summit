@@ -12,7 +12,7 @@ interface UserTagsDao {
     @Query("SELECT * FROM user_tags")
     suspend fun getAllUserTags(): List<UserTagEntry>
 
-    @Query("SELECT * FROM user_tags WHERE actor_id = :user")
+    @Query("SELECT * FROM user_tags WHERE actor_id = :user COLLATE NOCASE")
     suspend fun getUserTag(user: String): List<UserTagEntry>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -1,11 +1,14 @@
 package com.idunnololz.summit.lemmy.userTags
 
 import android.util.Log
+import com.idunnololz.summit.actions.PostReadManager
+import com.idunnololz.summit.actions.PostReadManager.Companion
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,12 +28,8 @@ class UserTagsManager @Inject constructor(
 
     val onChangedFlow = MutableSharedFlow<Unit>()
 
-    init {
-        coroutineScope.launch {
-            delay(1000)
-
-            initialize()
-        }
+    suspend fun init() {
+        initialize()
     }
 
     private suspend fun initialize() {
@@ -41,7 +40,7 @@ class UserTagsManager @Inject constructor(
         Log.d(TAG, "reload()")
 
         userTagsByName = dao.getAllUserTags()
-            .associate { it.tag.tagName to it.tag }
+            .associate { it.actorId to it.tag }
     }
 
     fun addOrUpdateTag(personName: String, tag: String, fillColor: Int, strokeColor: Int) {
@@ -61,7 +60,7 @@ class UserTagsManager @Inject constructor(
                 dao.insertUserTag(
                     UserTagEntry(
                         id = 0,
-                        actorId = personName,
+                        actorId = personName.lowercase(Locale.US),
                         tag = UserTagConfig(
                             tag,
                             fillColor,
@@ -75,7 +74,7 @@ class UserTagsManager @Inject constructor(
                 dao.insertUserTag(
                     UserTagEntry(
                         id = entry.id,
-                        actorId = personName,
+                        actorId = personName.lowercase(Locale.US),
                         tag = UserTagConfig(
                             tag,
                             fillColor,
@@ -91,19 +90,29 @@ class UserTagsManager @Inject constructor(
         }
     }
 
+    suspend fun getAllUserTags(): List<UserTagEntry> {
+        return coroutineScope.async {
+            dao.getAllUserTags()
+        }.await()
+    }
+
+    fun getUserTag(fullName: String): UserTagConfig? {
+        return userTagsByName[fullName.lowercase(Locale.US)]
+    }
+
+    fun deleteTag(personName: String) {
+        coroutineScope.launch {
+            dao.getUserTag(personName).forEach {
+                dao.delete(it)
+            }
+
+            onChanged()
+        }
+    }
+
     private suspend fun onChanged() {
         reload()
 
         onChangedFlow.emit(Unit)
-    }
-
-    suspend fun getAllUserTags(): List<UserTagConfig> {
-        return coroutineScope.async {
-            dao.getAllUserTags()
-        }.await().map { it.tag }
-    }
-
-    fun getUserTag(fullName: String): UserTagConfig? {
-        return userTagsByName[fullName]
     }
 }

@@ -52,9 +52,9 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
         val viewModel = parentFragment.viewModel
 
         adapter = PostListAdapter(
-            postListViewBuilder,
-            requireContext(),
-            viewModel.postListEngine,
+            postListViewBuilder = postListViewBuilder,
+            context = requireContext(),
+            postListEngine = viewModel.postListEngine,
             onNextClick = {
 //                viewModel.fetchNextPage(clearPagePosition = true)
             },
@@ -137,6 +137,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
         ).apply {
+            alwaysRenderAsUnread = true
             updateWithPreferences(preferences)
         }
         onSelectedLayoutChanged()

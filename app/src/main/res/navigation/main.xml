@@ -328,10 +328,18 @@
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_youFragment_to_draftsTabbedFragment"
-            app:destination="@id/draftsTabbedFragment" />
+            app:destination="@id/draftsTabbedFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/action_youFragment_to_userTagsFragment"
-            app:destination="@id/userTagsFragment" />
+            app:destination="@id/userTagsFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/hiddenPostsFragment2"

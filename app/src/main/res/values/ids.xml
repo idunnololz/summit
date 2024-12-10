@@ -249,4 +249,7 @@
     <item name="account_settings" type="id" />
     <item name="pa_tag_user" type="id" />
     <item name="user_tags" type="id" />
+    <item name="ca_tag_user" type="id" />
+    <item name="tag_user" type="id" />
+    <item name="ghost_item" type="id"/>
 </resources>

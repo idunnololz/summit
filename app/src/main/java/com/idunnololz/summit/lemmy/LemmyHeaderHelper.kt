@@ -303,6 +303,22 @@ class LemmyHeaderHelper @AssistedInject constructor(
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
+
+            val tag = userTagsManager.getUserTag(postView.creator.fullName)
+            if (tag != null) {
+                sb.append(" ")
+                val s = sb.length
+                sb.append(tag.tagName)
+                val e = sb.length
+                sb.append(" ") // used to prevent layout issues
+
+                sb.setSpan(
+                    RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
         }
         if (showUpvotePercentage) {
             sb.appendSeparator()
@@ -476,6 +492,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
         val tag = userTagsManager.getUserTag(commentView.creator.fullName)
         if (tag != null) {
+            sb.append(" ")
             val s = sb.length
             sb.append(tag.tagName)
             val e = sb.length

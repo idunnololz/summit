@@ -830,7 +830,7 @@ class Preferences(
         }
 
     var showProfileIcons: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_PROFILE_ICONS, false)
+        get() = prefs.getBoolean(KEY_SHOW_PROFILE_ICONS, true)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_SHOW_PROFILE_ICONS, value)
@@ -1021,7 +1021,7 @@ class Preferences(
         }
 
     var useCondensedTypefaceForCommentHeaders: Boolean
-        get() = prefs.getBoolean(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, false)
+        get() = prefs.getBoolean(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, true)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, value)
