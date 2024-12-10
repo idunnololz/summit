@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Event
@@ -38,6 +39,7 @@ class MainActivityViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
+    private val userTagsManager: UserTagsManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
     val userCommunitiesManager: UserCommunitiesManager,
     val postReadManager: PostReadManager,
@@ -114,6 +116,15 @@ class MainActivityViewModel @Inject constructor(
 
                 withContext(Dispatchers.Main) {
                     Log.d(TAG, "'PostReadyManager' ready!")
+                    readyCount.emit(readyCount.value + 1)
+                }
+            }
+
+            launch {
+                userTagsManager.init()
+
+                withContext(Dispatchers.Main) {
+                    Log.d(TAG, "'UserTagsManager' ready!")
                     readyCount.emit(readyCount.value + 1)
                 }
             }
@@ -240,6 +251,6 @@ class MainActivityViewModel @Inject constructor(
     private fun Flow<Int>.completeWhenDone(): Flow<Int> = transformWhile { readyCount ->
         emit(readyCount) // always emit progress
 
-        readyCount < 3
+        readyCount < 4
     }
 }

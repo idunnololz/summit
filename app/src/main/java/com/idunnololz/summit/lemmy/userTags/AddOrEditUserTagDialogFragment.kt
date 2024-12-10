@@ -25,11 +25,13 @@ import dagger.hilt.android.AndroidEntryPoint
 class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEditUserTagBinding>() {
 
     companion object {
-        fun show(fragmentManager: FragmentManager, person: Person?) {
+        fun show(fragmentManager: FragmentManager, person: Person? = null, userTag: UserTag? = null) {
             AddOrEditUserTagDialogFragment()
                 .apply {
-                    arguments = AddOrEditUserTagDialogFragmentArgs(person = person)
-                        .toBundle()
+                    arguments = AddOrEditUserTagDialogFragmentArgs(
+                        person = person,
+                        userTag = userTag,
+                    ).toBundle()
                 }
                 .show(fragmentManager, "AddOrEditUserTagDialogFragment")
         }
@@ -67,8 +69,12 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
 
         if (savedInstanceState == null) {
             val person = args.person
+            val userTag = args.userTag
             if (person != null) {
                 viewModel.personName = person.fullName
+            }
+            if (userTag != null) {
+                viewModel.personName = userTag.personName
             }
 
             viewModel.fillColor =
@@ -86,7 +92,6 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             )
             if (result != null) {
                 viewModel.personName = result.personRef.fullName
-                viewModel.generateModel()
             }
         }
 
@@ -100,37 +105,37 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
                 dismiss()
             }
 
-            personInputLayout.setOnClickListener {
-                PersonPickerDialogFragment.show(childFragmentManager)
-            }
-            personEditText.setOnClickListener {
-                PersonPickerDialogFragment.show(childFragmentManager)
-            }
             personEditText.setOnFocusChangeListener { view, b ->
-                if (personEditText.hasFocus()) {
-                    personEditText.clearFocus()
-                    PersonPickerDialogFragment.show(childFragmentManager)
-                }
+                showPersonPicker()
             }
 
             changeFillColorButton.setOnClickListener {
-                showColorPicker {
+                showColorPicker(viewModel.fillColor) {
                     viewModel.fillColor = it
-                    viewModel.generateModel()
                 }
             }
             changeStrokeColorButton.setOnClickListener {
-                showColorPicker {
+                showColorPicker(viewModel.strokeColor) {
                     viewModel.fillColor = it
-                    viewModel.generateModel()
                 }
             }
 
             positiveButton.setOnClickListener {
-                viewModel.personName = requireNotNull(binding.personEditText.text?.toString())
-                viewModel.tag = requireNotNull(binding.tagEditText.text?.toString())
+                // Remember the values before we set them as setting them will revert their values
+                val personName = requireNotNull(binding.personEditText.text?.toString())
+                val tag = requireNotNull(binding.tagEditText.text?.toString())
+
+                viewModel.personName = personName
+                viewModel.tag = tag
 
                 viewModel.addTag()
+            }
+            negativeButton.setOnClickListener {
+                dismiss()
+            }
+            neutralButton.setOnClickListener {
+                viewModel.deleteUserTag()
+                dismiss()
             }
 
             viewModel.model.observe(viewLifecycleOwner) {
@@ -144,6 +149,17 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
         viewModel.tag = requireNotNull(binding.tagEditText.text?.toString())
 
         super.onPause()
+    }
+
+    private fun showPersonPicker() {
+        val personEditText = binding.personEditText
+
+        if (personEditText.hasFocus()) {
+            val prefill = personEditText.text?.split("@")?.firstOrNull().toString()
+
+            personEditText.clearFocus()
+            PersonPickerDialogFragment.show(childFragmentManager, prefill)
+        }
     }
 
     private fun updateRender() {
@@ -163,10 +179,15 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
 
             tagFillColorInner.background = ColorDrawable(model.fillColor)
             tagStrokeColorInner.background = ColorDrawable(model.strokeColor)
+            neutralButton.visibility = if (model.showDeleteButton) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
         }
     }
 
-    private fun showColorPicker(onColorPicked: (Int) -> Unit) {
+    private fun showColorPicker(initialColor: Int, onColorPicked: (Int) -> Unit) {
         val context = requireContext()
         ColorPickerDialog.Builder(context)
             .setTitle(R.string.tag_fill_color)
@@ -182,6 +203,9 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             .attachAlphaSlideBar(true) // the default value is true.
             .attachBrightnessSlideBar(true) // the default value is true.
             .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
+            .apply {
+                colorPickerView.setInitialColor(initialColor)
+            }
             .show()
     }
 }

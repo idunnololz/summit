@@ -65,6 +65,7 @@ import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
@@ -149,6 +150,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var userTagsManager: UserTagsManager
 
     lateinit var preferences: Preferences
 
@@ -484,7 +488,6 @@ class CommunityFragment :
             }
 
             viewModel.updatePreferences()
-            loadingView.hideAll()
 
             lemmyAppBarController = LemmyAppBarController(
                 mainActivity = requireMainActivity(),
@@ -916,7 +919,10 @@ class CommunityFragment :
                         }
                     }
 
-                    is StatefulData.NotStarted -> {}
+                    is StatefulData.NotStarted -> {
+                        loadingView.hideAll()
+                    }
+
                     is StatefulData.Success -> {
                         loadingView.hideAll()
 
@@ -992,6 +998,12 @@ class CommunityFragment :
                         viewModel.unhidePost(hiddenPost.postId, hiddenPost.instance)
                     }
                     .show()
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                userTagsManager.onChangedFlow.collect {
+                    adapter?.notifyDataSetChanged()
+                }
             }
 
             if (adapter?.items.isNullOrEmpty()) {

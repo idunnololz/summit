@@ -62,6 +62,7 @@ import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
+import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
@@ -142,6 +143,9 @@ class PostFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var userTagsManager: UserTagsManager
 
     lateinit var preferences: Preferences
 
@@ -744,6 +748,12 @@ class PostFragment :
                 adapter?.contentMaxWidth = binding.recyclerView.width
 
                 setup()
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                userTagsManager.onChangedFlow.collect {
+                    adapter?.notifyDataSetChanged()
+                }
             }
         }
     }

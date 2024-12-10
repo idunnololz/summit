@@ -114,17 +114,6 @@ class PersonPickerDialogFragment :
         val context = requireContext()
 
         with(binding) {
-            val prefill = args.prefill
-
-            if (prefill != null &&
-                !isPrefillUsed &&
-                searchEditText.text.isNullOrBlank() &&
-                savedInstanceState == null) {
-
-                isPrefillUsed = true
-                searchEditText.setText(prefill)
-            }
-
             searchEditText.addTextChangedListener {
                 val query = it?.toString() ?: ""
                 adapter?.setQuery(query) {
@@ -172,6 +161,17 @@ class PersonPickerDialogFragment :
                         adapter?.setQueryServerResults(it.data)
                     }
                 }
+            }
+
+            val prefill = args.prefill
+
+            if (prefill != null &&
+                !isPrefillUsed &&
+                searchEditText.text.isNullOrBlank() &&
+                savedInstanceState == null) {
+
+                isPrefillUsed = true
+                searchEditText.setText(prefill)
             }
         }
 

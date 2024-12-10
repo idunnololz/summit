@@ -1338,13 +1338,27 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (item.isDeleted) {
             b.content.text = buildSpannedString {
-                append(context.getString(R.string.deleted_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+                val s = length
+                append(context.getString(R.string.deleted))
+                val e = length
+                setSpan(
+                    BorderedSpan(context),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
             }
         } else if (item.isRemoved) {
             b.content.text = buildSpannedString {
-                append(context.getString(R.string.removed_special))
-                setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
+                val s = length
+                append(context.getString(R.string.removed))
+                val e = length
+                setSpan(
+                    BorderedSpan(context),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
             }
         } else {
             LemmyTextHelper.bindText(

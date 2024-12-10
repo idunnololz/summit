@@ -2,17 +2,21 @@ package com.idunnololz.summit.lemmy.userTags
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Spannable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.buildSpannedString
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentUserTagsBinding
 import com.idunnololz.summit.databinding.ItemUserTagsUserTagBinding
+import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -23,7 +27,8 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
+class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
+    AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: UserTagsViewModel by viewModels()
 
@@ -31,7 +36,7 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         setBinding(FragmentUserTagsBinding.inflate(inflater, container, false))
@@ -45,7 +50,6 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
         val context = requireContext()
 
         with(binding) {
-
             requireMainActivity().apply {
                 insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
@@ -58,7 +62,20 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
                 }
             }
 
-            val adapter = UserTagsAdapter(context)
+            val adapter = UserTagsAdapter(
+                context = context,
+                onUserTagClick = {
+                    AddOrEditUserTagDialogFragment.show(childFragmentManager, userTag = it)
+                },
+                onDeleteClick = {
+                    AlertDialogFragment.Builder()
+                        .setExtra("tag", it.personName)
+                        .setMessage(getString(R.string.warn_delete_user_tag, it.personName))
+                        .setPositiveButton(R.string.delete)
+                        .setNegativeButton(R.string.cancel)
+                        .createAndShow(childFragmentManager, "delete_user_tag")
+                }
+            )
 
             toolbar.setTitle(R.string.user_tags)
             toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
@@ -98,10 +115,10 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
                         swipeRefreshLayout.isRefreshing = false
                         loadingView.hideAll()
 
+                        adapter.setData(it.data)
+
                         if (it.data.userTags.isEmpty()) {
                             loadingView.showErrorText(R.string.there_doesnt_seem_to_be_anything_here)
-                        } else {
-                            adapter.setData(it.data)
                         }
                     }
                 }
@@ -111,11 +128,13 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
 
     private class UserTagsAdapter(
         private val context: Context,
+        private val onUserTagClick: (UserTag) -> Unit,
+        private val onDeleteClick: (UserTag) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         sealed interface Item {
             data class UserTagItem(
-                val userTag: UserTagConfig
+                val userTag: UserTag
             ) : Item
         }
 
@@ -123,7 +142,7 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
             areItemsTheSame = { old, new ->
                 old::class == new::class && when (old) {
                     is Item.UserTagItem -> {
-                        old.userTag.tagName == (new as Item.UserTagItem).userTag.tagName
+                        old.userTag.personName == (new as Item.UserTagItem).userTag.personName
                     }
                 }
             }
@@ -132,7 +151,30 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
                 clazz = Item.UserTagItem::class,
                 inflateFn = ItemUserTagsUserTagBinding::inflate
             ) { item, b, h ->
-                b.title.text = item.userTag.tagName
+                b.title.text = item.userTag.personName
+                b.body.text = buildSpannedString {
+                    val tag = item.userTag.config
+
+                    val s = length
+                    append(tag.tagName)
+                    val e = length
+
+                    append(" ")
+
+                    setSpan(
+                        RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
+                        s,
+                        e,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                }
+
+                b.root.setOnClickListener {
+                    onUserTagClick(item.userTag)
+                }
+                b.delete.setOnClickListener {
+                    onDeleteClick(item.userTag)
+                }
             }
         }
 
@@ -159,14 +201,21 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
             val data = data
             val newItems = mutableListOf<Item>()
 
-            if (data != null) {
-                data.userTags.mapTo(newItems) {
-                    Item.UserTagItem(it)
-                }
+            data?.userTags?.mapTo(newItems) {
+                Item.UserTagItem(it)
             }
 
             adapterHelper.setItems(newItems, this)
         }
 
+    }
+
+    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+        val personName = dialog.getExtra("tag")
+
+        viewModel.deleteTag(personName)
+    }
+
+    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 }

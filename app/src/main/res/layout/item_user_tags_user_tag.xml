@@ -11,11 +11,36 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
-        android:layout_margin="@dimen/padding"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/delete"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/body"/>
+
+    <TextView
+        android:id="@+id/body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintEnd_toEndOf="@+id/title"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_close_24"
+        android:padding="12dp"
+        android:background="?selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="?colorControlNormal" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider"

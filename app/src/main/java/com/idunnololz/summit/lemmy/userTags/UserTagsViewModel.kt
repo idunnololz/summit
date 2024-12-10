@@ -15,7 +15,7 @@ class UserTagsViewModel @Inject constructor(
 ): ViewModel() {
 
     data class Model(
-        val userTags: List<UserTagConfig>,
+        val userTags: List<UserTag>,
     )
 
     val model = StatefulLiveData<Model>()
@@ -49,8 +49,20 @@ class UserTagsViewModel @Inject constructor(
             model.postValue(
                 Model(
                     userTagsManager.getAllUserTags()
+                        .map {
+                            UserTag(
+                                it.actorId,
+                                it.tag,
+                            )
+                        }
                 )
             )
         }
+    }
+
+    fun deleteTag(personName: String?) {
+        personName ?: return
+
+        userTagsManager.deleteTag(personName)
     }
 }

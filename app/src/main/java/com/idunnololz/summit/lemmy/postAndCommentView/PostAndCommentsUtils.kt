@@ -20,6 +20,7 @@ import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
+import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.Preferences
@@ -167,6 +168,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
         )
         addDivider()
 
+        addItemWithIcon(
+            R.id.ca_tag_user,
+            getString(R.string.tag_user_format, commentView.creator.name),
+            R.drawable.outline_sell_24,
+        )
         addItemWithIcon(R.id.ca_view_source, R.string.view_raw, R.drawable.baseline_code_24)
         addItemWithIcon(
             R.id.ca_detailed_view,
@@ -334,6 +340,12 @@ fun BaseFragment<*>.createCommentActionHandler(
         }
         R.id.ca_copy_text -> {
             Utils.copyToClipboard(context, commentView.comment.content)
+        }
+        R.id.ca_tag_user -> {
+            AddOrEditUserTagDialogFragment.show(
+                fragmentManager = childFragmentManager,
+                person = commentView.creator,
+            )
         }
     }
 }

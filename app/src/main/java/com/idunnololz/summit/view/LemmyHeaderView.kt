@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Build
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -117,6 +118,8 @@ class LemmyHeaderView : FrameLayout {
                 context.getColorFromAttribute(R.attr.colorControlNormal),
             ),
         )
+        ellipsize = TextUtils.TruncateAt.END
+        alpha = 0.8f
 
         return this
     }
@@ -201,7 +204,10 @@ class LemmyHeaderView : FrameLayout {
                 viewWidth += getViewWidth(iconImageView)
             }
 
-            viewWidth += max(getViewWidth(textView1), getViewWidth(textView2))
+            viewWidth += max(
+                getViewWidth(textView1),
+                getViewWidth(textView2) + getViewWidth(textView3)
+            )
 
             setMeasuredDimension(
                 viewWidth + paddingStart + paddingEnd,
