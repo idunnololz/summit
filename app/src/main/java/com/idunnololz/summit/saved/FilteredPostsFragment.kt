@@ -82,12 +82,19 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
                     .createAndShow(childFragmentManager, "onInstanceMismatch")
             },
             onImageClick = { _, postView, sharedElementView, url ->
+                val altUrl = if (url == postView.post.thumbnail_url) {
+                    postView.post.url
+                } else {
+                    null
+                }
+
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
                     appBar = parentFragment.binding.appBar,
                     title = postView.post.name,
                     url = url,
                     mimeType = null,
+                    urlAlt = altUrl,
                 )
             },
             onVideoClick = { url, videoType, state ->

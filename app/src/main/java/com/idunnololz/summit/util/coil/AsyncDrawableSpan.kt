@@ -2,15 +2,19 @@ package com.idunnololz.summit.util.coil
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.text.Spanned
 import android.text.style.ReplacementSpan
+import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.IntRange
 import com.idunnololz.summit.util.Utils
 import io.noties.markwon.core.MarkwonTheme
+import io.noties.markwon.core.spans.TextLayoutSpan
+import io.noties.markwon.core.spans.TextViewSpan
+import io.noties.markwon.ext.tables.TableDrawableSpan
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.utils.SpanUtils
 import kotlin.math.max
-import kotlin.math.min
 
 // @since 4.2.1 we do not set intrinsic bounds
 //  at this point they will always be 0,0-1,1, but this
@@ -20,7 +24,7 @@ class AsyncDrawableSpan(
     val drawable: AsyncDrawable,
     @param:Alignment private val alignment: Int,
     private val replacementTextIsLink: Boolean,
-) : ReplacementSpan() {
+) : ReplacementSpan(), TableDrawableSpan {
 
     private val minImageWidth = Utils.convertDpToPixel(64f).toInt()
 
@@ -29,6 +33,8 @@ class AsyncDrawableSpan(
         AnnotationRetention.SOURCE,
     )
     internal annotation class Alignment
+
+    private var canvasSize: Int = 0
 
     override fun getSize(
         paint: Paint,
@@ -42,6 +48,13 @@ class AsyncDrawableSpan(
         val size: Int
 
         if (drawable.hasResult()) {
+            if (canvasSize > 0 && !drawable.hasKnownDimensions()) {
+                drawable.initWithKnownDimensions(
+                    width(canvasSize, text),
+                    paint.textSize,
+                )
+            }
+
             val rect = drawable.bounds
 
             if (fm != null) {
@@ -78,10 +91,10 @@ class AsyncDrawableSpan(
         bottom: Int,
         paint: Paint,
     ) {
-        // @since 4.4.0 use SpanUtils instead of `canvas.getWidth`
-
         val canvasWidth = SpanUtils.width(canvas, text)
         val minWidth = minImageWidth
+
+        canvasSize = canvasWidth
 
         drawable.initWithKnownDimensions(
             max(canvasWidth - x.toInt(), minWidth),
@@ -133,5 +146,34 @@ class AsyncDrawableSpan(
             return (top + ((bottom - top) / 2) - ((paint.descent() + paint.ascent()) / 2f + .5f)).toInt()
                 .toFloat()
         }
+    }
+
+    override fun setWidthHint(width: Int) {
+        canvasSize = width
+    }
+
+    fun width(width: Int, cs: CharSequence): Int {
+        // Layout
+        // TextView
+        // canvas
+
+        if (cs is Spanned) {
+            val spanned = cs
+
+            // if we are displayed with layout information -> use it
+            val layout = TextLayoutSpan.layoutOf(spanned)
+            if (layout != null) {
+                return layout.width
+            }
+
+            // if we have TextView -> obtain width from it (exclude padding)
+            val textView = TextViewSpan.textViewOf(spanned)
+            if (textView != null) {
+                return textView.width - textView.paddingLeft - textView.paddingRight
+            }
+        }
+
+        // else just use canvas width
+        return width
     }
 }

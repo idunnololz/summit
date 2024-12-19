@@ -23,6 +23,7 @@ work = "2.10.0"
 coil = "2.5.0"
 retrofit = "2.11.0"
 jetbrainsKotlinJvm = "2.0.21"
+commonmark = "0.13.0"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -118,6 +119,8 @@ documentfile = { module = "androidx.documentfile:documentfile", version = "1.0.1
 hilt-common = { module = "androidx.hilt:hilt-common", version = "1.2.0"}
 hilt-work = { module = "androidx.hilt:hilt-work", version = "1.2.0" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version = "1.2.0" }
+
+commonmark-table = { module = "com.atlassian.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

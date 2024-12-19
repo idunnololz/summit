@@ -662,7 +662,7 @@ class PostViewModel @Inject constructor(
                     val oldComments = this@PostViewModel.comments
                     val newComments = result.getOrNull()
 
-                    var allCommentsUpdates = true // tracks if all comments are updated on the server
+                    var allCommentsUpdated = true // tracks if all comments are updated on the server
 
                     if (oldComments != null && newComments != null) {
                         for (completedPendingComment in completedPendingComments) {
@@ -681,7 +681,7 @@ class PostViewModel @Inject constructor(
                                         "1 completed pending comment was not " +
                                             "updated on the server.",
                                     )
-                                    allCommentsUpdates = false
+                                    allCommentsUpdated = false
                                 } else {
                                     Log.d(
                                         TAG,
@@ -698,8 +698,8 @@ class PostViewModel @Inject constructor(
                     // overridden by supplementary comments. So invalidate those...
                     invalidateSupplementaryComments(newComments)
 
-                    if (allCommentsUpdates) {
-                        delay(1000)
+                    if (allCommentsUpdated) {
+                        delay(600)
                         break
                     }
                 }
@@ -742,6 +742,14 @@ class PostViewModel @Inject constructor(
 
                         accountActionsManager.removePendingComment(pendingComment)
                     }
+                }
+
+                withContext(Dispatchers.Main) {
+                    fetchPostData(
+                        fetchPostData = true,
+                        fetchCommentData = false,
+                        force = true,
+                    )
                 }
             }
         }

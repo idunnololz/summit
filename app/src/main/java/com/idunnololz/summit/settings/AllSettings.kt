@@ -2105,6 +2105,8 @@ class NavigationSettings @Inject constructor(
         navBarDest3,
         navBarDest4,
         navBarDest5,
+        useBottomNavBar,
+        useCustomNavBar,
         navigationRailMode,
     )
 }

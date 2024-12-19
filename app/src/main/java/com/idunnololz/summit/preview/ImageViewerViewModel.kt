@@ -5,4 +5,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ImageViewerViewModel @Inject constructor() : ViewModel()
+class ImageViewerViewModel @Inject constructor() : ViewModel() {
+    var url: String? = null
+}

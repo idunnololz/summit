@@ -683,19 +683,29 @@ class PostListViewBuilder @Inject constructor(
                     when (val rb = rawBinding) {
                         is ListingItemCardBinding -> {
                             val lp = rb.cardView.layoutParams as MarginLayoutParams
-                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                            val imageLp = rb.image.layoutParams as MarginLayoutParams
+
+                            contentMaxWidth - lp.marginStart - lp.marginEnd -
+                                imageLp.marginStart - imageLp.marginEnd
                         }
                         is ListingItemCard2Binding -> {
                             val lp = rb.cardView.layoutParams as MarginLayoutParams
-                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                            val imageLp = rb.image.layoutParams as MarginLayoutParams
+
+                            contentMaxWidth - lp.marginStart - lp.marginEnd -
+                                imageLp.marginStart - imageLp.marginEnd
                         }
                         is ListingItemCard3Binding -> {
                             val lp = rb.cardView.layoutParams as MarginLayoutParams
-                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                            val imageLp = rb.image.layoutParams as MarginLayoutParams
+
+                            contentMaxWidth - lp.marginStart - lp.marginEnd -
+                                imageLp.marginStart - imageLp.marginEnd
                         }
                         is ListingItemLargeListBinding -> {
-                            val lp = rb.image.layoutParams as MarginLayoutParams
-                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                            val imageLp = rb.image.layoutParams as MarginLayoutParams
+
+                            contentMaxWidth - imageLp.marginStart - imageLp.marginEnd
                         }
                         else -> contentMaxWidth
                     }
@@ -972,11 +982,14 @@ class PostListViewBuilder @Inject constructor(
                 if (renderAsRead) {
                     if (themeManager.isLightTheme) {
                         contentView.alpha = 0.5f
+                        title.alpha = 0.5f
                     } else {
                         contentView.alpha = 0.6f
+                        title.alpha = 0.66f
                     }
                 } else {
                     contentView.alpha = 1f
+                    title.alpha = 1f
                 }
             } else {
                 if (renderAsRead) {

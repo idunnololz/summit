@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.text.Spanned
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -458,6 +459,10 @@ class PostAdapter(
                     } else {
                         null
                     }
+                    val k = "post:${item.postView.post.id}:${item.postView.post.updated
+                        ?: item.postView.post.published}"
+
+                    Log.d("HAHA", "postKey: ${k} cacheHit? ${contentCache[k] != null}")
 
                     postAndCommentViewBuilder.bindPostView(
                         binding = b,
@@ -479,6 +484,7 @@ class PostAdapter(
                                 item.currentMatch?.targetSubtype,
                             )
                         },
+                        contentSpannable = contentCache[k],
                         onRevealContentClickedFn = {
                             revealedItems.add(postKey)
                             notifyItemChanged(holder.absoluteAdapterPosition)
@@ -496,6 +502,9 @@ class PostAdapter(
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
                         screenshotConfig = screenshotConfig,
+                        onTextBound = {
+                            contentCache[k] = it
+                        },
                     )
 
                     if (item.showBottomDivider) {
@@ -543,7 +552,10 @@ class PostAdapter(
                 } else {
                     null
                 }
+                val k = "post:${item.postView.post.id}:${item.postView.post.updated
+                    ?: item.postView.post.published}"
 
+                Log.d("HAHA", "postKey2: ${k} cacheHit? ${contentCache[k] != null}")
                 holder.itemView.setTag(R.id.swipeable, true)
 
                 postAndCommentViewBuilder.bindPostView(
@@ -566,6 +578,7 @@ class PostAdapter(
                             item.currentMatch?.targetSubtype,
                         )
                     },
+                    contentSpannable = contentCache[k],
                     onRevealContentClickedFn = {
                         revealedItems.add(postKey)
                         notifyItemChanged(holder.absoluteAdapterPosition)
@@ -583,6 +596,9 @@ class PostAdapter(
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                     screenshotConfig = screenshotConfig,
+                    onTextBound = {
+                        contentCache[k] = it
+                    },
                 )
 
                 if (item.showBottomDivider) {

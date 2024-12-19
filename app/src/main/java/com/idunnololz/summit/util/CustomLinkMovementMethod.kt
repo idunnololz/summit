@@ -383,16 +383,22 @@ class CustomLinkMovementMethod : LinkMovementMethod() {
                 (x % span.cellWidth()).toFloat(),
             )
 
-            val rowClickableTextSpans = (rowLayout.text as Spanned)
-                .getSpans(rowOffset, rowOffset, ClickableSpanWithText::class.java)
-            if (rowClickableTextSpans.isNotEmpty()) {
-                return rowClickableTextSpans[0]
+            val rowDetailsClickableSpans = (rowLayout.text as Spanned)
+                .getSpans(rowOffset, rowOffset, DetailsClickableSpan::class.java)
+            if (rowDetailsClickableSpans.isNotEmpty()) {
+                return rowDetailsClickableSpans[0]
             }
 
             val rowClickableSpans = (rowLayout.text as Spanned)
                 .getSpans(rowOffset, rowOffset, ClickableSpan::class.java)
             if (rowClickableSpans.isNotEmpty()) {
                 return rowClickableSpans[0]
+            }
+
+            val rowDrawableSpans = (rowLayout.text as Spanned)
+                .getSpans(rowOffset, rowOffset, AsyncDrawableSpan::class.java)
+            if (rowDrawableSpans.isNotEmpty()) {
+                return rowDrawableSpans[0]
             }
         }
         return null

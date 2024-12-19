@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 204
-        versionName = "1.48.1"
+        versionCode = 206
+        versionName = "1.49.1"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -64,6 +64,7 @@ dependencies {
     implementation(project(":gravitySnapHelper"))
     implementation(project(":imagepicker"))
     implementation(project(":overlappingPane"))
+    implementation(project(":markwon:markwon-ext-tables"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
@@ -120,7 +121,6 @@ dependencies {
     implementation(libs.retrofit2.converter.moshi)
 
     implementation(libs.markwon.core)
-    implementation(libs.markwon.ext.tables)
     implementation(libs.markwon.simple.ext)
     implementation(libs.markwon.html)
     implementation(libs.markwon.ext.strikethrough)

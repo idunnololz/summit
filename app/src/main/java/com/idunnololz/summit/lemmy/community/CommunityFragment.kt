@@ -326,12 +326,19 @@ class CommunityFragment :
                         .createAndShow(childFragmentManager, "onInstanceMismatch")
                 },
                 onImageClick = { accountId, postView, sharedElementView, url ->
+                    val altUrl = if (url == postView.post.thumbnail_url) {
+                        postView.post.url
+                    } else {
+                        null
+                    }
+
                     getMainActivity()?.openImage(
                         sharedElement = sharedElementView,
                         appBar = binding.customAppBar.root,
                         title = postView.post.name,
                         url = url,
                         mimeType = null,
+                        urlAlt = altUrl,
                     )
                     moreActionsHelper.onPostRead(
                         postView = postView,
