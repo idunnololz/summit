@@ -48,14 +48,14 @@ fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
         if (communityLayout == CommunityLayout.ListWithCards) {
             this.addItemDecoration(
                 VerticalSpaceItemDecoration(
-                    this.context.getDimen(R.dimen.padding_quarter),
+                    this.context.getDimen(R.dimen.padding_half),
                     true,
                 ),
             )
         } else {
             this.addItemDecoration(
                 VerticalSpaceItemDecoration(
-                    this.context.getDimen(R.dimen.padding),
+                    this.context.getDimen(R.dimen.padding_half),
                     true,
                 ),
             )

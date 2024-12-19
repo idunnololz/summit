@@ -121,6 +121,27 @@ class ImageViewerActivity :
 
         showAboveCutout()
 
+        if (args.urlAlt != null) {
+            binding.hdButton.visibility = View.VISIBLE
+
+            binding.hdButton.setOnClickListener {
+                if (viewModel.url == args.url) {
+                    viewModel.url = args.urlAlt
+                    binding.hdButton.setImageResource(R.drawable.baseline_hd_24)
+                } else {
+                    viewModel.url = args.url
+                    binding.hdButton.setImageResource(R.drawable.outline_hd_24)
+                }
+
+                loadImage(viewModel.url)
+            }
+
+        } else {
+            binding.hdButton.visibility = View.GONE
+        }
+
+        viewModel.url = args.url
+
         onViewCreated()
 
         setSupportActionBar(binding.toolbar)
@@ -261,10 +282,11 @@ class ImageViewerActivity :
 
         binding.loadingView.showProgressBar()
         binding.loadingView.setOnRefreshClickListener {
-            loadImage(args.url)
+            val url = viewModel.url ?: return@setOnRefreshClickListener
+            loadImage(url)
         }
 
-        loadImage(args.url)
+        loadImage(viewModel.url)
 
         binding.imageView.postDelayed({
             startPostponedEnterTransition()
@@ -347,27 +369,31 @@ class ImageViewerActivity :
         }
 
         binding.shareButton.setOnClickListener {
+            val url = viewModel.url ?: return@setOnClickListener
             createImageOrLinkActionsHandler(
-                args.url,
+                url,
                 moreActionsHelper,
                 supportFragmentManager,
                 args.mimeType,
             )(R.id.share_image)
         }
         binding.downloadButton.setOnClickListener {
+            val url = viewModel.url ?: return@setOnClickListener
             createImageOrLinkActionsHandler(
-                args.url,
+                url,
                 moreActionsHelper,
                 supportFragmentManager,
                 args.mimeType,
             )(R.id.download)
         }
         binding.infoButton.setOnClickListener {
-            ImageInfoDialogFragment.show(supportFragmentManager, args.url)
+            val url = viewModel.url ?: return@setOnClickListener
+            ImageInfoDialogFragment.show(supportFragmentManager, url)
         }
         binding.moreButton.setOnClickListener {
+            val url = viewModel.url ?: return@setOnClickListener
             showAdvancedLinkOptions(
-                args.url,
+                url,
                 moreActionsHelper,
                 supportFragmentManager,
                 args.mimeType,
@@ -388,22 +414,17 @@ class ImageViewerActivity :
         super.onDestroy()
     }
 
-    private fun downloadImage() {
-        createImageOrLinkActionsHandler(
-            args.url,
-            moreActionsHelper,
-            supportFragmentManager,
-            args.mimeType,
-        )(R.id.download)
-    }
-
     /**
      * @param forceLoadAsImage is true, will ignore the url format or domain and download the page
      * and pretend it's an image/gif
      */
-    private fun loadImage(url: String, forceLoadAsImage: Boolean = false) {
+    private fun loadImage(url: String?, forceLoadAsImage: Boolean = false) {
+        url ?: return
+
         val uri = Uri.parse(url)
-        if (uri.host == "imgur.com" && !forceLoadAsImage && uri.encodedPath?.endsWith(".png") != true) {
+        if (uri.host == "imgur.com" && !forceLoadAsImage &&
+            uri.encodedPath?.endsWith(".png") != true) {
+
             websiteAdapterLoader = WebsiteAdapterLoader().apply {
                 add(ImgurWebsiteAdapter(url), url, Utils.hashSha256(url))
                 setOnEachAdapterLoadedListener a@{
@@ -431,7 +452,6 @@ class ImageViewerActivity :
             return
         }
 
-        this.url = url
         val imageName = args.title
         mimeType = args.mimeType
 
@@ -441,15 +461,13 @@ class ImageViewerActivity :
             if (indexOfDot != -1) {
                 s
             } else {
-                if (url != null) {
+                run {
                     val urlHasExtension = url.lastIndexOf(".") != -1
                     if (urlHasExtension) {
                         s + url.substring(url.lastIndexOf("."))
                     } else {
                         s
                     }
-                } else {
-                    s
                 }
             }
         }

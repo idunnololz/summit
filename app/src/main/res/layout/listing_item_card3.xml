@@ -7,7 +7,8 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_view"
-        android:layout_marginHorizontal="@dimen/padding_quarter"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -55,6 +56,8 @@
                 android:scaleType="centerCrop"
                 android:adjustViewBounds="true"
                 android:layout_marginTop="@dimen/padding"
+                android:layout_marginHorizontal="@dimen/post_list_image_view_horizontal_margin"
+                style="@style/CardImageView"
                 app:layout_constraintHeight_min="100dp"
                 app:layout_constraintHeight_max="1000dp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +69,9 @@
                 android:id="@+id/link_overlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@drawable/link_overlay2"
+                android:background="@drawable/link_overlay1"
+                android:layout_marginHorizontal="@dimen/post_list_image_view_border"
+                android:layout_marginBottom="@dimen/post_list_image_view_border"
                 app:layout_constraintTop_toTopOf="@+id/link_icon"
                 app:layout_constraintBottom_toBottomOf="@+id/image"
                 app:layout_constraintStart_toStartOf="@+id/image"
@@ -96,7 +101,7 @@
                 android:id="@+id/header_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_half"
+                android:layout_marginTop="@dimen/padding"
                 android:paddingStart="@dimen/reddit_content_horizontal_padding"
                 android:paddingEnd="@dimen/reddit_content_horizontal_padding"
                 app:layout_constraintHorizontal_bias="0"

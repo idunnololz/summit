@@ -7,7 +7,8 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_view"
-        android:layout_marginHorizontal="@dimen/padding_quarter"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

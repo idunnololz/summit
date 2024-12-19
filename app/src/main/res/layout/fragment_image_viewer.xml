@@ -83,6 +83,17 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_marginHorizontal="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/download_button"
+                    app:layout_constraintEnd_toStartOf="@+id/hd_button"
+                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+
+                <ImageButton
+                    android:id="@+id/hd_button"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/outline_hd_24"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:layout_marginHorizontal="@dimen/padding_half"
+                    app:layout_constraintStart_toEndOf="@+id/info_button"
                     app:layout_constraintEnd_toStartOf="@+id/more_button"
                     app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
 
@@ -93,7 +104,7 @@
                     android:src="@drawable/baseline_more_horiz_24"
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_marginHorizontal="@dimen/padding_half"
-                    app:layout_constraintStart_toEndOf="@+id/info_button"
+                    app:layout_constraintStart_toEndOf="@+id/hd_button"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
             </androidx.constraintlayout.widget.ConstraintLayout>

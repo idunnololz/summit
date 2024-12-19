@@ -47,4 +47,8 @@
     <dimen name="emoji_item_width">140dp</dimen>
     <dimen name="predictive_back_margin">16dp</dimen>
     <dimen name="search_home_items_width">140dp</dimen>
+
+    <dimen name="post_list_image_view_border">2dp</dimen>
+    <!-- This is a derived values. It is the card padding - border width. Eg. 16dp - 2dp = 14dp -->
+    <dimen name="post_list_image_view_horizontal_margin">14dp</dimen>
 </resources>

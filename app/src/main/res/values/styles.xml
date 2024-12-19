@@ -406,6 +406,10 @@
 
     <style name="CardImageView">
         <item name="shapeAppearanceOverlay">@style/CardImageViewAppearanceOverlay</item>
+        <item name="strokeColor">@color/colorDivider</item>
+        <item name="strokeWidth">@dimen/post_list_image_view_border</item>
+        <item name="android:cropToPadding">true</item>
+        <item name="android:padding">1dp</item>
         <item name="android:foreground">@drawable/card_image_ripple</item>
     </style>
 

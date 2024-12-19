@@ -4,6 +4,7 @@ include(":colorpickerview")
 include(":gravitySnapHelper")
 include(":overlappingPane")
 include(":imagepicker")
+include(":markwon:markwon-ext-tables")
 
 rootProject.name = "summit"
 

@@ -318,6 +318,7 @@ class SettingsPostAndCommentsAppearanceFragment :
                     viewLifecycleOwner = viewLifecycleOwner,
                     updateContent = true,
                     highlightTextData = null,
+                    contentSpannable = null,
                     onRevealContentClickedFn = {},
                     onImageClick = { _, _, _ -> },
                     onVideoClick = { _, _, _ -> },
@@ -330,6 +331,7 @@ class SettingsPostAndCommentsAppearanceFragment :
                     onPostActionClick = { _, _ -> },
                     onLinkClick = { _, _, _ -> },
                     onLinkLongClick = { _, _ -> },
+                    onTextBound = {},
                 )
             }
             if (preferences.hideCommentActions) {

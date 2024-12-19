@@ -962,6 +962,8 @@ class MainActivity :
         title: String?,
         url: String,
         mimeType: String?,
+        urlAlt: String? = null,
+        mimeTypeAlt: String? = null,
     ) {
         val transitionName =
             if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Extras)) {
@@ -970,7 +972,14 @@ class MainActivity :
                 null
             }
 
-        val args = ImageViewerActivityArgs(title, url, mimeType, transitionName)
+        val args = ImageViewerActivityArgs(
+            title = title,
+            url = url,
+            mimeType = mimeType,
+            urlAlt  = urlAlt,
+            mimeTypeAlt = mimeTypeAlt,
+            transitionName = transitionName,
+        )
 
         if (transitionName != null) {
             val sharedElements = mutableListOf<Pair<View, String>>()

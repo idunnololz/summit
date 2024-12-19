@@ -274,6 +274,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         videoState: VideoState?,
         updateContent: Boolean,
         highlightTextData: HighlightTextData?,
+        contentSpannable: Spanned?,
         screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
         onRevealContentClickedFn: () -> Unit,
         onPostActionClick: (PostView, actionId: Int) -> Unit,
@@ -286,6 +287,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onLinkLongClick: (url: String, text: String?) -> Unit,
         onSignInRequired: () -> Unit,
         onInstanceMismatch: (String, String) -> Unit,
+        onTextBound: (Spanned?) -> Unit = {},
     ) = with(binding) {
         val showCommunityIcon = postInListUiConfig.showCommunityIcon
         val useMultilineHeader = showCommunityIcon
@@ -449,6 +451,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 highlightTextData?.copy(matchIndex = null)
             },
             screenshotConfig = screenshotConfig,
+            contentSpannable = contentSpannable,
             onFullImageViewClickListener = { view, url ->
                 onImageClick(Either.Left(postView), view, url)
             },
@@ -462,6 +465,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             onLemmyUrlClick = onPageClick,
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
+            onTextBound = onTextBound,
         )
 
         val scoreCount: TextView? = viewHolder.qaScoreCount

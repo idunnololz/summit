@@ -4,14 +4,18 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Looper
 import android.os.SystemClock
+import android.text.Spannable
 import android.text.Spanned
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.idunnololz.summit.R
+import io.noties.markwon.ext.tables.TableRowSpan
+import io.noties.markwon.ext.tables.TableRowSpan.Cell
 import io.noties.markwon.image.AsyncDrawable
+import java.lang.reflect.Field
 
 object AsyncDrawableSchedulerFixed {
-
     fun schedule(textView: TextView) {
         // we need a simple check if current text has already scheduled drawables
         // we need this in order to allow multiple calls to schedule (different plugins
@@ -30,7 +34,7 @@ object AsyncDrawableSchedulerFixed {
             return
         }
         textView.setTag(R.id.markwon_drawables_scheduler_last_text_hashcode, textHashCode)
-        val spans = extractSpans(textView)
+        val spans = extractRecursive(textView)
         if (!spans.isNullOrEmpty()) {
             if (textView.getTag(R.id.markwon_drawables_scheduler) == null) {
                 val listener: View.OnAttachStateChangeListener =
@@ -77,6 +81,7 @@ object AsyncDrawableSchedulerFixed {
     private fun extractSpans(textView: TextView): Array<AsyncDrawableSpan>? {
         val cs = textView.text
         val length = cs?.length ?: 0
+
         return if (length == 0 ||
             cs !is Spanned
         ) {
@@ -87,6 +92,46 @@ object AsyncDrawableSchedulerFixed {
 
         // we also could've tried the `nextSpanTransition`, but strangely it leads to worse performance
         // than direct getSpans
+    }
+
+    private fun extractRecursive(textView: TextView): MutableList<AsyncDrawableSpan>? {
+        val cs = textView.text as? Spannable
+        val length = cs?.length ?: 0
+
+        if (length == 0) {
+            return null
+        }
+
+        if (cs == null) {
+            return null
+        }
+
+        fun extractFromSpannable(
+            accumulator: MutableList<AsyncDrawableSpan>,
+            spannable: Spannable,
+        ) {
+            val tableRows = spannable.getSpans(0, length, TableRowSpan::class.java)
+
+            for (row in tableRows) {
+                val cells = row.cells
+
+                for (cell in cells) {
+                    val cellText = (cell as? Cell)?.text()
+                        ?: continue
+                    val spannable = cellText as? Spannable
+                        ?: continue
+
+                    extractFromSpannable(accumulator, spannable)
+                }
+            }
+
+            accumulator.addAll(spannable.getSpans(0, length, AsyncDrawableSpan::class.java))
+        }
+
+        val spans = mutableListOf<AsyncDrawableSpan>()
+        extractFromSpannable(spans, cs)
+
+        return spans
     }
 
     private class DrawableCallbackImpl(

@@ -124,6 +124,14 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="urlAlt"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="mimeTypeAlt"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
             android:name="transitionName"
             app:argType="string"
             app:nullable="true" />

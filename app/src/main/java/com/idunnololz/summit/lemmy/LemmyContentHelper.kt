@@ -3,6 +3,8 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.text.Spannable
+import android.text.Spanned
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -95,6 +97,7 @@ class LemmyContentHelper(
         videoState: VideoState? = null,
         contentMaxLines: Int = -1,
         highlight: HighlightTextData? = null,
+        contentSpannable: Spanned? = null,
         screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
         onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
         onImageClickListener: (url: String) -> Unit,
@@ -105,6 +108,7 @@ class LemmyContentHelper(
         onLemmyUrlClick: (PageRef) -> Unit,
         onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String?) -> Unit,
+        onTextBound: (Spanned?) -> Unit = {},
     ) {
         assertMainThread()
         if (!lazyUpdate) {
@@ -626,10 +630,11 @@ class LemmyContentHelper(
         }
 
         (fullContentContainerView.getTag(R.id.body) as? TextView)?.let { textView ->
-            LemmyTextHelper.bindText(
+            val spannable = LemmyTextHelper.bindText(
                 textView = textView,
                 text = postView.post.body ?: "",
                 instance = instance,
+                spannedText = contentSpannable,
                 highlight = highlight,
                 onImageClick = onImageClickListener,
                 onVideoClick = {
@@ -639,6 +644,8 @@ class LemmyContentHelper(
                 onLinkClick = onLinkClick,
                 onLinkLongClick = onLinkLongClick,
             )
+
+            onTextBound(spannable)
         }
 
         addFooter()
