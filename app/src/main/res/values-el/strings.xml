@@ -571,4 +571,8 @@
     <string name="send_message">Αποστολή μηνύματος</string>
     <string name="downvote">Αρνητική ψήφος</string>
     <string name="error_save_failed">Η αποθήκευση απέτυχε</string>
+    <string name="ban_user">Αποκλεισμός χρήστη</string>
+    <string name="unban_user">Άρση αποκλεισμού χρήστη</string>
+    <string name="remove_content">Αφαίρεση περιεχομένου</string>
+    <string name="unable_to_ban_user">Αδυναμία αποκλεισμού χρήστη</string>
 </resources>
