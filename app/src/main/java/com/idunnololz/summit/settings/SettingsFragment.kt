@@ -23,6 +23,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
@@ -83,12 +84,20 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
 
-            binding.searchBar.setOnClickListener {
-                viewModel.showSearch.value = true
-            }
         }
 
         with(binding) {
+            searchBar.setOnClickListener {
+                viewModel.showSearch.value = true
+            }
+            toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
+            toolbar.setNavigationIconTint(
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            )
+            toolbar.setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
+
             recyclerView.setup(animationsHelper)
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)

@@ -430,5 +430,4 @@
         <item name="android:layout_marginTop">@dimen/padding_half</item>
         <item name="android:layout_marginBottom">@dimen/padding_half</item>
     </style>
-
 </resources>

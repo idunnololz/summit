@@ -130,6 +130,7 @@ class PostListViewBuilder @Inject constructor(
 
     private val voteUiHandler = accountActionsManager.voteUiHandler
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
+    private var postHorizontalMarginDp: Float? = postUiConfig.horizontalMarginDp
     private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
     private var contentMaxLines: Int = postUiConfig.contentMaxLines
     private var showUpAndDownVotes: Boolean = preferences.postShowUpAndDownVotes
@@ -175,6 +176,7 @@ class PostListViewBuilder @Inject constructor(
         textSizeMultiplier = postUiConfig.textSizeMultiplier
         contentMaxLines = postUiConfig.contentMaxLines
         dimReadPosts = postUiConfig.dimReadPosts
+        postHorizontalMarginDp = postUiConfig.horizontalMarginDp
 
         globalFontSizeMultiplier =
             GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
@@ -677,6 +679,73 @@ class PostListViewBuilder @Inject constructor(
                     imageView?.visibility = View.GONE
                     iconImage?.visibility = View.VISIBLE
                     iconImage?.setImageResource(R.drawable.baseline_article_24)
+                }
+
+                val postHorizontalMarginDp = postHorizontalMarginDp
+                val horizontalMargin = if (postHorizontalMarginDp != null) {
+                    Utils.convertDpToPixel(postHorizontalMarginDp).toInt()
+                } else {
+                    null
+                }
+
+                when (val rb = rawBinding) {
+                    is ListingItemCardBinding -> {
+                        val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                        if (horizontalMargin != null) {
+                            if (lp.marginStart != horizontalMargin ||
+                                lp.marginEnd != horizontalMargin) {
+
+                                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                                    marginStart = horizontalMargin
+                                    marginEnd = horizontalMargin
+                                }
+                            }
+                        }
+                    }
+                    is ListingItemCard2Binding -> {
+                        val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                        if (horizontalMargin != null) {
+                            if (lp.marginStart != horizontalMargin ||
+                                lp.marginEnd != horizontalMargin) {
+
+                                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                                    marginStart = horizontalMargin
+                                    marginEnd = horizontalMargin
+                                }
+                            }
+                        }
+                    }
+                    is ListingItemCard3Binding -> {
+                        val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                        if (horizontalMargin != null) {
+                            if (lp.marginStart != horizontalMargin ||
+                                lp.marginEnd != horizontalMargin) {
+
+                                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                                    marginStart = horizontalMargin
+                                    marginEnd = horizontalMargin
+                                }
+                            }
+                        }
+                    }
+                    is ListingItemListWithCardsBinding -> {
+                        val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                        if (horizontalMargin != null) {
+                            if (lp.marginStart != horizontalMargin ||
+                                lp.marginEnd != horizontalMargin) {
+
+                                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                                    marginStart = horizontalMargin
+                                    marginEnd = horizontalMargin
+                                }
+                            }
+                        }
+                    }
+                    else -> contentMaxWidth
                 }
 
                 val finalContentMaxWidth =
