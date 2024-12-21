@@ -10,6 +10,7 @@ data class PostInListUiConfig(
     val headerTextSizeSp: Float = 14f,
     val titleTextSizeSp: Float = 14f,
     val footerTextSizeSp: Float = 14f,
+    val horizontalMarginDp: Float? = null,
 
     // We need this because some layouts show the full content or can show it
     val fullContentConfig: FullContentConfig = FullContentConfig(),

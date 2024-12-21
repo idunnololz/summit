@@ -1489,6 +1489,13 @@ class PostsFeedAppearanceSettings @Inject constructor(
         context.getString(R.string.dim_read_posts_desc),
     )
 
+    val horizontalMarginSize = SliderSettingItem(
+        context.getString(R.string.horizontal_margin_size),
+        0f,
+        32f,
+        1f,
+    )
+
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
         PostsFeedSettings::class,
@@ -1502,6 +1509,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
         preferTitleText,
         preferCommunityIcon,
         dimReadPosts,
+        horizontalMarginSize,
     )
 }
 

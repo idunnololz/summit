@@ -165,6 +165,29 @@ class SettingsViewTypeFragment :
                 updateRendering()
             },
         )
+        when (preferences.getPostsLayout()) {
+            CommunityLayout.Card,
+            CommunityLayout.Card2,
+            CommunityLayout.Card3,
+            CommunityLayout.ListWithCards -> {
+                binding.horizontalMarginSizeSetting.root.visibility = View.VISIBLE
+                settings.horizontalMarginSize.bindTo(
+                    binding.horizontalMarginSizeSetting,
+                    { viewModel.currentPostUiConfig.horizontalMarginDp ?: 16f },
+                    {
+                        viewModel.currentPostUiConfig =
+                            viewModel.currentPostUiConfig.copy(
+                                horizontalMarginDp = it,
+                            )
+
+                        updateRendering()
+                    },
+                )
+            }
+            else -> {
+                binding.horizontalMarginSizeSetting.root.visibility = View.GONE
+            }
+        }
         settings.preferImageAtEnd.bindTo(
             binding.preferImageAtTheEnd,
             { viewModel.currentPostUiConfig.preferImagesAtEnd },

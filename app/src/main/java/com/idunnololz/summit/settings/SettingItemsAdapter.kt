@@ -184,7 +184,7 @@ class SettingItemsAdapter(
             if (item.hasTopMargin) {
                 b.title.updatePadding(top = context.getDimen(R.dimen.padding_three))
             } else {
-                b.title.updatePadding(top = context.getDimen(R.dimen.padding))
+                b.title.updatePadding(top = context.getDimen(R.dimen.padding_two))
             }
         }
         addItemType(Item.TextValueItem::class, SettingTextValueBinding::inflate) { item, b, h ->
