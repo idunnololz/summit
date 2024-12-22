@@ -83,7 +83,6 @@ class ImageViewerActivity :
 
     private var showingUi = true
 
-    private var url: String? = null
     private lateinit var fileName: String
     private var mimeType: String? = null
 
@@ -125,15 +124,7 @@ class ImageViewerActivity :
             binding.hdButton.visibility = View.VISIBLE
 
             binding.hdButton.setOnClickListener {
-                if (viewModel.url == args.url) {
-                    viewModel.url = args.urlAlt
-                    binding.hdButton.setImageResource(R.drawable.baseline_hd_24)
-                } else {
-                    viewModel.url = args.url
-                    binding.hdButton.setImageResource(R.drawable.outline_hd_24)
-                }
-
-                loadImage(viewModel.url)
+                toggleImageQuality()
             }
 
         } else {
@@ -193,6 +184,10 @@ class ImageViewerActivity :
 
                 override fun onTransitionEnd(p0: Transition?) {
                     onSharedElementEnterTransitionEnd()
+
+                    binding.imageView.postDelayed({
+                        toggleImageQuality(useHd = true)
+                    }, 50)
                 }
 
                 override fun onTransitionCancel(p0: Transition?) {
@@ -254,6 +249,18 @@ class ImageViewerActivity :
                 }
             }
         }
+    }
+
+    private fun toggleImageQuality(useHd: Boolean = false) {
+        if (viewModel.url == args.url || useHd) {
+            viewModel.url = args.urlAlt
+            binding.hdButton.setImageResource(R.drawable.baseline_hd_24)
+        } else {
+            viewModel.url = args.url
+            binding.hdButton.setImageResource(R.drawable.outline_hd_24)
+        }
+
+        loadImage(viewModel.url)
     }
 
     private fun onSharedElementEnterTransitionEnd() {
@@ -425,11 +432,15 @@ class ImageViewerActivity :
         if (uri.host == "imgur.com" && !forceLoadAsImage &&
             uri.encodedPath?.endsWith(".png") != true) {
 
+            binding.progressBar.visibility = View.VISIBLE
+
             websiteAdapterLoader = WebsiteAdapterLoader().apply {
                 add(ImgurWebsiteAdapter(url), url, Utils.hashSha256(url))
                 setOnEachAdapterLoadedListener a@{
                     if (it is ImgurWebsiteAdapter) {
                         val rootView = binding.root ?: return@a
+
+                        binding.progressBar.visibility = View.GONE
 
                         if (it.isSuccess()) {
                             rootView.post {
@@ -563,94 +574,97 @@ class ImageViewerActivity :
     private fun loadImageFromUrl(url: String, forceSize: Size? = null) {
         Log.d(TAG, "loadImageFromUrl: $url")
 
-        offlineManager.fetchImageWithError(binding.root, url, {
-//            if (!isBindingAvailable()) return@fetchImageWithError
+        binding.progressBar.visibility = View.VISIBLE
+        offlineManager.fetchImageWithError(
+            rootView = binding.root,
+            url = url,
+            listener = {
+                val tempSize = Size()
+                offlineManager.getMaxImageSizeHint(it, tempSize)
 
-            val tempSize = Size()
-            offlineManager.getMaxImageSizeHint(it, tempSize)
+                val request = ImageRequest.Builder(binding.imageView.context)
+                    .data(it)
+                    .allowHardware(false)
+                    .target(
+                        object : Target {
+                            override fun onError(error: Drawable?) {
+                                super.onError(error)
+                                binding.progressBar.visibility = View.GONE
+                                binding.loadingView.showErrorWithRetry(R.string.error_downloading_image)
+                            }
 
-            val request = ImageRequest.Builder(binding.imageView.context)
-                .data(it)
-                .allowHardware(false)
-                .target(
-                    object : Target {
-                        override fun onError(error: Drawable?) {
-                            super.onError(error)
-                            binding.loadingView.showErrorWithRetry(R.string.error_downloading_image)
-                        }
+                            override fun onSuccess(result: Drawable) {
+                                super.onSuccess(result)
+                                binding.progressBar.visibility = View.GONE
 
-                        override fun onStart(placeholder: Drawable?) {
-                            super.onStart(placeholder)
-                        }
+                                Log.d(
+                                    TAG,
+                                    "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}",
+                                )
 
-                        override fun onSuccess(result: Drawable) {
-                            super.onSuccess(result)
+                                if (result is BitmapDrawable) {
+                                    val bitmap = result.bitmap
+                                    if (bitmap.byteCount >= MAX_BITMAP_SIZE && forceSize == null) {
+                                        val maxPixels = 24000000
+                                        val pixelsInBitmap = bitmap.width * bitmap.height
 
-                            Log.d(
-                                TAG,
-                                "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}",
-                            )
-
-                            if (result is BitmapDrawable) {
-                                val bitmap = result.bitmap
-                                if (bitmap.byteCount >= MAX_BITMAP_SIZE && forceSize == null) {
-                                    val maxPixels = 24000000
-                                    val pixelsInBitmap = bitmap.width * bitmap.height
-
-                                    if (pixelsInBitmap > maxPixels) {
-                                        val scale = sqrt(pixelsInBitmap / maxPixels.toDouble())
-                                        loadImageFromUrl(
-                                            url,
-                                            Size(
-                                                (bitmap.width / scale).roundToInt(),
-                                                (bitmap.height / scale).roundToInt(),
-                                            ),
-                                        )
-
-                                        Snackbar
-                                            .make(
-                                                getSnackbarContainer(),
-                                                R.string.warn_image_downscaled,
-                                                Snackbar.LENGTH_LONG,
+                                        if (pixelsInBitmap > maxPixels) {
+                                            val scale = sqrt(pixelsInBitmap / maxPixels.toDouble())
+                                            loadImageFromUrl(
+                                                url,
+                                                Size(
+                                                    (bitmap.width / scale).roundToInt(),
+                                                    (bitmap.height / scale).roundToInt(),
+                                                ),
                                             )
-                                            .setAnchorView(binding.bottomBar)
-                                            .show()
-                                    } else {
-                                        binding.loadingView
-                                            .showErrorText(
-                                                R.string.error_image_too_large_to_preview,
-                                            )
+
+                                            Snackbar
+                                                .make(
+                                                    getSnackbarContainer(),
+                                                    R.string.warn_image_downscaled,
+                                                    Snackbar.LENGTH_LONG,
+                                                )
+                                                .setAnchorView(binding.bottomBar)
+                                                .show()
+                                        } else {
+                                            binding.loadingView
+                                                .showErrorText(
+                                                    R.string.error_image_too_large_to_preview,
+                                                )
+                                        }
+                                        return
                                     }
-                                    return
+                                }
+
+                                startPostponedEnterTransition()
+                                binding.loadingView.hideAll()
+
+                                binding.dummyImageView.setImageDrawable(result)
+                                binding.imageView.setImageDrawable(result)
+
+                                if (result is Animatable) {
+                                    result.start()
                                 }
                             }
-
-                            startPostponedEnterTransition()
-                            binding.loadingView.hideAll()
-
-                            binding.dummyImageView.setImageDrawable(result)
-                            binding.imageView.setImageDrawable(result)
-
-                            if (result is Animatable) {
-                                result.start()
-                            }
+                        },
+                    )
+                    .apply {
+                        if (forceSize != null) {
+                            size(Dimension(forceSize.width), Dimension(forceSize.height))
+                        } else {
+                            size(coil.size.Size.ORIGINAL)
                         }
-                    },
-                )
-                .apply {
-                    if (forceSize != null) {
-                        size(Dimension(forceSize.width), Dimension(forceSize.height))
-                    } else {
-                        size(coil.size.Size.ORIGINAL)
                     }
-                }
-                .build()
-            binding.imageView.context.imageLoader.enqueue(request)
-        }, {
-            binding.loadingView.showDefaultErrorMessageFor(
-                it,
-            )
-        })
+                    .build()
+                binding.imageView.context.imageLoader.enqueue(request)
+            },
+            errorListener = {
+                binding.progressBar.visibility = View.GONE
+                binding.loadingView.showDefaultErrorMessageFor(
+                    it,
+                )
+            }
+        )
     }
 
     private fun showActionBar() {

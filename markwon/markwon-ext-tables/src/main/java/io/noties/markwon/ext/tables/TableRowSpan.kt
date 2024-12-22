@@ -12,6 +12,7 @@ import android.text.Spanned
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
+import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.IntRange
 import io.noties.markwon.core.spans.TextLayoutSpan
@@ -255,6 +256,7 @@ class TableRowSpan(
     }
 
     private fun makeNewLayouts() {
+        Log.d("HAHA", "makeNewLayouts")
         textPaint.isFakeBoldText = header
 
         val columns = cells.size
@@ -317,9 +319,7 @@ class TableRowSpan(
             0, spannable.length,
             AsyncDrawableSpan::class.java
         )
-        if (spans != null
-            && spans.size > 0
-        ) {
+        if (spans != null && spans.isNotEmpty()) {
             for (span in spans) {
                 val drawable = span.drawable
 
@@ -363,6 +363,10 @@ class TableRowSpan(
     // @since 4.6.0
     protected fun cellWidth(size: Int): Int {
         return (1f * width / size + 0.5f).toInt()
+    }
+
+    fun invalidate() {
+        width = 0
     }
 
     fun invalidator(invalidator: Invalidator?) {
