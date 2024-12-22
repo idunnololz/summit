@@ -252,7 +252,8 @@ class ImageViewerActivity :
     }
 
     private fun toggleImageQuality(useHd: Boolean = false) {
-        if (viewModel.url == args.url || useHd) {
+        val hasAltUrl = !args.urlAlt.isNullOrBlank()
+        if (hasAltUrl && (viewModel.url == args.url || useHd)) {
             viewModel.url = args.urlAlt
             binding.hdButton.setImageResource(R.drawable.baseline_hd_24)
         } else {
