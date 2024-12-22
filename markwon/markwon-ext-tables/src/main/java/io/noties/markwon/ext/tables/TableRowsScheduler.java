@@ -38,12 +38,7 @@ abstract class TableRowsScheduler {
                 // @since 4.1.0
                 // let's stack-up invalidation calls (so invalidation happens,
                 // but not with each table-row-span draw call)
-                final Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        view.setText(view.getText());
-                    }
-                };
+                final Runnable runnable = () -> view.setText(view.getText());
 
                 @Override
                 public void invalidate() {

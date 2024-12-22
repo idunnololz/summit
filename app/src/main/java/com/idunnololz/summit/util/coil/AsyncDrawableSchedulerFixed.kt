@@ -57,8 +57,24 @@ object AsyncDrawableSchedulerFixed {
             val invalidator: DrawableCallbackImpl.Invalidator = TextViewInvalidator(textView)
             var drawable: AsyncDrawable
             for (span in spans) {
-                drawable = span.drawable
-                drawable.setCallback2(DrawableCallbackImpl(textView, invalidator, drawable.bounds))
+                drawable = span.drawableSpan.drawable
+                if (span.parentSpan is TableRowSpan) {
+                    drawable.setCallback2(
+                        DrawableCallbackImpl(
+                            textView,
+                            TableRowTextViewInvalidator(span.parentSpan, textView),
+                            drawable.bounds,
+                        )
+                    )
+                } else {
+                    drawable.setCallback2(
+                        DrawableCallbackImpl(
+                            textView,
+                            invalidator,
+                            drawable.bounds
+                        )
+                    )
+                }
             }
         }
     }
@@ -70,31 +86,20 @@ object AsyncDrawableSchedulerFixed {
             return
         }
         view.setTag(R.id.markwon_drawables_scheduler_last_text_hashcode, null)
-        val spans = extractSpans(view)
+        val spans = extractRecursive(view)
         if (!spans.isNullOrEmpty()) {
             for (span in spans) {
-                span.drawable.setCallback2(null)
+                span.drawableSpan.drawable.setCallback2(null)
             }
         }
     }
 
-    private fun extractSpans(textView: TextView): Array<AsyncDrawableSpan>? {
-        val cs = textView.text
-        val length = cs?.length ?: 0
+    private class ExtractedDrawableSpan(
+        val drawableSpan: AsyncDrawableSpan,
+        val parentSpan: Any,
+    )
 
-        return if (length == 0 ||
-            cs !is Spanned
-        ) {
-            null
-        } else {
-            cs.getSpans(0, length, AsyncDrawableSpan::class.java)
-        }
-
-        // we also could've tried the `nextSpanTransition`, but strangely it leads to worse performance
-        // than direct getSpans
-    }
-
-    private fun extractRecursive(textView: TextView): MutableList<AsyncDrawableSpan>? {
+    private fun extractRecursive(textView: TextView): MutableList<ExtractedDrawableSpan>? {
         val cs = textView.text as? Spannable
         val length = cs?.length ?: 0
 
@@ -107,8 +112,9 @@ object AsyncDrawableSchedulerFixed {
         }
 
         fun extractFromSpannable(
-            accumulator: MutableList<AsyncDrawableSpan>,
+            accumulator: MutableList<ExtractedDrawableSpan>,
             spannable: Spannable,
+            parent: Any,
         ) {
             val tableRows = spannable.getSpans(0, length, TableRowSpan::class.java)
 
@@ -121,15 +127,23 @@ object AsyncDrawableSchedulerFixed {
                     val spannable = cellText as? Spannable
                         ?: continue
 
-                    extractFromSpannable(accumulator, spannable)
+                    extractFromSpannable(accumulator, spannable, row)
                 }
             }
 
-            accumulator.addAll(spannable.getSpans(0, length, AsyncDrawableSpan::class.java))
+            accumulator.addAll(
+                spannable.getSpans(0, length, AsyncDrawableSpan::class.java)
+                    .map {
+                        ExtractedDrawableSpan(
+                            drawableSpan = it,
+                            parentSpan = parent
+                        )
+                    }
+            )
         }
 
-        val spans = mutableListOf<AsyncDrawableSpan>()
-        extractFromSpannable(spans, cs)
+        val spans = mutableListOf<ExtractedDrawableSpan>()
+        extractFromSpannable(spans, cs, cs)
 
         return spans
     }
@@ -190,6 +204,23 @@ object AsyncDrawableSchedulerFixed {
         }
 
         override fun run() {
+            textView.text = textView.text
+        }
+    }
+
+    private class TableRowTextViewInvalidator(
+        private val tableRowSpan: TableRowSpan,
+        private val textView: TextView
+    ) :
+        DrawableCallbackImpl.Invalidator, Runnable {
+        override fun invalidate() {
+            Log.d("HAHA", "invalidate")
+            textView.removeCallbacks(this)
+            textView.post(this)
+        }
+
+        override fun run() {
+            tableRowSpan.invalidate()
             textView.text = textView.text
         }
     }

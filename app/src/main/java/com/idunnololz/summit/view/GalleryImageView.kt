@@ -46,7 +46,7 @@ class GalleryImageView : ShapeableImageView {
         fun overScrollEnd(): Boolean
     }
 
-    private var detector: GestureDetectorCompat
+    private var detector: GestureDetector
     private var scaleDetector: ScaleGestureDetector
     private val _matrix: Matrix = Matrix()
     private val _matrixArr = FloatArray(9)
@@ -95,6 +95,15 @@ class GalleryImageView : ShapeableImageView {
 
     private var flingAnimation: ValueAnimator? = null
 
+    private var savedZoomState: ZoomState? = null
+
+    private data class ZoomState(
+        val relativeZoom: Double,
+        val imageRatio: Double,
+        val relativeOffX: Double,
+        val relativeOffY: Double,
+    )
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -119,20 +128,18 @@ class GalleryImageView : ShapeableImageView {
                     }
 
                     override fun onScale(detector: ScaleGestureDetector): Boolean {
-                        detector.let {
-                            zoomInToAbs(
-                                detector.focusX / curZoom - offX,
-                                detector.focusY / curZoom - offY,
-                                curZoom * detector.scaleFactor,
-                            )
-                        }
+                        zoomInToAbs(
+                            detector.focusX / curZoom - offX,
+                            detector.focusY / curZoom - offY,
+                            curZoom * detector.scaleFactor,
+                        )
                         return true
                     }
                 },
             )
         ScaleGestureDetectorCompat.setQuickScaleEnabled(scaleDetector, false)
 
-        detector = GestureDetectorCompat(
+        detector = GestureDetector(
             context,
             object : GestureDetector.OnGestureListener {
                 override fun onShowPress(e: MotionEvent) {
@@ -364,6 +371,8 @@ class GalleryImageView : ShapeableImageView {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        Log.d(TAG, "onMeasure()")
+
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         drawable ?: return
@@ -375,6 +384,10 @@ class GalleryImageView : ShapeableImageView {
     }
 
     private fun calculateImageSize() {
+        val savedZoomState = savedZoomState
+
+        this.savedZoomState = null
+
         if (!drawableDirty) return
         val d = drawable ?: return
 
@@ -398,12 +411,52 @@ class GalleryImageView : ShapeableImageView {
         imageW = d.intrinsicWidth.toFloat()
         imageH = d.intrinsicHeight.toFloat()
 
+        if (savedZoomState != null) {
+            Log.d(TAG, "Restoring zoom state: $savedZoomState")
+
+
+            val oldImageRatio = savedZoomState.imageRatio
+            val newImageRatio =
+                this.drawable.intrinsicWidth.toDouble() / this.drawable.intrinsicHeight
+
+            if (newImageRatio > oldImageRatio - 0.01 && newImageRatio < oldImageRatio + 0.01) {
+                // close enough
+
+                curZoom = (savedZoomState.relativeZoom * minZoom).toFloat()
+                offX = (savedZoomState.relativeOffX * imageW).toFloat()
+                offY = (savedZoomState.relativeOffY * imageH).toFloat()
+            }
+        }
+
         drawableDirty = false
     }
 
     override fun setImageDrawable(drawable: Drawable?) {
-        drawableDirty = true
-        super.setImageDrawable(drawable)
+        Log.d(TAG, "setImageDrawable()", RuntimeException())
+
+        val oldDrawable = this.drawable
+        if (oldDrawable != null &&
+            oldDrawable.intrinsicWidth > 0 && oldDrawable.intrinsicHeight > 0) {
+
+            if (oldDrawable.intrinsicWidth != drawable?.intrinsicWidth ||
+                oldDrawable.intrinsicHeight != drawable.intrinsicHeight) {
+
+                drawableDirty = true
+            }
+
+            savedZoomState = ZoomState(
+                relativeZoom = curZoom / minZoom.toDouble(),
+                imageRatio = oldDrawable.intrinsicWidth.toDouble() / oldDrawable.intrinsicHeight,
+                relativeOffX = offX.toDouble() / oldDrawable.intrinsicWidth,
+                relativeOffY = offY.toDouble() / oldDrawable.intrinsicHeight,
+            )
+
+            super.setImageDrawable(drawable)
+        } else {
+            drawableDirty = true
+
+            super.setImageDrawable(drawable)
+        }
     }
 
     private fun convertViewToSourceCoord(x: Float, y: Float) {
@@ -520,6 +573,8 @@ class GalleryImageView : ShapeableImageView {
     }
 
     private fun updateMatrix() {
+        Log.d(TAG, "curZoom: $curZoom")
+
         _matrix.reset()
         _matrix.postTranslate(offX + overScrollX, offY + overScrollY)
         _matrix.postScale(curZoom, curZoom)
