@@ -41,6 +41,7 @@ import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
+import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
@@ -104,6 +105,18 @@ class ImageViewerActivity :
     override val mainApplication: MainApplication
         get() = application as MainApplication
 
+    private val urlAlt: String?
+        get() {
+            val urlAlt = args.urlAlt
+                ?: return null
+
+            return if (ContentUtils.isUrlImage(urlAlt)) {
+                urlAlt
+            } else {
+                null
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge(
@@ -120,7 +133,7 @@ class ImageViewerActivity :
 
         showAboveCutout()
 
-        if (args.urlAlt != null) {
+        if (urlAlt != null) {
             binding.hdButton.visibility = View.VISIBLE
 
             binding.hdButton.setOnClickListener {
@@ -252,9 +265,9 @@ class ImageViewerActivity :
     }
 
     private fun toggleImageQuality(useHd: Boolean = false) {
-        val hasAltUrl = !args.urlAlt.isNullOrBlank()
+        val hasAltUrl = !urlAlt.isNullOrBlank()
         if (hasAltUrl && (viewModel.url == args.url || useHd)) {
-            viewModel.url = args.urlAlt
+            viewModel.url = urlAlt
             binding.hdButton.setImageResource(R.drawable.baseline_hd_24)
         } else {
             viewModel.url = args.url
