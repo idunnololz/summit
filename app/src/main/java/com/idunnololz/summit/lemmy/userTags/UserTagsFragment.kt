@@ -21,13 +21,12 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
+class UserTagsFragment :
+    BaseFragment<FragmentUserTagsBinding>(),
     AlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: UserTagsViewModel by viewModels()
@@ -74,7 +73,7 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
                         .setPositiveButton(R.string.delete)
                         .setNegativeButton(R.string.cancel)
                         .createAndShow(childFragmentManager, "delete_user_tag")
-                }
+                },
             )
 
             toolbar.setTitle(R.string.user_tags)
@@ -118,7 +117,9 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
                         adapter.setData(it.data)
 
                         if (it.data.userTags.isEmpty()) {
-                            loadingView.showErrorText(R.string.there_doesnt_seem_to_be_anything_here)
+                            loadingView.showErrorText(
+                                R.string.there_doesnt_seem_to_be_anything_here,
+                            )
                         }
                     }
                 }
@@ -134,7 +135,7 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
 
         sealed interface Item {
             data class UserTagItem(
-                val userTag: UserTag
+                val userTag: UserTag,
             ) : Item
         }
 
@@ -145,11 +146,11 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
                         old.userTag.personName == (new as Item.UserTagItem).userTag.personName
                     }
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.UserTagItem::class,
-                inflateFn = ItemUserTagsUserTagBinding::inflate
+                inflateFn = ItemUserTagsUserTagBinding::inflate,
             ) { item, b, h ->
                 b.title.text = item.userTag.personName
                 b.body.text = buildSpannedString {
@@ -180,14 +181,12 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
 
         private var data: UserTagsViewModel.Model? = null
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -207,7 +206,6 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>(),
 
             adapterHelper.setItems(newItems, this)
         }
-
     }
 
     override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {

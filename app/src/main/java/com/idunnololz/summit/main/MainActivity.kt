@@ -976,7 +976,7 @@ class MainActivity :
             title = title,
             url = url,
             mimeType = mimeType,
-            urlAlt  = urlAlt,
+            urlAlt = urlAlt,
             mimeTypeAlt = mimeTypeAlt,
             transitionName = transitionName,
         )

@@ -169,7 +169,8 @@ class SettingsViewTypeFragment :
             CommunityLayout.Card,
             CommunityLayout.Card2,
             CommunityLayout.Card3,
-            CommunityLayout.ListWithCards -> {
+            CommunityLayout.ListWithCards,
+            -> {
                 binding.horizontalMarginSizeSetting.root.visibility = View.VISIBLE
                 settings.horizontalMarginSize.bindTo(
                     binding.horizontalMarginSizeSetting,

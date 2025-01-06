@@ -694,8 +694,8 @@ class PostListViewBuilder @Inject constructor(
 
                         if (horizontalMargin != null) {
                             if (lp.marginStart != horizontalMargin ||
-                                lp.marginEnd != horizontalMargin) {
-
+                                lp.marginEnd != horizontalMargin
+                            ) {
                                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                                     marginStart = horizontalMargin
                                     marginEnd = horizontalMargin
@@ -708,8 +708,8 @@ class PostListViewBuilder @Inject constructor(
 
                         if (horizontalMargin != null) {
                             if (lp.marginStart != horizontalMargin ||
-                                lp.marginEnd != horizontalMargin) {
-
+                                lp.marginEnd != horizontalMargin
+                            ) {
                                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                                     marginStart = horizontalMargin
                                     marginEnd = horizontalMargin
@@ -722,8 +722,8 @@ class PostListViewBuilder @Inject constructor(
 
                         if (horizontalMargin != null) {
                             if (lp.marginStart != horizontalMargin ||
-                                lp.marginEnd != horizontalMargin) {
-
+                                lp.marginEnd != horizontalMargin
+                            ) {
                                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                                     marginStart = horizontalMargin
                                     marginEnd = horizontalMargin
@@ -736,8 +736,8 @@ class PostListViewBuilder @Inject constructor(
 
                         if (horizontalMargin != null) {
                             if (lp.marginStart != horizontalMargin ||
-                                lp.marginEnd != horizontalMargin) {
-
+                                lp.marginEnd != horizontalMargin
+                            ) {
                                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                                     marginStart = horizontalMargin
                                     marginEnd = horizontalMargin

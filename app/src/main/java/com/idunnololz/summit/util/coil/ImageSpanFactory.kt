@@ -1,6 +1,5 @@
 package com.idunnololz.summit.util.coil
 
-import android.util.Log
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.RenderProps
 import io.noties.markwon.SpanFactory

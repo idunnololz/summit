@@ -4,7 +4,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.text.Spanned
 import android.text.style.ReplacementSpan
-import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.IntRange
 import com.idunnololz.summit.util.Utils

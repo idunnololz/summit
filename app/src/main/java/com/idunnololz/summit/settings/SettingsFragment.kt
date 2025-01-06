@@ -83,7 +83,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             insetViewStartAndEndByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
-
         }
 
         with(binding) {

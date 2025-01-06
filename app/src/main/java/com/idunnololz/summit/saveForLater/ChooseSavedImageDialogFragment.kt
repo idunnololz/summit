@@ -3,6 +3,7 @@ package com.idunnololz.summit.saveForLater
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.dispose
@@ -33,6 +35,8 @@ import kotlinx.parcelize.Parcelize
 class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSavedImageBinding>() {
 
     companion object {
+
+        private const val TAG = "ChooseSavedImageDialogFragment"
 
         const val REQUEST_KEY = "ChooseSavedImageDialogFragment_req"
         const val REQUEST_RESULT = "REQUEST_RESULT"
@@ -129,6 +133,12 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
                 b.text.text = getString(R.string.slot_format, (index + 1).toString())
 
                 if (file.exists()) {
+                    lifecycle.coroutineScope.launch {
+                        val hex = file.readBytes().take(
+                            10,
+                        ).joinToString(separator = " ") { eachByte -> "%02x".format(eachByte) }
+                        Log.d(TAG, "File ${index + 1}. File name: ${file.absolutePath}. Hex: $hex")
+                    }
                     b.subtitle.text = "${humanReadableByteCountSi(file.length())} - ${tsToShortDate(file.lastModified())}"
                 } else {
                     b.subtitle.text = getString(R.string.empty)

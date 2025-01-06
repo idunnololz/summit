@@ -12,7 +12,6 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.animation.DecelerateInterpolator
-import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ScaleGestureDetectorCompat
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.util.Utils
@@ -414,7 +413,6 @@ class GalleryImageView : ShapeableImageView {
         if (savedZoomState != null) {
             Log.d(TAG, "Restoring zoom state: $savedZoomState")
 
-
             val oldImageRatio = savedZoomState.imageRatio
             val newImageRatio =
                 this.drawable.intrinsicWidth.toDouble() / this.drawable.intrinsicHeight
@@ -436,11 +434,11 @@ class GalleryImageView : ShapeableImageView {
 
         val oldDrawable = this.drawable
         if (oldDrawable != null &&
-            oldDrawable.intrinsicWidth > 0 && oldDrawable.intrinsicHeight > 0) {
-
+            oldDrawable.intrinsicWidth > 0 && oldDrawable.intrinsicHeight > 0
+        ) {
             if (oldDrawable.intrinsicWidth != drawable?.intrinsicWidth ||
-                oldDrawable.intrinsicHeight != drawable.intrinsicHeight) {
-
+                oldDrawable.intrinsicHeight != drawable.intrinsicHeight
+            ) {
                 drawableDirty = true
             }
 

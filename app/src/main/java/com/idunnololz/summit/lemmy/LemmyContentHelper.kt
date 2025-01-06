@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.text.Spannable
 import android.text.Spanned
 import android.text.TextUtils
 import android.util.Log

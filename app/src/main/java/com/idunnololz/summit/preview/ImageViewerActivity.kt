@@ -139,7 +139,6 @@ class ImageViewerActivity :
             binding.hdButton.setOnClickListener {
                 toggleImageQuality()
             }
-
         } else {
             binding.hdButton.visibility = View.GONE
         }
@@ -444,28 +443,26 @@ class ImageViewerActivity :
 
         val uri = Uri.parse(url)
         if (uri.host == "imgur.com" && !forceLoadAsImage &&
-            uri.encodedPath?.endsWith(".png") != true) {
-
+            uri.encodedPath?.endsWith(".png") != true
+        ) {
             binding.progressBar.visibility = View.VISIBLE
 
             websiteAdapterLoader = WebsiteAdapterLoader().apply {
                 add(ImgurWebsiteAdapter(url), url, Utils.hashSha256(url))
                 setOnEachAdapterLoadedListener a@{
                     if (it is ImgurWebsiteAdapter) {
-                        val rootView = binding.root ?: return@a
+                        val rootView = binding.root
 
-                        binding.progressBar.visibility = View.GONE
+                        rootView.post {
+                            binding.progressBar.visibility = View.GONE
 
-                        if (it.isSuccess()) {
-                            rootView.post {
+                            if (it.isSuccess()) {
                                 if (it.get().wasUrlRawGif) {
                                     loadImage(url, forceLoadAsImage = true)
                                 } else {
                                     loadImage(it.get().url)
                                 }
-                            }
-                        } else {
-                            rootView.post {
+                            } else {
                                 binding.loadingView.showDefaultErrorMessageFor(it.error)
 
                                 showUi()
@@ -604,7 +601,9 @@ class ImageViewerActivity :
                             override fun onError(error: Drawable?) {
                                 super.onError(error)
                                 binding.progressBar.visibility = View.GONE
-                                binding.loadingView.showErrorWithRetry(R.string.error_downloading_image)
+                                binding.loadingView.showErrorWithRetry(
+                                    R.string.error_downloading_image,
+                                )
                             }
 
                             override fun onSuccess(result: Drawable) {
@@ -677,7 +676,7 @@ class ImageViewerActivity :
                 binding.loadingView.showDefaultErrorMessageFor(
                     it,
                 )
-            }
+            },
         )
     }
 

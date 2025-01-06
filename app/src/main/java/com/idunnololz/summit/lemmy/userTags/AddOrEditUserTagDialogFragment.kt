@@ -25,7 +25,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEditUserTagBinding>() {
 
     companion object {
-        fun show(fragmentManager: FragmentManager, person: Person? = null, userTag: UserTag? = null) {
+        fun show(
+            fragmentManager: FragmentManager,
+            person: Person? = null,
+            userTag: UserTag? = null,
+        ) {
             AddOrEditUserTagDialogFragment()
                 .apply {
                     arguments = AddOrEditUserTagDialogFragmentArgs(
@@ -46,7 +50,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
 
         setSizeDynamically(
             width = ViewGroup.LayoutParams.MATCH_PARENT,
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
+            height = ViewGroup.LayoutParams.WRAP_CONTENT,
         )
     }
 

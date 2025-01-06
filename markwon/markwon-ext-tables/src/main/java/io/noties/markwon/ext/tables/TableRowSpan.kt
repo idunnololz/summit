@@ -24,11 +24,11 @@ class TableRowSpan(
     private val theme: TableTheme,
     val cells: List<Cell>,
     private val header: Boolean,
-    private val odd: Boolean
+    private val odd: Boolean,
 ) : ReplacementSpan() {
     @IntDef(value = [ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT])
     @Retention(
-        AnnotationRetention.SOURCE
+        AnnotationRetention.SOURCE,
     )
     annotation class Alignment
 
@@ -48,9 +48,9 @@ class TableRowSpan(
 
         override fun toString(): String {
             return "Cell{" +
-                    "alignment=" + alignment +
-                    ", text=" + text +
-                    '}'
+                "alignment=" + alignment +
+                ", text=" + text +
+                '}'
         }
     }
 
@@ -69,7 +69,7 @@ class TableRowSpan(
         text: CharSequence,
         @IntRange(from = 0) start: Int,
         @IntRange(from = 0) end: Int,
-        fm: Paint.FontMetricsInt?
+        fm: Paint.FontMetricsInt?,
     ): Int {
         // it's our absolute requirement to have width of the canvas here... because, well, it changes
         // the way we draw text. So, if we do not know the width of canvas we cannot correctly measure our text
@@ -110,7 +110,7 @@ class TableRowSpan(
         top: Int,
         y: Int,
         bottom: Int,
-        p: Paint
+        p: Paint,
     ) {
         val spanWidth = SpanUtils.width(canvas, text)
         if (recreateLayouts(spanWidth)) {
@@ -289,8 +289,9 @@ class TableRowSpan(
             SpannableString(cell.text)
         }
         spannable.getSpans(
-            0, spannable.length,
-            TableDrawableSpan::class.java
+            0,
+            spannable.length,
+            TableDrawableSpan::class.java,
         ).forEach {
             it.setWidthHint(width)
         }
@@ -302,7 +303,7 @@ class TableRowSpan(
             alignment(cell.alignment),
             1.0f,
             0.0f,
-            false
+            false,
         )
 
         // @since 4.4.0
@@ -316,8 +317,9 @@ class TableRowSpan(
 
     private fun scheduleAsyncDrawables(spannable: Spannable, recreate: Runnable) {
         val spans = spannable.getSpans(
-            0, spannable.length,
-            AsyncDrawableSpan::class.java
+            0,
+            spannable.length,
+            AsyncDrawableSpan::class.java,
         )
         if (spans != null && spans.isNotEmpty()) {
             for (span in spans) {

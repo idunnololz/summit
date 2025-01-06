@@ -219,7 +219,8 @@ fun BaseFragment<*>.showMorePostOptions(
         addItemWithIcon(
             R.id.pa_tag_user,
             getString(R.string.tag_user_format, postView.creator.name),
-            R.drawable.outline_sell_24)
+            R.drawable.outline_sell_24,
+        )
         addItemWithIcon(R.id.pa_view_source, R.string.view_raw, R.drawable.baseline_code_24)
         addItemWithIcon(
             R.id.pa_detailed_view,

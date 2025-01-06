@@ -31,4 +31,4 @@ internal annotation class ColorPickerDsl
 @JvmSynthetic
 @ColorPickerDsl
 inline fun Context.colorPickerDialog(block: ColorPickerDialog.Builder.() -> Unit) =
-  ColorPickerDialog.Builder(this).apply(block)
+    ColorPickerDialog.Builder(this).apply(block)

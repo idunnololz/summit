@@ -6,13 +6,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class AddOrEditUserTagViewModel @Inject constructor(
@@ -133,5 +132,4 @@ class AddOrEditUserTagViewModel @Inject constructor(
     fun deleteUserTag() {
         userTagsManager.deleteTag(personName)
     }
-
 }

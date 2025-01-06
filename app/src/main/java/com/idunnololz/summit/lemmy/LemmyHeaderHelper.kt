@@ -46,9 +46,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            context: Context,
-        ): LemmyHeaderHelper
+        fun create(context: Context): LemmyHeaderHelper
     }
 
     companion object {
@@ -70,6 +68,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     private val adminColor: Int = context.getColorCompat(R.color.style_red)
     private val savedColor: Int = context.getColorCompat(R.color.style_blue)
     private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
+    private val whiteTextColor: Int = context.getColorCompat(R.color.white97)
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
@@ -96,7 +95,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
             sb.append(context.getString(R.string.you))
             val e = sb.length
             sb.setSpan(
-                RoundedBackgroundSpan(infoColor, emphasisColor),
+                RoundedBackgroundSpan(backgroundColor = infoColor, textColor = whiteTextColor),
                 s,
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
@@ -373,7 +372,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
             sb.append(context.getString(R.string.you))
             val e = sb.length
             sb.setSpan(
-                RoundedBackgroundSpan(infoColor, emphasisColor),
+                RoundedBackgroundSpan(backgroundColor = infoColor, textColor = whiteTextColor),
                 s,
                 e,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,

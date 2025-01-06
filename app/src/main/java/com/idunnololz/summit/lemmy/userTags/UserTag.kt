@@ -7,4 +7,4 @@ import kotlinx.parcelize.Parcelize
 data class UserTag(
     val personName: String,
     val config: UserTagConfig,
-): Parcelable
+) : Parcelable
