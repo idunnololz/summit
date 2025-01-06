@@ -68,7 +68,13 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
     @Parcelize
     data class Result(
         val communityRef: CommunityRef.CommunityRefByName?,
+        val actionType: ActionType,
     ) : Parcelable
+
+    enum class ActionType {
+        Create,
+        Update,
+    }
 
     private val args by navArgs<CreateOrEditCommunityFragmentArgs>()
 
@@ -138,18 +144,6 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
         viewModel.loadCommunityInfoIfNeeded(args.community?.toCommunityRef())
 
-        childFragmentManager.setFragmentResultListener(
-            LanguageSelectDialogFragment.REQUEST_KEY,
-            viewLifecycleOwner,
-        ) { _, bundle ->
-            val result = bundle.getParcelableCompat<LanguageSelectDialogFragment.Result>(
-                LanguageSelectDialogFragment.REQUEST_RESULT,
-            )
-            if (result != null) {
-                viewModel.updateLanguages(result.selectedLanguages)
-            }
-        }
-
         requireMainActivity().apply {
             setupForFragment<CreateOrEditCommunityFragment>()
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
@@ -167,6 +161,42 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 }
 
             hideBottomNav()
+        }
+
+        with(binding) {
+            childFragmentManager.setFragmentResultListener(
+                LanguageSelectDialogFragment.REQUEST_KEY,
+                viewLifecycleOwner,
+            ) { _, bundle ->
+                val result = bundle.getParcelableCompat<LanguageSelectDialogFragment.Result>(
+                    LanguageSelectDialogFragment.REQUEST_RESULT,
+                )
+                if (result != null) {
+                    viewModel.updateLanguages(result.selectedLanguages)
+                }
+            }
+            childFragmentManager.setFragmentResultListener(
+                AddLinkDialogFragment.REQUEST_KEY,
+                viewLifecycleOwner,
+            ) { _, bundle ->
+                val result = bundle.getParcelableCompat<AddLinkDialogFragment.AddLinkResult>(
+                    AddLinkDialogFragment.REQUEST_KEY_RESULT,
+                )
+                if (result != null) {
+                    textFormatToolbar?.onLinkAdded(result.text, result.url)
+                }
+            }
+            childFragmentManager.setFragmentResultListener(
+                ChooseSavedImageDialogFragment.REQUEST_KEY,
+                viewLifecycleOwner,
+            ) { key, bundle ->
+                val result = bundle.getParcelableCompat<ChooseSavedImageDialogFragment.Result>(
+                    ChooseSavedImageDialogFragment.REQUEST_RESULT,
+                )
+                if (result != null) {
+                    uploadImageViewModel.uploadImage(result.fileUri)
+                }
+            }
         }
 
         textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
@@ -344,6 +374,21 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 }
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    setFragmentResult(
+                        REQUEST_KEY,
+                        bundleOf(
+                            REQUEST_RESULT to Result(
+                                communityRef = viewModel.currentCommunityData.value
+                                    ?.community
+                                    ?.toCommunityRef()
+                                    ?.copy(
+                                        instance = viewModel.instance,
+                                    ),
+                                actionType = ActionType.Update,
+                            ),
+                        ),
+                    )
+
                     binding.loadingView.hideAll()
                     setFormEnabled(enabled = true)
                     findNavController().popBackStack()
@@ -372,12 +417,13 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                         REQUEST_KEY,
                         bundleOf(
                             REQUEST_RESULT to Result(
-                                viewModel.currentCommunityData.value
+                                communityRef = viewModel.currentCommunityData.value
                                     ?.community
                                     ?.toCommunityRef()
                                     ?.copy(
                                         instance = viewModel.instance,
                                     ),
+                                actionType = ActionType.Create,
                             ),
                         ),
                     )

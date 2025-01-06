@@ -1,16 +1,13 @@
 package com.idunnololz.summit.lemmy.userTags
 
 import android.util.Log
-import com.idunnololz.summit.actions.PostReadManager
-import com.idunnololz.summit.actions.PostReadManager.Companion
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 @Singleton
 class UserTagsManager @Inject constructor(
@@ -68,7 +65,7 @@ class UserTagsManager @Inject constructor(
                         ),
                         createTs = ts,
                         updateTs = ts,
-                    )
+                    ),
                 )
             } else {
                 dao.insertUserTag(
@@ -82,7 +79,7 @@ class UserTagsManager @Inject constructor(
                         ),
                         createTs = entry.createTs,
                         updateTs = ts,
-                    )
+                    ),
                 )
             }
 

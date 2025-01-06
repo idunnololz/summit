@@ -47,7 +47,7 @@
                 android:id="@+id/bottom_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black50"
+                android:background="@color/colorOverlay"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
@@ -115,7 +115,7 @@
             android:id="@+id/dummy_app_bar"
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:background="@color/black50">
+            android:background="@color/colorOverlay">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/dummy_toolbar"
@@ -128,7 +128,8 @@
             android:id="@+id/app_bar"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:background="@color/black50">
+            android:background="@color/colorOverlay"
+            android:stateListAnimator="@null">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"

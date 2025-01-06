@@ -59,7 +59,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         init {
             val layoutInflater = LayoutInflater.from(
-                context
+                context,
             )
             this.dialogBinding =
                 ColorpickerviewDialogColorpickerBinding.inflate(layoutInflater, null, false)
@@ -69,7 +69,8 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
             colorPickerView.setColorListener(
                 ColorEnvelopeListener { envelope, fromUser ->
                     // no stubs
-                })
+                },
+            )
             super.setView(dialogBinding.root)
         }
 
@@ -153,7 +154,8 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
          * @return [Builder].
          */
         fun setPositiveButton(
-            text: CharSequence?, colorListener: ColorPickerViewListener
+            text: CharSequence?,
+            colorListener: ColorPickerViewListener,
         ): Builder {
             super.setPositiveButton(text, getOnClickListener(colorListener))
             return this
@@ -161,7 +163,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setNegativeButton(
             textId: Int,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setNegativeButton(textId, listener)
             return this
@@ -169,13 +171,15 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setNegativeButton(
             text: CharSequence?,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setNegativeButton(text, listener)
             return this
         }
 
-        private fun getOnClickListener(colorListener: ColorPickerViewListener): DialogInterface.OnClickListener {
+        private fun getOnClickListener(
+            colorListener: ColorPickerViewListener,
+        ): DialogInterface.OnClickListener {
             return object : DialogInterface.OnClickListener {
                 override fun onClick(dialogInterface: DialogInterface, i: Int) {
                     if (colorListener is ColorListener) {
@@ -276,29 +280,27 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
         }
 
         override fun setOnCancelListener(
-            onCancelListener: DialogInterface.OnCancelListener?
+            onCancelListener: DialogInterface.OnCancelListener?,
         ): Builder {
             super.setOnCancelListener(onCancelListener)
             return this
         }
 
         override fun setOnDismissListener(
-            onDismissListener: DialogInterface.OnDismissListener?
+            onDismissListener: DialogInterface.OnDismissListener?,
         ): Builder {
             super.setOnDismissListener(onDismissListener)
             return this
         }
 
-        override fun setOnKeyListener(
-            onKeyListener: DialogInterface.OnKeyListener?
-        ): Builder {
+        override fun setOnKeyListener(onKeyListener: DialogInterface.OnKeyListener?): Builder {
             super.setOnKeyListener(onKeyListener)
             return this
         }
 
         override fun setPositiveButton(
             textId: Int,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setPositiveButton(textId, listener)
             return this
@@ -306,7 +308,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setPositiveButton(
             text: CharSequence?,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setPositiveButton(text, listener)
             return this
@@ -314,7 +316,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setNeutralButton(
             textId: Int,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setNeutralButton(textId, listener)
             return this
@@ -322,7 +324,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setNeutralButton(
             text: CharSequence?,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setNeutralButton(text, listener)
             return this
@@ -335,7 +337,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setItems(
             items: Array<CharSequence>?,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setItems(items, listener)
             return this
@@ -343,7 +345,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
 
         override fun setAdapter(
             adapter: ListAdapter?,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setAdapter(adapter, listener)
             return this
@@ -352,7 +354,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
         override fun setCursor(
             cursor: Cursor?,
             listener: DialogInterface.OnClickListener?,
-            labelColumn: String
+            labelColumn: String,
         ): Builder {
             super.setCursor(cursor, listener, labelColumn)
             return this
@@ -361,7 +363,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
         override fun setMultiChoiceItems(
             itemsId: Int,
             checkedItems: BooleanArray?,
-            listener: DialogInterface.OnMultiChoiceClickListener?
+            listener: DialogInterface.OnMultiChoiceClickListener?,
         ): Builder {
             super.setMultiChoiceItems(itemsId, checkedItems, listener)
             return this
@@ -370,7 +372,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
         override fun setMultiChoiceItems(
             items: Array<CharSequence>?,
             checkedItems: BooleanArray?,
-            listener: DialogInterface.OnMultiChoiceClickListener?
+            listener: DialogInterface.OnMultiChoiceClickListener?,
         ): Builder {
             super.setMultiChoiceItems(items, checkedItems, listener)
             return this
@@ -380,7 +382,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
             cursor: Cursor?,
             isCheckedColumn: String,
             labelColumn: String,
-            listener: DialogInterface.OnMultiChoiceClickListener?
+            listener: DialogInterface.OnMultiChoiceClickListener?,
         ): Builder {
             super.setMultiChoiceItems(cursor, isCheckedColumn, labelColumn, listener)
             return this
@@ -389,7 +391,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
         override fun setSingleChoiceItems(
             itemsId: Int,
             checkedItem: Int,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setSingleChoiceItems(itemsId, checkedItem, listener)
             return this
@@ -399,7 +401,7 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
             cursor: Cursor?,
             checkedItem: Int,
             labelColumn: String,
-            listener: DialogInterface.OnClickListener?
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setSingleChoiceItems(cursor, checkedItem, labelColumn, listener)
             return this
@@ -415,14 +417,16 @@ class ColorPickerDialog(context: Context) : AlertDialog(context) {
         }
 
         override fun setSingleChoiceItems(
-            adapter: ListAdapter?, checkedItem: Int, listener: DialogInterface.OnClickListener?
+            adapter: ListAdapter?,
+            checkedItem: Int,
+            listener: DialogInterface.OnClickListener?,
         ): Builder {
             super.setSingleChoiceItems(adapter, checkedItem, listener)
             return this
         }
 
         override fun setOnItemSelectedListener(
-            listener: AdapterView.OnItemSelectedListener?
+            listener: AdapterView.OnItemSelectedListener?,
         ): Builder {
             super.setOnItemSelectedListener(listener)
             return this

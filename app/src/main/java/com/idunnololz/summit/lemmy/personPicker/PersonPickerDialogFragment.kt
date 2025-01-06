@@ -42,7 +42,7 @@ class PersonPickerDialogFragment :
             PersonPickerDialogFragment()
                 .apply {
                     arguments = PersonPickerDialogFragmentArgs(
-                        prefill
+                        prefill,
                     ).toBundle()
                 }
                 .showAllowingStateLoss(fragmentManager, "PersonPickerDialogFragment")
@@ -168,8 +168,8 @@ class PersonPickerDialogFragment :
             if (prefill != null &&
                 !isPrefillUsed &&
                 searchEditText.text.isNullOrBlank() &&
-                savedInstanceState == null) {
-
+                savedInstanceState == null
+            ) {
                 isPrefillUsed = true
                 searchEditText.setText(prefill)
             }

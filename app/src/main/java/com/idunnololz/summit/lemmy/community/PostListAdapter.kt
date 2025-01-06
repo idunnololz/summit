@@ -182,9 +182,11 @@ class PostListAdapter(
             R.layout.page_title_item ->
                 ViewBindingViewHolder(PageTitleItemBinding.bind(v))
             R.layout.item_generic_header ->
-                ViewBindingViewHolder(ItemGenericHeaderBinding.bind(v).apply {
-                    root.setTag(R.id.ghost_item, true)
-                })
+                ViewBindingViewHolder(
+                    ItemGenericHeaderBinding.bind(v).apply {
+                        root.setTag(R.id.ghost_item, true)
+                    },
+                )
             else -> throw RuntimeException("Unknown view type: $viewType")
         }
     }

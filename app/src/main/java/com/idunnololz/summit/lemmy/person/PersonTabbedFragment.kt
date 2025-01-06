@@ -60,7 +60,6 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -69,6 +68,7 @@ import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
@@ -319,7 +319,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 icon = R.drawable.baseline_message_24,
             )
 
-
             addItemWithIcon(
                 id = R.id.tag_user,
                 title = getString(R.string.tag_user_format, personRef.name),
@@ -391,7 +390,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
         val data = viewModel.personData.valueOrNull ?: return
         val context = requireContext()
-
 
         Log.d(TAG, "user id: ${data.personView.person.id}")
         Log.d(TAG, "actor id: ${data.personView.person.actor_id}")

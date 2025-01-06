@@ -8,12 +8,9 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.idunnololz.summit.account.info.AccountSubscription
-import com.idunnololz.summit.account.info.MiscAccountInfo
 import com.idunnololz.summit.util.crashlytics
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "user_tags")
@@ -31,7 +28,7 @@ data class UserTagEntry(
     val createTs: Long,
     @ColumnInfo(name = "update_ts")
     val updateTs: Long,
-): Parcelable
+) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
@@ -39,8 +36,7 @@ data class UserTagConfig(
     val tagName: String,
     val fillColor: Int,
     val borderColor: Int,
-): Parcelable
-
+) : Parcelable
 
 @ProvidedTypeConverter
 class UserTagConverters(private val moshi: Moshi) {

@@ -19,6 +19,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMessageBinding
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -308,7 +309,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                 fun goToPost() {
                     getMainActivity()?.launchPage(
-                        PostRef(args.instance, inboxItem.postId),
+                        CommentRef(args.instance, inboxItem.commentId),
                     )
                 }
 

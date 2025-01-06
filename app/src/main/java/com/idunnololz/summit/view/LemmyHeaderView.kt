@@ -217,7 +217,7 @@ class LemmyHeaderView : FrameLayout {
 
             viewWidth += max(
                 getViewWidth(textView1),
-                getViewWidth(textView2) + getViewWidth(textView3)
+                getViewWidth(textView2) + getViewWidth(textView3),
             )
 
             setMeasuredDimension(

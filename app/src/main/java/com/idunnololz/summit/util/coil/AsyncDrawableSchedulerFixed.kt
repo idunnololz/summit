@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.os.Looper
 import android.os.SystemClock
 import android.text.Spannable
-import android.text.Spanned
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -13,7 +12,6 @@ import com.idunnololz.summit.R
 import io.noties.markwon.ext.tables.TableRowSpan
 import io.noties.markwon.ext.tables.TableRowSpan.Cell
 import io.noties.markwon.image.AsyncDrawable
-import java.lang.reflect.Field
 
 object AsyncDrawableSchedulerFixed {
     fun schedule(textView: TextView) {
@@ -64,15 +62,15 @@ object AsyncDrawableSchedulerFixed {
                             textView,
                             TableRowTextViewInvalidator(span.parentSpan, textView),
                             drawable.bounds,
-                        )
+                        ),
                     )
                 } else {
                     drawable.setCallback2(
                         DrawableCallbackImpl(
                             textView,
                             invalidator,
-                            drawable.bounds
-                        )
+                            drawable.bounds,
+                        ),
                     )
                 }
             }
@@ -136,9 +134,9 @@ object AsyncDrawableSchedulerFixed {
                     .map {
                         ExtractedDrawableSpan(
                             drawableSpan = it,
-                            parentSpan = parent
+                            parentSpan = parent,
                         )
-                    }
+                    },
             )
         }
 
@@ -210,7 +208,7 @@ object AsyncDrawableSchedulerFixed {
 
     private class TableRowTextViewInvalidator(
         private val tableRowSpan: TableRowSpan,
-        private val textView: TextView
+        private val textView: TextView,
     ) :
         DrawableCallbackImpl.Invalidator, Runnable {
         override fun invalidate() {

@@ -128,8 +128,15 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             )
 
             if (result != null) {
-                result.communityRef?.let {
-                    getMainActivity()?.launchPage(it)
+                when (result.actionType) {
+                    CreateOrEditCommunityFragment.ActionType.Create -> {
+                        result.communityRef?.let {
+                            getMainActivity()?.launchPage(it)
+                        }
+                    }
+                    CreateOrEditCommunityFragment.ActionType.Update -> {
+                        viewModel.refetchCommunityOrSite(force = true)
+                    }
                 }
             }
         }

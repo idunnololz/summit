@@ -20,7 +20,6 @@ import androidx.core.view.doOnLayout
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -72,7 +71,6 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
@@ -171,8 +169,6 @@ class AddOrEditCommentFragment :
     private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
 
     private var isSent: Boolean = false
-
-    private val keyboardHiddenState = MutableStateFlow(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -421,8 +417,6 @@ class AddOrEditCommentFragment :
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
                 val imeInset = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
 
-                keyboardHiddenState.value = imeInset.bottom == 0
-
                 WindowInsetsCompat.CONSUMED
             }
 
@@ -592,16 +586,6 @@ class AddOrEditCommentFragment :
                 commentEditText.requestFocus()
             }
             setup(savedInstanceState)
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                keyboardHiddenState.collect {
-                    if (it) {
-                        if (commentEditText.isFocused) {
-                            commentEditText.clearFocus()
-                        }
-                    }
-                }
-            }
         }
     }
 

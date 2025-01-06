@@ -52,7 +52,6 @@ class RoundedBackgroundSpan(
         end: Int,
         fm: FontMetricsInt?,
     ): Int {
-
         if (fm != null) {
             fm.top = paint.fontMetrics.top.toInt()
             fm.bottom = paint.fontMetrics.bottom.toInt()
