@@ -51,7 +51,9 @@ class TranslatorsViewModel @Inject constructor(
                     for (translatorStats in translatorsStats) {
                         val (email, name, stringsTranslated) = translatorStats
 
-                        if (email == "garyguo9@gmail.com") {
+                        if (email == "garyguo9@gmail.com" ||
+                            email == "noreply-mt-google-translate-api-v3@weblate.org" ||
+                            email == "noreply-mt-weblate@weblate.org") {
                             continue
                         }
 
