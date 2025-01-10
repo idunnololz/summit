@@ -117,7 +117,7 @@
     <string name="no_results_found">Δε βρέθηκαν αποτελέσματα</string>
     <string name="history">Ιστορικό</string>
     <string name="offline_scheduler_title_text">Επέλεξε ένα χρόνο για να ανανεώσεις αυτόματα τα δεδομένα εκτός σύνδεσης.</string>
-    <string name="enable">Ενεργό</string>
+    <string name="enable">Ενεργοπ.</string>
     <string name="search">Αναζήτηση</string>
     <string name="sign_out">Αποσύνδεση</string>
     <string name="theme">Θέμα</string>
@@ -186,7 +186,7 @@
     <string name="text_emojis">Εμότζι κειμένου</string>
     <string name="bold">Έντονο</string>
     <string name="italic">Πλάγιο</string>
-    <string name="strikethrough">Διαγραφή</string>
+    <string name="strikethrough">Γραμμή διαγραφής</string>
     <string name="quote">Παράθεση</string>
     <string name="numbered_list">Αριθμημένη λίστα</string>
     <string name="add_link_to_app">Προσθ. συνδέσμου σε εφαρμ.</string>
@@ -775,8 +775,8 @@
     <string name="deselect_all">Αποεπιλογή όλων</string>
     <string name="link_type_post_link">σύνδεσμος ανάρτησης</string>
     <string name="show_edited_time">Εμφάνιση ώρας επεξεργασίας</string>
-    <string name="feature_post">Χαρακτηριστική ανάρτηση</string>
-    <string name="remove_feature_post">Αφαίρεση χαρακτηριστικής ανάρτησης</string>
+    <string name="feature_post">Επιλεγμένη ανάρτηση</string>
+    <string name="remove_feature_post">Αφαίρεση επιλεγμένης ανάρτησης</string>
     <string name="cross_post">Αναδημοσίευση</string>
     <string name="reports">Αναφορές</string>
     <string name="report">Αναφορά</string>
@@ -1090,4 +1090,10 @@
     <string name="home_page">Αρχική σελίδα</string>
     <string name="home_page_desc">Τι βλέπεις όταν ανοίγεις την εφαρμογή</string>
     <string name="change_password">Αλλαγή κωδικού πρόσβασης</string>
+    <string name="error_unable_to_feature_post">Αδυναμία επισήμανσης ανάρτησης ως (μη) επιλεγμένης.</string>
+    <string name="feature_comment">Επιλεγμένο σχόλιο</string>
+    <string name="remove_feature_comment">Αφαίρεση επιλεγμένου σχολίου</string>
+    <string name="featured_post_in_community_format">Επιλέχθη η ανάρτηση %1$s στην κοινότητα %2$s.</string>
+    <string name="unfeatured_post_in_community_format">Μη επιλεγμένη ανάρτηση %1$s στην κοινότητα %2$s.</string>
+    <string name="locale">en</string>
 </resources>
