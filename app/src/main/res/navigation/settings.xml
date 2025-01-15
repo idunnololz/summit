@@ -213,7 +213,7 @@
         android:label="SettingHistoryFragment" />
     <fragment
         android:id="@+id/settingViewTypeFragment"
-        android:name="com.idunnololz.summit.settings.viewType.SettingsViewTypeFragment"
+        android:name="com.idunnololz.summit.settings.postAppearance.SettingsViewTypeFragment"
         android:label="SettingViewTypeFragment" />
     <fragment
         android:id="@+id/settingThemeFragment"

@@ -62,6 +62,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GUEST_ACCOUNT_SETTINGS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HAPTICS_ENABLED
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
@@ -1049,6 +1050,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_POST_FEED_SHOW_SCROLL_BAR, value)
+                .apply()
+        }
+
+    var hapticsEnabled: Boolean
+        get() = prefs.getBoolean(KEY_HAPTICS_ENABLED, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_HAPTICS_ENABLED, value)
                 .apply()
         }
 

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
@@ -24,12 +25,17 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.LoopsVideoUtils
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,6 +60,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     @Inject
     lateinit var preferenceManager: PreferenceManager
+
+    @Inject
+    lateinit var okHttpClient: OkHttpClient
 
     private val playerListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -150,7 +159,8 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             },
         )
 
-        binding.playerView.findViewById<View>(androidx.media3.ui.R.id.exo_fullscreen).visibility = View.GONE
+        binding.playerView.findViewById<View>(androidx.media3.ui.R.id.exo_fullscreen)
+            .visibility = View.GONE
 
         binding.playerView.getRotateControl().apply {
             visibility = View.VISIBLE
@@ -227,6 +237,19 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                     loadVideo(context, url, VideoType.Mp4, videoState)
                 } else if (ContentUtils.isUrlWebm(uri.path ?: "")) {
                     loadVideo(context, url, VideoType.Webm, videoState)
+                } else if (uri.host?.endsWith("loops.video", ignoreCase = true) == true) {
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+                        val videoUrl = LoopsVideoUtils.extractVideoUrl(okHttpClient, url)
+
+                        withContext(Dispatchers.Main) {
+                            if (videoUrl != null) {
+                                loadVideo(context, videoUrl, videoType, videoState)
+                            } else {
+                                showUnsupportedVideoTypeError(url)
+                                (activity as? MainActivity)?.showSystemUI()
+                            }
+                        }
+                    }
                 } else if (uri.host?.endsWith("imgur.com", ignoreCase = true) == true) {
                     if (uri.path?.endsWith(".gifv", ignoreCase = true) == true) {
                         loadVideo(
@@ -257,7 +280,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                         videoState = videoState,
                         autoPlay = preferenceManager.currentPreferences.autoPlayVideos,
                     )
-                setupMoreButton(context, url, videoType)
+                setupMoreButton(context, url, args.url, videoType)
             }
         }
     }
@@ -267,14 +290,19 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             getString(R.string.error_unsupported_video_type),
             getString(R.string.more_actions),
             {
-                showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+                showMoreVideoOptions(url, args.url, moreActionsHelper, childFragmentManager)
             },
         )
     }
 
-    private fun setupMoreButton(context: Context, url: String, videoType: VideoType) {
+    private fun setupMoreButton(
+        context: Context,
+        url: String,
+        originalUrl: String,
+        videoType: VideoType,
+    ) {
         binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
-            showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+            showMoreVideoOptions(url, originalUrl, moreActionsHelper, childFragmentManager)
         }
     }
 }

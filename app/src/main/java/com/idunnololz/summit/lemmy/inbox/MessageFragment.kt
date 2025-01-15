@@ -485,7 +485,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         getMainActivity()?.openVideo(url, videoType, state)
                     },
                     onVideoLongClickListener = { url ->
-                        showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+                        showMoreVideoOptions(
+                            url = url,
+                            originalUrl = url,
+                            moreActionsHelper = moreActionsHelper,
+                            fragmentManager = childFragmentManager
+                        )
                     },
                     onPageClick = {
                         getMainActivity()?.launchPage(it)

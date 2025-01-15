@@ -1890,6 +1890,10 @@
     <string name="tag_text_color">Tag text color</string>
     <string name="warn_delete_user_tag">Delete tag for user %1$s?</string>
     <string name="horizontal_margin_size">Horizontal margin size</string>
+    <string name="haptics">Haptics</string>
+    <string name="haptics_desc">Control whether haptic feedback is enabled for some actions.</string>
+    <string name="prefer_text_preview_icon">Prefer text preview icon</string>
+    <string name="prefer_text_preview_icon_desc">Only applies to certain views. When enables, an icon will appear for text posts that can be tapped to expand the text contents of the post.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

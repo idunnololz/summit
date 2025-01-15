@@ -19,7 +19,8 @@ data class PostInListUiConfig(
     val preferTitleText: Boolean = false,
     val contentMaxLines: Int = -1,
     val showCommunityIcon: Boolean = true,
-    val dimReadPosts: Boolean?,
+    val dimReadPosts: Boolean? = null,
+    val showTextPreviewIcon: Boolean? = null,
 ) {
     fun updateTextSizeMultiplier(it: Float): PostInListUiConfig = this.copy(
         textSizeMultiplier = it,

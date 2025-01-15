@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
@@ -144,6 +145,8 @@ class PostListViewBuilder @Inject constructor(
     private var dimReadPosts: Boolean? = postUiConfig.dimReadPosts
     private var autoPlayVideos: Boolean = preferences.autoPlayVideos
     private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
+    private var useHapticFeedback: Boolean = preferences.hapticsEnabled
+    private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -177,6 +180,7 @@ class PostListViewBuilder @Inject constructor(
         contentMaxLines = postUiConfig.contentMaxLines
         dimReadPosts = postUiConfig.dimReadPosts
         postHorizontalMarginDp = postUiConfig.horizontalMarginDp
+        showTextPreviewIcon = postUiConfig.showTextPreviewIcon ?: true
 
         globalFontSizeMultiplier =
             GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
@@ -192,6 +196,7 @@ class PostListViewBuilder @Inject constructor(
         showEditedDate = preferences.showEditedDate
         autoPlayVideos = preferences.autoPlayVideos
         parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
+        useHapticFeedback = preferences.hapticsEnabled
     }
 
     /**
@@ -981,7 +986,7 @@ class PostListViewBuilder @Inject constructor(
                                 !postView.post.body.isNullOrBlank() ||
                                     !url.isNullOrBlank()
 
-                            if (hasAdditionalContent) {
+                            if (hasAdditionalContent && showTextPreviewIcon) {
                                 showDefaultImage()
                                 iconImage?.setOnClickListener {
                                     if (fullContentContainerView != null) {

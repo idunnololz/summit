@@ -2,6 +2,7 @@ package com.idunnololz.summit.account
 
 import android.content.Context
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -129,6 +130,10 @@ class AccountActionsManager @Inject constructor(
                     1
                 }
 
+                if (preferences.hapticsEnabled) {
+                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                }
+
                 voteOn(instance, ref, newScore, getAccount())
                     .onFailure {
                         registration.voteFailed(curVote, curScore, curUpvotes, curDownvotes, it)
@@ -144,6 +149,10 @@ class AccountActionsManager @Inject constructor(
                     0
                 } else {
                     -1
+                }
+
+                if (preferences.hapticsEnabled) {
+                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 }
 
                 voteOn(instance, ref, newScore, getAccount())

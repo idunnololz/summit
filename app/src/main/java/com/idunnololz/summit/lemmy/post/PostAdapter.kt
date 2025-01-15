@@ -26,7 +26,6 @@ import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemPostViewParentCommentsBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
-import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
@@ -319,11 +318,7 @@ class PostAdapter(
         is HeaderItem -> R.layout.post_header_item
         is Item.VisibleCommentItem ->
             if (item.isExpanded) {
-                if (postAndCommentViewBuilder.hideCommentActions) {
-                    R.layout.post_comment_expanded_compact_item
-                } else {
-                    R.layout.post_comment_expanded_item
-                }
+                R.layout.post_comment_expanded_item
             } else {
                 R.layout.post_comment_collapsed_item
             }
@@ -354,30 +349,6 @@ class PostAdapter(
             R.layout.post_header_item -> ViewBindingViewHolder(PostHeaderItemBinding.bind(v))
             R.layout.post_comment_expanded_item ->
                 CommentExpandedViewHolder.fromBinding(PostCommentExpandedItemBinding.bind(v))
-                    .apply {
-                        headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                            R.drawable.baseline_arrow_upward_16,
-                            0,
-                            0,
-                            0,
-                        )
-                        headerView.textView2.compoundDrawablePadding =
-                            Utils.convertDpToPixel(4f).toInt()
-
-                        headerView.textView3.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                            R.drawable.baseline_arrow_downward_16,
-                            0,
-                            0,
-                            0,
-                        )
-                        headerView.textView3.compoundDrawablePadding =
-                            Utils.convertDpToPixel(4f).toInt()
-                        headerView.textView3.updatePaddingRelative(
-                            start = Utils.convertDpToPixel(8f).toInt(),
-                        )
-                    }
-            R.layout.post_comment_expanded_compact_item ->
-                CommentExpandedViewHolder.fromBinding(PostCommentExpandedCompactItemBinding.bind(v))
                     .apply {
                         headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
                             R.drawable.baseline_arrow_upward_16,

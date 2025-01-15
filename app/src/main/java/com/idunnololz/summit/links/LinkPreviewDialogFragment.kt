@@ -135,7 +135,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
         }
 
         launchUrl.setOnClickListener {
-            Utils.openExternalLink(context, args.url)
+            onLinkClick(args.url, null, LinkContext.Force)
         }
         copyLink.setOnClickListener {
             Utils.copyToClipboard(context, args.url)

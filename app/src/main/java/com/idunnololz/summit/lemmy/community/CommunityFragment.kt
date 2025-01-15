@@ -33,6 +33,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
@@ -101,9 +102,13 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Request
+import org.jsoup.Jsoup
 
 @AndroidEntryPoint
 class CommunityFragment :
@@ -153,6 +158,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var userTagsManager: UserTagsManager
+
+    @Inject
+    lateinit var lemmyApiClient: LemmyApiClient
 
     lateinit var preferences: Preferences
 
@@ -351,7 +359,7 @@ class CommunityFragment :
                     getMainActivity()?.openVideo(url, videoType, state)
                 },
                 onVideoLongClickListener = { url ->
-                    showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+                    showMoreVideoOptions(url, url, moreActionsHelper, childFragmentManager)
                 },
                 onPageClick = { accountId, pageRef ->
                     getMainActivity()?.launchPage(pageRef)
@@ -567,7 +575,8 @@ class CommunityFragment :
                     },
                     onAccountClick = {
                         AccountsAndSettingsDialogFragment.newInstance()
-                            .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+                            .showAllowingStateLoss(
+                                childFragmentManager, "AccountsDialogFragment")
                     },
                     onSortOrderClick = {
                         getMainActivity()?.showBottomMenu(getSortByMenu())
@@ -686,7 +695,8 @@ class CommunityFragment :
                         if (isSlideable) {
                             val mainFragment = parentFragment?.parentFragment as? MainFragment
                             if (!lockPanes) {
-                                mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.UNLOCKED)
+                                mainFragment?.setStartPanelLockState(
+                                    OverlappingPanelsLayout.LockState.UNLOCKED)
                             }
                         }
                     }
@@ -807,7 +817,8 @@ class CommunityFragment :
                             super.onScrolled(recyclerView, dx, dy)
 
                             val range =
-                                layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
+                                layoutManager.findFirstCompletelyVisibleItemPosition()..
+                                    layoutManager.findLastCompletelyVisibleItemPosition()
 
                             range.forEach {
                                 adapter?.seenItemPositions?.add(it)
