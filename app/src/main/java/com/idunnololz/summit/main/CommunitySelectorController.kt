@@ -212,6 +212,14 @@ class CommunitySelectorController @AssistedInject constructor(
             return
         }
 
+        // reset any transforms by predictive back
+        binding.csBottomSheetContainerInner.apply {
+            scaleX = 1f
+            scaleY = 1f
+            translationX = 0f
+            translationY = 0f
+        }
+
         binding.recyclerView.adapter = adapter
         binding.recyclerView.scrollToPosition(0)
 

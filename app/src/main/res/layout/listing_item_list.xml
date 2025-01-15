@@ -54,14 +54,15 @@
         </FrameLayout>
 
         <!-- Width set programmatically -->
-        <com.idunnololz.summit.view.ReactiveImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
             android:layout_marginTop="12dp"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="H,16:9"
+            style="@style/ListImageView"
+            app:layout_constraintDimensionRatio="H,16:11"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header_view" />
 

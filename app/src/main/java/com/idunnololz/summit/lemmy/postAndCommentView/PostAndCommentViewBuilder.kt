@@ -10,6 +10,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
 import android.view.ViewGroup
@@ -46,8 +47,6 @@ import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
-import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
-import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
@@ -422,6 +421,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         viewHolder.actionButtons.forEach {
             it.setOnClickListener {
                 onPostActionClick(postView, it.id)
+                if (preferences.hapticsEnabled) {
+                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                }
             }
             if (it.id == R.id.pa_reply) {
                 it.isEnabled = !postView.post.locked
@@ -603,9 +605,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         onInstanceMismatch: (String, String) -> Unit,
         onTextBound: (Spanned?) -> Unit = {},
     ) = with(holder) {
-        val isCompactView = this.rawBinding is PostCommentExpandedCompactItemBinding
+        val isCompactView = preferences.hideCommentActions
         val useMultilineHeader =
             showProfileIcons || commentHeaderLayout == CommentHeaderLayoutId.Multiline
+        val isActionsExpanded = isActionsExpanded || !preferences.hideCommentActions
 
         with(holder) {
             if (holder.state.preferUpAndDownVotes != commentShowUpAndDownVotes) {
@@ -640,32 +643,20 @@ class PostAndCommentViewBuilder @Inject constructor(
                 )
             }
 
-            when (val rb = rawBinding) {
-                is PostCommentExpandedItemBinding -> {
-                    ensureCommentsActionButtons(
-                        vh = this,
-                        root = rb.root,
-                        isSaved = commentView.saved,
-                        fullWidth = false,
-                    )
-                }
-                is PostCommentExpandedCompactItemBinding -> {
-                    if (isActionsExpanded) {
-                        ensureCommentsActionButtons(
-                            vh = this,
-                            root = root,
-                            isSaved = commentView.saved,
-                            fullWidth = false,
-                        )
-                    } else {
-                        ensureCommentsActionButtons(
-                            vh = this,
-                            root = root,
-                            isSaved = commentView.saved,
-                            removeOnly = true,
-                        )
-                    }
-                }
+            if (isActionsExpanded) {
+                ensureCommentsActionButtons(
+                    vh = this,
+                    root = root,
+                    isSaved = commentView.saved,
+                    fullWidth = false,
+                )
+            } else {
+                ensureCommentsActionButtons(
+                    vh = this,
+                    root = root,
+                    isSaved = commentView.saved,
+                    removeOnly = true,
+                )
             }
         }
 
@@ -772,6 +763,10 @@ class PostAndCommentViewBuilder @Inject constructor(
         actionButtons.forEach {
             it.setOnClickListener {
                 onCommentActionClick(commentView, it.id)
+
+                if (preferences.hapticsEnabled) {
+                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                }
             }
             if (it.id == R.id.ca_reply) {
                 it.isEnabled = !isPostLocked
@@ -865,6 +860,16 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onSignInRequired = onSignInRequired,
                 onInstanceMismatch = onInstanceMismatch,
             )
+        }
+
+        if (isCompactView) {
+            scoreCount?.visibility = View.VISIBLE
+            upvoteCount?.visibility = View.VISIBLE
+            downvoteCount?.visibility = View.VISIBLE
+        } else {
+            scoreCount?.visibility = View.GONE
+            upvoteCount?.visibility = View.GONE
+            downvoteCount?.visibility = View.GONE
         }
 
         highlightComment(highlight, highlightForever, highlightBg)

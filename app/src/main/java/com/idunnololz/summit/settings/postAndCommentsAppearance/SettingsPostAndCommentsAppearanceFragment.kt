@@ -17,7 +17,6 @@ import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentSettingsPostAndCommentsAppearanceBinding
-import com.idunnololz.summit.databinding.PostCommentExpandedCompactItemBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
@@ -334,114 +333,63 @@ class SettingsPostAndCommentsAppearanceFragment :
                     onTextBound = {},
                 )
             }
-            if (preferences.hideCommentActions) {
-                adapterHelper.addItemType(
-                    clazz = CommentView::class,
-                    inflateFn = PostCommentExpandedCompactItemBinding::inflate,
-                ) { item, b, h ->
+            adapterHelper.addItemType(
+                clazz = CommentView::class,
+                inflateFn = PostCommentExpandedItemBinding::inflate,
+            ) { item, b, h ->
+                b.headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    R.drawable.baseline_arrow_upward_16,
+                    0,
+                    0,
+                    0,
+                )
+                b.headerView.textView2.compoundDrawablePadding =
+                    Utils.convertDpToPixel(4f).toInt()
+                b.headerView.textView2.updatePaddingRelative(
+                    start = Utils.convertDpToPixel(8f).toInt(),
+                )
 
-                    b.headerView.textView2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        R.drawable.baseline_arrow_upward_16,
-                        0,
-                        0,
-                        0,
-                    )
-                    b.headerView.textView2.compoundDrawablePadding =
-                        Utils.convertDpToPixel(4f).toInt()
-                    b.headerView.textView2.updatePaddingRelative(
-                        start = Utils.convertDpToPixel(8f).toInt(),
-                    )
-
-                    postAndCommentViewBuilder.bindCommentViewExpanded(
-                        h = h,
-                        holder = CommentExpandedViewHolder.fromBinding(b),
-                        baseDepth = 0,
-                        depth = when (item.comment.id) {
-                            LemmyFakeModels.fakeCommentView1.comment.id -> {
-                                0
-                            }
-                            LemmyFakeModels.fakeCommentView2.comment.id -> {
-                                1
-                            }
-                            else -> {
-                                2
-                            }
-                        },
-                        maxDepth = Integer.MAX_VALUE,
-                        commentView = item,
-                        accountId = null,
-                        isDeleting = false,
-                        isRemoved = false,
-                        content = item.comment.content,
-                        contentSpannable = null,
-                        instance = "https://fake.instance",
-                        isPostLocked = false,
-                        isUpdating = false,
-                        highlight = false,
-                        highlightForever = false,
-                        viewLifecycleOwner = viewLifecycleOwner,
-                        isActionsExpanded = false,
-                        highlightTextData = null,
-                        onImageClick = { _, _, _ -> },
-                        onVideoClick = { _, _, _ -> },
-                        onPageClick = {},
-                        collapseSection = {},
-                        toggleActionsExpanded = {},
-                        onSignInRequired = {},
-                        onInstanceMismatch = { _, _ -> },
-                        onCommentActionClick = { _, _ -> },
-                        onLinkClick = { _, _, _ -> },
-                        onLinkLongClick = { _, _ -> },
-                    )
-                }
-            } else {
-                adapterHelper.addItemType(
-                    clazz = CommentView::class,
-                    inflateFn = PostCommentExpandedItemBinding::inflate,
-                ) { item, b, h ->
-
-                    postAndCommentViewBuilder.bindCommentViewExpanded(
-                        h = h,
-                        holder = CommentExpandedViewHolder.fromBinding(b),
-                        baseDepth = 0,
-                        depth = when (item.comment.id) {
-                            LemmyFakeModels.fakeCommentView1.comment.id -> {
-                                0
-                            }
-                            LemmyFakeModels.fakeCommentView2.comment.id -> {
-                                1
-                            }
-                            else -> {
-                                2
-                            }
-                        },
-                        maxDepth = Integer.MAX_VALUE,
-                        commentView = item,
-                        accountId = null,
-                        isDeleting = false,
-                        isRemoved = false,
-                        content = item.comment.content,
-                        contentSpannable = null,
-                        instance = "https://fake.instance",
-                        isPostLocked = false,
-                        isUpdating = false,
-                        highlight = false,
-                        highlightForever = false,
-                        viewLifecycleOwner = viewLifecycleOwner,
-                        isActionsExpanded = false,
-                        highlightTextData = null,
-                        onImageClick = { _, _, _ -> },
-                        onVideoClick = { _, _, _ -> },
-                        onPageClick = {},
-                        collapseSection = {},
-                        toggleActionsExpanded = {},
-                        onSignInRequired = {},
-                        onInstanceMismatch = { _, _ -> },
-                        onCommentActionClick = { _, _ -> },
-                        onLinkClick = { _, _, _ -> },
-                        onLinkLongClick = { _, _ -> },
-                    )
-                }
+                postAndCommentViewBuilder.bindCommentViewExpanded(
+                    h = h,
+                    holder = CommentExpandedViewHolder.fromBinding(b),
+                    baseDepth = 0,
+                    depth = when (item.comment.id) {
+                        LemmyFakeModels.fakeCommentView1.comment.id -> {
+                            0
+                        }
+                        LemmyFakeModels.fakeCommentView2.comment.id -> {
+                            1
+                        }
+                        else -> {
+                            2
+                        }
+                    },
+                    maxDepth = Integer.MAX_VALUE,
+                    commentView = item,
+                    accountId = null,
+                    isDeleting = false,
+                    isRemoved = false,
+                    content = item.comment.content,
+                    contentSpannable = null,
+                    instance = "https://fake.instance",
+                    isPostLocked = false,
+                    isUpdating = false,
+                    highlight = false,
+                    highlightForever = false,
+                    viewLifecycleOwner = viewLifecycleOwner,
+                    isActionsExpanded = false,
+                    highlightTextData = null,
+                    onImageClick = { _, _, _ -> },
+                    onVideoClick = { _, _, _ -> },
+                    onPageClick = {},
+                    collapseSection = {},
+                    toggleActionsExpanded = {},
+                    onSignInRequired = {},
+                    onInstanceMismatch = { _, _ -> },
+                    onCommentActionClick = { _, _ -> },
+                    onLinkClick = { _, _, _ -> },
+                    onLinkLongClick = { _, _ -> },
+                )
             }
         }
 

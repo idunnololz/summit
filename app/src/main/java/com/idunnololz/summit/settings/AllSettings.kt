@@ -46,6 +46,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HAPTICS_ENABLED
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HOME_FAB_QUICK_ACTION
@@ -1488,6 +1489,11 @@ class PostsFeedAppearanceSettings @Inject constructor(
         context.getString(R.string.dim_read_posts),
         context.getString(R.string.dim_read_posts_desc),
     )
+    val preferTextPreviewIcon = OnOffSettingItem(
+        null,
+        context.getString(R.string.prefer_text_preview_icon),
+        context.getString(R.string.prefer_text_preview_icon_desc),
+    )
 
     val horizontalMarginSize = SliderSettingItem(
         context.getString(R.string.horizontal_margin_size),
@@ -1883,6 +1889,12 @@ class MiscSettings @Inject constructor(
         relatedKeys = listOf(
             KEY_ANIMATION_LEVEL,
         ),
+    )
+    val haptics = OnOffSettingItem(
+        null,
+        context.getString(R.string.haptics),
+        context.getString(R.string.haptics_desc),
+        relatedKeys = listOf(KEY_HAPTICS_ENABLED),
     )
 
     override val allSettings: List<SettingItem> = listOf(

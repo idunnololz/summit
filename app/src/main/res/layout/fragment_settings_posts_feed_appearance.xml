@@ -168,6 +168,15 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/content_max_lines"/>
 
+                <include
+                    android:id="@+id/prefer_text_preview_icon"
+                    layout="@layout/on_off_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/content_max_lines"/>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>

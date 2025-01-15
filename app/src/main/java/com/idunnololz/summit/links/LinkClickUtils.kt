@@ -1,17 +1,22 @@
 package com.idunnololz.summit.links
 
 import android.content.Context
+import android.net.Uri
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewAllLinks
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewNoLinks
+import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.video.VideoState
+import org.commonmark.node.Link
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    onLinkClick(
+    getMainActivity()?.onLinkClick(
         context ?: return,
         (activity?.application as? MainApplication) ?: return,
         childFragmentManager,
@@ -22,7 +27,7 @@ fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkCon
 }
 
 fun BaseDialogFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    onLinkClick(
+    getMainActivity()?.onLinkClick(
         context ?: return,
         (activity?.application as? MainApplication) ?: return,
         childFragmentManager,
@@ -32,18 +37,7 @@ fun BaseDialogFragment<*>.onLinkClick(url: String, text: String?, linkContext: L
     )
 }
 
-fun BaseActivity.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    onLinkClick(
-        this,
-        (application as? MainApplication) ?: return,
-        supportFragmentManager,
-        url,
-        text,
-        linkContext,
-    )
-}
-
-fun onLinkClick(
+fun MainActivity.onLinkClick(
     context: Context,
     application: MainApplication,
     fragmentManager: FragmentManager,
@@ -52,6 +46,19 @@ fun onLinkClick(
     linkContext: LinkContext,
 ) {
     val preferences = application.preferences
+
+    try {
+        val uri = Uri.parse(url)
+
+        if (uri.host.equals("loops.video", ignoreCase = true) &&
+            uri.path?.startsWith("/v/", ignoreCase = true) == true) {
+
+            openVideo(url, VideoType.Unknown, null)
+            return
+        }
+    } catch (e: Exception) {
+        // do nothing
+    }
 
     when (preferences.previewLinks) {
         PreviewNoLinks -> {
@@ -85,6 +92,11 @@ enum class LinkContext {
      * Eg. the user tapped on a special view with an image and other information.
      */
     Rich,
+
+    /**
+     * Means to open the link without any bs.
+     */
+    Force,
 }
 
 object PreviewLinkOptions {

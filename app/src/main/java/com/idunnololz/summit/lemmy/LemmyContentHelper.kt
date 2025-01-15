@@ -79,7 +79,8 @@ class LemmyContentHelper(
     var alwaysShowLinkBelowPost: Boolean = false
 
     /**
-     * @param lazyUpdate If true, content will not be refreshed. Only non content related things will be setup (eg. removed post warning)
+     * @param lazyUpdate If true, content will not be refreshed. Only non content related things
+     * will be setup (eg. removed post warning)
      */
     fun setupFullContent(
         reveal: Boolean,
@@ -382,7 +383,11 @@ class LemmyContentHelper(
                 ) {
                     onVideoClickListener(url, VideoType.Unknown, customPlayerView?.getVideoState())
                 } else if (uri.host == "gfycat.com") {
-                    val keyLowerCase = uri.path?.substring(1)?.split("-")?.get(0) ?: ""
+                    val keyLowerCase = uri.path
+                        ?.substring(1)
+                        ?.split("-")
+                        ?.get(0)
+                        ?: ""
                     val thumbnailUrl = requireNotNull(postView.post.thumbnail_url)
                     val startIndex = thumbnailUrl.indexOf(keyLowerCase, ignoreCase = true)
                     if (startIndex > -1 && keyLowerCase.isNotBlank()) {
@@ -564,7 +569,8 @@ class LemmyContentHelper(
                                 videoType,
                                 customPlayerView?.getVideoState()?.let {
                                     it.copy(
-                                        currentTime = it.currentTime - ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS,
+                                        currentTime = it.currentTime -
+                                            ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS,
                                     )
                                 },
                             )

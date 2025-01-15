@@ -98,7 +98,12 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                 getMainActivity()?.openVideo(url, videoType, state)
             },
             onVideoLongClickListener = { url ->
-                showMoreVideoOptions(url, moreActionsHelper, childFragmentManager)
+                showMoreVideoOptions(
+                    url = url,
+                    originalUrl = url,
+                    moreActionsHelper = moreActionsHelper,
+                    fragmentManager = childFragmentManager
+                )
             },
             onPageClick = { accountId, pageRef ->
                 getMainActivity()?.launchPage(pageRef)

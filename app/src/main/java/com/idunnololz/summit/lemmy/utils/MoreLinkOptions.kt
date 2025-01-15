@@ -400,7 +400,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             moreActionsHelper.downloadAndShareImage(url)
         }
         R.id.open_in_browser -> {
-            onLinkClick(
+            mainActivity?.onLinkClick(
                 context = context,
                 application = mainApplication,
                 fragmentManager = fragmentManager,

@@ -107,7 +107,7 @@
             android:id="@+id/search_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/subreddit_filter_bg"
+            android:background="@drawable/search_bar_bg"
             android:layout_marginHorizontal="@dimen/padding"
             android:layout_marginTop="@dimen/padding"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"

@@ -32,7 +32,7 @@
                 android:id="@+id/search_bar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/subreddit_filter_bg"
+                android:background="@drawable/search_bar_bg"
                 android:layout_marginHorizontal="@dimen/dialog_padding"
                 android:layout_marginTop="@dimen/dialog_padding"
                 app:layout_constraintStart_toStartOf="parent"

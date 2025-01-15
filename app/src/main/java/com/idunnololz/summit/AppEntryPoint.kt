@@ -9,6 +9,7 @@ import com.idunnololz.summit.preferences.ThemeManager
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
@@ -19,4 +20,5 @@ interface AppEntryPoint {
     fun notificationsUpdaterFactory(): NotificationsUpdater.Factory
     fun conversationsManager(): ConversationsManager
     fun accountInfoManager(): AccountInfoManager
+    fun okHttpClient(): OkHttpClient
 }

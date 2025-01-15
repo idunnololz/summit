@@ -19,6 +19,7 @@ import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
     url: String,
+    originalUrl: String,
     moreActionsHelper: MoreActionsHelper,
     fragmentManager: FragmentManager,
 ): BottomMenu? {
@@ -57,19 +58,19 @@ fun BaseFragment<*>.showMoreVideoOptions(
                     moreActionsHelper.downloadVideo(context, url)
                 }
                 R.id.copy_link -> {
-                    Utils.copyToClipboard(context, url)
+                    Utils.copyToClipboard(context, originalUrl)
                 }
                 R.id.share_link -> {
-                    Utils.shareLink(context, url)
+                    Utils.shareLink(context, originalUrl)
                 }
                 R.id.open_in_browser -> {
-                    onLinkClick(url, null, LinkContext.Action)
+                    onLinkClick(originalUrl, null, LinkContext.Force)
                 }
                 R.id.open_link_incognito -> {
-                    Utils.openExternalLink(context, url, openNewIncognitoTab = true)
+                    Utils.openExternalLink(context, originalUrl, openNewIncognitoTab = true)
                 }
                 R.id.preview_link -> {
-                    LinkPreviewDialogFragment.show(fragmentManager, url)
+                    LinkPreviewDialogFragment.show(fragmentManager, originalUrl)
                 }
             }
         }
@@ -123,8 +124,8 @@ fun BaseFragment<*>.showMoreVideoOptions(
                                 context,
                                 childFragmentManager,
                                 Intent(Intent.ACTION_VIEW).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
                                     setDataAndType(uri, mimeType)
                                 },
                             )
