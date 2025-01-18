@@ -1063,4 +1063,22 @@
     <string name="message_from_format">Od %1$s</string>
     <string name="post_scores_desc">Vyberte způsob zobrazení skóre u příspěvků</string>
     <string name="comment_scores_desc">Vyberte, jak se zobrazí skóre u komentářů</string>
+    <string name="warn_delete_draft">Smazat návrh?</string>
+    <string name="current_password">Aktuální heslo</string>
+    <string name="recent_searches">Nedávná vyhledávání</string>
+    <string name="your_communities">Vaše komunity</string>
+    <string name="trending_communities">Trendujicí komunity</string>
+    <string name="account_age">Věk účtu</string>
+    <string name="guest">Host</string>
+    <string name="save_comment">Uložit komentář</string>
+    <string name="new_password">Nové heslo</string>
+    <string name="error_passwords_do_not_match">Hesla se neshodují</string>
+    <string name="password_changed">Heslo změněno</string>
+    <string name="haptics">Vibrace</string>
+    <string name="error_community_blocked">Tuto komunitu jste zablokovali. Prosím odblokujte tuto komunitu aby jste mohli vidět její příspěvky.</string>
+    <string name="search_suggestions">Nabídka vyhledávání</string>
+    <string name="switch_account">Přepnout účet</string>
+    <string name="home_page">Domovská stránka</string>
+    <string name="user">Uživatel</string>
+    <string name="change_password">Změnit heslo</string>
 </resources>
