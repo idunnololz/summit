@@ -401,6 +401,7 @@ class PostFragment :
                             getMainActivity()?.showBottomMenu(getSortByMenu())
                         },
                         onRefreshClick = {
+                            swipeRefreshLayout.isRefreshing = true
                             viewModel.fetchPostData(force = true)
                         },
                         onFindInPageClick = {
@@ -1053,8 +1054,8 @@ class PostFragment :
 
         if (itemTouchHelper == null) {
             swipeActionCallback = LemmySwipeActionCallback(
-                context,
-                binding.recyclerView,
+                context = context,
+                recyclerView = binding.recyclerView,
                 onActionSelected = { action, vh ->
                     val postView = vh.itemView.tag as? PostView
                     if (postView != null) {
@@ -1099,7 +1100,8 @@ class PostFragment :
                         onInstanceMismatch(error.accountInstance, error.apiInstance)
                     }
                 },
-                preferences.commentGestureSize,
+                gestureSize = preferences.commentGestureSize,
+                hapticsEnabled = preferences.hapticsEnabled,
             )
             itemTouchHelper = ItemTouchHelper(requireNotNull(swipeActionCallback))
         }
@@ -1109,6 +1111,7 @@ class PostFragment :
             gestureSize = preferences.commentGestureSize
             postOnlyActions = preferences.getPostSwipeActions(context)
             postOnlyGestureSize = preferences.postGestureSize
+            hapticsEnabled = preferences.hapticsEnabled
 
             updateCommentSwipeActions()
         }

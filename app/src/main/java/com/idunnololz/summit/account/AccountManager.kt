@@ -26,6 +26,7 @@ class AccountManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val preferenceManager: PreferenceManager,
     @AccountIdsSharedPreference private val accountIdsSharedPreference: SharedPreferences,
+
 ) {
 
     companion object {

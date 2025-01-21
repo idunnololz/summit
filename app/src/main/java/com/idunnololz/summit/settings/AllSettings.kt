@@ -47,7 +47,9 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HAPTICS_ENABLED
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HAPTICS_ON_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_DUPLICATE_POSTS_ON_READ
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
@@ -168,6 +170,9 @@ object SettingPath {
             SearchHomeSettings::class ->
                 context.getString(R.string.search_screen_settings)
 
+            HapticSettings::class ->
+                context.getString(R.string.vibration_and_haptics)
+
             else -> error("No name for $this")
         }
     }
@@ -278,6 +283,11 @@ class MainSettings @Inject constructor(
         context.getString(R.string.notifications),
         context.getString(R.string.notifications_desc),
     )
+    val hapticSettings = BasicSettingItem(
+        R.drawable.baseline_vibration_24,
+        context.getString(R.string.vibration_and_haptics),
+        null,
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -287,6 +297,7 @@ class MainSettings @Inject constructor(
                 settingPostsFeed,
                 settingPostAndComments,
                 settingGestures,
+                hapticSettings,
                 miscSettings,
             ),
         ),
@@ -864,6 +875,12 @@ class PostsFeedSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_POST_FEED_SHOW_SCROLL_BAR),
     )
+    val hideDuplicatePostsOnRead = OnOffSettingItem(
+        null,
+        context.getString(R.string.hide_duplicate_posts_on_read),
+        context.getString(R.string.hide_duplicate_posts_on_read_desc),
+        relatedKeys = listOf(KEY_HIDE_DUPLICATE_POSTS_ON_READ),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -887,6 +904,7 @@ class PostsFeedSettings @Inject constructor(
         prefetchPosts,
         homePage,
         postFeedShowScrollBar,
+        hideDuplicatePostsOnRead,
     )
 }
 
@@ -1646,6 +1664,31 @@ class HiddenPostsSettings @Inject constructor(
 }
 
 @Singleton
+class HapticSettings @Inject constructor(
+    @ApplicationContext private val context: Context,
+) : SearchableSettings {
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+    val haptics = OnOffSettingItem(
+        null,
+        context.getString(R.string.vibration_and_haptics),
+        null,
+        relatedKeys = listOf(KEY_HAPTICS_ENABLED),
+    )
+    val moreHaptics = OnOffSettingItem(
+        null,
+        context.getString(R.string.more_haptics),
+        context.getString(R.string.more_haptics_desc),
+        relatedKeys = listOf(KEY_HAPTICS_ON_ACTIONS),
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        haptics,
+    )
+}
+
+@Singleton
 class MiscSettings @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : SearchableSettings {
@@ -1889,12 +1932,6 @@ class MiscSettings @Inject constructor(
         relatedKeys = listOf(
             KEY_ANIMATION_LEVEL,
         ),
-    )
-    val haptics = OnOffSettingItem(
-        null,
-        context.getString(R.string.haptics),
-        context.getString(R.string.haptics_desc),
-        relatedKeys = listOf(KEY_HAPTICS_ENABLED),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -2494,6 +2531,7 @@ class AllSettings @Inject constructor(
     perCommunitySettings: PerCommunitySettings,
     notificationSettings: NotificationSettings,
     searchHomeSettings: SearchHomeSettings,
+    hapticSettings: HapticSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -2518,6 +2556,7 @@ class AllSettings @Inject constructor(
         perCommunitySettings,
         notificationSettings,
         searchHomeSettings,
+        hapticSettings,
     )
 
     init {

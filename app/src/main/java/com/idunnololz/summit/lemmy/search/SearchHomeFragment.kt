@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -70,6 +71,7 @@ import com.idunnololz.summit.util.clearExcludeRegionFromSystemGestures
 import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -322,26 +324,31 @@ class SearchHomeFragment :
                 context = context,
                 avatarHelper = avatarHelper,
                 searchHomeConfig = preferences.searchHomeConfig,
-                onSuggestionClick = {
-                    launchSearch(it)
+                onSuggestionClick = { view, query ->
+                    launchSearch(query)
                 },
-                onRemoveSuggestionClick = {
+                onRemoveSuggestionClick = { view, query ->
                     viewModel.deleteSuggestion(
                         componentName = requireActivity().componentName,
-                        suggestion = it,
+                        suggestion = query,
                     )
+
+                    if (preferences.hapticsOnActions) {
+                        view.performHapticFeedbackCompat(
+                            HapticFeedbackConstantsCompat.CONFIRM)
+                    }
                 },
-                onCommunityClick = {
+                onCommunityClick = { view, community ->
                     requireMainActivity().launchPage(
-                        page = it,
+                        page = community,
                         preferMainFragment = true,
                     )
                 },
-                onCommunityLongClick = {
-                    val url = it.toUrl(viewModel.apiInstance)
+                onCommunityLongClick = { view, community ->
+                    val url = community.toUrl(viewModel.apiInstance)
                     getMainActivity()?.showMoreLinkOptions(url, null)
                 },
-                onSettingsClick = {
+                onSettingsClick = { view ->
                     SearchHomeConfigDialogFragment.show(
                         childFragmentManager,
                     )
@@ -521,11 +528,11 @@ class SearchHomeFragment :
         private val context: Context,
         private val avatarHelper: AvatarHelper,
         searchHomeConfig: SearchHomeConfig,
-        private val onSuggestionClick: (String) -> Unit,
-        private val onRemoveSuggestionClick: (String) -> Unit,
-        private val onCommunityClick: (CommunityRef) -> Unit,
-        private val onCommunityLongClick: (CommunityRef) -> Unit,
-        private val onSettingsClick: () -> Unit,
+        private val onSuggestionClick: (View, String) -> Unit,
+        private val onRemoveSuggestionClick: (View, String) -> Unit,
+        private val onCommunityClick: (View, CommunityRef) -> Unit,
+        private val onCommunityLongClick: (View, CommunityRef) -> Unit,
+        private val onSettingsClick: (View) -> Unit,
     ) : Adapter<RecyclerView.ViewHolder>() {
 
         sealed interface Item {
@@ -613,7 +620,7 @@ class SearchHomeFragment :
                     context.getString(R.string.error_search_home_no_sections_selected),
                     context.getString(R.string.search_screen_settings),
                 ) {
-                    onSettingsClick()
+                    onSettingsClick(it)
                 }
             }
             addItemType(
@@ -625,7 +632,7 @@ class SearchHomeFragment :
                     b.settings.excludeRegionFromSystemGestures()
                     b.settings.visibility = View.VISIBLE
                     b.settings.setOnClickListener {
-                        onSettingsClick()
+                        onSettingsClick(it)
                     }
                 } else {
                     b.settings.clearExcludeRegionFromSystemGestures()
@@ -638,10 +645,10 @@ class SearchHomeFragment :
             ) { item, b, _ ->
                 b.text.text = item.suggestion
                 b.cardView.setOnClickListener {
-                    onSuggestionClick(item.suggestion)
+                    onSuggestionClick(it, item.suggestion)
                 }
                 b.remove.setOnClickListener {
-                    onRemoveSuggestionClick(item.suggestion)
+                    onRemoveSuggestionClick(it, item.suggestion)
                 }
             }
             addItemType(
@@ -658,10 +665,10 @@ class SearchHomeFragment :
                 b.subtitle.text = item.community.instance
 
                 b.cardView.setOnClickListener {
-                    onCommunityClick(item.communityRef)
+                    onCommunityClick(it, item.communityRef)
                 }
                 b.cardView.setOnLongClickListener {
-                    onCommunityLongClick(item.communityRef)
+                    onCommunityLongClick(it, item.communityRef)
                     true
                 }
             }
@@ -979,8 +986,8 @@ class SearchHomeFragment :
     private class SuggestedCommunitiesAdapter(
         private val context: Context,
         private val avatarHelper: AvatarHelper,
-        private val onCommunityClick: (CommunityRef) -> Unit,
-        private val onCommunityLongClick: (CommunityRef) -> Unit,
+        private val onCommunityClick: (View, CommunityRef) -> Unit,
+        private val onCommunityLongClick: (View, CommunityRef) -> Unit,
     ) : Adapter<RecyclerView.ViewHolder>() {
 
         private sealed interface Item {
@@ -1045,10 +1052,10 @@ class SearchHomeFragment :
                 b.posts.typeface = LemmyHeaderHelper.condensedTypeface
 
                 b.cardView.setOnClickListener {
-                    onCommunityClick(item.communityRef)
+                    onCommunityClick(it, item.communityRef)
                 }
                 b.cardView.setOnLongClickListener {
-                    onCommunityLongClick(item.communityRef)
+                    onCommunityLongClick(it, item.communityRef)
                     true
                 }
             }

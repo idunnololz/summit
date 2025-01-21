@@ -24,6 +24,7 @@ import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -36,6 +37,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -87,6 +89,7 @@ class CommunityViewModel @Inject constructor(
     private val postFeedPrefetcher: PostFeedPrefetcher,
     private val postPrefetcher: PostPrefetcher,
     val basePreferences: Preferences,
+    private val duplicatePostsDetector: DuplicatePostsDetector,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -258,6 +261,27 @@ class CommunityViewModel @Inject constructor(
             postReadManager.postReadChanged.collect {
                 val pagesCopy = withContext(Dispatchers.Main) {
                     ArrayList(postListEngine.pages)
+                }
+
+                pagesCopy.forEach {
+                    it.posts.forEach {
+                        if (duplicatePostsDetector
+                            .isPostDuplicateOfRead(it.fetchedPost.postView)) {
+                            val postRef = duplicatePostsDetector.getPostDuplicates(
+                                it.fetchedPost.postView)
+                            val post = it.fetchedPost.postView
+
+                            Log.d("HAHA", "Marking duplicate post as read! " +
+                                "og: https://${postRef?.instance}/post/${postRef?.id}" +
+                                "nw: https://${post.instance}/post/${post.post.id}")
+
+                            postReadManager.markPostAsReadLocal(
+                                instance = it.fetchedPost.postView.instance,
+                                postId = it.fetchedPost.postView.post.id,
+                                read = true
+                            )
+                        }
+                    }
                 }
 
                 val updatedPages = withContext(Dispatchers.Default) {

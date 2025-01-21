@@ -69,7 +69,7 @@
                     android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/use_material_you"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <include
@@ -85,12 +85,12 @@
                     android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/use_black_theme"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/less_dark_background_theme"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -145,7 +145,7 @@
                     android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/transparent_notification_bar"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

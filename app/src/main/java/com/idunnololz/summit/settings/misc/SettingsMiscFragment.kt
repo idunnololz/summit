@@ -213,13 +213,6 @@ class SettingsMiscFragment :
                 preferences.uploadImagesToImgur = it
             },
         )
-        settings.haptics.bindTo(
-            binding.haptics,
-            { preferences.hapticsEnabled },
-            {
-                preferences.hapticsEnabled = it
-            }
-        )
         binding.uploadImagesToImgur.desc.movementMethod = CustomLinkMovementMethod().apply {
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
                 override fun onClick(

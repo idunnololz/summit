@@ -36,13 +36,13 @@
 
                 <include
                     android:id="@+id/open_links_in_app"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/auto_link_phone_numbers"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -54,13 +54,13 @@
 
                 <include
                     android:id="@+id/restore_last_post"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/left_hand_mode"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -72,7 +72,7 @@
 
                 <include
                     android:id="@+id/use_predictive_back"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -84,43 +84,43 @@
 
                 <include
                     android:id="@+id/indicate_posts_and_comments_created_by_current_user"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/save_drafts_automatically"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/large_screen_support"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_edited_date"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/image_preview_hide_ui_by_default"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/auto_play_videos"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/upload_images_to_imgur"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -131,14 +131,8 @@
                     android:layout_height="wrap_content"/>
 
                 <include
-                    android:id="@+id/haptics"
-                    layout="@layout/on_off_setting_item"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <include
                     android:id="@+id/rotate_instance_on_upload_fail"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

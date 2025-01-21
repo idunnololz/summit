@@ -48,19 +48,19 @@
 
                 <include
                     android:id="@+id/infinity"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/mark_posts_as_read_on_scroll"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/blur_nsfw_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -72,7 +72,7 @@
 
                 <include
                     android:id="@+id/view_image_on_single_tap"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -84,25 +84,25 @@
 
                 <include
                     android:id="@+id/lock_bottom_bar"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_post_upvote_percentage"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/use_multiline_post_headers"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/prefetch_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -114,7 +114,7 @@
 
                 <include
                     android:id="@+id/parse_markdown_in_post_titles"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -126,7 +126,13 @@
 
                 <include
                     android:id="@+id/show_scroll_bar"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/hide_duplicate_posts_on_read"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -166,37 +172,37 @@
 
                 <include
                     android:id="@+id/show_link_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_image_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_video_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_text_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_nsfw_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_filtered_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -212,13 +218,13 @@
 
                 <include
                     android:id="@+id/auto_load_more_posts"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/infinity_page_indicator"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

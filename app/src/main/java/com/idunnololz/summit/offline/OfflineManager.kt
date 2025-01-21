@@ -182,8 +182,9 @@ class OfflineManager @Inject constructor(
     }
 
     private fun getFilenameForUrl(url: String): String {
-        val extension = if (url.lastIndexOf(".") != -1) {
-            url.substring(url.lastIndexOf("."))
+        val baseUrl = url.split("?")[0]
+        val extension = if (baseUrl.lastIndexOf(".") != -1) {
+            baseUrl.substring(baseUrl.lastIndexOf("."))
         } else {
             ""
         }

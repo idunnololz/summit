@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.EditText
 import androidx.annotation.DrawableRes
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -49,9 +51,11 @@ import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StringSearchUtils
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
@@ -84,7 +88,13 @@ class CommunitySelectorController @AssistedInject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val animationsHelper: AnimationsHelper,
     private val avatarHelper: AvatarHelper,
+    private val preferences: Preferences,
 ) {
+
+    companion object {
+        private const val TAG = "CommunitySelectorController"
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(
@@ -206,6 +216,8 @@ class CommunitySelectorController @AssistedInject constructor(
     }
 
     fun show(bottomSheetContainer: ViewGroup, activity: MainActivity) {
+        Log.d(TAG, "show()")
+
         val rootView = rootView ?: return
 
         if (rootView.parent != null) {
@@ -526,6 +538,11 @@ class CommunitySelectorController @AssistedInject constructor(
                                     item.communityView.community.id,
                                     true,
                                 )
+
+                                if (preferences.hapticsOnActions) {
+                                    it.performHapticFeedbackCompat(
+                                        HapticFeedbackConstantsCompat.CONFIRM)
+                                }
                             }
                         } else {
                             b.actionButton.text = context.getString(R.string.unsubscribe)
@@ -534,6 +551,11 @@ class CommunitySelectorController @AssistedInject constructor(
                                     item.communityView.community.id,
                                     false,
                                 )
+
+                                if (preferences.hapticsOnActions) {
+                                    it.performHapticFeedbackCompat(
+                                        HapticFeedbackConstantsCompat.CONFIRM)
+                                }
                             }
                         }
                         b.moreInfo.visibility = View.VISIBLE

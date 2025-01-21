@@ -63,9 +63,11 @@ class ComposedPreferences(
 
     override fun registerOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener?,
-    ) = throw RuntimeException(
-        "registerOnSharedPreferenceChangeListener is not supported by ComposedPreferences.",
-    )
+    ) {
+        preferences.forEach {
+            it.registerOnSharedPreferenceChangeListener(listener)
+        }
+    }
 
     override fun unregisterOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener?,

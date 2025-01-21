@@ -48,7 +48,7 @@ class CommentNavViewController(
                 startY = e.rawY.toInt()
 
                 statButton.performHapticFeedback(
-                    HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.LONG_PRESS,
                 )
             }
         },

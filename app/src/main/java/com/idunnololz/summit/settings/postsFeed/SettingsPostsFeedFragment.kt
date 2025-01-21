@@ -351,6 +351,13 @@ class SettingsPostsFeedFragment :
                 preferences.postFeedShowScrollBar = it
             },
         )
+        settings.hideDuplicatePostsOnRead.bindTo(
+            binding.hideDuplicatePostsOnRead,
+            { preferences.hideDuplicatePostsOnRead },
+            {
+                preferences.hideDuplicatePostsOnRead = it
+            },
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

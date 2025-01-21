@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.GuestOrUserAccount
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.utils.StableAccountId
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -14,6 +15,7 @@ class PreferenceManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val baseSharedPreferences: SharedPreferences,
     val basePreferences: Preferences,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
     private var currentAccount: Account? = null
@@ -42,13 +44,18 @@ class PreferenceManager @Inject constructor(
         _currentPreferences = Preferences(
             context = context,
             prefs = ComposedPreferences(prefs),
+            coroutineScopeFactory = coroutineScopeFactory,
         )
 
         return _currentPreferences!!
     }
 
     fun getOnlyPreferencesForAccount(account: Account): Preferences {
-        return Preferences(context, getSharedPreferencesForAccount(account))
+        return Preferences(
+            context = context,
+            prefs = getSharedPreferencesForAccount(account),
+            coroutineScopeFactory = coroutineScopeFactory
+        )
     }
 
     fun getSharedPreferencesForAccount(account: Account): SharedPreferences {

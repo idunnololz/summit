@@ -1045,8 +1045,8 @@ class CommunityFragment :
 
         if (itemTouchHelper == null) {
             swipeActionCallback = LemmySwipeActionCallback(
-                context,
-                binding.recyclerView,
+                context = context,
+                recyclerView = binding.recyclerView,
                 onActionSelected = { action, vh ->
                     val fetchedPost = vh.itemView.getTag(R.id.fetched_post) as? FetchedPost
                         ?: return@LemmySwipeActionCallback
@@ -1098,7 +1098,8 @@ class CommunityFragment :
                         }
                     }
                 },
-                preferences.postGestureSize,
+                gestureSize = preferences.postGestureSize,
+                hapticsEnabled = preferences.hapticsEnabled,
             )
             itemTouchHelper = ItemTouchHelper(
                 requireNotNull(swipeActionCallback) {
@@ -1116,6 +1117,7 @@ class CommunityFragment :
         if (!isBindingAvailable()) return
         val context = requireContext()
         this.gestureSize = preferences.postGestureSize
+        this.hapticsEnabled = preferences.hapticsEnabled
         this.actions = preferences.getPostSwipeActions(context)
     }
 

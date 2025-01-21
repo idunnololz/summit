@@ -98,7 +98,7 @@
 
                 <include
                     android:id="@+id/always_show_link_below_post"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -146,13 +146,13 @@
 
                 <include
                     android:id="@+id/show_comment_actions"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/tap_comment_to_collapse"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -164,7 +164,7 @@
 
                 <include
                     android:id="@+id/use_condensed_typeface_for_comment_header"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

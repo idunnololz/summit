@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
@@ -44,6 +45,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -212,16 +214,34 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 R.id.mark_as_unread -> {
                     inboxViewModel.markAsRead(args.inboxItem, read = false)
                     (parentFragment as? InboxTabbedFragment)?.closeMessage()
+
+                    if (preferences.hapticsOnActions) {
+                        binding.bottomAppBar.performHapticFeedbackCompat(
+                            HapticFeedbackConstantsCompat.CONFIRM)
+                    }
+
                     true
                 }
                 R.id.upvote -> {
                     val commentId = (args.inboxItem as CommentBackedItem).commentId
                     accountActionsManager.vote(args.instance, VotableRef.CommentRef(commentId), 1)
+
+                    if (preferences.hapticsOnActions) {
+                        binding.bottomAppBar.performHapticFeedbackCompat(
+                            HapticFeedbackConstantsCompat.CONFIRM)
+                    }
+
                     true
                 }
                 R.id.downvote -> {
                     val commentId = (args.inboxItem as CommentBackedItem).commentId
                     accountActionsManager.vote(args.instance, VotableRef.CommentRef(commentId), -1)
+
+                    if (preferences.hapticsOnActions) {
+                        binding.bottomAppBar.performHapticFeedbackCompat(
+                            HapticFeedbackConstantsCompat.CONFIRM)
+                    }
+
                     true
                 }
                 else -> {
@@ -242,6 +262,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             binding.fab.setOnClickListener {
                 inboxViewModel.markAsRead(inboxItem, true)
                 (parentFragment as? InboxTabbedFragment)?.closeMessage()
+
+                if (preferences.hapticsOnActions) {
+                    binding.bottomAppBar.performHapticFeedbackCompat(
+                        HapticFeedbackConstantsCompat.CONFIRM)
+                }
             }
         } else {
             binding.fab.setImageResource(R.drawable.baseline_reply_24)
@@ -262,6 +287,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             inboxItem = inboxItem,
                         ).toBundle()
                 }.show(childFragmentManager, "asdf")
+
+                if (preferences.hapticsOnActions) {
+                    binding.bottomAppBar.performHapticFeedbackCompat(
+                        HapticFeedbackConstantsCompat.CONFIRM)
+                }
             }
         }
 

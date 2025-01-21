@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -84,13 +86,17 @@ class PersonCommentsFragment :
                     )
                     .createAndShow(childFragmentManager, "aa")
             },
-            onCommentActionClick = { commentView, actionId ->
+            onCommentActionClick = { view, commentView, actionId ->
                 createCommentActionHandler(
                     apiInstance = parentFragment.viewModel.instance,
                     commentView = commentView,
                     moreActionsHelper = moreActionsHelper,
                     fragmentManager = childFragmentManager,
                 )(actionId)
+
+                if (preferences.hapticsOnActions) {
+                    view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                }
             },
             onImageClick = { view, url ->
                 getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)

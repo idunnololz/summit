@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.dispose
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
+import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -225,7 +226,8 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             data class Divider(val key: String) : Item
             data class ProfileItem(
                 val name: String?,
-                val account: FullAccount?,
+                val account: Account?,
+                val accountInfo: AccountInfo?,
                 val person: PersonView?,
             ) : Item
             data class MenuItem(
@@ -264,8 +266,8 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             ) { _, _, _ ->
             }
             addItemType(Item.ProfileItem::class, ItemYouProfileBinding::inflate) { item, b, h ->
-                val account = item.account?.account
-                val profileUrl = item.account?.accountInfo?.miscAccountInfo?.avatar
+                val account = item.account
+                val profileUrl = item.accountInfo?.miscAccountInfo?.avatar
 
                 if (account != null) {
                     b.profileIcon.imageTintList = null
@@ -370,16 +372,15 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
 
             val model = model
             if (model != null) {
-                val account = model.fullAccount
-
                 newItems += Item.HeaderItem
                 newItems += Item.ProfileItem(
                     name = model.name,
-                    account = account,
+                    account = model.account,
+                    accountInfo = model.accountInfo,
                     person = model.personResult.getOrNull()?.person_view,
                 )
 
-                if (account != null) {
+                if (model.account != null) {
                     newItems += Item.MenuItem(
                         R.id.profile,
                         R.drawable.outline_account_circle_24,
@@ -388,7 +389,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     newItems += Item.Divider("div1")
                 }
 
-                if (account != null) {
+                if (model.account != null) {
                     newItems += Item.MenuItem(
                         R.id.saved,
                         R.drawable.outline_bookmark_border_24,
@@ -405,7 +406,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     R.drawable.outline_visibility_off_24,
                     R.string.hidden_posts,
                 )
-                if (account != null) {
+                if (model.account != null) {
                     newItems += Item.MenuItem(
                         R.id.blocked,
                         R.drawable.baseline_block_24,

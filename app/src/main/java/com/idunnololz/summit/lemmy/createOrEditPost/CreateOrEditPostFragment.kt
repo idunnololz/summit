@@ -17,6 +17,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
@@ -61,6 +62,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -217,562 +219,570 @@ class CreateOrEditPostFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
-            insetViewAutomaticallyByMargins(viewLifecycleOwner, binding.contentOuter)
-        }
-
-        binding.toolbar.inflateMenu(R.menu.menu_create_or_edit_post)
-
-        if (isEdit()) {
-            binding.toolbar.title = getString(R.string.edit_post)
-            binding.toolbar.menu.findItem(R.id.create_post)?.isVisible = false
-        } else {
-            binding.toolbar.title = getString(R.string.create_post)
-            binding.toolbar.menu.findItem(R.id.update_post)?.isVisible = false
-        }
-        binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-        binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
-        )
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-        binding.toolbar.setOnMenuItemClickListener a@{
-            when (it.itemId) {
-                R.id.create_post -> {
-                    if (uploadImageViewModel.isUploading) {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.warn_upload_in_progress)
-                            .setPositiveButton(R.string.proceed_anyways)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(this@CreateOrEditPostFragment, "create_post")
-                        return@a true
-                    }
-
-                    createPost()
-
-                    true
-                }
-                R.id.update_post -> {
-                    if (uploadImageViewModel.isUploading) {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.warn_upload_in_progress)
-                            .setPositiveButton(R.string.proceed_anyways)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(this@CreateOrEditPostFragment, "update_post")
-                        return@a true
-                    }
-
-                    updatePost()
-                    true
-                }
-                R.id.save_draft -> {
-                    saveDraft(overwriteExistingDraft = false)
-                    true
-                }
-                R.id.drafts -> {
-                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
-                    true
-                }
-                else -> false
+        with(binding) {
+            requireMainActivity().apply {
+                insetViewAutomaticallyByMargins(viewLifecycleOwner, contentOuter)
             }
-        }
 
-        binding.url.editText?.doOnTextChanged { text, _, _, _ ->
-            viewModel.setUrl(text.toString())
-        }
+            toolbar.inflateMenu(R.menu.menu_create_or_edit_post)
 
-        mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, binding.postEditText)
-        binding.postEditText.addTextChangedListener {
-            binding.root.postDelayed(
-                {
-                    onScrollUpdated()
-                },
-                10,
+            if (isEdit()) {
+                toolbar.title = getString(R.string.edit_post)
+                toolbar.menu.findItem(R.id.create_post)?.isVisible = false
+            } else {
+                toolbar.title = getString(R.string.create_post)
+                toolbar.menu.findItem(R.id.update_post)?.isVisible = false
+            }
+            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+            toolbar.setNavigationIconTint(
+                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
-        }
-        binding.titleEditText.addTextChangedListener {
-            binding.root.postDelayed(
-                {
-                    onScrollUpdated()
-                },
-                10,
-            )
-        }
-        binding.urlEditText.addTextChangedListener {
-            binding.root.postDelayed(
-                {
-                    onScrollUpdated()
-                },
-                10,
-            )
-        }
+            toolbar.setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+            toolbar.setOnMenuItemClickListener a@{
+                when (it.itemId) {
+                    R.id.create_post -> {
+                        if (uploadImageViewModel.isUploading) {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.warn_upload_in_progress)
+                                .setPositiveButton(R.string.proceed_anyways)
+                                .setNegativeButton(R.string.cancel)
+                                .createAndShow(this@CreateOrEditPostFragment, "create_post")
+                            return@a true
+                        }
 
-        textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
-            binding.postBodyToolbar.removeAllViews()
+                        createPost()
 
-            textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
-                context,
-                binding.postBodyToolbar,
-            )
+                        if (preferences.hapticsOnActions) {
+                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                        }
+                        true
+                    }
+                    R.id.update_post -> {
+                        if (uploadImageViewModel.isUploading) {
+                            AlertDialogFragment.Builder()
+                                .setMessage(R.string.warn_upload_in_progress)
+                                .setPositiveButton(R.string.proceed_anyways)
+                                .setNegativeButton(R.string.cancel)
+                                .createAndShow(this@CreateOrEditPostFragment, "update_post")
+                            return@a true
+                        }
 
-            val postEditor = binding.postEditor
-            textFormatToolbar?.setupTextFormatterToolbar(
-                editText = requireNotNull(postEditor.editText),
-                referenceTextView = null,
-                lifecycleOwner = viewLifecycleOwner,
-                fragmentManager = childFragmentManager,
-                onChooseImageClick = {
-                    val bottomMenu = BottomMenu(context).apply {
-                        setTitle(R.string.insert_image)
-                        addItemWithIcon(
-                            R.id.from_camera,
-                            R.string.take_a_photo,
-                            R.drawable.baseline_photo_camera_24,
-                        )
-                        addItemWithIcon(
-                            R.id.from_gallery,
-                            R.string.choose_from_gallery,
-                            R.drawable.baseline_image_24,
-                        )
-                        addItemWithIcon(
-                            R.id.from_camera_with_editor,
-                            R.string.take_a_photo_with_editor,
-                            R.drawable.baseline_photo_camera_24,
-                        )
-                        addItemWithIcon(
-                            R.id.from_gallery_with_editor,
-                            R.string.choose_from_gallery_with_editor,
-                            R.drawable.baseline_image_24,
-                        )
-                        addItemWithIcon(
-                            R.id.use_a_saved_image,
-                            R.string.use_a_saved_image,
-                            R.drawable.baseline_save_24,
-                        )
+                        updatePost()
 
-                        setOnMenuItemClickListener {
-                            when (it.id) {
-                                R.id.from_camera -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .cameraOnly()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.from_gallery -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .galleryOnly()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.from_camera_with_editor -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .cameraOnly()
-                                        .crop()
-                                        .cropFreeStyle()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.from_gallery_with_editor -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .galleryOnly()
-                                        .crop()
-                                        .cropFreeStyle()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.use_a_saved_image -> {
-                                    ChooseSavedImageDialogFragment()
-                                        .apply {
-                                            arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
-                                        }
-                                        .showAllowingStateLoss(
-                                            childFragmentManager,
-                                            "ChooseSavedImageDialogFragment",
-                                        )
+                        if (preferences.hapticsOnActions) {
+                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                        }
+                        true
+                    }
+                    R.id.save_draft -> {
+                        saveDraft(overwriteExistingDraft = false)
+                        true
+                    }
+                    R.id.drafts -> {
+                        DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            url.editText?.doOnTextChanged { text, _, _, _ ->
+                viewModel.setUrl(text.toString())
+            }
+
+            mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, binding.postEditText)
+            postEditText.addTextChangedListener {
+                root.postDelayed(
+                    {
+                        onScrollUpdated()
+                    },
+                    10,
+                )
+            }
+            titleEditText.addTextChangedListener {
+                root.postDelayed(
+                    {
+                        onScrollUpdated()
+                    },
+                    10,
+                )
+            }
+            urlEditText.addTextChangedListener {
+                root.postDelayed(
+                    {
+                        onScrollUpdated()
+                    },
+                    10,
+                )
+            }
+
+            textFieldToolbarManager.textFieldToolbarSettings.observe(viewLifecycleOwner) {
+                postBodyToolbar.removeAllViews()
+
+                textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
+                    context,
+                    binding.postBodyToolbar,
+                )
+
+                val postEditor = postEditor
+                textFormatToolbar?.setupTextFormatterToolbar(
+                    editText = requireNotNull(postEditor.editText),
+                    referenceTextView = null,
+                    lifecycleOwner = viewLifecycleOwner,
+                    fragmentManager = childFragmentManager,
+                    onChooseImageClick = {
+                        val bottomMenu = BottomMenu(context).apply {
+                            setTitle(R.string.insert_image)
+                            addItemWithIcon(
+                                R.id.from_camera,
+                                R.string.take_a_photo,
+                                R.drawable.baseline_photo_camera_24,
+                            )
+                            addItemWithIcon(
+                                R.id.from_gallery,
+                                R.string.choose_from_gallery,
+                                R.drawable.baseline_image_24,
+                            )
+                            addItemWithIcon(
+                                R.id.from_camera_with_editor,
+                                R.string.take_a_photo_with_editor,
+                                R.drawable.baseline_photo_camera_24,
+                            )
+                            addItemWithIcon(
+                                R.id.from_gallery_with_editor,
+                                R.string.choose_from_gallery_with_editor,
+                                R.drawable.baseline_image_24,
+                            )
+                            addItemWithIcon(
+                                R.id.use_a_saved_image,
+                                R.string.use_a_saved_image,
+                                R.drawable.baseline_save_24,
+                            )
+
+                            setOnMenuItemClickListener {
+                                when (it.id) {
+                                    R.id.from_camera -> {
+                                        val intent = ImagePicker.with(requireActivity())
+                                            .cameraOnly()
+                                            .createIntent()
+                                        launcher.launch(intent)
+                                    }
+                                    R.id.from_gallery -> {
+                                        val intent = ImagePicker.with(requireActivity())
+                                            .galleryOnly()
+                                            .createIntent()
+                                        launcher.launch(intent)
+                                    }
+                                    R.id.from_camera_with_editor -> {
+                                        val intent = ImagePicker.with(requireActivity())
+                                            .cameraOnly()
+                                            .crop()
+                                            .cropFreeStyle()
+                                            .createIntent()
+                                        launcher.launch(intent)
+                                    }
+                                    R.id.from_gallery_with_editor -> {
+                                        val intent = ImagePicker.with(requireActivity())
+                                            .galleryOnly()
+                                            .crop()
+                                            .cropFreeStyle()
+                                            .createIntent()
+                                        launcher.launch(intent)
+                                    }
+                                    R.id.use_a_saved_image -> {
+                                        ChooseSavedImageDialogFragment()
+                                            .apply {
+                                                arguments = ChooseSavedImageDialogFragmentArgs().toBundle()
+                                            }
+                                            .showAllowingStateLoss(
+                                                childFragmentManager,
+                                                "ChooseSavedImageDialogFragment",
+                                            )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    bottomMenu.show(
-                        bottomMenuContainer = requireMainActivity(),
-                        bottomSheetContainer = binding.root,
-                        expandFully = true,
-                        handleBackPress = false,
-                    )
-                },
-                onAddLinkClick = {
-                    AddLinkDialogFragment.show(
-                        binding.postEditText.getSelectedText(),
-                        childFragmentManager,
-                    )
-                },
-                onPreviewClick = {
-                    val postStr = buildString {
-                        appendLine("## ${binding.titleEditText.text}")
-                        appendLine()
-                        appendLine("![](${binding.urlEditText.text})")
-                        appendLine()
-                        appendLine(postEditor.editText?.text.toString())
-                    }
-                    PreviewCommentDialogFragment()
-                        .apply {
-                            arguments = PreviewCommentDialogFragmentArgs(
-                                args.instance,
-                                postStr,
-                            ).toBundle()
+                        bottomMenu.show(
+                            bottomMenuContainer = requireMainActivity(),
+                            bottomSheetContainer = binding.root,
+                            expandFully = true,
+                            handleBackPress = false,
+                        )
+                    },
+                    onAddLinkClick = {
+                        AddLinkDialogFragment.show(
+                            binding.postEditText.getSelectedText(),
+                            childFragmentManager,
+                        )
+                    },
+                    onPreviewClick = {
+                        val postStr = buildString {
+                            appendLine("## ${binding.titleEditText.text}")
+                            appendLine()
+                            appendLine("![](${binding.urlEditText.text})")
+                            appendLine()
+                            appendLine(postEditor.editText?.text.toString())
                         }
-                        .showAllowingStateLoss(childFragmentManager, "AA")
-                },
-                onDraftsClick = {
-                    DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
-                },
-                onSettingsClick = {
-                    EditTextToolbarSettingsDialogFragment.show(childFragmentManager)
+                        PreviewCommentDialogFragment()
+                            .apply {
+                                arguments = PreviewCommentDialogFragmentArgs(
+                                    args.instance,
+                                    postStr,
+                                ).toBundle()
+                            }
+                            .showAllowingStateLoss(childFragmentManager, "AA")
+                    },
+                    onDraftsClick = {
+                        DraftsDialogFragment.show(childFragmentManager, DraftTypes.Post)
+                    },
+                    onSettingsClick = {
+                        EditTextToolbarSettingsDialogFragment.show(childFragmentManager)
+                    },
+                )
+            }
+
+            loadingView.hideAll()
+
+            url.setEndIconOnClickListener {
+                val bottomMenu = BottomMenu(context).apply {
+                    setTitle(R.string.insert_image)
+                    addItemWithIcon(
+                        R.id.from_camera,
+                        R.string.take_a_photo,
+                        R.drawable.baseline_photo_camera_24,
+                    )
+                    addItemWithIcon(
+                        R.id.from_gallery,
+                        R.string.choose_from_gallery,
+                        R.drawable.baseline_image_24,
+                    )
+                    addItemWithIcon(
+                        R.id.from_camera_with_editor,
+                        R.string.take_a_photo_with_editor,
+                        R.drawable.baseline_photo_camera_24,
+                    )
+                    addItemWithIcon(
+                        R.id.from_gallery_with_editor,
+                        R.string.choose_from_gallery_with_editor,
+                        R.drawable.baseline_image_24,
+                    )
+                    addItemWithIcon(
+                        R.id.use_a_saved_image,
+                        R.string.use_a_saved_image,
+                        R.drawable.baseline_save_24,
+                    )
+
+                    setOnMenuItemClickListener {
+                        when (it.id) {
+                            R.id.from_camera -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .cameraOnly()
+                                    .createIntent()
+                                launcherForUrl.launch(intent)
+                            }
+                            R.id.from_gallery -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .galleryOnly()
+                                    .createIntent()
+                                launcherForUrl.launch(intent)
+                            }
+                            R.id.from_camera_with_editor -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .cameraOnly()
+                                    .crop()
+                                    .cropFreeStyle()
+                                    .createIntent()
+                                launcherForUrl.launch(intent)
+                            }
+                            R.id.from_gallery_with_editor -> {
+                                val intent = ImagePicker.with(requireActivity())
+                                    .galleryOnly()
+                                    .crop()
+                                    .cropFreeStyle()
+                                    .createIntent()
+                                launcherForUrl.launch(intent)
+                            }
+                            R.id.use_a_saved_image -> {
+                                ChooseSavedImageDialogFragment()
+                                    .apply {
+                                        arguments = ChooseSavedImageDialogFragmentArgs(
+                                            "for_link",
+                                        ).toBundle()
+                                    }
+                                    .showAllowingStateLoss(
+                                        childFragmentManager,
+                                        "ChooseSavedImageDialogFragment",
+                                    )
+                            }
+                        }
+                    }
+                }
+
+                bottomMenu.show(
+                    bottomMenuContainer = requireMainActivity(),
+                    bottomSheetContainer = root,
+                    expandFully = true,
+                    handleBackPress = true,
+                    onBackPressedDispatcher = onBackPressedDispatcher,
+                )
+            }
+            viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
+                updateEnableState()
+
+                when (it) {
+                    is StatefulData.Error -> {
+                        loadingView.hideAll()
+                        if (it.error is CreateOrEditPostViewModel.NoTitleError) {
+                            title.error = getString(R.string.required)
+                        } else {
+                            AlertDialogFragment.Builder()
+                                .setMessage(
+                                    getString(
+                                        R.string.error_unable_to_send_post,
+                                        it.error::class.qualifiedName,
+                                        it.error.message,
+                                    ),
+                                )
+                                .createAndShow(childFragmentManager, "ASDS")
+                        }
+                    }
+                    is StatefulData.Loading -> {
+                        loadingView.showProgressBar()
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        setFragmentResult(
+                            REQUEST_KEY,
+                            bundleOf(
+                                REQUEST_KEY_RESULT to it.data,
+                            ),
+                        )
+
+                        isSent = true
+                        dismiss()
+                    }
+                }
+            }
+            uploadImageViewModel.uploadImageResult.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        loadingView.hideAll()
+
+                        ErrorDialogFragment.show(
+                            getString(R.string.error_unable_to_upload_image),
+                            it.error,
+                            childFragmentManager,
+                        )
+                    }
+                    is StatefulData.Loading -> {
+                        loadingView.showProgressBar()
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        loadingView.hideAll()
+                        uploadImageViewModel.uploadImageResult.clear()
+
+                        textFormatToolbar?.onImageUploaded(it.data.url)
+                    }
+                }
+            }
+            uploadImageViewModel.uploadImageForUrlResult.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        loadingView.hideAll()
+
+                        ErrorDialogFragment.show(
+                            getString(R.string.error_unable_to_upload_image),
+                            it.error,
+                            childFragmentManager,
+                        )
+                    }
+                    is StatefulData.Loading -> {
+                        loadingView.showProgressBar()
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        loadingView.hideAll()
+                        uploadImageViewModel.uploadImageResult.clear()
+
+                        url.editText?.setText(it.data.url)
+                    }
+                }
+            }
+            viewModel.linkMetadata.observe(viewLifecycleOwner) {
+                onLinkMetadataChanged()
+            }
+
+            scrollView.setOnScrollChangeListener(
+                NestedScrollView.OnScrollChangeListener { _, _, _, _, _ ->
+                    onScrollUpdated()
                 },
             )
-        }
 
-        binding.loadingView.hideAll()
+            getMainActivity()?.insets?.observe(viewLifecycleOwner) { insets ->
+                val isImeOpen = (insets?.imeHeight ?: 0) > 0
 
-        binding.url.setEndIconOnClickListener {
-            val bottomMenu = BottomMenu(context).apply {
-                setTitle(R.string.insert_image)
-                addItemWithIcon(
-                    R.id.from_camera,
-                    R.string.take_a_photo,
-                    R.drawable.baseline_photo_camera_24,
-                )
-                addItemWithIcon(
-                    R.id.from_gallery,
-                    R.string.choose_from_gallery,
-                    R.drawable.baseline_image_24,
-                )
-                addItemWithIcon(
-                    R.id.from_camera_with_editor,
-                    R.string.take_a_photo_with_editor,
-                    R.drawable.baseline_photo_camera_24,
-                )
-                addItemWithIcon(
-                    R.id.from_gallery_with_editor,
-                    R.string.choose_from_gallery_with_editor,
-                    R.drawable.baseline_image_24,
-                )
-                addItemWithIcon(
-                    R.id.use_a_saved_image,
-                    R.string.use_a_saved_image,
-                    R.drawable.baseline_save_24,
-                )
+                root.post {
+                    onImeChange(isImeOpen)
+                }
+            }
+            root.viewTreeObserver.addOnPreDrawListener(
+                object : OnPreDrawListener {
+                    override fun onPreDraw(): Boolean {
+                        root.viewTreeObserver.removeOnPreDrawListener(this)
 
-                setOnMenuItemClickListener {
-                    when (it.id) {
-                        R.id.from_camera -> {
-                            val intent = ImagePicker.with(requireActivity())
-                                .cameraOnly()
-                                .createIntent()
-                            launcherForUrl.launch(intent)
+                        postBodyToolbarPlaceholder.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = postBodyToolbar.height
                         }
-                        R.id.from_gallery -> {
-                            val intent = ImagePicker.with(requireActivity())
-                                .galleryOnly()
-                                .createIntent()
-                            launcherForUrl.launch(intent)
+                        postBodyToolbarPlaceholder2.updateLayoutParams<LinearLayout.LayoutParams> {
+                            height = postBodyToolbar.height
                         }
-                        R.id.from_camera_with_editor -> {
-                            val intent = ImagePicker.with(requireActivity())
-                                .cameraOnly()
-                                .crop()
-                                .cropFreeStyle()
-                                .createIntent()
-                            launcherForUrl.launch(intent)
+
+                        root.post {
+                            onScrollUpdated()
                         }
-                        R.id.from_gallery_with_editor -> {
-                            val intent = ImagePicker.with(requireActivity())
-                                .galleryOnly()
-                                .crop()
-                                .cropFreeStyle()
-                                .createIntent()
-                            launcherForUrl.launch(intent)
-                        }
-                        R.id.use_a_saved_image -> {
-                            ChooseSavedImageDialogFragment()
-                                .apply {
-                                    arguments = ChooseSavedImageDialogFragmentArgs(
-                                        "for_link",
-                                    ).toBundle()
-                                }
-                                .showAllowingStateLoss(
-                                    childFragmentManager,
-                                    "ChooseSavedImageDialogFragment",
-                                )
-                        }
+
+                        return false // discard frame
+                    }
+                },
+            )
+
+            communityEditText.setOnClickListener {
+                viewModel.showSearch.value = true
+            }
+
+            communityEditText.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
+                viewModel.showSearch.value = communityEditText.hasFocus() &&
+                    !communityEditText.text.isNullOrBlank()
+            }
+
+            adapter = CommunitySearchResultsAdapter(
+                context,
+                offlineManager,
+                avatarHelper,
+                onCommunitySelected = {
+                    communityEditText.setText(it.community.toCommunityRef().fullName)
+                    viewModel.showSearch.value = false
+                },
+            )
+            communitySuggestionsRecyclerView.apply {
+                adapter = this@CreateOrEditPostFragment.adapter
+                setHasFixedSize(true)
+                setup(animationsHelper)
+                layoutManager = LinearLayoutManager(context)
+            }
+
+            viewModel.searchResults.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        adapter?.setQueryServerResults(listOf())
+                    }
+                    is StatefulData.Loading -> {
+                        adapter?.setQueryServerResultsInProgress()
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        adapter?.setQueryServerResults(it.data)
                     }
                 }
             }
 
-            bottomMenu.show(
-                bottomMenuContainer = requireMainActivity(),
-                bottomSheetContainer = binding.root,
-                expandFully = true,
-                handleBackPress = true,
-                onBackPressedDispatcher = onBackPressedDispatcher,
-            )
-        }
-        viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
+            viewModel.showSearchLiveData.observe(viewLifecycleOwner) { showSearch ->
+                if (showSearch) {
+                    showSearch()
+                } else {
+                    hideSearch()
+                }
+                updateToolbar()
+
+                showSearchBackPressedHandler.isEnabled = showSearch
+            }
+
+            communityEditText.addTextChangedListener {
+                val query = it?.toString() ?: ""
+                adapter?.setQuery(query) {
+                    communitySuggestionsRecyclerView.scrollToPosition(0)
+                }
+                viewModel.query.value = query.split("@").firstOrNull() ?: ""
+
+                if (communityEditText.hasFocus()) {
+                    viewModel.showSearch.value = query.isNotBlank()
+                }
+            }
+            viewModel.currentDraftEntry.observe(viewLifecycleOwner) {
+                if (it == null) return@observe
+
+                val data = it.data
+                if (data is DraftData.PostDraftData) {
+                    titleEditText.setText(data.name)
+                    postEditText.setText(data.body)
+                    urlEditText.setText(data.url)
+                    nsfwSwitch.isChecked = data.isNsfw
+                    communityEditText.setText(data.targetCommunityFullName)
+                }
+
+                viewModel.currentDraftEntry.postValue(null)
+            }
+
+            if (savedInstanceState == null && !viewModel.postPrefilled) {
+                viewModel.postPrefilled = true
+
+                if (args.communityName != null) {
+                    communityEditText.setText(
+                        CommunityRef.CommunityRefByName(
+                            name = requireNotNull(args.communityName),
+                            instance = args.instance,
+                        ).fullName,
+                    )
+                }
+
+                val post = args.post
+                val crossPost = args.crosspost
+                val draft = args.draft
+                if (crossPost != null) {
+                    url.editText?.setText(crossPost.url)
+                    title.editText?.setText(crossPost.name)
+                    postEditor.editText?.setText(crossPost.getCrossPostContent())
+                    nsfwSwitch.isChecked = crossPost.nsfw
+                } else if (post != null) {
+                    url.editText?.setText(post.url)
+                    title.editText?.setText(post.name)
+                    postEditor.editText?.setText(post.body)
+                    nsfwSwitch.isChecked = post.nsfw
+                } else if (draft != null) {
+                    viewModel.currentDraftEntry.value = draft
+                    viewModel.currentDraftId.value = draft.id
+                }
+            }
+
+            if (savedInstanceState == null) {
+                val extraText = args.extraText
+                val extraImage = args.extraStream
+
+                if (extraText != null) {
+                    if (URLUtil.isValidUrl(extraText)) {
+                        url.editText?.setText(extraText)
+                    } else {
+                        postEditor.editText?.setText(extraText)
+                    }
+                }
+
+                if (extraImage != null) {
+                    uploadImageViewModel.uploadImageForUrl(extraImage)
+                }
+            }
+
+            hideSearch(animate = false)
             updateEnableState()
 
-            when (it) {
-                is StatefulData.Error -> {
-                    binding.loadingView.hideAll()
-                    if (it.error is CreateOrEditPostViewModel.NoTitleError) {
-                        binding.title.error = getString(R.string.required)
-                    } else {
-                        AlertDialogFragment.Builder()
-                            .setMessage(
-                                getString(
-                                    R.string.error_unable_to_send_post,
-                                    it.error::class.qualifiedName,
-                                    it.error.message,
-                                ),
-                            )
-                            .createAndShow(childFragmentManager, "ASDS")
-                    }
-                }
-                is StatefulData.Loading -> {
-                    binding.loadingView.showProgressBar()
-                }
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        bundleOf(
-                            REQUEST_KEY_RESULT to it.data,
-                        ),
-                    )
-
-                    isSent = true
-                    dismiss()
-                }
-            }
+            onBackPressedDispatcher.addCallback(
+                viewLifecycleOwner,
+                showSearchBackPressedHandler,
+            )
         }
-        uploadImageViewModel.uploadImageResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    binding.loadingView.hideAll()
-
-                    ErrorDialogFragment.show(
-                        getString(R.string.error_unable_to_upload_image),
-                        it.error,
-                        childFragmentManager,
-                    )
-                }
-                is StatefulData.Loading -> {
-                    binding.loadingView.showProgressBar()
-                }
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    binding.loadingView.hideAll()
-                    uploadImageViewModel.uploadImageResult.clear()
-
-                    textFormatToolbar?.onImageUploaded(it.data.url)
-                }
-            }
-        }
-        uploadImageViewModel.uploadImageForUrlResult.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    binding.loadingView.hideAll()
-
-                    ErrorDialogFragment.show(
-                        getString(R.string.error_unable_to_upload_image),
-                        it.error,
-                        childFragmentManager,
-                    )
-                }
-                is StatefulData.Loading -> {
-                    binding.loadingView.showProgressBar()
-                }
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    binding.loadingView.hideAll()
-                    uploadImageViewModel.uploadImageResult.clear()
-
-                    binding.url.editText?.setText(it.data.url)
-                }
-            }
-        }
-        viewModel.linkMetadata.observe(viewLifecycleOwner) {
-            onLinkMetadataChanged()
-        }
-
-        binding.scrollView.setOnScrollChangeListener(
-            NestedScrollView.OnScrollChangeListener { _, _, _, _, _ ->
-                onScrollUpdated()
-            },
-        )
-
-        getMainActivity()?.insets?.observe(viewLifecycleOwner) { insets ->
-            val isImeOpen = (insets?.imeHeight ?: 0) > 0
-
-            binding.root.post {
-                onImeChange(isImeOpen)
-            }
-        }
-        binding.root.viewTreeObserver.addOnPreDrawListener(
-            object : OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    binding.root.viewTreeObserver.removeOnPreDrawListener(this)
-
-                    binding.postBodyToolbarPlaceholder.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        height = binding.postBodyToolbar.height
-                    }
-                    binding.postBodyToolbarPlaceholder2.updateLayoutParams<LinearLayout.LayoutParams> {
-                        height = binding.postBodyToolbar.height
-                    }
-
-                    binding.root.post {
-                        onScrollUpdated()
-                    }
-
-                    return false // discard frame
-                }
-            },
-        )
-
-        binding.communityEditText.setOnClickListener {
-            viewModel.showSearch.value = true
-        }
-
-        binding.communityEditText.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
-            viewModel.showSearch.value =
-                binding.communityEditText.hasFocus() &&
-                !binding.communityEditText.text.isNullOrBlank()
-        }
-
-        adapter = CommunitySearchResultsAdapter(
-            context,
-            offlineManager,
-            avatarHelper,
-            onCommunitySelected = {
-                binding.communityEditText.setText(it.community.toCommunityRef().fullName)
-                viewModel.showSearch.value = false
-            },
-        )
-        binding.communitySuggestionsRecyclerView.apply {
-            adapter = this@CreateOrEditPostFragment.adapter
-            setHasFixedSize(true)
-            setup(animationsHelper)
-            layoutManager = LinearLayoutManager(context)
-        }
-
-        viewModel.searchResults.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    adapter?.setQueryServerResults(listOf())
-                }
-                is StatefulData.Loading -> {
-                    adapter?.setQueryServerResultsInProgress()
-                }
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    adapter?.setQueryServerResults(it.data)
-                }
-            }
-        }
-
-        viewModel.showSearchLiveData.observe(viewLifecycleOwner) { showSearch ->
-            if (showSearch) {
-                showSearch()
-            } else {
-                hideSearch()
-            }
-            updateToolbar()
-
-            showSearchBackPressedHandler.isEnabled = showSearch
-        }
-
-        binding.communityEditText.addTextChangedListener {
-            val query = it?.toString() ?: ""
-            adapter?.setQuery(query) {
-                binding.communitySuggestionsRecyclerView.scrollToPosition(0)
-            }
-            viewModel.query.value = query.split("@").firstOrNull() ?: ""
-
-            if (binding.communityEditText.hasFocus()) {
-                viewModel.showSearch.value = query.isNotBlank()
-            }
-        }
-        viewModel.currentDraftEntry.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            val data = it.data
-            if (data is DraftData.PostDraftData) {
-                binding.titleEditText.setText(data.name)
-                binding.postEditText.setText(data.body)
-                binding.urlEditText.setText(data.url)
-                binding.nsfwSwitch.isChecked = data.isNsfw
-                binding.communityEditText.setText(data.targetCommunityFullName)
-            }
-
-            viewModel.currentDraftEntry.postValue(null)
-        }
-
-        if (savedInstanceState == null && !viewModel.postPrefilled) {
-            viewModel.postPrefilled = true
-
-            if (args.communityName != null) {
-                binding.communityEditText.setText(
-                    CommunityRef.CommunityRefByName(
-                        name = requireNotNull(args.communityName),
-                        instance = args.instance,
-                    ).fullName,
-                )
-            }
-
-            val post = args.post
-            val crossPost = args.crosspost
-            val draft = args.draft
-            if (crossPost != null) {
-                binding.url.editText?.setText(crossPost.url)
-                binding.title.editText?.setText(crossPost.name)
-                binding.postEditor.editText?.setText(crossPost.getCrossPostContent())
-                binding.nsfwSwitch.isChecked = crossPost.nsfw
-            } else if (post != null) {
-                binding.url.editText?.setText(post.url)
-                binding.title.editText?.setText(post.name)
-                binding.postEditor.editText?.setText(post.body)
-                binding.nsfwSwitch.isChecked = post.nsfw
-            } else if (draft != null) {
-                viewModel.currentDraftEntry.value = draft
-                viewModel.currentDraftId.value = draft.id
-            }
-        }
-
-        if (savedInstanceState == null) {
-            val extraText = args.extraText
-            val extraImage = args.extraStream
-
-            if (extraText != null) {
-                if (URLUtil.isValidUrl(extraText)) {
-                    binding.url.editText?.setText(extraText)
-                } else {
-                    binding.postEditor.editText?.setText(extraText)
-                }
-            }
-
-            if (extraImage != null) {
-                uploadImageViewModel.uploadImageForUrl(extraImage)
-            }
-        }
-
-        hideSearch(animate = false)
-        updateEnableState()
-
-        onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            showSearchBackPressedHandler,
-        )
     }
 
     private var isImeOpen: Boolean = false
