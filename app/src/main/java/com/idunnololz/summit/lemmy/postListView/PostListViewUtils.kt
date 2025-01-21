@@ -357,6 +357,9 @@ fun BaseFragment<*>.createPostActionHandler(
                             appendLine()
                             appendLine("Url:")
                             appendLine(postView.post.url ?: "")
+                            appendLine()
+                            appendLine("Thumbnail url:")
+                            appendLine(postView.post.thumbnail_url ?: "")
                         },
                         true,
                     ).toBundle()
