@@ -1894,6 +1894,12 @@
     <string name="haptics_desc">Control whether haptic feedback is enabled for some actions.</string>
     <string name="prefer_text_preview_icon">Prefer text preview icon</string>
     <string name="prefer_text_preview_icon_desc">Only applies to certain views. When enables, an icon will appear for text posts that can be tapped to expand the text contents of the post.</string>
+    <string name="vibration_and_haptics"><![CDATA[Vibration & haptics]]></string>
+    <string name="warn_system_haptic_feedback_disabled">Haptic feedback is disabled system-wide. You need to enable haptic feedback in the system settings for haptics to work.</string>
+    <string name="more_haptics">More haptics</string>
+    <string name="more_haptics_desc">Adds haptic feedback to most actions in the app.</string>
+    <string name="hide_duplicate_posts_on_read">Auto-hide duplicate posts</string>
+    <string name="hide_duplicate_posts_on_read_desc">If enabled the app will keep track of hidden or read posts. Any posts that are determined to be duplicates of these posts on another instance are automatically marked as read. This can reduce the feeling of seeing the same post over and over again.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
@@ -42,6 +43,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.durationToPretty
 import com.idunnololz.summit.util.ext.getDimen
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
@@ -176,11 +178,14 @@ class ScreenshotModeDialogFragment :
                 val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
                 viewModel.generateImageToSave(infographicsView, "post_screenshot_$ts")
             }
+
+            if (preferences.hapticsOnActions) {
+                view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+            }
         }
         binding.zoomLayout.isClickable = false
 
         viewModel.screenshotConfig.observe(viewLifecycleOwner) { config ->
-
             val nextPostViewType = config.postViewType
 
             binding.bottomAppBar.menu.findItem(R.id.toggle_post_view)?.apply {

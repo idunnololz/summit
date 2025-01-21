@@ -37,7 +37,7 @@
 
                 <include
                     android:id="@+id/notifications"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

@@ -433,8 +433,6 @@ class PostAdapter(
                     val k = "post:${item.postView.post.id}:${item.postView.post.updated
                         ?: item.postView.post.published}"
 
-                    Log.d("HAHA", "postKey: $k cacheHit? ${contentCache[k] != null}")
-
                     postAndCommentViewBuilder.bindPostView(
                         binding = b,
                         container = containerView,
@@ -526,7 +524,6 @@ class PostAdapter(
                 val k = "post:${item.postView.post.id}:${item.postView.post.updated
                     ?: item.postView.post.published}"
 
-                Log.d("HAHA", "postKey2: $k cacheHit? ${contentCache[k] != null}")
                 holder.itemView.setTag(R.id.swipeable, true)
 
                 postAndCommentViewBuilder.bindPostView(

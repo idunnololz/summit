@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,11 +23,13 @@ import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -58,6 +61,9 @@ class FilteredCommentsFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var preferences: Preferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,13 +107,17 @@ class FilteredCommentsFragment :
             onLoadPage = {
                 parentFragment.viewModel.fetchCommentPage(it, false)
             },
-            onCommentActionClick = { commentView, actionId ->
+            onCommentActionClick = { view, commentView, actionId ->
                 createCommentActionHandler(
                     apiInstance = parentFragment.viewModel.instance,
                     commentView = commentView,
                     moreActionsHelper = moreActionsHelper,
                     fragmentManager = childFragmentManager,
                 )(actionId)
+
+                if (preferences.hapticsOnActions) {
+                    view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                }
             },
             onLinkClick = { url, text, linkType ->
                 onLinkClick(url, text, linkType)

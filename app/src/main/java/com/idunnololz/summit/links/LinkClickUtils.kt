@@ -60,6 +60,11 @@ fun MainActivity.onLinkClick(
         // do nothing
     }
 
+    if (linkContext == LinkContext.Force) {
+        Utils.openExternalLink(context, url)
+        return
+    }
+
     when (preferences.previewLinks) {
         PreviewNoLinks -> {
             Utils.openExternalLink(context, url)

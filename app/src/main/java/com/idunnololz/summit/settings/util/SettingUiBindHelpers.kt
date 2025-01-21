@@ -4,10 +4,11 @@ import android.view.View
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
-import com.idunnololz.summit.databinding.OnOffSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupTitleSettingItemBinding
 import com.idunnololz.summit.databinding.SettingColorItemBinding
+import com.idunnololz.summit.databinding.SettingItemOnOffBinding
+import com.idunnololz.summit.databinding.SettingItemOnOffMasterBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
@@ -47,7 +48,7 @@ fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Un
 }
 
 fun OnOffSettingItem.bindTo(
-    b: OnOffSettingItemBinding,
+    b: SettingItemOnOffBinding,
     getCurrentValue: () -> Boolean,
     onValueChanged: (Boolean) -> Unit,
 ) {
@@ -75,6 +76,37 @@ fun OnOffSettingItem.bindTo(
         onValueChanged(newValue)
 
         b.switchView.isChecked = getCurrentValue()
+    }
+
+    // Prevent auto state restoration since multiple checkboxes can have the same id
+    b.switchView.isSaveEnabled = false
+}
+
+fun OnOffSettingItem.bindTo(
+    b: SettingItemOnOffMasterBinding,
+    getCurrentValue: () -> Boolean,
+    onValueChanged: (Boolean) -> Unit,
+) {
+    b.title.text = this.title
+    if (this.description != null) {
+        b.desc.visibility = View.VISIBLE
+
+        b.desc.text = LemmyTextHelper.getSpannable(b.root.context, description)
+    } else {
+        b.desc.visibility = View.GONE
+    }
+
+    // Unbind previous binding
+    b.switchView.setOnCheckedChangeListener(null)
+    b.switchView.isChecked = getCurrentValue()
+    b.switchView.jumpDrawablesToCurrentState()
+    b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
+        onValueChanged(newValue)
+
+        b.switchView.isChecked = getCurrentValue()
+    }
+    b.card.setOnClickListener {
+        b.switchView.performClick()
     }
 
     // Prevent auto state restoration since multiple checkboxes can have the same id
@@ -283,6 +315,15 @@ var SettingTextValueBinding.isEnabled: Boolean
         root.isEnabled = value
         this.title.isEnabled = value
         this.value.isEnabled = value
+    }
+
+var SettingItemOnOffBinding.isEnabled: Boolean
+    get() = root.isEnabled
+    set(value) {
+        root.isEnabled = value
+        this.title.isEnabled = value
+        this.desc.isEnabled = value
+        this.switchView.isEnabled = value
     }
 
 fun TextValueSettingItem.bindTo(

@@ -51,7 +51,7 @@ class CommentListAdapter(
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
     private val onCommentClick: (CommentRef) -> Unit,
-    private val onCommentActionClick: (CommentView, actionId: Int) -> Unit,
+    private val onCommentActionClick: (View, CommentView, actionId: Int) -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -238,7 +238,7 @@ class CommentListAdapter(
 
             viewHolder.actionButtons.forEach {
                 it.setOnClickListener {
-                    onCommentActionClick(item.commentView, it.id)
+                    onCommentActionClick(it, item.commentView, it.id)
                 }
                 if (it.id == R.id.ca_reply) {
                     it.isEnabled = !item.commentView.post.locked
@@ -268,7 +268,7 @@ class CommentListAdapter(
                 onCommentClick(CommentRef(item.instance, item.commentView.comment.id))
             }
             b.root.setOnLongClickListener {
-                onCommentActionClick(item.commentView, R.id.ca_more)
+                onCommentActionClick(it, item.commentView, R.id.ca_more)
                 true
             }
         }

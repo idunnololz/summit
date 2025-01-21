@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -63,6 +64,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -160,9 +162,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         }
 
         val adapter = PageDataAdapter(
-            context,
-            viewModel.instance,
-            offlineManager,
+            context = context,
+            instance = viewModel.instance,
+            offlineManager = offlineManager,
+            preferences = preferences,
             onImageClick = { imageName, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
@@ -641,6 +644,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val context: Context,
         private val instance: String,
         private val offlineManager: OfflineManager,
+        private val preferences: Preferences,
         private val onImageClick: (String, View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
@@ -782,6 +786,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         item.communityView.community.id,
                         item.subscribedStatus == SubscribedType.NotSubscribed,
                     )
+                    if (preferences.hapticsEnabled) {
+                        it.performHapticFeedbackCompat(
+                            HapticFeedbackConstantsCompat.CONFIRM)
+                    }
                 }
 
                 b.instanceInfo.visibility = View.VISIBLE

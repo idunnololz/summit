@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -64,6 +65,7 @@ import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -478,6 +480,9 @@ class AddOrEditCommentFragment :
                                 dismiss()
                             }
                         }
+                        if (preferences.hapticsOnActions) {
+                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                        }
                         true
                     }
                     R.id.update_comment -> {
@@ -490,6 +495,9 @@ class AddOrEditCommentFragment :
                             return@a true
                         }
                         updateComment()
+                        if (preferences.hapticsOnActions) {
+                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                        }
                         true
                     }
                     R.id.save_comment -> {

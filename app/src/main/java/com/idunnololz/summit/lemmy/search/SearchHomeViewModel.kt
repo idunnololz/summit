@@ -111,6 +111,55 @@ class SearchHomeViewModel @Inject constructor(
             currentModel.errors.isEmpty() &&
             !force
         ) {
+            viewModelScope.launch {
+                val seen = mutableSetOf<String>()
+                val searchSuggestions = ArrayList<String>()
+                val errors = mutableListOf<Throwable>()
+
+                val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+                val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
+                    componentName,
+                )
+
+                var text1Col: Int = -1
+
+                runInterruptible(Dispatchers.IO) {
+                    // Query 2x the limit because there might be case sensitive duplicates...
+                    getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
+                        if (c != null) {
+                            try {
+                                text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "error changing cursor and caching columns", e)
+                            }
+
+                            while (c.moveToNext()) {
+                                c.getStringOrNull(text1Col)?.let {
+                                    if (seen.add(it.lowercase(Locale.US))) {
+                                        searchSuggestions.add(it)
+                                        Log.d(TAG, "Got suggestion $it")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    model.setValue(
+                        currentModel.copy(
+                            suggestions = searchSuggestions.take(4),
+                            myCommunities = subscriptionCommunities.map {
+                                MyCommunity(
+                                    it.toCommunityRef(),
+                                    it,
+                                )
+                            },
+                        )
+                    )
+                }
+            }
+
             return
         }
 

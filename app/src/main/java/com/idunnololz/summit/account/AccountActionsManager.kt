@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.R
@@ -38,6 +39,7 @@ import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -130,8 +132,8 @@ class AccountActionsManager @Inject constructor(
                     1
                 }
 
-                if (preferences.hapticsEnabled) {
-                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                if (preferences.hapticsOnActions) {
+                    it.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
                 }
 
                 voteOn(instance, ref, newScore, getAccount())
@@ -151,8 +153,8 @@ class AccountActionsManager @Inject constructor(
                     -1
                 }
 
-                if (preferences.hapticsEnabled) {
-                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                if (preferences.hapticsOnActions) {
+                    it.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
                 }
 
                 voteOn(instance, ref, newScore, getAccount())

@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
@@ -70,6 +71,7 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToPretty
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
@@ -458,13 +460,23 @@ class InboxFragment :
             lifecycleOwner = viewLifecycleOwner,
             avatarHelper = avatarHelper,
             onImageClick = { url ->
-                getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+                getMainActivity()?.openImage(
+                    sharedElement = null,
+                    appBar = binding.appBar,
+                    title = null,
+                    url = url,
+                    mimeType = null
+                )
             },
             onVideoClick = { url, videoType, state ->
                 getMainActivity()?.openVideo(url, videoType, state)
             },
-            onMarkAsRead = { inboxItem, read ->
+            onMarkAsRead = { view, inboxItem, read ->
                 markAsRead(inboxItem, read)
+
+                if (preferences.hapticsOnActions) {
+                    view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                }
             },
             onPageClick = {
                 getMainActivity()?.launchPage(it)
@@ -488,7 +500,7 @@ class InboxFragment :
                     instance = viewModel.instance,
                 )
             },
-            onAddCommentClick = { inboxItem ->
+            onAddCommentClick = { view, inboxItem ->
                 if (accountInfoManager.currentFullAccount.value == null) {
                     PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                         .show(childFragmentManager, "asdf")
@@ -505,6 +517,10 @@ class InboxFragment :
                             inboxItem = inboxItem,
                         ).toBundle()
                 }.show(childFragmentManager, "asdf")
+
+                if (preferences.hapticsOnActions) {
+                    view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                }
             },
             onOverflowMenuClick = {
                 getMainActivity()?.showBottomMenu(
@@ -620,11 +636,11 @@ class InboxFragment :
             videoType: VideoType,
             videoState: VideoState?,
         ) -> Unit,
-        private val onMarkAsRead: (InboxItem, Boolean) -> Unit,
+        private val onMarkAsRead: (View, InboxItem, Boolean) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
         private val onMessageClick: (InboxItem) -> Unit,
         private val onConversationClick: (Conversation) -> Unit,
-        private val onAddCommentClick: (InboxItem) -> Unit,
+        private val onAddCommentClick: (View, InboxItem) -> Unit,
         private val onOverflowMenuClick: (InboxItem) -> Unit,
         private val onSignInRequired: () -> Unit,
         private val onInstanceMismatch: (String, String) -> Unit,

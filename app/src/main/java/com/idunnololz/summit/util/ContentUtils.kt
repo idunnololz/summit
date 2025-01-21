@@ -3,14 +3,17 @@ package com.idunnololz.summit.util
 import com.idunnololz.summit.preview.VideoType
 
 object ContentUtils {
-    fun isUrlImage(url: String) = url.endsWith(".jpg", ignoreCase = true) ||
-        url.endsWith(".jpeg", ignoreCase = true) ||
-        url.endsWith(".png", ignoreCase = true) ||
-        url.endsWith(".webp", ignoreCase = true) ||
-        url.endsWith(".gif", ignoreCase = true) ||
-        url.endsWith(".svg", ignoreCase = true) ||
-        url.endsWith(".avif", ignoreCase = true) ||
-        url.contains("/image_proxy?", ignoreCase = true)
+    fun isUrlImage(url: String): Boolean {
+        val urlWithoutParams = url.split("?")[0]
+        return urlWithoutParams.endsWith(".jpg", ignoreCase = true) ||
+            urlWithoutParams.endsWith(".jpeg", ignoreCase = true) ||
+            urlWithoutParams.endsWith(".png", ignoreCase = true) ||
+            urlWithoutParams.endsWith(".webp", ignoreCase = true) ||
+            urlWithoutParams.endsWith(".gif", ignoreCase = true) ||
+            urlWithoutParams.endsWith(".svg", ignoreCase = true) ||
+            urlWithoutParams.endsWith(".avif", ignoreCase = true) ||
+            urlWithoutParams.contains("/image_proxy?", ignoreCase = true)
+    }
 
     fun isUrlVideo(url: String) = isUrlMp4(url) ||
         isUrlWebm(url) ||

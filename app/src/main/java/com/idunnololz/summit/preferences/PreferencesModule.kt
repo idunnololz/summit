@@ -2,6 +2,7 @@ package com.idunnololz.summit.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
@@ -31,7 +32,12 @@ class PreferencesModule {
     fun providePreferences(
         @ApplicationContext context: Context,
         sharedPreferences: SharedPreferences,
-    ): Preferences = Preferences(context, sharedPreferences)
+        coroutineScopeFactory: CoroutineScopeFactory,
+    ): Preferences = Preferences(
+        context = context,
+        prefs = sharedPreferences,
+        coroutineScopeFactory = coroutineScopeFactory
+    )
 
     @Provides
     @Singleton

@@ -84,3 +84,7 @@ fun View.focusAndShowKeyboard() {
         )
     }
 }
+
+fun View.performHapticFeedbackCompat(feedbackConstant: Int) {
+    ViewCompat.performHapticFeedback(this, feedbackConstant)
+}

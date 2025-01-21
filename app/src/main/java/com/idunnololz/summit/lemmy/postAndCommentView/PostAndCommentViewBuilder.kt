@@ -26,6 +26,7 @@ import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
@@ -99,6 +100,7 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.markwon.BorderedSpan
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -421,8 +423,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         viewHolder.actionButtons.forEach {
             it.setOnClickListener {
                 onPostActionClick(postView, it.id)
-                if (preferences.hapticsEnabled) {
-                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                if (preferences.hapticsOnActions) {
+                    it.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
                 }
             }
             if (it.id == R.id.pa_reply) {
@@ -764,8 +766,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             it.setOnClickListener {
                 onCommentActionClick(commentView, it.id)
 
-                if (preferences.hapticsEnabled) {
-                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                if (preferences.hapticsOnActions) {
+                    it.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
                 }
             }
             if (it.id == R.id.ca_reply) {
@@ -1144,9 +1146,9 @@ class PostAndCommentViewBuilder @Inject constructor(
         onImageClick: (String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
         onPageClick: (PageRef) -> Unit,
-        onMarkAsRead: (InboxItem, Boolean) -> Unit,
+        onMarkAsRead: (View, InboxItem, Boolean) -> Unit,
         onMessageClick: (InboxItem) -> Unit,
-        onAddCommentClick: (InboxItem) -> Unit,
+        onAddCommentClick: (View, InboxItem) -> Unit,
         onOverflowMenuClick: (InboxItem) -> Unit,
         onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
         onLinkLongClick: (url: String, text: String) -> Unit,
@@ -1396,7 +1398,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             b.markAsRead.imageTintList =
                 ColorStateList.valueOf(context.getColorCompat(R.color.style_green))
             b.markAsRead.setOnClickListener {
-                onMarkAsRead(item, false)
+                onMarkAsRead(it, item, false)
             }
             b.author.alpha = .5f
         } else {
@@ -1409,12 +1411,12 @@ class PostAndCommentViewBuilder @Inject constructor(
                     context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
                 )
             b.markAsRead.setOnClickListener {
-                onMarkAsRead(item, true)
+                onMarkAsRead(it, item, true)
             }
         }
 
         b.reply.setOnClickListener {
-            onAddCommentClick(item)
+            onAddCommentClick(it, item)
         }
         b.moreButton.setOnClickListener {
             onOverflowMenuClick(item)

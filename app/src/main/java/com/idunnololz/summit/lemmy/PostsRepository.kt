@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.ListingType
@@ -12,11 +13,14 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -35,6 +39,8 @@ class PostsRepository @AssistedInject constructor(
     private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
     private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
     private val accountManager: AccountManager,
+    private val preferences: Preferences,
+    private val duplicatePostsDetector: DuplicatePostsDetector,
 ) {
     companion object {
         private val TAG = PostsRepository::class.simpleName
@@ -380,6 +386,7 @@ class PostsRepository @AssistedInject constructor(
         val currentDataSource = currentDataSource
         val newPostResults = currentDataSource.fetchPosts(sortType, pageIndex, force)
         val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
+        val account = accountManager.currentAccount.asAccount
 
         if (currentDataSource is MultiCommunityDataSource) {
             persistentErrors = currentDataSource.getPersistentErrors()
@@ -398,8 +405,16 @@ class PostsRepository @AssistedInject constructor(
                     }
                 }
 
+                if (preferences.hideDuplicatePostsOnRead && account != null) {
+                    newPosts.forEach {
+                        if (it.postView.read || hiddenPosts.contains(it.postView.post.id)) {
+                            duplicatePostsDetector.addReadOrHiddenPost(it.postView)
+                        }
+                    }
+                }
+
                 Log.d(TAG, "Fetched ${newPosts.size} posts.")
-                addPosts(newPosts, pageIndex, hiddenPosts, force)
+                addPosts(newPosts, pageIndex, hiddenPosts, duplicatePostsDetector, force)
 
                 if (consecutiveFilteredPostsByFilter > 20) {
                     Result.failure(FilterTooAggressiveException())
@@ -420,6 +435,7 @@ class PostsRepository @AssistedInject constructor(
         newPosts: List<FetchedPost>,
         pageIndex: Int,
         hiddenPosts: Set<PostId>,
+        duplicatePostsDetector: DuplicatePostsDetector?,
         force: Boolean,
     ) {
         val mutableAllPosts = allPosts.toMutableList()
@@ -428,6 +444,18 @@ class PostsRepository @AssistedInject constructor(
             val uniquePostKey = post.getUniqueKey()
             var filterReason: FilterReason? = null
             val instance = fetchedPost.source.instance ?: apiInstance
+
+            if (duplicatePostsDetector?.isPostDuplicateOfRead(post) == true) {
+                if (!hiddenPosts.contains(post.post.id) && !post.read) {
+                    val postRef = duplicatePostsDetector.getPostDuplicates(post)
+                    Log.d("HAHA", "Marking duplicate post as read! " +
+                        "og: https://${postRef?.instance}/post/${postRef?.id}" +
+                        "nw: https://${post.instance}/post/${post.post.id}")
+                }
+
+                hideReadCount++
+                continue
+            }
 
             if (hideRead &&
                 (post.read || postReadManager.isPostRead(instance, post.post.id) == true)

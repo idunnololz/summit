@@ -67,7 +67,8 @@ class YouViewModel @Inject constructor(
             model.postValue(
                 YouModel(
                     name = personResult.getOrNull()?.person_view?.person?.display_name ?: account?.account?.name,
-                    account,
+                    account?.account,
+                    account?.accountInfo,
                     personResult,
                 ),
             )

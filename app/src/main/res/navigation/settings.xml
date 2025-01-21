@@ -179,6 +179,9 @@
             app:exitAnim="@animator/fade_out"
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsHapticsFragment"
+            app:destination="@id/settingsHapticsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -451,4 +454,8 @@
         android:id="@+id/viewCurrentSettingsFragment"
         android:name="com.idunnololz.summit.settings.backupAndRestore.ViewCurrentSettingsFragment"
         android:label="ViewCurrentSettingsFragment" />
+    <fragment
+        android:id="@+id/settingsHapticsFragment"
+        android:name="com.idunnololz.summit.settings.haptics.SettingsHapticsFragment"
+        android:label="SettingsHapticsFragment" />
 </navigation>

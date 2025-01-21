@@ -48,7 +48,7 @@
 
                 <include
                     android:id="@+id/relay_style_navigation"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -76,13 +76,13 @@
 
                 <include
                     android:id="@+id/use_volume_button_navigation"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/collapse_child_comments_by_default"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -94,13 +94,13 @@
                 
                 <include
                     android:id="@+id/show_comment_upvote_percentage"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/show_inline_media_as_links"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -124,7 +124,7 @@
                     android:layout_height="wrap_content"/>
                 <include
                     android:id="@+id/show_profile_icons"
-                    layout="@layout/on_off_setting_item"
+                    layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
                 <include

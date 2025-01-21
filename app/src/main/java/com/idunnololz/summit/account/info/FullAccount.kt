@@ -4,7 +4,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 
-data class FullAccount(
+class FullAccount(
     val account: Account,
     val accountInfo: AccountInfo,
 ) {

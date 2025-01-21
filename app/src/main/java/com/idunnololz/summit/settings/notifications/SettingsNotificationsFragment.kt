@@ -17,7 +17,7 @@ import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.databinding.FragmentSettingsNotificationsBinding
-import com.idunnololz.summit.databinding.OnOffSettingItemBinding
+import com.idunnololz.summit.databinding.SettingItemOnOffBinding
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.NotificationSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -153,7 +153,7 @@ class SettingsNotificationsFragment :
             val inflater = LayoutInflater.from(context)
 
             for (account in it.sortedBy { it.fullName }) {
-                val accountRowBinding = OnOffSettingItemBinding
+                val accountRowBinding = SettingItemOnOffBinding
                     .inflate(inflater, binding.accountsContainer, false)
 
                 accountRowBinding.icon.visibility = View.GONE

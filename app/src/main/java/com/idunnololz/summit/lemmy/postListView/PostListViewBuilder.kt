@@ -5,7 +5,6 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity
-import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
@@ -145,7 +144,7 @@ class PostListViewBuilder @Inject constructor(
     private var dimReadPosts: Boolean? = postUiConfig.dimReadPosts
     private var autoPlayVideos: Boolean = preferences.autoPlayVideos
     private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
-    private var useHapticFeedback: Boolean = preferences.hapticsEnabled
+    private var hapticsOnActions: Boolean = preferences.hapticsOnActions
     private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
@@ -196,7 +195,7 @@ class PostListViewBuilder @Inject constructor(
         showEditedDate = preferences.showEditedDate
         autoPlayVideos = preferences.autoPlayVideos
         parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
-        useHapticFeedback = preferences.hapticsEnabled
+        hapticsOnActions = preferences.hapticsOnActions
     }
 
     /**

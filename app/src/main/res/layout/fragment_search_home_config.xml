@@ -29,31 +29,31 @@
 
             <include
                 android:id="@+id/search_suggestions"
-                layout="@layout/on_off_setting_item"
+                layout="@layout/setting_item_on_off"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <include
                 android:id="@+id/your_communities"
-                layout="@layout/on_off_setting_item"
+                layout="@layout/setting_item_on_off"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <include
                 android:id="@+id/top_communities"
-                layout="@layout/on_off_setting_item"
+                layout="@layout/setting_item_on_off"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <include
                 android:id="@+id/trending_communities"
-                layout="@layout/on_off_setting_item"
+                layout="@layout/setting_item_on_off"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <include
                 android:id="@+id/rising_communities"
-                layout="@layout/on_off_setting_item"
+                layout="@layout/setting_item_on_off"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

@@ -119,7 +119,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                                 true
                             }
                             mainSettings.settingLemmyWeb.id -> {
-                                launchWebSettings()
+                                launchWebSettings(popSettingsFragment = false)
                                 true
                             }
                             mainSettings.settingGestures.id -> {
@@ -211,6 +211,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             mainSettings.notificationSettings.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingNotificationsFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.hapticSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingsHapticsFragment()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -378,6 +384,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                         }
 
+                        is HapticSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingsHapticsFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+
                         is SearchHomeSettings -> TODO()
 
                         null -> {
@@ -401,7 +413,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
             when (link) {
                 "web" -> {
-                    launchWebSettings()
+                    launchWebSettings(popSettingsFragment = true)
                 }
                 "downloads" -> {
                     launchDownloadsSettings()
@@ -410,7 +422,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         }
     }
 
-    private fun launchWebSettings() {
+    private fun launchWebSettings(popSettingsFragment: Boolean) {
         val directions = SettingsFragmentDirections
             .actionSettingsFragmentToSettingWebFragment()
         findNavController().navigateSafe(
@@ -422,7 +434,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                     androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
                 )
                 .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
-                .setPopUpTo(R.id.settingsFragment, true)
+                .apply {
+                    if (popSettingsFragment) {
+                        setPopUpTo(R.id.settingsFragment, true)
+                    }
+                }
                 .build(),
         )
     }

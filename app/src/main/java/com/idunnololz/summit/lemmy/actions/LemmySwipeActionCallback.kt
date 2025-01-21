@@ -10,22 +10,26 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import androidx.annotation.ColorInt
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.preferences.CommentGestureAction
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 
 class LemmySwipeActionCallback(
     private val context: Context,
     val recyclerView: RecyclerView,
     val onActionSelected: (SwipeAction, ViewHolder) -> Unit,
     var gestureSize: Float,
+    var hapticsEnabled: Boolean,
 ) : ItemTouchHelper.Callback() {
 
     companion object {
@@ -188,9 +192,10 @@ class LemmySwipeActionCallback(
                         val swipeAction = actions[index]
                         background.color = swipeAction.color
                         if (currentSwipeAction != swipeAction) {
-                            viewHolder.itemView.performHapticFeedback(
-                                HapticFeedbackConstants.VIRTUAL_KEY,
-                            )
+                            if (hapticsEnabled) {
+                                viewHolder.itemView.performHapticFeedbackCompat(
+                                    HapticFeedbackConstantsCompat.CONFIRM)
+                            }
                             this.currentSwipeAction = swipeAction
                         }
 

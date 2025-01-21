@@ -1,13 +1,17 @@
 package com.idunnololz.summit.util
 
 import android.content.SharedPreferences
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.Preferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AnimationsHelper @Inject constructor(
     private val preferences: Preferences,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
     enum class AnimationLevel(val animationLevel: Int) {
         /**
@@ -43,16 +47,14 @@ class AnimationsHelper @Inject constructor(
             }
         }
     }
+    private val coroutineScope = coroutineScopeFactory.create()
 
     private var animationLevel: AnimationLevel = preferences.animationLevel
 
-    private val preferenceListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+    init {
+        coroutineScope.launch(Dispatchers.Main) {
             animationLevel = preferences.animationLevel
         }
-
-    init {
-        preferences.registerListener(preferenceListener)
     }
 
     fun shouldAnimate(animationLevel: AnimationLevel) =

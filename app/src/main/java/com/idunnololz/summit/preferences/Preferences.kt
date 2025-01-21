@@ -11,6 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
@@ -63,8 +64,10 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_FONT_SIZE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GLOBAL_LAYOUT_MODE
 import com.idunnololz.summit.util.PreferenceUtil.KEY_GUEST_ACCOUNT_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HAPTICS_ENABLED
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HAPTICS_ON_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_COMMENT_SCORES
+import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_DUPLICATE_POSTS_ON_READ
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
@@ -140,8 +143,10 @@ import com.idunnololz.summit.util.ext.putMoshiValue
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.Duration
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -151,10 +156,23 @@ private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesD
 class Preferences(
     @ApplicationContext private val context: Context,
     private val prefs: SharedPreferences,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
     companion object {
         private const val TAG = "Preferences"
+    }
+
+    private val coroutineScope = coroutineScopeFactory.create()
+
+    val onPreferenceChangeFlow = MutableSharedFlow<Unit>()
+
+    init {
+        prefs.registerOnSharedPreferenceChangeListener { _, _ ->
+            coroutineScope.launch {
+                onPreferenceChangeFlow.emit(Unit)
+            }
+        }
     }
 
     val all: MutableMap<String, *>
@@ -1054,10 +1072,26 @@ class Preferences(
         }
 
     var hapticsEnabled: Boolean
-        get() = prefs.getBoolean(KEY_HAPTICS_ENABLED, false)
+        get() = prefs.getBoolean(KEY_HAPTICS_ENABLED, true)
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_HAPTICS_ENABLED, value)
+                .apply()
+        }
+
+    var hapticsOnActions: Boolean
+        get() = hapticsEnabled && prefs.getBoolean(KEY_HAPTICS_ON_ACTIONS, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_HAPTICS_ON_ACTIONS, value)
+                .apply()
+        }
+
+    var hideDuplicatePostsOnRead: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_DUPLICATE_POSTS_ON_READ, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_HIDE_DUPLICATE_POSTS_ON_READ, value)
                 .apply()
         }
 
@@ -1114,9 +1148,5 @@ class Preferences(
 
     fun clear() {
         prefs.edit().clear().commit()
-    }
-
-    fun registerListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
-        prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 }
