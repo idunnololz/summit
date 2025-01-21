@@ -228,8 +228,6 @@ class OfflineManager @Inject constructor(
                     destDir = destDir,
                     force = force,
                     saveToFileFn = saveToFileFn,
-                    listener = listener,
-                    errorListener = errorListener,
                 )
             }
 
@@ -279,8 +277,6 @@ class OfflineManager @Inject constructor(
         destDir: File,
         force: Boolean,
         saveToFileFn: (File) -> Result<Unit>,
-        listener: (File) -> Unit,
-        errorListener: ((e: Throwable) -> Unit)?,
     ): Result<File> {
         val fileName = getFilenameForUrl(url)
         val downloadedFile = File(destDir, fileName)
@@ -322,6 +318,7 @@ class OfflineManager @Inject constructor(
             val req = try {
                 Request.Builder()
                     .header("User-Agent", USER_AGENT)
+                    .header("Accept", "*/*")
                     .url(url)
                     .build()
             } catch (e: Exception) {

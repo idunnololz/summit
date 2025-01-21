@@ -12,7 +12,7 @@ object ContentUtils {
             urlWithoutParams.endsWith(".gif", ignoreCase = true) ||
             urlWithoutParams.endsWith(".svg", ignoreCase = true) ||
             urlWithoutParams.endsWith(".avif", ignoreCase = true) ||
-            urlWithoutParams.contains("/image_proxy?", ignoreCase = true)
+            urlWithoutParams.endsWith("/image_proxy", ignoreCase = true)
     }
 
     fun isUrlVideo(url: String) = isUrlMp4(url) ||
