@@ -88,7 +88,7 @@ class PostAdapter(
     private val onPostActionClick: (PostView, String, actionId: Int) -> Unit,
     private val onCommentActionClick: (CommentView, String, actionId: Int) -> Unit,
     private val onFetchComments: (CommentId) -> Unit,
-    private val onLoadPost: (PostId) -> Unit,
+    private val onLoadPost: (PostId, force: Boolean) -> Unit,
     private val onLoadCommentPath: (String) -> Unit,
     private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String?) -> Unit,
@@ -797,7 +797,7 @@ class PostAdapter(
             is Item.ViewAllComments -> {
                 val b = holder.getBinding<ViewAllCommentsBinding>()
                 b.button.setOnClickListener {
-                    onLoadPost(item.postId)
+                    onLoadPost(item.postId, true)
                 }
                 updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
             }

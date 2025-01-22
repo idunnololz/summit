@@ -514,9 +514,9 @@ class PostFragment :
                     onFetchComments = {
                         viewModel.fetchMoreComments(it)
                     },
-                    onLoadPost = {
-                        viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), it)))
-                        viewModel.fetchPostData()
+                    onLoadPost = { post, force ->
+                        viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), post)))
+                        viewModel.fetchPostData(force = force)
                     },
                     onLoadCommentPath = {
                         viewModel.fetchCommentPath(getInstance(), it)

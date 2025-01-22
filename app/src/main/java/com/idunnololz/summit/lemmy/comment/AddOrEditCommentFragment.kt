@@ -8,6 +8,7 @@ import android.os.Parcelable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -97,6 +98,7 @@ class AddOrEditCommentFragment :
             fragmentManager: FragmentManager,
             accountId: Long?,
         ) {
+            Log.d("ASDF", "showReplyDialog()", RuntimeException())
             AddOrEditCommentFragment().apply {
                 arguments = AddOrEditCommentFragmentArgs(
                     instance = instance,
@@ -228,6 +230,7 @@ class AddOrEditCommentFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        Log.d("ASDF", "onCreateView()", RuntimeException())
         super.onCreateView(inflater, container, savedInstanceState)
 
         setBinding(FragmentAddOrEditCommentBinding.inflate(inflater, container, false))
@@ -236,6 +239,7 @@ class AddOrEditCommentFragment :
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d("ASDF", "onViewCreated()", RuntimeException())
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
@@ -973,7 +977,7 @@ class AddOrEditCommentFragment :
                 onFetchComments = {
                     showError()
                 },
-                onLoadPost = {},
+                onLoadPost = { _, _ -> },
                 onLoadCommentPath = {},
                 onLinkClick = { url, text, linkType ->
                     showError()
