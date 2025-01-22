@@ -374,7 +374,7 @@
     <string name="changelog">Ändringslogg</string>
     <string name="open_link">Öppna länken</string>
     <string name="login">Inloggning</string>
-    <string name="instance">Exempel</string>
+    <string name="instance">Instans</string>
     <string name="sign_up_title">Har du inget konto? [Registrera dig]()</string>
     <string name="sign_up">Anmäl dig</string>
     <string name="button_continue">Fortsätta</string>
@@ -433,8 +433,8 @@
     <string name="error_page_not_found">Sidan hittades inte.</string>
     <string name="comment">Kommentar</string>
     <string name="preview">Förhandsvisning</string>
-    <string name="text_emojis">Sms:a emojis</string>
-    <string name="bold">Djärv</string>
+    <string name="text_emojis">Text emojis</string>
+    <string name="bold">Fet</string>
     <string name="italic">Kursiv</string>
     <string name="strikethrough">Genomstruken</string>
     <string name="quote">Citationstecken</string>
@@ -1056,4 +1056,5 @@
     <string name="delete_comment_confirm">Radera kommentar</string>
     <string name="post_scores_desc">Välj hur poäng på inlägg ska visas</string>
     <string name="comment_scores_desc">Välj hur poäng på kommentarer ska visas</string>
+    <string name="recent_searches">Senaste sökningar</string>
 </resources>
