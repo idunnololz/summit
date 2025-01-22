@@ -94,13 +94,16 @@ class LemmySwipeActionCallback(
         //
         // Therefore we can use this call to know when the user has let go!
 
-        Log.d(TAG, "Selected action: $currentSwipeAction")
+        Log.d(TAG, "Selected action: $currentSwipeAction animateDx: $animateDx animateDy: $animateDy")
 
         val currentSwipeAction = currentSwipeAction
         val lastVhSwiped = lastVhSwiped
 
         if (currentSwipeAction != null && lastVhSwiped != null) {
             onActionSelected(currentSwipeAction, lastVhSwiped)
+
+            this.currentSwipeAction = null
+            this.lastVhSwiped = null
         }
 
         return super.getAnimationDuration(recyclerView, animationType, animateDx, animateDy)

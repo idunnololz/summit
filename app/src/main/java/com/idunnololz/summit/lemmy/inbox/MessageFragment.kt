@@ -556,7 +556,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             PostRef(args.instance, postId),
                         )
                     },
-                    onLoadPost = {},
+                    onLoadPost = { _, _ -> },
                     onLoadCommentPath = {},
                     onLinkClick = { url, text, linkType ->
                         onLinkClick(url, text, linkType)
