@@ -205,6 +205,10 @@
             android:defaultValue="@null"
             app:argType="com.idunnololz.summit.lemmy.PersonRef"
             app:nullable="true"/>
+        <argument
+            android:name="screen"
+            app:argType="com.idunnololz.summit.lemmy.person.PersonTabbedFragment$Screen"
+            android:defaultValue="Posts" />
     </fragment>
     <action
         android:id="@+id/action_global_personTabbedFragment"

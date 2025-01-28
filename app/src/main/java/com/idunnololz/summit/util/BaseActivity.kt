@@ -29,12 +29,10 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun attachBaseContext(base: Context) {
         if (PreferenceUtil.usingCustomFont) {
             super.attachBaseContext(
-                ViewPumpContextWrapper.wrap(
-                    LocaleHelper.setLocale(base),
-                ),
+                ViewPumpContextWrapper.wrap(base),
             )
         } else {
-            super.attachBaseContext(LocaleHelper.setLocale(base))
+            super.attachBaseContext(base)
         }
     }
 
