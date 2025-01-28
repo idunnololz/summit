@@ -107,6 +107,14 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         get() = args.personRef
             ?: accountManager.currentAccount.asAccount?.toPersonRef()
 
+    private var consumedArgs = false
+
+    enum class Screen {
+        Posts,
+        Comments,
+        About,
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -199,6 +207,22 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         loadingView.hideAll()
 
                         setup(personRef)
+
+                        if (!consumedArgs && savedInstanceState == null) {
+                            consumedArgs = true
+
+                            when (args.screen as Screen) {
+                                Screen.Posts -> {
+                                    viewPager.currentItem = 0
+                                }
+                                Screen.Comments -> {
+                                    viewPager.currentItem = 1
+                                }
+                                Screen.About -> {
+                                    viewPager.currentItem = 2
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -31,6 +31,7 @@ import com.idunnololz.summit.databinding.ItemYouDividerBinding
 import com.idunnololz.summit.databinding.ItemYouMenuBinding
 import com.idunnololz.summit.databinding.ItemYouProfileBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -120,6 +121,27 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                             null,
                         )
                     }
+                },
+                onPostsClick = {
+                    val direction = YouFragmentDirections
+                        .actionYouFragmentToPersonTabbedFragment2(
+                            screen = PersonTabbedFragment.Screen.Posts
+                        )
+                    findNavController().navigateSafe(direction)
+                },
+                onCommentsClick = {
+                    val direction = YouFragmentDirections
+                        .actionYouFragmentToPersonTabbedFragment2(
+                            screen = PersonTabbedFragment.Screen.Comments
+                        )
+                    findNavController().navigateSafe(direction)
+                },
+                onAccountAgeClick = {
+                    val direction = YouFragmentDirections
+                        .actionYouFragmentToPersonTabbedFragment2(
+                            screen = PersonTabbedFragment.Screen.About
+                        )
+                    findNavController().navigateSafe(direction)
                 },
             ) {
                 when (it) {
@@ -217,6 +239,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
         private val avatarHelper: AvatarHelper,
         private val onSwitchAccountClick: () -> Unit,
         private val onProfileClick: (Account, View, String?) -> Unit,
+        private val onPostsClick: () -> Unit,
+        private val onCommentsClick: () -> Unit,
+        private val onAccountAgeClick: () -> Unit,
         private val onItemClick: (Int) -> Unit,
     ) : Adapter<ViewHolder>() {
 
@@ -337,10 +362,23 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                             append("d ")
                         }
                     }.trim()
+
+                    b.statCard1.setOnClickListener {
+                        onPostsClick()
+                    }
+                    b.statCard2.setOnClickListener {
+                        onCommentsClick()
+                    }
+                    b.statCard3.setOnClickListener {
+                        onAccountAgeClick()
+                    }
                 } else {
                     b.posts.text = "-"
                     b.comments.text = "-"
                     b.accountAge.text = "-"
+                    b.statCard1.setOnClickListener(null)
+                    b.statCard2.setOnClickListener(null)
+                    b.statCard3.setOnClickListener(null)
                 }
             }
             addItemType(Item.MenuItem::class, ItemYouMenuBinding::inflate) { item, b, h ->

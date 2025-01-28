@@ -97,13 +97,12 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
     override fun attachBaseContext(base: Context) {
         PreferenceUtil.initialize(base)
         setLocaleFromPrefs(base)
-        super.attachBaseContext(LocaleHelper.setLocale(base))
+        super.attachBaseContext(base)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         setLocaleFromPrefs(this)
-        LocaleHelper.setLocale(this)
 
         themeManager.updateTextConfig()
 
