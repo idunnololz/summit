@@ -1121,4 +1121,5 @@
     <string name="haptics">Haptics</string>
     <string name="haptics_desc">Kontrollera om haptisk feedback är aktiverad för vissa åtgärder.</string>
     <string name="prefer_text_preview_icon">Föredrar ikon för förhandsgranskning av text</string>
+    <string name="user">Användare</string>
 </resources>
