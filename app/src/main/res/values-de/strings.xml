@@ -1121,4 +1121,5 @@
     <string name="haptics_desc">Steuern Sie, ob für einige Aktionen haptisches Feedback aktiviert ist.</string>
     <string name="prefer_text_preview_icon">Symbol „Textvorschau bevorzugen“</string>
     <string name="prefer_text_preview_icon_desc">Gilt nur für bestimmte Ansichten. Wenn aktiviert, wird bei Textbeiträgen ein Symbol angezeigt, auf das Sie tippen können, um den Textinhalt des Beitrags zu erweitern.</string>
+    <string name="user">Benutzer</string>
 </resources>
