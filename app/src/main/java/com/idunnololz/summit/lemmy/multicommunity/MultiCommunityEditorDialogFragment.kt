@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunityIconItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
@@ -56,7 +56,7 @@ import javax.inject.Inject
 class MultiCommunityEditorDialogFragment :
     BaseDialogFragment<DialogFragmentMultiCommunityEditorBinding>(),
     FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "MultiCommunityEditorDialogFragment_req_key"
@@ -105,7 +105,7 @@ class MultiCommunityEditorDialogFragment :
 
     private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setTitle(R.string.error_unsaved_changes)
                 .setMessage(R.string.error_multi_community_unsaved_changes)
                 .setPositiveButton(R.string.proceed_anyways)
@@ -192,7 +192,7 @@ class MultiCommunityEditorDialogFragment :
                             ?: listOf()
 
                         if (selectedCommunities.isEmpty()) {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setTitle(R.string.error_no_communities_selected)
                                 .setMessage(R.string.error_no_communities_selected_desc)
                                 .setPositiveButton(android.R.string.ok)
@@ -345,7 +345,7 @@ class MultiCommunityEditorDialogFragment :
     }
 
     private fun showTooManyCommunitiesMessage() {
-        AlertDialogFragment.Builder()
+        OldAlertDialogFragment.Builder()
             .setMessage(
                 getString(
                     R.string.error_multi_community_limit_reached,
@@ -355,13 +355,13 @@ class MultiCommunityEditorDialogFragment :
             .createAndShow(childFragmentManager, "asdfss")
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "UnsavedChanges") {
             dismiss()
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
     private fun showSearch() {

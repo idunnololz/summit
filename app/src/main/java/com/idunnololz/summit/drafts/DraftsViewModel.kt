@@ -104,10 +104,13 @@ class DraftsViewModel @Inject constructor(
 
     private suspend fun generateItems() {
         val items = mutableListOf<ViewModelItem>()
+        var isEmpty = false
 
         items += ViewModelItem.HeaderItem
 
         withContext(draftEntriesContext) {
+            isEmpty = draftEntries.isEmpty()
+
             for (draft in draftEntries) {
                 when (draft.data) {
                     is DraftData.CommentDraftData ->
@@ -128,7 +131,7 @@ class DraftsViewModel @Inject constructor(
         }
         if (hasMore) {
             items.add(ViewModelItem.LoadingItem)
-        } else if (items.isEmpty()) {
+        } else if (isEmpty) {
             items.add(ViewModelItem.EmptyItem)
         }
 

@@ -9,7 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentRichTextValueBinding
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
@@ -194,7 +194,7 @@ class RichTextValueDialogFragment :
                 when (it) {
                     is StatefulData.Error -> {
                         loadingView.hideAll()
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(
                                 getString(
                                     R.string.error_unable_to_send_post,

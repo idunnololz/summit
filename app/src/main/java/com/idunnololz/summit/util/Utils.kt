@@ -41,7 +41,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
@@ -618,7 +618,7 @@ object Utils {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             fm ?: return
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(
                     context.getString(
                         R.string.error_external_activity_not_found,
@@ -740,4 +740,11 @@ fun Fragment.shareUri(uri: Uri, mimeType: String) {
         type = mimeType
     }
     startActivity(Intent.createChooser(shareIntent, null))
+}
+
+fun getColorWithAlpha(yourColor: Int, alpha: Int): Int {
+    val red = Color.red(yourColor)
+    val blue = Color.blue(yourColor)
+    val green = Color.green(yourColor)
+    return Color.argb(alpha, red, green, blue)
 }

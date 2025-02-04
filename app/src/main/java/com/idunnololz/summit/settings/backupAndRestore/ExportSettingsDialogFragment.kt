@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentBackupSettingsBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -104,7 +104,7 @@ class ExportSettingsDialogFragment :
                 when (it) {
                     is StatefulData.Error -> {
                         progressBar.visibility = View.GONE
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(R.string.error_generating_backup)
                             .createAndShow(childFragmentManager, "error_generating_backup")
                     }
@@ -155,7 +155,7 @@ class ExportSettingsDialogFragment :
                                         }
                                     } else {
                                         withContext(Dispatchers.Main) {
-                                            AlertDialogFragment.Builder()
+                                            OldAlertDialogFragment.Builder()
                                                 .setMessage(R.string.error_generating_backup)
                                                 .createAndShow(
                                                     childFragmentManager,

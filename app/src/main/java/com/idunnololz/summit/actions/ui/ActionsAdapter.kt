@@ -27,18 +27,19 @@ class ActionsAdapter(
     private val onPageClick: (PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
+    private val onActionClick: (Action) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
         data class ActionItem(
-            val action: ActionsViewModel.Action,
+            val action: Action,
         ) : Item
 
         data object EmptyItem : Item
     }
 
     var accountDictionary: Map<Long, Account?> = mapOf()
-    var actions: List<ActionsViewModel.Action> = listOf()
+    var actions: List<Action> = listOf()
         set(value) {
             field = value
 
@@ -63,11 +64,14 @@ class ActionsAdapter(
             val actionDate: Long = item.action.ts
             val actionDesc: String
 
+            b.title.text = actionInfo?.getActionName(context)
+                ?: context.getString(R.string.unknown)
+
             when (actionInfo) {
                 is ActionInfo.CommentActionInfo -> {
+                    b.icon.setImageResource(R.drawable.outline_comment_24)
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown_special))
-                        append(" commented on post ")
+                        append("Commented on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
                         append(
@@ -81,9 +85,9 @@ class ActionsAdapter(
                     }
                 }
                 is ActionInfo.DeleteCommentActionInfo -> {
+                    b.icon.setImageResource(R.drawable.outline_delete_24)
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown_special))
-                        append(" deleted comment on post ")
+                        append("Deleted comment on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
                         append(
@@ -96,10 +100,10 @@ class ActionsAdapter(
                         append(".")
                     }
                 }
-                is ActionInfo.EditActionInfo -> {
+                is ActionInfo.EditCommentActionInfo -> {
+                    b.icon.setImageResource(R.drawable.baseline_edit_24)
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown_special))
-                        append(" edited comment on post ")
+                        append("Edited comment on post ")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
                         append(
@@ -113,9 +117,13 @@ class ActionsAdapter(
                     }
                 }
                 is ActionInfo.MarkPostAsReadActionInfo -> {
+                    if (actionInfo.read) {
+                        b.icon.setImageResource(R.drawable.baseline_check_24)
+                    } else {
+                        b.icon.setImageResource(R.drawable.outline_thread_unread_24)
+                    }
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown_special))
-                        append(" marked a post as read (")
+                        append("Marked a post as read (")
                         append("[${actionInfo.postRef.id}@${actionInfo.postRef.instance}]")
                         append("(")
                         append(
@@ -130,14 +138,15 @@ class ActionsAdapter(
                 }
                 is ActionInfo.VoteActionInfo -> {
                     actionDesc = buildString {
-                        append(account?.name ?: context.getString(R.string.unknown_special))
-                        append(" ")
                         if (actionInfo.dir > 0) {
-                            append("upvoted")
+                            b.icon.setImageResource(R.drawable.baseline_arrow_upward_24)
+                            append("Upvoted")
                         } else if (actionInfo.dir < 0) {
-                            append("downvoted")
+                            b.icon.setImageResource(R.drawable.baseline_arrow_downward_24)
+                            append("Downvoted")
                         } else {
-                            append("removed their vote from")
+                            b.icon.setImageResource(R.drawable.baseline_remove_24)
+                            append("Removed vote from")
                         }
                         append(" ")
                         when (actionInfo.ref) {
@@ -174,7 +183,16 @@ class ActionsAdapter(
                 }
             }
 
-            b.user.text = account?.name ?: context.getString(R.string.unknown_special)
+            b.user.text = if (account != null) {
+                account.name
+            } else if (actionInfo?.accountInstance != null) {
+                context.getString(
+                    R.string.user_id_format,
+                    "${accountId.toString()}@${actionInfo.accountInstance.toString()}"
+                )
+            } else {
+                context.getString(R.string.user_id_format, accountId.toString())
+            }
             b.date.text = dateStringToPretty(context, actionDate)
 
             LemmyTextHelper.bindText(
@@ -193,7 +211,7 @@ class ActionsAdapter(
             )
 
             when (val details = item.action.details) {
-                is ActionsViewModel.ActionDetails.FailureDetails -> {
+                is ActionDetails.FailureDetails -> {
                     b.failureReason.visibility = View.VISIBLE
                     b.failureReason.text = buildString {
                         appendLine("This action failed for the following reason:")
@@ -203,7 +221,7 @@ class ActionsAdapter(
                                 append("There was an authentication issue.")
                             LemmyActionFailureReason.ActionOverwritten ->
                                 append("An action performed after this one overrode this action.")
-                            LemmyActionFailureReason.ConnectionError ->
+                            LemmyActionFailureReason.NoInternetError ->
                                 append("Network issues were encountered.")
                             LemmyActionFailureReason.DeserializationError ->
                                 append("Deserialization error.")
@@ -221,15 +239,21 @@ class ActionsAdapter(
                                     "Unknown error. Code '${details.reason.errorCode}'. " +
                                         "Key '${details.reason.errorMessage}'.",
                                 )
+                            LemmyActionFailureReason.ConnectionError ->
+                                append(context.getString(R.string.error_network))
                         }
                     }
                 }
-                ActionsViewModel.ActionDetails.PendingDetails -> {
+                ActionDetails.PendingDetails -> {
                     b.failureReason.visibility = View.GONE
                 }
-                ActionsViewModel.ActionDetails.SuccessDetails -> {
+                ActionDetails.SuccessDetails -> {
                     b.failureReason.visibility = View.GONE
                 }
+            }
+
+            b.root.setOnClickListener {
+                onActionClick(item.action)
             }
         }
         addItemType(Item.EmptyItem::class, ActionsItemEmptyBinding::inflate) { item, b, h ->

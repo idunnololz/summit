@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsBackupAndRestoreBinding
 import com.idunnololz.summit.settings.ImportAndExportSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsBackupAndRestoreFragment :
     BaseFragment<FragmentSettingsBackupAndRestoreBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
     lateinit var settings: ImportAndExportSettings
@@ -81,7 +81,7 @@ class SettingsBackupAndRestoreFragment :
             settings.resetSettingsWithBackup.bindTo(
                 resetSettingsWithBackup,
             ) {
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.reset_settings_prompt)
                     .setMessage(R.string.backup_and_reset_settings_desc)
                     .setPositiveButton(R.string.reset_settings)
@@ -107,7 +107,7 @@ class SettingsBackupAndRestoreFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "reset_settings" -> {
                 exportSettingsViewModel.saveToInternalBackups(
@@ -115,7 +115,7 @@ class SettingsBackupAndRestoreFragment :
                 )
                 exportSettingsViewModel.resetSettings()
 
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.app_restart_required)
                     .setMessage(R.string.app_restart_required_after_pref_cleared_desc)
                     .setPositiveButton(R.string.restart_app)
@@ -128,7 +128,7 @@ class SettingsBackupAndRestoreFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "restart_required" -> {
                 // do nothing

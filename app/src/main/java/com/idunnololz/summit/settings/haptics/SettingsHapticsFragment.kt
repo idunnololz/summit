@@ -1,17 +1,13 @@
 package com.idunnololz.summit.settings.haptics
 
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationAttributes
-import android.os.VibratorManager
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsHapticsBinding
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.HapticSettings
@@ -28,7 +24,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsHapticsFragment : BaseFragment<FragmentSettingsHapticsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
     lateinit var preferences: Preferences
@@ -87,7 +83,7 @@ class SettingsHapticsFragment : BaseFragment<FragmentSettingsHapticsBinding>(),
                         Settings.System.getInt(context.contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) == 1
 
                     if (!hapticsEnabled) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(R.string.warn_system_haptic_feedback_disabled)
                             .setPositiveButton(R.string.settings)
                             .setNegativeButton(R.string.cancel)
@@ -109,11 +105,11 @@ class SettingsHapticsFragment : BaseFragment<FragmentSettingsHapticsBinding>(),
         binding.moreHaptics.isEnabled = preferences.hapticsEnabled
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         val intent = Intent(Settings.ACTION_SOUND_SETTINGS)
         startActivity(intent)
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

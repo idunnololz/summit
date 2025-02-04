@@ -8,7 +8,7 @@ import android.view.ViewTreeObserver
 import androidx.fragment.app.viewModels
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsPostsFeedAppearanceBinding
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
@@ -39,7 +39,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsViewTypeFragment :
     BaseFragment<FragmentSettingsPostsFeedAppearanceBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SettingsViewTypeViewModel by viewModels()
 
@@ -102,7 +102,7 @@ class SettingsViewTypeFragment :
         updateRendering()
 
         binding.reset.setOnClickListener {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(R.string.reset_view_to_default_styles)
                 .setPositiveButton(android.R.string.ok)
                 .setNegativeButton(R.string.cancel)
@@ -361,6 +361,7 @@ class SettingsViewTypeFragment :
             highlight = false,
             highlightForever = false,
             themeColor = null,
+            isDuplicatePost = false,
             onRevealContentClickedFn = {},
             onImageClick = { _, _, _, _ -> },
             onVideoClick = { _, _, _ -> },
@@ -378,12 +379,12 @@ class SettingsViewTypeFragment :
         )
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "reset_view_to_default_styles") {
             viewModel.resetPostUiConfig()
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

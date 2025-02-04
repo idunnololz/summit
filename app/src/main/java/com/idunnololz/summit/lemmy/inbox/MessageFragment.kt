@@ -18,7 +18,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -324,7 +324,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             .show(childFragmentManager, "asdf")
                     },
                     onInstanceMismatch = { accountInstance, apiInstance ->
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.error_account_instance_mismatch_title)
                             .setMessage(
                                 getString(
@@ -483,7 +483,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             .show(childFragmentManager, "asdf")
                     },
                     onInstanceMismatch = { accountInstance, apiInstance ->
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.error_account_instance_mismatch_title)
                             .setMessage(
                                 getString(

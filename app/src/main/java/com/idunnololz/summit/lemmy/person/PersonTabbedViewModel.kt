@@ -10,11 +10,13 @@ import arrow.core.Either
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentRef
@@ -26,6 +28,7 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
@@ -40,12 +43,11 @@ import kotlinx.coroutines.withContext
 class PersonTabbedViewModel @Inject constructor(
     private val context: Application,
     private val apiClient: AccountAwareLemmyClient,
+    private val apiClientFactory: LemmyApiClient.Factory,
     private val state: SavedStateHandle,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
     private val commentListEngineFactory: CommentListEngine.Factory,
-    private val singlePostDataSourceWithCursorFactory: SinglePostDataSourceWithCursor.Factory,
+    private val postListEngineFactory: PostListEngine.Factory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -57,12 +59,11 @@ class PersonTabbedViewModel @Inject constructor(
     val personData = StatefulLiveData<PersonDetailsData>()
     val postsState = StatefulLiveData<UpdateInfo>()
     val commentsState = StatefulLiveData<UpdateInfo>()
+    val stateLessApiClient = apiClientFactory.create()
 
-    val postListEngine = PostListEngine(
+    val postListEngine = postListEngineFactory.create(
         infinity = true,
         autoLoadMoreItems = true,
-        coroutineScopeFactory = coroutineScopeFactory,
-        directoryHelper = directoryHelper,
     ).apply {
         setKey("person")
     }
@@ -85,6 +86,7 @@ class PersonTabbedViewModel @Inject constructor(
 
     private var personRef: PersonRef? = null
     private var fetchingPages = mutableSetOf<Int>()
+    private val personIdToPersonName = mutableMapOf<String, String>()
 
     init {
         viewModelScope.launch {
@@ -139,6 +141,49 @@ class PersonTabbedViewModel @Inject constructor(
                         sortType = sortType,
                     )
                 }
+                is PersonRef.PersonRefById -> {
+                    val fn = personIdToPersonName[personRef.fullName]
+
+                    if (fn != null) {
+                        apiClient.fetchPersonByNameWithRetry(
+                            name = fn,
+                            page = pageIndex.toLemmyPageIndex(),
+                            limit = PAGE_SIZE,
+                            force = force,
+                            sortType = sortType,
+                        )
+                    } else {
+                        stateLessApiClient.changeInstance(personRef.instance)
+                        val r = stateLessApiClient.fetchPerson(
+                            personId = personRef.id,
+                            force = force,
+                            name = null,
+                            account = null,
+                        )
+
+                        r.fold(
+                            {
+                                val fullName = PersonRef.PersonRefByName(
+                                    it.person_view.person.name,
+                                    it.person_view.person.instance
+                                ).fullName
+
+                                personIdToPersonName[personRef.fullName] = fullName
+
+                                apiClient.fetchPersonByNameWithRetry(
+                                    name = fullName,
+                                    page = pageIndex.toLemmyPageIndex(),
+                                    limit = PAGE_SIZE,
+                                    force = force,
+                                    sortType = sortType,
+                                )
+                            },
+                            {
+                                r
+                            }
+                        )
+                    }
+                }
             }
 
             result
@@ -156,7 +201,11 @@ class PersonTabbedViewModel @Inject constructor(
 
                     if (postListEngine.hasMore || force) {
                         val posts = result.posts.map {
-                            LocalPostView(fetchedPost = it.toFetchedPost(), filterReason = null)
+                            LocalPostView(
+                                fetchedPost = it.toFetchedPost(),
+                                filterReason = null,
+                                isDuplicatePost = false
+                            )
                         }
                         postListEngine.addPage(
                             LoadedPostsData(

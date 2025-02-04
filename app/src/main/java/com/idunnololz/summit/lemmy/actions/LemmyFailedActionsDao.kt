@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.actions
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Delete
@@ -11,6 +12,7 @@ import androidx.room.Query
 import androidx.room.TypeConverters
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.parcelize.Parcelize
 
 @Dao
 interface LemmyFailedActionsDao {
@@ -39,34 +41,37 @@ interface LemmyFailedActionsDao {
 data class LemmyFailedAction(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Long,
+    override val id: Long,
     @ColumnInfo(name = "ts")
-    val ts: Long,
+    override val ts: Long,
     @ColumnInfo(name = "cts")
-    val creationTs: Long,
+    override val creationTs: Long,
     @ColumnInfo(name = "fts")
     val failedTs: Long,
     @ColumnInfo(name = "error")
     val error: LemmyActionFailureReason,
     @ColumnInfo(name = "info")
-    val info: ActionInfo?,
-)
+    override val info: ActionInfo?,
+): LemmyAction
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
-sealed interface LemmyActionFailureReason {
+sealed interface LemmyActionFailureReason : Parcelable {
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("1")
     data class RateLimit(
         val recommendedTimeoutMs: Long,
     ) : LemmyActionFailureReason
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("2")
     data class TooManyRequests(
         val retries: Int,
     ) : LemmyActionFailureReason
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("3")
     data class UnknownError(
@@ -74,23 +79,32 @@ sealed interface LemmyActionFailureReason {
         val errorMessage: String?,
     ) : LemmyActionFailureReason
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("4")
     data class AccountNotFoundError(
         val accountId: Long,
     ) : LemmyActionFailureReason
 
+    @Parcelize
     @TypeLabel("5")
-    data object ConnectionError : LemmyActionFailureReason
+    data object NoInternetError : LemmyActionFailureReason
 
+    @Parcelize
     @TypeLabel("6")
     data object DeserializationError : LemmyActionFailureReason
 
+    @Parcelize
     @TypeLabel("7")
     data object ServerError : LemmyActionFailureReason
 
+    @Parcelize
     @TypeLabel("8")
     data object ActionOverwritten : LemmyActionFailureReason
+
+    @Parcelize
+    @TypeLabel("9")
+    data object ConnectionError : LemmyActionFailureReason
 }
 
 class LemmyActionFailureException(val reason: LemmyActionFailureReason) : RuntimeException(

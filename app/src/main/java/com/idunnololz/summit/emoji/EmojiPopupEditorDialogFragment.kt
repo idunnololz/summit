@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentEmojiPopupEditorBinding
 import com.idunnololz.summit.databinding.EmojiEditorEmojiItemBinding
 import com.idunnololz.summit.util.AnimationsHelper
@@ -35,7 +35,7 @@ import javax.inject.Inject
 class EmojiPopupEditorDialogFragment :
     BaseDialogFragment<DialogFragmentEmojiPopupEditorBinding>(),
     FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -120,7 +120,7 @@ class EmojiPopupEditorDialogFragment :
                 setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.reset -> {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(R.string.warn_reset_emojis)
                                 .setPositiveButton(R.string.reset_emojis)
                                 .setNegativeButton(android.R.string.cancel)
@@ -324,12 +324,12 @@ class EmojiPopupEditorDialogFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "reset_emojis") {
             viewModel.resetEmojis()
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

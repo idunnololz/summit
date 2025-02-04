@@ -37,7 +37,7 @@ import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.summit.TrendingCommunityData
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentSearchHomeBinding
@@ -87,7 +87,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchHomeFragment :
     BaseFragment<FragmentSearchHomeBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "SearchHomeFragment"
@@ -229,7 +229,7 @@ class SearchHomeFragment :
                     }
 
                     override fun onSuggestionLongClicked(query: String) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.delete_suggest)
                             .setPositiveButton(android.R.string.ok)
                             .setNegativeButton(android.R.string.cancel)
@@ -483,7 +483,7 @@ class SearchHomeFragment :
         findNavController().navigateSafe(directions)
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         val context = context ?: return
 
         val suggestionToDelete = dialog.getExtra(ARG_SUGGESTION_TO_DELETE)
@@ -515,7 +515,7 @@ class SearchHomeFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

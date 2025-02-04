@@ -7,7 +7,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.lemmy.CommentRef
@@ -232,7 +232,7 @@ fun BaseFragment<*>.createCommentActionHandler(
             return@a
         }
 
-        AlertDialogFragment.Builder()
+        OldAlertDialogFragment.Builder()
             .setMessage(R.string.delete_comment_confirm)
             .setPositiveButton(android.R.string.ok)
             .setNegativeButton(android.R.string.cancel)

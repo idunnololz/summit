@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsHiddenPostsBinding
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.preferences.Preferences
@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class SettingsHiddenPostsFragment :
     BaseFragment<FragmentSettingsHiddenPostsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
     lateinit var preferences: Preferences
@@ -112,7 +112,7 @@ class SettingsHiddenPostsFragment :
                     }
 
                     withContext(Dispatchers.Main) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.reset_hidden_posts_confirm_title)
                             .setMessage(
                                 getString(
@@ -138,7 +138,7 @@ class SettingsHiddenPostsFragment :
         )
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "reset_hidden_posts" -> {
                 lifecycleScope.launch {
@@ -159,6 +159,6 @@ class SettingsHiddenPostsFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

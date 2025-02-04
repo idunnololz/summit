@@ -15,13 +15,6 @@
         android:background="?selectableItemBackground"
         android:padding="@dimen/padding">
 
-        <View
-            android:id="@+id/theme_color_bar"
-            android:layout_width="@dimen/theme_color_bar_width"
-            android:layout_height="match_parent"
-            android:background="@color/colorHighlight"
-            android:layout_gravity="start"/>
-
         <TextView
             android:id="@+id/text"
             android:layout_width="match_parent"

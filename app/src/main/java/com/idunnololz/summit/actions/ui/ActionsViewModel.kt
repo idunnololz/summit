@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager
-import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.lemmy.actions.LemmyActionResult
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.util.StatefulLiveData
@@ -24,19 +25,52 @@ class ActionsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val actionsDataLiveData = StatefulLiveData<ActionsData>()
+    private val actionsListener =
+        object : PendingActionsManager.OnActionChangedListener {
+            override fun onActionAdded(action: LemmyPendingAction) {
+                loadActions()
+            }
+
+            override fun onActionFailed(
+                action: LemmyPendingAction,
+                reason: LemmyActionFailureReason,
+            ) {
+                loadActions()
+            }
+
+            override fun onActionComplete(
+                action: LemmyPendingAction,
+                result: LemmyActionResult<*, *>,
+            ) {
+                loadActions()
+            }
+
+            override fun onActionDeleted(action: LemmyAction) {
+                loadActions()
+            }
+        }
 
     init {
         loadActions()
+
+        pendingActionsManager.addActionCompleteListener(actionsListener)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        pendingActionsManager.removeActionCompleteListener(actionsListener)
     }
 
     fun loadActions() {
         actionsDataLiveData.setIsLoading()
 
         viewModelScope.launch(Dispatchers.Default) {
-            delay(400)
-            val pendingActions = pendingActionsManager.getAllPendingActions().sortedByDescending { it.ts }
-            val completedActions = pendingActionsManager.getAllCompletedActions().sortedByDescending { it.ts }
-            val failedAccountInfo = pendingActionsManager.getAllFailedActions().sortedByDescending { it.ts }
+            val pendingActions = pendingActionsManager.getAllPendingActions()
+                .sortedByDescending { it.ts }
+            val completedActions = pendingActionsManager.getAllCompletedActions()
+                .sortedByDescending { it.ts }
+            val failedAccountInfo = pendingActionsManager.getAllFailedActions()
+                .sortedByDescending { it.ts }
 
             val accountIds = mutableSetOf<Long>()
 
@@ -57,11 +91,12 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
-    private fun List<LemmyAction>.pendingToActions(): List<Action> = this.map {
+    private fun List<LemmyPendingAction>.pendingToActions(): List<Action> = this.map {
         Action(
             id = it.id,
             info = it.info,
             ts = it.ts,
+            creationTs = it.creationTs,
             details = ActionDetails.PendingDetails,
         )
     }
@@ -71,6 +106,7 @@ class ActionsViewModel @Inject constructor(
             id = it.id,
             info = it.info,
             ts = it.ts,
+            creationTs = it.creationTs,
             details = ActionDetails.SuccessDetails,
         )
     }
@@ -80,6 +116,7 @@ class ActionsViewModel @Inject constructor(
             id = it.id,
             info = it.info,
             ts = it.ts,
+            creationTs = it.creationTs,
             details = ActionDetails.FailureDetails(
                 it.error,
             ),
@@ -113,19 +150,4 @@ class ActionsViewModel @Inject constructor(
         val failedActions: List<Action>,
         val accountDictionary: Map<Long, Account?>,
     )
-
-    data class Action(
-        val id: Long,
-        val info: ActionInfo?,
-        val ts: Long,
-        val details: ActionDetails,
-    )
-
-    sealed interface ActionDetails {
-        data object SuccessDetails : ActionDetails
-        data object PendingDetails : ActionDetails
-        data class FailureDetails(
-            val reason: LemmyActionFailureReason,
-        ) : ActionDetails
-    }
 }

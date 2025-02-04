@@ -141,6 +141,7 @@
 
     <!-- FrameLayout so that the background full bleeds -->
     <FrameLayout
+        android:id="@+id/coordinator_layout_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?backgroundColor">
@@ -162,8 +163,7 @@
                     android:layout_height="?attr/actionBarSize"
                     app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                     app:contentInsetStart="0dp"
-                    app:contentInsetStartWithNavigation="0dp"
-                    app:layout_collapseMode="pin">
+                    app:contentInsetStartWithNavigation="0dp">
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/account_image_view"
@@ -183,7 +183,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
 
                 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                     android:id="@+id/swipe_refresh_layout"

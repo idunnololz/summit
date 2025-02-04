@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentViewCurrentSettingsBinding
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ViewCurrentSettingsFragment :
     BaseFragment<FragmentViewCurrentSettingsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: ViewCurrentSettingsViewModel by viewModels()
 
@@ -66,7 +66,7 @@ class ViewCurrentSettingsFragment :
                     )
                 },
                 onDeleteClick = {
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setMessage(R.string.warn_reset_setting)
                         .setPositiveButton(R.string.reset)
                         .setNegativeButton(R.string.cancel)
@@ -99,12 +99,12 @@ class ViewCurrentSettingsFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "reset_setting") {
             val settingKey = dialog.getExtra("key")
             viewModel.resetSetting(settingKey)
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {}
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {}
 }

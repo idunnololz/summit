@@ -23,10 +23,22 @@ sealed interface PersonRef : Parcelable, PageRef {
         override val instance: String,
     ) : PersonRef
 
+    @Parcelize
+    @TypeLabel("2")
+    @JsonClass(generateAdapter = true)
+    data class PersonRefById(
+        val id: Long,
+        /**
+         * This should be the instance of the actual person.
+         */
+        override val instance: String,
+    ) : PersonRef
+
     val fullName: String
         get() =
             when (this) {
                 is PersonRefByName -> "$name@$instance"
+                is PersonRefById -> "id:$id@$instance"
             }
 }
 

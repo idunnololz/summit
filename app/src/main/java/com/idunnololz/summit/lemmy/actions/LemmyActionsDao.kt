@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.actions
 
+import android.os.Parcelable
 import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Dao
@@ -22,18 +23,20 @@ import com.idunnololz.summit.util.crashlytics
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
 @Dao
 interface LemmyActionsDao {
 
     @Query("SELECT * FROM lemmy_actions")
-    suspend fun getAllPendingActions(): List<LemmyAction>
+    suspend fun getAllPendingActions(): List<LemmyPendingAction>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAction(action: LemmyAction): Long
+    suspend fun insertAction(action: LemmyPendingAction): Long
 
     @Delete
-    suspend fun delete(action: LemmyAction)
+    suspend fun delete(action: LemmyPendingAction)
 
     @Query("DELETE FROM lemmy_actions")
     suspend fun deleteAllActions()
@@ -44,17 +47,17 @@ interface LemmyActionsDao {
 
 @Entity(tableName = "lemmy_actions")
 @TypeConverters(LemmyActionConverters::class)
-data class LemmyAction(
+data class LemmyPendingAction(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Long,
+    override val id: Long,
     @ColumnInfo(name = "ts")
-    val ts: Long,
+    override val ts: Long,
     @ColumnInfo(name = "cts")
-    val creationTs: Long,
+    override val creationTs: Long,
     @ColumnInfo(name = "info")
-    val info: ActionInfo?,
-)
+    override val info: ActionInfo?,
+): LemmyAction
 
 @ProvidedTypeConverter
 class LemmyActionConverters(private val moshi: Moshi) {
@@ -93,13 +96,15 @@ class LemmyActionConverters(private val moshi: Moshi) {
 }
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
-sealed interface ActionInfo {
+sealed interface ActionInfo: Parcelable {
 
     val accountId: Long?
+    val accountInstance: String?
     val action: ActionType
     val isAffectedByRateLimit: Boolean
     val retries: Int
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("1")
     data class VoteActionInfo(
@@ -117,12 +122,15 @@ sealed interface ActionInfo {
         val dir: Int,
         val rank: Int,
         override val accountId: Long,
+        override val accountInstance: String?,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.VOTE,
     ) : ActionInfo {
+        @IgnoredOnParcel
         override val isAffectedByRateLimit: Boolean = true
     }
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("2")
     data class CommentActionInfo(
@@ -134,12 +142,15 @@ sealed interface ActionInfo {
         val content: String,
 
         override val accountId: Long,
+        override val accountInstance: String?,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
     ) : ActionInfo {
+        @IgnoredOnParcel
         override val isAffectedByRateLimit: Boolean = true
     }
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("3")
     data class DeleteCommentActionInfo(
@@ -147,15 +158,18 @@ sealed interface ActionInfo {
         val commentId: CommentId,
 
         override val accountId: Long,
+        override val accountInstance: String?,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.DELETE_COMMENT,
     ) : ActionInfo {
+        @IgnoredOnParcel
         override val isAffectedByRateLimit: Boolean = true
     }
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("4")
-    data class EditActionInfo(
+    data class EditCommentActionInfo(
         val postRef: PostRef,
         val commentId: CommentId,
         /**
@@ -164,12 +178,15 @@ sealed interface ActionInfo {
         val content: String,
 
         override val accountId: Long,
+        override val accountInstance: String?,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
     ) : ActionInfo {
+        @IgnoredOnParcel
         override val isAffectedByRateLimit: Boolean = true
     }
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("5")
     data class MarkPostAsReadActionInfo(
@@ -177,16 +194,18 @@ sealed interface ActionInfo {
         val read: Boolean,
 
         override val accountId: Long,
+        override val accountInstance: String?,
         override val retries: Int = 0,
         override val action: ActionType = ActionType.COMMENT,
     ) : ActionInfo {
+        @IgnoredOnParcel
         override val isAffectedByRateLimit: Boolean = true
     }
 
     fun incRetries() = when (this) {
         is CommentActionInfo -> this.copy(retries = this.retries + 1)
         is DeleteCommentActionInfo -> this.copy(retries = this.retries + 1)
-        is EditActionInfo -> this.copy(retries = this.retries + 1)
+        is EditCommentActionInfo -> this.copy(retries = this.retries + 1)
         is VoteActionInfo -> this.copy(retries = this.retries + 1)
         is MarkPostAsReadActionInfo -> this.copy(retries = this.retries + 1)
     }
@@ -208,7 +227,7 @@ interface LemmyActionResult<T : ActionInfo, R> {
         override val result = Unit
     }
 
-    class EditLemmyActionResult() : LemmyActionResult<ActionInfo.EditActionInfo, Unit> {
+    class EditLemmyActionResult() : LemmyActionResult<ActionInfo.EditCommentActionInfo, Unit> {
         override val result = Unit
     }
     class MarkPostAsReadActionResult() : LemmyActionResult<ActionInfo.MarkPostAsReadActionInfo, Unit> {

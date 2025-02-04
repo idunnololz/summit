@@ -207,7 +207,7 @@ class SettingsPerAccountFragment : BaseFragment<FragmentSettingsPerAccountBindin
                             }
                             settings.userActionsSettings.id -> {
                                 val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToActionsTabbedFragment()
+                                    .actionSettingsFragmentToActions()
                                 findNavController().navigateSafe(directions)
                                 true
                             }

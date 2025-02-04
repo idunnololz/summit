@@ -1898,8 +1898,24 @@
     <string name="warn_system_haptic_feedback_disabled">Haptic feedback is disabled system-wide. You need to enable haptic feedback in the system settings for haptics to work.</string>
     <string name="more_haptics">More haptics</string>
     <string name="more_haptics_desc">Adds haptic feedback to most actions in the app.</string>
-    <string name="hide_duplicate_posts_on_read">Auto-hide duplicate posts</string>
+    <string name="hide_duplicate_posts_on_read">Mark duplicate posts as read</string>
     <string name="hide_duplicate_posts_on_read_desc">If enabled the app will keep track of hidden or read posts. Any posts that are determined to be duplicates of these posts on another instance are automatically marked as read. This can reduce the feeling of seeing the same post over and over again.</string>
+    <string name="your_actions">Your actions</string>
+    <string name="failed">Failed</string>
+    <string name="pending">Pending</string>
+    <string name="success">Success</string>
+    <string name="clear_vote">Clear vote</string>
+    <string name="object_reference">Object reference</string>
+    <string name="comment_content">Comment content</string>
+    <string name="mark_post_as_read">Mark post as read</string>
+    <string name="user_id_format">User %1$s</string>
+    <string name="account">Account</string>
+    <string name="run_action">Run action</string>
+    <string name="warn_run_action_again_title">Run action again?</string>
+    <string name="warn_run_action_again_desc">This will create a duplicate of this action and run it.</string>
+    <string name="rerun_action_success_desc">Action re-run successfully.</string>
+    <string name="retry_action_success_desc">Action successfully retried.</string>
+    <string name="mark_post_as_unread">Mark post as unread</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

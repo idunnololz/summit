@@ -29,7 +29,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
@@ -74,7 +74,7 @@ import javax.inject.Inject
 class CreateOrEditPostFragment :
     BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
     FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"
@@ -244,7 +244,7 @@ class CreateOrEditPostFragment :
                 when (it.itemId) {
                     R.id.create_post -> {
                         if (uploadImageViewModel.isUploading) {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(R.string.warn_upload_in_progress)
                                 .setPositiveButton(R.string.proceed_anyways)
                                 .setNegativeButton(R.string.cancel)
@@ -261,7 +261,7 @@ class CreateOrEditPostFragment :
                     }
                     R.id.update_post -> {
                         if (uploadImageViewModel.isUploading) {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(R.string.warn_upload_in_progress)
                                 .setPositiveButton(R.string.proceed_anyways)
                                 .setNegativeButton(R.string.cancel)
@@ -538,7 +538,7 @@ class CreateOrEditPostFragment :
                         if (it.error is CreateOrEditPostViewModel.NoTitleError) {
                             title.error = getString(R.string.required)
                         } else {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(
                                     getString(
                                         R.string.error_unable_to_send_post,
@@ -1054,7 +1054,7 @@ class CreateOrEditPostFragment :
         this.nsfw,
     )
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "create_post" -> {
                 createPost()
@@ -1065,6 +1065,6 @@ class CreateOrEditPostFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

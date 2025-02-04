@@ -14,7 +14,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.databinding.FragmentLoginBinding
@@ -126,12 +126,12 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                         if (it.error.errorMessage == "password_incorrect") {
                             binding.password.error = getString(R.string.incorrect_password)
                         } else {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(it.error.message ?: getString(R.string.error_unknown))
                                 .createAndShow(childFragmentManager, "asdf")
                         }
                     } else {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(it.error.message ?: getString(R.string.error_unknown))
                             .createAndShow(childFragmentManager, "asdf")
                     }

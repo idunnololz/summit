@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.BackupItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentImportSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingsFromBackupsBinding
@@ -36,7 +36,7 @@ import javax.inject.Inject
 class ImportSettingsDialogFragment :
     BaseDialogFragment<DialogFragmentImportSettingsBinding>(),
     FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
 
@@ -149,7 +149,7 @@ class ImportSettingsDialogFragment :
                             }
                         }
 
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(errorMessage)
                             .createAndShow(childFragmentManager, "error_dialog")
 
@@ -163,7 +163,7 @@ class ImportSettingsDialogFragment :
                     }
                     ImportSettingsViewModel.State.NotStarted -> {}
                     ImportSettingsViewModel.State.ImportSettingsCompleted -> {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.app_restart_required)
                             .setMessage(R.string.app_restart_required_desc)
                             .setPositiveButton(R.string.restart_app)
@@ -257,7 +257,7 @@ class ImportSettingsDialogFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "restart_required" -> {
                 ProcessPhoenix.triggerRebirth(requireContext())
@@ -265,7 +265,7 @@ class ImportSettingsDialogFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "restart_required" -> {
                 dismiss()

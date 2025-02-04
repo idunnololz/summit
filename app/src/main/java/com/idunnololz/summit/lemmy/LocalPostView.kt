@@ -10,4 +10,5 @@ import kotlinx.parcelize.Parcelize
 data class LocalPostView(
     val fetchedPost: FetchedPost,
     val filterReason: FilterReason?,
+    val isDuplicatePost: Boolean,
 ) : Parcelable

@@ -9,7 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsThemeBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.BaseTheme
@@ -135,7 +135,7 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
                         preferences.colorScheme = ColorSchemes.Default
                         themeManager.onPreferencesChanged()
                     } else if (it) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(R.string.error_dynamic_color_not_supported)
                             .createAndShow(childFragmentManager, "Asdfff")
                         preferences.setUseMaterialYou(false)

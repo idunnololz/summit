@@ -804,8 +804,8 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         private val ESCAPABLE = Pattern.compile('^'.toString() + Escaping.ESCAPABLE)
         private val ENTITY_HERE =
             Pattern.compile('^'.toString() + Escaping.ENTITY, Pattern.CASE_INSENSITIVE)
-        private val TICKS = Pattern.compile("`+")
-        private val TICKS_HERE = Pattern.compile("^`+")
+        val TICKS = Pattern.compile("`+")
+        val TICKS_HERE = Pattern.compile("^`+")
         private val EMAIL_AUTOLINK = Pattern
             .compile(
                 "^<([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>",

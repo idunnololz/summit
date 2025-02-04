@@ -32,7 +32,7 @@ import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
@@ -102,19 +102,15 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.Request
-import org.jsoup.Jsoup
 
 @AndroidEntryPoint
 class CommunityFragment :
     BaseFragment<FragmentCommunityBinding>(),
     SignInNavigator,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "CommunityFragment"
@@ -321,7 +317,7 @@ class CommunityFragment :
                         .show(childFragmentManager, "asdf")
                 },
                 onInstanceMismatch = { accountInstance, apiInstance ->
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setTitle(R.string.error_account_instance_mismatch_title)
                         .setMessage(
                             getString(
@@ -1627,7 +1623,7 @@ class CommunityFragment :
                     val shareIntent = Intent.createChooser(sendIntent, null)
                     startActivity(shareIntent)
                 } catch (e: MultiCommunityException) {
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setMessage(R.string.error_cannot_share_multi_community)
                         .createAndShow(childFragmentManager, "sdafx")
                 }
@@ -1858,10 +1854,10 @@ class CommunityFragment :
 
     override fun proceedAnyways(tag: Int) {}
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "onInstanceMismatch") {
             dialog.dismiss()
             viewModel.resetToAccountInstance()

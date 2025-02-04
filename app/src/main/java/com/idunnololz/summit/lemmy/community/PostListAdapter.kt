@@ -241,6 +241,7 @@ class PostListAdapter(
                         highlight = item.highlight,
                         highlightForever = item.highlightForever,
                         themeColor = themeColor,
+                        isDuplicatePost = item.isDuplicatePost,
                         onRevealContentClickedFn = {
                             revealedItems.add(item.fetchedPost.postView.getUniqueKey())
                             notifyItemChanged(h.absoluteAdapterPosition)
@@ -338,6 +339,7 @@ class PostListAdapter(
                     highlight = item.highlight,
                     highlightForever = item.highlightForever,
                     themeColor = themeColor,
+                    isDuplicatePost = item.isDuplicatePost,
                     onRevealContentClickedFn = {
                         revealedItems.add(item.fetchedPost.postView.getUniqueKey())
                         notifyItemChanged(h.absoluteAdapterPosition)

@@ -158,7 +158,7 @@ class LinkFixer @Inject constructor(
             is CommunityRef.MultiCommunity -> null
             is CommunityRef.AllSubscribed -> null
             is CommunityRef.Subscribed -> pageRef.instance
-            is PersonRef.PersonRefByName -> pageRef.instance
+            is PersonRef -> pageRef.instance
             is PostRef -> pageRef.instance
         }
 
@@ -192,7 +192,7 @@ class LinkFixer @Inject constructor(
             is CommunityRef.MultiCommunity -> null
             is CommunityRef.AllSubscribed -> null
             is CommunityRef.Subscribed -> pageRef.instance
-            is PersonRef.PersonRefByName -> pageRef.instance
+            is PersonRef -> pageRef.instance
             is PostRef -> pageRef.instance
         } ?: return@a pageRef
 
@@ -240,6 +240,7 @@ class LinkFixer @Inject constructor(
         is CommunityRef.AllSubscribed -> this
         is CommunityRef.Subscribed -> this.copy(instance = newInstance)
         is PersonRef.PersonRefByName -> this.copy(instance = newInstance)
+        is PersonRef.PersonRefById -> this.copy(instance = newInstance)
         is PostRef -> this.copy(instance = newInstance)
     }
 

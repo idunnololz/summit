@@ -57,6 +57,7 @@ class PostsRepository @AssistedInject constructor(
         val post: FetchedPost,
         val postPageIndexInternal: Int,
         val filterReason: FilterReason? = null,
+        val isDuplicatePost: Boolean,
     ) {
         val isFiltered = filterReason != null
     }
@@ -201,6 +202,7 @@ class PostsRepository @AssistedInject constructor(
                         LocalPostView(
                             fetchedPost = transformPostWithLocalData(it.post),
                             filterReason = it.filterReason,
+                            isDuplicatePost = it.isDuplicatePost,
                         )
                     },
                 pageIndex = pageIndex,
@@ -443,18 +445,11 @@ class PostsRepository @AssistedInject constructor(
             val post = fetchedPost.postView
             val uniquePostKey = post.getUniqueKey()
             var filterReason: FilterReason? = null
+            var isDuplicatePost = false
             val instance = fetchedPost.source.instance ?: apiInstance
 
             if (duplicatePostsDetector?.isPostDuplicateOfRead(post) == true) {
-                if (!hiddenPosts.contains(post.post.id) && !post.read) {
-                    val postRef = duplicatePostsDetector.getPostDuplicates(post)
-                    Log.d("HAHA", "Marking duplicate post as read! " +
-                        "og: https://${postRef?.instance}/post/${postRef?.id}" +
-                        "nw: https://${post.instance}/post/${post.post.id}")
-                }
-
-                hideReadCount++
-                continue
+                isDuplicatePost = true
             }
 
             if (hideRead &&
@@ -524,6 +519,7 @@ class PostsRepository @AssistedInject constructor(
                         post = fetchedPost,
                         postPageIndexInternal = pageIndex,
                         filterReason = filterReason,
+                        isDuplicatePost = isDuplicatePost,
                     ),
                 )
             }

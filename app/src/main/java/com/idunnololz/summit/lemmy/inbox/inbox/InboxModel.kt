@@ -11,11 +11,16 @@ class InboxModel(
 )
 
 sealed interface InboxListItem {
+
+    val page: Int
+
     data class RegularInboxItem(
+        override val page: Int,
         val item: InboxItem,
     ) : InboxListItem
 
     data class ConversationItem(
+        override val page: Int,
         val conversation: Conversation,
         val draftMessage: DraftData.MessageDraftData?,
     ) : InboxListItem

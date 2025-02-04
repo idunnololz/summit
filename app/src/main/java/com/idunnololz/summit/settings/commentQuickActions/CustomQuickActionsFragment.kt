@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentCustomQuickActionsBinding
 import com.idunnololz.summit.databinding.InactiveActionsTitleBinding
 import com.idunnololz.summit.databinding.QuickActionBinding
@@ -41,7 +41,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CustomQuickActionsFragment :
     BaseFragment<FragmentCustomQuickActionsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: CustomQuickActionsViewModel by viewModels()
 
@@ -85,7 +85,7 @@ class CustomQuickActionsFragment :
                     override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                         when (menuItem.itemId) {
                             R.id.reset_settings -> {
-                                AlertDialogFragment.Builder()
+                                OldAlertDialogFragment.Builder()
                                     .setMessage(R.string.warn_reset_settings)
                                     .setPositiveButton(R.string.reset_settings)
                                     .setNegativeButton(R.string.cancel)
@@ -376,10 +376,10 @@ class CustomQuickActionsFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         viewModel.resetSettings()
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

@@ -188,7 +188,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             }
                             mainSettings.userActionsSettings.id -> {
                                 val directions = SettingsFragmentDirections
-                                    .actionSettingsFragmentToActionsTabbedFragment()
+                                    .actionSettingsFragmentToActions()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -352,7 +352,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
                         is ActionsSettings -> {
                             val directions = SettingsFragmentDirections
-                                .actionSettingsFragmentToActionsTabbedFragment()
+                                .actionSettingsFragmentToActions()
                             findNavController().navigateSafe(directions)
                         }
 

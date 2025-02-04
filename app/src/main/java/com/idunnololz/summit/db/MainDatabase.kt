@@ -28,7 +28,7 @@ import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryConverters
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.history.HistoryEntry
-import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
@@ -56,7 +56,7 @@ import com.idunnololz.summit.util.moshi
         UserCommunityEntry::class,
         HistoryEntry::class,
         Account::class,
-        LemmyAction::class,
+        LemmyPendingAction::class,
         LemmyFailedAction::class,
         LemmyCompletedAction::class,
         AccountInfo::class,

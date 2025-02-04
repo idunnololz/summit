@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.FragmentSettingsPostAndCommentsAppearanceBinding
@@ -46,7 +46,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsPostAndCommentsAppearanceFragment :
     BaseFragment<FragmentSettingsPostAndCommentsAppearanceBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener,
+    OldAlertDialogFragment.AlertDialogFragmentListener,
     SettingValueUpdateCallback {
 
     private val viewModel: SettingsPostAndCommentsAppearanceViewModel by viewModels()
@@ -122,7 +122,7 @@ class SettingsPostAndCommentsAppearanceFragment :
         val context = requireContext()
 
         settings.resetPostStyles.bindTo(binding.resetPostStyles) {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(R.string.reset_view_to_default_styles)
                 .setPositiveButton(android.R.string.ok)
                 .setNegativeButton(R.string.cancel)
@@ -130,7 +130,7 @@ class SettingsPostAndCommentsAppearanceFragment :
         }
 
         settings.resetCommentStyles.bindTo(binding.resetCommentStyles) {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(R.string.reset_view_to_default_styles)
                 .setPositiveButton(android.R.string.ok)
                 .setNegativeButton(R.string.cancel)
@@ -404,7 +404,7 @@ class SettingsPostAndCommentsAppearanceFragment :
             adapterHelper.onBindViewHolder(holder, position)
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "reset_post_to_default_styles") {
             viewModel.resetPostUiConfig()
         } else if (tag == "reset_comment_to_default_styles") {
@@ -412,6 +412,6 @@ class SettingsPostAndCommentsAppearanceFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

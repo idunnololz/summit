@@ -24,6 +24,7 @@ import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -55,6 +56,7 @@ class MoreActionsHelper @Inject constructor(
     private val fileDownloadHelper: FileDownloadHelper,
     private val offlineManager: OfflineManager,
     private val nsfwModeManager: NsfwModeManager,
+    private val duplicatePostsDetector: DuplicatePostsDetector,
     coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
@@ -277,6 +279,9 @@ class MoreActionsHelper @Inject constructor(
                 read = read,
                 accountId = accountId,
             )
+            if (read) {
+                duplicatePostsDetector.addReadOrHiddenPost(postView)
+            }
         }
     }
 
@@ -285,12 +290,16 @@ class MoreActionsHelper @Inject constructor(
             if (delayMs > 0) {
                 delay(delayMs)
             }
+            val newRead = !postView.read
             accountActionsManager.markPostAsRead(
                 instance = apiClient.instance,
                 id = postView.post.id,
-                read = !postView.read,
+                read = newRead,
                 accountId = accountId,
             )
+            if (newRead) {
+                duplicatePostsDetector.addReadOrHiddenPost(postView)
+            }
         }
     }
 

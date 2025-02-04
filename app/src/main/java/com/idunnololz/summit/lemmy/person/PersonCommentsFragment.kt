@@ -13,7 +13,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonCommentsBinding
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
@@ -36,7 +36,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PersonCommentsFragment :
     BaseFragment<FragmentPersonCommentsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener,
+    OldAlertDialogFragment.AlertDialogFragmentListener,
     SignInNavigator {
 
     companion object {
@@ -75,7 +75,7 @@ class PersonCommentsFragment :
                     .show(childFragmentManager, "asdf")
             },
             onInstanceMismatch = { accountInstance, apiInstance ->
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.error_account_instance_mismatch_title)
                     .setMessage(
                         getString(
@@ -248,7 +248,7 @@ class PersonCommentsFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             CONFIRM_DELETE_COMMENT_TAG -> {
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
@@ -260,7 +260,7 @@ class PersonCommentsFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
     override fun navigateToSignInScreen() {

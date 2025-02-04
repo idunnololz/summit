@@ -33,7 +33,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.setupWithNavController
 import coil.target.Target
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
@@ -45,8 +44,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.lemmy.CommentRef
@@ -548,7 +546,7 @@ class MainActivity :
         )
 
         if (fileUri == null) {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(R.string.error_unable_to_read_file)
                 .createAndShow(supportFragmentManager, "asdf")
             return
@@ -567,7 +565,7 @@ class MainActivity :
         val account = accountManager.currentAccount.asAccount
 
         if (account == null) {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(R.string.error_you_must_sign_in_to_create_a_post)
                 .createAndShow(supportFragmentManager, "asdf")
             return
@@ -616,7 +614,7 @@ class MainActivity :
         if (page == null) {
             Log.d(TAG, "Unable to handle uri $data")
 
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setMessage(getString(R.string.error_unable_to_handle_link, data.toString()))
                 .createAndShow(supportFragmentManager, "error")
         } else {

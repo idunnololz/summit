@@ -90,7 +90,7 @@ class StorageUsageView : ConstraintLayout {
     fun setStorageUsage(storageUsage: List<StorageUsageItem>) {
         storageUsageItems = storageUsage
 
-        val totalBytes = storageUsage.sumByDouble { it.sizeInBytes.toDouble() }
+        val totalBytes = storageUsage.sumOf { it.sizeInBytes.toDouble() }
 
         storageUsageTextView.text = Utils.fileSizeToHumanReadableString(totalBytes, nf)
 

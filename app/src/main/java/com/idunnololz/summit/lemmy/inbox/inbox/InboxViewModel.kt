@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.inbox.inbox
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -45,6 +46,7 @@ class InboxViewModel @Inject constructor(
     private val inboxRepositoryFactory: InboxRepository.Factory,
     private val notificationsManager: NotificationsManager,
     private val conversationsManager: ConversationsManager,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
@@ -63,11 +65,9 @@ class InboxViewModel @Inject constructor(
 
     val inboxUpdate = StatefulLiveData<InboxUpdate>()
 
-    val pageTypeFlow = MutableStateFlow<PageType>(PageType.Unread)
+    val pageTypeFlow = savedStateHandle.getStateFlow("page_type", PageType.Unread)
 
     val pageType = pageTypeFlow.asLiveData()
-
-    var pageIndex = 0
 
     var instance: String = apiClient.instance
 
@@ -78,7 +78,7 @@ class InboxViewModel @Inject constructor(
     private var hasMore = true
     private val fetchingPages = mutableSetOf<Int>()
     private var conversations: ConversationsModel? = null
-    private val fetchInboxRequestFlow = MutableSharedFlow<Unit>()
+    private val fetchInboxRequestFlow = MutableSharedFlow<Int>()
 
     val isUserOnInboxScreen = MutableStateFlow<Boolean>(false)
     val lastInboxUnreadLoadTimeMs = MutableStateFlow<Long>(0)
@@ -96,7 +96,6 @@ class InboxViewModel @Inject constructor(
                 inboxRepository = inboxRepositoryFactory.create()
 
                 delay(10) // just in case it takes a second for the api client to update...
-                pageIndex = 0
 
                 clearData()
 
@@ -104,10 +103,11 @@ class InboxViewModel @Inject constructor(
                     InboxUpdate(
                         inboxModel = InboxModel(),
                         scrollToTop = false,
+                        isLoading = true,
                     ),
                 )
 
-                fetchInboxAsync()
+                fetchInboxAsync(pageIndex = 0)
             }
         }
 
@@ -127,7 +127,7 @@ class InboxViewModel @Inject constructor(
         viewModelScope.launch {
             pageTypeFlow.collect {
                 withContext(Dispatchers.Main) {
-                    pageIndex = 0
+                    Log.d(TAG, "Page type changed")
 
                     clearData()
 
@@ -135,10 +135,11 @@ class InboxViewModel @Inject constructor(
                         InboxUpdate(
                             inboxModel = InboxModel(),
                             scrollToTop = false,
+                            isLoading = true,
                         ),
                     )
 
-                    fetchInbox()
+                    fetchNextPage()
                 }
             }
         }
@@ -169,19 +170,42 @@ class InboxViewModel @Inject constructor(
         viewModelScope.launch {
             fetchInboxRequestFlow.debounce(100)
                 .collect {
-                    fetchInbox()
+                    fetchInbox(it)
                 }
         }
         inboxRepository.onServerChanged()
     }
 
-    fun fetchInboxAsync() {
+    fun setPageType(pageType: PageType) {
+        savedStateHandle["page_type"] = pageType
+    }
+
+    fun refresh(force: Boolean) {
         viewModelScope.launch {
-            fetchInboxRequestFlow.emit(Unit)
+            clearData()
+            fetchInbox(0, force = force)
         }
     }
 
-    fun fetchInbox(pageIndex: Int = this.pageIndex, force: Boolean = false) {
+    fun fetchNextPage() {
+        viewModelScope.launch {
+            val currentPage = inboxUpdate.valueOrNull
+                ?.inboxModel
+                ?.items
+                ?.maxOfOrNull { it.page }
+                ?: -1
+            val nextPage = currentPage + 1
+            fetchInboxAsync(nextPage)
+        }
+    }
+
+    fun fetchInboxAsync(pageIndex: Int) {
+        viewModelScope.launch {
+            fetchInboxRequestFlow.emit(pageIndex)
+        }
+    }
+
+    fun fetchInbox(pageIndex: Int, force: Boolean = false) {
         val pageType = pageTypeFlow.value
 
         observeConversationsJob?.cancel()
@@ -264,13 +288,9 @@ class InboxViewModel @Inject constructor(
 
             inboxRepository.markAsRead(inboxItem, read)
                 .onSuccess {
-                    if (!read || refreshAfter) {
-                        fetchInbox(force = true)
-                    }
                     markAsReadResult.postValue(Unit)
                 }
                 .onFailure {
-                    fetchInbox(force = true)
                     markAsReadResult.postError(it)
                 }
         }
@@ -278,13 +298,24 @@ class InboxViewModel @Inject constructor(
 
     fun markAllAsRead() {
         markAsReadResult.setIsLoading()
+
+        allInboxItems.forEach {
+            markAsReadInViewData(
+                id = when (it) {
+                    is InboxListItem.ConversationItem -> it.conversation.id
+                    is InboxListItem.RegularInboxItem -> it.item.id.toLong()
+                },
+                isRead = true,
+            )
+        }
+
         viewModelScope.launch {
             apiClient.markAllAsRead()
                 .onSuccess {
-                    fetchInbox(force = true)
+                    markAsReadResult.postValue(Unit)
                 }
                 .onFailure {
-                    fetchInbox(force = true)
+                    markAsReadResult.postError(it)
                 }
         }
     }
@@ -300,12 +331,14 @@ class InboxViewModel @Inject constructor(
                             InboxListItem.ConversationItem(
                                 conversation = it,
                                 draftMessage = conversations.drafts[it.personId]?.draftData,
+                                page = 0,
                             )
                         },
                         earliestMessageTs = conversations.conversationEarliestMessageTs,
                         hasMore = false,
                     ),
                     scrollToTop = scrollToTop,
+                    isLoading = false,
                 ),
             )
         } else {
@@ -316,6 +349,7 @@ class InboxViewModel @Inject constructor(
                         hasMore = hasMore,
                     ),
                     scrollToTop = scrollToTop,
+                    isLoading = false,
                 ),
             )
         }
@@ -353,13 +387,15 @@ class InboxViewModel @Inject constructor(
                     if (data.conversation.mostRecentMessageId != id) {
                         continue
                     }
-                    allInboxItems[index] = data.copy(conversation = data.conversation.copy(isRead = isRead))
+                    allInboxItems[index] = data.copy(
+                        conversation = data.conversation.copy(isRead = isRead))
                 }
                 is InboxListItem.RegularInboxItem -> {
                     if (data.item.id.toLong() != id) {
                         continue
                     }
-                    allInboxItems[index] = data.copy(item = data.item.updateIsRead(isRead = isRead) as InboxItem)
+                    allInboxItems[index] = data.copy(
+                        item = data.item.updateIsRead(isRead = isRead) as InboxItem)
                 }
             }
         }
@@ -376,7 +412,7 @@ class InboxViewModel @Inject constructor(
 
         hasMore = data.hasMore
 
-        allInboxItems.addAll(data.items.map { InboxListItem.RegularInboxItem(it) })
+        allInboxItems.addAll(data.items.map { InboxListItem.RegularInboxItem(data.pageIndex, it) })
 
         Log.d(TAG, "Data updated! Total items: ${allInboxItems.size} hasMore: $hasMore")
     }
@@ -435,4 +471,5 @@ fun PageType.getName(context: Context) = when (this) {
 data class InboxUpdate(
     val inboxModel: InboxModel,
     val scrollToTop: Boolean,
+    val isLoading: Boolean,
 )

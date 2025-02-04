@@ -27,7 +27,7 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonBinding
@@ -454,7 +454,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             avatarHelper.loadAvatar(profileIcon, data.personView.person)
             if (data.personView.person.avatar.isNullOrBlank()) {
                 profileIcon.setOnClickListener {
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setMessage(R.string.error_user_has_no_profile_image)
                         .createAndShow(childFragmentManager, "error_user_has_no_profile_image")
                 }

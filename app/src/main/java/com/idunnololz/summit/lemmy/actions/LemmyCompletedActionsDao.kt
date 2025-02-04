@@ -49,11 +49,11 @@ interface LemmyCompletedActionsDao {
 data class LemmyCompletedAction(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Long,
+    override val id: Long,
     @ColumnInfo(name = "ts")
-    val ts: Long,
+    override val ts: Long,
     @ColumnInfo(name = "cts")
-    val creationTs: Long,
+    override val creationTs: Long,
     @ColumnInfo(name = "info")
-    val info: ActionInfo?,
-)
+    override val info: ActionInfo?,
+): LemmyAction
