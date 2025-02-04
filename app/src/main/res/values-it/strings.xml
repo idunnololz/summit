@@ -1128,4 +1128,5 @@
     <string name="haptics">Aptica</string>
     <string name="haptics_desc">Controlla se il feedback tattile è abilitato per alcune azioni.</string>
     <string name="prefer_text_preview_icon">Preferisci l\'icona di anteprima del testo</string>
+    <string name="user">Utente</string>
 </resources>
