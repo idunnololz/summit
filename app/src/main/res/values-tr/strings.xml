@@ -1121,4 +1121,5 @@
     <string name="prefer_text_preview_icon_desc">Yalnızca belirli görünümler için geçerlidir. Etkinleştirildiğinde, gönderinin metin içeriğini genişletmek için dokunulabilen metin gönderileri için bir simge görünecektir.</string>
     <string name="haptics">Dokunsal</string>
     <string name="prefer_text_preview_icon">Metin önizleme simgesini tercih et</string>
+    <string name="user">Kullanıcı</string>
 </resources>
