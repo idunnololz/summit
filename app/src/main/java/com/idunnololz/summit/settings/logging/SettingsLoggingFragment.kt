@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsLoggingBinding
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LoggingSettings
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsLoggingFragment :
     BaseFragment<FragmentSettingsLoggingBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
     lateinit var preferences: Preferences
@@ -74,7 +74,7 @@ class SettingsLoggingFragment :
             b = binding.useFirebase,
             { preferences.useFirebase },
             {
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.app_restart_required_by_setting)
                     .setMessage(R.string.app_restart_required_by_setting_desc)
                     .setPositiveButton(R.string.restart_app)
@@ -91,7 +91,7 @@ class SettingsLoggingFragment :
         )
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "enableFirebase" -> {
                 preferences.useFirebase = true
@@ -104,7 +104,7 @@ class SettingsLoggingFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "enableFirebase",
             "disableFirebase",

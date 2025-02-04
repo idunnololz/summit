@@ -8,7 +8,6 @@ import android.os.Parcelable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.transition.TransitionManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +29,7 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
@@ -52,7 +51,6 @@ import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -74,7 +72,6 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
@@ -82,7 +79,7 @@ class AddOrEditCommentFragment :
     BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
     FullscreenDialogFragment,
     SignInNavigator,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
@@ -98,7 +95,6 @@ class AddOrEditCommentFragment :
             fragmentManager: FragmentManager,
             accountId: Long?,
         ) {
-            Log.d("ASDF", "showReplyDialog()", RuntimeException())
             AddOrEditCommentFragment().apply {
                 arguments = AddOrEditCommentFragmentArgs(
                     instance = instance,
@@ -230,7 +226,6 @@ class AddOrEditCommentFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        Log.d("ASDF", "onCreateView()", RuntimeException())
         super.onCreateView(inflater, container, savedInstanceState)
 
         setBinding(FragmentAddOrEditCommentBinding.inflate(inflater, container, false))
@@ -239,7 +234,6 @@ class AddOrEditCommentFragment :
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d("ASDF", "onViewCreated()", RuntimeException())
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
@@ -457,7 +451,7 @@ class AddOrEditCommentFragment :
                 when (it.itemId) {
                     R.id.send_comment -> {
                         if (uploadImageViewModel.isUploading) {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(R.string.warn_upload_in_progress)
                                 .setPositiveButton(R.string.proceed_anyways)
                                 .setNegativeButton(R.string.cancel)
@@ -491,7 +485,7 @@ class AddOrEditCommentFragment :
                     }
                     R.id.update_comment -> {
                         if (uploadImageViewModel.isUploading) {
-                            AlertDialogFragment.Builder()
+                            OldAlertDialogFragment.Builder()
                                 .setMessage(R.string.warn_upload_in_progress)
                                 .setPositiveButton(R.string.proceed_anyways)
                                 .setNegativeButton(R.string.cancel)
@@ -912,7 +906,7 @@ class AddOrEditCommentFragment :
             val recyclerView = contextRecyclerView
 
             fun showError() {
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.error_operation_not_permitted)
                     .setMessage(R.string.error_action_on_comment_context)
                     .setPositiveButton(android.R.string.ok)
@@ -942,7 +936,7 @@ class AddOrEditCommentFragment :
                         .show(childFragmentManager, "asdf")
                 },
                 onInstanceMismatch = { accountInstance, apiInstance ->
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setTitle(R.string.error_account_instance_mismatch_title)
                         .setMessage(
                             getString(
@@ -1027,7 +1021,7 @@ class AddOrEditCommentFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "send_comment" -> {
                 sendComment()
@@ -1038,7 +1032,7 @@ class AddOrEditCommentFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
     private val isDm: Boolean

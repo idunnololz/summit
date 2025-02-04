@@ -526,6 +526,54 @@ class AccountAwareLemmyClient @Inject constructor(
             .autoSignOut(account)
     }
 
+    suspend fun createComment(
+        content: String,
+        postId: PostId,
+        parentId: CommentId?,
+        account: Account? = accountForInstance(),
+    ) : Result<CommentView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient
+            .createComment(
+                account = account,
+                content = content,
+                postId = postId,
+                parentId = parentId
+            )
+            .autoSignOut(account)
+    }
+
+    suspend fun editComment(
+        content: String,
+        commentId: CommentId,
+        account: Account? = accountForInstance(),
+    ): Result<CommentView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient
+            .editComment(
+                account = account,
+                content = content,
+                commentId = commentId,
+            )
+            .autoSignOut(account)
+    }
+
+    suspend fun deleteComment(
+        commentId: CommentId,
+        account: Account? = accountForInstance(),
+    ): Result<CommentView> = if (account == null) {
+        createAccountErrorResult()
+    } else {
+        apiClient
+            .deleteComment(
+                account = account,
+                commentId = commentId,
+            )
+            .autoSignOut(account)
+    }
+
     suspend fun editPost(
         postId: PostId,
         name: String,

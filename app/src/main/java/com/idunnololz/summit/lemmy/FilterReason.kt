@@ -7,4 +7,5 @@ enum class FilterReason {
     Video,
     Text,
     Custom,
+    Duplicate,
 }

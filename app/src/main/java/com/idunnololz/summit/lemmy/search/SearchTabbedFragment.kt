@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -60,7 +60,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchTabbedFragment :
     BaseFragment<FragmentSearchBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "SearchTabbedFragment"
@@ -311,7 +311,7 @@ class SearchTabbedFragment :
                     }
 
                     override fun onSuggestionLongClicked(query: String) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.delete_suggest)
                             .setPositiveButton(android.R.string.ok)
                             .setNegativeButton(android.R.string.cancel)
@@ -544,7 +544,7 @@ class SearchTabbedFragment :
         slidingPaneController?.closePost(postFragment)
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         val context = context ?: return
 
         val suggestionToDelete = dialog.getExtra(ARG_SUGGESTION_TO_DELETE)
@@ -576,6 +576,6 @@ class SearchTabbedFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

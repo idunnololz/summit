@@ -73,23 +73,19 @@ class CommunityViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val userCommunitiesManager: UserCommunitiesManager,
     private val accountInfoManager: AccountInfoManager,
-    private val accountActionsManager: AccountActionsManager,
     private val postReadManager: PostReadManager,
     private val preferenceManager: PreferenceManager,
     private val state: SavedStateHandle,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val directoryHelper: DirectoryHelper,
     val hiddenPostsManager: HiddenPostsManager,
     private val tabsManager: TabsManager,
-    private val apiClient: AccountAwareLemmyClient,
     private val apiClientFactory: AccountAwareLemmyClient.Factory,
     private val guestAccountManager: GuestAccountManager,
     private val perCommunityPreferences: PerCommunityPreferences,
     private val nsfwModeManager: NsfwModeManager,
     private val postFeedPrefetcher: PostFeedPrefetcher,
-    private val postPrefetcher: PostPrefetcher,
     val basePreferences: Preferences,
     private val duplicatePostsDetector: DuplicatePostsDetector,
+    private val postListEngineFactory: PostListEngine.Factory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -149,9 +145,7 @@ class CommunityViewModel @Inject constructor(
     var preferences: Preferences = preferenceManager.currentPreferences
 
     private var fetchingPages = mutableSetOf<Int>()
-    var postListEngine = PostListEngine(
-        coroutineScopeFactory = coroutineScopeFactory,
-        directoryHelper = directoryHelper,
+    var postListEngine = postListEngineFactory.create(
         infinity = preferences.infinity,
         autoLoadMoreItems = preferences.autoLoadMorePosts,
         usePageIndicators = preferences.infinityPageIndicator,
@@ -259,29 +253,12 @@ class CommunityViewModel @Inject constructor(
 
         viewModelScope.launch {
             postReadManager.postReadChanged.collect {
-                val pagesCopy = withContext(Dispatchers.Main) {
-                    ArrayList(postListEngine.pages)
+                if (duplicatePostsDetector.isEnabled) {
+                    postListEngine.markDuplicatePostsAsRead()
                 }
 
-                pagesCopy.forEach {
-                    it.posts.forEach {
-                        if (duplicatePostsDetector
-                            .isPostDuplicateOfRead(it.fetchedPost.postView)) {
-                            val postRef = duplicatePostsDetector.getPostDuplicates(
-                                it.fetchedPost.postView)
-                            val post = it.fetchedPost.postView
-
-                            Log.d("HAHA", "Marking duplicate post as read! " +
-                                "og: https://${postRef?.instance}/post/${postRef?.id}" +
-                                "nw: https://${post.instance}/post/${post.post.id}")
-
-                            postReadManager.markPostAsReadLocal(
-                                instance = it.fetchedPost.postView.instance,
-                                postId = it.fetchedPost.postView.post.id,
-                                read = true
-                            )
-                        }
-                    }
+                val pagesCopy = withContext(Dispatchers.Main) {
+                    ArrayList(postListEngine.pages)
                 }
 
                 val updatedPages = withContext(Dispatchers.Default) {

@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.databinding.HistoryEntryItemBinding
 import com.idunnololz.summit.databinding.HistoryHeaderItemBinding
@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class HistoryFragment :
     BaseFragment<FragmentHistoryBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private const val TAG = "HistoryFragment"
@@ -106,7 +106,7 @@ class HistoryFragment :
             onEntryClick = {
                 val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance, mustHandle = true)
                 if (pageRef == null) {
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setMessage(R.string.error_history_entry_corrupt)
                         .createAndShow(this@HistoryFragment, "asdf")
                 } else {
@@ -126,6 +126,7 @@ class HistoryFragment :
                             )
                         }
                         is PersonRef.PersonRefByName,
+                        is PersonRef.PersonRefById,
                         is CommunityRef.All,
                         is CommunityRef.AllSubscribed,
                         is CommunityRef.CommunityRefByName,
@@ -426,9 +427,9 @@ class HistoryFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

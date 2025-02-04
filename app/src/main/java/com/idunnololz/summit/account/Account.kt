@@ -17,7 +17,7 @@ data class Account(
     @ColumnInfo(name = "id")
     val id: Long,
     @ColumnInfo(name = "current") val current: Boolean,
-    @ColumnInfo(name = "instance") val instance: String,
+    @ColumnInfo(name = "instance") override val instance: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "jwt") val jwt: String,
     @ColumnInfo(

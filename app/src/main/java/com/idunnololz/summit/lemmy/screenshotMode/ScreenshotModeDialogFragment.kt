@@ -23,7 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.DialogFragmentScreenshotModeBinding
 import com.idunnololz.summit.databinding.ScreenshotBottomBarBinding
 import com.idunnololz.summit.databinding.ScreenshotStageBinding
@@ -65,7 +65,7 @@ import kotlinx.parcelize.Parcelize
 class ScreenshotModeDialogFragment :
     BaseDialogFragment<DialogFragmentScreenshotModeBinding>(),
     FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         const val REQUEST_KEY = "ScreenshotModeDialogFragment_req_key"
@@ -536,7 +536,7 @@ class ScreenshotModeDialogFragment :
                 if (recordingStats != null) {
                     val df = PrettyPrintUtils.defaultDecimalFormat
 
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setMessage(
                             getString(
                                 R.string.desc_recording_stats,
@@ -558,7 +558,7 @@ class ScreenshotModeDialogFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "recording_stats") {
             setResultIfPossible()
 
@@ -566,7 +566,7 @@ class ScreenshotModeDialogFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "recording_stats") {
             setResultIfPossible()
 

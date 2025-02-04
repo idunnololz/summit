@@ -26,6 +26,8 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.markwon.SpoilerPlugin
 import com.idunnololz.summit.util.markwon.SummitInlineParser
+import com.idunnololz.summit.util.markwon.SummitInlineParser.Companion.TICKS
+import com.idunnololz.summit.util.markwon.SummitInlineParser.Companion.TICKS_HERE
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.core.MarkwonTheme
@@ -35,6 +37,8 @@ import io.noties.markwon.html.span.SubScriptSpan
 import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
+import org.commonmark.internal.util.Parsing
+import org.commonmark.node.Code
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -191,6 +195,11 @@ object LemmyTextHelper {
         private val context: Context,
     ) : AbstractMarkwonPlugin() {
 
+        companion object {
+            private const val STYLE_BLOCK = 1
+            private const val STYLE_INLINE = 2
+        }
+
         /**
          * Combination of 4 regexes "or'd" (|) together.
          * 1) Matches against words where the first character is a caret. Eg. '^hello'
@@ -202,6 +211,7 @@ object LemmyTextHelper {
         )
 
         private fun processAll(s: String): String {
+            val s = fixTicks(s)
             val matcher = largeRegex.matcher(s)
             val sb = StringBuffer()
             while (matcher.find()) {
@@ -255,6 +265,54 @@ object LemmyTextHelper {
                 }
             }
             matcher.appendTail(sb)
+            return sb.toString()
+        }
+
+        private fun fixTicks(s: String): CharSequence {
+            if (!s.contains('`')) {
+                return s
+            }
+
+            val sb = StringBuilder()
+            var lastBlockType: Int = 0
+            var index = 0
+            while (true) {
+                if (index == s.length) {
+                    break
+                }
+
+                var currentBlockType: Int = 0
+                val c = s[index]
+                if (c == '`') {
+                    if (s.getOrNull(index + 1) == '`' && s.getOrNull(index + 2) == '`') {
+                        currentBlockType = STYLE_BLOCK
+                        index += 2
+                        sb.append("```")
+                    } else {
+                        currentBlockType = STYLE_INLINE
+                        sb.append("`")
+                    }
+                } else {
+                    if (lastBlockType == STYLE_INLINE) {
+                        if (c == '\n') {
+                            sb.append(" ")
+                        } else {
+                            sb.append(c)
+                        }
+                    } else {
+                        sb.append(c)
+                    }
+                }
+
+                if (lastBlockType == 0) {
+                    lastBlockType = currentBlockType
+                } else if (lastBlockType == currentBlockType) {
+                    lastBlockType = 0
+                }
+
+                index++
+            }
+
             return sb.toString()
         }
 

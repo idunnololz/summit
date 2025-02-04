@@ -14,7 +14,9 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DuplicatePostsDetector @Inject constructor(
     private val preferences: Preferences,
     private val accountManager: AccountManager,
@@ -25,7 +27,8 @@ class DuplicatePostsDetector @Inject constructor(
     private val coroutineScope = coroutineScopeFactory.create()
     private val detectors = mutableMapOf<StableAccountId, PerAccountDuplicatePostsDetector>()
     private var currentDuplicatePostsDetector: PerAccountDuplicatePostsDetector? = null
-    private var isEnabled: Boolean
+    var isEnabled: Boolean
+        private set
 
     init {
         isEnabled = preferences.isHiddenPostsEnabled
@@ -115,13 +118,42 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor() {
             append("|")
             append(postView.post.url)
             append("|")
-            append(postView.post.body)
+            append(cleanPostBody(postView.post.body))
         }
 
         if (key.length < 25) {
             return null
         } else {
-            return key
+            return key.take(256)
         }
+    }
+
+    private fun cleanPostBody(body: String?): String {
+        if (body.isNullOrEmpty()) {
+            return ""
+        }
+
+        var lines = body.split("\n").filter { it.isNotBlank() }
+
+        if (lines.isEmpty()) {
+            return ""
+        }
+
+        lines = if (lines[0].startsWith("cross-posted from:", ignoreCase = true)) {
+            lines.drop(1)
+        } else {
+            lines
+        }
+
+        return buildString {
+            for (line in lines) {
+                val cleanedLine = line.replace(">", "").trim()
+
+                if (cleanedLine.isNotBlank()) {
+                    append(cleanedLine)
+                    append(" ")
+                }
+            }
+        }.trim()
     }
 }

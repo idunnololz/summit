@@ -352,6 +352,9 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_actions"
+            app:destination="@id/actions" />
     </fragment>
     <fragment
         android:id="@+id/hiddenPostsFragment2"
@@ -382,4 +385,5 @@
         android:id="@+id/userTagsFragment"
         android:name="com.idunnololz.summit.lemmy.userTags.UserTagsFragment"
         android:label="UserTagsFragment" />
+    <include app:graph="@navigation/actions" />
 </navigation>

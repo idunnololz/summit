@@ -216,6 +216,7 @@ class PostListViewBuilder @Inject constructor(
         highlight: Boolean,
         highlightForever: Boolean,
         themeColor: Int?,
+        isDuplicatePost: Boolean,
         onRevealContentClickedFn: () -> Unit,
         onImageClick: (accountId: Long?, PostView, sharedElementView: View?, String) -> Unit,
         onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,

@@ -48,7 +48,7 @@ class PendingCommentsManager @Inject constructor() {
         idToPendingCommentView[id]?.complete = true
     }
 
-    fun onEditCommentActionAdded(id: Long, action: ActionInfo.EditActionInfo) {
+    fun onEditCommentActionAdded(id: Long, action: ActionInfo.EditCommentActionInfo) {
         val pendingCommentView =
             PendingCommentView(
                 actionId = id,
@@ -63,13 +63,13 @@ class PendingCommentsManager @Inject constructor() {
 
     fun onEditCommentActionFailed(
         id: Long,
-        info: ActionInfo.EditActionInfo,
+        info: ActionInfo.EditCommentActionInfo,
         reason: LemmyActionFailureReason,
     ) {
         idToPendingCommentView[id]?.error = reason
     }
 
-    fun onEditCommentActionComplete(id: Long, info: ActionInfo.EditActionInfo) {
+    fun onEditCommentActionComplete(id: Long, info: ActionInfo.EditCommentActionInfo) {
         idToPendingCommentView[id]?.complete = true
     }
 

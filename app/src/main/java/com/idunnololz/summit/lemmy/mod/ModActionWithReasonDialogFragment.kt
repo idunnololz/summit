@@ -8,12 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.databinding.DialogFragmentRemoveCommentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.AdminOrModActionsViewModel
@@ -28,7 +27,7 @@ import kotlinx.parcelize.Parcelize
 @AndroidEntryPoint
 class ModActionWithReasonDialogFragment :
     BaseDialogFragment<DialogFragmentRemoveCommentBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val args by navArgs<ModActionWithReasonDialogFragmentArgs>()
 
@@ -149,7 +148,7 @@ class ModActionWithReasonDialogFragment :
                     binding.title.setText(R.string.purge_comment)
                     binding.positiveButton.setText(R.string.purge_comment)
                     binding.positiveButton.setOnClickListener {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.purge_comment_title)
                             .setMessage(R.string.purge_community_body)
                             .setPositiveButton(R.string.purge_comment)
@@ -169,7 +168,7 @@ class ModActionWithReasonDialogFragment :
                     binding.title.setText(R.string.purge_community)
                     binding.positiveButton.setText(R.string.purge_community)
                     binding.positiveButton.setOnClickListener {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.purge_community_title)
                             .setMessage(R.string.purge_community_body)
                             .setPositiveButton(R.string.purge_community)
@@ -185,7 +184,7 @@ class ModActionWithReasonDialogFragment :
                     binding.title.setText(R.string.purge_person)
                     binding.positiveButton.setText(R.string.purge_person)
                     binding.positiveButton.setOnClickListener {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.purge_user_title)
                             .setMessage(R.string.purge_community_body)
                             .setPositiveButton(R.string.purge_user)
@@ -201,7 +200,7 @@ class ModActionWithReasonDialogFragment :
                     binding.title.setText(R.string.purge_post)
                     binding.positiveButton.setText(R.string.purge_post)
                     binding.positiveButton.setOnClickListener {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setTitle(R.string.purge_post_title)
                             .setMessage(R.string.purge_community_body)
                             .setPositiveButton(R.string.purge_post)
@@ -393,7 +392,7 @@ class ModActionWithReasonDialogFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (!isBindingAvailable()) {
             return
         }
@@ -434,7 +433,7 @@ class ModActionWithReasonDialogFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
     sealed class ModActionWithReason : Parcelable {

@@ -1,15 +1,21 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.FilterReason
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.util.DirectoryHelper
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -29,6 +35,7 @@ sealed interface Item {
         val highlight: Boolean,
         val highlightForever: Boolean,
         val pageIndex: Int,
+        val isDuplicatePost: Boolean,
     ) : PostItem
 
     data class FilteredPostItem(
@@ -61,13 +68,35 @@ sealed interface Item {
     data object FooterSpacerItem : Item
 }
 
-class PostListEngine(
+class PostListEngine @AssistedInject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val directoryHelper: DirectoryHelper,
+    private val duplicatePostsDetector: DuplicatePostsDetector,
+    private val postReadManager: PostReadManager,
+
+    @Assisted("infinity")
     infinity: Boolean,
+
+    @Assisted("autoLoadMoreItems")
     autoLoadMoreItems: Boolean,
+
+    @Assisted("usePageIndicators")
     usePageIndicators: Boolean = false,
 ) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("infinity")
+            infinity: Boolean,
+
+            @Assisted("autoLoadMoreItems")
+            autoLoadMoreItems: Boolean,
+
+            @Assisted("usePageIndicators")
+            usePageIndicators: Boolean = false,
+        ): PostListEngine
+    }
 
     companion object {
         private const val TAG = "PostListEngine"
@@ -245,6 +274,7 @@ class PostListEngine(
                                 highlight = postToHighlight?.id == postView.post.id,
                                 highlightForever = postToHighlightForever?.id == postView.post.id,
                                 pageIndex = page.pageIndex,
+                                isDuplicatePost = it.isDuplicatePost,
                             )
                         }
                     }
@@ -451,6 +481,35 @@ class PostListEngine(
                     },
                 )
             }
+        }
+        _pages = pages
+    }
+
+    fun markDuplicatePostsAsRead() {
+        val pages = _pages.toMutableList()
+        for ((index, page) in pages.withIndex()) {
+            pages[index] = page.copy(
+                posts = page.posts.map {
+                    val postView = it.fetchedPost.postView
+                    if (duplicatePostsDetector.isPostDuplicateOfRead(postView)) {
+                        postReadManager.markPostAsReadLocal(
+                            instance = postView.instance,
+                            postId = postView.post.id,
+                            read = true,
+                        )
+                        it.copy(
+                            fetchedPost = it.fetchedPost.copy(
+                                postView = postView.copy(
+                                    read = true
+                                )
+                            ),
+                            isDuplicatePost = true
+                        )
+                    } else {
+                        it
+                    }
+                },
+            )
         }
         _pages = pages
     }

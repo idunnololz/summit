@@ -24,6 +24,7 @@ import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.utils.actions.SaveCommentResult
 import com.idunnololz.summit.lemmy.utils.actions.SavePostResult
@@ -44,10 +45,9 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val state: SavedStateHandle,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val directoryHelper: DirectoryHelper,
     private val savedManager: SavedManager,
     private val commentListEngineFactory: CommentListEngine.Factory,
+    private val postListEngineFactory: PostListEngine.Factory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
     companion object {
@@ -59,11 +59,9 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
     val postsState = StatefulLiveData<Unit>()
     val commentsState = StatefulLiveData<Unit>()
 
-    val postListEngine = PostListEngine(
+    val postListEngine = postListEngineFactory.create(
         infinity = true,
         autoLoadMoreItems = true,
-        coroutineScopeFactory = coroutineScopeFactory,
-        directoryHelper = directoryHelper,
     )
     var commentListEngine = commentListEngineFactory.create()
 
@@ -231,7 +229,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
                 .onSuccess {
                     if (postListEngine.hasMore || force) {
                         val posts = it.map {
-                            LocalPostView(it.toFetchedPost(), null)
+                            LocalPostView(it.toFetchedPost(), null, false)
                         }
                         postListEngine.addPage(
                             LoadedPostsData(

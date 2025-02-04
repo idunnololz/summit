@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentManageSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingItemBinding
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ManageSettingsFragment :
     BaseFragment<FragmentManageSettingsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val args: ManageSettingsFragmentArgs by navArgs()
     private val viewModel: ManageSettingsViewModel by viewModels()
@@ -77,7 +77,7 @@ class ManageSettingsFragment :
                 context = context,
                 onClearSettingClick = { settingKey ->
                     if (args.account != null) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(
                                 getString(
                                     R.string.delete_setting_override_for_setting_format,
@@ -219,7 +219,7 @@ class ManageSettingsFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             "delete_confirm" -> {
                 viewModel.deleteSetting(args.account, dialog.getExtra("setting_key"))
@@ -227,6 +227,6 @@ class ManageSettingsFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

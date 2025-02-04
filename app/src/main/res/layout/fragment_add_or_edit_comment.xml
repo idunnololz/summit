@@ -44,7 +44,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/comment_edit_text"
+                    app:layout_constraintBottom_toTopOf="@+id/comment_input_layout"
                     app:layout_constraintVertical_weight="1">
 
                     <androidx.core.widget.NestedScrollView
@@ -86,23 +86,32 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/context_container"
-                    app:layout_constraintBottom_toTopOf="@+id/comment_edit_text"/>
+                    app:layout_constraintBottom_toTopOf="@+id/comment_input_layout"/>
 
-                <com.idunnololz.summit.view.CustomTextInputEditText
-                    android:id="@+id/comment_edit_text"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/comment_input_layout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:autofillHints="no"
-                    android:hint="@string/comment"
-                    android:background="@null"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:padding="@dimen/padding"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/context_container"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintVertical_weight="1"/>
+                    app:layout_constraintVertical_weight="1">
+
+                    <com.idunnololz.summit.view.CustomTextInputEditText
+                        android:id="@+id/comment_edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:autofillHints="no"
+                        android:hint="@string/comment"
+                        android:background="@null"
+                        android:gravity="start|top"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:padding="@dimen/padding"/>
+                </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

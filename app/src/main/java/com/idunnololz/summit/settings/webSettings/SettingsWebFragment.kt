@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
@@ -43,7 +43,7 @@ import javax.inject.Inject
 class SettingsWebFragment :
     BaseFragment<FragmentSettingsWebBinding>(),
     SettingValueUpdateCallback,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SettingsWebViewModel by viewModels()
 
@@ -57,7 +57,7 @@ class SettingsWebFragment :
 
     private val backPressHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setTitle(R.string.error_unsaved_changes)
                 .setMessage(R.string.error_web_settings_unsaved_changes_desc)
                 .setPositiveButton(R.string.save)
@@ -125,7 +125,7 @@ class SettingsWebFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setTitle(R.string.error_save_failed)
                         .setMessage(it.error.toErrorMessage(context))
                         .setPositiveButton(android.R.string.ok)
@@ -146,7 +146,7 @@ class SettingsWebFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setTitle(R.string.error_upload_failed)
                         .setMessage(it.error.toErrorMessage(context))
                         .setPositiveButton(android.R.string.ok)
@@ -185,7 +185,7 @@ class SettingsWebFragment :
     private fun save() {
         val updatedSettingValues = adapter?.updatedSettingValues
         if (updatedSettingValues.isNullOrEmpty()) {
-            AlertDialogFragment.Builder()
+            OldAlertDialogFragment.Builder()
                 .setTitle(R.string.error_no_settings_changed)
                 .setMessage(R.string.error_no_settings_changed_desc)
                 .createAndShow(childFragmentManager, "esadfsadf")
@@ -316,14 +316,14 @@ class SettingsWebFragment :
         adapter?.updateSettingValue(key, value)
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "unsaved_changes") {
             // save changes
             save()
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "unsaved_changes") {
             // discard changes
             findNavController().navigateUp()

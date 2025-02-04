@@ -216,7 +216,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                             icon = R.drawable.baseline_subscriptions_24,
                         )
                     }
-                    is PersonRef.PersonRefByName -> {
+                    is PersonRef -> {
                         setTitle(
                             context.getString(
                                 R.string.link_actions_format,
@@ -240,7 +240,10 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                                     id = R.id.unblock_user,
                                     title = context.getString(
                                         R.string.unblock_this_user_format,
-                                        pageRef.name,
+                                        when (pageRef) {
+                                            is PersonRef.PersonRefById -> pageRef.id
+                                            is PersonRef.PersonRefByName -> pageRef.name
+                                        },
                                     ),
                                     icon = R.drawable.baseline_person_24,
                                 )
@@ -249,7 +252,10 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                                     id = R.id.block_user,
                                     title = context.getString(
                                         R.string.block_this_user_format,
-                                        pageRef.name,
+                                        when (pageRef) {
+                                            is PersonRef.PersonRefById -> pageRef.id
+                                            is PersonRef.PersonRefByName -> pageRef.name
+                                        },
                                     ),
                                     icon = R.drawable.baseline_person_off_24,
                                 )

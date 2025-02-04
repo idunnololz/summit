@@ -6,27 +6,18 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult.Failure
-import com.idunnololz.summit.api.ApiException
-import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.ServerApiException
-import com.idunnololz.summit.api.SocketTimeoutException
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.connectivity.ConnectivityChangedWorker
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.AccountNotFoundError
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.util.crashlytics
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -37,7 +28,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.pow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -45,34 +35,35 @@ class PendingActionsRunner @AssistedInject constructor(
     @ApplicationContext private val context: Context,
     private val accountManager: AccountManager,
     private val apiClient: LemmyApiClient,
+    private val actionsRunnerHelper: ActionsRunnerHelper,
 
-    @Assisted private val actions: LinkedList<LemmyAction>,
+    @Assisted private val actions: LinkedList<LemmyPendingAction>,
     @Assisted private val coroutineScope: CoroutineScope,
     @Assisted private val actionsContext: CoroutineContext,
 
-    @Assisted private val delayAction: suspend (action: LemmyAction, nextRefreshMs: Long) -> Unit,
+    @Assisted private val delayAction: suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
     @Assisted private val completeActionError: suspend (
-        action: LemmyAction,
+        action: LemmyPendingAction,
         failureReason: LemmyActionFailureReason,
     ) -> Unit,
     @Assisted private val completeActionSuccess: suspend (
-        action: LemmyAction,
+        action: LemmyPendingAction,
         result: LemmyActionResult<*, *>,
     ) -> Unit,
 ) {
     @AssistedFactory
     interface Factory {
         fun create(
-            actions: LinkedList<LemmyAction>,
+            actions: LinkedList<LemmyPendingAction>,
             coroutineScope: CoroutineScope,
             actionsContext: CoroutineContext,
-            delayAction: suspend (action: LemmyAction, nextRefreshMs: Long) -> Unit,
+            delayAction: suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
             completeActionError: suspend (
-                action: LemmyAction,
+                action: LemmyPendingAction,
                 failureReason: LemmyActionFailureReason,
             ) -> Unit,
             completeActionSuccess: suspend (
-                action: LemmyAction,
+                action: LemmyPendingAction,
                 result: LemmyActionResult<*, *>,
             ) -> Unit,
         ): PendingActionsRunner
@@ -136,7 +127,7 @@ class PendingActionsRunner @AssistedInject constructor(
         }
     }
 
-    private suspend fun checkAndExecuteAction(action: LemmyAction) {
+    private suspend fun checkAndExecuteAction(action: LemmyPendingAction) {
         if (action.info == null) {
             completeActionError(action, LemmyActionFailureReason.DeserializationError)
             return
@@ -149,7 +140,7 @@ class PendingActionsRunner @AssistedInject constructor(
 
         try {
             Log.d(TAG, "Executing action $action")
-            val result = executeAction(action, action.info.retries)
+            val result = actionsRunnerHelper.executeAction(action.info, action.info.retries)
 
             when (result) {
                 is PendingActionsManager.ActionExecutionResult.Success -> {
@@ -164,7 +155,7 @@ class PendingActionsRunner @AssistedInject constructor(
                                     result.failureReason.accountId,
                                 ),
                             )
-                        LemmyActionFailureReason.ConnectionError ->
+                        LemmyActionFailureReason.NoInternetError ->
                             connectionIssue = true
                         is RateLimit ->
                             delayAction(action, result.failureReason.recommendedTimeoutMs)
@@ -188,6 +179,14 @@ class PendingActionsRunner @AssistedInject constructor(
                         LemmyActionFailureReason.ServerError ->
                             delayAction(action, 10_000)
 
+                        is LemmyActionFailureReason.ConnectionError -> {
+                            if (action.info is ActionInfo.CommentActionInfo) {
+                                completeActionError(action, result.failureReason)
+                            } else {
+                                delayAction(action, 10_000)
+                            }
+                        }
+
                         is LemmyActionFailureReason.UnknownError,
                         LemmyActionFailureReason.DeserializationError,
                         LemmyActionFailureReason.ActionOverwritten,
@@ -199,200 +198,6 @@ class PendingActionsRunner @AssistedInject constructor(
         } catch (e: Exception) {
             crashlytics?.recordException(e)
             Log.e(TAG, "Error executing pending action.", e)
-        }
-    }
-
-    private suspend fun executeAction(
-        action: LemmyAction,
-        retries: Int,
-    ): PendingActionsManager.ActionExecutionResult {
-        var shouldDeleteAction = true
-
-        fun getResultForError(error: Throwable): PendingActionsManager.ActionExecutionResult =
-            when (error) {
-                is ApiException -> {
-                    when (error) {
-                        is ClientApiException -> {
-                            if (error is NotAuthenticatedException) {
-                                Failure(AccountNotFoundError(action.info?.accountId ?: 0))
-                            }
-                            if (error.errorCode == 429) {
-                                if (RateLimitManager.isRateLimitHit()) {
-                                    shouldDeleteAction = false
-
-                                    Log.d(TAG, "429. Hard limit hit. Rescheduling action...")
-
-                                    val nextRefresh = RateLimitManager.getTimeUntilNextRefreshMs()
-                                    Failure(RateLimit(recommendedTimeoutMs = nextRefresh))
-                                } else {
-                                    Failure(TooManyRequests(retries + 1))
-                                }
-                            } else {
-                                Failure(LemmyActionFailureReason.UnknownError(error.errorCode, ""))
-                            }
-                        }
-                        is ServerApiException ->
-                            Failure(LemmyActionFailureReason.ServerError)
-                    }
-                }
-                is SocketTimeoutException ->
-                    Failure(LemmyActionFailureReason.ServerError)
-                else -> {
-                    Failure(LemmyActionFailureReason.UnknownError(-1, error.javaClass.simpleName))
-                }
-            }
-
-        val actionInfo = requireNotNull(action.info)
-
-        val accountId = actionInfo.accountId
-        val account = if (accountId != null) {
-            accountManager.getAccountById(accountId)
-        } else {
-            null
-        }
-
-        if (account != null) {
-            apiClient.changeInstance(account.instance)
-        }
-
-        when (actionInfo) {
-            is ActionInfo.VoteActionInfo -> {
-                if (account == null) {
-                    return Failure(AccountNotFoundError(actionInfo.accountId))
-                }
-
-                val result: Result<Either<PostView, CommentView>> = when (actionInfo.ref) {
-                    is VotableRef.CommentRef -> {
-                        apiClient.likeCommentWithRetry(
-                            actionInfo.ref.commentId,
-                            actionInfo.dir,
-                            account,
-                        )
-                            .fold(
-                                onSuccess = {
-                                    Result.success(Either.Right(it))
-                                },
-                                onFailure = {
-                                    Result.failure(it)
-                                },
-                            )
-                    }
-                    is VotableRef.PostRef -> {
-                        apiClient.likePostWithRetry(
-                            actionInfo.ref.postId,
-                            actionInfo.dir,
-                            account,
-                        )
-                            .fold(
-                                onSuccess = {
-                                    Result.success(Either.Left(it))
-                                },
-                                onFailure = {
-                                    Result.failure(it)
-                                },
-                            )
-                    }
-                }
-
-                return result.fold(
-                    onSuccess = {
-                        PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.VoteLemmyActionResult(it),
-                        )
-                    },
-                    onFailure = {
-                        getResultForError(it)
-                    },
-                )
-            }
-            is ActionInfo.CommentActionInfo -> {
-                if (account == null) {
-                    return Failure(AccountNotFoundError(actionInfo.accountId))
-                }
-
-                val result = apiClient.createComment(
-                    account = account,
-                    content = actionInfo.content,
-                    postId = actionInfo.postRef.id,
-                    parentId = actionInfo.parentId,
-                )
-
-                return result.fold(
-                    onSuccess = {
-                        PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.CommentLemmyActionResult(),
-                        )
-                    },
-                    onFailure = {
-                        getResultForError(it)
-                    },
-                )
-            }
-            is ActionInfo.EditActionInfo -> {
-                if (account == null) {
-                    return Failure(AccountNotFoundError(actionInfo.accountId))
-                }
-
-                val result = apiClient.editComment(
-                    account = account,
-                    content = actionInfo.content,
-                    commentId = actionInfo.commentId,
-                )
-
-                return result.fold(
-                    onSuccess = {
-                        PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.EditLemmyActionResult(),
-                        )
-                    },
-                    onFailure = {
-                        getResultForError(it)
-                    },
-                )
-            }
-            is ActionInfo.DeleteCommentActionInfo -> {
-                if (account == null) {
-                    return Failure(AccountNotFoundError(actionInfo.accountId))
-                }
-
-                val result = apiClient.deleteComment(
-                    account = account,
-                    commentId = actionInfo.commentId,
-                )
-
-                return result.fold(
-                    onSuccess = {
-                        PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.DeleteCommentLemmyActionResult(),
-                        )
-                    },
-                    onFailure = {
-                        getResultForError(it)
-                    },
-                )
-            }
-            is ActionInfo.MarkPostAsReadActionInfo -> {
-                if (account == null) {
-                    return Failure(AccountNotFoundError(actionInfo.accountId))
-                }
-
-                val result = apiClient.markPostAsRead(
-                    actionInfo.postRef.id,
-                    actionInfo.read,
-                    account,
-                )
-
-                return result.fold(
-                    onSuccess = {
-                        PendingActionsManager.ActionExecutionResult.Success(
-                            LemmyActionResult.MarkPostAsReadActionResult(),
-                        )
-                    },
-                    onFailure = {
-                        getResultForError(it)
-                    },
-                )
-            }
         }
     }
 

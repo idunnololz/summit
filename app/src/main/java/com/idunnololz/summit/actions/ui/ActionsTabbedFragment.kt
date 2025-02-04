@@ -5,23 +5,47 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.TabbedFragmentActionsBinding
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ActionsTabbedFragment :
-    BaseFragment<TabbedFragmentActionsBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    BaseFragment<TabbedFragmentActionsBinding>() {
 
     val viewModel: ActionsViewModel by viewModels()
+
+    private val deleteCompletedActionsDialogLauncher = newAlertDialogLauncher(
+        "delete_completed_actions"
+    ) {
+        if (it.isOk) {
+            viewModel.deleteCompletedActions()
+        }
+    }
+    private val deletePendingActionsDialogLauncher = newAlertDialogLauncher(
+        "delete_pending_actions"
+    ) {
+        if (it.isOk) {
+            viewModel.deletePendingActions()
+        }
+    }
+    private val deleteFailedActionsDialogLauncher = newAlertDialogLauncher(
+        "delete_failed_actions"
+    ) {
+        if (it.isOk) {
+            viewModel.deleteFailedActions()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,9 +76,9 @@ class ActionsTabbedFragment :
         }
 
         val actions = mutableListOf(
-            ActionsFragment.ActionType.Pending,
-            ActionsFragment.ActionType.Completed,
             ActionsFragment.ActionType.Failed,
+            ActionsFragment.ActionType.Completed,
+            ActionsFragment.ActionType.Pending,
         )
 
         with(binding) {
@@ -64,7 +88,11 @@ class ActionsTabbedFragment :
             if (viewPager.adapter == null) {
                 viewPager.offscreenPageLimit = 5
                 val adapter =
-                    ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
+                    ViewPagerAdapter(
+                        context = context,
+                        fragmentManager = childFragmentManager,
+                        lifecycle = viewLifecycleOwner.lifecycle
+                    )
 
                 actions.forEach { action ->
                     adapter.addFrag(
@@ -94,27 +122,27 @@ class ActionsTabbedFragment :
 
                 when (action) {
                     ActionsFragment.ActionType.Completed -> {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.delete_completed_actions_history)
-                            .setPositiveButton(android.R.string.ok)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(childFragmentManager, "delete_completed_actions")
+                        deleteCompletedActionsDialogLauncher.launchDialog {
+                            messageResId = R.string.delete_completed_actions_history
+                            positionButtonResId = android.R.string.ok
+                            negativeButtonResId = R.string.cancel
+                        }
                     }
 
                     ActionsFragment.ActionType.Pending -> {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.clear_pending_actions)
-                            .setPositiveButton(android.R.string.ok)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(childFragmentManager, "delete_pending_actions")
+                        deletePendingActionsDialogLauncher.launchDialog {
+                            messageResId = R.string.clear_pending_actions
+                            positionButtonResId = android.R.string.ok
+                            negativeButtonResId = R.string.cancel
+                        }
                     }
 
                     ActionsFragment.ActionType.Failed -> {
-                        AlertDialogFragment.Builder()
-                            .setMessage(R.string.delete_failed_actions_history)
-                            .setPositiveButton(android.R.string.ok)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(childFragmentManager, "delete_failed_actions")
+                        deleteFailedActionsDialogLauncher.launchDialog {
+                            messageResId = R.string.delete_failed_actions_history
+                            positionButtonResId = android.R.string.ok
+                            negativeButtonResId = R.string.cancel
+                        }
                     }
                     null -> {}
                 }
@@ -122,14 +150,9 @@ class ActionsTabbedFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
-        when (tag) {
-            "delete_completed_actions" -> viewModel.deleteCompletedActions()
-            "delete_pending_actions" -> viewModel.deletePendingActions()
-            "delete_failed_actions" -> viewModel.deleteFailedActions()
-        }
-    }
-
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    fun openActionDetails(action: Action) {
+        val direction = ActionsTabbedFragmentDirections
+            .actionActionsTabbedFragmentToActionDetailsFragment(action)
+        findNavController().navigateSafe(direction)
     }
 }

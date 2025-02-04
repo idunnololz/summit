@@ -11,7 +11,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentDraftsBinding
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
@@ -29,8 +30,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DraftsFragment :
     BaseFragment<FragmentDraftsBinding>(),
-    FullscreenDialogFragment,
-    AlertDialogFragment.AlertDialogFragmentListener {
+    FullscreenDialogFragment {
 
     companion object {
         const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -52,6 +52,14 @@ class DraftsFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    private val deleteDraftDialogLauncher = newAlertDialogLauncher("delete_draft") {
+        if (it.isOk) {
+            it.extras?.getLong("draft_id")?.let { draftId ->
+                viewModel.deleteDraft(draftId)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,12 +88,12 @@ class DraftsFragment :
                     openDraft(it)
                 },
                 onDeleteClick = {
-                    AlertDialogFragment.Builder()
-                        .setMessage(R.string.warn_delete_draft)
-                        .setPositiveButton(R.string.delete)
-                        .setNegativeButton(R.string.cancel)
-                        .setExtra("draft_id", it.id.toString())
-                        .createAndShow(childFragmentManager, "delete")
+                    deleteDraftDialogLauncher.launchDialog {
+                        messageResId = R.string.warn_delete_draft
+                        positionButtonResId = R.string.delete
+                        negativeButtonResId = R.string.cancel
+                        extras.putLong("draft_id", it.id)
+                    }
                 },
             )
             val layoutManager = LinearLayoutManager(context)
@@ -133,19 +141,6 @@ class DraftsFragment :
                 viewModel.loadMoreDrafts(force = true)
             }
         }
-    }
-
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
-        if (tag == "delete_all") {
-            viewModel.deleteAll(args.draftType)
-        } else if (tag == "delete") {
-            dialog.getExtra("draft_id")?.toLong()?.let { draftId ->
-                viewModel.deleteDraft(draftId)
-            }
-        }
-    }
-
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
     }
 
     fun onSelected() {

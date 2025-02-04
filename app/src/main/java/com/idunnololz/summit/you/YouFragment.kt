@@ -19,9 +19,8 @@ import coil.dispose
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
-import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentYouBinding
@@ -106,7 +105,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 },
                 onProfileClick = { account, profileIcon, url ->
                     if (url.isNullOrBlank()) {
-                        AlertDialogFragment.Builder()
+                        OldAlertDialogFragment.Builder()
                             .setMessage(R.string.error_user_has_no_profile_image)
                             .createAndShow(
                                 childFragmentManager,
@@ -190,6 +189,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     }
                     R.id.user_tags -> {
                         val direction = YouFragmentDirections.actionYouFragmentToUserTagsFragment()
+                        findNavController().navigateSafe(direction)
+                    }
+                    R.id.your_actions -> {
+                        val direction = YouFragmentDirections
+                            .actionYouFragmentToActions()
                         findNavController().navigateSafe(direction)
                     }
                 }
@@ -476,6 +480,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     R.id.user_tags,
                     R.drawable.outline_sell_24,
                     R.string.user_tags,
+                )
+                newItems += Item.MenuItem(
+                    R.id.your_actions,
+                    R.drawable.outline_play_arrow_24,
+                    R.string.your_actions,
                 )
                 newItems += Item.FooterItem
             }

@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentPendingActionsBinding
 import com.idunnololz.summit.links.onLinkClick
@@ -75,7 +76,16 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
-        )
+            onActionClick = {
+                parentFragment.openActionDetails(it)
+//                ActionDetailsDialogFragment.show(
+//                    fragmentManager = parentFragmentManager,
+//                    action = it,
+//                )
+            }
+        ).apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         viewModel.actionsDataLiveData.observe(viewLifecycleOwner) {
             when (it) {
@@ -93,7 +103,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
 
                     adapter.accountDictionary = it.data.accountDictionary
 
-                    when (args.actionType) {
+                    when (args.actionType as ActionType) {
                         ActionType.Completed -> {
                             adapter.actions = it.data.completedActions
                         }

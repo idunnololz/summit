@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.utils
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -17,6 +18,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
+import kotlinx.parcelize.Parcelize
 
 private val TAG = "VoteUiHandler"
 
@@ -300,13 +302,15 @@ fun VoteUiHandler.bind(
 }
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
-sealed interface VotableRef {
+sealed interface VotableRef : Parcelable {
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("1")
     data class PostRef(
         val postId: Int,
     ) : VotableRef
 
+    @Parcelize
     @JsonClass(generateAdapter = true)
     @TypeLabel("2")
     data class CommentRef(

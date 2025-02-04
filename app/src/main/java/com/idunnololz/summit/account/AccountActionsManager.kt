@@ -2,7 +2,6 @@ package com.idunnololz.summit.account
 
 import android.content.Context
 import android.util.Log
-import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.HapticFeedbackConstantsCompat
@@ -31,6 +30,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
@@ -224,7 +224,7 @@ class AccountActionsManager @Inject constructor(
     }
 
     private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {
-        override fun onActionAdded(action: LemmyAction) {
+        override fun onActionAdded(action: LemmyPendingAction) {
             when (action.info) {
                 is ActionInfo.VoteActionInfo -> {
                     votesManager.setPendingVote(action.info.ref, action.info.dir)
@@ -249,7 +249,7 @@ class AccountActionsManager @Inject constructor(
                         onCommentActionChanged.emit(Unit)
                     }
                 }
-                is ActionInfo.EditActionInfo -> {
+                is ActionInfo.EditCommentActionInfo -> {
                     coroutineScope.launch {
                         pendingCommentsManager.onEditCommentActionAdded(action.id, action.info)
                         onCommentActionChanged.emit(Unit)
@@ -269,7 +269,7 @@ class AccountActionsManager @Inject constructor(
             }
         }
 
-        override fun onActionFailed(action: LemmyAction, reason: LemmyActionFailureReason) {
+        override fun onActionFailed(action: LemmyPendingAction, reason: LemmyActionFailureReason) {
             Log.d(TAG, "onActionComplete(): $action, reason: $reason")
             when (action.info) {
                 is ActionInfo.VoteActionInfo -> {
@@ -300,7 +300,7 @@ class AccountActionsManager @Inject constructor(
                         onCommentActionChanged.emit(Unit)
                     }
                 }
-                is ActionInfo.EditActionInfo -> {
+                is ActionInfo.EditCommentActionInfo -> {
                     coroutineScope.launch {
                         pendingCommentsManager.onEditCommentActionFailed(
                             action.id,
@@ -323,7 +323,7 @@ class AccountActionsManager @Inject constructor(
             }
         }
 
-        override fun onActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>) {
+        override fun onActionComplete(action: LemmyPendingAction, result: LemmyActionResult<*, *>) {
             Log.d(TAG, "onActionComplete(): $action")
             when (action.info) {
                 is ActionInfo.VoteActionInfo -> {
@@ -387,7 +387,7 @@ class AccountActionsManager @Inject constructor(
                         onCommentActionChanged.emit(Unit)
                     }
                 }
-                is ActionInfo.EditActionInfo -> {
+                is ActionInfo.EditCommentActionInfo -> {
                     coroutineScope.launch {
                         pendingCommentsManager.onEditCommentActionComplete(action.id, action.info)
                         onCommentActionChanged.emit(Unit)
@@ -406,6 +406,8 @@ class AccountActionsManager @Inject constructor(
                 null -> {}
             }
         }
+
+        override fun onActionDeleted(action: LemmyAction) {}
     }
 
     init {
@@ -430,14 +432,14 @@ class AccountActionsManager @Inject constructor(
         content: String,
         accountId: Long? = null,
     ) {
-        val finalAccountId = accountId
-            ?: accountOrDefault(null)?.id
+        val finalAccount = accountOrDefault(accountId)
             ?: return
         pendingActionsManager.comment(
             postRef,
             parentId,
             content,
-            finalAccountId,
+            finalAccount.id,
+            finalAccount.instance,
         )
     }
 
@@ -447,25 +449,25 @@ class AccountActionsManager @Inject constructor(
         content: String,
         accountId: Long? = null,
     ) {
-        val finalAccountId = accountId
-            ?: accountOrDefault(null)?.id
+        val finalAccount = accountOrDefault(accountId)
             ?: return
         pendingActionsManager.editComment(
             postRef,
             commentId,
             content,
-            finalAccountId,
+            finalAccount.id,
+            finalAccount.instance,
         )
     }
 
     suspend fun deleteComment(postRef: PostRef, commentId: CommentId, accountId: Long? = null) {
-        val finalAccountId = accountId
-            ?: accountOrDefault(null)?.id
+        val finalAccount = accountOrDefault(accountId)
             ?: return
         pendingActionsManager.deleteComment(
             postRef,
             commentId,
-            finalAccountId,
+            finalAccount.id,
+            finalAccount.instance,
         )
     }
 
@@ -486,6 +488,7 @@ class AccountActionsManager @Inject constructor(
             PostRef(instance, id),
             read,
             account.id,
+            account.instance,
         )
     }
 
@@ -520,7 +523,7 @@ class AccountActionsManager @Inject constructor(
             return Result.failure(AccountInstanceMismatchException(account.instance, instance))
         }
 
-        pendingActionsManager.voteOn(instance, ref, dir, account.id)
+        pendingActionsManager.voteOn(instance, ref, dir, account.id, account.instance)
 
         return Result.success(Unit)
     }

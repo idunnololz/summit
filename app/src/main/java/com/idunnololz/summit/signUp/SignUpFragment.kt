@@ -23,7 +23,7 @@ import androidx.viewbinding.ViewBinding
 import coil.dispose
 import coil.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.api.LemmyApiClient.Companion.INSTANCE_LEMMY_WORLD
 import com.idunnololz.summit.databinding.FragmentSignUpBinding
@@ -69,7 +69,7 @@ import kotlinx.coroutines.runInterruptible
 @AndroidEntryPoint
 class SignUpFragment :
     BaseFragment<FragmentSignUpBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: SignUpViewModel by viewModels()
 
@@ -559,7 +559,7 @@ class SignUpFragment :
 
                 if (scene.error != null && submitApplicationErrorDialog?.isVisible != true) {
                     val fm = childFragmentManager
-                    submitApplicationErrorDialog = AlertDialogFragment.Builder()
+                    submitApplicationErrorDialog = OldAlertDialogFragment.Builder()
                         .setTitle(R.string.error_sign_up)
                         .setMessage(scene.error)
                         .setPositiveButton(android.R.string.ok)
@@ -734,12 +734,12 @@ class SignUpFragment :
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         if (tag == "submit_application_error") {
             viewModel.goBack()
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

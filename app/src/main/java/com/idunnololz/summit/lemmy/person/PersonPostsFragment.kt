@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
 import com.idunnololz.summit.lemmy.community.Item
 import com.idunnololz.summit.lemmy.community.PostListAdapter
@@ -66,7 +66,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     .show(childFragmentManager, "asdf")
             },
             onInstanceMismatch = { accountInstance, apiInstance ->
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.error_account_instance_mismatch_title)
                     .setMessage(
                         getString(

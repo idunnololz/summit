@@ -33,7 +33,7 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
@@ -108,7 +108,7 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class PostFragment :
     BaseFragment<FragmentPostBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener,
+    OldAlertDialogFragment.AlertDialogFragmentListener,
     SignInNavigator {
 
     companion object {
@@ -645,7 +645,7 @@ class PostFragment :
             }
             binding.accountImageView.setOnClickListener {
                 if (accountId != null) {
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setTitle(R.string.account_switching_disabled)
                         .setMessage(R.string.account_switching_disabled_desc)
                         .createAndShow(childFragmentManager, "asfg")
@@ -765,7 +765,7 @@ class PostFragment :
     }
 
     private fun onInstanceMismatch(accountInstance: String, apiInstance: String) {
-        AlertDialogFragment.Builder()
+        OldAlertDialogFragment.Builder()
             .setTitle(R.string.error_account_instance_mismatch_title)
             .setMessage(
                 getString(
@@ -1264,7 +1264,7 @@ class PostFragment :
         return _sortByMenu
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
         when (tag) {
             CONFIRM_DELETE_COMMENT_TAG -> {
                 val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
@@ -1282,7 +1282,7 @@ class PostFragment :
         }
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
         // do nothing
     }
 

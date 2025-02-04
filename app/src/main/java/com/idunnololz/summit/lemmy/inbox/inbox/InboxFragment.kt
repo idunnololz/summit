@@ -14,11 +14,11 @@ import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
@@ -29,7 +29,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentInboxBinding
@@ -84,14 +84,11 @@ import com.idunnololz.summit.util.tsToShortDate
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class InboxFragment :
     BaseFragment<FragmentInboxBinding>(),
-    AlertDialogFragment.AlertDialogFragmentListener {
+    OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
         private val TAG = "InboxFragment"
@@ -118,6 +115,8 @@ class InboxFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    private var lastPageType: PageType? = null
 
     private var adapter: InboxItemAdapter? = null
 
@@ -188,7 +187,7 @@ class InboxFragment :
 
             insetViewAutomaticallyByPaddingAndNavUi(
                 lifecycleOwner = viewLifecycleOwner,
-                rootView = binding.coordinatorLayout,
+                rootView = binding.coordinatorLayoutContainer,
                 applyTopInset = false,
             )
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPane)
@@ -198,6 +197,8 @@ class InboxFragment :
         viewModel.pageType.observe(viewLifecycleOwner) {
             it ?: return@observe
 
+            Log.d(TAG, "Page type changed")
+
             getMainActivity()?.supportActionBar?.title = it.getName(context)
             binding.itemHighlighter.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 when (it) {
@@ -205,26 +206,32 @@ class InboxFragment :
                         topToTop = R.id.unread
                         bottomToBottom = R.id.unread
                     }
+
                     PageType.All -> {
                         topToTop = R.id.all
                         bottomToBottom = R.id.all
                     }
+
                     PageType.Replies -> {
                         topToTop = R.id.replies
                         bottomToBottom = R.id.replies
                     }
+
                     PageType.Mentions -> {
                         topToTop = R.id.mentions
                         bottomToBottom = R.id.mentions
                     }
+
                     PageType.Messages -> {
                         topToTop = R.id.messages
                         bottomToBottom = R.id.messages
                     }
+
                     PageType.Reports -> {
                         topToTop = R.id.reports
                         bottomToBottom = R.id.reports
                     }
+
                     PageType.Conversation -> error("unreachable")
                 }
             }
@@ -236,6 +243,7 @@ class InboxFragment :
                         PersonPickerDialogFragment.show(childFragmentManager)
                     }
                 }
+
                 PageType.Conversation -> error("unreachable")
                 else -> {
                     binding.fab.setImageResource(R.drawable.baseline_done_all_24)
@@ -245,14 +253,23 @@ class InboxFragment :
                 }
             }
 
-            binding.recyclerView.postDelayed({
-                if (isBindingAvailable()) {
-                    binding.recyclerView.scrollToPosition(0)
-                }
-            }, 100)
+            if (lastPageType != null && lastPageType != it) {
+                binding.recyclerView.postDelayed(
+                    {
+                        if (isBindingAvailable()) {
+                            binding.recyclerView.scrollToPosition(0)
+                            binding.appBar.setExpanded(true)
+                        }
+                    },
+                    100
+                )
+            }
+
+            lastPageType = it
         }
 
         viewModel.inboxUpdate.observe(viewLifecycleOwner) {
+            Log.d(TAG, "", RuntimeException())
             onUpdate()
         }
         viewModel.currentFullAccount.observe(viewLifecycleOwner) {
@@ -263,7 +280,8 @@ class InboxFragment :
             }
         }
 
-        val adapter = createAdapter()
+        val adapter = this.adapter
+            ?: createAdapter()
         this.adapter = adapter
 
         binding.loadingView.setOnRefreshClickListener {
@@ -278,14 +296,10 @@ class InboxFragment :
             refresh(force = true)
         }
 
-        (viewModel.inboxUpdate.value as? StatefulData.Success)?.data?.let {
-            adapter.setData(it.inboxModel)
-        }
-
-        binding.recyclerView.setup(animationsHelper)
-        binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.setup(animationsHelper)
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.adapter = adapter
         binding.recyclerView.addOnScrollListener(
             object : OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -296,8 +310,7 @@ class InboxFragment :
 
                     if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
                         if (!viewModel.inboxUpdate.isLoading && adapter.hasMore()) {
-                            viewModel.pageIndex++
-                            viewModel.fetchInboxAsync()
+                            viewModel.fetchNextPage()
                         }
                     }
                 }
@@ -367,39 +380,28 @@ class InboxFragment :
 
         with(binding) {
             unread.setOnClickListener {
-                viewModel.pageTypeFlow.value = PageType.Unread
+                viewModel.setPageType(PageType.Unread)
                 paneLayout.closePanels()
             }
             all.setOnClickListener {
-                viewModel.pageTypeFlow.value = PageType.All
+                viewModel.setPageType(PageType.All)
                 paneLayout.closePanels()
             }
             replies.setOnClickListener {
-                viewModel.pageTypeFlow.value = PageType.Replies
+                viewModel.setPageType(PageType.Replies)
                 paneLayout.closePanels()
             }
             mentions.setOnClickListener {
-                viewModel.pageTypeFlow.value = PageType.Mentions
+                viewModel.setPageType(PageType.Mentions)
                 paneLayout.closePanels()
             }
             messages.setOnClickListener {
-                viewModel.pageTypeFlow.value = PageType.Messages
+                viewModel.setPageType(PageType.Messages)
                 paneLayout.closePanels()
             }
             reports.setOnClickListener {
-                viewModel.pageTypeFlow.value = PageType.Reports
+                viewModel.setPageType(PageType.Reports)
                 paneLayout.closePanels()
-            }
-        }
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            accountInfoManager.currentFullAccountOnChange.collect {
-                withContext(Dispatchers.Main) {
-                    if (!isBindingAvailable()) return@withContext
-
-                    viewModel.pageIndex = 0
-                    viewModel.fetchInboxAsync()
-                }
             }
         }
 
@@ -428,8 +430,6 @@ class InboxFragment :
             binding.fab.visibility = View.GONE
         }
         binding.fab.setup(preferences)
-
-        viewModel.fetchInboxAsync()
 
         installOnActionResultHandler(
             moreActionsHelper = moreActionsHelper,
@@ -535,7 +535,7 @@ class InboxFragment :
                     .show(childFragmentManager, "asdf")
             },
             onInstanceMismatch = { accountInstance, apiInstance ->
-                AlertDialogFragment.Builder()
+                OldAlertDialogFragment.Builder()
                     .setTitle(R.string.error_account_instance_mismatch_title)
                     .setMessage(
                         getString(
@@ -552,12 +552,13 @@ class InboxFragment :
             onLinkLongClick = { url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
-        )
+        ).apply {
+            stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
     }
 
     fun refresh(force: Boolean) {
-        viewModel.pageIndex = 0
-        viewModel.fetchInbox(force = force)
+        viewModel.refresh(force = force)
     }
 
     private fun onUpdate() {
@@ -581,23 +582,27 @@ class InboxFragment :
             }
             is StatefulData.NotStarted -> {}
             is StatefulData.Success -> {
-                binding.loadingView.hideAll()
-                binding.swipeRefreshLayout.isRefreshing = false
-
                 val inboxUpdate = data.data
                 val inboxData = inboxUpdate.inboxModel
                 val itemCount = inboxData.items.size
                 val adapter = (binding.recyclerView.adapter as? InboxItemAdapter)
 
-                if (itemCount == 0) {
+                if (data.data.isLoading) {
+                    binding.loadingView.showProgressBar()
+                } else if (itemCount == 0) {
                     binding.loadingView.showErrorWithRetry(
                         getString(R.string.there_doesnt_seem_to_be_anything_here),
                         getString(R.string.refresh),
                     )
+                    binding.swipeRefreshLayout.isRefreshing = false
+                } else {
+                    binding.loadingView.hideAll()
+                    binding.swipeRefreshLayout.isRefreshing = false
                 }
 
                 adapter?.setData(inboxData) {
                     if (inboxUpdate.scrollToTop) {
+                        Log.d(TAG, "Scrolling back to top")
                         binding.recyclerView.scrollToPosition(0)
                     }
                 }
@@ -621,6 +626,8 @@ class InboxFragment :
         binding.paneLayout.isEnabled = true
 
         super.onResume()
+
+//        viewModel.fetchInbox(0, force = true)
     }
 
     private class InboxItemAdapter(
@@ -861,15 +868,15 @@ class InboxFragment :
             }
 
         fun setData(inboxModel: InboxModel, cb: (() -> Unit)? = null) {
-            Log.d(TAG, "Data set! hasMore: ${inboxModel.hasMore}", RuntimeException())
+            Log.d(TAG, "Data set! hasMore: ${inboxModel.hasMore}")
             this.inboxModel = inboxModel
             refreshItems(cb)
         }
     }
 
-    override fun onPositiveClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
-    override fun onNegativeClick(dialog: AlertDialogFragment, tag: String?) {
+    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

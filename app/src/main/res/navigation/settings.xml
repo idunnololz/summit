@@ -138,13 +138,6 @@
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out"/>
         <action
-            android:id="@+id/action_settingsFragment_to_actionsTabbedFragment"
-            app:destination="@id/actionsTabbedFragment"
-            app:enterAnim="@animator/slide_in"
-            app:exitAnim="@animator/fade_out"
-            app:popEnterAnim="@animator/fade_in"
-            app:popExitAnim="@animator/fade_out"/>
-        <action
             android:id="@+id/action_settingsFragment_to_settingAccountsFragment"
             app:destination="@id/settingAccountsFragment"
             app:enterAnim="@animator/slide_in"
@@ -181,7 +174,18 @@
             app:popExitAnim="@animator/fade_out"/>
         <action
             android:id="@+id/action_settingsFragment_to_settingsHapticsFragment"
-            app:destination="@id/settingsHapticsFragment" />
+            app:destination="@id/settingsHapticsFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_actions"
+            app:destination="@id/actions"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out"/>
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -337,10 +341,6 @@
         android:name="com.idunnololz.summit.settings.navigation.SettingsNavigationFragment"
         android:label="SettingNavigationFragment" />
     <fragment
-        android:id="@+id/actionsTabbedFragment"
-        android:name="com.idunnololz.summit.actions.ui.ActionsTabbedFragment"
-        android:label="ActionsTabbedFragment" />
-    <fragment
         android:id="@+id/hiddenPostsFragment"
         android:name="com.idunnololz.summit.settings.hiddenPosts.HiddenPostsFragment"
         android:label="HiddenPostsFragment" />
@@ -458,4 +458,5 @@
         android:id="@+id/settingsHapticsFragment"
         android:name="com.idunnololz.summit.settings.haptics.SettingsHapticsFragment"
         android:label="SettingsHapticsFragment" />
+    <include app:graph="@navigation/actions" />
 </navigation>

@@ -25,7 +25,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -200,7 +200,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 onInstanceMismatch = { accountInstance, apiInstance ->
                     if (!isBindingAvailable()) return@SearchResultAdapter
 
-                    AlertDialogFragment.Builder()
+                    OldAlertDialogFragment.Builder()
                         .setTitle(R.string.error_account_instance_mismatch_title)
                         .setMessage(
                             getString(
@@ -623,6 +623,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     highlight = false,
                     highlightForever = false,
                     themeColor = null,
+                    isDuplicatePost = false,
                     onRevealContentClickedFn = {
                         revealedItems.add(item.fetchedPost.postView.getUniqueKey())
                         notifyItemChanged(h.absoluteAdapterPosition)

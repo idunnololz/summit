@@ -33,6 +33,7 @@ import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
@@ -62,6 +63,7 @@ class PostViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val unauthedApiClient: LemmyApiClient,
     private val contentFiltersManager: ContentFiltersManager,
+    private val duplicatePostsDetector: DuplicatePostsDetector,
     val queryMatchHelper: QueryMatchHelper,
 ) : ViewModel() {
 
@@ -357,6 +359,7 @@ class PostViewModel @Inject constructor(
 
             if (post != null) {
                 postReadManager.markPostAsReadLocal(apiInstance, post.post.id, read = true)
+                duplicatePostsDetector.addReadOrHiddenPost(post)
                 if (force) {
                     accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
                 }
