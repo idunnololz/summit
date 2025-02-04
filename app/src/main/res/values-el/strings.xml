@@ -1102,8 +1102,24 @@
     <string name="prefer_text_preview_icon_desc">Ισχύει μόνο για ορισμένες προβολές. Όταν ενεργοποιηθεί, θα εμφανιστεί ένα εικονίδιο για αναρτήσεις κειμένου που μπορείς να πατήσεις για να επεκτείνεις τα περιεχόμενα κειμένου της ανάρτησης.</string>
     <string name="more_haptics">Περισσότερα απτικά</string>
     <string name="more_haptics_desc">Προσθέτει απτική ανάδραση στις περισσότερες ενέργειες στην εφαρμογή.</string>
-    <string name="hide_duplicate_posts_on_read">Αυτόματη απόκρυψη διπλότυπων αναρτήσεων</string>
+    <string name="hide_duplicate_posts_on_read">Επισήμανση διπλών αναρτήσεων ως αναγνωσμένων</string>
     <string name="vibration_and_haptics">Δόνηση &amp; απτικά</string>
     <string name="warn_system_haptic_feedback_disabled">Η απτική ανάδραση είναι απενεργοποιημένη σε όλο το σύστημα. Πρέπει να ενεργοποιήσεις την απτική ανάδραση στις ρυθμίσεις συστήματος για να λειτουργήσουν τα απτικά.</string>
     <string name="hide_duplicate_posts_on_read_desc">Εάν είναι ενεργό, η εφαρμογή θα παρακολουθεί κρυφές ή αναγνωσμένες αναρτήσεις. Οποιεσδήποτε αναρτήσεις προσδιορίζονται ως διπλότυπες αυτών των αναρτήσεων σε άλλη οντότητα επισημαίνονται αυτόματα ως αναγνωσμένες. Αυτό μπορεί να μειώσει την αίσθηση του να βλέπεις την ίδια ανάρτηση ξανά και ξανά.</string>
+    <string name="user_id_format">Χρήστης %1$s</string>
+    <string name="account">Λογαριασμός</string>
+    <string name="run_action">Εκτέλεση δράσης</string>
+    <string name="warn_run_action_again_title">Εκτέλεση δράσης ξανά;</string>
+    <string name="your_actions">Οι πράξεις σας</string>
+    <string name="failed">Αποτυχημένος</string>
+    <string name="pending">Εκκρεμής</string>
+    <string name="success">Επιτυχία</string>
+    <string name="clear_vote">Καθαρή ψήφος</string>
+    <string name="object_reference">Αναφορά αντικειμένου</string>
+    <string name="comment_content">Περιεχόμενο σχολίου</string>
+    <string name="mark_post_as_read">Επισήμανση της ανάρτησης ως αναγνωσμένης</string>
+    <string name="warn_run_action_again_desc">Αυτό θα δημιουργήσει ένα αντίγραφο αυτής της ενέργειας και θα το εκτελέσει.</string>
+    <string name="rerun_action_success_desc">Η ενέργεια επανεκτελέστηκε με επιτυχία.</string>
+    <string name="retry_action_success_desc">Η ενέργεια δοκιμάστηκε ξανά με επιτυχία.</string>
+    <string name="mark_post_as_unread">Επισήμανση της ανάρτησης ως μη αναγνωσμένης</string>
 </resources>
