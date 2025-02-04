@@ -1121,4 +1121,5 @@
     <string name="haptics">हैप्टिक्स</string>
     <string name="haptics_desc">नियंत्रित करें कि कुछ क्रियाओं के लिए स्पर्श फीडबैक सक्षम है या नहीं।</string>
     <string name="prefer_text_preview_icon">टेक्स्ट पूर्वावलोकन आइकन को प्राथमिकता दें</string>
+    <string name="user">उपयोगकर्ता</string>
 </resources>
