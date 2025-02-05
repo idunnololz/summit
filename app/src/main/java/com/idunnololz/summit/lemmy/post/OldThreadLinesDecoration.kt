@@ -8,7 +8,6 @@ import android.graphics.Rect
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
-import arrow.core.left
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -25,7 +24,7 @@ class OldThreadLinesDecoration(
     private val distanceBetweenLinesUnit =
         Utils.convertDpToPixel(1f)
     private val startingPadding =
-        context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
+        context.resources.getDimensionPixelSize(R.dimen.content_horizontal_padding)
     private val topOverdraw =
         if (isCompactView) {
             context.resources.getDimensionPixelSize(R.dimen.comment_top_overdraw_compact)

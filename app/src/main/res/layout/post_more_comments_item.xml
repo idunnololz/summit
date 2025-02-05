@@ -27,7 +27,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="start|center_vertical"
-        android:paddingHorizontal="@dimen/reddit_content_horizontal_padding"
+        android:paddingHorizontal="@dimen/content_horizontal_padding"
         style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"

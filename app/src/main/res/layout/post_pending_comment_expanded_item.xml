@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:orientation="horizontal"
-        android:layout_marginStart="@dimen/reddit_content_horizontal_padding"
+        android:layout_marginStart="@dimen/content_horizontal_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -80,8 +80,8 @@
         android:layout_height="36dp"
         android:src="@drawable/baseline_expand_less_18"
         android:background="?selectableItemBackgroundBorderless"
-        android:paddingStart="@dimen/reddit_content_horizontal_padding"
-        android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+        android:paddingStart="@dimen/content_horizontal_padding"
+        android:paddingEnd="@dimen/content_horizontal_padding"
         app:layout_constraintStart_toEndOf="@+id/header_view"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

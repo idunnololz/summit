@@ -91,7 +91,7 @@ class InboxFragment :
     OldAlertDialogFragment.AlertDialogFragmentListener {
 
     companion object {
-        private val TAG = "InboxFragment"
+        private const val TAG = "InboxFragment"
     }
 
     private val args by navArgs<InboxFragmentArgs>()
@@ -269,7 +269,6 @@ class InboxFragment :
         }
 
         viewModel.inboxUpdate.observe(viewLifecycleOwner) {
-            Log.d(TAG, "", RuntimeException())
             onUpdate()
         }
         viewModel.currentFullAccount.observe(viewLifecycleOwner) {
@@ -627,7 +626,7 @@ class InboxFragment :
 
         super.onResume()
 
-//        viewModel.fetchInbox(0, force = true)
+        viewModel.fetchNewInboxItems()
     }
 
     private class InboxItemAdapter(
