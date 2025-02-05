@@ -195,7 +195,7 @@ class ConversationViewModel @Inject constructor(
         force: Boolean = false,
     ): Result<ConversationModel> = withContext(Dispatchers.Default) {
         val inboxItems = inboxRepository
-            ?.getPage(pageIndex, PageType.Conversation, force)
+            ?.getPage(pageIndex = pageIndex, pageType = PageType.Conversation, force = force)
 
         if (inboxItems == null) {
             return@withContext Result.failure(RuntimeException("Inbox repository is null!"))

@@ -79,6 +79,7 @@ class InboxViewModel @Inject constructor(
     private val fetchingPages = mutableSetOf<Int>()
     private var conversations: ConversationsModel? = null
     private val fetchInboxRequestFlow = MutableSharedFlow<Int>()
+    private var seen = mutableSetOf<Int>()
 
     val isUserOnInboxScreen = MutableStateFlow<Boolean>(false)
     val lastInboxUnreadLoadTimeMs = MutableStateFlow<Long>(0)
@@ -205,7 +206,50 @@ class InboxViewModel @Inject constructor(
         }
     }
 
-    fun fetchInbox(pageIndex: Int, force: Boolean = false) {
+    fun fetchNewInboxItems() {
+        val pageType = pageTypeFlow.value
+
+        if (pageType == PageType.Messages) {
+            // TODO: Fetch new conversations...
+            return
+        }
+
+        viewModelScope.launch {
+            val result = inboxRepository.getPage(
+                pageIndex = 0,
+                pageType = pageType,
+                force = true,
+                retainItemsOnForce = true
+            )
+
+            ensureActive()
+
+            result
+                .onSuccess {
+                    val pageResult =
+                        it.copy(
+                            items = it.items
+                                .filter {
+                                    if (it is InboxItem.MessageInboxItem) {
+                                        it.authorId != currentAccount.value?.id
+                                    } else {
+                                        true
+                                    }
+                                },
+                        )
+
+                    addData(pageResult.toInboxItemResult())
+
+                    publishInboxUpdate(scrollToTop = false)
+                }
+                .onFailure {
+                    // silently fail
+                }
+        }
+
+    }
+
+    fun fetchInbox(pageIndex: Int, force: Boolean = false, retainItemsOnForce: Boolean = false) {
         val pageType = pageTypeFlow.value
 
         observeConversationsJob?.cancel()
@@ -234,7 +278,12 @@ class InboxViewModel @Inject constructor(
 
         inboxUpdate.setIsLoading()
         fetchInboxJob = viewModelScope.launch {
-            val result = inboxRepository.getPage(pageIndex, pageType, force)
+            val result = inboxRepository.getPage(
+                pageIndex = pageIndex,
+                pageType = pageType,
+                force = force,
+                retainItemsOnForce = retainItemsOnForce
+            )
 
             ensureActive()
 
@@ -412,7 +461,20 @@ class InboxViewModel @Inject constructor(
 
         hasMore = data.hasMore
 
-        allInboxItems.addAll(data.items.map { InboxListItem.RegularInboxItem(data.pageIndex, it) })
+        allInboxItems.addAll(data.items.mapNotNull {
+            if (seen.contains(it.id)) {
+                null
+            } else {
+                seen.add(it.id)
+                InboxListItem.RegularInboxItem(data.pageIndex, it)
+            }
+        })
+        allInboxItems.sortByDescending {
+            when (it) {
+                is InboxListItem.ConversationItem -> it.conversation.ts
+                is InboxListItem.RegularInboxItem -> it.item.lastUpdateTs
+            }
+        }
 
         Log.d(TAG, "Data updated! Total items: ${allInboxItems.size} hasMore: $hasMore")
     }
@@ -422,6 +484,7 @@ class InboxViewModel @Inject constructor(
         isLoaded = false
         allInboxItems.clear()
         fetchingPages.clear()
+        seen.clear()
         conversations = null
     }
 

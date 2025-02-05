@@ -61,7 +61,7 @@
         android:src="@drawable/baseline_arrow_downward_24"
         android:paddingStart="@dimen/padding_half"
         android:paddingVertical="@dimen/padding_half"
-        android:paddingEnd="@dimen/reddit_content_horizontal_padding_for_downvote"
+        android:paddingEnd="@dimen/content_horizontal_padding_for_downvote"
         android:background="?selectableItemBackgroundBorderless"
         android:layout_gravity="center_vertical"/>
 </LinearLayout>

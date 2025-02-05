@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:paddingStart="@dimen/padding"
-                android:paddingEnd="@dimen/reddit_content_horizontal_padding"
+                android:paddingEnd="@dimen/content_horizontal_padding"
                 android:gravity="center"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

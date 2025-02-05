@@ -62,14 +62,20 @@ class InboxRepository @Inject constructor(
 
         val allItems = mutableListOf<LiteInboxItem>()
 
-        suspend fun getPage(pageIndex: Int, force: Boolean): Result<PageResult<LiteInboxItem>> {
+        suspend fun getPage(
+            pageIndex: Int,
+            force: Boolean,
+            retainItemsOnForce: Boolean
+        ): Result<PageResult<LiteInboxItem>> {
             Log.d(
                 TAG,
                 "Index: $pageIndex. Sources: ${sources.size}. Force: $force",
             )
 
             if (force) {
-                allItems.clear()
+                if (!retainItemsOnForce) {
+                    allItems.clear()
+                }
                 sources.forEach {
                     it.invalidate()
                 }
@@ -192,10 +198,11 @@ class InboxRepository @Inject constructor(
         pageIndex: Int,
         pageType: PageType,
         force: Boolean,
+        retainItemsOnForce: Boolean = false,
     ): Result<PageResult<LiteInboxItem>> {
         val source = getSource(pageType)
 
-        val result = source.getPage(pageIndex, force)
+        val result = source.getPage(pageIndex, force, retainItemsOnForce)
 
         Log.d(TAG, "Got ${result.getOrNull()?.items?.size} items for page $pageType")
 
@@ -344,7 +351,7 @@ class InboxRepository @Inject constructor(
 
         return result.fold(
             onSuccess = {
-                getPage(0, PageType.Unread, force = true)
+                getPage(0, PageType.Unread, force = true, retainItemsOnForce = true)
                 invalidate(PageType.Unread)
 
                 accountInfoManager.updateUnreadCount()
@@ -355,7 +362,7 @@ class InboxRepository @Inject constructor(
                 allSources.markAsRead(inboxItem.id, !read)
 
                 if (read) {
-                    getPage(0, PageType.Unread, force = true)
+                    getPage(0, PageType.Unread, force = true, retainItemsOnForce = true)
                     invalidate(PageType.Unread)
                 }
                 Result.failure(it)
@@ -364,7 +371,7 @@ class InboxRepository @Inject constructor(
     }
 
     fun onServerChanged() {
-        PageType.values().forEach {
+        PageType.entries.forEach {
             invalidate(it)
         }
     }

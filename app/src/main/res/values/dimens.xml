@@ -12,8 +12,8 @@
     <dimen name="dialog_padding">24dp</dimen>
 
 
-    <dimen name="reddit_content_horizontal_padding">16dp</dimen>
-    <dimen name="reddit_content_horizontal_padding_for_downvote">14dp</dimen>
+    <dimen name="content_horizontal_padding">16dp</dimen>
+    <dimen name="content_horizontal_padding_for_downvote">14dp</dimen>
 
     <dimen name="fastscroll__handle_corner">4dp</dimen>
     <dimen name="fastscroll__handle_height">48dp</dimen>

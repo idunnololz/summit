@@ -24,7 +24,7 @@ class ModernThreadLinesDecoration(
     private val distanceBetweenLinesUnit =
         Utils.convertDpToPixel(1f)
     private val startingPadding =
-        context.resources.getDimensionPixelSize(R.dimen.reddit_content_horizontal_padding)
+        context.resources.getDimensionPixelSize(R.dimen.content_horizontal_padding)
     private val lineMargin = context.getDimen(R.dimen.padding_half)
 
     private val lineColors = listOf(
