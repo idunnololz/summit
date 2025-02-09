@@ -248,11 +248,11 @@ class CommunitiesPaneController @AssistedInject constructor(
 
                     when (item.communityRef) {
                         is CommunityRef.All ->
-                            loadIcon(R.drawable.ic_subreddit_all)
+                            loadIcon(R.drawable.ic_feed_all)
                         is CommunityRef.CommunityRefByName ->
                             avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
                         is CommunityRef.Local ->
-                            loadIcon(R.drawable.ic_subreddit_home)
+                            loadIcon(R.drawable.ic_feed_home)
                         is CommunityRef.MultiCommunity ->
                             loadIcon(R.drawable.baseline_dynamic_feed_24)
                         is CommunityRef.AllSubscribed ->

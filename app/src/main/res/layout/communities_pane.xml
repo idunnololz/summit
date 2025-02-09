@@ -40,48 +40,6 @@
             android:hint="@string/filter"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-<!--    <LinearLayout-->
-<!--        android:id="@+id/search_bar"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:background="@drawable/subreddit_filter_bg"-->
-<!--        android:layout_marginTop="@dimen/padding"-->
-<!--        android:layout_marginHorizontal="@dimen/padding"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
-
-
-<!--        <com.idunnololz.summit.view.PrefixedEditText-->
-<!--            android:id="@+id/search_view"-->
-<!--            android:layout_weight="1"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:maxLines="1"-->
-<!--            android:inputType="text"-->
-<!--            android:textAppearance="?textAppearanceBodyMedium"-->
-<!--            android:background="@null"-->
-<!--            android:gravity="center_vertical"-->
-<!--            android:hint="@string/community_hint"-->
-<!--            android:paddingVertical="12dp"-->
-<!--            android:paddingHorizontal="@dimen/padding"-->
-<!--            app:prefix="c/"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent" />-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/clear"-->
-<!--            android:layout_width="40dp"-->
-<!--            android:layout_height="40dp"-->
-<!--            android:padding="10dp"-->
-<!--            android:layout_marginEnd="@dimen/padding_quarter"-->
-<!--            android:src="@drawable/baseline_close_18"-->
-<!--            android:background="?selectableItemBackgroundBorderless"-->
-<!--            app:tint="?colorControlNormal"/>-->
-<!--    </LinearLayout>-->
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"

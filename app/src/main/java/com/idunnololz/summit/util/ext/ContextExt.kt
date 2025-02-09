@@ -11,6 +11,8 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import com.google.android.material.resources.TextAppearance
+import com.idunnololz.summit.R
 
 fun Context.getColorFromAttribute(attribute: Int): Int {
     val attributes = obtainStyledAttributes(intArrayOf(attribute))
@@ -31,6 +33,16 @@ fun Context.getResIdFromAttribute(attribute: Int): Int {
     val resourceId = attributes.getResourceId(0, 0)
     attributes.recycle()
     return resourceId
+}
+
+fun Context.getTextSizeFromTextAppearance(attribute: Int): Float {
+    val attributes = obtainStyledAttributes(
+        getResIdFromAttribute(attribute), com.google.android.material.R.styleable.TextAppearance)
+    val fontSize = attributes.getDimension(
+        com.google.android.material.R.styleable.TextAppearance_android_textSize, 0f)
+    attributes.recycle()
+
+    return fontSize
 }
 
 fun Context.getDimen(@DimenRes dimen: Int): Int {

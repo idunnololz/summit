@@ -775,7 +775,7 @@ class MainActivity :
         }
     }
 
-    private fun createOrGetSubredditSelectorController(): CommunitySelectorController =
+    private fun createOrGetCommunitySelectorController(): CommunitySelectorController =
         communitySelectorController
             ?: viewModel.communitySelectorControllerFactory.create(
                 context = this,
@@ -790,7 +790,7 @@ class MainActivity :
     fun showCommunitySelector(
         currentCommunityRef: CommunityRef? = null,
     ): CommunitySelectorController {
-        val communitySelectorController = createOrGetSubredditSelectorController()
+        val communitySelectorController = createOrGetCommunitySelectorController()
 
         viewModel.communities.value.let {
             communitySelectorController.setCommunities(it)

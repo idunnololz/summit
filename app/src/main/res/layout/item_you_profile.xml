@@ -102,6 +102,7 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
+                android:id="@+id/posts_label"
                 android:text="@string/posts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -148,6 +149,7 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
+                android:id="@+id/comments_label"
                 android:text="@string/comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -194,6 +196,7 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
+                android:id="@+id/account_age_label"
                 android:text="@string/account_age"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

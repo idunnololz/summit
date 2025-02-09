@@ -58,6 +58,7 @@ import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
+import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
@@ -70,6 +71,7 @@ import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.getSize
@@ -128,6 +130,8 @@ class PostListViewBuilder @Inject constructor(
     private val padding = context.getDimen(R.dimen.padding)
     private val paddingHalf = context.getDimen(R.dimen.padding_half)
 
+    private var upvoteColor = preferences.upvoteColor
+    private var downvoteColor = preferences.downvoteColor
     private val voteUiHandler = accountActionsManager.voteUiHandler
     private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
     private var postHorizontalMarginDp: Float? = postUiConfig.horizontalMarginDp
@@ -296,7 +300,6 @@ class PostListViewBuilder @Inject constructor(
                                 ColorStateList.valueOf(normalTextColor),
                             )
                             includeFontPadding = false
-                            setBackgroundResource(selectableItemBackground)
                             gravity = Gravity.CENTER
                         }.also {
                             downvoteCount = it
@@ -1131,7 +1134,39 @@ class PostListViewBuilder @Inject constructor(
                     upvoteCount = upvoteCount,
                     downvoteCount = downvoteCount,
                     accountId = accountId,
-                    onUpdate = null,
+                    onUpdate = { vote, totalScore, upvotes, downvotes ->
+                        if (vote < 0) {
+                            if (upvoteCount == null || downvoteCount == null) {
+                                scoreCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(downvoteColor)
+                            } else {
+                                upvoteCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                                downvoteCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(downvoteColor)
+                            }
+                        } else if (vote > 0) {
+                            if (upvoteCount == null || downvoteCount == null) {
+                                scoreCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(upvoteColor)
+                            } else {
+                                upvoteCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(upvoteColor)
+                                downvoteCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                            }
+                        } else {
+                            if (upvoteCount == null || downvoteCount == null) {
+                                scoreCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                            } else {
+                                upvoteCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                                downvoteCount.compoundDrawableTintListCompat =
+                                    ColorStateList.valueOf(context.getColorCompat(R.color.colorText))
+                            }
+                        }
+                    },
                     onSignInRequired = onSignInRequired,
                     onInstanceMismatch = onInstanceMismatch,
                 )

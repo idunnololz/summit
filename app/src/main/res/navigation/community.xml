@@ -39,7 +39,7 @@
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out" />
         <action
-            android:id="@+id/action_subredditFragment_self"
+            android:id="@+id/action_communityFragment_self"
             app:destination="@id/communityFragment"
             app:launchSingleTop="true" />
         <action
@@ -98,7 +98,7 @@
             app:argType="long"
             android:defaultValue="0L" />
         <action
-            android:id="@+id/action_postFragment_to_subredditFragment"
+            android:id="@+id/action_postFragment_to_communityFragment"
             app:destination="@id/communityFragment" />
         <action
             android:id="@+id/action_postFragment_to_login"

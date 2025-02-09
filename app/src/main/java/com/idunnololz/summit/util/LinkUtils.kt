@@ -81,11 +81,6 @@ object LinkUtils {
         }
     }
 
-    fun subredditsSearch(query: CharSequence?): String =
-        "https://www.reddit.com/subreddits/search.json?q=$query"
-
-    fun getRedirectLink(thingId: String): String = "https://www.reddit.com/$thingId"
-
     fun postIdToLink(instance: String, postId: Int) = "https://$instance/post/$postId"
 
     fun getLinkForPerson(personRef: PersonRef.PersonRefByName) =

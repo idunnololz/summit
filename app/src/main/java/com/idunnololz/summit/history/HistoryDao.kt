@@ -79,7 +79,7 @@ interface HistoryDao {
                         }
 
                     HistoryEntry.TYPE_COMMUNITY_STATE -> {
-                        // Url for subreddit state is actually the tab id...
+                        // Url for community state is actually the tab id...
                         val adapter = moshi.adapter(TabCommunityState::class.java)
                         val oldState = adapter.fromJson(lastEntry.extras)
                         val newState = adapter.fromJson(newEntry.extras)

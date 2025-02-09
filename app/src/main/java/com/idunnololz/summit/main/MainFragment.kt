@@ -395,6 +395,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         requireMainActivity().apply {
             this.insetViewAutomaticallyByPadding(this, binding.startPanel.root)
         }
+
+        tabsManager.currentTab.observe(viewLifecycleOwner) {
+            updateBackHandler()
+        }
     }
 
     fun navigateToPage(page: PageRef, switchToNativeInstance: Boolean) {
@@ -483,10 +487,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
             onNavigationItemReselectedListener,
         )
 
-        onBackPressedCallback.isEnabled = !(
-            isPredictiveBackSupported() &&
-                preferences.usePredictiveBack
-            )
+        updateBackHandler()
     }
 
     override fun onPause() {
@@ -505,6 +506,25 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         super.onDestroyView()
         Log.d(TAG, "onDestroyView()")
+    }
+
+    private fun updateBackHandler() {
+        val shouldUsePredictiveBack = isPredictiveBackSupported() &&
+            preferences.usePredictiveBack
+
+        if (!shouldUsePredictiveBack) {
+            onBackPressedCallback.isEnabled = true
+            return
+        }
+
+        val tab = tabsManager.currentTab.value
+
+        if (tab?.isHomeTab == false) {
+            onBackPressedCallback.isEnabled = true
+            return
+        }
+
+        onBackPressedCallback.isEnabled = false
     }
 
     private fun getCurrentFragment(): Fragment? {
@@ -631,6 +651,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     fun expandStartPane() {
         binding.rootView.openStartPanel()
+    }
+
+    fun forceBack() {
+        onBackPressedCallback.handleOnBackPressed()
     }
 
     private fun resetCurrentTab(tab: TabsManager.Tab) {

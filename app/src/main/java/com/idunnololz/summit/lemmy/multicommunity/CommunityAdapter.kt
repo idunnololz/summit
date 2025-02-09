@@ -364,7 +364,7 @@ class CommunityAdapter @AssistedInject constructor(
                 newItems.add(
                     Item.StaticChildItem(
                         context.getString(R.string.all),
-                        R.drawable.ic_subreddit_all,
+                        R.drawable.ic_feed_all,
                         CommunityRef.All(),
                     ),
                 )
@@ -381,7 +381,7 @@ class CommunityAdapter @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.local),
-                            R.drawable.ic_subreddit_home,
+                            R.drawable.ic_feed_home,
                             CommunityRef.Local(null),
                         ),
                     )
@@ -411,7 +411,7 @@ class CommunityAdapter @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.local),
-                            R.drawable.ic_subreddit_home,
+                            R.drawable.ic_feed_home,
                             CommunityRef.Local(null),
                         ),
                     )

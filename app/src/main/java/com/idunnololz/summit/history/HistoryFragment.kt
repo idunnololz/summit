@@ -400,10 +400,9 @@ class HistoryFragment :
                 }
                 newItems.add(
                     Item.HistoryItem(
-                        sharableUrl = LemmyUtils.convertRedditUrl(
+                        sharableUrl = LemmyUtils.cleanUrl(
                             it.url,
                             desiredFormat = "",
-                            sharable = true,
                         ),
                         data = it,
                         headerId = headerId,

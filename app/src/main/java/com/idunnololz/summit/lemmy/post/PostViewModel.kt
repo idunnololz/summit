@@ -92,6 +92,12 @@ class PostViewModel @Inject constructor(
             state["postRef"] = value?.leftOrNull()
             state["commentRef"] = value?.getOrNull()
         }
+    var postRef: PostRef? = state.get<PostRef>("postRef2")
+        set(value) {
+            field = value
+
+            state["postRef2"] = value
+        }
     var currentAccountIdOverride: Long? = null
     val onPostOrCommentRefChange = MutableLiveData<Either<PostRef, CommentRef>>()
 
@@ -220,6 +226,10 @@ class PostViewModel @Inject constructor(
     fun updatePostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
         this.postOrCommentRef = postOrCommentRef
 
+        postOrCommentRef.leftOrNull()?.let {
+            this.postRef = it
+        }
+
         onPostOrCommentRefChange.postValue(postOrCommentRef)
     }
 
@@ -297,6 +307,7 @@ class PostViewModel @Inject constructor(
                     ),
             )
 
+            val apiInstance = lemmyApiClient.instance
             val postResult = if (fetchPostData) {
                 postOrCommentRef
                     .fold(
@@ -316,6 +327,10 @@ class PostViewModel @Inject constructor(
             } else {
                 postResult.getOrNull()
                     ?: this@PostViewModel.postView
+            }
+
+            this@PostViewModel.postView?.let {
+                postRef = PostRef(instance = apiInstance, id = it.post.id)
             }
 
             val commentsResult = if (fetchCommentData) {
@@ -639,7 +654,9 @@ class PostViewModel @Inject constructor(
         sortOrder: CommentSortType,
         resolveCompletedPendingComments: Boolean,
     ) {
-        val postRef = postOrCommentRef.leftOrNull() ?: return
+        val postRef = postRef
+            ?: postOrCommentRef.leftOrNull()
+            ?: return
 
         pendingComments = accountActionsManager.getPendingComments(postRef)
 
@@ -771,7 +788,7 @@ class PostViewModel @Inject constructor(
     }
 
     private suspend fun updateData() {
-        Log.d(TAG, "updateData()")
+        Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
 
         val post = postView ?: return
         val comments = comments
