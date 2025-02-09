@@ -35,6 +35,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.window.layout.WindowMetricsCalculator
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -76,7 +77,6 @@ object Utils {
 
     val gson: Gson by lazy {
         GsonBuilder()
-            // .registerTypeAdapter(RedditObject::class.java, RedditObjectSerializer())
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create()
     }
@@ -647,7 +647,7 @@ object Utils {
     }
 
     fun fileSizeToHumanReadableString(totalBytes: Double, nf: NumberFormat): String {
-        var suffix: String = "B"
+        var suffix = "B"
         var totalBytes = totalBytes
 
         if (totalBytes >= 1024) {
@@ -701,6 +701,9 @@ fun convertSpToPixel(sp: Float): Float = TypedValue.applyDimension(
     Utils.displayMetrics,
 )
 
+fun convertPixelToSp(px: Float): Float =
+    px / Utils.displayMetrics.scaledDensity
+
 fun Context.isLightTheme(): Boolean = resources.getBoolean(R.bool.isLightTheme)
 
 private const val EMAIL_FEEDBACK = "feedback@idunnololz.com"
@@ -727,6 +730,7 @@ fun startFeedbackIntent(context: Context) {
 
         context.startActivity(Intent.createChooser(i, "Send via email"))
     } catch (e: PackageManager.NameNotFoundException) {
+        // do nothing
     }
 }
 
@@ -748,3 +752,6 @@ fun getColorWithAlpha(yourColor: Int, alpha: Int): Int {
     val green = Color.green(yourColor)
     return Color.argb(alpha, red, green, blue)
 }
+
+fun Activity.computeWindowMetrics() =
+    WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)

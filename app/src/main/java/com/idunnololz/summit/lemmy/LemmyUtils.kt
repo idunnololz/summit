@@ -55,14 +55,14 @@ object LemmyUtils {
 
     fun calculateBestVideoSize(
         context: Context,
-        redditVideo: VideoSizeHint,
+        videoSizeHint: VideoSizeHint,
         availableW: Int = Utils.getScreenWidth(context) - context.resources.getDimensionPixelOffset(
             R.dimen.padding_half,
         ) * 2,
         availableH: Int = Utils.getScreenHeight(context),
     ): Point {
-        val w = redditVideo.width
-        val h = redditVideo.height
+        val w = videoSizeHint.width
+        val h = videoSizeHint.height
 
         // find limiting factor
         val scale = availableW.toDouble() / w
@@ -127,7 +127,7 @@ object LemmyUtils {
         }
     }
 
-    fun convertRedditUrl(url: String, desiredFormat: String = "", sharable: Boolean): String {
+    fun cleanUrl(url: String, desiredFormat: String = ""): String {
         val uri = Uri.parse(url)
         val path = uri.path ?: ""
         val cleanPath = if (path.endsWith(".xml")) {
@@ -140,29 +140,8 @@ object LemmyUtils {
 
         return uri.buildUpon().apply {
             path("$cleanPath$desiredFormat")
-
-            if (uri.authority == "oauth.reddit.com" && sharable) {
-                authority("www.reddit.com")
-            } else if (uri.authority == "amp.reddit.com") {
-                authority("www.reddit.com")
-            }
         }.build().toString()
     }
-
-    fun openRedditUrl(context: Context, url: String) {
-        context.startActivity(
-            Intent(context, MainActivity::class.java)
-                .setData(Uri.parse(url)),
-        )
-    }
-
-    fun isUrlReddit(url: String): Boolean = isUriReddit(Uri.parse(url))
-
-    fun isUriReddit(uri: Uri): Boolean = uri.host == "www.reddit.com" ||
-        uri.host == "reddit.com" ||
-        uri.host == "oauth.reddit.com" ||
-        uri.host == "redd.it" ||
-        uri.host == "amp.reddit.com"
 
     fun isUrlRedirect(url: String): Boolean = isUriRedirect(Uri.parse(url))
 

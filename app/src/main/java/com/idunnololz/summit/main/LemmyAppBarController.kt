@@ -25,7 +25,7 @@ class LemmyAppBarController(
 
     companion object {
 
-        private const val TAG = "RedditAppBarController"
+        private const val TAG = "LemmyAppBarController"
     }
 
     data class State(

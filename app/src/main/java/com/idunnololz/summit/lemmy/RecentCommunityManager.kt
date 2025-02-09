@@ -35,7 +35,7 @@ class RecentCommunityManager @Inject constructor(
     /**
      * Priority queue where the last item is the most recent recent.
      */
-    private var _recentSubreddits: LinkedHashMap<String, CommunityHistoryEntry>? = null
+    private var _recentCommunities: LinkedHashMap<String, CommunityHistoryEntry>? = null
 
     init {
         if (PreferenceUtil.preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
@@ -129,9 +129,9 @@ class RecentCommunityManager @Inject constructor(
     }
 
     private fun getRecents(): LinkedHashMap<String, CommunityHistoryEntry> {
-        val recentSubreddits = _recentSubreddits
-        if (recentSubreddits != null) {
-            return recentSubreddits
+        val recentCommunities = _recentCommunities
+        if (recentCommunities != null) {
+            return recentCommunities
         }
         val jsonStr = preferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
         val data = try {
@@ -155,7 +155,7 @@ class RecentCommunityManager @Inject constructor(
         }
 
         return map.also {
-            _recentSubreddits = it
+            _recentCommunities = it
         }
     }
 

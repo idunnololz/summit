@@ -206,7 +206,7 @@ class Preferences(
     fun getPostsLayout(): CommunityLayout = try {
         CommunityLayout.valueOf(
             PreferenceUtil.preferences
-                .getString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, null) ?: "",
+                .getString(PreferenceUtil.KEY_COMMUNITY_LAYOUT, null) ?: "",
         )
     } catch (e: IllegalArgumentException) {
         CommunityLayout.List
@@ -214,7 +214,7 @@ class Preferences(
 
     fun setPostsLayout(layout: CommunityLayout) {
         PreferenceUtil.preferences.edit()
-            .putString(PreferenceUtil.KEY_SUBREDDIT_LAYOUT, layout.name)
+            .putString(PreferenceUtil.KEY_COMMUNITY_LAYOUT, layout.name)
             .apply()
     }
 

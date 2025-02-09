@@ -3,6 +3,7 @@ package com.idunnololz.summit.you
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.dispose
+import com.google.android.material.internal.ContextUtils
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
@@ -34,9 +36,14 @@ import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.computeWindowMetrics
+import com.idunnololz.summit.util.convertPixelToSp
+import com.idunnololz.summit.util.convertSpToPixel
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getTextSizeFromTextAppearance
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -99,6 +106,8 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             val adapter = YouAdapter(
                 context = context,
                 avatarHelper = avatarHelper,
+                screenWidthDp = Utils.convertPixelsToDp(
+                    requireActivity().computeWindowMetrics().bounds.width().toFloat()).toInt(),
                 onSwitchAccountClick = {
                     AccountsAndSettingsDialogFragment.newInstance()
                         .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
@@ -241,6 +250,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
     private class YouAdapter(
         private val context: Context,
         private val avatarHelper: AvatarHelper,
+        private val screenWidthDp: Int,
         private val onSwitchAccountClick: () -> Unit,
         private val onProfileClick: (Account, View, String?) -> Unit,
         private val onPostsClick: () -> Unit,
@@ -335,6 +345,25 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 } else {
                     b.subtitle.visibility = View.GONE
                 }
+
+                val mult = if (screenWidthDp > 400) {
+                    1f
+                } else if (screenWidthDp > 350) {
+                    0.9f
+                } else {
+                    0.8f
+                }
+                val titleSize = convertPixelToSp(context.getTextSizeFromTextAppearance(
+                    com.google.android.material.R.attr.textAppearanceTitleLarge)) * mult
+                val labelSize = convertPixelToSp(context.getTextSizeFromTextAppearance(
+                    com.google.android.material.R.attr.textAppearanceLabelSmall)) * mult
+
+                b.posts.textSize = titleSize
+                b.postsLabel.textSize = labelSize
+                b.comments.textSize = titleSize
+                b.commentsLabel.textSize = labelSize
+                b.accountAge.textSize = titleSize
+                b.accountAgeLabel.textSize = labelSize
 
                 if (item.person != null) {
                     b.posts.text = LemmyUtils.abbrevNumber(item.person.counts.post_count.toLong())

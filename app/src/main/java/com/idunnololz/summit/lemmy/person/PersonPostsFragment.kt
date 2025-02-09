@@ -19,6 +19,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -44,6 +45,9 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var nsfwModeManager: NsfwModeManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,7 +154,9 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
             },
         ).apply {
             alwaysRenderAsUnread = true
+
             updateWithPreferences(preferences)
+            updateNsfwMode(nsfwModeManager)
         }
         onSelectedLayoutChanged()
     }
