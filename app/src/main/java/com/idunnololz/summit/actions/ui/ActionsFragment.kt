@@ -127,22 +127,6 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.setup(animationsHelper)
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.addItemDecoration(
-            CustomDividerItemDecoration(
-                context,
-                DividerItemDecoration.VERTICAL,
-                dividerAfterLastItem = true,
-            ).apply {
-                setDrawable(
-                    checkNotNull(
-                        ContextCompat.getDrawable(
-                            context,
-                            R.drawable.vertical_divider,
-                        ),
-                    ),
-                )
-            },
-        )
         binding.fastScroller.setRecyclerView(binding.recyclerView)
     }
 }

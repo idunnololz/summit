@@ -31,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.image.ImageInfoDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
@@ -246,7 +247,13 @@ class ImageViewerActivity :
 
         moreActionsHelper.downloadAndShareFile.observe(this) {
             when (it) {
-                is StatefulData.Error -> {}
+                is StatefulData.Error -> {
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_share_file),
+                        it.error,
+                        supportFragmentManager,
+                    )
+                }
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {

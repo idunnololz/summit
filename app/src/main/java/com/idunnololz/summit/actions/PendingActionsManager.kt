@@ -454,6 +454,11 @@ class PendingActionsManager @Inject constructor(
 
     suspend fun deleteFailedActions() {
         failedActionsDao.deleteAllFailedActions()
+
+        val dbFailedActions = failedActionsDao.getLast100FailedActions()
+        failedActions.clear()
+        failedActions.addAll(dbFailedActions)
+        updateNewErrorsCount()
     }
 
     suspend fun deleteAllPendingActions() {
