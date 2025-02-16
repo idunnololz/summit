@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
@@ -82,6 +83,8 @@ class PendingActionsManager @Inject constructor(
         },
     )
 
+    val numNewFailedActionsFlow = MutableStateFlow<Int>(0)
+
     init {
         coroutineScope.launch {
             val dbActions = actionsDao.getAllPendingActions()
@@ -97,6 +100,7 @@ class PendingActionsManager @Inject constructor(
 
                 failedActions.clear()
                 failedActions.addAll(dbFailedActions)
+                updateNewErrorsCount()
 
                 for (action in actions) {
                     Log.d(TAG, "Restored action with id ${action.id}")
@@ -114,6 +118,29 @@ class PendingActionsManager @Inject constructor(
     }
 
     fun getAllPendingActions(): List<LemmyPendingAction> = actions
+
+    fun markActionAsSeen(action: LemmyAction) {
+        coroutineScope.launch {
+            withContext(actionsContext) {
+                when (action) {
+                    is LemmyCompletedAction -> {}
+                    is LemmyFailedAction -> {
+                        val updatedAction = action.copy(
+                            seen = true
+                        )
+                        failedActionsDao.insertFailedAction(updatedAction)
+                        val pos = failedActions.indexOfFirst { it.id == action.id }
+                        if (pos >= 0) {
+                            failedActions[pos] = updatedAction
+                            updateNewErrorsCount()
+                        }
+                    }
+
+                    is LemmyPendingAction -> {}
+                }
+            }
+        }
+    }
 
     suspend fun getAllCompletedActions(): List<LemmyCompletedAction> =
         completedActionsDao.getAllCompletedActions()
@@ -343,9 +370,10 @@ class PendingActionsManager @Inject constructor(
             actionsDao.delete(action)
 
             action.toLemmyFailedAction(error).let {
-                failedActionsDao.insertFailedAction(it)
-                failedActions.add(it)
+                val id = failedActionsDao.insertFailedAction(it)
+                failedActions.add(it.copy(id = id))
             }
+            updateNewErrorsCount()
         }
         notifyActionFailed(action, error)
     }
@@ -367,6 +395,16 @@ class PendingActionsManager @Inject constructor(
     ) {
         withContext(actionsContext) {
             failedActionsDao.delete(action)
+
+            val it = failedActions.iterator()
+            while (it.hasNext()) {
+                val next = it.next()
+
+                if (next.id == action.id) {
+                    it.remove()
+                }
+            }
+            updateNewErrorsCount()
         }
         notifyActionDeleted(action)
     }
@@ -429,5 +467,9 @@ class PendingActionsManager @Inject constructor(
         }
 
         actionsDao.deleteAllActions()
+    }
+
+    private fun updateNewErrorsCount() {
+        numNewFailedActionsFlow.value = failedActions.count { it.seen != true }
     }
 }

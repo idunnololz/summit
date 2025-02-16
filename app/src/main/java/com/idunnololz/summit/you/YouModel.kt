@@ -9,5 +9,6 @@ data class YouModel(
     val name: String?,
     val account: Account?,
     val accountInfo: AccountInfo?,
-    val personResult: Result<GetPersonDetailsResponse>,
+    val personResult: Result<GetPersonDetailsResponse>?,
+    val isLoading: Boolean,
 )

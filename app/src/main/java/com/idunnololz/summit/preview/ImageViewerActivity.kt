@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.navArgs
 import coil.imageLoader
+import coil.load
 import coil.request.ImageRequest
 import coil.size.Dimension
 import coil.target.Target
@@ -312,6 +313,12 @@ class ImageViewerActivity :
             startPostponedEnterTransition()
         }, 50)
 
+        if (viewModel.url?.startsWith("file:") == true) {
+            binding.bottomBar.visibility = View.GONE
+        } else {
+            binding.bottomBar.visibility = View.VISIBLE
+        }
+
         moreActionsHelper.downloadResult.observe(this) {
             when (it) {
                 is StatefulData.NotStarted -> {}
@@ -586,6 +593,17 @@ class ImageViewerActivity :
         Log.d(TAG, "loadImageFromUrl: $url")
 
         binding.progressBar.visibility = View.VISIBLE
+
+        if (url.startsWith("file:")) {
+            binding.progressBar.visibility = View.GONE
+            startPostponedEnterTransition()
+            binding.loadingView.hideAll()
+
+            binding.dummyImageView.load(Uri.parse(url))
+            binding.imageView.load(Uri.parse(url))
+            return
+        }
+
         offlineManager.fetchImageWithError(
             rootView = binding.root,
             url = url,

@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsAboutBinding
+import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.AboutSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -21,6 +22,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.launchChangelog
+import com.idunnololz.summit.util.openAppOnPlayStore
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.startFeedbackIntent
 import com.idunnololz.summit.util.summitCommunityPage
@@ -74,50 +76,11 @@ class SettingsAboutFragment : BaseFragment<FragmentSettingsAboutBinding>() {
         }
 
         aboutSettings.googlePlayLink.bindTo(binding.playStoreListing) {
-            try {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=com.idunnololz.summit"),
-                    ),
-                )
-            } catch (e: ActivityNotFoundException) {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(
-                            "https://play.google.com/store/apps/details?id=com.idunnololz.summit",
-                        ),
-                    ),
-                )
-            }
+            openAppOnPlayStore()
         }
 
         aboutSettings.giveFeedback.bindTo(binding.giveFeedback) {
-            val bottomMenu = BottomMenu(requireContext()).apply {
-                setTitle(R.string.give_feedback)
-                addItemWithIcon(
-                    R.id.summit_community,
-                    R.string.through_the_community,
-                    R.drawable.ic_logo_mono_24,
-                )
-                addItemWithIcon(R.id.email, R.string.by_email, R.drawable.baseline_email_24)
-
-                setOnMenuItemClickListener {
-                    when (it.id) {
-                        R.id.email -> startFeedbackIntent(requireContext())
-                        R.id.summit_community -> {
-                            val fm = parentFragmentManager
-                            for (i in 0 until fm.backStackEntryCount) {
-                                fm.popBackStack()
-                            }
-                            getMainActivity()?.launchPage(summitCommunityPage)
-                        }
-                    }
-                }
-            }
-
-            getMainActivity()?.showBottomMenu(bottomMenu)
+            showHelpAndFeedbackOptions()
         }
 
         aboutSettings.patreonSettings.bindTo(binding.patreon) {

@@ -60,6 +60,7 @@ class InboxRepository @Inject constructor(
         private val pageSize: Int = DEFAULT_PAGE_SIZE,
     ) {
 
+        val seenIds = mutableSetOf<Int>()
         val allItems = mutableListOf<LiteInboxItem>()
 
         suspend fun getPage(
@@ -75,6 +76,7 @@ class InboxRepository @Inject constructor(
             if (force) {
                 if (!retainItemsOnForce) {
                     allItems.clear()
+                    seenIds.clear()
                 }
                 sources.forEach {
                     it.invalidate()
@@ -110,7 +112,9 @@ class InboxRepository @Inject constructor(
                     "Adding item ${nextItem.id} from source ${nextItem::class.java}",
                 )
 
-                allItems.add(nextItem)
+                if (seenIds.add(nextItem.id)) {
+                    allItems.add(nextItem)
+                }
 
                 // increment the max item
                 nextSourceAndResult.first.next()
@@ -144,6 +148,7 @@ class InboxRepository @Inject constructor(
 
         fun invalidate() {
             allItems.clear()
+            seenIds.clear()
             sources.forEach {
                 it.invalidate()
             }

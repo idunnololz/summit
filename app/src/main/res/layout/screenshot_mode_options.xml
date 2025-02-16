@@ -13,12 +13,13 @@
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:text="Include in screenshot"
+        android:text="@string/include_in_screenshot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/padding_half"
         android:gravity="center"
         android:fontFamily="sans-serif-condensed"
-        android:textAppearance="?textAppearanceLabelSmall"/>
+        android:textAppearance="?textAppearanceLabelSmall"
+        android:paddingBottom="@dimen/padding_half"/>
 
 </LinearLayout>

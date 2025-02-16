@@ -6,6 +6,7 @@ import com.idunnololz.summit.api.LemmyApi.Companion.CACHE_CONTROL_NO_CACHE
 import com.idunnololz.summit.api.LemmyApi.Companion.getOkHttpClient
 import com.idunnololz.summit.api.summit.CommunitySuggestionsDto
 import com.idunnololz.summit.cache.CachePolicyManager
+import com.idunnololz.summit.util.DirectoryHelper
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -27,11 +28,17 @@ interface SummitServerApi {
             context: Context,
             userAgent: String,
             cachePolicyManager: CachePolicyManager,
+            directoryHelper: DirectoryHelper,
         ): SummitServerApi {
             return Retrofit.Builder()
                 .baseUrl("https://summitforlemmyserver.idunnololz.com")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getOkHttpClient(context, userAgent, cachePolicyManager))
+                .client(getOkHttpClient(
+                    context = context,
+                    userAgent = userAgent,
+                    cachePolicyManager = cachePolicyManager,
+                    cacheDir = directoryHelper.okHttpCacheDir
+                ))
                 .build()
                 .create(SummitServerApi::class.java)
         }

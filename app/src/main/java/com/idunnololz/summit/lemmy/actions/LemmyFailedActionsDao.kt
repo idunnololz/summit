@@ -52,6 +52,8 @@ data class LemmyFailedAction(
     val error: LemmyActionFailureReason,
     @ColumnInfo(name = "info")
     override val info: ActionInfo?,
+    @ColumnInfo(name = "seen")
+    val seen: Boolean? = null,
 ): LemmyAction
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")

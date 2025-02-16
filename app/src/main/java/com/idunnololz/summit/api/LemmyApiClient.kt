@@ -117,6 +117,7 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
 import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
@@ -143,6 +144,7 @@ class LemmyApiClient(
     private val userAgent: String,
     private val preferences: Preferences,
     private val cachePolicyManager: CachePolicyManager,
+    private val directoryHelper: DirectoryHelper,
 ) {
 
     companion object {
@@ -184,11 +186,13 @@ class LemmyApiClient(
         cachePolicyManager = cachePolicyManager,
         instance = preferences.guestAccountSettings?.instance
             ?: DEFAULT_INSTANCE,
+        cacheDir = directoryHelper.okHttpCacheDir,
     )
     val okHttpClient = LemmyApi.okHttpClient(
         context = context,
         cachePolicyManager = cachePolicyManager,
         userAgent = userAgent,
+        cacheDir = directoryHelper.okHttpCacheDir,
     )
 
     class Factory @Inject constructor(
@@ -196,12 +200,14 @@ class LemmyApiClient(
         private val apiListenerManager: ApiListenerManager,
         private val preferences: Preferences,
         private val cachePolicyManager: CachePolicyManager,
+        private val directoryHelper: DirectoryHelper,
     ) {
         fun create() = LemmyApiClient(
             context = context,
             apiListenerManager = apiListenerManager,
             preferences = preferences,
             cachePolicyManager = cachePolicyManager,
+            directoryHelper = directoryHelper,
         )
     }
 
@@ -210,13 +216,22 @@ class LemmyApiClient(
         apiListenerManager: ApiListenerManager,
         preferences: Preferences,
         cachePolicyManager: CachePolicyManager,
-    ) : this(context, apiListenerManager, LinkUtils.USER_AGENT, preferences, cachePolicyManager)
+        directoryHelper: DirectoryHelper,
+    ) : this(
+        context = context,
+        apiListenerManager = apiListenerManager,
+        userAgent = LinkUtils.USER_AGENT,
+        preferences = preferences,
+        cachePolicyManager = cachePolicyManager,
+        directoryHelper = directoryHelper
+    )
 
     fun changeInstance(newInstance: String) {
         api = LemmyApi.getInstance(
             context = context,
             cachePolicyManager = cachePolicyManager,
             instance = newInstance,
+            cacheDir = directoryHelper.okHttpCacheDir,
         )
 
         instanceFlow.value = api.instance
@@ -228,6 +243,7 @@ class LemmyApiClient(
             cachePolicyManager = cachePolicyManager,
             instance = preferences.guestAccountSettings?.instance
                 ?: DEFAULT_INSTANCE,
+            cacheDir = directoryHelper.okHttpCacheDir,
         )
 
         instanceFlow.value = api.instance

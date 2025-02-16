@@ -67,6 +67,14 @@ class ActionsAdapter(
             b.title.text = actionInfo?.getActionName(context)
                 ?: context.getString(R.string.unknown)
 
+            if (item.action.seen) {
+                b.title.setCompoundDrawablesWithIntrinsicBounds(
+                    0, 0, 0, 0)
+            } else {
+                b.title.setCompoundDrawablesWithIntrinsicBounds(
+                    0, 0, R.drawable.baseline_indicator_12, 0)
+            }
+
             when (actionInfo) {
                 is ActionInfo.CommentActionInfo -> {
                     b.icon.setImageResource(R.drawable.outline_comment_24)

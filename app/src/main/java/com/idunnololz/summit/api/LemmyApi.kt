@@ -752,34 +752,41 @@ interface LemmyApi {
         fun getInstance(
             context: Context,
             cachePolicyManager: CachePolicyManager,
+            cacheDir: File,
             instance: String = DEFAULT_INSTANCE,
         ): LemmyApiWithSite {
-            return apis[instance] ?: buildInstance(context, cachePolicyManager, instance).also {
-                apis[instance] = it
-            }
+            return apis[instance]
+                ?: buildInstance(context, cachePolicyManager, cacheDir, instance).also {
+                    apis[instance] = it
+                }
         }
 
         fun okHttpClient(
             context: Context,
             cachePolicyManager: CachePolicyManager,
+            cacheDir: File,
             userAgent: String = LinkUtils.USER_AGENT,
-        ) = okHttpClient ?: getOkHttpClient(context, userAgent, cachePolicyManager).also {
-            okHttpClient = it
-        }
+        ) =
+            okHttpClient
+                ?: getOkHttpClient(context, userAgent, cachePolicyManager, cacheDir).also {
+                    okHttpClient = it
+                }
 
         private fun buildInstance(
             context: Context,
             cachePolicyManager: CachePolicyManager,
+            cacheDir: File,
             instance: String = DEFAULT_INSTANCE,
             userAgent: String = LinkUtils.USER_AGENT,
         ): LemmyApiWithSite {
-            return buildApi(context, instance, userAgent, cachePolicyManager)
+            return buildApi(context, instance, userAgent, cachePolicyManager, cacheDir)
         }
 
         internal fun getOkHttpClient(
             context: Context,
             userAgent: String,
             cachePolicyManager: CachePolicyManager,
+            cacheDir: File,
         ): OkHttpClient {
             okHttpClient?.let {
                 return it
@@ -789,7 +796,7 @@ interface LemmyApi {
             loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
 
             val myCache = Cache(
-                directory = File(context.cacheDir, "okhttp_cache"),
+                directory = cacheDir,
                 maxSize = 20L * 1024L * 1024L, // 20MB
             )
             val okHttpClient = OkHttpClient.Builder()
@@ -903,12 +910,13 @@ interface LemmyApi {
             instance: String,
             userAgent: String,
             cachePolicyManager: CachePolicyManager,
+            cacheDir: File,
         ): LemmyApiWithSite {
             return LemmyApiWithSite(
                 Retrofit.Builder()
                     .baseUrl("https://$instance/api/$API_VERSION/")
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(getOkHttpClient(context, userAgent, cachePolicyManager))
+                    .client(getOkHttpClient(context, userAgent, cachePolicyManager, cacheDir))
                     .build()
                     .create(LemmyApi::class.java),
                 instance,

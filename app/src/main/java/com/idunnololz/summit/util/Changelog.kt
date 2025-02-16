@@ -7,8 +7,11 @@ import com.idunnololz.summit.main.MainActivity
  * Patch notes/changelog stuff.
  */
 
+val changeLogPostRef
+    get() = PostRef("lemmy.world", 25640887)
+
 fun MainActivity.launchChangelog() {
-    launchPage(PostRef("lemmy.world", 25109976), switchToNativeInstance = true)
+    launchPage(changeLogPostRef, switchToNativeInstance = true)
 }
 fun BaseFragment<*>.launchChangelog() {
     getMainActivity()?.launchChangelog()

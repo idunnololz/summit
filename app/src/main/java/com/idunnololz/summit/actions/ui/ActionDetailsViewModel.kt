@@ -26,6 +26,12 @@ class ActionDetailsViewModel @Inject constructor(
     val retryActionResult = StatefulLiveData<Unit>()
     val deleteActionResult = StatefulLiveData<Unit>()
 
+    fun markActionAsSeen(action: Action) {
+        if (!action.seen) {
+            pendingActionsManager.markActionAsSeen(action.toLemmyAction())
+        }
+    }
+
     fun retryAction(action: Action) {
         retryActionResult.setIsLoading()
 

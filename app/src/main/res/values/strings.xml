@@ -423,7 +423,7 @@
     <!-- Setting body text. -->
     <string name="give_feedback_desc">Tell me what you think or report bugs</string>
     <!-- Keep short. Button text. Option for giving feedback. -->
-    <string name="through_the_community">Through the community page</string>
+    <string name="through_the_community">Through the community</string>
     <!-- Keep short. Button text. Option for giving feedback. -->
     <string name="by_email">By email</string>
     <!-- Setting title text. -->
@@ -1916,6 +1916,29 @@
     <string name="rerun_action_success_desc">Action re-run successfully.</string>
     <string name="retry_action_success_desc">Action successfully retried.</string>
     <string name="mark_post_as_unread">Mark post as unread</string>
+    <string name="help_and_feedback"><![CDATA[Help & feedback]]></string>
+    <string name="rate_app">Rate app</string>
+    <string name="post_feedback_to_community">Post feedback to community</string>
+    <string name="go_to_community">Go to community</string>
+    <string name="post_feedback">Post feedback</string>
+    <string name="error_cache_size_calculation">Unable to calculate cache size.</string>
+    <string name="images">Images</string>
+    <string name="videos">Videos</string>
+    <string name="network">Network</string>
+    <string name="other">Other</string>
+    <string name="other_cached_media">Other cached media</string>
+    <string name="save_and_close"><![CDATA[Save & close]]></string>
+    <string name="error_unable_to_submit_feedback">Unable to submit feedback</string>
+    <string name="feedback_question">Feedback/question</string>
+    <string name="include_in_screenshot">Include in screenshot</string>
+    <string name="include_screenshot">Include screenshot</string>
+    <string name="post_feedback_or_question_to_community">Post feedback/question to community</string>
+    <string name="send_feedback_or_question_by_email">Send feedback/question by email</string>
+    <string name="rate_app_desc">Enjoying the app? Consider leaving a rating or review.</string>
+    <string name="other_links">Other links</string>
+    <string name="help_and_feedback_desc">Give feedback from anywhere in the app by shaking your device.</string>
+    <string name="see_the_official_summit_community">See the official Summit community</string>
+    <string name="preview_screenshot">Preview screenshot</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

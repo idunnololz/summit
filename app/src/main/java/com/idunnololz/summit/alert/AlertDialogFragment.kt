@@ -30,6 +30,7 @@ class AlertDialogFragment : DialogFragment() {
 
         private const val EXTRA_POSITIVE_TEXT = "positive_text"
         private const val EXTRA_NEGATIVE_TEXT = "negative_text"
+        private const val EXTRA_NEUTRAL_TEXT = "neutral_text"
 
         private const val EXTRA_EXTRAS = "EXTRA_EXTRAS"
 
@@ -99,6 +100,7 @@ class AlertDialogFragment : DialogFragment() {
         @StringRes var messageResId: Int = 0
         @StringRes var positionButtonResId: Int = 0
         @StringRes var negativeButtonResId: Int = 0
+        @StringRes var neutralButtonResId: Int = 0
         var cancelable = true
 
         val extras = Bundle()
@@ -123,6 +125,9 @@ class AlertDialogFragment : DialogFragment() {
                 }
                 if (negativeButtonResId != 0) {
                     putInt(EXTRA_NEGATIVE_TEXT, negativeButtonResId)
+                }
+                if (neutralButtonResId != 0) {
+                    putInt(EXTRA_NEUTRAL_TEXT, neutralButtonResId)
                 }
                 putBoolean(EXTRA_CANCELABLE, cancelable)
                 putBundle(EXTRA_EXTRAS, extras)
@@ -169,6 +174,7 @@ class AlertDialogFragment : DialogFragment() {
 
         var positiveTextId = args.getInt(EXTRA_POSITIVE_TEXT, 0)
         val negativeTextId = args.getInt(EXTRA_NEGATIVE_TEXT, 0)
+        val neutralTextId = args.getInt(EXTRA_NEUTRAL_TEXT, 0)
         val reqKey = args.getString(EXTRA_REQUEST_KEY, "")
 
         val builder = MaterialAlertDialogBuilder(activity).setIcon(icon)
@@ -235,6 +241,16 @@ class AlertDialogFragment : DialogFragment() {
                     ))
                 })
                 parent.onNegativeClick(dialog, tag)
+            }
+        }
+
+        if (neutralTextId != 0) {
+            builder.setNeutralButton(neutralTextId) { _, _ ->
+                setFragmentResult(reqKey, Bundle().apply {
+                    putParcelable(KEY_RESULT, Result.Neutral(
+                        args.getBundle(EXTRA_EXTRAS)
+                    ))
+                })
             }
         }
 

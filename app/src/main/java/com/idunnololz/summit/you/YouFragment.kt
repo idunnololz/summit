@@ -229,12 +229,17 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         loadingView.hideAll()
                     }
                     is StatefulData.Success -> {
-                        swipeRefreshLayout.isRefreshing = false
-                        loadingView.hideAll()
+                        if (!it.data.isLoading) {
+                            swipeRefreshLayout.isRefreshing = false
+                            loadingView.hideAll()
+                        }
 
                         adapter.updateModel(it.data)
                     }
                 }
+            }
+            viewModel.newActionErrorsCount.observe(viewLifecycleOwner) {
+                adapter.updateNewActionErrorsCount(it)
             }
 
             viewModel.loadModel(force = false)
@@ -273,9 +278,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 @IdRes val itemId: Int,
                 @DrawableRes val iconRes: Int,
                 @StringRes val text: Int,
+                val number: Int? = null,
             ) : Item
         }
 
+        private var actionErrorsCount = 0
         private var model: YouModel? = null
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -418,12 +425,19 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 b.text.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     item.iconRes,
                     0,
-                    R.drawable.baseline_chevron_right_24,
+                    0,
                     0,
                 )
                 b.text.setText(item.text)
                 b.root.setOnClickListener {
                     onItemClick(item.itemId)
+                }
+
+                if (item.number == null) {
+                    b.number.visibility = View.GONE
+                } else {
+                    b.number.visibility = View.VISIBLE
+                    b.number.text = item.number.toString()
                 }
             }
         }
@@ -448,7 +462,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     name = model.name,
                     account = model.account,
                     accountInfo = model.accountInfo,
-                    person = model.personResult.getOrNull()?.person_view,
+                    person = model.personResult?.getOrNull()?.person_view,
                 )
 
                 if (model.account != null) {
@@ -511,9 +525,14 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     R.string.user_tags,
                 )
                 newItems += Item.MenuItem(
-                    R.id.your_actions,
-                    R.drawable.outline_play_arrow_24,
-                    R.string.your_actions,
+                    itemId = R.id.your_actions,
+                    iconRes = R.drawable.outline_play_arrow_24,
+                    text = R.string.your_actions,
+                    number = if (actionErrorsCount == 0) {
+                        null
+                    } else {
+                        actionErrorsCount
+                    },
                 )
                 newItems += Item.FooterItem
             }
@@ -523,6 +542,13 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
 
         fun updateModel(model: YouModel) {
             this.model = model
+
+            refreshItems()
+        }
+
+        fun updateNewActionErrorsCount(count: Int?) {
+            count ?: return
+            actionErrorsCount = count
 
             refreshItems()
         }

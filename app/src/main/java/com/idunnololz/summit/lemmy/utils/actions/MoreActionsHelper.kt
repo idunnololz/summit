@@ -260,8 +260,8 @@ class MoreActionsHelper @Inject constructor(
         }
     }
 
-    fun hidePost(id: PostId) {
-        hiddenPostsManager.hidePost(id, apiClient.instance)
+    fun hidePost(id: PostId, postView: PostView?) {
+        hiddenPostsManager.hidePost(id, postView, apiClient.instance)
     }
 
     fun onPostRead(postView: PostView, delayMs: Long, read: Boolean, accountId: Long? = null) {

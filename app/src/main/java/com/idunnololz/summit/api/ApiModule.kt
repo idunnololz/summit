@@ -3,6 +3,7 @@ package com.idunnololz.summit.api
 import android.content.Context
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.cache.CachePolicyManager
+import com.idunnololz.summit.util.DirectoryHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,9 +19,11 @@ class ApiModule {
     fun provideSummitServerApi(
         @ApplicationContext context: Context,
         cachePolicyManager: CachePolicyManager,
+        directoryHelper: DirectoryHelper,
     ): SummitServerApi = SummitServerApi.newInstance(
         context = context,
         userAgent = "Summit / ${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID}",
         cachePolicyManager = cachePolicyManager,
+        directoryHelper = directoryHelper,
     )
 }

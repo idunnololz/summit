@@ -11,6 +11,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +45,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.computeWindowMetrics
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
@@ -51,7 +53,10 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
 
 @AndroidEntryPoint
 class MessageFragment : BaseFragment<FragmentMessageBinding>() {
@@ -599,7 +604,67 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             val commentId = args.inboxItem.commentId
             if (commentId != null) {
                 adapter.highlightCommentForever(commentId)
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    var lastScrollY = 0
+                    var startMonitorTs = 0L
+                    val mainActivity = requireMainActivity()
+                    while (true) {
+                        delay(100)
+
+                        val position = adapter.getPositionOfComment(commentId)
+                        val vh = recyclerView.findViewHolderForAdapterPosition(position)
+                        val itemView = vh?.itemView
+                            ?: continue
+
+                        if (itemView.height == 0) {
+                            continue
+                        }
+
+                        if (startMonitorTs == 0L) {
+                            startMonitorTs = System.currentTimeMillis()
+                            binding.appBar.setExpanded(false)
+                        }
+
+                        val top = getTopRelativeToView(itemView, binding.mainContainer)
+                        val viewportHeight = mainContainer.height -
+                            mainContainer.paddingTop -
+                            mainContainer.paddingBottom
+                        val scrollY = top -
+                            max(
+                                (viewportHeight - itemView.height) / 2,
+                                mainActivity.insets.value?.topInset ?: 0
+                            )
+
+                        if (scrollY != lastScrollY) {
+                            // In cases where there are images in the post/comment list, the layout
+                            // can be unstable. Monitor view positions for about 1s before we
+                            // give up.
+                            binding.mainContainer.smoothScrollTo(0, scrollY)
+                            lastScrollY = scrollY
+                        }
+
+                        if (System.currentTimeMillis() - startMonitorTs > 1_500) {
+                            break
+                        }
+                    }
+                }
             }
         }
+    }
+
+    private fun getTopRelativeToView(childView: View, parentView: View): Int {
+        var top = 0
+        var curView = childView
+
+        while (curView != parentView) {
+            val parent = curView.parent as? View
+                ?: return 0
+
+            top += curView.top
+            curView = parent
+        }
+
+        return top
     }
 }

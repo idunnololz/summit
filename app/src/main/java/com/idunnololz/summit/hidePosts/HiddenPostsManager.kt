@@ -1,7 +1,9 @@
 package com.idunnololz.summit.hidePosts
 
 import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.preferences.Preferences
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,6 +15,7 @@ class HiddenPostsManager @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val hiddenPostsDao: HiddenPostsDao,
     private val preferences: Preferences,
+    private val duplicatePostsDetector: DuplicatePostsDetector,
 ) {
     private val coroutineScope = coroutineScopeFactory.create()
 
@@ -32,7 +35,7 @@ class HiddenPostsManager @Inject constructor(
         return instanceFlows
     }
 
-    fun hidePost(postId: PostId, instance: String, hide: Boolean = true) {
+    fun hidePost(postId: PostId, postView: PostView?, instance: String, hide: Boolean = true) {
         coroutineScope.launch {
             if (hide) {
                 val entry = HiddenPostEntry(
@@ -48,11 +51,19 @@ class HiddenPostsManager @Inject constructor(
                     onHiddenPostsChangeFlow.emit(Unit)
                     onHidePostFlow.emit(entry)
                 }
+
+                postView?.let {
+                    duplicatePostsDetector.addReadOrHiddenPost(it)
+                }
             } else {
                 hiddenPostsDao.deleteByPost(instance, postId)
                 getHiddenPostEntriesInternal(instance).remove(postId)
 
                 getInstanceFlows(instance).onHiddenPostsChangeFlow.emit(Unit)
+
+                postView?.let {
+                    duplicatePostsDetector.removeReadOrHiddenPost(it)
+                }
             }
         }
     }

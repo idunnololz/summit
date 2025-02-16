@@ -455,10 +455,6 @@ class InboxViewModel @Inject constructor(
     }
 
     private fun addData(data: LemmyListSource.PageResult<InboxItem>) {
-        if (data.pageIndex == 0) {
-            clearData()
-        }
-
         hasMore = data.hasMore
 
         allInboxItems.addAll(data.items.mapNotNull {

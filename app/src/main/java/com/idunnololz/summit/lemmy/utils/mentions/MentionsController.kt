@@ -15,6 +15,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
@@ -26,6 +27,7 @@ import dagger.assisted.AssistedInject
 import info.debatty.java.stringsimilarity.NGram
 import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.min
 
 private const val TAG = "MentionsController"
 
@@ -315,7 +318,7 @@ class MentionsAutoCompleteRepository(
                 val results = if (currentResult?.nameQuery == nameQuery) {
                     currentResult.results
                 } else {
-                    val communityQuery = async(Dispatchers.IO) {
+                    val communityQuery: Deferred<Result<SearchResponse>> = async(Dispatchers.IO) {
                         apiClient
                             .search(
                                 sortType = SortType.TopMonth,
@@ -349,6 +352,8 @@ class MentionsAutoCompleteRepository(
                                         communityView = it,
                                         mentionPrefix = queryPrefix,
                                         sortKey = it.community.fullName,
+                                        popularityValue =
+                                            min(it.counts.users_active_month / 10_000.0, 1.0)
                                     )
                                 }
                                 it.users.mapTo(results) {
@@ -357,6 +362,7 @@ class MentionsAutoCompleteRepository(
                                         mentionPrefix = queryPrefix,
                                         sortKey = it.person.fullName,
                                         bio = it.person.bio?.take(100),
+                                        popularityValue = 0.0
                                     )
                                 }
                             }
@@ -374,7 +380,7 @@ class MentionsAutoCompleteRepository(
                             trigram.distance(
                                 it.sortKey,
                                 actualQuery,
-                            )
+                            ) * 0.5 + (0.5 - it.popularityValue * 0.5)
                         },
                         fullQuery = actualQuery,
                         nameQuery = nameQuery,
@@ -425,22 +431,32 @@ data class QueryResult(
 
 sealed interface MentionsAutoCompleteItem {
     val sortKey: String
+
+    /**
+     * Between 0 (unpopular) and 1 (popular)
+     */
+    val popularityValue: Double
 }
 
 data object EmptyItem : MentionsAutoCompleteItem {
     override val sortKey: String
         get() = ""
+
+    override val popularityValue: Double
+        get() = 0.0
 }
 
 sealed interface ResultItem : MentionsAutoCompleteItem
 data class CommunityResultItem(
     override val sortKey: String,
+    override val popularityValue: Double,
     val mentionPrefix: String,
     val communityView: CommunityView,
 ) : ResultItem
 
 data class PersonResultItem(
     override val sortKey: String,
+    override val popularityValue: Double,
     val mentionPrefix: String,
     val personView: PersonView,
     val bio: String?,

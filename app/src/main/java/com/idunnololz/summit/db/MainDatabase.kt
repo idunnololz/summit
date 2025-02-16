@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
@@ -78,8 +79,9 @@ import com.idunnololz.summit.util.moshi
         AutoMigration(from = 32, to = 33),
         AutoMigration(from = 41, to = 42),
         AutoMigration(from = 42, to = 43),
+        AutoMigration(from = 43, to = 44),
     ],
-    version = 43,
+    version = 44,
     exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -125,7 +127,11 @@ abstract class MainDatabase : RoomDatabase() {
                     MainDatabase::class.java,
                     "main.db",
                 )
-                .fallbackToDestructiveMigration()
+                .apply {
+                    if (!BuildConfig.DEBUG) {
+                        fallbackToDestructiveMigration()
+                    }
+                }
                 .addTypeConverter(LemmyActionConverters(moshi))
                 .addTypeConverter(UserCommunitiesConverters(moshi))
                 .addTypeConverter(AccountInfoConverters(moshi))

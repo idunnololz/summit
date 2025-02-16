@@ -57,7 +57,6 @@
                     android:layout_height="64dp"
                     android:src="@drawable/baseline_share_24"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:layout_marginHorizontal="@dimen/padding_half"
                     android:layout_marginBottom="@dimen/padding"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/download_button"
@@ -70,7 +69,6 @@
                     android:layout_height="64dp"
                     android:src="@drawable/baseline_download_24"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:layout_marginHorizontal="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/share_button"
                     app:layout_constraintEnd_toStartOf="@+id/info_button"
                     app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
@@ -81,7 +79,6 @@
                     android:layout_height="64dp"
                     android:src="@drawable/outline_info_24"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:layout_marginHorizontal="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/download_button"
                     app:layout_constraintEnd_toStartOf="@+id/hd_button"
                     app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
@@ -92,7 +89,6 @@
                     android:layout_height="64dp"
                     android:src="@drawable/outline_hd_24"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:layout_marginHorizontal="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/info_button"
                     app:layout_constraintEnd_toStartOf="@+id/more_button"
                     app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
@@ -103,7 +99,6 @@
                     android:layout_height="64dp"
                     android:src="@drawable/baseline_more_horiz_24"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:layout_marginHorizontal="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/hd_button"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
