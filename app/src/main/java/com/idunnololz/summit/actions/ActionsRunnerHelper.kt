@@ -201,7 +201,6 @@ class ActionsRunnerHelper @Inject constructor(
                 if (account == null) {
                     return Failure(AccountNotFoundError(actionInfo.accountId))
                 }
-                return Failure(AccountNotFoundError(actionInfo.accountId))
 
                 val result = apiClient.markPostAsRead(
                     actionInfo.postRef.id,
