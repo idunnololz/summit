@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @ActivityScoped
 class ShakeFeedbackHelper @Inject constructor(
-    private val activity: Activity
+    private val activity: Activity,
 ) {
 
     companion object {
@@ -41,13 +41,14 @@ class ShakeFeedbackHelper @Inject constructor(
                     }
 
                     mainActivity.getRootView().performHapticFeedbackCompat(
-                        HapticFeedbackConstantsCompat.LONG_PRESS)
+                        HapticFeedbackConstantsCompat.LONG_PRESS,
+                    )
 
                     lastShakeTs = System.currentTimeMillis()
 
                     HelpAndFeedbackDialogFragment.show(mainActivity.supportFragmentManager)
                 }
-            }
+            },
         )
 
     fun start() {

@@ -1,14 +1,10 @@
 package com.idunnololz.summit.settings.about
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsAboutBinding
 import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
 import com.idunnololz.summit.preferences.Preferences
@@ -17,15 +13,12 @@ import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.util.openAppOnPlayStore
 import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.startFeedbackIntent
-import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

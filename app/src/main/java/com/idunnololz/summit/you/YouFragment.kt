@@ -3,7 +3,6 @@ package com.idunnololz.summit.you
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.dispose
-import com.google.android.material.internal.ContextUtils
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
@@ -39,7 +37,6 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.computeWindowMetrics
 import com.idunnololz.summit.util.convertPixelToSp
-import com.idunnololz.summit.util.convertSpToPixel
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -107,7 +104,8 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 context = context,
                 avatarHelper = avatarHelper,
                 screenWidthDp = Utils.convertPixelsToDp(
-                    requireActivity().computeWindowMetrics().bounds.width().toFloat()).toInt(),
+                    requireActivity().computeWindowMetrics().bounds.width().toFloat(),
+                ).toInt(),
                 onSwitchAccountClick = {
                     AccountsAndSettingsDialogFragment.newInstance()
                         .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
@@ -133,21 +131,21 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 onPostsClick = {
                     val direction = YouFragmentDirections
                         .actionYouFragmentToPersonTabbedFragment2(
-                            screen = PersonTabbedFragment.Screen.Posts
+                            screen = PersonTabbedFragment.Screen.Posts,
                         )
                     findNavController().navigateSafe(direction)
                 },
                 onCommentsClick = {
                     val direction = YouFragmentDirections
                         .actionYouFragmentToPersonTabbedFragment2(
-                            screen = PersonTabbedFragment.Screen.Comments
+                            screen = PersonTabbedFragment.Screen.Comments,
                         )
                     findNavController().navigateSafe(direction)
                 },
                 onAccountAgeClick = {
                     val direction = YouFragmentDirections
                         .actionYouFragmentToPersonTabbedFragment2(
-                            screen = PersonTabbedFragment.Screen.About
+                            screen = PersonTabbedFragment.Screen.About,
                         )
                     findNavController().navigateSafe(direction)
                 },
@@ -360,10 +358,16 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 } else {
                     0.8f
                 }
-                val titleSize = convertPixelToSp(context.getTextSizeFromTextAppearance(
-                    com.google.android.material.R.attr.textAppearanceTitleLarge)) * mult
-                val labelSize = convertPixelToSp(context.getTextSizeFromTextAppearance(
-                    com.google.android.material.R.attr.textAppearanceLabelSmall)) * mult
+                val titleSize = convertPixelToSp(
+                    context.getTextSizeFromTextAppearance(
+                        com.google.android.material.R.attr.textAppearanceTitleLarge,
+                    ),
+                ) * mult
+                val labelSize = convertPixelToSp(
+                    context.getTextSizeFromTextAppearance(
+                        com.google.android.material.R.attr.textAppearanceLabelSmall,
+                    ),
+                ) * mult
 
                 b.posts.textSize = titleSize
                 b.postsLabel.textSize = labelSize

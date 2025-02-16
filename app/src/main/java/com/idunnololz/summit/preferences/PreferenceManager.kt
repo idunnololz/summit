@@ -54,7 +54,7 @@ class PreferenceManager @Inject constructor(
         return Preferences(
             context = context,
             prefs = getSharedPreferencesForAccount(account),
-            coroutineScopeFactory = coroutineScopeFactory
+            coroutineScopeFactory = coroutineScopeFactory,
         )
     }
 

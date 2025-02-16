@@ -71,17 +71,17 @@ class AlertDialogFragment : DialogFragment() {
 
         @Parcelize
         data class Positive(
-            override val extras: Bundle?
+            override val extras: Bundle?,
         ) : Result
 
         @Parcelize
         data class Negative(
-            override val extras: Bundle?
+            override val extras: Bundle?,
         ) : Result
 
         @Parcelize
         data class Neutral(
-            override val extras: Bundle?
+            override val extras: Bundle?,
         ) : Result
 
         val isOk: Boolean
@@ -95,11 +95,16 @@ class AlertDialogFragment : DialogFragment() {
 
         var requestKey: String = ""
         var title: String = ""
+
         @StringRes var titleResId: Int = 0
         var message: String = ""
+
         @StringRes var messageResId: Int = 0
+
         @StringRes var positionButtonResId: Int = 0
+
         @StringRes var negativeButtonResId: Int = 0
+
         @StringRes var neutralButtonResId: Int = 0
         var cancelable = true
 
@@ -225,32 +230,50 @@ class AlertDialogFragment : DialogFragment() {
 
         val dialog = this
         builder.setPositiveButton(positiveTextId) { _, _ ->
-            setFragmentResult(reqKey, Bundle().apply {
-                putParcelable(KEY_RESULT, Result.Positive(
-                    args.getBundle(EXTRA_EXTRAS)
-                ))
-            })
+            setFragmentResult(
+                reqKey,
+                Bundle().apply {
+                    putParcelable(
+                        KEY_RESULT,
+                        Result.Positive(
+                            args.getBundle(EXTRA_EXTRAS),
+                        ),
+                    )
+                },
+            )
             parent.onPositiveClick(dialog, tag)
         }
 
         if (negativeTextId != 0) {
             builder.setNegativeButton(negativeTextId) { _, _ ->
-                setFragmentResult(reqKey, Bundle().apply {
-                    putParcelable(KEY_RESULT, Result.Negative(
-                        args.getBundle(EXTRA_EXTRAS)
-                    ))
-                })
+                setFragmentResult(
+                    reqKey,
+                    Bundle().apply {
+                        putParcelable(
+                            KEY_RESULT,
+                            Result.Negative(
+                                args.getBundle(EXTRA_EXTRAS),
+                            ),
+                        )
+                    },
+                )
                 parent.onNegativeClick(dialog, tag)
             }
         }
 
         if (neutralTextId != 0) {
             builder.setNeutralButton(neutralTextId) { _, _ ->
-                setFragmentResult(reqKey, Bundle().apply {
-                    putParcelable(KEY_RESULT, Result.Neutral(
-                        args.getBundle(EXTRA_EXTRAS)
-                    ))
-                })
+                setFragmentResult(
+                    reqKey,
+                    Bundle().apply {
+                        putParcelable(
+                            KEY_RESULT,
+                            Result.Neutral(
+                                args.getBundle(EXTRA_EXTRAS),
+                            ),
+                        )
+                    },
+                )
             }
         }
 
@@ -267,7 +290,7 @@ fun Fragment.newAlertDialogLauncher(tag: String, handleResult: (Result) -> Unit)
     val launcher = Launcher(
         tag = tag,
         fragmentManagerProvider = { childFragmentManager },
-        handleResult = handleResult
+        handleResult = handleResult,
     )
 
     lifecycle.addObserver(object : DefaultLifecycleObserver {

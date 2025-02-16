@@ -119,7 +119,7 @@ class StorageUsageView : ConstraintLayout {
                 R.string.storage_usage_legend_format,
                 item.label,
                 pf.format(percent),
-                Utils.fileSizeToHumanReadableString(item.sizeInBytes.toDouble(), nf)
+                Utils.fileSizeToHumanReadableString(item.sizeInBytes.toDouble(), nf),
             )
             tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
             tv.compoundDrawablePadding =
@@ -139,7 +139,8 @@ class StorageUsageView : ConstraintLayout {
     fun setErrorText(text: String) {
         storageUsageTextView.text = text
         storageUsageTextView.setTextColor(
-            context.getColorFromAttribute(com.google.android.material.R.attr.errorTextColor))
+            context.getColorFromAttribute(com.google.android.material.R.attr.errorTextColor),
+        )
     }
 
     fun setLoadingText(text: String) {

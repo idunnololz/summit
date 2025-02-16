@@ -33,12 +33,14 @@ interface SummitServerApi {
             return Retrofit.Builder()
                 .baseUrl("https://summitforlemmyserver.idunnololz.com")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getOkHttpClient(
-                    context = context,
-                    userAgent = userAgent,
-                    cachePolicyManager = cachePolicyManager,
-                    cacheDir = directoryHelper.okHttpCacheDir
-                ))
+                .client(
+                    getOkHttpClient(
+                        context = context,
+                        userAgent = userAgent,
+                        cachePolicyManager = cachePolicyManager,
+                        cacheDir = directoryHelper.okHttpCacheDir,
+                    ),
+                )
                 .build()
                 .create(SummitServerApi::class.java)
         }

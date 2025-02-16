@@ -272,12 +272,13 @@ class SettingsViewTypeFragment :
             {
                 viewModel.currentPostUiConfig.showTextPreviewIcon
                     ?: true
-            }, {
+            },
+            {
                 viewModel.currentPostUiConfig =
                     viewModel.currentPostUiConfig.copy(showTextPreviewIcon = it)
 
                 updateRendering()
-            }
+            },
         )
     }
 

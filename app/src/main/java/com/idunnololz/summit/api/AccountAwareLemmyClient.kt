@@ -531,7 +531,7 @@ class AccountAwareLemmyClient @Inject constructor(
         postId: PostId,
         parentId: CommentId?,
         account: Account? = accountForInstance(),
-    ) : Result<CommentView> = if (account == null) {
+    ): Result<CommentView> = if (account == null) {
         createAccountErrorResult()
     } else {
         apiClient
@@ -539,7 +539,7 @@ class AccountAwareLemmyClient @Inject constructor(
                 account = account,
                 content = content,
                 postId = postId,
-                parentId = parentId
+                parentId = parentId,
             )
             .autoSignOut(account)
     }

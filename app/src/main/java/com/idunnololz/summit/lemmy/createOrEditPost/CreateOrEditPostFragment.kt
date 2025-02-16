@@ -255,7 +255,9 @@ class CreateOrEditPostFragment :
                         createPost()
 
                         if (preferences.hapticsOnActions) {
-                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                            toolbar.performHapticFeedbackCompat(
+                                HapticFeedbackConstantsCompat.CONFIRM,
+                            )
                         }
                         true
                     }
@@ -272,7 +274,9 @@ class CreateOrEditPostFragment :
                         updatePost()
 
                         if (preferences.hapticsOnActions) {
-                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                            toolbar.performHapticFeedbackCompat(
+                                HapticFeedbackConstantsCompat.CONFIRM,
+                            )
                         }
                         true
                     }

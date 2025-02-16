@@ -26,6 +26,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import info.debatty.java.stringsimilarity.NGram
 import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.min
 
 private const val TAG = "MentionsController"
 
@@ -353,7 +353,7 @@ class MentionsAutoCompleteRepository(
                                         mentionPrefix = queryPrefix,
                                         sortKey = it.community.fullName,
                                         popularityValue =
-                                            min(it.counts.users_active_month / 10_000.0, 1.0)
+                                        min(it.counts.users_active_month / 10_000.0, 1.0),
                                     )
                                 }
                                 it.users.mapTo(results) {
@@ -362,7 +362,7 @@ class MentionsAutoCompleteRepository(
                                         mentionPrefix = queryPrefix,
                                         sortKey = it.person.fullName,
                                         bio = it.person.bio?.take(100),
-                                        popularityValue = 0.0
+                                        popularityValue = 0.0,
                                     )
                                 }
                             }

@@ -53,7 +53,8 @@ class TranslatorsViewModel @Inject constructor(
 
                         if (email == "garyguo9@gmail.com" ||
                             email == "noreply-mt-google-translate-api-v3@weblate.org" ||
-                            email == "noreply-mt-weblate@weblate.org") {
+                            email == "noreply-mt-weblate@weblate.org"
+                        ) {
                             continue
                         }
 

@@ -335,7 +335,8 @@ class SearchHomeFragment :
 
                     if (preferences.hapticsOnActions) {
                         view.performHapticFeedbackCompat(
-                            HapticFeedbackConstantsCompat.CONFIRM)
+                            HapticFeedbackConstantsCompat.CONFIRM,
+                        )
                     }
                 },
                 onCommunityClick = { view, community ->

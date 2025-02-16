@@ -66,7 +66,7 @@ class InboxRepository @Inject constructor(
         suspend fun getPage(
             pageIndex: Int,
             force: Boolean,
-            retainItemsOnForce: Boolean
+            retainItemsOnForce: Boolean,
         ): Result<PageResult<LiteInboxItem>> {
             Log.d(
                 TAG,

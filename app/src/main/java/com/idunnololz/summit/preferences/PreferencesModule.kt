@@ -36,7 +36,7 @@ class PreferencesModule {
     ): Preferences = Preferences(
         context = context,
         prefs = sharedPreferences,
-        coroutineScopeFactory = coroutineScopeFactory
+        coroutineScopeFactory = coroutineScopeFactory,
     )
 
     @Provides

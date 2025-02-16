@@ -219,7 +219,7 @@ class InboxViewModel @Inject constructor(
                 pageIndex = 0,
                 pageType = pageType,
                 force = true,
-                retainItemsOnForce = true
+                retainItemsOnForce = true,
             )
 
             ensureActive()
@@ -246,7 +246,6 @@ class InboxViewModel @Inject constructor(
                     // silently fail
                 }
         }
-
     }
 
     fun fetchInbox(pageIndex: Int, force: Boolean = false, retainItemsOnForce: Boolean = false) {
@@ -282,7 +281,7 @@ class InboxViewModel @Inject constructor(
                 pageIndex = pageIndex,
                 pageType = pageType,
                 force = force,
-                retainItemsOnForce = retainItemsOnForce
+                retainItemsOnForce = retainItemsOnForce,
             )
 
             ensureActive()
@@ -437,14 +436,16 @@ class InboxViewModel @Inject constructor(
                         continue
                     }
                     allInboxItems[index] = data.copy(
-                        conversation = data.conversation.copy(isRead = isRead))
+                        conversation = data.conversation.copy(isRead = isRead),
+                    )
                 }
                 is InboxListItem.RegularInboxItem -> {
                     if (data.item.id.toLong() != id) {
                         continue
                     }
                     allInboxItems[index] = data.copy(
-                        item = data.item.updateIsRead(isRead = isRead) as InboxItem)
+                        item = data.item.updateIsRead(isRead = isRead) as InboxItem,
+                    )
                 }
             }
         }
@@ -457,14 +458,16 @@ class InboxViewModel @Inject constructor(
     private fun addData(data: LemmyListSource.PageResult<InboxItem>) {
         hasMore = data.hasMore
 
-        allInboxItems.addAll(data.items.mapNotNull {
-            if (seen.contains(it.id)) {
-                null
-            } else {
-                seen.add(it.id)
-                InboxListItem.RegularInboxItem(data.pageIndex, it)
-            }
-        })
+        allInboxItems.addAll(
+            data.items.mapNotNull {
+                if (seen.contains(it.id)) {
+                    null
+                } else {
+                    seen.add(it.id)
+                    InboxListItem.RegularInboxItem(data.pageIndex, it)
+                }
+            },
+        )
         allInboxItems.sortByDescending {
             when (it) {
                 is InboxListItem.ConversationItem -> it.conversation.ts

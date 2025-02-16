@@ -106,7 +106,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
                     url = url,
                     originalUrl = url,
                     moreActionsHelper = moreActionsHelper,
-                    fragmentManager = childFragmentManager
+                    fragmentManager = childFragmentManager,
                 )
             },
             onPageClick = { accountId, pageRef ->

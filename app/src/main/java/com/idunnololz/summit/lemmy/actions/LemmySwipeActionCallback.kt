@@ -8,7 +8,6 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
-import android.view.HapticFeedbackConstants
 import androidx.annotation.ColorInt
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.preferences.CommentGestureAction
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
@@ -94,7 +92,10 @@ class LemmySwipeActionCallback(
         //
         // Therefore we can use this call to know when the user has let go!
 
-        Log.d(TAG, "Selected action: $currentSwipeAction animateDx: $animateDx animateDy: $animateDy")
+        Log.d(
+            TAG,
+            "Selected action: $currentSwipeAction animateDx: $animateDx animateDy: $animateDy",
+        )
 
         val currentSwipeAction = currentSwipeAction
         val lastVhSwiped = lastVhSwiped
@@ -197,7 +198,8 @@ class LemmySwipeActionCallback(
                         if (currentSwipeAction != swipeAction) {
                             if (hapticsEnabled) {
                                 viewHolder.itemView.performHapticFeedbackCompat(
-                                    HapticFeedbackConstantsCompat.CONFIRM)
+                                    HapticFeedbackConstantsCompat.CONFIRM,
+                                )
                             }
                             this.currentSwipeAction = swipeAction
                         }

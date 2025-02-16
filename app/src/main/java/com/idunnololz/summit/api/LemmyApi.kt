@@ -766,11 +766,10 @@ interface LemmyApi {
             cachePolicyManager: CachePolicyManager,
             cacheDir: File,
             userAgent: String = LinkUtils.USER_AGENT,
-        ) =
-            okHttpClient
-                ?: getOkHttpClient(context, userAgent, cachePolicyManager, cacheDir).also {
-                    okHttpClient = it
-                }
+        ) = okHttpClient
+            ?: getOkHttpClient(context, userAgent, cachePolicyManager, cacheDir).also {
+                okHttpClient = it
+            }
 
         private fun buildInstance(
             context: Context,

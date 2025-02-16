@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.InputStream
 
 class UploadHelper @Inject constructor(
     private val context: Application,
@@ -92,10 +91,7 @@ class UploadHelper @Inject constructor(
         }
     }
 
-    suspend fun uploadFile(
-        file: File,
-        rotateAccounts: Boolean,
-    ): Result<UploadImageResult> {
+    suspend fun uploadFile(file: File, rotateAccounts: Boolean): Result<UploadImageResult> {
         try {
             val currentAccount = accountManager.currentAccount.asAccount
 

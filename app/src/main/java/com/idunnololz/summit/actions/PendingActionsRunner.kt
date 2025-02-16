@@ -12,12 +12,12 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.connectivity.ConnectivityChangedWorker
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.AccountNotFoundError
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.util.crashlytics
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -41,7 +41,8 @@ class PendingActionsRunner @AssistedInject constructor(
     @Assisted private val coroutineScope: CoroutineScope,
     @Assisted private val actionsContext: CoroutineContext,
 
-    @Assisted private val delayAction: suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
+    @Assisted private val delayAction:
+    suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
     @Assisted private val completeActionError: suspend (
         action: LemmyPendingAction,
         failureReason: LemmyActionFailureReason,

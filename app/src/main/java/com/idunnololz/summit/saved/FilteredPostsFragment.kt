@@ -109,7 +109,7 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
                     url = url,
                     originalUrl = url,
                     moreActionsHelper = moreActionsHelper,
-                    fragmentManager = childFragmentManager
+                    fragmentManager = childFragmentManager,
                 )
             },
             onPageClick = { accountId, pageRef ->

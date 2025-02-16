@@ -6,9 +6,9 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsCacheViewModel @Inject constructor(
@@ -48,16 +48,15 @@ class SettingsCacheViewModel @Inject constructor(
             dataModel.postValue(
                 DataModel(
                     cacheTotalSizeBytes =
-                        fileOrFolderToSize.values.sum(),
+                    fileOrFolderToSize.values.sum(),
                     imagesSizeBytes = imageDirSize,
                     videosSizeBytes = videoDirSize,
                     cacheMediaSizeBytes =
-                        fileOrFolderToSize[mediaCacheDir] ?: 0,
+                    fileOrFolderToSize[mediaCacheDir] ?: 0,
                     cacheNetworkCacheSizeBytes =
-                        fileOrFolderToSize[directoryHelper.okHttpCacheDir] ?: 0,
-                )
+                    fileOrFolderToSize[directoryHelper.okHttpCacheDir] ?: 0,
+                ),
             )
         }
     }
-
 }

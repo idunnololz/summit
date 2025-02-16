@@ -1,12 +1,11 @@
 package com.idunnololz.summit.util
 
-import android.content.SharedPreferences
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.Preferences
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Singleton
 class AnimationsHelper @Inject constructor(

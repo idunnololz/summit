@@ -70,7 +70,6 @@ import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -477,7 +476,7 @@ class PostFragment :
                             url = url,
                             originalUrl = url,
                             moreActionsHelper = moreActionsHelper,
-                            fragmentManager = childFragmentManager
+                            fragmentManager = childFragmentManager,
                         )
                     },
                     onPageClick = {

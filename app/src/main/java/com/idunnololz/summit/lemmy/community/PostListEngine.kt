@@ -89,10 +89,8 @@ class PostListEngine @AssistedInject constructor(
         fun create(
             @Assisted("infinity")
             infinity: Boolean,
-
             @Assisted("autoLoadMoreItems")
             autoLoadMoreItems: Boolean,
-
             @Assisted("usePageIndicators")
             usePageIndicators: Boolean = false,
         ): PostListEngine
@@ -500,10 +498,10 @@ class PostListEngine @AssistedInject constructor(
                         it.copy(
                             fetchedPost = it.fetchedPost.copy(
                                 postView = postView.copy(
-                                    read = true
-                                )
+                                    read = true,
+                                ),
                             ),
-                            isDuplicatePost = true
+                            isDuplicatePost = true,
                         )
                     } else {
                         it

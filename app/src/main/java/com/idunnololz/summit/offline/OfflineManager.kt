@@ -8,7 +8,6 @@ import android.view.View
 import androidx.core.net.toUri
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
-import coil.util.CoilUtils
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient

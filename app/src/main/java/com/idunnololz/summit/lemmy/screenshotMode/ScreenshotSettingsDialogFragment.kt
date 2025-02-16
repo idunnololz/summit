@@ -43,7 +43,7 @@ class ScreenshotSettingsDialogFragment :
             screenshotWidth.setText(preferences.screenshotWidthDp.toString())
             dateScreenshots.isChecked = preferences.dateScreenshots
             watermarkScreenshots.isChecked =
-                preferences.screenshotWatermark == ScreenshotWatermarkId.Lemmy
+                preferences.screenshotWatermark == ScreenshotWatermarkId.LEMMY
 
             positiveButton.setOnClickListener {
                 var width = binding.screenshotWidth.text?.toString()?.toIntOrNull() ?: 0
@@ -52,9 +52,9 @@ class ScreenshotSettingsDialogFragment :
                 preferences.screenshotWidthDp = width
                 preferences.dateScreenshots = dateScreenshots.isChecked
                 if (watermarkScreenshots.isChecked) {
-                    preferences.screenshotWatermark = ScreenshotWatermarkId.Lemmy
+                    preferences.screenshotWatermark = ScreenshotWatermarkId.LEMMY
                 } else {
-                    preferences.screenshotWatermark = ScreenshotWatermarkId.Off
+                    preferences.screenshotWatermark = ScreenshotWatermarkId.OFF
                 }
 
                 (parentFragment as? ScreenshotModeDialogFragment)?.generateScreenshot()

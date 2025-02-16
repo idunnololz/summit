@@ -54,7 +54,7 @@ data class LemmyFailedAction(
     override val info: ActionInfo?,
     @ColumnInfo(name = "seen")
     val seen: Boolean? = null,
-): LemmyAction
+) : LemmyAction
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
 sealed interface LemmyActionFailureReason : Parcelable {

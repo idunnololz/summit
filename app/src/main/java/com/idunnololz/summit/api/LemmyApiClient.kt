@@ -223,7 +223,7 @@ class LemmyApiClient(
         userAgent = LinkUtils.USER_AGENT,
         preferences = preferences,
         cachePolicyManager = cachePolicyManager,
-        directoryHelper = directoryHelper
+        directoryHelper = directoryHelper,
     )
 
     fun changeInstance(newInstance: String) {

@@ -573,7 +573,9 @@ class CommunityFragment :
                     onAccountClick = {
                         AccountsAndSettingsDialogFragment.newInstance()
                             .showAllowingStateLoss(
-                                childFragmentManager, "AccountsDialogFragment")
+                                childFragmentManager,
+                                "AccountsDialogFragment",
+                            )
                     },
                     onSortOrderClick = {
                         getMainActivity()?.showBottomMenu(getSortByMenu())
@@ -693,7 +695,8 @@ class CommunityFragment :
                             val mainFragment = parentFragment?.parentFragment as? MainFragment
                             if (!lockPanes) {
                                 mainFragment?.setStartPanelLockState(
-                                    OverlappingPanelsLayout.LockState.UNLOCKED)
+                                    OverlappingPanelsLayout.LockState.UNLOCKED,
+                                )
                             }
                         }
                     }
@@ -814,8 +817,7 @@ class CommunityFragment :
                             super.onScrolled(recyclerView, dx, dy)
 
                             val range =
-                                layoutManager.findFirstCompletelyVisibleItemPosition()..
-                                    layoutManager.findLastCompletelyVisibleItemPosition()
+                                layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
 
                             range.forEach {
                                 adapter?.seenItemPositions?.add(it)

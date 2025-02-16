@@ -38,11 +38,11 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
     clearItemDecorations()
     addItemDecoration(
         when (preferences.commentThreadStyle) {
-            CommentsThreadStyle.Legacy ->
+            CommentsThreadStyle.LEGACY ->
                 OldThreadLinesDecoration(context, preferences.hideCommentActions)
-            CommentsThreadStyle.LegacyWithColors ->
+            CommentsThreadStyle.LEGACY_WITH_COLORS ->
                 OldThreadLinesDecoration(context, preferences.hideCommentActions, colorful = true)
-            CommentsThreadStyle.LegacyWithColorsAndDividers ->
+            CommentsThreadStyle.LEGACY_WITH_COLORS_AND_DIVIDERS ->
                 OldThreadLinesDecoration(
                     context,
                     preferences.hideCommentActions,

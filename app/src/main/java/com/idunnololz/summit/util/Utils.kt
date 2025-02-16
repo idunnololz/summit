@@ -701,8 +701,7 @@ fun convertSpToPixel(sp: Float): Float = TypedValue.applyDimension(
     Utils.displayMetrics,
 )
 
-fun convertPixelToSp(px: Float): Float =
-    px / Utils.displayMetrics.scaledDensity
+fun convertPixelToSp(px: Float): Float = px / Utils.displayMetrics.scaledDensity
 
 fun Context.isLightTheme(): Boolean = resources.getBoolean(R.bool.isLightTheme)
 
@@ -756,21 +755,20 @@ fun getColorWithAlpha(yourColor: Int, alpha: Int): Int {
 fun Activity.computeWindowMetrics() =
     WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
 
-fun Fragment.openAppOnPlayStore() =
-    try {
-        startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("market://details?id=com.idunnololz.summit"),
+fun Fragment.openAppOnPlayStore() = try {
+    startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("market://details?id=com.idunnololz.summit"),
+        ),
+    )
+} catch (e: ActivityNotFoundException) {
+    startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(
+                "https://play.google.com/store/apps/details?id=com.idunnololz.summit",
             ),
-        )
-    } catch (e: ActivityNotFoundException) {
-        startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(
-                    "https://play.google.com/store/apps/details?id=com.idunnololz.summit",
-                ),
-            ),
-        )
-    }
+        ),
+    )
+}

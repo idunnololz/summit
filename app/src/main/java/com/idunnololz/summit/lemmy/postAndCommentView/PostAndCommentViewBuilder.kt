@@ -10,7 +10,6 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.Gravity
-import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
 import android.view.ViewGroup

@@ -172,7 +172,8 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun onSiteLoadedAndConfirmed(instance: String, site: SiteModel) {
-        val currentScene = signUpModelState.value.currentScene as? SignUpScene.InstanceForm ?: return
+        val currentScene = signUpModelState.value.currentScene as? SignUpScene.InstanceForm
+            ?: return
         signUpModelState.value = signUpModelState.value.copy(
             currentScene = requireNotNull(currentScene.nextScene(instance, site)),
             signUpFormData = signUpModelState.value.signUpFormData.copy(
@@ -183,7 +184,8 @@ class SignUpViewModel @Inject constructor(
 
     @OptIn(ExperimentalEncodingApi::class)
     private fun updateCaptcha(captcha: Result<GetCaptchaResponse>) {
-        val currentScene = signUpModelState.value.currentScene as? SignUpScene.CaptchaForm ?: return
+        val currentScene = signUpModelState.value.currentScene as? SignUpScene.CaptchaForm
+            ?: return
 
         captcha
             .onSuccess {

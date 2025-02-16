@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -50,7 +49,6 @@ import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
-import com.idunnololz.summit.feedback.HelpAndFeedbackDialogFragment
 import com.idunnololz.summit.feedback.PostFeedbackDialogFragment
 import com.idunnololz.summit.feedback.ShakeFeedbackHelper
 import com.idunnololz.summit.lemmy.CommentRef
@@ -86,7 +84,6 @@ import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.KeyPressRegistrationManager
-import com.idunnololz.summit.util.ShakeDetector
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -94,13 +91,13 @@ import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 @AndroidEntryPoint
 class MainActivity :

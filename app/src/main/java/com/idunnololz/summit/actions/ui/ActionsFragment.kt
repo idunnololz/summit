@@ -83,7 +83,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
 //                    fragmentManager = parentFragmentManager,
 //                    action = it,
 //                )
-            }
+            },
         ).apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }

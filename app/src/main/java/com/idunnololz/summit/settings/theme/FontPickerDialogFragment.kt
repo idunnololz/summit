@@ -170,19 +170,19 @@ class FontPickerDialogFragment :
         private fun refreshItems() {
             val newItems = listOf(
                 Item.FontItem(
-                    FontIds.Default,
+                    FontIds.DEFAULT,
                     context.getString(R.string._default),
                 ),
                 Item.FontItem(
-                    FontIds.Roboto,
+                    FontIds.ROBOTO,
                     context.getString(R.string.roboto),
                 ),
                 Item.FontItem(
-                    FontIds.RobotoSerif,
+                    FontIds.ROBOTO_SERIF,
                     context.getString(R.string.roboto_serif),
                 ),
                 Item.FontItem(
-                    FontIds.OpenSans,
+                    FontIds.OPEN_SANS,
                     context.getString(R.string.open_sans),
                 ),
             )

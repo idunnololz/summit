@@ -17,20 +17,16 @@ import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.SinglePostDataSourceWithCursor
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
-import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
-import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -165,7 +161,7 @@ class PersonTabbedViewModel @Inject constructor(
                             {
                                 val fullName = PersonRef.PersonRefByName(
                                     it.person_view.person.name,
-                                    it.person_view.person.instance
+                                    it.person_view.person.instance,
                                 ).fullName
 
                                 personIdToPersonName[personRef.fullName] = fullName
@@ -180,7 +176,7 @@ class PersonTabbedViewModel @Inject constructor(
                             },
                             {
                                 r
-                            }
+                            },
                         )
                     }
                 }
@@ -204,7 +200,7 @@ class PersonTabbedViewModel @Inject constructor(
                             LocalPostView(
                                 fetchedPost = it.toFetchedPost(),
                                 filterReason = null,
-                                isDuplicatePost = false
+                                isDuplicatePost = false,
                             )
                         }
                         postListEngine.addPage(

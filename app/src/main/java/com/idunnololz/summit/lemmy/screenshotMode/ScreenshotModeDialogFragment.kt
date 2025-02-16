@@ -471,7 +471,7 @@ class ScreenshotModeDialogFragment :
 
         val dateScreenshots = preferences.dateScreenshots
         val screenshotWatermark = preferences.screenshotWatermark
-        if (dateScreenshots || screenshotWatermark != ScreenshotWatermarkId.Off) {
+        if (dateScreenshots || screenshotWatermark != ScreenshotWatermarkId.OFF) {
             screenshotStage.contentContainer.addView(
                 MaterialDivider(context),
             )
@@ -490,10 +490,10 @@ class ScreenshotModeDialogFragment :
                 }
 
                 when (screenshotWatermark) {
-                    ScreenshotWatermarkId.Lemmy -> {
+                    ScreenshotWatermarkId.LEMMY -> {
                         watermark.setImageResource(R.drawable.ic_lemmy_24)
                     }
-                    ScreenshotWatermarkId.Summit -> {
+                    ScreenshotWatermarkId.SUMMIT -> {
                         watermark.setImageResource(R.drawable.ic_logo_mono_24)
                     }
                     else -> {

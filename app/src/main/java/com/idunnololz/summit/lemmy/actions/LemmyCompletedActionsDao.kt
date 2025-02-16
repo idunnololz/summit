@@ -56,4 +56,4 @@ data class LemmyCompletedAction(
     override val creationTs: Long,
     @ColumnInfo(name = "info")
     override val info: ActionInfo?,
-): LemmyAction
+) : LemmyAction

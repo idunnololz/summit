@@ -103,7 +103,8 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
                 b.text.text = getString(R.string.slot_format, (index + 1).toString())
 
                 if (file.exists()) {
-                    b.subtitle.text = "${humanReadableByteCountSi(file.length())} - ${tsToShortDate(file.lastModified())}"
+                    b.subtitle.text = "${humanReadableByteCountSi(file.length())} - " +
+                        "${tsToShortDate(file.lastModified())}"
                 } else {
                     b.subtitle.text = getString(R.string.empty)
                 }

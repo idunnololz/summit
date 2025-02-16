@@ -453,9 +453,11 @@ class PostsRepository @AssistedInject constructor(
             }
 
             if (hideRead &&
-                (post.read ||
-                    postReadManager.isPostRead(instance, post.post.id) == true ||
-                    isDuplicatePost)
+                (
+                    post.read ||
+                        postReadManager.isPostRead(instance, post.post.id) == true ||
+                        isDuplicatePost
+                    )
             ) {
                 hideReadCount++
                 continue
