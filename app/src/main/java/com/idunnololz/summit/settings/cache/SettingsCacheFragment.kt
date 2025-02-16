@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.cache.CachePolicyManager
@@ -20,7 +21,7 @@ import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.DirectoryHelper
-import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -33,6 +34,8 @@ import javax.inject.Inject
 class SettingsCacheFragment :
     BaseFragment<FragmentCacheBinding>(),
     SettingValueUpdateCallback {
+
+    private val viewModel: SettingsCacheViewModel by viewModels()
 
     private var progressListener: OfflineDownloadProgressListener? = null
 
@@ -98,6 +101,64 @@ class SettingsCacheFragment :
 //        }
 
         updateRendering()
+
+        with(binding) {
+
+            val colors = listOf(
+                ContextCompat.getColor(context, R.color.style_pink),
+                ContextCompat.getColor(context, R.color.style_amber),
+                ContextCompat.getColor(context, R.color.style_blue),
+                ContextCompat.getColor(context, R.color.style_green),
+                ContextCompat.getColor(context, R.color.style_orange),
+            )
+
+            viewModel.dataModel.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> {
+                        storageUsageView.setErrorText(
+                            context.getString(R.string.error_cache_size_calculation))
+                    }
+                    is StatefulData.Loading -> {
+                        storageUsageView.setLoadingText(
+                            context.getString(R.string.loading))
+                    }
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        storageUsageView.setStorageUsage(
+                            listOf(
+                                StorageUsageItem(
+                                    context.getString(R.string.images),
+                                    it.data.imagesSizeBytes,
+                                    colors[0],
+                                ),
+                                StorageUsageItem(
+                                    context.getString(R.string.videos),
+                                    it.data.videosSizeBytes,
+                                    colors[1],
+                                ),
+                                StorageUsageItem(
+                                    context.getString(R.string.other_cached_media),
+                                    it.data.cacheMediaSizeBytes,
+                                    colors[3],
+                                ),
+                                StorageUsageItem(
+                                    context.getString(R.string.network),
+                                    it.data.cacheNetworkCacheSizeBytes,
+                                    colors[4],
+                                ),
+                                StorageUsageItem(
+                                    context.getString(R.string.other),
+                                    it.data.cacheOtherSizeBytes,
+                                    colors[2],
+                                ),
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        viewModel.generateDataModel()
     }
 
     override fun onDestroyView() {
@@ -110,42 +171,11 @@ class SettingsCacheFragment :
 
         val context = requireContext()
 
-        val colors = listOf(
-            ContextCompat.getColor(context, R.color.style_pink),
-            ContextCompat.getColor(context, R.color.style_amber),
-            ContextCompat.getColor(context, R.color.style_blue),
-            ContextCompat.getColor(context, R.color.style_green),
-            ContextCompat.getColor(context, R.color.style_orange),
-        )
-
-        val totalSize = Utils.getSizeOfFile(context.cacheDir)
-        val imageDirSize = Utils.getSizeOfFile(directoryHelper.imagesDir)
-        val videoDirSize = Utils.getSizeOfFile(directoryHelper.videosDir) +
-            Utils.getSizeOfFile(directoryHelper.videoCacheDir)
-
-        binding.storageUsageView.setStorageUsage(
-            listOf(
-                StorageUsageItem(
-                    "Images",
-                    imageDirSize,
-                    colors[0],
-                ),
-                StorageUsageItem(
-                    "Videos",
-                    videoDirSize,
-                    colors[1],
-                ),
-                StorageUsageItem(
-                    "Other",
-                    totalSize - (imageDirSize + videoDirSize),
-                    colors[2],
-                ),
-            ),
-        )
         cacheSettings.clearCache.bindTo(binding.clearMediaCache) {
             offlineManager.clearOfflineData()
 
             updateRendering()
+            viewModel.generateDataModel()
         }
         cacheSettings.cachePolicy.bindTo(
             binding.cachePolicy,

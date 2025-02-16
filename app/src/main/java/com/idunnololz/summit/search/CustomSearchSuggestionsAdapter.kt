@@ -219,11 +219,6 @@ class CustomSearchSuggestionsAdapter(
         this.listener = listener
     }
 
-    private class SuggestionViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        var text: TextView = v.findViewById(R.id.text)
-        var copyTextToSearchView: View = v.findViewById(R.id.copy_text_to_search_view)
-    }
-
     interface OnSuggestionListener {
         fun onSuggestionsChanged(newSuggestions: List<String>)
         fun onSuggestionSelected(query: String)

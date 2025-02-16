@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunityIconItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
@@ -29,6 +31,8 @@ import com.idunnololz.summit.databinding.MultiCommunityHeaderItemBinding
 import com.idunnololz.summit.databinding.MultiCommunityIconSelectorBinding
 import com.idunnololz.summit.databinding.MultiCommunitySelectedCommunitiesItemBinding
 import com.idunnololz.summit.databinding.MultiCommunitySelectedCommunityBinding
+import com.idunnololz.summit.databinding.MultiCommunitySelectorGroupHeaderItemBinding
+import com.idunnololz.summit.databinding.MultiCommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource.Companion.MULTI_COMMUNITY_DATA_SOURCE_LIMIT
 import com.idunnololz.summit.offline.OfflineManager
@@ -55,8 +59,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MultiCommunityEditorDialogFragment :
     BaseDialogFragment<DialogFragmentMultiCommunityEditorBinding>(),
-    FullscreenDialogFragment,
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+    FullscreenDialogFragment {
 
     companion object {
         const val REQUEST_KEY = "MultiCommunityEditorDialogFragment_req_key"
@@ -103,14 +106,27 @@ class MultiCommunityEditorDialogFragment :
         }
     }
 
+    private val unsavedChangesDialogLauncher = newAlertDialogLauncher("unsaved_changes") {
+        when (it) {
+            is AlertDialogFragment.Result.Negative -> {}
+            is AlertDialogFragment.Result.Neutral -> {
+                saveAndDismiss()
+            }
+            is AlertDialogFragment.Result.Positive -> {
+                dismiss()
+            }
+        }
+    }
+
     private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            OldAlertDialogFragment.Builder()
-                .setTitle(R.string.error_unsaved_changes)
-                .setMessage(R.string.error_multi_community_unsaved_changes)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(childFragmentManager, "UnsavedChanges")
+            unsavedChangesDialogLauncher.launchDialog {
+                titleResId = R.string.error_unsaved_changes
+                messageResId = R.string.error_multi_community_unsaved_changes
+                positionButtonResId = R.string.proceed_anyways
+                negativeButtonResId = R.string.cancel
+                neutralButtonResId = R.string.save_and_close
+            }
         }
     }
 
@@ -181,50 +197,17 @@ class MultiCommunityEditorDialogFragment :
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
-                dismiss()
+                if (unsavedChangesBackPressedHandler.isEnabled) {
+                    unsavedChangesBackPressedHandler.handleOnBackPressed()
+                } else {
+                    dismiss()
+                }
             }
             toolbar.inflateMenu(R.menu.menu_multi_community_editor)
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.ok -> {
-                        val adapter = adapter
-                        val selectedCommunities = adapter?.selectedCommunities?.keys?.toList()
-                            ?: listOf()
-
-                        if (selectedCommunities.isEmpty()) {
-                            OldAlertDialogFragment.Builder()
-                                .setTitle(R.string.error_no_communities_selected)
-                                .setMessage(R.string.error_no_communities_selected_desc)
-                                .setPositiveButton(android.R.string.ok)
-                                .createAndShow(childFragmentManager, "defsdaf")
-                            return@setOnMenuItemClickListener true
-                        }
-
-                        if (selectedCommunities.size > MULTI_COMMUNITY_DATA_SOURCE_LIMIT) {
-                            showTooManyCommunitiesMessage()
-                            return@setOnMenuItemClickListener true
-                        }
-
-                        val ref = CommunityRef.MultiCommunity(
-                            viewModel.communityName.value ?: "",
-                            viewModel.selectedIcon.value,
-                            selectedCommunities,
-                        )
-
-                        userCommunitiesManager.addUserCommunity(
-                            dbId = args.dbId,
-                            communityRef = ref,
-                            icon = ref.icon,
-                        )
-
-                        setFragmentResult(
-                            REQUEST_KEY,
-                            bundleOf(
-                                REQUEST_KEY_RESULT to ref,
-                            ),
-                        )
-                        dismiss()
-
+                        saveAndDismiss()
                         true
                     }
                     else -> false
@@ -344,6 +327,46 @@ class MultiCommunityEditorDialogFragment :
         )
     }
 
+    private fun saveAndDismiss() {
+        val adapter = adapter
+        val selectedCommunities = adapter?.selectedCommunities?.keys?.toList()
+            ?: listOf()
+
+        if (selectedCommunities.isEmpty()) {
+            OldAlertDialogFragment.Builder()
+                .setTitle(R.string.error_no_communities_selected)
+                .setMessage(R.string.error_no_communities_selected_desc)
+                .setPositiveButton(android.R.string.ok)
+                .createAndShow(childFragmentManager, "defsdaf")
+            return
+        }
+
+        if (selectedCommunities.size > MULTI_COMMUNITY_DATA_SOURCE_LIMIT) {
+            showTooManyCommunitiesMessage()
+            return
+        }
+
+        val ref = CommunityRef.MultiCommunity(
+            viewModel.communityName.value ?: "",
+            viewModel.selectedIcon.value,
+            selectedCommunities,
+        )
+
+        userCommunitiesManager.addUserCommunity(
+            dbId = args.dbId,
+            communityRef = ref,
+            icon = ref.icon,
+        )
+
+        setFragmentResult(
+            REQUEST_KEY,
+            bundleOf(
+                REQUEST_KEY_RESULT to ref,
+            ),
+        )
+        dismiss()
+    }
+
     private fun showTooManyCommunitiesMessage() {
         OldAlertDialogFragment.Builder()
             .setMessage(
@@ -353,15 +376,6 @@ class MultiCommunityEditorDialogFragment :
                 ),
             )
             .createAndShow(childFragmentManager, "asdfss")
-    }
-
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        if (tag == "UnsavedChanges") {
-            dismiss()
-        }
-    }
-
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 
     private fun showSearch() {
@@ -501,7 +515,7 @@ class MultiCommunityEditorDialogFragment :
             }
             addItemType(
                 clazz = Item.GroupHeaderItem::class,
-                inflateFn = CommunitySelectorGroupItemBinding::inflate,
+                inflateFn = MultiCommunitySelectorGroupHeaderItemBinding::inflate,
             ) { item, b, _ ->
                 b.titleTextView.text = item.text
 
@@ -552,7 +566,7 @@ class MultiCommunityEditorDialogFragment :
             }
             addItemType(
                 clazz = Item.NoResultsItem::class,
-                inflateFn = CommunitySelectorNoResultsItemBinding::inflate,
+                inflateFn = MultiCommunitySelectorNoResultsItemBinding::inflate,
             ) { item, b, _ ->
                 b.text.text = item.text
             }

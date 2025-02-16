@@ -52,6 +52,12 @@ class DuplicatePostsDetector @Inject constructor(
         currentDuplicatePostsDetector?.addReadOrHiddenPost(postView)
     }
 
+    fun removeReadOrHiddenPost(postView: PostView) {
+        if (!isEnabled) return
+
+        currentDuplicatePostsDetector?.removeReadOrHiddenPost(postView)
+    }
+
     fun getPostDuplicates(postView: PostView): PostRef? {
         if (!isEnabled) return null
 
@@ -93,6 +99,14 @@ class PerAccountDuplicatePostsDetector @AssistedInject constructor() {
 
         if (key != null) {
             readPosts[key] = PostRef(postView.instance, postView.post.id)
+        }
+    }
+
+    fun removeReadOrHiddenPost(postView: PostView) {
+        val key = generateKeyForPostView(postView)
+
+        if (key != null) {
+            readPosts.remove(key)
         }
     }
 

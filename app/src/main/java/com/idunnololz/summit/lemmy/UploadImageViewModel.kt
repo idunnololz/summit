@@ -42,7 +42,7 @@ class UploadImageViewModel @Inject constructor(
     private fun uploadImageInternal(uri: Uri, imageLiveData: StatefulLiveData<UploadImageResult>) {
         imageLiveData.setIsLoading()
 
-        uploadHelper.upload(
+        uploadHelper.uploadAsync(
             coroutineScope = viewModelScope,
             uri = uri,
             rotateAccounts = preferences.rotateInstanceOnUploadFail,

@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.InputStream
 
 class UploadHelper @Inject constructor(
     private val context: Application,
@@ -44,6 +45,7 @@ class UploadHelper @Inject constructor(
         apiListenerManager = apiListenerManager,
         preferences = preferences,
         cachePolicyManager = cachePolicyManager,
+        directoryHelper = directoryHelper,
     )
 
     private var uploadJob: Job? = null
@@ -55,7 +57,7 @@ class UploadHelper @Inject constructor(
             return uploadJob != null && uploadJob.isActive
         }
 
-    fun upload(
+    fun uploadAsync(
         coroutineScope: CoroutineScope,
         uri: Uri,
         rotateAccounts: Boolean,
@@ -90,7 +92,7 @@ class UploadHelper @Inject constructor(
         }
     }
 
-    private suspend fun uploadFile(
+    suspend fun uploadFile(
         file: File,
         rotateAccounts: Boolean,
     ): Result<UploadImageResult> {

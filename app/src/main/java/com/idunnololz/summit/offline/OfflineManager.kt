@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
 import androidx.core.net.toUri
+import coil.annotation.ExperimentalCoilApi
+import coil.imageLoader
+import coil.util.CoilUtils
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
@@ -414,12 +417,14 @@ class OfflineManager @Inject constructor(
         offlineDownloadProgressListeners.remove(listener)
     }
 
+    @OptIn(ExperimentalCoilApi::class)
     fun clearOfflineData() {
         Utils.deleteDir(imagesDir)
         Utils.deleteDir(videosDir)
         Utils.deleteDir(videoCacheDir)
 
         lemmyApiClient.clearCache()
+        context.imageLoader.diskCache?.clear()
 
         imagesDir.mkdirs()
         videosDir.mkdirs()

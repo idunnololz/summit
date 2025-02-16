@@ -458,7 +458,7 @@ class AddOrEditCommentFragment :
                                 .createAndShow(this@AddOrEditCommentFragment, "send_comment")
                             return@a true
                         }
-                        when (args.sendAction) {
+                        when (args.sendAction as SendAction) {
                             SendAction.Send -> {
                                 sendComment()
                             }

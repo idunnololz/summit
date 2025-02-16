@@ -13,7 +13,7 @@
         android:layout_marginTop="@dimen/padding"
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
-        android:text="@string/media_cache"
+        android:text="@string/cache"
         android:textAppearance="?textAppearanceBodyMedium"
         android:textColor="@color/colorTextTitle"
         app:layout_constraintTop_toTopOf="parent"
@@ -46,7 +46,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <HorizontalScrollView
+    <ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -59,10 +59,10 @@
 
         <LinearLayout
             android:id="@+id/details_container"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-    </HorizontalScrollView>
+    </ScrollView>
 
 </merge>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,18 +14,20 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginEnd="@dimen/dialog_padding"
+        android:layout_gravity="center_vertical"
         app:tint="?colorControlNormal" />
 
     <TextView
         android:id="@+id/title"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:maxLines="1"
+        android:maxLines="2"
         android:ellipsize="end"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextTitle"
-        android:textAppearance="?textAppearanceBodyMedium"/>
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:includeFontPadding="false"/>
 
     <Space
         android:layout_width="16dp"

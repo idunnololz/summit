@@ -3,8 +3,11 @@ package com.idunnololz.summit.main
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -47,6 +50,9 @@ import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
+import com.idunnololz.summit.feedback.HelpAndFeedbackDialogFragment
+import com.idunnololz.summit.feedback.PostFeedbackDialogFragment
+import com.idunnololz.summit.feedback.ShakeFeedbackHelper
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -59,6 +65,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.getFeedbackScreenshotFile
 import com.idunnololz.summit.links.LinkFixer
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.ResolvingLinkDialog
@@ -75,9 +82,11 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
 import com.idunnololz.summit.util.KeyPressRegistrationManager
+import com.idunnololz.summit.util.ShakeDetector
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -88,8 +97,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity :
@@ -171,6 +182,12 @@ class MainActivity :
     @Inject
     lateinit var avatarHelper: AvatarHelper
 
+    @Inject
+    lateinit var directoryHelper: DirectoryHelper
+
+    @Inject
+    lateinit var shakeFeedbackHelper: ShakeFeedbackHelper
+
     private val imageViewerLauncher = registerForActivityResult(
         ImageViewerContract(),
     ) { resultCode ->
@@ -247,6 +264,18 @@ class MainActivity :
                 if (allUnreads > 0) {
                     isVisible = true
                     number = allUnreads
+                } else {
+                    isVisible = false
+                }
+            }
+        }
+        viewModel.newActionErrorsCount.observe(this) { count ->
+            if (!navBarController.useBottomNavBar) return@observe
+
+            navBarController.navBar.getOrCreateBadge(R.id.youFragment).apply {
+                if (count > 0) {
+                    isVisible = true
+                    number = count
                 } else {
                     isVisible = false
                 }
@@ -338,6 +367,8 @@ class MainActivity :
         }
     }
 
+    fun getRootView() = binding.rootView
+
     fun onPreferencesChanged() {
         if (preferences.transparentNotificationBar) {
             binding.notificationBarBgContainer.visibility = View.GONE
@@ -379,6 +410,13 @@ class MainActivity :
         super.onResume()
 
         viewModel.updateUnreadCount()
+        shakeFeedbackHelper.start()
+    }
+
+    override fun onPause() {
+        shakeFeedbackHelper.stop()
+
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -633,9 +671,9 @@ class MainActivity :
 
         if (pageRefResult.isSuccess) {
             launchPageInternal(
-                pageRefResult.getOrNull() ?: page,
-                switchToNativeInstance,
-                preferMainFragment,
+                page = pageRefResult.getOrNull() ?: page,
+                switchToNativeInstance = switchToNativeInstance,
+                preferMainFragment = preferMainFragment,
             )
             return
         }
@@ -1063,5 +1101,38 @@ class MainActivity :
     fun showDownloadsSettings() {
         val direction = MainDirections.actionGlobalSettingsFragment("downloads")
         currentNavController?.navigateSafe(direction)
+    }
+
+    suspend fun requestScreenshot(): File {
+        val screenshot = directoryHelper.getFeedbackScreenshotFile()
+
+        if (screenshot.exists()) {
+            screenshot.delete()
+        }
+
+        screenshot.parentFile?.mkdirs()
+
+        val bitmap: Bitmap
+        withContext(Dispatchers.Main) {
+            val rootView = binding.root
+            bitmap = Bitmap.createBitmap(rootView.width, rootView.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            rootView.draw(canvas)
+        }
+
+        screenshot.outputStream().use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
+        }
+
+        return screenshot
+    }
+
+    fun requestScreenshotAndShowFeedbackScreen() {
+        lifecycleScope.launch {
+            delay(500)
+            requestScreenshot()
+
+            PostFeedbackDialogFragment.show(supportFragmentManager)
+        }
     }
 }

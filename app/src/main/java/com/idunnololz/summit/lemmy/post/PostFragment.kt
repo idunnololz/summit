@@ -1157,7 +1157,7 @@ class PostFragment :
             }
 
             PostGestureAction.Hide -> {
-                moreActionsHelper.hidePost(postView.post.id)
+                moreActionsHelper.hidePost(postView.post.id, postView)
             }
 
             PostGestureAction.MarkAsRead -> {

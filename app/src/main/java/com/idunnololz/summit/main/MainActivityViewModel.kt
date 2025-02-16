@@ -10,6 +10,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommunityView
@@ -40,6 +41,7 @@ class MainActivityViewModel @Inject constructor(
     private val directoryHelper: DirectoryHelper,
     private val accountInfoManager: AccountInfoManager,
     private val userTagsManager: UserTagsManager,
+    private val pendingActionsManager: PendingActionsManager,
     val communitySelectorControllerFactory: CommunitySelectorController.Factory,
     val userCommunitiesManager: UserCommunitiesManager,
     val postReadManager: PostReadManager,
@@ -53,6 +55,7 @@ class MainActivityViewModel @Inject constructor(
     val communities = StatefulLiveData<List<CommunityView>>()
     val currentAccount = MutableLiveData<AccountView?>(null)
     val unreadCount = accountInfoManager.unreadCount.asLiveData()
+    val newActionErrorsCount = pendingActionsManager.numNewFailedActionsFlow.asLiveData()
 
     private var communityRef: CommunityRef? = null
 

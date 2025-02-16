@@ -30,29 +30,6 @@ open class BaseBottomSheetDialogFragment<T : ViewBinding>() : BottomSheetDialogF
         _binding = binding
     }
 
-    fun runOnUiThread(r: () -> Unit) {
-        runOnUiThread(
-            Runnable {
-                r()
-            },
-        )
-    }
-
-    fun runOnUiThread(r: Runnable) {
-        if (isAdded) {
-            activity?.runOnUiThread(fun() {
-                val act = activity
-                if (act == null || act.isFinishing) return
-
-                try {
-                    r.run()
-                } catch (e: IllegalStateException) {
-                    /* do nothing */
-                }
-            })
-        }
-    }
-
     override fun onStart() {
         MyLog.d(logTag, "Lifecycle: onStart()")
         super.onStart()

@@ -21,6 +21,8 @@ class DirectoryHelper @Inject constructor(
         private const val TAG = "DirectoryHelper"
     }
 
+    val cacheDir = context.cacheDir
+    val okHttpCacheDir = File(context.cacheDir, "okhttp_cache")
     val downloadInProgressDir = File(context.filesDir, "dl")
     val imagesDir = File(context.filesDir, "imgs")
     val videosDir = File(context.filesDir, "videos")

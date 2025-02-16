@@ -832,12 +832,12 @@ class CommunityViewModel @Inject constructor(
         postListEngine.setKey(tag)
     }
 
-    fun hidePost(id: PostId) {
-        hiddenPostsManager.hidePost(id, apiInstance)
+    fun hidePost(id: PostId, postView: PostView?) {
+        hiddenPostsManager.hidePost(id, postView, apiInstance)
     }
 
-    fun unhidePost(id: PostId, instance: String) {
-        hiddenPostsManager.hidePost(id, instance, hide = false)
+    fun unhidePost(id: PostId, instance: String, postView: PostView?) {
+        hiddenPostsManager.hidePost(id, postView, instance, hide = false)
     }
 
     fun recheckPreferences() {

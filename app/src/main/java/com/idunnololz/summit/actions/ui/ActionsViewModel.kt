@@ -91,6 +91,26 @@ class ActionsViewModel @Inject constructor(
         }
     }
 
+    fun markActionAsSeen(action: Action) {
+        val value = actionsDataLiveData.valueOrNull
+            ?: return
+
+        if (action.seen) {
+            return
+        }
+
+        val newValue = value.copy(
+            failedActions = value.failedActions.map {
+                if (it.id == action.id) {
+                    it.copy(seen = true)
+                } else {
+                    it
+                }
+            }
+        )
+        actionsDataLiveData.setValue(newValue)
+    }
+
     private fun List<LemmyPendingAction>.pendingToActions(): List<Action> = this.map {
         Action(
             id = it.id,
@@ -98,6 +118,7 @@ class ActionsViewModel @Inject constructor(
             ts = it.ts,
             creationTs = it.creationTs,
             details = ActionDetails.PendingDetails,
+            seen = true,
         )
     }
 
@@ -108,6 +129,7 @@ class ActionsViewModel @Inject constructor(
             ts = it.ts,
             creationTs = it.creationTs,
             details = ActionDetails.SuccessDetails,
+            seen = true,
         )
     }
 
@@ -120,6 +142,7 @@ class ActionsViewModel @Inject constructor(
             details = ActionDetails.FailureDetails(
                 it.error,
             ),
+            seen = it.seen ?: false,
         )
     }
 

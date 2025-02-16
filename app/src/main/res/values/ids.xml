@@ -253,4 +253,5 @@
     <item name="tag_user" type="id" />
     <item name="ghost_item" type="id"/>
     <item name="your_actions" type="id" />
+    <item name="rate" type="id" />
 </resources>

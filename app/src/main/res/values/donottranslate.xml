@@ -3,7 +3,7 @@
 
     <string name="app_name">Summit</string>
 
-    <string name="storage_usage_legend_format">%1$s - %2$s</string>
+    <string name="storage_usage_legend_format">%1$s - %2$s (%3$s)</string>
     <string name="c_summit">!summit@lemmy.world</string>
     <string name="updoot_color">Updoot color</string>
     <string name="downdoot_color">Downdoot color</string>

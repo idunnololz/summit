@@ -18,6 +18,7 @@ data class Action(
     val ts: Long,
     val creationTs: Long,
     val details: ActionDetails,
+    val seen: Boolean,
 ): Parcelable
 
 fun ActionInfo.getActionName(context: Context) =

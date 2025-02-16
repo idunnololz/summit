@@ -72,6 +72,7 @@ import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
+import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.LemmyAppBarController
@@ -1009,7 +1010,11 @@ class CommunityFragment :
                         Snackbar.LENGTH_LONG,
                     )
                     .setAction(R.string.undo) {
-                        viewModel.unhidePost(hiddenPost.postId, hiddenPost.instance)
+                        viewModel.unhidePost(
+                            id = hiddenPost.postId,
+                            instance = hiddenPost.instance,
+                            postView = null,
+                        )
                     }
                     .show()
             }
@@ -1082,7 +1087,7 @@ class CommunityFragment :
                         }
 
                         PostGestureAction.Hide -> {
-                            viewModel.hidePost(postView.post.id)
+                            viewModel.hidePost(id = postView.post.id, postView = postView)
                         }
 
                         PostGestureAction.MarkAsRead -> {
@@ -1498,6 +1503,11 @@ class CommunityFragment :
                 title = getString(R.string.go_to),
                 icon = R.drawable.baseline_arrow_forward_24,
             )
+            addItemWithIcon(
+                id = R.id.give_feedback,
+                title = getString(R.string.help_and_feedback),
+                icon = R.drawable.outline_feedback_24,
+            )
 
             if (currentCommunityRef != null) {
                 addDivider()
@@ -1787,6 +1797,9 @@ class CommunityFragment :
                 if (currentCommunityRef is CommunityRef.CommunityRefByName) {
                     moreActionsHelper.blockCommunity(currentCommunityRef, false)
                 }
+            }
+            R.id.give_feedback -> {
+                showHelpAndFeedbackOptions()
             }
         }
     }

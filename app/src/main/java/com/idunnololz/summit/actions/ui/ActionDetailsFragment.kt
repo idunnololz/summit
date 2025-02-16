@@ -35,6 +35,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getColorWithAlpha
@@ -212,6 +213,10 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
+
+            if (!args.action.seen) {
+                viewModel.markActionAsSeen(args.action)
+            }
         }
     }
 
@@ -286,7 +291,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                         b.status.chipBackgroundColor =
                             ColorStateList.valueOf(
                                 getColorWithAlpha(
-                                    yourColor = context.getColor(R.color.style_red),
+                                    yourColor = context.getColorCompat(R.color.style_red),
                                     alpha = 40,
                                 )
                             )
@@ -296,7 +301,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                         b.status.chipBackgroundColor =
                             ColorStateList.valueOf(
                                 getColorWithAlpha(
-                                    yourColor = context.getColor(R.color.style_blue),
+                                    yourColor = context.getColorCompat(R.color.style_blue),
                                     alpha = 40,
                                 )
                             )
@@ -306,7 +311,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                         b.status.chipBackgroundColor =
                             ColorStateList.valueOf(
                                 getColorWithAlpha(
-                                    yourColor = context.getColor(R.color.style_green),
+                                    yourColor = context.getColorCompat(R.color.style_green),
                                     alpha = 40,
                                 )
                             )

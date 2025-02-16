@@ -292,7 +292,7 @@ fun BaseFragment<*>.createPostActionHandler(
             moreActionsHelper.deletePost(postView.post.id, delete = false)
         }
         R.id.hide_post -> {
-            moreActionsHelper.hidePost(postView.post.id)
+            moreActionsHelper.hidePost(postView.post.id, postView)
         }
         R.id.pa_save_toggle -> {
             if (postView.saved) {

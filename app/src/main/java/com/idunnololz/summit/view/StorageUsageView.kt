@@ -14,6 +14,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import java.text.NumberFormat
 
 data class StorageUsageItem(
@@ -30,7 +32,9 @@ class StorageUsageView : ConstraintLayout {
 
     private var storageUsageItems: List<StorageUsageItem> = listOf()
 
-    private val nf = NumberFormat.getNumberInstance()
+    private val nf = NumberFormat.getNumberInstance().apply {
+        maximumFractionDigits = 2
+    }
     private val pf = NumberFormat.getPercentInstance()
 
     private val tempRect = Rect()
@@ -93,6 +97,7 @@ class StorageUsageView : ConstraintLayout {
         val totalBytes = storageUsage.sumOf { it.sizeInBytes.toDouble() }
 
         storageUsageTextView.text = Utils.fileSizeToHumanReadableString(totalBytes, nf)
+        storageUsageTextView.setTextColor(context.getColorCompat(R.color.colorText))
 
         detailsContainer.removeAllViews()
 
@@ -114,6 +119,7 @@ class StorageUsageView : ConstraintLayout {
                 R.string.storage_usage_legend_format,
                 item.label,
                 pf.format(percent),
+                Utils.fileSizeToHumanReadableString(item.sizeInBytes.toDouble(), nf)
             )
             tv.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
             tv.compoundDrawablePadding =
@@ -122,13 +128,22 @@ class StorageUsageView : ConstraintLayout {
 
             detailsContainer.addView(tv)
 
-            if (index != storageUsage.size - 1) {
-                tv.layoutParams = (tv.layoutParams as MarginLayoutParams).apply {
-                    rightMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
-                }
+            tv.layoutParams = (tv.layoutParams as MarginLayoutParams).apply {
+                topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding_half)
             }
         }
 
         invalidate()
+    }
+
+    fun setErrorText(text: String) {
+        storageUsageTextView.text = text
+        storageUsageTextView.setTextColor(
+            context.getColorFromAttribute(com.google.android.material.R.attr.errorTextColor))
+    }
+
+    fun setLoadingText(text: String) {
+        storageUsageTextView.text = text
+        storageUsageTextView.setTextColor(context.getColorCompat(R.color.colorText))
     }
 }

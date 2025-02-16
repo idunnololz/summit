@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="?selectableItemBackground">
 
     <TextView
         android:id="@+id/text"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="@dimen/padding"
         android:gravity="start|center_vertical"
-        android:paddingHorizontal="@dimen/padding"
+        android:layout_marginStart="@dimen/padding"
+        android:layout_marginEnd="@dimen/padding_half"
         android:paddingVertical="@dimen/padding"
-        android:background="?selectableItemBackground"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:drawableTint="?colorOnBackground"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/number"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/error_number_bg"
+        android:padding="@dimen/padding_quarter"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        app:layout_constraintStart_toEndOf="@+id/text"
+        app:layout_constraintEnd_toStartOf="@+id/end_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/end_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/baseline_chevron_right_24"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:tint="?colorControlNormal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

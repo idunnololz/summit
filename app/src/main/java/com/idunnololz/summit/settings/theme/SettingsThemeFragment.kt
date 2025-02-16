@@ -177,7 +177,7 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
             settings.font.bindTo(
                 binding.font,
                 { preferences.globalFont },
-                { setting, currentValue ->
+                { _, _ ->
                     FontPickerDialogFragment.newInstance(account)
                         .show(childFragmentManager, "FontPickerDialogFragment")
                 },

@@ -54,7 +54,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
         val parentFragment = parentFragment as ActionsTabbedFragment
         val viewModel = parentFragment.viewModel
         val adapter = ActionsAdapter(
-            context,
+            context = context,
             onImageClick = { postView, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
@@ -77,6 +77,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
                 getMainActivity()?.showMoreLinkOptions(url, text)
             },
             onActionClick = {
+                viewModel.markActionAsSeen(it)
                 parentFragment.openActionDetails(it)
 //                ActionDetailsDialogFragment.show(
 //                    fragmentManager = parentFragmentManager,
@@ -130,6 +131,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
             CustomDividerItemDecoration(
                 context,
                 DividerItemDecoration.VERTICAL,
+                dividerAfterLastItem = true,
             ).apply {
                 setDrawable(
                     checkNotNull(

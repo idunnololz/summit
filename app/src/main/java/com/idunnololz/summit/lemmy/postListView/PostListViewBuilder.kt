@@ -1051,7 +1051,7 @@ class PostListViewBuilder @Inject constructor(
                 title.text = postView.post.name
             }
 
-            val renderAsRead = postView.read && !alwaysRenderAsUnread
+            val renderAsRead = (postView.read || isDuplicatePost) && !alwaysRenderAsUnread
             val dimReadPosts = dimReadPosts
                 ?: rawBinding.communityLayout?.defaultDimReadPosts
                 ?: true
