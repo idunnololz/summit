@@ -4,8 +4,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
-
 
 /**
  * Detects phone shaking. If more than 75% of the samples taken in the past 0.5s are

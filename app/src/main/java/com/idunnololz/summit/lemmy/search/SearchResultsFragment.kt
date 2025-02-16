@@ -156,7 +156,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                         url = url,
                         originalUrl = url,
                         moreActionsHelper = moreActionsHelper,
-                        fragmentManager = childFragmentManager
+                        fragmentManager = childFragmentManager,
                     )
                 },
                 onPageClick = {

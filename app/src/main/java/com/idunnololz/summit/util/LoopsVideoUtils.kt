@@ -7,10 +7,10 @@ import org.jsoup.Jsoup
 object LoopsVideoUtils {
     fun extractVideoUrl(okHttpClient: OkHttpClient, loopsVideoUrl: String): String? {
         val response = okHttpClient.newCall(
-                Request.Builder()
-                    .url(loopsVideoUrl)
-                    .build()
-            )
+            Request.Builder()
+                .url(loopsVideoUrl)
+                .build(),
+        )
             .execute()
         val pageHtml = response.body?.string()
 

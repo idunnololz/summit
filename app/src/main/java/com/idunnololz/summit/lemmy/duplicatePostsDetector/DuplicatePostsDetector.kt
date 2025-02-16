@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.duplicatePostsDetector
 
-import android.content.SharedPreferences
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.dto.PostView
@@ -8,13 +7,12 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.StableAccountId
-import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.Preferences
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.launch
 
 @Singleton
 class DuplicatePostsDetector @Inject constructor(
@@ -71,7 +69,6 @@ class DuplicatePostsDetector @Inject constructor(
     }
 
     private fun Account.getDuplicatePostsDetector(): PerAccountDuplicatePostsDetector {
-
         val key = StableAccountId(id, instance)
         val detector = detectors[key]
 

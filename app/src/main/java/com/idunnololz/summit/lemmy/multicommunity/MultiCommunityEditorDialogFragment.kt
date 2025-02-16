@@ -24,8 +24,6 @@ import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunityIconItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
-import com.idunnololz.summit.databinding.CommunitySelectorNoResultsItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentMultiCommunityEditorBinding
 import com.idunnololz.summit.databinding.MultiCommunityHeaderItemBinding
 import com.idunnololz.summit.databinding.MultiCommunityIconSelectorBinding

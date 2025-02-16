@@ -7,7 +7,6 @@ import com.idunnololz.summit.actions.db.ReadPostEntry
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow

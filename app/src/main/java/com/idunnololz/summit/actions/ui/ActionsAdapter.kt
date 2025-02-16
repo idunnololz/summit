@@ -69,10 +69,18 @@ class ActionsAdapter(
 
             if (item.action.seen) {
                 b.title.setCompoundDrawablesWithIntrinsicBounds(
-                    0, 0, 0, 0)
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             } else {
                 b.title.setCompoundDrawablesWithIntrinsicBounds(
-                    0, 0, R.drawable.baseline_indicator_12, 0)
+                    0,
+                    0,
+                    R.drawable.baseline_indicator_12,
+                    0,
+                )
             }
 
             when (actionInfo) {
@@ -196,7 +204,7 @@ class ActionsAdapter(
             } else if (actionInfo?.accountInstance != null) {
                 context.getString(
                     R.string.user_id_format,
-                    "${accountId.toString()}@${actionInfo.accountInstance.toString()}"
+                    "$accountId@${actionInfo.accountInstance}",
                 )
             } else {
                 context.getString(R.string.user_id_format, accountId.toString())

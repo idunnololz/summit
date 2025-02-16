@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.TabbedFragmentActionsBinding
 import com.idunnololz.summit.util.BaseFragment
@@ -26,21 +25,21 @@ class ActionsTabbedFragment :
     val viewModel: ActionsViewModel by viewModels()
 
     private val deleteCompletedActionsDialogLauncher = newAlertDialogLauncher(
-        "delete_completed_actions"
+        "delete_completed_actions",
     ) {
         if (it.isOk) {
             viewModel.deleteCompletedActions()
         }
     }
     private val deletePendingActionsDialogLauncher = newAlertDialogLauncher(
-        "delete_pending_actions"
+        "delete_pending_actions",
     ) {
         if (it.isOk) {
             viewModel.deletePendingActions()
         }
     }
     private val deleteFailedActionsDialogLauncher = newAlertDialogLauncher(
-        "delete_failed_actions"
+        "delete_failed_actions",
     ) {
         if (it.isOk) {
             viewModel.deleteFailedActions()
@@ -91,7 +90,7 @@ class ActionsTabbedFragment :
                     ViewPagerAdapter(
                         context = context,
                         fragmentManager = childFragmentManager,
-                        lifecycle = viewLifecycleOwner.lifecycle
+                        lifecycle = viewLifecycleOwner.lifecycle,
                     )
 
                 actions.forEach { action ->

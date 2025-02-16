@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.databinding.ActionDetailsItemFooterBinding
@@ -46,7 +45,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>(),
+class ActionDetailsFragment :
+    BaseFragment<DialogFragmentActionDetailsBinding>(),
     FullscreenDialogFragment {
 
     private val args: ActionDetailsFragmentArgs by navArgs()
@@ -56,8 +56,9 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
     lateinit var apiClient: LemmyApiClient
 
     private val runActionAgainDialogLauncher = newAlertDialogLauncher("run_action_again") {
-        if (it.isOk)
+        if (it.isOk) {
             viewModel.retryAction(args.action)
+        }
     }
     private val actionRunSuccessDialogLauncher = newAlertDialogLauncher("run_action_success") {
         if (it.isOk) {
@@ -106,7 +107,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                         appBar = null,
                         title = null,
                         url = url,
-                        mimeType = null
+                        mimeType = null,
                     )
                 },
                 onVideoClick = { url ->
@@ -145,7 +146,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                             ).toBundle()
                         }
                         .showAllowingStateLoss(childFragmentManager, "PreviewCommentDialogFragment")
-                }
+                },
             )
 
             viewModel.retryActionResult.observe(viewLifecycleOwner) {
@@ -239,24 +240,24 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             class HeaderItem(
                 val actionDetails: ActionDetails,
                 val title: String,
-            ): Item
+            ) : Item
 
             class TextFieldItem(
                 val title: String,
                 val value: String,
                 val pageRef: PageRef?,
-            ): Item
+            ) : Item
 
             class RichTextFieldItem(
                 val title: String,
                 val value: String,
                 val pageRef: PageRef?,
-            ): Item
+            ) : Item
 
             class FooterItem(
                 val actionDetails: ActionDetails,
-                val enableActions: Boolean
-            ): Item
+                val enableActions: Boolean,
+            ) : Item
         }
 
         var disableActions: Boolean = false
@@ -279,11 +280,11 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                     is Item.FooterItem ->
                         true
                 }
-            }
+            },
         ).apply {
             addItemType(
                 clazz = Item.HeaderItem::class,
-                inflateFn = ActionDetailsItemHeaderBinding::inflate
+                inflateFn = ActionDetailsItemHeaderBinding::inflate,
             ) { item, b, h ->
                 val details = item.actionDetails
                 when (details) {
@@ -293,7 +294,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                                 getColorWithAlpha(
                                     yourColor = context.getColorCompat(R.color.style_red),
                                     alpha = 40,
-                                )
+                                ),
                             )
                         b.status.text = context.getString(R.string.failed)
                     }
@@ -303,7 +304,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                                 getColorWithAlpha(
                                     yourColor = context.getColorCompat(R.color.style_blue),
                                     alpha = 40,
-                                )
+                                ),
                             )
                         b.status.text = context.getString(R.string.pending)
                     }
@@ -313,7 +314,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                                 getColorWithAlpha(
                                     yourColor = context.getColorCompat(R.color.style_green),
                                     alpha = 40,
-                                )
+                                ),
                             )
                         b.status.text = context.getString(R.string.success)
                     }
@@ -323,13 +324,16 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             }
             addItemType(
                 clazz = Item.TextFieldItem::class,
-                inflateFn = ActionDetailsItemTextFieldBinding::inflate
+                inflateFn = ActionDetailsItemTextFieldBinding::inflate,
             ) { item, b, h ->
                 b.label.text = item.title
 
                 if (item.pageRef == null) {
-                    b.value.setTextColor(context.getColorFromAttribute(
-                        com.google.android.material.R.attr.colorOnSurface))
+                    b.value.setTextColor(
+                        context.getColorFromAttribute(
+                            com.google.android.material.R.attr.colorOnSurface,
+                        ),
+                    )
                     LemmyTextHelper.bindText(
                         textView = b.value,
                         text = item.value,
@@ -342,8 +346,11 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                     )
                 } else {
                     b.value.text = item.value
-                    b.value.setTextColor(context.getColorFromAttribute(
-                        com.google.android.material.R.attr.colorPrimary))
+                    b.value.setTextColor(
+                        context.getColorFromAttribute(
+                            com.google.android.material.R.attr.colorPrimary,
+                        ),
+                    )
                     b.root.setOnClickListener {
                         onPageClick(item.pageRef)
                     }
@@ -351,7 +358,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             }
             addItemType(
                 clazz = Item.RichTextFieldItem::class,
-                inflateFn = ActionDetailsItemRichTextFieldBinding::inflate
+                inflateFn = ActionDetailsItemRichTextFieldBinding::inflate,
             ) { item, b, h ->
                 b.label.text = item.title
 
@@ -379,7 +386,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             }
             addItemType(
                 clazz = Item.FooterItem::class,
-                inflateFn = ActionDetailsItemFooterBinding::inflate
+                inflateFn = ActionDetailsItemFooterBinding::inflate,
             ) { item, b, h ->
                 b.dismissAction.setOnClickListener {
                     dismissAction()
@@ -410,14 +417,12 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             }
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -437,29 +442,29 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                     actionDetails = data.details,
                     title = info?.getActionName(context)
                         ?: context.getString(R.string.unknown),
-                )
+                ),
             )
             items.add(
                 Item.TextFieldItem(
                     title = context.getString(R.string.account),
                     value =
-                        if (info?.accountInstance == null) {
-                            "${info?.accountId}"
-                        } else {
-                            "${info.accountId}@${info.accountInstance}"
-                        },
+                    if (info?.accountInstance == null) {
+                        "${info?.accountId}"
+                    } else {
+                        "${info.accountId}@${info.accountInstance}"
+                    },
                     pageRef = if (info?.accountInstance != null &&
                         info.accountId != null &&
-                        info.accountInstance != null) {
-
+                        info.accountInstance != null
+                    ) {
                         PersonRef.PersonRefById(
                             requireNotNull(info.accountId),
-                            requireNotNull(info.accountInstance)
+                            requireNotNull(info.accountInstance),
                         )
                     } else {
                         null
                     },
-                )
+                ),
             )
 
             when (info) {
@@ -469,7 +474,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                             title = context.getString(R.string.post),
                             value = "${info.postRef.id}@${info.postRef.instance}",
                             pageRef = info.postRef,
-                        )
+                        ),
                     )
                     if (info.parentId != null) {
                         items.add(
@@ -477,7 +482,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                                 title = context.getString(R.string.comment),
                                 value = "${info.parentId}@${info.postRef.instance}",
                                 pageRef = CommentRef(info.postRef.instance, info.parentId),
-                            )
+                            ),
                         )
                     }
                     items.add(
@@ -485,7 +490,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                             title = context.getString(R.string.comment_content),
                             value = info.content,
                             pageRef = null,
-                        )
+                        ),
                     )
                 }
                 is ActionInfo.DeleteCommentActionInfo -> {
@@ -494,7 +499,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                             title = context.getString(R.string.object_reference),
                             value = "${info.postRef.id}@${info.postRef.instance}",
                             pageRef = info.postRef,
-                        )
+                        ),
                     )
                 }
                 is ActionInfo.EditCommentActionInfo -> {
@@ -503,7 +508,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                             title = context.getString(R.string.object_reference),
                             value = "${info.postRef.id}@${info.postRef.instance}",
                             pageRef = info.postRef,
-                        )
+                        ),
                     )
                 }
                 is ActionInfo.MarkPostAsReadActionInfo -> {
@@ -512,7 +517,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                             title = context.getString(R.string.object_reference),
                             value = "${info.postRef.id}@${info.postRef.instance}",
                             pageRef = info.postRef,
-                        )
+                        ),
                     )
                 }
                 is ActionInfo.VoteActionInfo -> {
@@ -535,16 +540,18 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
                                     CommentRef(info.instance, info.ref.postId)
                                 }
                             },
-                        )
+                        ),
                     )
                 }
                 null -> {}
             }
 
-            items.add(Item.FooterItem(
-                actionDetails = data.details,
-                enableActions = !disableActions
-            ))
+            items.add(
+                Item.FooterItem(
+                    actionDetails = data.details,
+                    enableActions = !disableActions,
+                ),
+            )
 
             adapterHelper.setItems(items, this)
         }

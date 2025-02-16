@@ -26,8 +26,6 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.markwon.SpoilerPlugin
 import com.idunnololz.summit.util.markwon.SummitInlineParser
-import com.idunnololz.summit.util.markwon.SummitInlineParser.Companion.TICKS
-import com.idunnololz.summit.util.markwon.SummitInlineParser.Companion.TICKS_HERE
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.core.MarkwonTheme
@@ -37,8 +35,6 @@ import io.noties.markwon.html.span.SubScriptSpan
 import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
-import org.commonmark.internal.util.Parsing
-import org.commonmark.node.Code
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern

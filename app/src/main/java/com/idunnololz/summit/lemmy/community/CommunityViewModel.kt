@@ -11,7 +11,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.GuestAccountManager
@@ -25,7 +24,6 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
@@ -45,10 +43,8 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.prefetcher.PostFeedPrefetcher
-import com.idunnololz.summit.prefetcher.PostPrefetcher
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
-import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.crashlytics

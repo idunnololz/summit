@@ -103,7 +103,6 @@ class SettingsCacheFragment :
         updateRendering()
 
         with(binding) {
-
             val colors = listOf(
                 ContextCompat.getColor(context, R.color.style_pink),
                 ContextCompat.getColor(context, R.color.style_amber),
@@ -116,11 +115,13 @@ class SettingsCacheFragment :
                 when (it) {
                     is StatefulData.Error -> {
                         storageUsageView.setErrorText(
-                            context.getString(R.string.error_cache_size_calculation))
+                            context.getString(R.string.error_cache_size_calculation),
+                        )
                     }
                     is StatefulData.Loading -> {
                         storageUsageView.setLoadingText(
-                            context.getString(R.string.loading))
+                            context.getString(R.string.loading),
+                        )
                     }
                     is StatefulData.NotStarted -> {}
                     is StatefulData.Success -> {

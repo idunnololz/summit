@@ -6,14 +6,14 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.ActionsRunnerHelper
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ActionDetailsViewModel @Inject constructor(
@@ -21,7 +21,7 @@ class ActionDetailsViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val actionsRunnerHelper: ActionsRunnerHelper,
     private val pendingActionsManager: PendingActionsManager,
-): ViewModel() {
+) : ViewModel() {
 
     val retryActionResult = StatefulLiveData<Unit>()
     val deleteActionResult = StatefulLiveData<Unit>()
@@ -64,7 +64,7 @@ class ActionDetailsViewModel @Inject constructor(
                     )
                     if (action.details is ActionDetails.FailureDetails) {
                         pendingActionsManager.deleteFailedAction(
-                            action = action.toLemmyAction() as LemmyFailedAction
+                            action = action.toLemmyAction() as LemmyFailedAction,
                         )
                     }
                 }
@@ -89,17 +89,17 @@ class ActionDetailsViewModel @Inject constructor(
             when (val lemmyAction = action.toLemmyAction()) {
                 is LemmyCompletedAction -> {
                     pendingActionsManager.deleteCompletedAction(
-                        action = lemmyAction
+                        action = lemmyAction,
                     )
                 }
                 is LemmyFailedAction -> {
                     pendingActionsManager.deleteFailedAction(
-                        action = lemmyAction
+                        action = lemmyAction,
                     )
                 }
                 is LemmyPendingAction -> {
                     pendingActionsManager.deletePendingAction(
-                        action = lemmyAction
+                        action = lemmyAction,
                     )
                 }
             }

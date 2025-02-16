@@ -1183,25 +1183,25 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
         null,
         listOf(
             RadioGroupSettingItem.RadioGroupOption(
-                CommentsThreadStyle.Modern,
+                CommentsThreadStyle.MODERN,
                 context.getString(R.string.modern),
                 null,
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
-                CommentsThreadStyle.Legacy,
+                CommentsThreadStyle.LEGACY,
                 context.getString(R.string.classic),
                 null,
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
-                CommentsThreadStyle.LegacyWithColors,
+                CommentsThreadStyle.LEGACY_WITH_COLORS,
                 context.getString(R.string.classic_but_with_colors),
                 null,
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
-                CommentsThreadStyle.LegacyWithColorsAndDividers,
+                CommentsThreadStyle.LEGACY_WITH_COLORS_AND_DIVIDERS,
                 context.getString(R.string.classic_but_with_colors_and_dividers),
                 null,
                 null,
@@ -1372,25 +1372,25 @@ class ThemeSettings @Inject constructor(
         null,
         listOf(
             RadioGroupSettingItem.RadioGroupOption(
-                FontIds.Default,
+                FontIds.DEFAULT,
                 context.getString(R.string._default),
                 null,
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
-                FontIds.Roboto,
+                FontIds.ROBOTO,
                 context.getString(R.string.roboto),
                 null,
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
-                FontIds.RobotoSerif,
+                FontIds.ROBOTO_SERIF,
                 context.getString(R.string.roboto_serif),
                 null,
                 null,
             ),
             RadioGroupSettingItem.RadioGroupOption(
-                FontIds.OpenSans,
+                FontIds.OPEN_SANS,
                 context.getString(R.string.open_sans),
                 null,
                 null,

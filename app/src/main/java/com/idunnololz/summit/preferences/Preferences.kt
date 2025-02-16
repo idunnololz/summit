@@ -143,8 +143,8 @@ import com.idunnololz.summit.util.ext.putMoshiValue
 import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableSharedFlow
 import java.time.Duration
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -417,7 +417,7 @@ class Preferences(
         }
 
     var commentThreadStyle: CommentThreadStyleId
-        get() = prefs.getInt(KEY_COMMENT_THREAD_STYLE, CommentsThreadStyle.Modern)
+        get() = prefs.getInt(KEY_COMMENT_THREAD_STYLE, CommentsThreadStyle.MODERN)
         set(value) {
             prefs.edit().putInt(KEY_COMMENT_THREAD_STYLE, value).apply()
         }
@@ -569,7 +569,7 @@ class Preferences(
         }
 
     var globalFont: Int
-        get() = prefs.getInt(KEY_GLOBAL_FONT, FontIds.Default)
+        get() = prefs.getInt(KEY_GLOBAL_FONT, FontIds.DEFAULT)
         set(value) {
             prefs.edit()
                 .putInt(KEY_GLOBAL_FONT, value)
@@ -704,7 +704,7 @@ class Preferences(
         }
 
     var screenshotWatermark: Int
-        get() = prefs.getInt(KEY_SCREENSHOT_WATERMARK, ScreenshotWatermarkId.Lemmy)
+        get() = prefs.getInt(KEY_SCREENSHOT_WATERMARK, ScreenshotWatermarkId.LEMMY)
         set(value) {
             prefs.edit()
                 .putInt(KEY_SCREENSHOT_WATERMARK, value)

@@ -116,7 +116,9 @@ class SearchHomeViewModel @Inject constructor(
                 val searchSuggestions = ArrayList<String>()
                 val errors = mutableListOf<Throwable>()
 
-                val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+                val searchManager = context.getSystemService(
+                    Context.SEARCH_SERVICE,
+                ) as SearchManager
                 val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
                     componentName,
                 )
@@ -155,7 +157,7 @@ class SearchHomeViewModel @Inject constructor(
                                     it,
                                 )
                             },
-                        )
+                        ),
                     )
                 }
             }

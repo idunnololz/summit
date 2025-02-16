@@ -7,7 +7,6 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyAction
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
@@ -15,6 +14,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
@@ -90,8 +90,8 @@ class PendingActionsManager @Inject constructor(
             val dbActions = actionsDao.getAllPendingActions()
             val dbFailedActions = failedActionsDao.getLast100FailedActions()
 
-            Log.d("dbdb", "actionsDao: ${actionsDao.count()}")
-            Log.d("dbdb", "failedActionsDao: ${failedActionsDao.count()}")
+            Log.d(TAG, "actionsDao: ${actionsDao.count()}")
+            Log.d(TAG, "failedActionsDao: ${failedActionsDao.count()}")
 
             withContext(actionsContext) {
                 actions.clear()
@@ -126,7 +126,7 @@ class PendingActionsManager @Inject constructor(
                     is LemmyCompletedAction -> {}
                     is LemmyFailedAction -> {
                         val updatedAction = action.copy(
-                            seen = true
+                            seen = true,
                         )
                         failedActionsDao.insertFailedAction(updatedAction)
                         val pos = failedActions.indexOfFirst { it.id == action.id }
@@ -273,16 +273,20 @@ class PendingActionsManager @Inject constructor(
         onActionChangedListeners.remove(l)
     }
 
-    private suspend fun notifyActionComplete(action: LemmyPendingAction, result: LemmyActionResult<*, *>) =
-        withContext(
-            Dispatchers.Main,
-        ) {
-            for (onActionCompleteListener in onActionChangedListeners) {
-                onActionCompleteListener.onActionComplete(action, result)
-            }
+    private suspend fun notifyActionComplete(
+        action: LemmyPendingAction,
+        result: LemmyActionResult<*, *>,
+    ) = withContext(
+        Dispatchers.Main,
+    ) {
+        for (onActionCompleteListener in onActionChangedListeners) {
+            onActionCompleteListener.onActionComplete(action, result)
         }
+    }
 
-    private suspend fun notifyActionAdded(action: LemmyPendingAction) = withContext(Dispatchers.Main) {
+    private suspend fun notifyActionAdded(action: LemmyPendingAction) = withContext(
+        Dispatchers.Main,
+    ) {
         for (onActionCompleteListener in onActionChangedListeners) {
             onActionCompleteListener.onActionAdded(action)
         }
@@ -291,19 +295,17 @@ class PendingActionsManager @Inject constructor(
     private suspend fun notifyActionFailed(
         action: LemmyPendingAction,
         reason: LemmyActionFailureReason,
-    ) =
-        withContext(Dispatchers.Main) {
-            for (onActionCompleteListener in onActionChangedListeners) {
-                onActionCompleteListener.onActionFailed(action, reason)
-            }
+    ) = withContext(Dispatchers.Main) {
+        for (onActionCompleteListener in onActionChangedListeners) {
+            onActionCompleteListener.onActionFailed(action, reason)
         }
+    }
 
-    private suspend fun notifyActionDeleted(action: LemmyAction) =
-        withContext(Dispatchers.Main) {
-            for (onActionCompleteListener in onActionChangedListeners) {
-                onActionCompleteListener.onActionDeleted(action)
-            }
+    private suspend fun notifyActionDeleted(action: LemmyAction) = withContext(Dispatchers.Main) {
+        for (onActionCompleteListener in onActionChangedListeners) {
+            onActionCompleteListener.onActionDeleted(action)
         }
+    }
 
     private suspend fun insertAction(action: LemmyPendingAction): LemmyPendingAction =
         withContext(Dispatchers.Default) {
@@ -390,9 +392,7 @@ class PendingActionsManager @Inject constructor(
         notifyActionComplete(action, result)
     }
 
-    suspend fun deleteFailedAction(
-        action: LemmyFailedAction
-    ) {
+    suspend fun deleteFailedAction(action: LemmyFailedAction) {
         withContext(actionsContext) {
             failedActionsDao.delete(action)
 
@@ -409,18 +409,14 @@ class PendingActionsManager @Inject constructor(
         notifyActionDeleted(action)
     }
 
-    suspend fun deleteCompletedAction(
-        action: LemmyCompletedAction
-    ) {
+    suspend fun deleteCompletedAction(action: LemmyCompletedAction) {
         withContext(actionsContext) {
             completedActionsDao.delete(action)
         }
         notifyActionDeleted(action)
     }
 
-    suspend fun deletePendingAction(
-        action: LemmyPendingAction
-    ) {
+    suspend fun deletePendingAction(action: LemmyPendingAction) {
         withContext(actionsContext) {
             actionsDao.delete(action)
         }

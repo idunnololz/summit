@@ -1,6 +1,5 @@
 package com.idunnololz.summit.feedback
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -17,12 +16,12 @@ import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadHelper
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.changeLogPostRef as changeLogPostRef1
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
-import com.idunnololz.summit.util.changeLogPostRef as changeLogPostRef1
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PostFeedbackViewModel @Inject constructor(

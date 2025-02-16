@@ -139,7 +139,8 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
                         ).joinToString(separator = " ") { eachByte -> "%02x".format(eachByte) }
                         Log.d(TAG, "File ${index + 1}. File name: ${file.absolutePath}. Hex: $hex")
                     }
-                    b.subtitle.text = "${humanReadableByteCountSi(file.length())} - ${tsToShortDate(file.lastModified())}"
+                    b.subtitle.text = "${humanReadableByteCountSi(file.length())} - " +
+                        "${tsToShortDate(file.lastModified())}"
                 } else {
                     b.subtitle.text = getString(R.string.empty)
                 }

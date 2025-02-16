@@ -8,14 +8,13 @@ import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
+import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -106,7 +105,7 @@ class ActionsViewModel @Inject constructor(
                 } else {
                     it
                 }
-            }
+            },
         )
         actionsDataLiveData.setValue(newValue)
     }

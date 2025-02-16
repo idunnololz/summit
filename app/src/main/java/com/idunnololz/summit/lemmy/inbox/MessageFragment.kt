@@ -45,7 +45,6 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.computeWindowMetrics
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
@@ -53,10 +52,10 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.max
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MessageFragment : BaseFragment<FragmentMessageBinding>() {
@@ -222,7 +221,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                     if (preferences.hapticsOnActions) {
                         binding.bottomAppBar.performHapticFeedbackCompat(
-                            HapticFeedbackConstantsCompat.CONFIRM)
+                            HapticFeedbackConstantsCompat.CONFIRM,
+                        )
                     }
 
                     true
@@ -233,7 +233,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                     if (preferences.hapticsOnActions) {
                         binding.bottomAppBar.performHapticFeedbackCompat(
-                            HapticFeedbackConstantsCompat.CONFIRM)
+                            HapticFeedbackConstantsCompat.CONFIRM,
+                        )
                     }
 
                     true
@@ -244,7 +245,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                     if (preferences.hapticsOnActions) {
                         binding.bottomAppBar.performHapticFeedbackCompat(
-                            HapticFeedbackConstantsCompat.CONFIRM)
+                            HapticFeedbackConstantsCompat.CONFIRM,
+                        )
                     }
 
                     true
@@ -270,7 +272,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                 if (preferences.hapticsOnActions) {
                     binding.bottomAppBar.performHapticFeedbackCompat(
-                        HapticFeedbackConstantsCompat.CONFIRM)
+                        HapticFeedbackConstantsCompat.CONFIRM,
+                    )
                 }
             }
         } else {
@@ -295,7 +298,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
                 if (preferences.hapticsOnActions) {
                     binding.bottomAppBar.performHapticFeedbackCompat(
-                        HapticFeedbackConstantsCompat.CONFIRM)
+                        HapticFeedbackConstantsCompat.CONFIRM,
+                    )
                 }
             }
         }
@@ -524,7 +528,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             url = url,
                             originalUrl = url,
                             moreActionsHelper = moreActionsHelper,
-                            fragmentManager = childFragmentManager
+                            fragmentManager = childFragmentManager,
                         )
                     },
                     onPageClick = {
@@ -633,7 +637,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         val scrollY = top -
                             max(
                                 (viewportHeight - itemView.height) / 2,
-                                mainActivity.insets.value?.topInset ?: 0
+                                mainActivity.insets.value?.topInset ?: 0,
                             )
 
                         if (scrollY != lastScrollY) {

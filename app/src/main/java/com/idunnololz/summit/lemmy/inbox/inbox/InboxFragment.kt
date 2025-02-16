@@ -261,7 +261,7 @@ class InboxFragment :
                             binding.appBar.setExpanded(true)
                         }
                     },
-                    100
+                    100,
                 )
             }
 
@@ -464,7 +464,7 @@ class InboxFragment :
                     appBar = binding.appBar,
                     title = null,
                     url = url,
-                    mimeType = null
+                    mimeType = null,
                 )
             },
             onVideoClick = { url, videoType, state ->

@@ -788,7 +788,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     )
                     if (preferences.hapticsEnabled) {
                         it.performHapticFeedbackCompat(
-                            HapticFeedbackConstantsCompat.CONFIRM)
+                            HapticFeedbackConstantsCompat.CONFIRM,
+                        )
                     }
                 }
 

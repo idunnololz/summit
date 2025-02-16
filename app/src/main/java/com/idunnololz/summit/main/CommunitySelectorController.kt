@@ -541,7 +541,8 @@ class CommunitySelectorController @AssistedInject constructor(
 
                                 if (preferences.hapticsOnActions) {
                                     it.performHapticFeedbackCompat(
-                                        HapticFeedbackConstantsCompat.CONFIRM)
+                                        HapticFeedbackConstantsCompat.CONFIRM,
+                                    )
                                 }
                             }
                         } else {
@@ -554,7 +555,8 @@ class CommunitySelectorController @AssistedInject constructor(
 
                                 if (preferences.hapticsOnActions) {
                                     it.performHapticFeedbackCompat(
-                                        HapticFeedbackConstantsCompat.CONFIRM)
+                                        HapticFeedbackConstantsCompat.CONFIRM,
+                                    )
                                 }
                             }
                         }

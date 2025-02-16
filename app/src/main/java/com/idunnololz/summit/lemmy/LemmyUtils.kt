@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Point
 import android.icu.text.CompactDecimalFormat
 import android.icu.text.DecimalFormat
@@ -15,7 +14,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SearchType
-import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.Size

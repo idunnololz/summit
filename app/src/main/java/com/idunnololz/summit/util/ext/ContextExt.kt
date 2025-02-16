@@ -37,9 +37,13 @@ fun Context.getResIdFromAttribute(attribute: Int): Int {
 
 fun Context.getTextSizeFromTextAppearance(attribute: Int): Float {
     val attributes = obtainStyledAttributes(
-        getResIdFromAttribute(attribute), com.google.android.material.R.styleable.TextAppearance)
+        getResIdFromAttribute(attribute),
+        com.google.android.material.R.styleable.TextAppearance,
+    )
     val fontSize = attributes.getDimension(
-        com.google.android.material.R.styleable.TextAppearance_android_textSize, 0f)
+        com.google.android.material.R.styleable.TextAppearance_android_textSize,
+        0f,
+    )
     attributes.recycle()
 
     return fontSize

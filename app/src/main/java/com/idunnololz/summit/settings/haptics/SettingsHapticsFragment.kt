@@ -23,7 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsHapticsFragment : BaseFragment<FragmentSettingsHapticsBinding>(),
+class SettingsHapticsFragment :
+    BaseFragment<FragmentSettingsHapticsBinding>(),
     OldAlertDialogFragment.AlertDialogFragmentListener {
 
     @Inject
@@ -64,7 +65,6 @@ class SettingsHapticsFragment : BaseFragment<FragmentSettingsHapticsBinding>(),
         updateRendering()
     }
 
-
     private fun updateRendering() {
         if (!isBindingAvailable()) {
             return
@@ -92,14 +92,14 @@ class SettingsHapticsFragment : BaseFragment<FragmentSettingsHapticsBinding>(),
                 }
 
                 updateRendering()
-            }
+            },
         )
         settings.moreHaptics.bindTo(
             binding.moreHaptics,
             { preferences.hapticsOnActions },
             {
                 preferences.hapticsOnActions = it
-            }
+            },
         )
 
         binding.moreHaptics.isEnabled = preferences.hapticsEnabled

@@ -479,7 +479,9 @@ class AddOrEditCommentFragment :
                             }
                         }
                         if (preferences.hapticsOnActions) {
-                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                            toolbar.performHapticFeedbackCompat(
+                                HapticFeedbackConstantsCompat.CONFIRM,
+                            )
                         }
                         true
                     }
@@ -494,7 +496,9 @@ class AddOrEditCommentFragment :
                         }
                         updateComment()
                         if (preferences.hapticsOnActions) {
-                            toolbar.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                            toolbar.performHapticFeedbackCompat(
+                                HapticFeedbackConstantsCompat.CONFIRM,
+                            )
                         }
                         true
                     }

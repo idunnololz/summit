@@ -57,7 +57,7 @@ data class LemmyPendingAction(
     override val creationTs: Long,
     @ColumnInfo(name = "info")
     override val info: ActionInfo?,
-): LemmyAction
+) : LemmyAction
 
 @ProvidedTypeConverter
 class LemmyActionConverters(private val moshi: Moshi) {
@@ -96,7 +96,7 @@ class LemmyActionConverters(private val moshi: Moshi) {
 }
 
 @JsonClass(generateAdapter = true, generator = "sealed:t")
-sealed interface ActionInfo: Parcelable {
+sealed interface ActionInfo : Parcelable {
 
     val accountId: Long?
     val accountInstance: String?

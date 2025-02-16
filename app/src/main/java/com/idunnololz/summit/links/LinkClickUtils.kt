@@ -8,12 +8,9 @@ import com.idunnololz.summit.links.PreviewLinkOptions.PreviewAllLinks
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewNoLinks
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.preview.VideoType
-import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.video.VideoState
-import org.commonmark.node.Link
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
     getMainActivity()?.onLinkClick(
@@ -51,8 +48,8 @@ fun MainActivity.onLinkClick(
         val uri = Uri.parse(url)
 
         if (uri.host.equals("loops.video", ignoreCase = true) &&
-            uri.path?.startsWith("/v/", ignoreCase = true) == true) {
-
+            uri.path?.startsWith("/v/", ignoreCase = true) == true
+        ) {
             openVideo(url, VideoType.Unknown, null)
             return
         }

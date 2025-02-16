@@ -229,9 +229,12 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
                 var content = input.substring(afterOpenTicks, index - ticks.length)
                 content = content.replace('\n', ' ')
 
-                // spec: If the resulting string both begins and ends with a space character, but does not consist
-                // entirely of space characters, a single space character is removed from the front and back.
-                if (content.length >= 3 && content[0] == ' ' && content[content.length - 1] == ' ' &&
+                // spec: If the resulting string both begins and ends with a space character, but
+                // does not consist entirely of space characters, a single space character is
+                // removed from the front and back.
+                if (content.length >= 3 &&
+                    content[0] == ' ' &&
+                    content[content.length - 1] == ' ' &&
                     Parsing.hasNonSpace(content)
                 ) {
                     content = content.substring(1, content.length - 1)
@@ -804,8 +807,8 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
         private val ESCAPABLE = Pattern.compile('^'.toString() + Escaping.ESCAPABLE)
         private val ENTITY_HERE =
             Pattern.compile('^'.toString() + Escaping.ENTITY, Pattern.CASE_INSENSITIVE)
-        val TICKS = Pattern.compile("`+")
-        val TICKS_HERE = Pattern.compile("^`+")
+        private val TICKS = Pattern.compile("`+")
+        private val TICKS_HERE = Pattern.compile("^`+")
         private val EMAIL_AUTOLINK = Pattern
             .compile(
                 "^<([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>",

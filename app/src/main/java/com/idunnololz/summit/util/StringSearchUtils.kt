@@ -1,6 +1,6 @@
 package com.idunnololz.summit.util
 
-import java.util.*
+import java.util.Locale
 
 object StringSearchUtils {
     /**
@@ -26,8 +26,8 @@ object StringSearchUtils {
     // Example implementation of the Levenshtein Edit Distance
     // See http://rosettacode.org/wiki/Levenshtein_distance#Java
     fun editDistance(s1: String, s2: String): Int {
-        val s1 = s1.toLowerCase(Locale.US)
-        val s2 = s2.toLowerCase(Locale.US)
+        val s1 = s1.lowercase(Locale.US)
+        val s2 = s2.lowercase(Locale.US)
 
         val costs = Array<Int>(s2.length + 1) { 0 }
         for (i in 0..s1.length) {

@@ -53,13 +53,13 @@ class NotificationsManager @Inject constructor(
     companion object {
         private const val TAG = "NotificationsManager"
 
-        private const val ChannelIdAccountPrefix = "channel.account."
-        private const val ChannelGroupIdAccountPrefix = "channel_group.account."
+        private const val CHANNEL_ID_ACCOUNT_PREFIX = "channel.account."
+        private const val CHANNEL_GROUP_ID_ACCOUNT_PREFIX = "channel_group.account."
 
-        private const val InboxNotificationStartId = 1000
-        private const val InboxNotificationLastId = 9999
+        private const val INBOX_NOTIFICATION_START_ID = 1000
+        private const val INBOX_NOTIFICATION_LAST_ID = 9999
 
-        private const val AccountSummaryNotificationStartId = 20000
+        private const val ACCOUNT_SUMMARY_NOTIFICATION_START_ID = 20000
     }
 
     class NotificationWithId(
@@ -74,7 +74,7 @@ class NotificationsManager @Inject constructor(
     private var channelsCreated = mutableSetOf<String>()
 
     private var nextNotificationId = if (preferences.lastAccountNotificationId == 0) {
-        InboxNotificationStartId
+        INBOX_NOTIFICATION_START_ID
     } else {
         preferences.lastAccountNotificationId
     }
@@ -123,10 +123,10 @@ class NotificationsManager @Inject constructor(
 
         val work =
             PeriodicWorkRequestBuilder<NotificationsWorker>(
-                repeatInterval,
-                TimeUnit.MILLISECONDS, // repeatInterval (the period cycle)
-                flexInterval,
-                TimeUnit.MILLISECONDS, // flexInterval
+                repeatInterval = repeatInterval,
+                repeatIntervalTimeUnit = TimeUnit.MILLISECONDS,
+                flexTimeInterval = flexInterval,
+                flexTimeIntervalUnit = TimeUnit.MILLISECONDS,
             )
                 .setInitialDelay(repeatInterval, TimeUnit.MILLISECONDS)
                 .addTag(TAG)
@@ -233,8 +233,8 @@ class NotificationsManager @Inject constructor(
 
                 val notificationId = nextNotificationId
 
-                if (nextNotificationId == InboxNotificationLastId) {
-                    nextNotificationId = InboxNotificationStartId
+                if (nextNotificationId == INBOX_NOTIFICATION_LAST_ID) {
+                    nextNotificationId = INBOX_NOTIFICATION_START_ID
                 }
 
                 nextNotificationId++
@@ -303,7 +303,7 @@ class NotificationsManager @Inject constructor(
                 .setSummaryText(account.fullName)
 
             val localAccountId = accountManager.getLocalAccountId(account)
-            val summaryNotificationId = AccountSummaryNotificationStartId + localAccountId
+            val summaryNotificationId = ACCOUNT_SUMMARY_NOTIFICATION_START_ID + localAccountId
 
             val intent = MainActivity.createInboxPageIntent(context, account)
             val pendingIntent = PendingIntent.getActivity(
@@ -347,10 +347,10 @@ class NotificationsManager @Inject constructor(
         }
     }
 
-    private fun getChannelIdForAccount(account: Account) = ChannelIdAccountPrefix + account.fullName
+    private fun getChannelIdForAccount(account: Account) = CHANNEL_ID_ACCOUNT_PREFIX + account.fullName
 
     private fun getChannelGroupIdForAccount(account: Account) =
-        ChannelGroupIdAccountPrefix + account.fullName
+        CHANNEL_GROUP_ID_ACCOUNT_PREFIX + account.fullName
 
     fun isNotificationsEnabledForAccount(account: Account): Boolean =
         notificationsSharedPreferences.getBoolean("${account.fullName}_isOn", false)

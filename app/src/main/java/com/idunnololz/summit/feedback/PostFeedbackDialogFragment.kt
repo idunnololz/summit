@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import coil.load
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentPostFeedbackBinding
@@ -41,15 +40,14 @@ import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.launchChangelog
-import com.idunnololz.summit.util.summitCommunityPage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PostFeedbackDialogFragment : BaseDialogFragment<DialogFragmentPostFeedbackBinding>(),
+class PostFeedbackDialogFragment :
+    BaseDialogFragment<DialogFragmentPostFeedbackBinding>(),
     FullscreenDialogFragment {
 
     companion object {
@@ -145,7 +143,8 @@ class PostFeedbackDialogFragment : BaseDialogFragment<DialogFragmentPostFeedback
         super.onCreateView(inflater, container, savedInstanceState)
 
         setBinding(
-            DialogFragmentPostFeedbackBinding.inflate(inflater, container, false))
+            DialogFragmentPostFeedbackBinding.inflate(inflater, container, false),
+        )
 
         return binding.root
     }
@@ -155,7 +154,7 @@ class PostFeedbackDialogFragment : BaseDialogFragment<DialogFragmentPostFeedback
 
         val context = requireContext()
 
-        with (binding) {
+        with(binding) {
             requireMainActivity().apply {
                 insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.content)
                 insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
@@ -316,7 +315,7 @@ class PostFeedbackDialogFragment : BaseDialogFragment<DialogFragmentPostFeedback
                             }
                             .showAllowingStateLoss(
                                 childFragmentManager,
-                                "PreviewCommentDialogFragment"
+                                "PreviewCommentDialogFragment",
                             )
                     },
                     onDraftsClick = {
