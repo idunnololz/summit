@@ -1939,6 +1939,7 @@
     <string name="help_and_feedback_desc">Give feedback from anywhere in the app by shaking your device.</string>
     <string name="see_the_official_summit_community">See the official Summit community</string>
     <string name="preview_screenshot">Preview screenshot</string>
+    <string name="error_unable_to_share_file">Unable to share file.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

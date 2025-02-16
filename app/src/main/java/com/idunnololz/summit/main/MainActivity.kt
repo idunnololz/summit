@@ -49,6 +49,7 @@ import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.feedback.PostFeedbackDialogFragment
 import com.idunnololz.summit.feedback.ShakeFeedbackHelper
 import com.idunnololz.summit.lemmy.CommentRef
@@ -217,7 +218,13 @@ class MainActivity :
                 return@observe
             }
             when (it) {
-                is StatefulData.Error -> {}
+                is StatefulData.Error -> {
+                    ErrorDialogFragment.show(
+                        getString(R.string.error_unable_to_share_file),
+                        it.error,
+                        supportFragmentManager,
+                    )
+                }
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
