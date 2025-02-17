@@ -506,7 +506,9 @@ class SignUpFragment :
                             directoryHelper.miscDir.mkdirs()
 
                             val file = File(directoryHelper.miscDir, "captcha_sound.wav")
-                            val waveData = Base64.Mime.decode(scene.captchaWav)
+                            val waveData = Base64.Mime
+                                .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+                                .decode(scene.captchaWav)
 
                             runInterruptible {
                                 file.outputStream().use {

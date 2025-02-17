@@ -485,6 +485,7 @@ class InboxViewModel @Inject constructor(
         fetchingPages.clear()
         seen.clear()
         conversations = null
+        fetchInboxJob?.cancel()
     }
 
     override fun onCleared() {

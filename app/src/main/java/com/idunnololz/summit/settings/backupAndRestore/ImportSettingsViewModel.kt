@@ -7,6 +7,7 @@ import android.util.Base64
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.common.util.Base64Utils
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.util.PreferenceUtil
