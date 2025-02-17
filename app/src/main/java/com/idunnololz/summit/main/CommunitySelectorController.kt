@@ -1,6 +1,7 @@
 package com.idunnololz.summit.main
 
 import android.content.Context
+import android.net.Uri
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.TextWatcher
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
@@ -179,6 +181,13 @@ class CommunitySelectorController @AssistedInject constructor(
                     val communityName = tokens.getOrNull(0) ?: return@OnKeyListener true
                     val instance = tokens.getOrNull(1)
                         ?: lemmyApiClient.instance
+
+                    if (Uri.parse(instance) == null) {
+                        MaterialAlertDialogBuilder(context)
+                            .setMessage(R.string.error_invalid_instance_format)
+                            .show()
+                        return@OnKeyListener true
+                    }
 
                     onCommunitySelectedListener?.invoke(
                         this@CommunitySelectorController,

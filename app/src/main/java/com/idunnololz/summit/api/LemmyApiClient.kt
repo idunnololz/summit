@@ -227,14 +227,18 @@ class LemmyApiClient(
     )
 
     fun changeInstance(newInstance: String) {
-        api = LemmyApi.getInstance(
-            context = context,
-            cachePolicyManager = cachePolicyManager,
-            instance = newInstance,
-            cacheDir = directoryHelper.okHttpCacheDir,
-        )
+        try {
+            api = LemmyApi.getInstance(
+                context = context,
+                cachePolicyManager = cachePolicyManager,
+                instance = newInstance,
+                cacheDir = directoryHelper.okHttpCacheDir,
+            )
 
-        instanceFlow.value = api.instance
+            instanceFlow.value = api.instance
+        } catch (e: Exception) {
+            Log.w(TAG, "Invalid instance: ${newInstance}", e)
+        }
     }
 
     fun defaultInstance() {

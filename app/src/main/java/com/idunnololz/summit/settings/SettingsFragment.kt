@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
+import com.idunnololz.summit.lemmy.search.SearchHomeConfigDialogFragment
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -390,7 +391,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             findNavController().navigateSafe(directions)
                         }
 
-                        is SearchHomeSettings -> TODO()
+                        is SearchHomeSettings -> {
+                            SearchHomeConfigDialogFragment.show(childFragmentManager)
+                        }
+
 
                         null -> {
                             // do nothing

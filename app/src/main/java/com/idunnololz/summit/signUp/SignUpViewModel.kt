@@ -199,7 +199,9 @@ class SignUpViewModel @Inject constructor(
                 }
 
                 val bitmap = try {
-                    val data = Base64.Mime.decode(it.ok.png)
+                    val data = Base64.Mime
+                        .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+                        .decode(it.ok.png)
                     BitmapFactory.decodeByteArray(data, 0, data.size)
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to decode captcha image", e)
