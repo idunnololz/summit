@@ -248,7 +248,7 @@
     <string name="version_code">Κωδικός έκδοσης %1$s</string>
     <string name="view_on_the_play_store">Προβολή στο Google Play</string>
     <string name="give_feedback">Δώσε σχόλια</string>
-    <string name="through_the_community">Μέσω της σελίδας της κοινότητας</string>
+    <string name="through_the_community">Μέσω της κοινότητας</string>
     <string name="by_email">Με email</string>
     <string name="show_nsfw_posts">Εμφάνιση αναρτήσεων NSFW</string>
     <string name="blur_nsfw_posts">Θόλωμα αναρτήσεων NSFW</string>
@@ -1122,4 +1122,28 @@
     <string name="rerun_action_success_desc">Η ενέργεια επανεκτελέστηκε με επιτυχία.</string>
     <string name="retry_action_success_desc">Η ενέργεια δοκιμάστηκε ξανά με επιτυχία.</string>
     <string name="mark_post_as_unread">Επισήμανση της ανάρτησης ως μη αναγνωσμένης</string>
+    <string name="help_and_feedback">Βοήθεια &amp; σχόλια</string>
+    <string name="rate_app">Βαθμολογία εφαρμογής</string>
+    <string name="post_feedback_to_community">Δημοσίευσε σχόλια στην κοινότητα</string>
+    <string name="go_to_community">Πήγαινε στην κοινότητα</string>
+    <string name="post_feedback">Δημοσίευση σχολίων</string>
+    <string name="error_cache_size_calculation">Αδυναμία υπολογισμού μεγέθους κρυφής μνήμης.</string>
+    <string name="images">Εικόνες</string>
+    <string name="videos">Βίντεο</string>
+    <string name="network">Δίκτυο</string>
+    <string name="other">Άλλο</string>
+    <string name="other_cached_media">Άλλα πολυμέσα στην κρυφή μνήμη</string>
+    <string name="feedback_question">Σχόλια/ερώτηση</string>
+    <string name="include_in_screenshot">Συμπερίληψη στο στιγμιότυπο οθόνης</string>
+    <string name="include_screenshot">Συμπερίληψη στιγμιοτύπου οθόνης</string>
+    <string name="send_feedback_or_question_by_email">Στείλε σχόλια/ερωτήσεις μέσω email</string>
+    <string name="rate_app_desc">Απολαμβάνεις την εφαρμογή; Σκέψου να αφήσεις μια αξιολόγηση ή κριτική.</string>
+    <string name="other_links">Άλλοι σύνδεσμοι</string>
+    <string name="see_the_official_summit_community">Δες την επίσημη κοινότητα του Summit</string>
+    <string name="preview_screenshot">Προεπισκόπηση στιγμιοτύπου οθόνης</string>
+    <string name="error_unable_to_share_file">Δεν είναι δυνατή η κοινή χρήση του αρχείου.</string>
+    <string name="save_and_close">Αποθήκευση &amp; κλείσιμο</string>
+    <string name="error_unable_to_submit_feedback">Δεν είναι δυνατή η υποβολή σχολίων</string>
+    <string name="help_and_feedback_desc">Δώσε σχόλια από οπουδήποτε στην εφαρμογή κουνώντας τη συσκευή σου.</string>
+    <string name="post_feedback_or_question_to_community">Δημοσίευσε σχόλια/ερώτηση στην κοινότητα</string>
 </resources>
