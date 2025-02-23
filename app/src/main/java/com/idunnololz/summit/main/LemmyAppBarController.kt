@@ -13,7 +13,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
@@ -115,6 +114,7 @@ class LemmyAppBarController(
             override val collapsingToolbarLayout: CollapsingToolbarLayout,
             override val toolbar: MaterialToolbar,
             val title: TextView,
+            val body: TextView,
             val banner: ImageView,
             val communitySortOrder2: TextView,
             val toolbarPlaceholder: View,
@@ -262,21 +262,21 @@ class LemmyAppBarController(
 
         if (isHome) {
             vh.communityTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                R.drawable.baseline_home_18,
+                R.drawable.outline_home_18,
                 0,
                 0,
                 0,
             )
         } else if (currentCommunity is CommunityRef.MultiCommunity) {
             vh.communityTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                R.drawable.baseline_dynamic_feed_24,
+                R.drawable.outline_dynamic_feed_18,
                 0,
                 0,
                 0,
             )
         } else if (isSubscribed) {
             vh.communityTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                R.drawable.outline_mail_24,
+                R.drawable.outline_mail_18,
                 0,
                 0,
                 0,
@@ -299,6 +299,7 @@ class LemmyAppBarController(
                         allowHardware(false)
                     }
                     vh.icon.load(newShimmerDrawableSquare(context))
+                    vh.body.visibility = View.GONE
                 }
 
                 is StatefulData.NotStarted -> {}
@@ -314,6 +315,18 @@ class LemmyAppBarController(
                                 it.community_view.community.banner
                             }
                         )
+                    val body = value.data.response
+                        .fold(
+                            { it.site_view.site.description },
+                            { it.community_view.community.description }
+                        )
+
+                    if (body.isNullOrBlank()) {
+                        vh.body.visibility = View.GONE
+                    } else {
+                        vh.body.visibility = View.VISIBLE
+                        vh.body.text = body
+                    }
 
                     if (bannerUrl == null) {
                         vh.banner.load("file:///android_asset/banner_placeholder.svg") {
@@ -514,6 +527,7 @@ class LemmyAppBarController(
                 b.collapsingToolbarLayout,
                 b.toolbar,
                 b.title,
+                b.body,
                 b.banner,
                 b.communitySortOrder2,
                 b.toolbarPlaceholder,
