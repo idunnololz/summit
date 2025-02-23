@@ -19,6 +19,7 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_IP_ADDRESSES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_PLAY_VIDEOS
@@ -105,6 +106,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MATERIAL_YOU
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MULTILINE_POST_HEADERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PER_COMMUNITY_SETTINGS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -880,6 +882,12 @@ class PostsFeedSettings @Inject constructor(
         context.getString(R.string.hide_duplicate_posts_on_read),
         context.getString(R.string.hide_duplicate_posts_on_read_desc),
         relatedKeys = listOf(KEY_HIDE_DUPLICATE_POSTS_ON_READ),
+    )
+    val usePostsFeedHeader = OnOffSettingItem(
+        null,
+        context.getString(R.string.use_posts_feed_header),
+        context.getString(R.string.use_posts_feed_header_desc),
+        relatedKeys = listOf(KEY_USE_POSTS_FEED_HEADER),
     )
 
     override val allSettings: List<SettingItem> = listOf(
@@ -1706,6 +1714,12 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.auto_convert_phone_numbers_to_links),
         null,
         relatedKeys = listOf(KEY_AUTO_LINK_PHONE_NUMBERS),
+    )
+    val autoLinkIpAddresses = OnOffSettingItem(
+        null,
+        context.getString(R.string.auto_convert_ip_addresses_to_links),
+        null,
+        relatedKeys = listOf(KEY_AUTO_LINK_IP_ADDRESSES),
     )
     val instanceNameStyle = RadioGroupSettingItem(
         null,

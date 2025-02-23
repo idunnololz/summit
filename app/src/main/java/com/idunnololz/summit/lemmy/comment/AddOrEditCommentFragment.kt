@@ -60,7 +60,7 @@ import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
@@ -699,7 +699,7 @@ class AddOrEditCommentFragment :
                 )
                 b.message.text = getString(
                     R.string.error_retry_target_too_old_format,
-                    dateStringToPretty(context, message.replyTargetTs),
+                    tsToConcise(context, message.replyTargetTs),
                 )
                 b.close.setOnClickListener {
                     viewModel.dismissMessage(message)

@@ -136,6 +136,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <include
+                    android:id="@+id/use_posts_feed_header"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <TextView
                     android:id="@+id/filters_title"
                     android:text="@string/filters"

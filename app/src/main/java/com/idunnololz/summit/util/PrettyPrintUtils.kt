@@ -50,10 +50,10 @@ object PrettyPrintStyles {
     const val SHORT_DYNAMIC = 2
 }
 
-fun dateStringToPretty(context: Context, dateStr: String): String =
-    dateStringToPretty(context, dateStringToTs(dateStr))
+fun tsToConcise(context: Context, dateStr: String): String =
+    tsToConcise(context, dateStringToTs(dateStr))
 
-fun dateStringToPretty(context: Context, ts: Long, style: Int = PrettyPrintStyles.SHORT): String {
+fun tsToConcise(context: Context, ts: Long, style: Int = PrettyPrintStyles.SHORT): String {
     val now = System.currentTimeMillis()
     val diff: Long = now - ts
     var isRecent = false
@@ -95,6 +95,34 @@ fun dateStringToPretty(context: Context, ts: Long, style: Int = PrettyPrintStyle
     } else {
         shortDate
     }
+}
+
+fun relativeTimeToConcise(context: Context, diffMs: Long): String {
+    val shortDate = if (diffMs < MINUTE_MILLIS) {
+        context.getString(R.string.elapsed_time_just_now)
+    } else if (diffMs < 2 * MINUTE_MILLIS) {
+        context.getString(R.string.elapsed_time_a_minute_ago)
+    } else if (diffMs < 50 * MINUTE_MILLIS) {
+        context.getString(R.string.elapsed_time_minutes_ago, diffMs / MINUTE_MILLIS)
+    } else if (diffMs < 120 * MINUTE_MILLIS) {
+        context.getString(R.string.elapsed_time_an_hour_ago)
+    } else if (diffMs < 24 * HOUR_MILLIS) {
+        context.getString(R.string.elapsed_time_hours_ago, diffMs / HOUR_MILLIS)
+    } else if (diffMs < 48 * HOUR_MILLIS) {
+        context.getString(R.string.elapsed_time_yesterday)
+    } else if (diffMs < MONTH_MILLIS) {
+        context.getString(R.string.elapsed_time_days_ago, diffMs / DAY_MILLIS)
+    } else if (diffMs < 2 * MONTH_MILLIS) {
+        context.getString(R.string.elapsed_time_a_month_ago)
+    } else if (diffMs < YEAR_MILLIS) {
+        context.getString(R.string.elapsed_time_months_ago, diffMs / MONTH_MILLIS)
+    } else if (diffMs < 2 * YEAR_MILLIS) {
+        context.getString(R.string.elapsed_time_a_year_ago)
+    } else {
+        context.getString(R.string.elapsed_time_years_ago, diffMs / YEAR_MILLIS)
+    }
+
+    return shortDate
 }
 
 fun dateStringToFullDateTime(dateStr: String): String {

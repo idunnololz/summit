@@ -92,6 +92,11 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig = when (this) {
             imageWidthPercent = 0.2f,
             dimReadPosts = false,
         )
+    CommunityLayout.FullWithCards ->
+        PostInListUiConfig(
+            imageWidthPercent = 0.2f,
+            dimReadPosts = true,
+        )
     CommunityLayout.LargeList ->
         PostInListUiConfig(
             imageWidthPercent = 1f,
@@ -126,6 +131,7 @@ val CommunityLayout.defaultDimReadPosts
             CommunityLayout.Compact,
             CommunityLayout.List,
             CommunityLayout.ListWithCards,
+            CommunityLayout.FullWithCards,
             -> false
             CommunityLayout.LargeList,
             CommunityLayout.Card,

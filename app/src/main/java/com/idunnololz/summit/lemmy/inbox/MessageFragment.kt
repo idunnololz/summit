@@ -56,6 +56,7 @@ import javax.inject.Inject
 import kotlin.math.max
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 @AndroidEntryPoint
 class MessageFragment : BaseFragment<FragmentMessageBinding>() {
@@ -70,7 +71,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     private val args by navArgs<MessageFragmentArgs>()
 
     private val viewModel: MessageViewModel by viewModels()
-    val inboxViewModel: InboxViewModel by activityViewModels()
+    private val inboxViewModel: InboxViewModel by activityViewModels()
 
     @Inject
     lateinit var moreActionsHelper: MoreActionsHelper
@@ -579,7 +580,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 }
                 recyclerView.adapter = adapter
                 recyclerView.doOnLayout {
-                    adapter.contentMaxWidth = recyclerView.measuredWidth
+                    recyclerView.post {
+                        adapter.contentMaxWidth = recyclerView.measuredWidth
+                    }
                 }
                 recyclerView.setup(animationsHelper)
                 recyclerView.layoutManager = LinearLayoutManager(context)
@@ -649,6 +652,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                         }
 
                         if (System.currentTimeMillis() - startMonitorTs > 1_500) {
+                            binding.root.invalidate()
                             break
                         }
                     }

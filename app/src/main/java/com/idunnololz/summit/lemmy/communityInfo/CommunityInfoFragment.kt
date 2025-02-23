@@ -150,8 +150,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 applyTopInset = false,
             )
             insets.observe(viewLifecycleOwner) {
-                val previousPadding = binding.toolbar.paddingTop
-                val newToolbarHeight = binding.toolbar.measuredHeight - previousPadding + it.topInset
+                val newToolbarHeight =
+                    context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize).toInt() +
+                        it.topInset
                 binding.toolbar.updatePadding(top = it.topInset)
                 binding.collapsingToolbarLayout.scrimVisibleHeightTrigger =
                     (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()

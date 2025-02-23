@@ -45,20 +45,24 @@ fun RecyclerView.setupDecoratorsForPostList(communityLayout: CommunityLayout) {
             },
         )
     } else {
-        if (communityLayout == CommunityLayout.ListWithCards) {
-            this.addItemDecoration(
-                VerticalSpaceItemDecoration(
-                    this.context.getDimen(R.dimen.padding_half),
-                    true,
-                ),
-            )
-        } else {
-            this.addItemDecoration(
-                VerticalSpaceItemDecoration(
-                    this.context.getDimen(R.dimen.padding_half),
-                    true,
-                ),
-            )
+        when (communityLayout) {
+            CommunityLayout.ListWithCards,
+            CommunityLayout.FullWithCards -> {
+                this.addItemDecoration(
+                    VerticalSpaceItemDecoration(
+                        this.context.getDimen(R.dimen.padding_half),
+                        true,
+                    ),
+                )
+            }
+            else -> {
+                this.addItemDecoration(
+                    VerticalSpaceItemDecoration(
+                        this.context.getDimen(R.dimen.padding_half),
+                        true,
+                    ),
+                )
+            }
         }
     }
 }

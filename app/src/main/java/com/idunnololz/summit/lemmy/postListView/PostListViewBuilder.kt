@@ -42,6 +42,7 @@ import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
@@ -346,6 +347,14 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemFullBinding -> {
+                        ensureActionButtons(rb.contentView, leftHandMode)
+                        commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            topToBottom = R.id.bottom_barrier
+                            bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+                            bottomToTop = ConstraintLayout.LayoutParams.UNSET
+                        }
+                    }
+                    is ListingItemFullWithCardsBinding -> {
                         ensureActionButtons(rb.contentView, leftHandMode)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.bottom_barrier
@@ -753,7 +762,21 @@ class PostListViewBuilder @Inject constructor(
                             }
                         }
                     }
-                    else -> contentMaxWidth
+                    is ListingItemFullWithCardsBinding -> {
+                        val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                        if (horizontalMargin != null) {
+                            if (lp.marginStart != horizontalMargin ||
+                                lp.marginEnd != horizontalMargin
+                            ) {
+                                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                                    marginStart = horizontalMargin
+                                    marginEnd = horizontalMargin
+                                }
+                            }
+                        }
+                    }
+                    else -> {}
                 }
 
                 val finalContentMaxWidth =
@@ -783,6 +806,11 @@ class PostListViewBuilder @Inject constructor(
                             val imageLp = rb.image.layoutParams as MarginLayoutParams
 
                             contentMaxWidth - imageLp.marginStart - imageLp.marginEnd
+                        }
+                        is ListingItemFullWithCardsBinding -> {
+                            val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                            contentMaxWidth - lp.marginStart - lp.marginEnd
                         }
                         else -> contentMaxWidth
                     }
@@ -915,7 +943,7 @@ class PostListViewBuilder @Inject constructor(
                         reveal = isRevealed,
                         tempSize = tempSize,
                         videoViewMaxHeight = contentPreferredHeight,
-                        contentMaxWidth = contentMaxWidth,
+                        contentMaxWidth = finalContentMaxWidth,
                         fullImageViewTransitionName = "full_image_$absoluteAdapterPosition",
                         postView = postView,
                         instance = instance,
@@ -1558,6 +1586,7 @@ val ViewBinding.communityLayout: CommunityLayout?
             is ListingItemCompactBinding -> CommunityLayout.Compact
             is ListingItemListBinding -> CommunityLayout.List
             is ListingItemListWithCardsBinding -> CommunityLayout.ListWithCards
+            is ListingItemFullWithCardsBinding -> CommunityLayout.FullWithCards
             is ListingItemCardBinding -> CommunityLayout.Card
             is ListingItemCard2Binding -> CommunityLayout.Card2
             is ListingItemCard3Binding -> CommunityLayout.Card3

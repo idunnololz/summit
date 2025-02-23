@@ -74,8 +74,6 @@ class CommunityInfoViewModel @Inject constructor(
     private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
         siteOrCommunity.setIsLoading()
         viewModelScope.launch {
-            delay(250)
-
             if (communityRef is CommunityRef.MultiCommunity) {
                 siteOrCommunity.postError(RuntimeException())
                 return@launch
@@ -294,6 +292,10 @@ class CommunityInfoViewModel @Inject constructor(
     }
 
     fun onCommunityChanged(communityRef: CommunityRef) {
+        if (this.communityRef == communityRef) {
+            return
+        }
+
         this.communityRef = communityRef
 
         fetchCommunityOrSiteInfo(communityRef)

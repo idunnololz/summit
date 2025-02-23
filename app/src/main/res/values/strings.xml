@@ -1940,6 +1940,10 @@
     <string name="see_the_official_summit_community">See the official Summit community</string>
     <string name="preview_screenshot">Preview screenshot</string>
     <string name="error_unable_to_share_file">Unable to share file.</string>
+    <string name="auto_convert_ip_addresses_to_links">Auto-convert IP addresses to links</string>
+    <string name="full_with_cards">Full with cards</string>
+    <string name="use_posts_feed_header">Use posts feed header</string>
+    <string name="use_posts_feed_header_desc">Display a descriptive header at the top of the posts feed.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

@@ -20,6 +20,7 @@ import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
@@ -133,6 +134,7 @@ class PostListAdapter(
             CommunityLayout.Card3 -> R.layout.listing_item_card3
             CommunityLayout.Full -> R.layout.listing_item_full
             CommunityLayout.ListWithCards -> R.layout.listing_item_list_with_cards
+            CommunityLayout.FullWithCards -> R.layout.listing_item_full_with_cards
         }
         is Item.FilteredPostItem -> R.layout.filtered_post_item
         is Item.FooterItem -> R.layout.main_footer_item
@@ -165,6 +167,8 @@ class PostListAdapter(
                 ListingItemViewHolder.fromBinding(ListingItemFullBinding.bind(v))
             R.layout.listing_item_list_with_cards ->
                 ListingItemViewHolder.fromBinding(ListingItemListWithCardsBinding.bind(v))
+            R.layout.listing_item_full_with_cards ->
+                ListingItemViewHolder.fromBinding(ListingItemFullWithCardsBinding.bind(v))
             R.layout.filtered_post_item -> ViewBindingViewHolder(FilteredPostItemBinding.bind(v))
             R.layout.main_footer_item -> ViewBindingViewHolder(MainFooterItemBinding.bind(v))
             R.layout.auto_load_item ->

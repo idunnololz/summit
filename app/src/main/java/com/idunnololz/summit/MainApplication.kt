@@ -55,54 +55,17 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
     companion object {
         private val TAG = MainApplication::class.java.simpleName
-
-        fun setLocaleFromPrefs(context: Context) {
-            val locale = LocaleHelper.getLocaleFromPreferences(context)
-            Log.d(TAG, "Lang: " + locale?.toString())
-            Log.d(TAG, "Current locale: " + Locale.getDefault().toString())
-            setLocale(context, locale)
-        }
-
-        fun setLocale(context: Context, locale: Locale?) {
-            if (locale == null) return
-
-            val config = context.resources.configuration
-
-            val isAlreadyThatLocale: Boolean
-            val curLocale: Locale = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-                config.locales.get(0)
-            } else {
-                config.locale
-            }
-            isAlreadyThatLocale = curLocale.language.equals(locale.language, ignoreCase = true) &&
-                curLocale.country.equals(locale.country, ignoreCase = true)
-
-            if (isAlreadyThatLocale) {
-                Log.d(TAG, "Looks like the locale did not change. Skipping locale set.")
-                return
-            }
-
-            Locale.setDefault(locale)
-            val conf = Configuration(config)
-            conf.setLocale(locale)
-            context.resources.updateConfiguration(
-                conf,
-                context.resources.displayMetrics,
-            )
-        }
     }
 
     private var originalLocale: Locale? = null
 
     override fun attachBaseContext(base: Context) {
         PreferenceUtil.initialize(base)
-        setLocaleFromPrefs(base)
         super.attachBaseContext(base)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        setLocaleFromPrefs(this)
 
         themeManager.updateTextConfig()
 
@@ -119,10 +82,10 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         PreferenceUtil.initialize(context)
 
-        val preferences = PreferenceUtil.preferences
+        val sharedPreferences = PreferenceUtil.preferences
 
         AppCompatDelegate.setDefaultNightMode(
-            preferences.getInt(
+            sharedPreferences.getInt(
                 PreferenceUtil.KEY_THEME,
                 AppCompatDelegate.MODE_NIGHT_YES,
             ),
@@ -161,8 +124,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
             Log.d(TAG, "Perf. Everything else: " + (System.currentTimeMillis() - startTime))
             startTime = System.currentTimeMillis()
         }
-
-        setLocaleFromPrefs(baseContext)
 
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Perf. setLocaleFromPrefs: " + (System.currentTimeMillis() - startTime))
@@ -215,19 +176,22 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
+        val preferences = hiltEntryPoint.preferences()
+
         hiltEntryPoint.themeManager().onPreferencesChanged()
-        Utils.openExternalLinksInBrowser = hiltEntryPoint.preferences().openLinksInExternalApp
-        LemmyTextHelper.autoLinkPhoneNumbers = hiltEntryPoint.preferences().autoLinkPhoneNumbers
+        Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
+        LemmyTextHelper.autoLinkPhoneNumbers = preferences.autoLinkPhoneNumbers
+        LemmyTextHelper.autoLinkIpAddresses = preferences.autoLinkIpAddresses
         notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
 
         hiltEntryPoint.notificationsManager().start()
 
-        GlobalSettings.refresh(hiltEntryPoint.preferences())
+        GlobalSettings.refresh(preferences)
 
         hiltEntryPoint.accountInfoManager().init()
         hiltEntryPoint.conversationsManager().init()
 
-        if (hiltEntryPoint.preferences().useFirebase) {
+        if (preferences.useFirebase) {
             FirebaseApp.initializeApp(this)
             Firebase.crashlytics.isCrashlyticsCollectionEnabled = true
 

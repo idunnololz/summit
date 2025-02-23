@@ -69,7 +69,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
@@ -779,7 +779,7 @@ class InboxFragment :
                 )
                 b.content.addEllipsizeToSpannedOnLayout()
 
-                b.ts.text = dateStringToPretty(
+                b.ts.text = tsToConcise(
                     context = context,
                     ts = conversation.ts,
                     style = PrettyPrintStyles.SHORT_DYNAMIC,

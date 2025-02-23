@@ -49,10 +49,10 @@ fun InsetsProvider.insetViewExceptTopAutomaticallyByPadding(
 
 fun InsetsProvider.insetViewExceptBottomAutomaticallyByPadding(
     lifecycleOwner: LifecycleOwner,
-    rootView: View,
+    view: View,
 ) {
     insets.observe(lifecycleOwner) {
-        rootView.setPadding(
+        view.setPadding(
             it.leftInset,
             it.topInset,
             it.rightInset,

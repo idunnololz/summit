@@ -28,6 +28,7 @@ import com.idunnololz.summit.util.PreferenceUtil
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtil.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_IP_ADDRESSES
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_LOAD_MORE_POSTS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_AUTO_PLAY_VIDEOS
@@ -129,6 +130,7 @@ import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_LESS_DARK_BACKGROUND
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_MULTILINE_POST_HEADERS
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PER_COMMUNITY_SETTINGS
+import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtil.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.util.PreferenceUtil.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -257,6 +259,8 @@ class Preferences(
             PreferenceUtil.KEY_POST_UI_CONFIG_FULL
         CommunityLayout.ListWithCards ->
             PreferenceUtil.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
+        CommunityLayout.FullWithCards ->
+            PreferenceUtil.KEY_POST_UI_CONFIG_FULL_WITH_CARDS
     }
 
     fun getBaseTheme(): BaseTheme {
@@ -607,6 +611,13 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_AUTO_LINK_PHONE_NUMBERS, value)
+                .apply()
+        }
+    var autoLinkIpAddresses: Boolean
+        get() = prefs.getBoolean(KEY_AUTO_LINK_IP_ADDRESSES, true)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_AUTO_LINK_IP_ADDRESSES, value)
                 .apply()
         }
     var postShowUpAndDownVotes: Boolean
@@ -1092,6 +1103,14 @@ class Preferences(
         set(value) {
             prefs.edit()
                 .putBoolean(KEY_HIDE_DUPLICATE_POSTS_ON_READ, value)
+                .apply()
+        }
+
+    var usePostsFeedHeader: Boolean
+        get() = prefs.getBoolean(KEY_USE_POSTS_FEED_HEADER, false)
+        set(value) {
+            prefs.edit()
+                .putBoolean(KEY_USE_POSTS_FEED_HEADER, value)
                 .apply()
         }
 

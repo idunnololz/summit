@@ -31,7 +31,7 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.view.LemmyHeaderView
@@ -208,12 +208,12 @@ class LemmyHeaderHelper @AssistedInject constructor(
         }
 
         sb.appendSeparator()
-        dateStringToPretty(context, postView.post.published).let {
+        tsToConcise(context, postView.post.published).let {
             sb.append(it)
         }
 
         if (showEditedDate && postView.post.updated != null) {
-            dateStringToPretty(context, postView.post.updated).let {
+            tsToConcise(context, postView.post.updated).let {
                 sb.append(" ($it)")
             }
         }
@@ -508,11 +508,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
             sb.append("  ")
         }
         sb.append(
-            dateStringToPretty(context, commentView.comment.published),
+            tsToConcise(context, commentView.comment.published),
         )
 
         if (showEditedDate && commentView.comment.updated != null) {
-            dateStringToPretty(context, commentView.comment.updated).let {
+            tsToConcise(context, commentView.comment.updated).let {
                 sb.append(" ($it)")
             }
         }

@@ -145,8 +145,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 applyTopInset = false,
             )
             insets.observe(viewLifecycleOwner) {
-                val previousPadding = binding.toolbar.paddingTop
-                val newToolbarHeight = binding.toolbar.measuredHeight - previousPadding + it.topInset
+                val newToolbarHeight =
+                    context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize).toInt() +
+                        it.topInset
 
                 binding.bannerDummy.updateLayoutParams<MarginLayoutParams> {
                     topMargin = -it.topInset

@@ -199,6 +199,7 @@
     <item name="refresh_interval_12_hours" type="id" />
     <item name="unknown" type="id" />
     <item name="layout_list_with_card" type="id" />
+    <item name="layout_full_with_card" type="id" />
     <item name="edit_community" type="id" />
     <item name="create_community" type="id" />
     <item name="delete_community" type="id" />

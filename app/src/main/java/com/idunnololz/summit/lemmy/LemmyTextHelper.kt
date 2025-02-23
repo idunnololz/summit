@@ -7,9 +7,11 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
+import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
+import androidx.core.text.getSpans
 import coil.imageLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
@@ -47,6 +49,13 @@ object LemmyTextHelper {
     private var noMediaMarkwon: Markwon? = null
 
     var autoLinkPhoneNumbers: Boolean = true
+    var autoLinkIpAddresses: Boolean = true
+
+    private val ipPattern = Pattern.compile(
+        "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]"
+            + "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]"
+            + "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}"
+            + "|[1-9][0-9]|[0-9]))")
 
     fun bindText(
         textView: TextView,
@@ -126,6 +135,24 @@ object LemmyTextHelper {
         return try {
             val _spanned = spannableText ?: markwon.toMarkdown(text)
             val spanned = SpannableStringBuilder(_spanned)
+
+            if (!autoLinkIpAddresses) {
+                val spans = spanned.getSpans<URLSpan>(0, spanned.length)
+                for (s in spans) {
+                    val linkText = spanned.subSequence(
+                        spanned.getSpanStart(s),
+                        spanned.getSpanEnd(s),
+                    )
+
+                    val matcher = ipPattern.matcher(linkText)
+                    if (matcher.find() &&
+                        matcher.group().length == linkText.length &&
+                        "http://${linkText}" == s.url) {
+
+                        spanned.removeSpan(s)
+                    }
+                }
+            }
 
             if (highlight != null) {
                 val highlightColor = textView.context.getColorFromAttribute(

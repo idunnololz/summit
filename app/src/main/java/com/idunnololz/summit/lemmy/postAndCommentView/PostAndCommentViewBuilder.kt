@@ -92,7 +92,7 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -1323,7 +1323,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             null,
             null,
         )
-        b.date.text = dateStringToPretty(context, item.lastUpdate)
+        b.date.text = tsToConcise(context, item.lastUpdate)
 
         val title = if (item is InboxItem.MessageInboxItem) {
             context.getString(R.string.message_to_format, item.targetUserName)
