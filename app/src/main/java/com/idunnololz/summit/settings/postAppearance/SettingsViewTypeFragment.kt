@@ -15,6 +15,7 @@ import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
@@ -121,6 +122,7 @@ class SettingsViewTypeFragment :
                 CommunityLayout.Card3 to getString(R.string.card3),
                 CommunityLayout.Full to getString(R.string.full),
                 CommunityLayout.ListWithCards to getString(R.string.list_with_cards),
+                CommunityLayout.FullWithCards to getString(R.string.full_with_cards),
             ),
             getCurrentChoice = {
                 preferences.getPostsLayout()
@@ -170,6 +172,7 @@ class SettingsViewTypeFragment :
             CommunityLayout.Card2,
             CommunityLayout.Card3,
             CommunityLayout.ListWithCards,
+            CommunityLayout.FullWithCards,
             -> {
                 binding.horizontalMarginSizeSetting.root.visibility = View.VISIBLE
                 settings.horizontalMarginSize.bindTo(
@@ -334,6 +337,14 @@ class SettingsViewTypeFragment :
             CommunityLayout.ListWithCards ->
                 ListingItemViewHolder.fromBinding(
                     ListingItemListWithCardsBinding.inflate(
+                        inflater,
+                        binding.demoViewContainer,
+                        false,
+                    ),
+                )
+            CommunityLayout.FullWithCards ->
+                ListingItemViewHolder.fromBinding(
+                    ListingItemFullWithCardsBinding.inflate(
                         inflater,
                         binding.demoViewContainer,
                         false,

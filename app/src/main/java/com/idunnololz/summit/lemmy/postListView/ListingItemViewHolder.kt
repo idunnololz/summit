@@ -11,6 +11,7 @@ import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
 import com.idunnololz.summit.databinding.ListingItemCompactBinding
 import com.idunnololz.summit.databinding.ListingItemFullBinding
+import com.idunnololz.summit.databinding.ListingItemFullWithCardsBinding
 import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
@@ -195,6 +196,27 @@ class ListingItemViewHolder(
         )
 
         fun fromBinding(binding: ListingItemFullBinding) = ListingItemViewHolder(
+            rawBinding = binding,
+            root = binding.root,
+            contentView = binding.contentView,
+            headerContainer = binding.headerContainer,
+            imageView = null,
+            title = binding.title,
+            commentText = null,
+            commentButton = null,
+            upvoteCount = null,
+            upvoteButton = null,
+            downvoteCount = null,
+            downvoteButton = null,
+            iconImage = null,
+            fullContentContainerView = binding.fullContent,
+            highlightBg = binding.highlightBg,
+            layoutShowsFullContent = true,
+            createCommentButton = null,
+            themeColorBar = binding.themeColorBar,
+        )
+
+        fun fromBinding(binding: ListingItemFullWithCardsBinding) = ListingItemViewHolder(
             rawBinding = binding,
             root = binding.root,
             contentView = binding.contentView,

@@ -35,6 +35,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel.SiteOrCommunityResult
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity

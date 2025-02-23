@@ -37,7 +37,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.coil.AsyncDrawableSpan
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.setup
@@ -404,7 +404,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
                     doesTextContainDrawable = false
                 }
 
-                b.info.text = dateStringToPretty(
+                b.info.text = tsToConcise(
                     context = context,
                     ts = item.messageItem.lastUpdateTs,
                     style = PrettyPrintStyles.SHORT_DYNAMIC,

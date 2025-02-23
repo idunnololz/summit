@@ -74,7 +74,7 @@ class ModernThreadLinesDecoration(
     }
 
     override fun onDraw(c: Canvas, parent: ViewGroup) {
-        context.getColorFromAttribute(R.attr.border_color)
+        context.getColorFromAttribute(com.google.android.material.R.attr.strokeColor)
         val childCount = parent.childCount
 
         for (i in 0 until childCount) {

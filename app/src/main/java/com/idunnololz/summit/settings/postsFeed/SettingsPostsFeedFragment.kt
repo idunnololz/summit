@@ -358,6 +358,13 @@ class SettingsPostsFeedFragment :
                 preferences.hideDuplicatePostsOnRead = it
             },
         )
+        settings.usePostsFeedHeader.bindTo(
+            binding.usePostsFeedHeader,
+            { preferences.usePostsFeedHeader },
+            {
+                preferences.usePostsFeedHeader = it
+            },
+        )
     }
 
     override fun updateValue(key: Int, value: Any?) {

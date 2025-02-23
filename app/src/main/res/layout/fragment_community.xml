@@ -11,10 +11,6 @@
         android:layout_width="@dimen/sliding_pane_first_child_width"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/custom_app_bar"
-            layout="@layout/custom_app_bar"/>
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

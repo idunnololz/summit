@@ -17,6 +17,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.FloatingWindow
@@ -43,6 +44,8 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
+import kotlin.math.max
+import kotlin.math.min
 
 class NavBarController(
     val activity: Activity,
@@ -101,8 +104,9 @@ class NavBarController(
             } else {
                 0
             }
-
-    val navBarOffsetPercent = MutableLiveData<Float>(0f)
+    private val _navBarOffsetPercent = MutableLiveData<Float>(0f)
+    val navBarOffsetPercent: LiveData<Float>
+        get() = _navBarOffsetPercent
     val bottomNavViewAnimationOffsetPercent = MutableLiveData<Float>(0f)
     val bottomNavOpenPercent: Float
         get() = navBarOffsetPercent.value!! +
@@ -122,6 +126,11 @@ class NavBarController(
         bottomNavViewAnimationOffsetPercent.observe(lifecycleOwner) {
             updateOpenness(bottomNavOpenPercent)
         }
+    }
+
+    fun setNavBarOpenPercent(percent: Float) {
+        val v = max(min(percent, 1f), 0f)
+        _navBarOffsetPercent.value = v
     }
 
     fun setup() {
@@ -306,7 +315,7 @@ class NavBarController(
                     navBarContainer.height.toFloat()
                 }
 
-        navBarOffsetPercent.value = 0f
+        _navBarOffsetPercent.value = 0f
 
         if (useNavigationRail) {
             if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {

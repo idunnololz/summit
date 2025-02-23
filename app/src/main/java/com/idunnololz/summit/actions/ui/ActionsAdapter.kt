@@ -16,7 +16,7 @@ import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.video.VideoState
 
@@ -209,7 +209,7 @@ class ActionsAdapter(
             } else {
                 context.getString(R.string.user_id_format, accountId.toString())
             }
-            b.date.text = dateStringToPretty(context, actionDate)
+            b.date.text = tsToConcise(context, actionDate)
 
             LemmyTextHelper.bindText(
                 b.actionDesc,

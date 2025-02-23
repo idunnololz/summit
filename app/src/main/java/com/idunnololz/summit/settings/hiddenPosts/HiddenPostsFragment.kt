@@ -26,7 +26,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomDividerItemDecoration
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -172,7 +172,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
                 val hiddenPost = item.hiddenPost
 
                 b.timestamp.text = if (System.currentTimeMillis() - hiddenPost.ts < ONE_DAY_MS * 7) {
-                    dateStringToPretty(context, hiddenPost.ts)
+                    tsToConcise(context, hiddenPost.ts)
                 } else {
                     dateFormat.format(Instant.ofEpochMilli(hiddenPost.ts).atZone(ZoneId.systemDefault()).toLocalDate())
                 }

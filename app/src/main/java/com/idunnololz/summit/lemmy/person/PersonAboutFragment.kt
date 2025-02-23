@@ -29,7 +29,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -213,7 +213,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
                             if (personView.person.ban_expires != null) {
                                 context.getString(
                                     R.string.banned_until_format,
-                                    dateStringToPretty(context, personView.person.ban_expires),
+                                    tsToConcise(context, personView.person.ban_expires),
                                 )
                             } else {
                                 context.getString(R.string.banned)

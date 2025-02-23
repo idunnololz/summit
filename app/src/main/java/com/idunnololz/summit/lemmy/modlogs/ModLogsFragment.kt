@@ -37,7 +37,7 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.dateStringToPretty
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -657,7 +657,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 }
 
                 b.overtext.text = SpannableStringBuilder().apply {
-                    append(dateStringToPretty(context, modEvent.ts))
+                    append(tsToConcise(context, modEvent.ts))
                     appendSeparator()
                     append(
                         context.getString(

@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +39,7 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.goTo.GoToDialogFragment
 import com.idunnololz.summit.history.HistoryManager
@@ -50,6 +53,7 @@ import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MultiCommunityException
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
 import com.idunnololz.summit.lemmy.getShortDesc
@@ -94,11 +98,11 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -120,6 +124,7 @@ class CommunityFragment :
     private val args: CommunityFragmentArgs by navArgs()
 
     private val viewModel: CommunityViewModel by viewModels()
+    private val communityInfoViewModel: CommunityInfoViewModel by viewModels()
 
     private var adapter: PostListAdapter? = null
 
@@ -158,6 +163,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var lemmyApiClient: LemmyApiClient
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     lateinit var preferences: Preferences
 
@@ -339,7 +347,7 @@ class CommunityFragment :
 
                     getMainActivity()?.openImage(
                         sharedElement = sharedElementView,
-                        appBar = binding.customAppBar.root,
+                        appBar = lemmyAppBarController?.appBarRoot,
                         title = postView.post.name,
                         url = url,
                         mimeType = null,
@@ -503,13 +511,24 @@ class CommunityFragment :
 
             lemmyAppBarController = LemmyAppBarController(
                 mainActivity = requireMainActivity(),
-                binding = customAppBar,
+                parentContainer = coordinatorLayout,
                 accountInfoManager = accountInfoManager,
+                communityInfoViewModel = communityInfoViewModel,
+                viewLifecycleOwner = viewLifecycleOwner,
+                avatarHelper = avatarHelper,
+                useHeader = preferences.usePostsFeedHeader,
                 state = lemmyAppBarController?.state,
             )
 
+            // Prevent flickers by setting the app bar here first
+            lemmyAppBarController?.setCommunity(args.communityRef)
+            // Prevent flickers by setting the header thing
+            lemmyAppBarController?.setUseHeader(preferences.usePostsFeedHeader)
+
             viewModel.defaultCommunity.observe(viewLifecycleOwner) {
-                lemmyAppBarController?.setDefaultCommunity(it)
+                if (it != null) {
+                    lemmyAppBarController?.setDefaultCommunity(it)
+                }
             }
             viewModel.currentAccount.observe(viewLifecycleOwner) {
                 lemmyAppBarController?.onAccountChanged(it)
@@ -536,26 +555,19 @@ class CommunityFragment :
             )
 
             requireMainActivity().apply {
-                insetViewExceptBottomAutomaticallyByMargins(
-                    lifecycleOwner = viewLifecycleOwner,
-                    view = customAppBar.customActionBar,
-                )
-
                 if (navBarController.useNavigationRail) {
                     navBarController.updatePaddingForNavBar(coordinatorLayout)
                 }
-                customAppBar.root.addOnOffsetChangedListener { _, verticalOffset ->
+                lemmyAppBarController?.percentShown?.observe(viewLifecycleOwner) {
                     if (!isBindingAvailable() || viewModel.lockBottomBar) {
-                        return@addOnOffsetChangedListener
+                        return@observe
                     }
-
-                    val percentShown = -verticalOffset.toFloat() / customAppBar.root.height
 
                     if (!navBarController.useNavigationRail) {
-                        navBarController.navBarOffsetPercent.value = percentShown
+                        navBarController.setNavBarOpenPercent(it)
                     }
 
-                    isCustomAppBarExpandedPercent = 1f - percentShown
+                    isCustomAppBarExpandedPercent = 1f - it
 
                     updateFabState()
                 }
@@ -985,7 +997,7 @@ class CommunityFragment :
                                             )
                                     } else {
                                         recyclerView.scrollToPosition(0)
-                                        customAppBar.root.setExpanded(true)
+                                        lemmyAppBarController?.setExpanded(true)
                                     }
                                 }
                             }
@@ -1149,6 +1161,7 @@ class CommunityFragment :
             }
 
             customAppBarController.setIsInfinity(viewModel.infinity)
+            customAppBarController.setUseHeader(preferences.usePostsFeedHeader)
             if (viewModel.infinity) {
                 onBackPressedHandler.isEnabled = false
             } else {
@@ -1288,6 +1301,8 @@ class CommunityFragment :
                 _layoutSelectorMenu.setChecked(R.id.layout_full)
             CommunityLayout.ListWithCards ->
                 _layoutSelectorMenu.setChecked(R.id.layout_list_with_card)
+            CommunityLayout.FullWithCards ->
+                _layoutSelectorMenu.setChecked(R.id.layout_full_with_card)
         }
 
         return _layoutSelectorMenu
@@ -1935,6 +1950,16 @@ class CommunityFragment :
             addItemWithIcon(R.id.layout_card2, R.string.card2, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_card3, R.string.card3, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
+            addItemWithIcon(
+                R.id.layout_list_with_card,
+                R.string.list_with_cards,
+                R.drawable.baseline_view_list_24,
+            )
+            addItemWithIcon(
+                R.id.layout_full_with_card,
+                R.string.full_with_cards,
+                R.drawable.outline_cards_24,
+            )
             setTitle(R.string.layout)
 
             setOnMenuItemClickListener { menuItem ->
@@ -1955,6 +1980,8 @@ class CommunityFragment :
                         onLayoutSelected(CommunityLayout.Full)
                     R.id.layout_list_with_card ->
                         onLayoutSelected(CommunityLayout.ListWithCards)
+                    R.id.layout_full_with_card ->
+                        onLayoutSelected(CommunityLayout.FullWithCards)
                 }
             }
         }

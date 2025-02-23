@@ -110,6 +110,16 @@ class SettingsMiscFragment :
                 LemmyTextHelper.resetMarkwon(context)
             },
         )
+        settings.autoLinkIpAddresses.bindTo(
+            binding.autoLinkIpAddresses,
+            { preferences.autoLinkIpAddresses },
+            {
+                preferences.autoLinkIpAddresses = it
+
+                LemmyTextHelper.autoLinkIpAddresses = it
+                LemmyTextHelper.resetMarkwon(context)
+            },
+        )
         settings.instanceNameStyle.bindTo(
             binding.instanceNameStyle,
             { preferences.displayInstanceStyle },

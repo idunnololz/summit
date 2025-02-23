@@ -47,6 +47,12 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/auto_link_ip_addresses"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/instance_name_style"
                     layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
