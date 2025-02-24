@@ -65,7 +65,7 @@
         android:layout_marginEnd="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding_quarter"
         android:layout_marginBottom="@dimen/padding_three_quarters"
-        android:textAppearance="?textAppearanceBodySmall"
+        android:textAppearance="?textAppearanceLabelMedium"
         android:textColor="@color/colorTextFaint"
         android:includeFontPadding="false"
         android:maxLines="1"

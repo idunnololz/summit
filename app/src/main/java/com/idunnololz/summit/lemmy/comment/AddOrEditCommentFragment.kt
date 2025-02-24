@@ -415,8 +415,6 @@ class AddOrEditCommentFragment :
 
         with(binding) {
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
-                val imeInset = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
-
                 WindowInsetsCompat.CONSUMED
             }
 

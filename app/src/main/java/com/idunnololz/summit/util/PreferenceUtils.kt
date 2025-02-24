@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.idunnololz.summit.util.ext.getIntOrNull
 import com.idunnololz.summit.util.ext.getLongSafe
 import java.util.HashSet
@@ -11,6 +12,8 @@ import kotlin.reflect.KProperty
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+
+private const val TAG = "PreferenceUtils"
 
 object PreferenceUtils {
 
@@ -356,7 +359,7 @@ class NullableIntPreferenceDelegate(
 }
 
 class LongPreferenceDelegate(
-    val prefs: SharedPreferences,
+    private val prefs: SharedPreferences,
     val key: String,
     val defaultValue: Long = 0,
 ) : ReadWriteProperty<Any, Long> {
@@ -394,6 +397,7 @@ class JsonPreferenceDelegate<T>(
                 default()
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Error reading json. Key: $key", e)
             default()
         }.also {
             cache(it)
@@ -404,6 +408,7 @@ class JsonPreferenceDelegate<T>(
         val s = try {
             json.encodeToString(serializer, value)
         } catch (e: Exception) {
+            Log.e(TAG, "Error converting object to json. Key: $key", e)
             null
         }
         prefs.edit()

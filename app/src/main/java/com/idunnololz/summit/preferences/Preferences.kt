@@ -693,7 +693,7 @@ class Preferences(
 
     @Suppress("NOTHING_TO_INLINE")
     private inline fun longPreference(key: String, defaultValue: Long = 0) =
-        LongPreferenceDelegate(prefs, key)
+        LongPreferenceDelegate(prefs, key, defaultValue)
 
     private inline fun <reified T> jsonPreference(key: String, noinline defaultValue: () -> T) =
         JsonPreferenceDelegate(prefs, json, key, serializer(), defaultValue)

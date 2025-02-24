@@ -694,6 +694,8 @@ class PostListViewBuilder @Inject constructor(
                     iconImageView.setOnClickListener {
                         onPageClick(accountId, postView.community.toCommunityRef())
                     }
+                } else {
+                    headerContainer.ensureNoIconImageView()
                 }
 
                 fun showDefaultImage() {

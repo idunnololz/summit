@@ -1957,11 +1957,6 @@ class CommunityFragment :
             addItemWithIcon(R.id.layout_card3, R.string.card3, R.drawable.baseline_article_24)
             addItemWithIcon(R.id.layout_full, R.string.full, R.drawable.baseline_view_day_24)
             addItemWithIcon(
-                R.id.layout_list_with_card,
-                R.string.list_with_cards,
-                R.drawable.baseline_view_list_24,
-            )
-            addItemWithIcon(
                 R.id.layout_full_with_card,
                 R.string.full_with_cards,
                 R.drawable.outline_cards_24,
