@@ -1,7 +1,5 @@
 package com.idunnololz.summit.main
 
-import android.annotation.SuppressLint
-import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -27,30 +25,23 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.loadProfileImageOrDefault
-import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CustomAppBarLargeBinding
 import com.idunnololz.summit.databinding.CustomAppBarSmallBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.appendNameWithInstance
-import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.instance
-import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.relativeTimeToConcise
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -137,7 +128,7 @@ class LemmyAppBarController(
             val icon: ImageView,
             val subscribe: TextView,
             val info: TextView,
-        ): ViewHolder {
+        ) : ViewHolder {
             override fun setSortOrderText(text: String) {
                 communitySortOrder.text = text
                 communitySortOrder2.text = text
@@ -161,7 +152,7 @@ class LemmyAppBarController(
             override val communitySortOrder: TextView,
             override val collapsingToolbarLayout: CollapsingToolbarLayout,
             override val toolbar: MaterialToolbar,
-        ): ViewHolder {
+        ) : ViewHolder {
             override fun setSortOrderText(text: String) {
                 communitySortOrder.text = text
             }
@@ -171,14 +162,15 @@ class LemmyAppBarController(
             }
         }
     }
-    
+
     init {
         vh = ensureViewHolder(useHeader, force = true)
 
         mainActivity.apply {
             insets.observe(viewLifecycleOwner) {
                 val toolbarHeight = context.getDimenFromAttribute(
-                    androidx.appcompat.R.attr.actionBarSize).toInt()
+                    androidx.appcompat.R.attr.actionBarSize,
+                ).toInt()
                 val newToolbarHeight = toolbarHeight + it.topInset
                 vh.setToolbarTopPadding(it.topInset)
                 vh.collapsingToolbarLayout.scrimVisibleHeightTrigger =
@@ -327,7 +319,7 @@ class LemmyAppBarController(
                 val communityInstance = currentCommunity.instance ?: communityInfoViewModel.instance
                 vh.subtitle.visibility = View.VISIBLE
                 @Suppress("SetTextI18n")
-                vh.subtitle.text = "${communityName}@${communityInstance}"
+                vh.subtitle.text = "$communityName@$communityInstance"
             }
 
             when (val value = communityInfoViewModel.siteOrCommunity.value) {
@@ -352,7 +344,7 @@ class LemmyAppBarController(
                             {
                                 avatarHelper.loadCommunityIcon(vh.icon, it.community_view.community)
                                 it.community_view.community.banner
-                            }
+                            },
                         )
                     val iconUrl = value.data.response
                         .fold(
@@ -361,12 +353,12 @@ class LemmyAppBarController(
                             },
                             {
                                 it.community_view.community.icon
-                            }
+                            },
                         )
                     val body = value.data.response
                         .fold(
                             { it.site_view.site.description },
-                            { it.community_view.community.description }
+                            { it.community_view.community.description },
                         )
 
                     if (body.isNullOrBlank()) {
@@ -383,7 +375,7 @@ class LemmyAppBarController(
                                     appBar = appBarRoot,
                                     title = null,
                                     url = url,
-                                    mimeType = null
+                                    mimeType = null,
                                 )
                             },
                             onVideoClick = { url ->
@@ -419,7 +411,7 @@ class LemmyAppBarController(
                                 appBar = appBarRoot,
                                 title = null,
                                 url = bannerUrl,
-                                mimeType = null
+                                mimeType = null,
                             )
                         }
                     }
@@ -433,7 +425,7 @@ class LemmyAppBarController(
                                 appBar = appBarRoot,
                                 title = null,
                                 url = iconUrl,
-                                mimeType = null
+                                mimeType = null,
                             )
                         }
                     }
@@ -444,7 +436,8 @@ class LemmyAppBarController(
 
             when (currentCommunity) {
                 is CommunityRef.All,
-                is CommunityRef.Local -> {
+                is CommunityRef.Local,
+                -> {
                     vh.info.visibility = View.VISIBLE
                     vh.info.text = context.getString(R.string.instance_info)
                 }
@@ -454,7 +447,8 @@ class LemmyAppBarController(
                 }
                 is CommunityRef.Subscribed,
                 is CommunityRef.AllSubscribed,
-                is CommunityRef.ModeratedCommunities -> {
+                is CommunityRef.ModeratedCommunities,
+                -> {
                     vh.info.visibility = View.VISIBLE
                     vh.info.text = context.getString(R.string.feed_info)
                 }
@@ -565,9 +559,13 @@ class LemmyAppBarController(
             when (communitySortOrder) {
                 CommunitySortOrder.Active -> context.getString(R.string.sort_order_active)
                 CommunitySortOrder.Hot -> context.getString(R.string.sort_order_hot)
-                CommunitySortOrder.MostComments -> context.getString(R.string.sort_order_most_comments)
+                CommunitySortOrder.MostComments -> context.getString(
+                    R.string.sort_order_most_comments,
+                )
                 CommunitySortOrder.New -> context.getString(R.string.sort_order_new)
-                CommunitySortOrder.NewComments -> context.getString(R.string.sort_order_new_comments)
+                CommunitySortOrder.NewComments -> context.getString(
+                    R.string.sort_order_new_comments,
+                )
                 CommunitySortOrder.Old -> context.getString(R.string.sort_order_old)
                 is CommunitySortOrder.TopOrder ->
                     context.getString(
@@ -597,7 +595,9 @@ class LemmyAppBarController(
                                 context.getString(R.string.time_frame_all_time)
                         },
                     )
-                CommunitySortOrder.Controversial -> context.getString(R.string.sort_order_controversial)
+                CommunitySortOrder.Controversial -> context.getString(
+                    R.string.sort_order_controversial,
+                )
                 CommunitySortOrder.Scaled -> context.getString(R.string.sort_order_scaled_short)
             }
         vh.setSortOrderText(sortOrderText)
@@ -625,7 +625,7 @@ class LemmyAppBarController(
             with(vh.collapsingToolbarLayout) {
                 setToolbarElementsVisibility(
                     visible = this.isLaidOut && height + currentOffset < scrimVisibleHeightTrigger,
-                    animate = animate
+                    animate = animate,
                 )
             }
         }

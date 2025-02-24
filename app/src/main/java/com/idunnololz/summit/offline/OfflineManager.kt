@@ -393,8 +393,10 @@ class OfflineManager @Inject constructor(
         // TODO()
     }
 
-    fun getLastSuccessfulOfflineDownloadTime(): Long =
-        PreferenceUtils.preferences.getLong(PreferenceUtils.KEY_LAST_SUCCESSFUL_OFFLINE_DOWNLOAD, -1)
+    fun getLastSuccessfulOfflineDownloadTime(): Long = PreferenceUtils.preferences.getLong(
+        PreferenceUtils.KEY_LAST_SUCCESSFUL_OFFLINE_DOWNLOAD,
+        -1,
+    )
 
 //    fun postProgressUpdate(message: String, progress: Double) {
 //        val copy = offlineDownloadProgressListeners.toList()

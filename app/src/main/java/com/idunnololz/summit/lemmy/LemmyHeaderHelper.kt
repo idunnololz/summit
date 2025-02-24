@@ -31,9 +31,9 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

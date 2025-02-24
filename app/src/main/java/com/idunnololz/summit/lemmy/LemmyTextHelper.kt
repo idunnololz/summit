@@ -52,10 +52,11 @@ object LemmyTextHelper {
     var autoLinkIpAddresses: Boolean = true
 
     private val ipPattern = Pattern.compile(
-        "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]"
-            + "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]"
-            + "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}"
-            + "|[1-9][0-9]|[0-9]))")
+        "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]" +
+            "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]" +
+            "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}" +
+            "|[1-9][0-9]|[0-9]))",
+    )
 
     fun bindText(
         textView: TextView,
@@ -147,8 +148,8 @@ object LemmyTextHelper {
                     val matcher = ipPattern.matcher(linkText)
                     if (matcher.find() &&
                         matcher.group().length == linkText.length &&
-                        "http://${linkText}" == s.url) {
-
+                        "http://$linkText" == s.url
+                    ) {
                         spanned.removeSpan(s)
                     }
                 }

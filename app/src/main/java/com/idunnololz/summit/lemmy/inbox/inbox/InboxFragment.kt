@@ -69,7 +69,6 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
@@ -80,6 +79,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.tsToShortDate
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint

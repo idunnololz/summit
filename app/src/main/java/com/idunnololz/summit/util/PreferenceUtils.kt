@@ -2,13 +2,8 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMUNITY_SORT_ORDER
-import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
-import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_COLOR_3
-import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.getIntOrNull
 import com.idunnololz.summit.util.ext.getLongSafe
-import com.idunnololz.summit.util.ext.toJsonSafe
 import com.squareup.moshi.Moshi
 import java.util.HashSet
 import java.util.StringTokenizer
@@ -298,11 +293,10 @@ object PreferenceUtils {
 class StringPreferenceDelegate(
     val prefs: SharedPreferences,
     val key: String,
-    val defaultValue: String? = ""
+    val defaultValue: String? = "",
 ) : ReadWriteProperty<Any, String?> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getString(key, defaultValue)
+    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getString(key, defaultValue)
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: String?) =
         prefs.edit().putString(key, value).apply()
@@ -311,11 +305,10 @@ class StringPreferenceDelegate(
 class FloatPreferenceDelegate(
     val prefs: SharedPreferences,
     val key: String,
-    val defaultValue: Float = 0f
+    val defaultValue: Float = 0f,
 ) : ReadWriteProperty<Any, Float> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getFloat(key, defaultValue)
+    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getFloat(key, defaultValue)
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) =
         prefs.edit().putFloat(key, value).apply()
@@ -324,7 +317,7 @@ class FloatPreferenceDelegate(
 class BooleanPreferenceDelegate(
     val prefs: SharedPreferences,
     val key: String,
-    val defaultValue: Boolean = false
+    val defaultValue: Boolean = false,
 ) : ReadWriteProperty<Any, Boolean> {
 
     override fun getValue(thisRef: Any, property: KProperty<*>) =
@@ -337,11 +330,10 @@ class BooleanPreferenceDelegate(
 class IntPreferenceDelegate(
     val prefs: SharedPreferences,
     val key: String,
-    val defaultValue: Int = 0
+    val defaultValue: Int = 0,
 ) : ReadWriteProperty<Any, Int> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getInt(key, defaultValue)
+    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getInt(key, defaultValue)
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
         prefs.edit().putInt(key, value).apply()
@@ -352,8 +344,7 @@ class NullableIntPreferenceDelegate(
     val key: String,
 ) : ReadWriteProperty<Any, Int?> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getIntOrNull(key)
+    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getIntOrNull(key)
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Int?) {
         if (value != null) {
@@ -365,7 +356,7 @@ class NullableIntPreferenceDelegate(
 class LongPreferenceDelegate(
     val prefs: SharedPreferences,
     val key: String,
-    val defaultValue: Long = 0
+    val defaultValue: Long = 0,
 ) : ReadWriteProperty<Any, Long> {
 
     override fun getValue(thisRef: Any, property: KProperty<*>) =
@@ -426,4 +417,3 @@ class JsonPreferenceDelegate<T>(
         cache = value
     }
 }
-

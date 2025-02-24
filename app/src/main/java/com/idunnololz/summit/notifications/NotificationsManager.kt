@@ -347,7 +347,8 @@ class NotificationsManager @Inject constructor(
         }
     }
 
-    private fun getChannelIdForAccount(account: Account) = CHANNEL_ID_ACCOUNT_PREFIX + account.fullName
+    private fun getChannelIdForAccount(account: Account) =
+        CHANNEL_ID_ACCOUNT_PREFIX + account.fullName
 
     private fun getChannelGroupIdForAccount(account: Account) =
         CHANNEL_GROUP_ID_ACCOUNT_PREFIX + account.fullName

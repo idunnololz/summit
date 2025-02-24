@@ -144,22 +144,15 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.StringPreferenceDelegate
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.fromJsonSafe
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getIntOrNull
-import com.idunnololz.summit.util.ext.getLongSafe
 import com.idunnololz.summit.util.ext.getMoshiValue
 import com.idunnololz.summit.util.ext.putMoshiValue
-import com.idunnololz.summit.util.ext.toJsonSafe
 import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.Duration
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesDataStore(
     name = "offlineModePreferences",
@@ -445,7 +438,9 @@ class Preferences(
 
     var displayInstanceStyle: Int
         by intPreference(
-            KEY_DISPLAY_INSTANCE_STYLE, DisplayInstanceOptions.OnlyDisplayNonLocalInstances)
+            KEY_DISPLAY_INSTANCE_STYLE,
+            DisplayInstanceOptions.OnlyDisplayNonLocalInstances,
+        )
 
     var retainLastPost: Boolean
         by booleanPreference(KEY_RETAIN_LAST_POST, true)
@@ -731,9 +726,6 @@ class Preferences(
     private inline fun longPreference(key: String, defaultValue: Long = 0) =
         LongPreferenceDelegate(prefs, key)
 
-    private inline fun <reified T> jsonPreference(
-        key: String,
-        noinline defaultValue: () -> T,
-    ) =
+    private inline fun <reified T> jsonPreference(key: String, noinline defaultValue: () -> T) =
         JsonPreferenceDelegate(prefs, moshi, key, T::class.java, defaultValue)
 }

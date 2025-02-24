@@ -16,8 +16,8 @@ import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.video.VideoState
 
 class ActionsAdapter(

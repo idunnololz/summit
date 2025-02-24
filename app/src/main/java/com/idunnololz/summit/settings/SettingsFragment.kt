@@ -395,7 +395,6 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             SearchHomeConfigDialogFragment.show(childFragmentManager)
                         }
 
-
                         null -> {
                             // do nothing
                         }

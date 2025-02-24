@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import coil.dispose
-import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
@@ -35,9 +34,7 @@ import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.setup
-import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -247,10 +244,16 @@ class CommunitiesPaneController @AssistedInject constructor(
                         b.icon.dispose()
                         b.icon.setImageResource(d)
                         b.icon.scaleType = ImageView.ScaleType.CENTER
-                        b.icon.setBackgroundColor(context.getColorFromAttribute(
-                            com.google.android.material.R.attr.colorSurfaceContainerHighest))
-                        b.icon.imageTintList = ColorStateList.valueOf(context.getColorFromAttribute(
-                            com.google.android.material.R.attr.colorOnSurface))
+                        b.icon.setBackgroundColor(
+                            context.getColorFromAttribute(
+                                com.google.android.material.R.attr.colorSurfaceContainerHighest,
+                            ),
+                        )
+                        b.icon.imageTintList = ColorStateList.valueOf(
+                            context.getColorFromAttribute(
+                                com.google.android.material.R.attr.colorOnSurface,
+                            ),
+                        )
 //                        b.icon.load(
 //                            context.getDrawableCompat(d)
 //                                ?.tint(
