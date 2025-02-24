@@ -352,7 +352,7 @@ class MoreActionsHelper @Inject constructor(
             },
             errorListener = {
                 downloadAndShareFile.postError(it)
-            }
+            },
         )
     }
 

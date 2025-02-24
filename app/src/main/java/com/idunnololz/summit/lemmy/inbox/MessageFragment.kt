@@ -56,7 +56,6 @@ import javax.inject.Inject
 import kotlin.math.max
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.min
 
 @AndroidEntryPoint
 class MessageFragment : BaseFragment<FragmentMessageBinding>() {

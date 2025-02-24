@@ -79,7 +79,7 @@ class ExoPlayerManagerManager @Inject constructor(
             globalStateStorage,
             players,
             preferences,
-            { dataSourceFactory }
+            { dataSourceFactory },
         ).also { manager ->
             Log.d(TAG, "No manager found for $lifecycleOwner. Creating one...")
             managersMap[lifecycleOwner] = manager
@@ -120,7 +120,6 @@ class ExoPlayerManagerManager @Inject constructor(
     }
 
     fun onDestroyView() {
-
     }
 }
 
@@ -139,6 +138,7 @@ class ExoPlayerManager(
     companion object {
 
         private const val TAG = "ExoPlayerManager"
+
         /**
          * The amount to rewind a video if we are maintaining video position and transitioning screens.
          * The idea is that the transition might be laggy so rewind slightly to account for it.
@@ -254,26 +254,25 @@ class ExoPlayerManager(
         }
     }
 
-    private fun newPlayer() =
-        ExoPlayer.Builder(context)
-            .build()
-            .apply {
-                addListener(
-                    object : Player.Listener {
-                        override fun onEvents(player: Player, events: Player.Events) {
-                            super.onEvents(player, events)
+    private fun newPlayer() = ExoPlayer.Builder(context)
+        .build()
+        .apply {
+            addListener(
+                object : Player.Listener {
+                    override fun onEvents(player: Player, events: Player.Events) {
+                        super.onEvents(player, events)
 
-                            if (events.containsAny(Player.EVENT_REPEAT_MODE_CHANGED)) {
-                                if (!player.isPlaying &&
-                                    player.repeatMode != Player.REPEAT_MODE_OFF
-                                ) {
-                                    Util.handlePlayPauseButtonAction(player)
-                                }
+                        if (events.containsAny(Player.EVENT_REPEAT_MODE_CHANGED)) {
+                            if (!player.isPlaying &&
+                                player.repeatMode != Player.REPEAT_MODE_OFF
+                            ) {
+                                Util.handlePlayPauseButtonAction(player)
                             }
                         }
-                    },
-                )
-            }
+                    }
+                },
+            )
+        }
 
     private fun setupPlayer(player: ExoPlayer, config: ExoPlayerConfig) {
         // Create a data source factory.

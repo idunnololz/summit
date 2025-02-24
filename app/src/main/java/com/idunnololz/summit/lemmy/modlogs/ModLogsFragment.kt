@@ -37,7 +37,6 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -45,6 +44,7 @@ import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

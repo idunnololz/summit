@@ -237,7 +237,7 @@ class LemmyApiClient(
 
             instanceFlow.value = api.instance
         } catch (e: Exception) {
-            Log.w(TAG, "Invalid instance: ${newInstance}", e)
+            Log.w(TAG, "Invalid instance: $newInstance", e)
         }
     }
 

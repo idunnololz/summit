@@ -37,7 +37,6 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.coil.AsyncDrawableSpan
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.setup
@@ -46,6 +45,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

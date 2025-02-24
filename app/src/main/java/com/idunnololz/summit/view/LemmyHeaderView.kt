@@ -16,7 +16,6 @@ import androidx.core.widget.TextViewCompat
 import com.google.android.material.R
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.AbsoluteCornerSize
-import com.google.android.material.shape.RelativeCornerSize
 import com.idunnololz.summit.R as R2
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.convertSpToPixel

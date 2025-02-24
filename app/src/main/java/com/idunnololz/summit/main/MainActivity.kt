@@ -89,7 +89,6 @@ import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
-import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
@@ -100,10 +99,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @AndroidEntryPoint
 class MainActivity :

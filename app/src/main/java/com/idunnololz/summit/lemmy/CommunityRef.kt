@@ -5,7 +5,6 @@ import android.os.Parcelable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
@@ -18,7 +17,6 @@ import com.idunnololz.summit.lemmy.CommunityRef.Local
 import com.idunnololz.summit.lemmy.CommunityRef.ModeratedCommunities
 import com.idunnololz.summit.lemmy.CommunityRef.MultiCommunity
 import com.idunnololz.summit.lemmy.CommunityRef.Subscribed
-import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
