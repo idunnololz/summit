@@ -9,6 +9,7 @@ import com.idunnololz.summit.lemmy.utils.StableAccountId
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.json.Json
 
 @Singleton
 class PreferenceManager @Inject constructor(
@@ -16,6 +17,7 @@ class PreferenceManager @Inject constructor(
     private val baseSharedPreferences: SharedPreferences,
     val basePreferences: Preferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val json: Json,
 ) {
 
     private var currentAccount: Account? = null
@@ -45,6 +47,7 @@ class PreferenceManager @Inject constructor(
             context = context,
             prefs = ComposedPreferences(prefs),
             coroutineScopeFactory = coroutineScopeFactory,
+            json = json,
         )
 
         return _currentPreferences!!
@@ -55,6 +58,7 @@ class PreferenceManager @Inject constructor(
             context = context,
             prefs = getSharedPreferencesForAccount(account),
             coroutineScopeFactory = coroutineScopeFactory,
+            json = json,
         )
     }
 

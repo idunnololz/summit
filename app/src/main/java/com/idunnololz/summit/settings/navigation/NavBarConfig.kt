@@ -1,8 +1,8 @@
 package com.idunnololz.summit.settings.navigation
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class NavBarConfig(
     val navBarDestinations: List<NavBarDestId> = listOf(
         NavBarDestinations.Home,

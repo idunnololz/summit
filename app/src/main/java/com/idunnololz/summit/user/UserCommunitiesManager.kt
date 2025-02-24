@@ -42,7 +42,7 @@ class UserCommunitiesManager @Inject constructor(
 
     val userCommunitiesChangedFlow = MutableSharedFlow<Unit>()
     val userCommunitiesUpdatedFlow = MutableSharedFlow<UserCommunityItem>()
-    val defaultCommunity = MutableStateFlow(preferences.getDefaultPage())
+    val defaultCommunity = MutableStateFlow(preferences.defaultPage)
 
     init {
         coroutineScope.launch {
@@ -112,7 +112,7 @@ class UserCommunitiesManager @Inject constructor(
     fun getAllUserCommunities(): List<UserCommunityItem> = userCommunityItems
 
     suspend fun setDefaultPage(currentCommunityRef: CommunityRef) {
-        preferences.setDefaultPage(currentCommunityRef)
+        preferences.defaultPage = currentCommunityRef
         onDefaultPageChanged(currentCommunityRef)
     }
 
@@ -169,9 +169,9 @@ class UserCommunitiesManager @Inject constructor(
     }
 
     private fun makeHomeTab(): UserCommunityItem = UserCommunityItem(
-        FIRST_FRAGMENT_TAB_ID,
-        FIRST_FRAGMENT_SORT_ID,
-        communityRef = preferences.getDefaultPage(),
+        id = FIRST_FRAGMENT_TAB_ID,
+        sortOrder = FIRST_FRAGMENT_SORT_ID,
+        communityRef = preferences.defaultPage,
     )
 
     private suspend fun onDefaultPageChanged(newValue: CommunityRef) {

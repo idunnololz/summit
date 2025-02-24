@@ -18,10 +18,10 @@ import com.idunnololz.summit.lemmy.CommunityRef.ModeratedCommunities
 import com.idunnololz.summit.lemmy.CommunityRef.MultiCommunity
 import com.idunnololz.summit.lemmy.CommunityRef.Subscribed
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 /**
  * Instances that don't support self references by fully qualified names.
@@ -33,7 +33,8 @@ private val CommunitiesNoAt = setOf(
     "lemmy.thesanewriter.com",
 )
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface CommunityRef : PageRef, Parcelable {
 
 //    @Parcelize
@@ -52,24 +53,24 @@ sealed interface CommunityRef : PageRef, Parcelable {
 //        }
 //    }
 
+    @Serializable
+    @SerialName("2")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("2")
     data class Local(
         val instance: String?,
     ) : CommunityRef
 
+    @Serializable
+    @SerialName("3")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("3")
     data class All(
-        @Json(name = "site")
+        @SerialName("site")
         val instance: String? = null,
     ) : CommunityRef
 
+    @Serializable
+    @SerialName("4")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("4")
     data class CommunityRefByName(
         val name: String,
         val instance: String?,
@@ -94,32 +95,32 @@ sealed interface CommunityRef : PageRef, Parcelable {
         }
     }
 
+    @Serializable
+    @SerialName("5")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("5")
     data class Subscribed(
         val instance: String?,
     ) : CommunityRef
 
+    @Serializable
+    @SerialName("6")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("6")
     data class MultiCommunity(
         val name: String,
         val icon: String?,
         val communities: List<CommunityRefByName>,
     ) : CommunityRef
 
+    @Serializable
+    @SerialName("7")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("7")
     data class ModeratedCommunities(
         val instance: String?,
     ) : CommunityRef
 
+    @Serializable
+    @SerialName("8")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("8")
     class AllSubscribed() : CommunityRef
 
     fun getName(context: Context): String = when (this) {

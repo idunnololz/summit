@@ -9,9 +9,9 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.util.crashlytics
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Entity(tableName = "user_tags")
 @Parcelize
@@ -31,7 +31,7 @@ data class UserTagEntry(
 ) : Parcelable
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class UserTagConfig(
     val tagName: String,
     val fillColor: Int,
@@ -39,7 +39,7 @@ data class UserTagConfig(
 ) : Parcelable
 
 @ProvidedTypeConverter
-class UserTagConverters(private val moshi: Moshi) {
+class UserTagConverters(private val json: Json) {
 
     companion object {
         private const val TAG = "UserTagConverters"
@@ -47,14 +47,12 @@ class UserTagConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun userTagConfigToString(value: UserTagConfig): String {
-        return moshi.adapter<UserTagConfig>(UserTagConfig::class.java)
-            .toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToUserTagConfig(value: String): UserTagConfig? = try {
-        moshi.adapter<UserTagConfig>(UserTagConfig::class.java)
-            .fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)

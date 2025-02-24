@@ -14,8 +14,8 @@ import androidx.room.TypeConverters
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.DefaultSortOrder
-import com.squareup.moshi.Moshi
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.json.Json
 
 /**
  * Data Access Object
@@ -82,28 +82,27 @@ fun UserCommunityEntry.toItem(): UserCommunityItem? {
 }
 
 @ProvidedTypeConverter
-class UserCommunitiesConverters(private val moshi: Moshi) {
+class UserCommunitiesConverters(private val json: Json) {
     @TypeConverter
     fun communitySortOrderToString(value: CommunitySortOrder): String {
-        return moshi.adapter(CommunitySortOrder::class.java).toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToCommunitySortOrder(value: String): CommunitySortOrder = try {
-        moshi.adapter(CommunitySortOrder::class.java).fromJson(value)
-            ?: DefaultSortOrder
+        json.decodeFromString(value) ?: DefaultSortOrder
     } catch (e: Exception) {
         DefaultSortOrder
     }
 
     @TypeConverter
     fun communityRefToString(value: CommunityRef): String {
-        return moshi.adapter(CommunityRef::class.java).toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToCommunityRef(value: String): CommunityRef? = try {
-        moshi.adapter(CommunityRef::class.java).fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         null
     }

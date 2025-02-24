@@ -1,9 +1,9 @@
 package com.idunnololz.summit.preferences
 
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class GuestAccountSettings(
     val instance: String = DEFAULT_INSTANCE,
 )

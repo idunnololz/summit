@@ -1,14 +1,14 @@
 package com.idunnololz.summit.preferences
 
-import com.squareup.moshi.Json
+import kotlinx.serialization.SerialName
 
 enum class BaseTheme {
-    @Json(name = "use_system")
+    @SerialName("use_system")
     UseSystem,
 
-    @Json(name = "light")
+    @SerialName("light")
     Light,
 
-    @Json(name = "dark")
+    @SerialName("dark")
     Dark,
 }

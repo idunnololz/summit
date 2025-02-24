@@ -10,7 +10,6 @@ import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.TabCommunityState
-import com.idunnololz.summit.util.moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 @Singleton
 class HistoryManager @Inject constructor(
@@ -26,6 +26,7 @@ class HistoryManager @Inject constructor(
     private val historyDao: HistoryDao,
     private val apiClient: AccountAwareLemmyClient,
     private val preferences: Preferences,
+    private val json: Json,
 ) {
 
     companion object {
@@ -110,8 +111,12 @@ class HistoryManager @Inject constructor(
                     url = state.toUrl(apiClient.instance),
                     shortDesc = shortDesc,
                     ts = ts,
-                    extras = moshi.adapter(TabCommunityState::class.java)
-                        .toJson(TabCommunityState(tabId = tabId, viewState = state)),
+                    extras = json.encodeToString(
+                        TabCommunityState(
+                            tabId = tabId,
+                            viewState = state,
+                        ),
+                    ),
                 )
                 recordHistoryEntry(historyEntry)
             }
@@ -130,7 +135,7 @@ class HistoryManager @Inject constructor(
 
     private suspend fun recordHistoryEntry(newEntry: HistoryEntry) {
         withContext(dbContext) {
-            historyDao.insertEntryMergeWithPreviousIfSame(newEntry)
+            historyDao.insertEntryMergeWithPreviousIfSame(json, newEntry)
         }
 
         withContext(Dispatchers.Default) {

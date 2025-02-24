@@ -3,18 +3,20 @@ package com.idunnololz.summit.lemmy
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.utils.instance
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface PersonRef : Parcelable, PageRef {
 
     val instance: String
 
+    @Serializable
+    @SerialName("1")
     @Parcelize
-    @TypeLabel("1")
-    @JsonClass(generateAdapter = true)
     data class PersonRefByName(
         val name: String,
         /**
@@ -23,9 +25,9 @@ sealed interface PersonRef : Parcelable, PageRef {
         override val instance: String,
     ) : PersonRef
 
+    @Serializable
+    @SerialName("2")
     @Parcelize
-    @TypeLabel("2")
-    @JsonClass(generateAdapter = true)
     data class PersonRefById(
         val id: Long,
         /**

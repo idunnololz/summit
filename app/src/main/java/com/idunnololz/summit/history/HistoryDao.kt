@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.idunnololz.summit.user.TabCommunityState
-import com.idunnololz.summit.util.moshi
+import kotlinx.serialization.json.Json
 
 private const val TAG = "HistoryDao"
 
@@ -56,7 +56,7 @@ interface HistoryDao {
     suspend fun count(): Int
 
     @Transaction
-    open suspend fun insertEntryMergeWithPreviousIfSame(newEntry: HistoryEntry) {
+    open suspend fun insertEntryMergeWithPreviousIfSame(json: Json, newEntry: HistoryEntry) {
         val lastEntry = getLastHistoryEntryWithType(newEntry.type)
 
         Log.d(TAG, "Last entry: $lastEntry")
@@ -80,9 +80,8 @@ interface HistoryDao {
 
                     HistoryEntry.TYPE_COMMUNITY_STATE -> {
                         // Url for community state is actually the tab id...
-                        val adapter = moshi.adapter(TabCommunityState::class.java)
-                        val oldState = adapter.fromJson(lastEntry.extras)
-                        val newState = adapter.fromJson(newEntry.extras)
+                        val oldState = json.decodeFromString<TabCommunityState?>(lastEntry.extras)
+                        val newState = json.decodeFromString<TabCommunityState?>(newEntry.extras)
                         if (oldState?.viewState?.communityState?.communityRef == newState?.viewState?.communityState?.communityRef &&
                             oldState?.viewState?.communityState?.currentPageIndex ==
                             newState?.viewState?.communityState?.currentPageIndex

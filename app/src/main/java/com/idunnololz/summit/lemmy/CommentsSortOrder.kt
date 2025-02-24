@@ -4,27 +4,33 @@ import android.content.Context
 import android.os.Parcelable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentSortType
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface CommentsSortOrder : Parcelable {
 
+    @Serializable
+    @SerialName("1")
     @Parcelize
-    @TypeLabel("1")
     data object Hot : CommentsSortOrder
 
+    @Serializable
+    @SerialName("2")
     @Parcelize
-    @TypeLabel("2")
     data object Top : CommentsSortOrder
 
+    @Serializable
+    @SerialName("3")
     @Parcelize
-    @TypeLabel("3")
     data object New : CommentsSortOrder
 
+    @Serializable
+    @SerialName("4")
     @Parcelize
-    @TypeLabel("4")
     data object Old : CommentsSortOrder
 }
 

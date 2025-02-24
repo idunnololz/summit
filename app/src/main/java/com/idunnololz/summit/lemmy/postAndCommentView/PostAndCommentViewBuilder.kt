@@ -130,7 +130,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private var preferences = preferenceManager.currentPreferences
 
     var postInListUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
-    var uiConfig: PostAndCommentsUiConfig = preferences.getPostAndCommentsUiConfig()
+    var uiConfig: PostAndCommentsUiConfig = preferences.postAndCommentsUiConfig
         set(value) {
             field = value
 
@@ -215,7 +215,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     fun onPreferencesChanged() {
-        uiConfig = preferences.getPostAndCommentsUiConfig()
+        uiConfig = preferences.postAndCommentsUiConfig
         hideCommentActions = preferences.hideCommentActions
         tapCommentToCollapse = preferences.tapCommentToCollapse
         globalFontSizeMultiplier = GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)

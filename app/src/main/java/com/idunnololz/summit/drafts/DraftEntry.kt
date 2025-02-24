@@ -10,10 +10,11 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashlytics
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Entity(tableName = "drafts")
 @TypeConverters(DraftConverters::class)
@@ -37,7 +38,7 @@ data class DraftEntry(
 ) : Parcelable
 
 @ProvidedTypeConverter
-class DraftConverters(private val moshi: Moshi) {
+class DraftConverters(private val json: Json) {
 
     companion object {
         private const val TAG = "DraftConverters"
@@ -45,12 +46,12 @@ class DraftConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun draftDataToString(value: DraftData): String {
-        return moshi.adapter(DraftData::class.java).toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToDraftData(value: String): DraftData? = try {
-        moshi.adapter(DraftData::class.java).fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)
@@ -64,14 +65,15 @@ object DraftTypes {
     const val Message = 3
 }
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface DraftData : Parcelable {
     val accountId: Long
     val accountInstance: String
 
     @Parcelize
-    @TypeLabel("1")
-    @JsonClass(generateAdapter = true)
+    @Serializable
+    @SerialName("1")
     data class PostDraftData(
         val originalPost: OriginalPostData?,
         val name: String?,
@@ -84,8 +86,8 @@ sealed interface DraftData : Parcelable {
     ) : DraftData
 
     @Parcelize
-    @TypeLabel("2")
-    @JsonClass(generateAdapter = true)
+    @Serializable
+    @SerialName("2")
     data class CommentDraftData(
         val originalComment: OriginalCommentData?,
         val postRef: PostRef?,
@@ -96,8 +98,8 @@ sealed interface DraftData : Parcelable {
     ) : DraftData
 
     @Parcelize
-    @TypeLabel("3")
-    @JsonClass(generateAdapter = true)
+    @Serializable
+    @SerialName("3")
     data class MessageDraftData(
         val targetAccountId: Long,
         val targetInstance: String,
@@ -115,7 +117,7 @@ val DraftData.type
     }
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class OriginalPostData(
     val name: String,
     val body: String?,
@@ -124,7 +126,7 @@ data class OriginalPostData(
 ) : Parcelable
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class OriginalCommentData(
     val postRef: PostRef,
     val commentId: Int,

@@ -5,8 +5,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -16,7 +18,11 @@ class ImgurModule {
     fun provideImgurApi(): ImgurApi = Retrofit.Builder()
         .baseUrl("https://api.imgur.com")
         .client(get())
-        .addConverterFactory(MoshiConverterFactory.create())
+        .addConverterFactory(
+            Json.asConverterFactory(
+                "application/json; charset=UTF8".toMediaType(),
+            ),
+        )
         .build()
         .create(ImgurApi::class.java)
 }

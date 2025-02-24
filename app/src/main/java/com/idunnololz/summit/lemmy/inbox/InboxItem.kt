@@ -10,9 +10,10 @@ import com.idunnololz.summit.api.dto.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 interface CommentBackedItem {
     val score: Int
@@ -26,7 +27,8 @@ interface CommentBackedItem {
 
 sealed interface ReportItem
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface InboxItem : Parcelable, LiteInboxItem {
 
     override val id: Int
@@ -43,8 +45,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     val isRemoved: Boolean
     val isRead: Boolean
 
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("1")
+    @Serializable
+    @SerialName("1")
     @Parcelize
     data class ReplyInboxItem(
         override val id: Int,
@@ -95,8 +97,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
         override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
     }
 
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("2")
+    @Serializable
+    @SerialName("2")
     @Parcelize
     data class MentionInboxItem(
         override val id: Int,
@@ -147,8 +149,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
         override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
     }
 
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("3")
+    @Serializable
+    @SerialName("3")
     @Parcelize
     data class MessageInboxItem(
         override val id: Int,
@@ -198,8 +200,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
         override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
     }
 
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("4")
+    @Serializable
+    @SerialName("4")
     @Parcelize
     data class ReportMessageInboxItem(
         override val id: Int,
@@ -241,8 +243,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
         override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
     }
 
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("5")
+    @Serializable
+    @SerialName("5")
     @Parcelize
     data class ReportPostInboxItem(
         override val id: Int,
@@ -285,8 +287,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
         override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
     }
 
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("6")
+    @Serializable
+    @SerialName("6")
     @Parcelize
     data class ReportCommentInboxItem(
         override val id: Int,

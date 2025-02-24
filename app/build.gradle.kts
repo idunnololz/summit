@@ -5,9 +5,9 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("androidx.navigation.safeargs.kotlin")
     id("org.jetbrains.kotlin.plugin.parcelize")
-    id("kotlin-kapt")
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 android {
@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 223
-        versionName = "1.55.0"
+        versionCode = 224
+        versionName = "1.55.1"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -118,7 +118,7 @@ dependencies {
 
     implementation(libs.retrofit2.retrofit)
     implementation(libs.retrofit2.converter.gson)
-    implementation(libs.retrofit2.converter.moshi)
+    implementation(libs.retrofit2.converter.kotlinx.serialization)
 
     implementation(libs.markwon.core)
     implementation(libs.markwon.simple.ext)
@@ -130,10 +130,6 @@ dependencies {
 
     implementation(libs.browser)
 
-    implementation(libs.moshi)
-    implementation(libs.moshi.adapter)
-    ksp(libs.moshi.kotlin.codegen)
-
     implementation(libs.flow.layout)
 
     implementation(libs.arrow.core)
@@ -142,16 +138,13 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.core.splashscreen)
 
-    implementation(libs.moshi.sealed.runtime)
-    ksp(libs.moshi.sealed.codegen)
-
     implementation(libs.transformations)
     implementation(libs.java.string.similarity)
     implementation(libs.viewpump)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.hilt.compiler)
 
     implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
@@ -162,9 +155,6 @@ dependencies {
     implementation(libs.datastore.preferences)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
-}
 
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
+    implementation(libs.kotlinx.serialization.json)
 }

@@ -1,8 +1,8 @@
 package com.idunnololz.summit.preferences
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 class PostQuickActionsSettings(
     val actions: List<PostQuickActionId> =
         listOf(

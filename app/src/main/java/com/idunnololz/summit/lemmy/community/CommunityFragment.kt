@@ -107,6 +107,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @AndroidEntryPoint
 class CommunityFragment :
@@ -163,6 +164,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    @Inject
+    lateinit var json: Json
 
     lateinit var preferences: Preferences
 
@@ -425,7 +429,10 @@ class CommunityFragment :
         viewModel.changeCommunity(args.communityRef)
 
         if (savedInstanceState != null) {
-            restoreState(CommunityViewState.restoreFromBundle(savedInstanceState), reload = false)
+            restoreState(
+                CommunityViewState.restoreFromBundle(savedInstanceState, json),
+                reload = false,
+            )
         }
 
         sharedElementEnterTransition = SharedElementTransition()
@@ -1207,7 +1214,7 @@ class CommunityFragment :
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.createState()?.writeToBundle(outState)
+        viewModel.createState()?.writeToBundle(outState, json)
         super.onSaveInstanceState(outState)
     }
 
@@ -1237,7 +1244,6 @@ class CommunityFragment :
         Log.d(TAG, "onDestroyView()")
 
         itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
-        postListViewBuilder.onDestroyView()
 
         super.onDestroyView()
     }
@@ -1313,7 +1319,7 @@ class CommunityFragment :
 
         val fullAccount = moreActionsHelper.fullAccount
         val currentCommunityRef = viewModel.currentCommunityRef.value
-        val currentDefaultPage = preferences.getDefaultPage()
+        val currentDefaultPage = preferences.defaultPage
         val isBookmarked =
             if (currentCommunityRef == null) {
                 false

@@ -20,11 +20,12 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.util.crashlytics
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Dao
 interface LemmyActionsDao {
@@ -60,7 +61,7 @@ data class LemmyPendingAction(
 ) : LemmyAction
 
 @ProvidedTypeConverter
-class LemmyActionConverters(private val moshi: Moshi) {
+class LemmyActionConverters(private val json: Json) {
 
     companion object {
         private const val TAG = "LemmyActionConverters"
@@ -68,12 +69,12 @@ class LemmyActionConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun actionInfoToString(value: ActionInfo): String {
-        return moshi.adapter(ActionInfo::class.java).toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToActionInfo(value: String): ActionInfo? = try {
-        moshi.adapter(ActionInfo::class.java).fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)
@@ -82,12 +83,12 @@ class LemmyActionConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun lemmyActionFailureReasonToString(value: LemmyActionFailureReason): String {
-        return moshi.adapter(LemmyActionFailureReason::class.java).toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToLemmyActionFailureReason(value: String): LemmyActionFailureReason? = try {
-        moshi.adapter(LemmyActionFailureReason::class.java).fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)
@@ -95,7 +96,8 @@ class LemmyActionConverters(private val moshi: Moshi) {
     }
 }
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface ActionInfo : Parcelable {
 
     val accountId: Long?
@@ -105,8 +107,8 @@ sealed interface ActionInfo : Parcelable {
     val retries: Int
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("1")
+    @Serializable
+    @SerialName("1")
     data class VoteActionInfo(
         /**
          * Instance where the object lives.
@@ -131,8 +133,8 @@ sealed interface ActionInfo : Parcelable {
     }
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("2")
+    @Serializable
+    @SerialName("2")
     data class CommentActionInfo(
         val postRef: PostRef,
         val parentId: CommentId?,
@@ -151,8 +153,8 @@ sealed interface ActionInfo : Parcelable {
     }
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("3")
+    @Serializable
+    @SerialName("3")
     data class DeleteCommentActionInfo(
         val postRef: PostRef,
         val commentId: CommentId,
@@ -167,8 +169,8 @@ sealed interface ActionInfo : Parcelable {
     }
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("4")
+    @Serializable
+    @SerialName("4")
     data class EditCommentActionInfo(
         val postRef: PostRef,
         val commentId: CommentId,
@@ -187,8 +189,8 @@ sealed interface ActionInfo : Parcelable {
     }
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("5")
+    @Serializable
+    @SerialName("5")
     data class MarkPostAsReadActionInfo(
         val postRef: PostRef,
         val read: Boolean,

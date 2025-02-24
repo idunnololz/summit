@@ -15,8 +15,7 @@ class SettingsPostAndCommentsAppearanceViewModel @Inject constructor(
     val preferences: Preferences,
 ) : ViewModel() {
 
-    var currentPostAndCommentUiConfig: PostAndCommentsUiConfig =
-        preferences.getPostAndCommentsUiConfig()
+    var currentPostAndCommentUiConfig: PostAndCommentsUiConfig = preferences.postAndCommentsUiConfig
         set(value) {
             field = value
 
@@ -32,7 +31,7 @@ class SettingsPostAndCommentsAppearanceViewModel @Inject constructor(
     }
 
     fun onLayoutChanged() {
-        currentPostAndCommentUiConfig = preferences.getPostAndCommentsUiConfig()
+        currentPostAndCommentUiConfig = preferences.postAndCommentsUiConfig
         onPostUiChanged.value = Unit
     }
 
@@ -51,7 +50,7 @@ class SettingsPostAndCommentsAppearanceViewModel @Inject constructor(
     }
 
     private fun applyConfig() {
-        preferences.setPostAndCommentsUiConfig(currentPostAndCommentUiConfig)
+        preferences.postAndCommentsUiConfig = currentPostAndCommentUiConfig
     }
 
     override fun onCleared() {

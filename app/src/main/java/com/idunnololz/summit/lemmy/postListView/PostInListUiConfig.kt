@@ -1,9 +1,9 @@
 package com.idunnololz.summit.lemmy.postListView
 
 import com.idunnololz.summit.lemmy.community.CommunityLayout
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class PostInListUiConfig(
     val imageWidthPercent: Float,
     val textSizeMultiplier: Float = 1f,
@@ -28,13 +28,13 @@ data class PostInListUiConfig(
     )
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class PostAndCommentsUiConfig(
     val postUiConfig: PostUiConfig = PostUiConfig(),
     val commentUiConfig: CommentUiConfig = CommentUiConfig(),
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class PostUiConfig(
     val textSizeMultiplier: Float = 1f,
     val headerTextSizeSp: Float = 14f,
@@ -48,7 +48,7 @@ data class PostUiConfig(
     )
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CommentUiConfig(
     val textSizeMultiplier: Float = 1f,
     val headerTextSizeSp: Float = 14f,
@@ -65,7 +65,7 @@ data class CommentUiConfig(
     )
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class FullContentConfig(
     val titleTextSizeSp: Float = 18f,
     val bodyTextSizeSp: Float = 14f,

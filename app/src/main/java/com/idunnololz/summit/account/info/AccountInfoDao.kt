@@ -19,9 +19,8 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.crashlytics
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Entity(tableName = "account_info")
 @TypeConverters(AccountInfoConverters::class)
@@ -35,7 +34,7 @@ data class AccountInfo(
     val miscAccountInfo: MiscAccountInfo?,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class MiscAccountInfo(
     val avatar: String? = null,
     val defaultCommunitySortType: SortType? = null,
@@ -50,7 +49,7 @@ data class MiscAccountInfo(
     val isAdmin: Boolean? = null,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class AccountSubscription(
     val id: CommunityId,
     val name: String,
@@ -69,19 +68,19 @@ data class AccountSubscription(
     val instanceId: InstanceId,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class BlockedPerson(
     val personId: PersonId,
     val personRef: PersonRef,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class BlockedCommunity(
     val communityId: CommunityId,
     val communityRef: CommunityRef.CommunityRefByName,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class BlockedInstance(
     val instanceId: InstanceId,
     val instanceName: String,
@@ -106,7 +105,7 @@ abstract class AccountInfoDao {
 }
 
 @ProvidedTypeConverter
-class AccountInfoConverters(private val moshi: Moshi) {
+class AccountInfoConverters(private val json: Json) {
 
     companion object {
         private const val TAG = "AccountInfoConverters"
@@ -114,18 +113,12 @@ class AccountInfoConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun subscriptionsToString(value: List<AccountSubscription>): String {
-        return moshi.adapter<List<AccountSubscription>>(
-            Types.newParameterizedType(List::class.java, AccountSubscription::class.java),
-        )
-            .toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToSubscriptions(value: String): List<AccountSubscription>? = try {
-        moshi.adapter<List<AccountSubscription>>(
-            Types.newParameterizedType(List::class.java, AccountSubscription::class.java),
-        )
-            .fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)
@@ -134,14 +127,12 @@ class AccountInfoConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun miscAccountInfoToString(miscAccountInfo: MiscAccountInfo): String {
-        return moshi.adapter<MiscAccountInfo>(MiscAccountInfo::class.java)
-            .toJson(miscAccountInfo)
+        return json.encodeToString(miscAccountInfo)
     }
 
     @TypeConverter
     fun stringToMiscAccountInfo(value: String): MiscAccountInfo? = try {
-        moshi.adapter(MiscAccountInfo::class.java)
-            .fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)

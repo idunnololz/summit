@@ -1,9 +1,9 @@
 package com.idunnololz.summit.user
 
 import com.idunnololz.summit.lemmy.CommunityViewState
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class TabCommunityState(
     val tabId: Long?,
     val viewState: CommunityViewState?,

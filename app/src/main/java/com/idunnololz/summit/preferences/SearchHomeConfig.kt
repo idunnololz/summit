@@ -1,8 +1,8 @@
 package com.idunnololz.summit.preferences
 
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class SearchHomeConfig(
     val showSearchSuggestions: Boolean = true,
     val showSubscribedCommunities: Boolean = true,
