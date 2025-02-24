@@ -7,10 +7,9 @@ import android.util.Base64
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.common.util.Base64Utils
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.AllSettings
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -118,7 +117,7 @@ class ImportSettingsViewModel @Inject constructor(
             return
         }
 
-        val o = json.opt(PreferenceUtil.PREFERENCE_VERSION_CODE)
+        val o = json.opt(PreferenceUtils.PREFERENCE_VERSION_CODE)
 
         if (o == null) {
             state.postValue(State.Error(ErrorType.InvalidSettingsJson, RuntimeException()))

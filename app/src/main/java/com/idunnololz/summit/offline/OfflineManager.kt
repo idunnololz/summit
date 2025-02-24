@@ -16,7 +16,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.LinkUtils.USER_AGENT
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.assertMainThread
@@ -394,7 +394,7 @@ class OfflineManager @Inject constructor(
     }
 
     fun getLastSuccessfulOfflineDownloadTime(): Long =
-        PreferenceUtil.preferences.getLong(PreferenceUtil.KEY_LAST_SUCCESSFUL_OFFLINE_DOWNLOAD, -1)
+        PreferenceUtils.preferences.getLong(PreferenceUtils.KEY_LAST_SUCCESSFUL_OFFLINE_DOWNLOAD, -1)
 
 //    fun postProgressUpdate(message: String, progress: Double) {
 //        val copy = offlineDownloadProgressListeners.toList()

@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.utils.actions
 import android.content.Context
 import android.net.Uri
 import arrow.core.Either
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -357,7 +356,7 @@ class MoreActionsHelper @Inject constructor(
         )
     }
 
-    fun downloadFile(
+    fun downloadImage(
         context: Context,
         destFileName: String,
         url: String,

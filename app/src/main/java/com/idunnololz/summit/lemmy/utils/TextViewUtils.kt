@@ -14,11 +14,11 @@ fun TextView.addEllipsizeToSpannedOnLayout() {
     doOnNextLayout {
         if (maxLines != -1 && lineCount > maxLines) {
             val endOfLastLine = layout.getLineEnd(maxLines - 1)
-            val spannedDropLast3Chars = text.subSequence(0, endOfLastLine - 3) as? Spanned
+            val spannedDropLastChar = text.subSequence(0, endOfLastLine - 1) as? Spanned
 
-            if (spannedDropLast3Chars != null) {
+            if (spannedDropLastChar != null) {
                 val spannableBuilder = SpannableStringBuilder()
-                    .append(spannedDropLast3Chars)
+                    .append(spannedDropLastChar)
                     .append("…")
 
                 text = spannableBuilder

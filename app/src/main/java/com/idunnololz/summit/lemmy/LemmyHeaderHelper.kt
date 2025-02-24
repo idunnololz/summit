@@ -474,7 +474,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
         if (commentView.creator.id == commentView.post.creator_id) {
             run {
                 val d = Utils.tint(context, R.drawable.ic_op, R.color.style_blue)
-                val size: Int = Utils.convertDpToPixel(16f).toInt()
+                val size: Int = Utils.convertDpToPixel(14f).toInt()
                 d.setBounds(0, 0, size, size)
                 sb.append(" ")
                 val s = sb.length

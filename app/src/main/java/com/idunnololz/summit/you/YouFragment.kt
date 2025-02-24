@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.dispose
+import com.idunnololz.summit.CommunityDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
@@ -29,6 +30,7 @@ import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ItemYouDividerBinding
 import com.idunnololz.summit.databinding.ItemYouMenuBinding
 import com.idunnololz.summit.databinding.ItemYouProfileBinding
+import com.idunnololz.summit.databinding.ItemYouSignInOrSignUpBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
@@ -149,6 +151,10 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         )
                     findNavController().navigateSafe(direction)
                 },
+                onSignInOrSignUpClick = {
+                    val direction = YouFragmentDirections.actionGlobalLogin()
+                    findNavController().navigateSafe(direction)
+                },
             ) {
                 when (it) {
                     R.id.saved -> {
@@ -259,12 +265,14 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
         private val onPostsClick: () -> Unit,
         private val onCommentsClick: () -> Unit,
         private val onAccountAgeClick: () -> Unit,
+        private val onSignInOrSignUpClick: () -> Unit,
         private val onItemClick: (Int) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         sealed interface Item {
             data object HeaderItem : Item
             data object FooterItem : Item
+            data object SignInOrSignUpItem : Item
             data class Divider(val key: String) : Item
             data class ProfileItem(
                 val name: String?,
@@ -291,6 +299,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         old.itemId == (new as Item.MenuItem).itemId
                     is Item.ProfileItem -> true
                     Item.FooterItem -> true
+                    Item.SignInOrSignUpItem -> true
                     is Item.Divider ->
                         old.key == (new as Item.Divider).key
                 }
@@ -308,6 +317,14 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 clazz = Item.Divider::class,
                 inflateFn = ItemYouDividerBinding::inflate,
             ) { _, _, _ ->
+            }
+            addItemType(
+                clazz = Item.SignInOrSignUpItem::class,
+                inflateFn = ItemYouSignInOrSignUpBinding::inflate,
+            ) { _, b, _ ->
+                b.button.setOnClickListener {
+                    onSignInOrSignUpClick()
+                }
             }
             addItemType(Item.ProfileItem::class, ItemYouProfileBinding::inflate) { item, b, h ->
                 val account = item.account
@@ -468,6 +485,10 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                     accountInfo = model.accountInfo,
                     person = model.personResult?.getOrNull()?.person_view,
                 )
+
+                if (model.account == null) {
+                    newItems += Item.SignInOrSignUpItem
+                }
 
                 if (model.account != null) {
                     newItems += Item.MenuItem(

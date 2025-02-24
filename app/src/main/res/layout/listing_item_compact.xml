@@ -47,13 +47,12 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <!-- Width set programatically -->
-        <com.idunnololz.summit.view.ReactiveImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/icon_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/content_horizontal_padding"
             android:layout_marginTop="@dimen/padding_half"
-            android:background="@drawable/border1"
             android:padding="@dimen/padding"
             app:layout_constraintVertical_bias="0"
             app:layout_constraintDimensionRatio="H,16:12"

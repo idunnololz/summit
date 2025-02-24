@@ -42,7 +42,11 @@ class DirectoryHelper @Inject constructor(
         fun File.cleanupDir() {
             this.listFiles()?.forEach {
                 if (it.lastModified() < thresholdTime) {
-                    it.delete()
+                    if (it.isDirectory) {
+                        it.deleteRecursively()
+                    } else {
+                        it.delete()
+                    }
                     purgedFiles++
                 }
             }

@@ -20,15 +20,17 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.LoopsVideoUtils
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.video.ExoPlayerManager
+import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,12 +66,24 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     @Inject
     lateinit var okHttpClient: OkHttpClient
 
+    @Inject
+    lateinit var exoPlayerManagerManager: ExoPlayerManagerManager
+
+    @Inject
+    lateinit var globalStateStorage: GlobalStateStorage
+
     private val playerListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
 
             binding.playerView.keepScreenOn =
                 !(playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED)
+        }
+
+        override fun onVolumeChanged(volume: Float) {
+            super.onVolumeChanged(volume)
+
+            globalStateStorage.videoStateVolume = volume
         }
     }
 
@@ -100,7 +114,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         }
 
         if (orientationListener?.canDetectOrientation() == true) {
-            if (PreferenceUtil.isVideoPlayerRotationLocked()) {
+            if (PreferenceUtils.isVideoPlayerRotationLocked()) {
                 orientationListener?.disable()
             } else {
                 orientationListener?.enable()
@@ -166,7 +180,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             visibility = View.VISIBLE
 
             fun updateUi() {
-                if (PreferenceUtil.isVideoPlayerRotationLocked()) {
+                if (PreferenceUtils.isVideoPlayerRotationLocked()) {
                     setImageResource(R.drawable.ic_baseline_screen_rotation_24)
                 } else {
                     setImageResource(R.drawable.ic_baseline_screen_lock_rotation_24)
@@ -174,9 +188,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             }
 
             setOnClickListener {
-                val isOrientationLocked = !PreferenceUtil.isVideoPlayerRotationLocked()
-                PreferenceUtil.setVideoPlayerRotationLocked(isOrientationLocked)
-                if (PreferenceUtil.isVideoPlayerRotationLocked()) {
+                val isOrientationLocked = !PreferenceUtils.isVideoPlayerRotationLocked()
+                PreferenceUtils.setVideoPlayerRotationLocked(isOrientationLocked)
+                if (PreferenceUtils.isVideoPlayerRotationLocked()) {
                     orientationListener?.disable()
                 } else {
                     orientationListener?.enable()
@@ -188,14 +202,12 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
         val videoState: VideoState? =
             if (savedInstanceState != null && savedInstanceState.containsKey(SIS_VIDEO_STATE)) {
-                savedInstanceState.getParcelable(SIS_VIDEO_STATE)
+                savedInstanceState.getParcelableCompat(SIS_VIDEO_STATE)
             } else {
                 args.videoState
             }
 
         loadVideo(context, LinkUtils.convertToHttps(args.url), args.videoType, videoState)
-
-        binding.playerView.player?.addListener(playerListener)
     }
 
     override fun onDestroyView() {
@@ -272,14 +284,29 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             VideoType.Webm,
             VideoType.Hls,
             -> {
+                binding.playerView.player?.removeListener(playerListener)
                 @Suppress("UnsafeOptInUsageError")
-                binding.playerView.player = ExoPlayerManager.get(viewLifecycleOwner)
+                binding.playerView.player = exoPlayerManagerManager.get(viewLifecycleOwner)
                     .getPlayerForUrl(
                         url = url,
                         videoType = videoType,
-                        videoState = videoState,
+                        videoState = videoState ?: VideoState(
+                            0,
+                            volume = globalStateStorage.videoStateVolume,
+                            playing = true,
+                        ),
                         autoPlay = preferenceManager.currentPreferences.autoPlayVideos,
+                        isInline = false,
                     )
+                    .apply {
+                        addListener(playerListener)
+
+                        if (videoState?.volume == null) {
+                            volume = globalStateStorage.videoStateVolume
+                        } else {
+                            volume = videoState.volume
+                        }
+                    }
                 setupMoreButton(context, url, args.url, videoType)
             }
         }

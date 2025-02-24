@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.idunnololz.summit.MainApplication
-import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
@@ -27,7 +26,7 @@ abstract class BaseActivity : AppCompatActivity() {
     var isMaterialYou = false
 
     override fun attachBaseContext(base: Context) {
-        if (PreferenceUtil.usingCustomFont) {
+        if (PreferenceUtils.usingCustomFont) {
             super.attachBaseContext(
                 ViewPumpContextWrapper.wrap(base),
             )

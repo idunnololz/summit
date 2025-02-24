@@ -36,7 +36,7 @@ class DataFiles private constructor(private val context: Context) : IDataCache {
     private lateinit var dataFilesDir: File
 
     init {
-        PreferenceUtil.initialize(context)
+        PreferenceUtils.initialize(context)
         setupDataDir()
     }
 

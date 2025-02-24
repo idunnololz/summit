@@ -511,12 +511,14 @@ class CommunityFragment :
 
             lemmyAppBarController = LemmyAppBarController(
                 mainActivity = requireMainActivity(),
+                baseFragment = this@CommunityFragment,
                 parentContainer = coordinatorLayout,
                 accountInfoManager = accountInfoManager,
                 communityInfoViewModel = communityInfoViewModel,
                 viewLifecycleOwner = viewLifecycleOwner,
                 avatarHelper = avatarHelper,
                 useHeader = preferences.usePostsFeedHeader,
+                moreActionsHelper = moreActionsHelper,
                 state = lemmyAppBarController?.state,
             )
 
@@ -1238,6 +1240,7 @@ class CommunityFragment :
         Log.d(TAG, "onDestroyView()")
 
         itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
+        postListViewBuilder.onDestroyView()
 
         super.onDestroyView()
     }

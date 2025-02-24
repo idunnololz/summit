@@ -2,6 +2,10 @@ package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import android.os.Parcelable
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
@@ -14,6 +18,8 @@ import com.idunnololz.summit.lemmy.CommunityRef.Local
 import com.idunnololz.summit.lemmy.CommunityRef.ModeratedCommunities
 import com.idunnololz.summit.lemmy.CommunityRef.MultiCommunity
 import com.idunnololz.summit.lemmy.CommunityRef.Subscribed
+import com.idunnololz.summit.util.ext.appendLink
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import dev.zacsweers.moshix.sealed.annotations.TypeLabel
@@ -156,6 +162,53 @@ sealed interface CommunityRef : PageRef, Parcelable {
                 context.getString(R.string.moderated_communities)
             }
         is AllSubscribed -> context.getString(R.string.all_subscribed)
+    }
+    fun getLocalizedFullNameSpannable(context: Context): Spannable {
+        val text = when (this) {
+            is Local ->
+                if (this.instance != null) {
+                    "${context.getString(R.string.local)}@${this.instance}"
+                } else {
+                    context.getString(R.string.local)
+                }
+            is All ->
+                if (this.instance != null) {
+                    "${context.getString(R.string.all)}@${this.instance}"
+                } else {
+                    context.getString(R.string.all)
+                }
+            is CommunityRefByName -> this.fullName
+            is Subscribed ->
+                if (this.instance != null) {
+                    "${context.getString(R.string.subscribed)}@${this.instance}"
+                } else {
+                    context.getString(R.string.subscribed)
+                }
+            is MultiCommunity -> this.name
+            is ModeratedCommunities ->
+                if (this.instance != null) {
+                    "${context.getString(R.string.moderated_communities)}@${this.instance}"
+                } else {
+                    context.getString(R.string.moderated_communities)
+                }
+            is AllSubscribed -> context.getString(R.string.all_subscribed)
+        }
+
+        return SpannableStringBuilder().apply {
+            append(text)
+
+            val atIndex = text.indexOf('@')
+            val end = length
+
+            if (atIndex >= 0) {
+                setSpan(
+                    ForegroundColorSpan(context.getColorCompat(R.color.colorTextFaint)),
+                    atIndex,
+                    end,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
+        }
     }
 
     fun getKey(): String = when (this) {

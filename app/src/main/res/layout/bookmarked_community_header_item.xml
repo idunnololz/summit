@@ -13,7 +13,7 @@
         android:textAppearance="?textAppearanceTitleMedium"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/dialog_padding"
-        android:layout_marginBottom="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constrainedWidth="true"

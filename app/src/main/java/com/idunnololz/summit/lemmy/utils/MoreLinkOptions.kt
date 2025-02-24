@@ -386,7 +386,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             )
         }
         R.id.download -> {
-            moreActionsHelper.downloadFile(
+            moreActionsHelper.downloadImage(
                 context = context,
                 destFileName = fileName,
                 url = url,

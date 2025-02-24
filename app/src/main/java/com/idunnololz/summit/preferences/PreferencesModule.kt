@@ -3,7 +3,9 @@ package com.idunnololz.summit.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
+import com.idunnololz.summit.lemmy.utils.stateStorage.StateStorageManager
+import com.idunnololz.summit.util.PreferenceUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,7 +43,7 @@ class PreferencesModule {
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(): SharedPreferences = PreferenceUtil.preferences
+    fun provideSharedPreferences(): SharedPreferences = PreferenceUtils.preferences
 
     @AccountIdsSharedPreference
     @Provides
@@ -58,4 +60,9 @@ class PreferencesModule {
     @Provides
     fun provideStateSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
         preferenceManager.getGlobalStateSharedPreferences()
+
+    @Provides
+    @Singleton
+    fun provideGlobalStateStorage(stateStorageManager: StateStorageManager): GlobalStateStorage =
+        stateStorageManager.globalStateStorage
 }

@@ -3,7 +3,6 @@ package com.idunnololz.summit
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
@@ -28,12 +27,10 @@ import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_
 import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
-import com.idunnololz.summit.util.LocaleHelper
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
 import com.idunnololz.summit.util.isFirebaseInitialized
-import com.idunnololz.summit.video.ExoPlayerManager
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import java.util.Locale
@@ -60,7 +57,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
     private var originalLocale: Locale? = null
 
     override fun attachBaseContext(base: Context) {
-        PreferenceUtil.initialize(base)
+        PreferenceUtils.initialize(base)
         super.attachBaseContext(base)
     }
 
@@ -80,13 +77,13 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
     override fun onCreate() {
         val context = applicationContext
 
-        PreferenceUtil.initialize(context)
+        PreferenceUtils.initialize(context)
 
-        val sharedPreferences = PreferenceUtil.preferences
+        val sharedPreferences = PreferenceUtils.preferences
 
         AppCompatDelegate.setDefaultNightMode(
             sharedPreferences.getInt(
-                PreferenceUtil.KEY_THEME,
+                PreferenceUtils.KEY_THEME,
                 AppCompatDelegate.MODE_NIGHT_YES,
             ),
         )
@@ -115,7 +112,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         }
 
         // Needs to be initialized first
-        ExoPlayerManager.initialize(context)
         DataFiles.initialize(context)
         DataCache.initialize(context)
         OfflineScheduleManager.initialize(context)

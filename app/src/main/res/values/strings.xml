@@ -1944,6 +1944,12 @@
     <string name="full_with_cards">Full with cards</string>
     <string name="use_posts_feed_header">Use posts feed header</string>
     <string name="use_posts_feed_header_desc">Display a descriptive header at the top of the posts feed.</string>
+    <string name="sign_in_or_sign_up">Sign in or sign up</string>
+    <string name="all_feed_desc">Posts from all communities</string>
+    <string name="subscribed_feed_desc">Posts from subscribed communities</string>
+    <string name="local_feed_desc">Posts from communities on this instance</string>
+    <string name="moderated_feed_desc">Posts from communities you moderate</string>
+    <string name="all_subscribed_feed_desc">Posts from your communities across all accounts</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

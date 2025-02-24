@@ -10,9 +10,21 @@
 
     <include app:graph="@navigation/block_list" />
 
-    <action android:id="@+id/action_global_login" app:destination="@id/login"/>
-    <action android:id="@+id/action_global_community" app:destination="@id/community"/>
-    <action android:id="@+id/action_global_history" app:destination="@id/historyFragment"/>
+    <action android:id="@+id/action_global_login" app:destination="@id/login"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
+    <action android:id="@+id/action_global_community" app:destination="@id/community"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
+    <action android:id="@+id/action_global_history" app:destination="@id/historyFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
     <action
         android:id="@+id/action_global_personTabbedFragment2"
         app:destination="@id/personTabbedFragment2"

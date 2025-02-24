@@ -57,7 +57,7 @@ import com.idunnololz.summit.view.LoadingView
 class LemmyContentHelper(
     private val context: Context,
     private val offlineManager: OfflineManager,
-    private val exoPlayerManager: ExoPlayerManager,
+    private val getExoPlayerManager: () -> ExoPlayerManager,
     private val viewRecycler: ViewRecycler<View> = ViewRecycler(),
 ) {
 
@@ -580,10 +580,11 @@ class LemmyContentHelper(
 
                         playerView.player = null
                         playerView.player =
-                            exoPlayerManager.getPlayerForUrl(
-                                videoInfo.videoUrl,
-                                videoType,
+                            getExoPlayerManager().getPlayerForUrl(
+                                url = videoInfo.videoUrl,
+                                videoType = videoType,
                                 videoState = videoState,
+                                isInline = true,
                                 autoPlay = autoPlayVideos,
                             )
                     } else {
@@ -672,10 +673,10 @@ class LemmyContentHelper(
 
             if (viewId == R.layout.full_content_video_view) {
                 val playerView = c.findViewById<CustomPlayerView>(R.id.player_view)
-                stateBuilder.setVideoState(playerView?.player?.getVideoState())
+                stateBuilder.setVideoState(playerView?.getVideoState())
 
                 if (recycle) {
-                    exoPlayerManager.release(playerView.player)
+                    getExoPlayerManager().release(playerView.player)
                 }
             }
 
