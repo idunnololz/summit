@@ -16,27 +16,57 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
+        style="@style/RoundImageView"
         android:id="@+id/icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="12dp"
-        android:layout_marginStart="12dp"
-        android:src="@drawable/baseline_home_18"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginVertical="12dp"
+        android:layout_marginStart="@dimen/dialog_padding"
+        android:layout_marginEnd="@dimen/padding"
+        android:src="@drawable/outline_home_24"
+        android:background="?colorPrimaryContainer"
+        android:scaleType="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:tint="?colorControlNormal" />
+        app:tint="?colorOnPrimaryContainer" />
 
     <TextView
-        android:id="@+id/text_view"
-        android:layout_width="wrap_content"
+        android:id="@+id/title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_quarter"
+        android:layout_marginStart="@dimen/padding_three_quarters"
         android:layout_marginEnd="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/padding_three_quarters"
         android:textAppearance="?textAppearanceBodyMedium"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="end"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/subtitle"
+        app:layout_constraintStart_toEndOf="@+id/icon"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_three_quarters"
+        android:layout_marginEnd="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/padding_quarter"
+        android:layout_marginBottom="@dimen/padding_three_quarters"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:textColor="@color/colorTextFaint"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="end"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintEnd_toEndOf="parent" />

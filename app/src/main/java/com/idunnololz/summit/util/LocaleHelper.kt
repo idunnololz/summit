@@ -9,7 +9,7 @@ import java.util.*
 object LocaleHelper {
 
     fun getLocaleFromPreferences(context: Context): Locale? {
-        val settings = PreferenceUtil.preferences
+        val settings = PreferenceUtils.preferences
         val localeStr = settings.getString(context.getString(R.string.pref_key_app_language), "")
 
         if (localeStr.isNullOrEmpty() || localeStr == "0") return null

@@ -42,7 +42,7 @@
                 android:id="@+id/header_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_half"
+                android:layout_marginTop="@dimen/padding"
                 android:paddingStart="@dimen/content_horizontal_padding"
                 android:paddingEnd="@dimen/content_horizontal_padding"
                 app:layout_constraintHorizontal_bias="0"

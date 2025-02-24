@@ -5,7 +5,7 @@ import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.StateSharedPreference
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.moshi
 import com.squareup.moshi.JsonClass
 import javax.inject.Inject
@@ -38,13 +38,13 @@ class RecentCommunityManager @Inject constructor(
     private var _recentCommunities: LinkedHashMap<String, CommunityHistoryEntry>? = null
 
     init {
-        if (PreferenceUtil.preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
-            val str = PreferenceUtil.preferences.getString(PREF_KEY_RECENT_COMMUNITIES, "")
+        if (PreferenceUtils.preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
+            val str = PreferenceUtils.preferences.getString(PREF_KEY_RECENT_COMMUNITIES, "")
 
             preferences.edit()
                 .putString(PREF_KEY_RECENT_COMMUNITIES, str)
                 .apply()
-            PreferenceUtil.preferences.edit()
+            PreferenceUtils.preferences.edit()
                 .remove(PREF_KEY_RECENT_COMMUNITIES)
                 .apply()
         }

@@ -1,8 +1,10 @@
 package com.idunnololz.summit.main.communitiesPane
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
@@ -10,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
+import coil.dispose
 import coil.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -74,8 +77,6 @@ class CommunitiesPaneController @AssistedInject constructor(
 
         val adapter = UserCommunitiesAdapter(
             context = context,
-            offlineManager = offlineManager,
-            tabsManager = tabsManager,
             onCommunitySelected = onCommunitySelected,
             avatarHelper = avatarHelper,
             onDeleteUserCommunity = { id ->
@@ -121,8 +122,6 @@ class CommunitiesPaneController @AssistedInject constructor(
 
     private class UserCommunitiesAdapter(
         private val context: Context,
-        private val offlineManager: OfflineManager,
-        private val tabsManager: TabsManager,
         private val onCommunitySelected: OnCommunitySelected,
         private val avatarHelper: AvatarHelper,
         private val onDeleteUserCommunity: (Long) -> Unit,
@@ -213,8 +212,9 @@ class CommunitiesPaneController @AssistedInject constructor(
             addItemType(
                 clazz = Item.HomeCommunityItem::class,
                 inflateFn = HomeCommunityItemBinding::inflate,
-            ) { item, b, h ->
-                b.textView.text = context.getString(R.string.home)
+            ) { item, b, _ ->
+                b.title.text = context.getString(R.string.home)
+                b.subtitle.text = item.communityRef.getLocalizedFullName(context)
                 b.selectedIndicator.visibility = if (item.isSelected) {
                     View.VISIBLE
                 } else {
@@ -234,23 +234,38 @@ class CommunitiesPaneController @AssistedInject constructor(
                     View.GONE
                 }
 
+                fun loadCommunityIcon() {
+                    b.icon.dispose()
+                    b.icon.scaleType = ImageView.ScaleType.CENTER_CROP
+                    b.icon.background = null
+                    b.icon.imageTintList = null
+                    avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
+                }
+
                 if (item.iconUrl == null) {
                     fun loadIcon(d: Int) {
-                        b.icon.load(
-                            context.getDrawableCompat(d)
-                                ?.tint(
-                                    context.getColorFromAttribute(
-                                        androidx.appcompat.R.attr.colorControlNormal,
-                                    ),
-                                ),
-                        ) {}
+                        b.icon.dispose()
+                        b.icon.setImageResource(d)
+                        b.icon.scaleType = ImageView.ScaleType.CENTER
+                        b.icon.setBackgroundColor(context.getColorFromAttribute(
+                            com.google.android.material.R.attr.colorSurfaceContainerHighest))
+                        b.icon.imageTintList = ColorStateList.valueOf(context.getColorFromAttribute(
+                            com.google.android.material.R.attr.colorOnSurface))
+//                        b.icon.load(
+//                            context.getDrawableCompat(d)
+//                                ?.tint(
+//                                    context.getColorFromAttribute(
+//                                        androidx.appcompat.R.attr.colorControlNormal,
+//                                    ),
+//                                ),
+//                        ) {}
                     }
 
                     when (item.communityRef) {
                         is CommunityRef.All ->
                             loadIcon(R.drawable.ic_feed_all)
                         is CommunityRef.CommunityRefByName ->
-                            avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
+                            loadCommunityIcon()
                         is CommunityRef.Local ->
                             loadIcon(R.drawable.ic_feed_home)
                         is CommunityRef.MultiCommunity ->
@@ -263,7 +278,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                             loadIcon(R.drawable.outline_shield_24)
                     }
                 } else {
-                    avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
+                    loadCommunityIcon()
                 }
 
                 if (item.communityRef is CommunityRef.MultiCommunity) {
@@ -273,7 +288,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                     b.typeIcon.visibility = View.GONE
                 }
 
-                b.textView.text = item.communityRef.getName(context)
+                b.title.text = item.communityRef.getName(context)
+                b.subtitle.text = item.communityRef.getLocalizedFullNameSpannable(context)
                 b.root.setOnClickListener {
                     onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)
                 }
@@ -327,7 +343,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                 } else {
                     View.GONE
                 }
-                b.textView.text = item.communityRef.getName(context)
+                b.title.text = item.communityRef.getName(context)
+                b.subtitle.text = item.communityRef.getLocalizedFullNameSpannable(context)
 
                 b.root.setOnClickListener {
                     onCommunitySelected(Either.Right(item.communityRef), item.resetTabOnClick)

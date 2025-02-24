@@ -9,6 +9,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
@@ -38,7 +39,9 @@ class CommunitiesPaneViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.Default) {
             accountInfoManager.subscribedCommunities.collect {
-                subscriptionCommunities = it
+                subscriptionCommunities = it.sortedBy {
+                    it.toCommunityRef().getLocalizedFullName(context)
+                }
 
                 updateCommunities()
             }

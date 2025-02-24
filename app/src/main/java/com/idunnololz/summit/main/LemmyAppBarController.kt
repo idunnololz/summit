@@ -1,5 +1,7 @@
 package com.idunnololz.summit.main
 
+import android.annotation.SuppressLint
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
@@ -30,11 +33,20 @@ import com.idunnololz.summit.databinding.CustomAppBarLargeBinding
 import com.idunnololz.summit.databinding.CustomAppBarSmallBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
+import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.community.CommunityFragmentDirections
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
+import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toUrl
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
+import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
@@ -42,14 +54,17 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.relativeTimeToConcise
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showMoreLinkOptions
+import kotlinx.coroutines.launch
 
 class LemmyAppBarController(
     private val mainActivity: MainActivity,
+    private val baseFragment: BaseFragment<*>,
     private val parentContainer: CoordinatorLayout,
     private val accountInfoManager: AccountInfoManager,
     private val communityInfoViewModel: CommunityInfoViewModel,
     private val viewLifecycleOwner: LifecycleOwner,
     private val avatarHelper: AvatarHelper,
+    private val moreActionsHelper: MoreActionsHelper,
     useHeader: Boolean,
     state: State? = null,
 ) {
@@ -114,11 +129,14 @@ class LemmyAppBarController(
             override val collapsingToolbarLayout: CollapsingToolbarLayout,
             override val toolbar: MaterialToolbar,
             val title: TextView,
+            val subtitle: TextView,
             val body: TextView,
             val banner: ImageView,
             val communitySortOrder2: TextView,
             val toolbarPlaceholder: View,
             val icon: ImageView,
+            val subscribe: TextView,
+            val info: TextView,
         ): ViewHolder {
             override fun setSortOrderText(text: String) {
                 communitySortOrder.text = text
@@ -175,6 +193,11 @@ class LemmyAppBarController(
 
             this@LemmyAppBarController.percentShown.value = percentShown
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            accountInfoManager.subscribedCommunities.collect {
+                updateSubscribeButton()
+            }
+        }
     }
 
     fun setup(
@@ -208,6 +231,12 @@ class LemmyAppBarController(
                 showCommunitySelectorInternal()
             }
             vh.title.setOnLongClickListener {
+                onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
+            }
+            vh.subtitle.setOnClickListener {
+                showCommunitySelectorInternal()
+            }
+            vh.subtitle.setOnLongClickListener {
                 onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
             }
             vh.communitySortOrder2.setOnClickListener {
@@ -292,6 +321,15 @@ class LemmyAppBarController(
 
         if (vh is ViewHolder.LargeAppBarViewHolder) {
             vh.title.text = communityName
+            if (currentCommunity == null) {
+                vh.subtitle.visibility = View.GONE
+            } else {
+                val communityInstance = currentCommunity.instance ?: communityInfoViewModel.instance
+                vh.subtitle.visibility = View.VISIBLE
+                @Suppress("SetTextI18n")
+                vh.subtitle.text = "${communityName}@${communityInstance}"
+            }
+
             when (val value = communityInfoViewModel.siteOrCommunity.value) {
                 is StatefulData.Error -> {}
                 is StatefulData.Loading -> {
@@ -304,6 +342,7 @@ class LemmyAppBarController(
 
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
+                    vh.icon.transitionName = "app_bar_icon"
                     val bannerUrl = value.data.response
                         .fold(
                             {
@@ -313,6 +352,15 @@ class LemmyAppBarController(
                             {
                                 avatarHelper.loadCommunityIcon(vh.icon, it.community_view.community)
                                 it.community_view.community.banner
+                            }
+                        )
+                    val iconUrl = value.data.response
+                        .fold(
+                            {
+                                it.site_view.site.icon
+                            },
+                            {
+                                it.community_view.community.icon
                             }
                         )
                     val body = value.data.response
@@ -325,24 +373,148 @@ class LemmyAppBarController(
                         vh.body.visibility = View.GONE
                     } else {
                         vh.body.visibility = View.VISIBLE
-                        vh.body.text = body
+                        LemmyTextHelper.bindText(
+                            vh.body,
+                            body,
+                            communityInfoViewModel.instance,
+                            onImageClick = { url ->
+                                mainActivity.openImage(
+                                    sharedElement = null,
+                                    appBar = appBarRoot,
+                                    title = null,
+                                    url = url,
+                                    mimeType = null
+                                )
+                            },
+                            onVideoClick = { url ->
+                                mainActivity.openVideo(url, VideoType.Unknown, null)
+                            },
+                            onPageClick = {
+                                mainActivity.launchPage(it)
+                            },
+                            onLinkClick = { url, text, linkType ->
+                                baseFragment.onLinkClick(url, text, linkType)
+                            },
+                            onLinkLongClick = { url, text ->
+                                mainActivity.showMoreLinkOptions(url, text)
+                            },
+                        )
+                        vh.body.addEllipsizeToSpannedOnLayout()
                     }
 
                     if (bannerUrl == null) {
                         vh.banner.load("file:///android_asset/banner_placeholder.svg") {
                             allowHardware(false)
                         }
+                        vh.banner.setOnClickListener(null)
+                        vh.banner.isClickable = false
                     } else {
+                        vh.banner.transitionName = "app_bar_banner"
                         vh.banner.load(bannerUrl) {
                             allowHardware(false)
                         }
+                        vh.banner.setOnClickListener {
+                            mainActivity.openImage(
+                                sharedElement = vh.banner,
+                                appBar = appBarRoot,
+                                title = null,
+                                url = bannerUrl,
+                                mimeType = null
+                            )
+                        }
                     }
+                    if (iconUrl == null) {
+                        vh.icon.setOnClickListener(null)
+                        vh.icon.isClickable = false
+                    } else {
+                        vh.icon.setOnClickListener {
+                            mainActivity.openImage(
+                                sharedElement = vh.icon,
+                                appBar = appBarRoot,
+                                title = null,
+                                url = iconUrl,
+                                mimeType = null
+                            )
+                        }
+                    }
+                }
+            }
+
+            updateSubscribeButton()
+
+            when (currentCommunity) {
+                is CommunityRef.All,
+                is CommunityRef.Local -> {
+                    vh.info.visibility = View.VISIBLE
+                    vh.info.text = context.getString(R.string.instance_info)
+                }
+                is CommunityRef.MultiCommunity -> {
+                    vh.info.visibility = View.VISIBLE
+                    vh.info.text = context.getString(R.string.multi_community_info)
+                }
+                is CommunityRef.Subscribed,
+                is CommunityRef.AllSubscribed,
+                is CommunityRef.ModeratedCommunities -> {
+                    vh.info.visibility = View.VISIBLE
+                    vh.info.text = context.getString(R.string.feed_info)
+                }
+                is CommunityRef.CommunityRefByName -> {
+                    vh.info.visibility = View.VISIBLE
+                    vh.info.text = context.getString(R.string.community_info)
+                }
+                null -> {
+                    vh.info.visibility = View.GONE
+                }
+            }
+            vh.info.setOnClickListener {
+                if (currentCommunity != null) {
+                    mainActivity.showCommunityInfo(currentCommunity)
                 }
             }
         }
 
         if (currentCommunity != null) {
             communityInfoViewModel.onCommunityChanged(currentCommunity)
+        }
+    }
+
+    private fun updateSubscribeButton() {
+        val currentCommunity = state.currentCommunity
+        val vh = vh
+        val fullAccount = accountInfoManager.currentFullAccount.value
+        val isSubscribed = fullAccount?.accountInfo?.subscriptions?.any {
+            it.toCommunityRef() == currentCommunity
+        } == true
+
+        if (vh is ViewHolder.LargeAppBarViewHolder) {
+            if (currentCommunity is CommunityRef.CommunityRefByName) {
+                vh.subscribe.visibility = View.VISIBLE
+                if (isSubscribed) {
+                    vh.subscribe.text = context.getString(R.string.subscribed)
+                    vh.subscribe.setOnClickListener {
+                        moreActionsHelper.updateSubscription(currentCommunity, false)
+                    }
+                    vh.subscribe.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        R.drawable.baseline_notifications_18,
+                        0,
+                        0,
+                        0,
+                    )
+                } else {
+                    vh.subscribe.text = context.getString(R.string.subscribe)
+                    vh.subscribe.setOnClickListener {
+                        moreActionsHelper.updateSubscription(currentCommunity, true)
+                    }
+                    vh.subscribe.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        R.drawable.outline_notifications_18,
+                        0,
+                        0,
+                        0,
+                    )
+                }
+            } else {
+                vh.subscribe.visibility = View.GONE
+            }
         }
     }
 
@@ -527,11 +699,14 @@ class LemmyAppBarController(
                 b.collapsingToolbarLayout,
                 b.toolbar,
                 b.title,
+                b.subtitle,
                 b.body,
                 b.banner,
                 b.communitySortOrder2,
                 b.toolbarPlaceholder,
                 b.icon,
+                b.subscribe,
+                b.info,
             )
         } else {
             val b = CustomAppBarSmallBinding.inflate(inflater, parentContainer, false)

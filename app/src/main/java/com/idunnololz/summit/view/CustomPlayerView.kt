@@ -22,6 +22,7 @@ class CustomPlayerView : PlayerView {
 
     private var canRotate = false
     private var rotationLocked = false
+    private var isVolumeChanged = false
 
     override fun setPlayer(player: Player?) {
         super.setPlayer(player)
@@ -39,6 +40,7 @@ class CustomPlayerView : PlayerView {
                 muteButton.setImageResource(R.drawable.baseline_volume_up_24)
             }
             muteButton.setOnClickListener {
+                isVolumeChanged = true
                 if (player.volume <= 0.1f) {
                     player.volume = 1f
                     muteButton.setImageResource(R.drawable.baseline_volume_up_24)
@@ -52,5 +54,5 @@ class CustomPlayerView : PlayerView {
 
     fun getRotateControl(): ImageButton = findViewById(R.id.exo_rotate_control)
 
-    fun getVideoState(): VideoState? = player?.getVideoState()
+    fun getVideoState(): VideoState? = player?.getVideoState(includeVolume = isVolumeChanged)
 }

@@ -47,11 +47,11 @@
             app:drawableStartCompat="@drawable/outline_article_14"
             app:drawableTint="@color/style_red" />
 
-        <HorizontalScrollView
+        <FrameLayout
             android:id="@+id/header_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_half"
+            android:layout_marginTop="@dimen/padding_three_quarters"
             android:paddingStart="@dimen/content_horizontal_padding"
             android:paddingEnd="@dimen/content_horizontal_padding"
             android:fadingEdge="horizontal"
@@ -65,7 +65,7 @@
                 android:id="@+id/header_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-        </HorizontalScrollView>
+        </FrameLayout>
 
         <!-- Width set programatically -->
         <com.idunnololz.summit.view.ReactiveImageView
@@ -114,7 +114,7 @@
             android:textAppearance="?textAppearanceBodyMedium"
             android:layout_marginStart="@dimen/padding_half"
             android:layout_marginEnd="@dimen/content_horizontal_padding"
-            android:layout_marginTop="@dimen/padding_quarter"
+            android:layout_marginTop="@dimen/padding_half"
             app:layout_constraintTop_toBottomOf="@+id/header_view"
             app:layout_constraintStart_toEndOf="@+id/left_barrier"
             app:layout_constraintEnd_toEndOf="parent" />

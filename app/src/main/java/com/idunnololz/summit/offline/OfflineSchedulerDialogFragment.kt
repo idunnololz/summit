@@ -13,7 +13,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentOfflineSchedulerBinding
 import com.idunnololz.summit.util.AnimationUtils
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.view.DayPicker
 import java.util.*
@@ -35,7 +35,7 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
         val context = requireContext()
         val builder: AlertDialog.Builder = AlertDialog.Builder(context, R.style.Theme_App_Dialog)
 
-        val preferences = PreferenceUtil.preferences
+        val preferences = PreferenceUtils.preferences
 
         val inflater = LayoutInflater.from(context)
         val rootView = inflater.inflate(R.layout.dialog_fragment_offline_scheduler, null)
@@ -74,10 +74,10 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
             onEnableChanged()
         }
         enableSwitch.isChecked =
-            preferences.getBoolean(PreferenceUtil.KEY_ENABLE_OFFLINE_SCHEDULE, false)
+            preferences.getBoolean(PreferenceUtils.KEY_ENABLE_OFFLINE_SCHEDULE, false)
         onEnableChanged()
 
-        preferences.getString(PreferenceUtil.KEY_OFFLINE_SCHEDULE, null)?.let {
+        preferences.getString(PreferenceUtils.KEY_OFFLINE_SCHEDULE, null)?.let {
             val savedRecurringEvent = RecurringEvent.fromString(it)
             dayPicker.setSelectedDays(savedRecurringEvent.daysOfWeek)
             timePicker.currentHour = savedRecurringEvent.hourOfDay
@@ -96,9 +96,9 @@ class OfflineSchedulerDialogFragment : BaseDialogFragment<DialogFragmentOfflineS
                 minuteOfHour = timePicker.currentMinute,
             )
 
-            PreferenceUtil.preferences.edit()
-                .putBoolean(PreferenceUtil.KEY_ENABLE_OFFLINE_SCHEDULE, enabled)
-                .putString(PreferenceUtil.KEY_OFFLINE_SCHEDULE, recurringEvent.serializeToString())
+            PreferenceUtils.preferences.edit()
+                .putBoolean(PreferenceUtils.KEY_ENABLE_OFFLINE_SCHEDULE, enabled)
+                .putString(PreferenceUtils.KEY_OFFLINE_SCHEDULE, recurringEvent.serializeToString())
                 .apply()
 
             OfflineScheduleManager.instance.onAlarmChanged()

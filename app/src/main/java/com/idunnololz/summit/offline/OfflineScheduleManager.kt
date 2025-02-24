@@ -6,7 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.idunnololz.summit.util.PreferenceUtil
+import com.idunnololz.summit.util.PreferenceUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,11 +33,11 @@ class OfflineScheduleManager(
         private const val OFFLINE_DOWNLOAD_REQUEST_CODE = 1001
     }
 
-    private val preferences = PreferenceUtil.preferences
+    private val preferences = PreferenceUtils.preferences
 
     fun setupAlarms() {
         val isOfflineSchedulerEnabled =
-            preferences.getBoolean(PreferenceUtil.KEY_ENABLE_OFFLINE_SCHEDULE, false)
+            preferences.getBoolean(PreferenceUtils.KEY_ENABLE_OFFLINE_SCHEDULE, false)
         if (isOfflineSchedulerEnabled) {
             val olderIntent = PendingIntent.getBroadcast(
                 context,
@@ -59,8 +59,8 @@ class OfflineScheduleManager(
         Log.d(TAG, "Alarm changed...")
 
         val isOfflineSchedulerEnabled =
-            preferences.getBoolean(PreferenceUtil.KEY_ENABLE_OFFLINE_SCHEDULE, false)
-        val recurringEvent = preferences.getString(PreferenceUtil.KEY_OFFLINE_SCHEDULE, null)?.let {
+            preferences.getBoolean(PreferenceUtils.KEY_ENABLE_OFFLINE_SCHEDULE, false)
+        val recurringEvent = preferences.getString(PreferenceUtils.KEY_OFFLINE_SCHEDULE, null)?.let {
             RecurringEvent.fromString(it)
         } ?: return
 

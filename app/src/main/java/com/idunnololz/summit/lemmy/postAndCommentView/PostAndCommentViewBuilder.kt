@@ -29,6 +29,7 @@ import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
@@ -102,18 +103,20 @@ import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.markwon.BorderedSpan
 import com.idunnololz.summit.video.ExoPlayerManager
+import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.AutoHorizontalScrollView
 import com.idunnololz.summit.view.LemmyHeaderView
 import com.idunnololz.summit.view.LemmyHeaderView.Companion.DEFAULT_ICON_SIZE_DP
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-@ActivityScoped
+@FragmentScoped
 class PostAndCommentViewBuilder @Inject constructor(
-    private val activity: FragmentActivity,
+    private val fragment: Fragment,
     @ActivityContext private val context: Context,
     private val offlineManager: OfflineManager,
     private val accountActionsManager: AccountActionsManager,
@@ -122,6 +125,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val avatarHelper: AvatarHelper,
     private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
+    private val exoPlayerManagerManager: ExoPlayerManagerManager,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
@@ -154,7 +158,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
-        ExoPlayerManager.get(activity),
+        { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     ).also {
         it.globalFontSizeMultiplier = globalFontSizeMultiplier
     }

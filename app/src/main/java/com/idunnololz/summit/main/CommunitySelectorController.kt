@@ -393,6 +393,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         class StaticChildItem(
             val text: String,
+            val description: String,
             @DrawableRes val iconResId: Int,
             val communityRef: CommunityRef,
         ) : Item(communityRef.getKey())
@@ -540,7 +541,7 @@ class CommunitySelectorController @AssistedInject constructor(
                         b.instance.text = item.communityView.community.instance
 
                         b.actionButton.visibility = View.VISIBLE
-                        if (item.communityView.subscribed != SubscribedType.Subscribed) {
+                        if (item.communityView.subscribed == SubscribedType.NotSubscribed) {
                             b.actionButton.text = context.getString(R.string.subscribe)
                             b.actionButton.setOnClickListener {
                                 viewModel.updateSubscriptionStatus(
@@ -555,7 +556,11 @@ class CommunitySelectorController @AssistedInject constructor(
                                 }
                             }
                         } else {
-                            b.actionButton.text = context.getString(R.string.unsubscribe)
+                            b.actionButton.text = if (item.communityView.subscribed == SubscribedType.Subscribed) {
+                                context.getString(R.string.unsubscribe)
+                            } else {
+                                context.getString(R.string.subscription_pending)
+                            }
                             b.actionButton.setOnClickListener {
                                 viewModel.updateSubscriptionStatus(
                                     item.communityView.community.id,
@@ -633,7 +638,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 inflateFn = CommunitySelectorStaticCommunityItemBinding::inflate,
             ) { item, b, h ->
                 b.icon.setImageResource(item.iconResId)
-                b.textView.text = item.text
+                b.title.text = item.text
+                b.subtitle.text = item.description
 
                 h.itemView.setOnClickListener {
                     onCommunitySelectedListener?.invoke(
@@ -789,6 +795,7 @@ class CommunitySelectorController @AssistedInject constructor(
                 newItems.add(
                     Item.StaticChildItem(
                         context.getString(R.string.all),
+                        context.getString(R.string.all_feed_desc),
                         R.drawable.ic_feed_all,
                         CommunityRef.All(),
                     ),
@@ -798,6 +805,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.subscribed),
+                            context.getString(R.string.subscribed_feed_desc),
                             R.drawable.baseline_subscriptions_24,
                             CommunityRef.Subscribed(null),
                         ),
@@ -805,6 +813,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.local),
+                            context.getString(R.string.local_feed_desc),
                             R.drawable.ic_feed_home,
                             CommunityRef.Local(null),
                         ),
@@ -818,6 +827,7 @@ class CommunitySelectorController @AssistedInject constructor(
                         newItems.add(
                             Item.StaticChildItem(
                                 context.getString(R.string.moderated_communities),
+                                context.getString(R.string.moderated_feed_desc),
                                 R.drawable.outline_shield_24,
                                 CommunityRef.ModeratedCommunities(null),
                             ),
@@ -827,6 +837,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.all_subscribed),
+                            context.getString(R.string.all_subscribed_feed_desc),
                             R.drawable.baseline_groups_24,
                             CommunityRef.AllSubscribed(),
                         ),
@@ -835,6 +846,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     newItems.add(
                         Item.StaticChildItem(
                             context.getString(R.string.local),
+                            context.getString(R.string.local_feed_desc),
                             R.drawable.ic_feed_home,
                             CommunityRef.Local(null),
                         ),

@@ -2,10 +2,20 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_COLOR_3
+import com.idunnololz.summit.util.ext.fromJsonSafe
+import com.idunnololz.summit.util.ext.getIntOrNull
+import com.idunnololz.summit.util.ext.getLongSafe
+import com.idunnololz.summit.util.ext.toJsonSafe
+import com.squareup.moshi.Moshi
 import java.util.HashSet
 import java.util.StringTokenizer
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
-object PreferenceUtil {
+object PreferenceUtils {
 
     var usingCustomFont: Boolean = false
     lateinit var preferences: SharedPreferences
@@ -219,6 +229,7 @@ object PreferenceUtil {
     const val KEY_HAPTICS_ON_ACTIONS = "KEY_HAPTICS_ON_ACTIONS"
     const val KEY_HIDE_DUPLICATE_POSTS_ON_READ = "KEY_HIDE_DUPLICATE_POSTS_ON_READ"
     const val KEY_USE_POSTS_FEED_HEADER = "KEY_USE_POSTS_FEED_HEADER"
+    const val KEY_INLINE_VIDEO_DEFAULT_VOLUME = "KEY_INLINE_VIDEO_DEFAULT_VOLUME"
 
     // Unused/dead keys
     const val DEAD_KEY_SHARE_IMAGES_DIRECTLY = "KEY_SHARE_IMAGES_DIRECTLY"
@@ -283,3 +294,136 @@ object PreferenceUtil {
             .apply()
     }
 }
+
+class StringPreferenceDelegate(
+    val prefs: SharedPreferences,
+    val key: String,
+    val defaultValue: String? = ""
+) : ReadWriteProperty<Any, String?> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getString(key, defaultValue)
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: String?) =
+        prefs.edit().putString(key, value).apply()
+}
+
+class FloatPreferenceDelegate(
+    val prefs: SharedPreferences,
+    val key: String,
+    val defaultValue: Float = 0f
+) : ReadWriteProperty<Any, Float> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getFloat(key, defaultValue)
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) =
+        prefs.edit().putFloat(key, value).apply()
+}
+
+class BooleanPreferenceDelegate(
+    val prefs: SharedPreferences,
+    val key: String,
+    val defaultValue: Boolean = false
+) : ReadWriteProperty<Any, Boolean> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getBoolean(key, defaultValue)
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) =
+        prefs.edit().putBoolean(key, value).apply()
+}
+
+class IntPreferenceDelegate(
+    val prefs: SharedPreferences,
+    val key: String,
+    val defaultValue: Int = 0
+) : ReadWriteProperty<Any, Int> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getInt(key, defaultValue)
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
+        prefs.edit().putInt(key, value).apply()
+}
+
+class NullableIntPreferenceDelegate(
+    val prefs: SharedPreferences,
+    val key: String,
+) : ReadWriteProperty<Any, Int?> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getIntOrNull(key)
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int?) {
+        if (value != null) {
+            prefs.edit().putInt(key, value).apply()
+        }
+    }
+}
+
+class LongPreferenceDelegate(
+    val prefs: SharedPreferences,
+    val key: String,
+    val defaultValue: Long = 0
+) : ReadWriteProperty<Any, Long> {
+
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getLongSafe(key, defaultValue)
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) =
+        prefs.edit().putLong(key, value).apply()
+}
+
+class JsonPreferenceDelegate<T>(
+    val prefs: SharedPreferences,
+    val moshi: Moshi,
+    val key: String,
+    val clazz: Class<T>,
+    val default: () -> T,
+) : ReadWriteProperty<Any, T> {
+
+    var isCached: Boolean = false
+    var cache: T? = null
+
+    override fun getValue(thisRef: Any, property: KProperty<*>): T {
+        if (isCached) {
+            @Suppress("UNCHECKED_CAST")
+            return cache as T
+        }
+
+        val s = prefs.getString(key, null)
+        return try {
+            if (s != null) {
+                moshi.adapter(clazz).fromJson(s)
+                    ?: default()
+            } else {
+                default()
+            }
+        } catch (e: Exception) {
+            default()
+        }.also {
+            cache(it)
+        }
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+        val s = try {
+            moshi.adapter(clazz).toJson(value)
+        } catch (e: Exception) {
+            null
+        }
+        prefs.edit()
+            .putString(key, s)
+            .apply()
+
+        cache(value)
+    }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun cache(value: T?) {
+        isCached = true
+        cache = value
+    }
+}
+

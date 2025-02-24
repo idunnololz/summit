@@ -47,12 +47,10 @@ class SettingsCacheViewModel @Inject constructor(
 
             dataModel.postValue(
                 DataModel(
-                    cacheTotalSizeBytes =
-                    fileOrFolderToSize.values.sum(),
+                    cacheTotalSizeBytes = fileOrFolderToSize.values.sum(),
                     imagesSizeBytes = imageDirSize,
                     videosSizeBytes = videoDirSize,
-                    cacheMediaSizeBytes =
-                    fileOrFolderToSize[mediaCacheDir] ?: 0,
+                    cacheMediaSizeBytes = fileOrFolderToSize[mediaCacheDir] ?: 0,
                     cacheNetworkCacheSizeBytes =
                     fileOrFolderToSize[directoryHelper.okHttpCacheDir] ?: 0,
                 ),

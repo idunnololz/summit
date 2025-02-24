@@ -15,6 +15,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import com.google.android.material.R
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.shape.AbsoluteCornerSize
 import com.google.android.material.shape.RelativeCornerSize
 import com.idunnololz.summit.R as R2
 import com.idunnololz.summit.util.Utils
@@ -110,6 +111,7 @@ class LemmyHeaderView : FrameLayout {
 
     private fun LinkifyTextView.style(): LinkifyTextView {
         maxLines = 1
+        includeFontPadding = false
 //        isSingleLine = true
         setTextColor(context.getColorCompat(R2.color.colorTextFaint))
         TextViewCompat.setCompoundDrawableTintList(
@@ -148,14 +150,15 @@ class LemmyHeaderView : FrameLayout {
             return
         }
 
-        val strokeWidth = Utils.convertDpToPixel(2f)
+        val strokeWidth = Utils.convertDpToPixel(1f)
         val strokeWidthHalf = (strokeWidth / 2f).toInt()
+        val cornerSize = Utils.convertDpToPixel(8f)
 
-        val iconImageView = ShapeableImageView(context, null, R2.style.CircleImageView)
+        val iconImageView = ShapeableImageView(context, null, R2.style.RoundImageView)
         addView(iconImageView, 0)
         iconImageView.shapeAppearanceModel = iconImageView.shapeAppearanceModel
             .toBuilder()
-            .setAllCornerSizes(RelativeCornerSize(0.5f))
+            .setAllCornerSizes(AbsoluteCornerSize(cornerSize))
             .build()
         iconImageView.scaleType = ImageView.ScaleType.CENTER_CROP
         iconImageView.strokeWidth = strokeWidth
@@ -299,7 +302,7 @@ class LemmyHeaderView : FrameLayout {
                 start += child.measuredWidth + layoutParams.rightMargin
             }
 
-            val marginBetweenLines = Utils.convertDpToPixel(2f).toInt()
+            val marginBetweenLines = Utils.convertDpToPixel(4f).toInt()
             val textChildrenTotalHeight =
                 textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight) +
                     marginBetweenLines
