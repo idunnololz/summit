@@ -4,11 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.idunnololz.summit.util.ext.getIntOrNull
 import com.idunnololz.summit.util.ext.getLongSafe
-import com.squareup.moshi.Moshi
 import java.util.HashSet
 import java.util.StringTokenizer
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 
 object PreferenceUtils {
 
@@ -368,9 +370,9 @@ class LongPreferenceDelegate(
 
 class JsonPreferenceDelegate<T>(
     val prefs: SharedPreferences,
-    val moshi: Moshi,
+    val json: Json,
     val key: String,
-    val clazz: Class<T>,
+    val serializer: KSerializer<T>,
     val default: () -> T,
 ) : ReadWriteProperty<Any, T> {
 
@@ -386,7 +388,7 @@ class JsonPreferenceDelegate<T>(
         val s = prefs.getString(key, null)
         return try {
             if (s != null) {
-                moshi.adapter(clazz).fromJson(s)
+                json.decodeFromString(serializer, s)
                     ?: default()
             } else {
                 default()
@@ -400,7 +402,7 @@ class JsonPreferenceDelegate<T>(
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
         val s = try {
-            moshi.adapter(clazz).toJson(value)
+            json.encodeToString(serializer, value)
         } catch (e: Exception) {
             null
         }

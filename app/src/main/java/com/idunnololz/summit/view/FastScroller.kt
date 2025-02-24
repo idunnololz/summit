@@ -139,7 +139,7 @@ class FastScroller : LinearLayout {
             0,
             0,
         )
-        ViewCompat.setBackground(handle, handleBg)
+        handle.background = handleBg
 
         val handleWidth =
             res.getDimensionPixelSize(

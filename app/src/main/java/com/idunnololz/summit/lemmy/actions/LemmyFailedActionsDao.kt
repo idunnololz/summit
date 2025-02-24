@@ -10,9 +10,10 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.TypeConverters
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Dao
 interface LemmyFailedActionsDao {
@@ -56,56 +57,62 @@ data class LemmyFailedAction(
     val seen: Boolean? = null,
 ) : LemmyAction
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface LemmyActionFailureReason : Parcelable {
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("1")
+    @Serializable
+    @SerialName("1")
     data class RateLimit(
         val recommendedTimeoutMs: Long,
     ) : LemmyActionFailureReason
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("2")
+    @Serializable
+    @SerialName("2")
     data class TooManyRequests(
         val retries: Int,
     ) : LemmyActionFailureReason
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("3")
+    @Serializable
+    @SerialName("3")
     data class UnknownError(
         val errorCode: Int,
         val errorMessage: String?,
     ) : LemmyActionFailureReason
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("4")
+    @Serializable
+    @SerialName("4")
     data class AccountNotFoundError(
         val accountId: Long,
     ) : LemmyActionFailureReason
 
     @Parcelize
-    @TypeLabel("5")
+    @Serializable
+    @SerialName("5")
     data object NoInternetError : LemmyActionFailureReason
 
     @Parcelize
-    @TypeLabel("6")
+    @Serializable
+    @SerialName("6")
     data object DeserializationError : LemmyActionFailureReason
 
     @Parcelize
-    @TypeLabel("7")
+    @Serializable
+    @SerialName("7")
     data object ServerError : LemmyActionFailureReason
 
     @Parcelize
-    @TypeLabel("8")
+    @Serializable
+    @SerialName("8")
     data object ActionOverwritten : LemmyActionFailureReason
 
     @Parcelize
-    @TypeLabel("9")
+    @Serializable
+    @SerialName("9")
     data object ConnectionError : LemmyActionFailureReason
 }
 

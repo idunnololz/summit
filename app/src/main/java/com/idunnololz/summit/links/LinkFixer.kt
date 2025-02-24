@@ -12,8 +12,6 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.moshi
-import com.squareup.moshi.JsonClass
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -23,6 +21,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.jsoup.HttpStatusException
 
@@ -30,6 +30,7 @@ import org.jsoup.HttpStatusException
 class LinkFixer @Inject constructor(
     coroutineScopeFactory: CoroutineScopeFactory,
     private val apiClient: LemmyApiClient,
+    private val json: Json,
 ) {
 
     companion object {
@@ -247,11 +248,11 @@ class LinkFixer @Inject constructor(
     private suspend fun fetchVersionObject(instance: String): Result<VersionObject> =
         withContext(Dispatchers.Default) {
             try {
-                val json =
+                val jsonStr =
                     runInterruptible(Dispatchers.IO) {
                         LinkUtils.downloadSite("https://$instance/version", cache = true)
                     }
-                val versionObject = moshi.adapter(VersionObject::class.java).fromJson(json)
+                val versionObject = json.decodeFromString<VersionObject?>(jsonStr)
 
                 if (versionObject == null) {
                     Result.failure(
@@ -282,13 +283,13 @@ class LinkFixer @Inject constructor(
             }
         }
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class VersionObject(
         val version: String?,
         val software: SoftwareInfo?,
     )
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class SoftwareInfo(
         val name: String?,
         val version: String?,

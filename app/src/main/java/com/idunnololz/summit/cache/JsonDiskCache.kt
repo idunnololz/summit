@@ -2,32 +2,30 @@ package com.idunnololz.summit.cache
 
 import android.util.Log
 import com.idunnololz.summit.util.IDataCache
-import com.squareup.moshi.Moshi
 import java.io.File
+import kotlinx.serialization.json.Json
 
-class MoshiDiskCache(
-    val moshi: Moshi,
+class JsonDiskCache(
+    val json: Json,
     private val cache: SimpleDiskCache,
 ) : IDataCache by cache {
 
     companion object {
-        const val TAG = "MoshiDiskCache"
+        const val TAG = "JsonDiskCache"
 
-        fun create(moshi: Moshi, dir: File, appVersion: Int, maxSize: Long) = MoshiDiskCache(
-            moshi,
+        fun create(json: Json, dir: File, appVersion: Int, maxSize: Long) = JsonDiskCache(
+            json,
             SimpleDiskCache(dir, appVersion, maxSize),
         )
     }
 
     inline fun <reified T> getCachedObject(key: String): T? {
-        val adapter = moshi.adapter(T::class.java)
-
         return try {
             val value = getCachedData(key)
             if (value.isNullOrBlank()) {
                 null
             } else {
-                adapter.fromJson(value)
+                json.decodeFromString(key)
             }
         } catch (e: Exception) {
             Log.e(TAG, "getCachedObject()", e)
@@ -36,10 +34,8 @@ class MoshiDiskCache(
     }
 
     inline fun <reified T> cacheObject(key: String, obj: T?) {
-        val adapter = moshi.adapter(T::class.java)
-
         try {
-            cacheData(key, adapter.toJson(obj))
+            cacheData(key, json.encodeToString(obj))
         } catch (e: Exception) {
             Log.e(TAG, "cacheObject()", e)
         }

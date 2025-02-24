@@ -3,50 +3,60 @@ package com.idunnololz.summit.lemmy
 import android.os.Parcelable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SortType
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface CommunitySortOrder : Parcelable {
 
+    @Serializable
+    @SerialName("1")
     @Parcelize
-    @TypeLabel("1")
     data object Hot : CommunitySortOrder
 
+    @Serializable
+    @SerialName("2")
     @Parcelize
-    @TypeLabel("2")
     data object Active : CommunitySortOrder
 
+    @Serializable
+    @SerialName("3")
     @Parcelize
-    @TypeLabel("3")
     data object New : CommunitySortOrder
 
+    @Serializable
+    @SerialName("4")
     @Parcelize
-    @TypeLabel("4")
     data object Old : CommunitySortOrder
 
+    @Serializable
+    @SerialName("5")
     @Parcelize
-    @TypeLabel("5")
     data object MostComments : CommunitySortOrder
 
+    @Serializable
+    @SerialName("6")
     @Parcelize
-    @TypeLabel("6")
     data object NewComments : CommunitySortOrder
 
+    @Serializable
+    @SerialName("7")
     @Parcelize
-    @TypeLabel("7")
-    @JsonClass(generateAdapter = true)
     data class TopOrder(
         val timeFrame: TimeFrame = TimeFrame.Today,
     ) : CommunitySortOrder
 
+    @Serializable
+    @SerialName("8")
     @Parcelize
-    @TypeLabel("8")
     data object Controversial : CommunitySortOrder
 
+    @Serializable
+    @SerialName("9")
     @Parcelize
-    @TypeLabel("9")
     data object Scaled : CommunitySortOrder
 
     enum class TimeFrame {

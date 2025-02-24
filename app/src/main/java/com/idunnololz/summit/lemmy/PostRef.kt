@@ -1,11 +1,11 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
-import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class PostRef(
     val instance: String,
     val id: Int,

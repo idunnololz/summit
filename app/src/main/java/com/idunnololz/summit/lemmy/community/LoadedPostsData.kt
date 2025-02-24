@@ -2,11 +2,11 @@ package com.idunnololz.summit.lemmy.community
 
 import android.os.Parcelable
 import com.idunnololz.summit.lemmy.LocalPostView
-import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class LoadedPostsData(
     // Used for filtering
     val allPosts: List<LocalPostView>,
@@ -20,7 +20,7 @@ data class LoadedPostsData(
 ) : Parcelable
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class PostLoadError(
     val errorCode: Int,
     val errorMessage: String,

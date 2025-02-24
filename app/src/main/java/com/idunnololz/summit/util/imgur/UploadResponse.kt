@@ -1,70 +1,70 @@
 package com.idunnololz.summit.util.imgur
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class UploadResponse(
-    @Json(name = "data")
+    @SerialName("data")
     val upload: Upload,
-    @Json(name = "status")
+    @SerialName("status")
     val status: Int,
-    @Json(name = "success")
+    @SerialName("success")
     val success: Boolean,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class Upload(
-    @Json(name = "account_id")
+    @SerialName("account_id")
     val accountId: Int?,
-    @Json(name = "account_url")
+    @SerialName("account_url")
     val accountUrl: String?,
-    @Json(name = "ad_type")
+    @SerialName("ad_type")
     val adType: Int?,
-    @Json(name = "ad_url")
+    @SerialName("ad_url")
     val adUrl: String?,
-    @Json(name = "animated")
+    @SerialName("animated")
     val animated: Boolean,
-    @Json(name = "bandwidth")
+    @SerialName("bandwidth")
     val bandwidth: Int,
-    @Json(name = "datetime")
+    @SerialName("datetime")
     val datetime: Long,
-    @Json(name = "deletehash")
+    @SerialName("deletehash")
     val deletehash: String,
-    @Json(name = "description")
+    @SerialName("description")
     val description: String?,
-    @Json(name = "favorite")
+    @SerialName("favorite")
     val favorite: Boolean,
-    @Json(name = "has_sound")
+    @SerialName("has_sound")
     val hasSound: Boolean,
-    @Json(name = "height")
+    @SerialName("height")
     val height: Int,
-    @Json(name = "hls")
+    @SerialName("hls")
     val hls: String,
-    @Json(name = "id")
+    @SerialName("id")
     val id: String,
-    @Json(name = "in_gallery")
+    @SerialName("in_gallery")
     val inGallery: Boolean,
-    @Json(name = "in_most_viral")
+    @SerialName("in_most_viral")
     val inMostViral: Boolean,
-    @Json(name = "is_ad")
+    @SerialName("is_ad")
     val isAd: Boolean,
-    @Json(name = "link")
+    @SerialName("link")
     val link: String?,
-    @Json(name = "mp4")
+    @SerialName("mp4")
     val mp4: String,
-    @Json(name = "name")
+    @SerialName("name")
     val name: String,
-    @Json(name = "size")
+    @SerialName("size")
     val size: Int,
-    @Json(name = "tags")
+    @SerialName("tags")
     val tags: List<String>,
-    @Json(name = "title")
+    @SerialName("title")
     val title: String?,
-    @Json(name = "type")
+    @SerialName("type")
     val type: String,
-    @Json(name = "views")
+    @SerialName("views")
     val views: Int,
-    @Json(name = "width")
+    @SerialName("width")
     val width: Int,
 )

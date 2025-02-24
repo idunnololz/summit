@@ -22,6 +22,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import kotlinx.serialization.json.Json
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -76,6 +77,6 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideMainDatabase(@ApplicationContext context: Context): MainDatabase =
-        MainDatabase.getInstance(context)
+    fun provideMainDatabase(@ApplicationContext context: Context, json: Json): MainDatabase =
+        MainDatabase.getInstance(context, json)
 }

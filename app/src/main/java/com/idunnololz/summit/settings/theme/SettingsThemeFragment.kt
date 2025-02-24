@@ -103,7 +103,7 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
                 baseThemeSetting,
                 listOf(this.option1, this.option2, this.option3),
                 {
-                    when (preferences.getBaseTheme()) {
+                    when (preferences.baseTheme) {
                         BaseTheme.UseSystem -> R.id.setting_option_use_system
                         BaseTheme.Light -> R.id.setting_option_light_theme
                         BaseTheme.Dark -> R.id.setting_option_dark_theme
@@ -112,11 +112,11 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
                 {
                     when (it) {
                         R.id.setting_option_use_system ->
-                            preferences.setBaseTheme(BaseTheme.UseSystem)
+                            preferences.baseTheme = BaseTheme.UseSystem
                         R.id.setting_option_light_theme ->
-                            preferences.setBaseTheme(BaseTheme.Light)
+                            preferences.baseTheme = BaseTheme.Light
                         R.id.setting_option_dark_theme ->
-                            preferences.setBaseTheme(BaseTheme.Dark)
+                            preferences.baseTheme = BaseTheme.Dark
                     }
 
                     binding.root.post {

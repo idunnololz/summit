@@ -7,7 +7,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashlytics
-import com.idunnololz.summit.util.moshi
+import com.idunnololz.summit.util.dagger.json
 
 object LinkResolver {
 
@@ -77,7 +77,7 @@ object LinkResolver {
                     if (fragment.startsWith("!mc=")) {
                         // this is likely a multi-community url
                         val communityRef: CommunityRef? = try {
-                            moshi.adapter(CommunityRef::class.java).fromJson(fragment.drop(4))
+                            json.decodeFromString<CommunityRef?>(fragment.drop(4))
                         } catch (e: Exception) {
                             // best effort
                             null

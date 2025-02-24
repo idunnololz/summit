@@ -6,19 +6,20 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.StateSharedPreference
 import com.idunnololz.summit.util.PreferenceUtils
-import com.idunnololz.summit.util.moshi
-import com.squareup.moshi.JsonClass
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Singleton
 class RecentCommunityManager @Inject constructor(
     @StateSharedPreference private val preferences: SharedPreferences,
     private val lemmyApiClientFactory: LemmyApiClient.Factory,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val json: Json,
 ) {
     companion object {
         private const val TAG = "RecentCommunityManager"
@@ -30,7 +31,6 @@ class RecentCommunityManager @Inject constructor(
     private val lemmyApiClient = lemmyApiClientFactory.create()
 
     private val coroutineScope = coroutineScopeFactory.create()
-    private val adapter = moshi.adapter(RecentCommunityData::class.java)
 
     /**
      * Priority queue where the last item is the most recent recent.
@@ -92,9 +92,7 @@ class RecentCommunityManager @Inject constructor(
             preferences.edit()
                 .putString(
                     PREF_KEY_RECENT_COMMUNITIES,
-                    adapter.toJson(
-                        RecentCommunityData(resultsList),
-                    ),
+                    json.encodeToString(RecentCommunityData(resultsList)),
                 )
                 .apply()
         }
@@ -136,7 +134,7 @@ class RecentCommunityManager @Inject constructor(
         val jsonStr = preferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
         val data = try {
             if (jsonStr != null) {
-                adapter.fromJson(jsonStr)
+                json.decodeFromString<RecentCommunityData?>(jsonStr)
             } else {
                 null
             }
@@ -159,7 +157,7 @@ class RecentCommunityManager @Inject constructor(
         }
     }
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class CommunityHistoryEntry(
         val communityRef: CommunityRef,
         val iconUrl: String?,
@@ -169,7 +167,7 @@ class RecentCommunityManager @Inject constructor(
             get() = communityRef.getKey()
     }
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class RecentCommunityData(
         val entries: List<CommunityHistoryEntry>,
     )

@@ -107,7 +107,9 @@ object IntentUtils {
                     intent.putExtra("default_camera", "1")
                     intent.putExtra("default_mode", "com.huawei.camera2.mode.photo.PhotoMode")
                 }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 &&
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> {
+
                     intent.putExtra(
                         CAMERA_FACING_EXTRA,
                         CameraCharacteristics.LENS_FACING_FRONT,

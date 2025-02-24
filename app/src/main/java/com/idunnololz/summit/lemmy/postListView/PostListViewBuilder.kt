@@ -697,11 +697,15 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 fun showDefaultImage() {
-                    imageView?.visibility = View.VISIBLE
-                    imageView?.dispose()
-                    imageView?.setImageDrawable(null)
-                    iconImage?.visibility = View.VISIBLE
-                    iconImage?.setImageResource(R.drawable.baseline_article_24)
+                    if (iconImage != null) {
+                        imageView?.visibility = View.VISIBLE
+                        imageView?.dispose()
+                        imageView?.setImageDrawable(null)
+                        iconImage.visibility = View.VISIBLE
+                        iconImage.setImageResource(R.drawable.baseline_article_24)
+                    } else {
+                        imageView?.visibility = View.GONE
+                    }
                 }
 
                 val postHorizontalMarginDp = postHorizontalMarginDp
@@ -1021,9 +1025,9 @@ class PostListViewBuilder @Inject constructor(
                                 !postView.post.body.isNullOrBlank() ||
                                     !url.isNullOrBlank()
 
-                            if (hasAdditionalContent && showTextPreviewIcon) {
+                            if (hasAdditionalContent && showTextPreviewIcon && iconImage != null) {
                                 showDefaultImage()
-                                iconImage?.setOnClickListener {
+                                iconImage.setOnClickListener {
                                     if (fullContentContainerView != null) {
                                         toggleItem(fetchedPost)
                                     } else {
@@ -1583,10 +1587,6 @@ class PostListViewBuilder @Inject constructor(
                 errorListener = errorListener,
             )
         }
-    }
-
-    fun onDestroyView() {
-        exoPlayerManagerManager.onDestroyView()
     }
 }
 

@@ -2,19 +2,21 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.cache.MoshiDiskCache
+import com.idunnololz.summit.cache.JsonDiskCache
 import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
-import com.squareup.moshi.JsonClass
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Singleton
 class DirectoryHelper @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val json: Json,
 ) {
 
     companion object {
@@ -32,8 +34,8 @@ class DirectoryHelper @Inject constructor(
     val settingBackupsDir = File(context.filesDir, "sb")
     val saveForLaterDir = File(context.filesDir, "sfl")
 
-    val tabsDiskCache = MoshiDiskCache
-        .create(moshi, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)
+    val tabsDiskCache = JsonDiskCache
+        .create(json, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)
 
     fun cleanup() {
         var purgedFiles = 0
@@ -64,7 +66,7 @@ class DirectoryHelper @Inject constructor(
         imagesDir.deleteRecursively()
     }
 
-    @JsonClass(generateAdapter = true)
+    @Serializable
     data class PostListEngineCacheInfo(
         val totalPages: Int,
     )

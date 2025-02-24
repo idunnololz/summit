@@ -8,7 +8,7 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.util.crashlytics
-import com.squareup.moshi.Moshi
+import kotlinx.serialization.json.Json
 
 @Entity(tableName = "inbox_entries")
 @TypeConverters(InboxEntryConverters::class)
@@ -29,7 +29,7 @@ data class InboxEntry(
 )
 
 @ProvidedTypeConverter
-class InboxEntryConverters(private val moshi: Moshi) {
+class InboxEntryConverters(private val json: Json) {
 
     companion object {
         private const val TAG = "InboxEntryConverters"
@@ -37,12 +37,12 @@ class InboxEntryConverters(private val moshi: Moshi) {
 
     @TypeConverter
     fun inboxItemToString(value: InboxItem): String {
-        return moshi.adapter(InboxItem::class.java).toJson(value)
+        return json.encodeToString(value)
     }
 
     @TypeConverter
     fun stringToInboxItem(value: String): InboxItem? = try {
-        moshi.adapter(InboxItem::class.java).fromJson(value)
+        json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
         crashlytics?.recordException(e)

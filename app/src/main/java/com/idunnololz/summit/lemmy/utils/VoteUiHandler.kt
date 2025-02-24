@@ -16,9 +16,10 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 private val TAG = "VoteUiHandler"
 
@@ -301,18 +302,19 @@ fun VoteUiHandler.bind(
     )
 }
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface VotableRef : Parcelable {
+    @Serializable
+    @SerialName("1")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("1")
     data class PostRef(
         val postId: Int,
     ) : VotableRef
 
+    @Serializable
+    @SerialName("2")
     @Parcelize
-    @JsonClass(generateAdapter = true)
-    @TypeLabel("2")
     data class CommentRef(
         val commentId: Int,
     ) : VotableRef

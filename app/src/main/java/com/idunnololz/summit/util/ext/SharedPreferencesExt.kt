@@ -2,28 +2,24 @@ package com.idunnololz.summit.util.ext
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.idunnololz.summit.util.moshi
+import kotlinx.serialization.json.Json
 
-inline fun <reified T> SharedPreferences.getMoshiValue(key: String): T? {
+inline fun <reified T> SharedPreferences.getJsonValue(json: Json, key: String): T? {
     return try {
-        val json = this.getString(key, null)
-            ?: return null
-        moshi.adapter(T::class.java).fromJson(
-            json,
-        )
+        json.decodeFromString(this.getString(key, null) ?: return null)
     } catch (e: Exception) {
         Log.e("SharedPreferencesExt", "", e)
         null
     }
 }
 
-inline fun <reified T> SharedPreferences.putMoshiValue(key: String, value: T) {
+inline fun <reified T> SharedPreferences.putJsonValue(json: Json, key: String, value: T) {
     this.edit()
         .apply {
             if (value == null) {
                 remove(key)
             } else {
-                putString(key, moshi.adapter(T::class.java).toJson(value))
+                putString(key, json.encodeToString(value))
             }
         }
         .apply()

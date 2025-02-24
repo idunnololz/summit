@@ -1,9 +1,9 @@
 package com.idunnololz.summit.preferences
 
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarOption
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class TextFieldToolbarSettings(
     val useCustomToolbar: Boolean = false,
     val toolbarOptions: List<TextFieldToolbarOption> = listOf(

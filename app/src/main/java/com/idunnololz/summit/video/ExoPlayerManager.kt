@@ -118,9 +118,6 @@ class ExoPlayerManagerManager @Inject constructor(
         }
         players.clear()
     }
-
-    fun onDestroyView() {
-    }
 }
 
 /**

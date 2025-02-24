@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin.android.extensions) apply false
     alias(libs.plugins.navigation.safeargs) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.plugin.serialization) apply false
 }
 
 subprojects {

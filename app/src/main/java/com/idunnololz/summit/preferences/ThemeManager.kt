@@ -46,7 +46,7 @@ class ThemeManager @Inject constructor(
     val useCustomFont = MutableStateFlow<Boolean>(preferences.globalFont != 0)
 
     var isLightTheme =
-        when (preferences.getBaseTheme()) {
+        when (preferences.baseTheme) {
             BaseTheme.UseSystem -> context.isLightTheme()
             BaseTheme.Light -> true
             BaseTheme.Dark -> false
@@ -67,7 +67,7 @@ class ThemeManager @Inject constructor(
 
     fun onPreferencesChanged() {
         val currentConfig = ThemeOverlayConfig(
-            baseTheme = preferences.getBaseTheme(),
+            baseTheme = preferences.baseTheme,
             isBlackTheme = preferences.isBlackTheme(),
             useLessDarkBackgroundTheme = preferences.useLessDarkBackgroundTheme,
             isMaterialYou = preferences.isUseMaterialYou(),

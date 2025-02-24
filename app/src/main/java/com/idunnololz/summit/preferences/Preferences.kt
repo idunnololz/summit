@@ -61,6 +61,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DATE_SCREENSHOTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMUNITY_SORT_ORDER
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_PAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNVOTE_COLOR
@@ -145,13 +146,14 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_
 import com.idunnololz.summit.util.StringPreferenceDelegate
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getMoshiValue
-import com.idunnololz.summit.util.ext.putMoshiValue
-import com.idunnololz.summit.util.moshi
+import com.idunnololz.summit.util.ext.getJsonValue
+import com.idunnololz.summit.util.ext.putJsonValue
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import org.json.JSONObject
 
 private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -162,6 +164,7 @@ class Preferences(
     @ApplicationContext private val context: Context,
     val prefs: SharedPreferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val json: Json,
 ) {
 
     companion object {
@@ -183,30 +186,8 @@ class Preferences(
     val all: MutableMap<String, *>
         get() = prefs.all
 
-    fun getDefaultPage(): CommunityRef {
-        val communityJson = prefs.getString(PreferenceUtils.KEY_DEFAULT_PAGE, null)
-        val communityRef = if (communityJson == null) {
-            null
-        } else {
-            try {
-                moshi.adapter(CommunityRef::class.java)
-                    .fromJson(communityJson)
-            } catch (e: Exception) {
-                null
-            }
-        }
-
-        return communityRef ?: CommunityRef.All()
-    }
-
-    fun setDefaultPage(communityRef: CommunityRef) {
-        prefs.edit()
-            .putString(
-                PreferenceUtils.KEY_DEFAULT_PAGE,
-                moshi.adapter(CommunityRef::class.java).toJson(communityRef),
-            )
-            .apply()
-    }
+    var defaultPage: CommunityRef
+        by jsonPreference(KEY_DEFAULT_PAGE) { CommunityRef.All() }
 
     fun getPostsLayout(): CommunityLayout = try {
         CommunityLayout.valueOf(
@@ -228,22 +209,16 @@ class Preferences(
     }
 
     fun setPostInListUiConfig(config: PostInListUiConfig) {
-        prefs.putMoshiValue(getPostUiConfigKey(getPostsLayout()), config)
+        prefs.putJsonValue(json, getPostUiConfigKey(getPostsLayout()), config)
     }
 
     fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig {
-        return prefs.getMoshiValue<PostInListUiConfig>(getPostUiConfigKey(layout))
+        return prefs.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
             ?: layout.getDefaultPostUiConfig()
     }
 
-    fun getPostAndCommentsUiConfig(): PostAndCommentsUiConfig {
-        return prefs.getMoshiValue<PostAndCommentsUiConfig>(KEY_POST_AND_COMMENTS_UI_CONFIG)
-            ?: getDefaultPostAndCommentsUiConfig()
-    }
-
-    fun setPostAndCommentsUiConfig(config: PostAndCommentsUiConfig) {
-        prefs.putMoshiValue(KEY_POST_AND_COMMENTS_UI_CONFIG, config)
-    }
+    var postAndCommentsUiConfig: PostAndCommentsUiConfig
+        by jsonPreference(KEY_POST_AND_COMMENTS_UI_CONFIG) { getDefaultPostAndCommentsUiConfig() }
 
     private fun getPostUiConfigKey(layout: CommunityLayout) = when (layout) {
         CommunityLayout.Compact ->
@@ -266,15 +241,6 @@ class Preferences(
             PreferenceUtils.KEY_POST_UI_CONFIG_FULL_WITH_CARDS
     }
 
-    fun getBaseTheme(): BaseTheme {
-        return prefs.getMoshiValue<BaseTheme>(KEY_BASE_THEME)
-            ?: BaseTheme.Dark
-    }
-
-    fun setBaseTheme(baseTheme: BaseTheme) {
-        prefs.putMoshiValue(KEY_BASE_THEME, baseTheme)
-    }
-
     fun isUseMaterialYou(): Boolean {
         return prefs.getBoolean(PreferenceUtils.KEY_USE_MATERIAL_YOU, false)
     }
@@ -290,6 +256,9 @@ class Preferences(
     fun setUseBlackTheme(b: Boolean) {
         prefs.edit().putBoolean(PreferenceUtils.KEY_USE_BLACK_THEME, b).apply()
     }
+
+    var baseTheme: BaseTheme
+        by jsonPreference(KEY_BASE_THEME) { BaseTheme.Dark }
 
     var useLessDarkBackgroundTheme: Boolean
         by booleanPreference(KEY_USE_LESS_DARK_BACKGROUND, false)
@@ -727,5 +696,5 @@ class Preferences(
         LongPreferenceDelegate(prefs, key)
 
     private inline fun <reified T> jsonPreference(key: String, noinline defaultValue: () -> T) =
-        JsonPreferenceDelegate(prefs, moshi, key, T::class.java, defaultValue)
+        JsonPreferenceDelegate(prefs, json, key, serializer(), defaultValue)
 }

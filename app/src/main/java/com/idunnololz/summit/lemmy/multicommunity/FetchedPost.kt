@@ -3,12 +3,13 @@ package com.idunnololz.summit.lemmy.multicommunity
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
-import com.squareup.moshi.JsonClass
-import dev.zacsweers.moshix.sealed.annotations.TypeLabel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class FetchedPost(
     val postView: PostView,
     val source: Source,
@@ -19,16 +20,17 @@ fun PostView.toFetchedPost() = FetchedPost(
     source = Source.StandardSource(),
 )
 
-@JsonClass(generateAdapter = true, generator = "sealed:t")
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface Source : Parcelable {
+    @Serializable
+    @SerialName("1")
     @Parcelize
-    @TypeLabel("1")
-    @JsonClass(generateAdapter = true)
     class StandardSource : Source
 
+    @Serializable
+    @SerialName("2")
     @Parcelize
-    @TypeLabel("2")
-    @JsonClass(generateAdapter = true)
     class AccountSource(
         val name: String,
         val id: PersonId,

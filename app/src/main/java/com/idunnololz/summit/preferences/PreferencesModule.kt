@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlinx.serialization.json.Json
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -35,10 +36,12 @@ class PreferencesModule {
         @ApplicationContext context: Context,
         sharedPreferences: SharedPreferences,
         coroutineScopeFactory: CoroutineScopeFactory,
+        json: Json,
     ): Preferences = Preferences(
         context = context,
         prefs = sharedPreferences,
         coroutineScopeFactory = coroutineScopeFactory,
+        json = json,
     )
 
     @Provides

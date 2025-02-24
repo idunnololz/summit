@@ -49,7 +49,6 @@ import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.toErrorMessage
-import com.squareup.moshi.JsonClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.RuntimeException
@@ -60,6 +59,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
@@ -89,7 +89,7 @@ class CommunityViewModel @Inject constructor(
     }
 
     @Parcelize
-    @JsonClass(generateAdapter = true)
+    @Serializable
     class PageScrollState(
         var isAtBottom: Boolean = false,
         var itemIndex: Int = 0,

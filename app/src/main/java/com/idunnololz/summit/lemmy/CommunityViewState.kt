@@ -5,10 +5,11 @@ import android.net.Uri
 import android.os.Bundle
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.community.CommunityViewModel
-import com.idunnololz.summit.util.moshi
-import com.squareup.moshi.JsonClass
+import com.idunnololz.summit.util.dagger.json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CommunityViewState(
     val communityState: CommunityState,
     val pageScrollStates: List<CommunityViewModel.PageScrollState>,
@@ -17,18 +18,18 @@ data class CommunityViewState(
 
         private const val SIS_KEY = "LemmyViewState_pp"
 
-        fun restoreFromBundle(inState: Bundle): CommunityViewState? {
-            val json = inState.getString(SIS_KEY, null) ?: return null
+        fun restoreFromBundle(inState: Bundle, json: Json): CommunityViewState? {
+            val jsonStr = inState.getString(SIS_KEY, null) ?: return null
             return try {
-                moshi.adapter(CommunityViewState::class.java).fromJson(json)
+                json.decodeFromString<CommunityViewState?>(jsonStr)
             } catch (e: Exception) {
                 null
             }
         }
     }
 
-    fun writeToBundle(outState: Bundle) {
-        outState.putString(SIS_KEY, moshi.adapter(CommunityViewState::class.java).toJson(this))
+    fun writeToBundle(outState: Bundle, json: Json) {
+        outState.putString(SIS_KEY, json.encodeToString<CommunityViewState?>(this))
     }
 }
 
@@ -48,9 +49,9 @@ fun CommunityRef.toUri(apiInstance: String): Uri {
         is CommunityRef.Local -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Local"
         is CommunityRef.CommunityRefByName -> "https://${community.instance}/c/${community.name}?dataType=Post"
         is CommunityRef.Subscribed -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=Subscribed"
-        is CommunityRef.MultiCommunity -> "https://$apiInstance/#!mc=${moshi.adapter(
-            CommunityRef::class.java,
-        ).toJson(community)}"
+        is CommunityRef.MultiCommunity -> "https://$apiInstance/#!mc=${json.encodeToString(
+            community,
+        )}"
         is CommunityRef.ModeratedCommunities -> "https://${community.instance ?: apiInstance}/?dataType=Post&listingType=ModeratorView"
         is CommunityRef.AllSubscribed -> "https://$apiInstance/#!as="
     }
@@ -58,14 +59,14 @@ fun CommunityRef.toUri(apiInstance: String): Uri {
     return Uri.parse(url)
 }
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class CommunityState(
     val communityRef: CommunityRef,
     val pages: List<PageInfo>,
     val currentPageIndex: Int,
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class PageInfo(
     val pageIndex: Int,
     var flags: Int,

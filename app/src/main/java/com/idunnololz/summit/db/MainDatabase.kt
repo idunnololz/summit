@@ -47,7 +47,8 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsDao
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
 import com.idunnololz.summit.user.UserCommunityEntry
-import com.idunnololz.summit.util.moshi
+import com.idunnololz.summit.util.dagger.json
+import kotlinx.serialization.json.Json
 
 /**
  * Db that contains actions taken by the user. This is necessary to cache all of the user's actions.
@@ -108,13 +109,12 @@ abstract class MainDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: MainDatabase? = null
 
-        fun getInstance(context: Context): MainDatabase = INSTANCE ?: synchronized(this) {
-            INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
-        }
+        fun getInstance(context: Context, json: Json): MainDatabase =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: buildDatabase(context, json).also { INSTANCE = it }
+            }
 
-        private fun buildDatabase(context: Context): MainDatabase {
-            val moshi = moshi
-
+        private fun buildDatabase(context: Context, json: Json): MainDatabase {
 //            if (BuildConfig.DEBUG) {
 //                context.deleteDatabase("main.db")
 //                val db = context.openOrCreateDatabase("main.db", 0, null)
@@ -132,12 +132,12 @@ abstract class MainDatabase : RoomDatabase() {
                         fallbackToDestructiveMigration()
                     }
                 }
-                .addTypeConverter(LemmyActionConverters(moshi))
-                .addTypeConverter(UserCommunitiesConverters(moshi))
-                .addTypeConverter(AccountInfoConverters(moshi))
-                .addTypeConverter(DraftConverters(moshi))
-                .addTypeConverter(InboxEntryConverters(moshi))
-                .addTypeConverter(UserTagConverters(moshi))
+                .addTypeConverter(LemmyActionConverters(json))
+                .addTypeConverter(UserCommunitiesConverters(json))
+                .addTypeConverter(AccountInfoConverters(json))
+                .addTypeConverter(DraftConverters(json))
+                .addTypeConverter(InboxEntryConverters(json))
+                .addTypeConverter(UserTagConverters(json))
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_24)
@@ -261,14 +261,13 @@ val MIGRATION_37_38 = object : Migration(37, 38) {
 val MIGRATION_38_39 = object : Migration(38, 39) {
     override fun migrate(db: SupportSQLiteDatabase) {
         val cursor = db.query("SELECT id, data FROM drafts;")
-        val draftDataAdapter = moshi.adapter(DraftData::class.java)
         val toExecute = mutableListOf<String>()
 
         while (cursor.moveToNext()) {
             val id = cursor.getLong(0)
             val data = cursor.getString(1)
 
-            val draftData = draftDataAdapter.fromJson(data)
+            val draftData = json.decodeFromString<DraftData>(data)
                 ?: continue
             val accountId = draftData.accountId
             val accountInstance = draftData.accountInstance
