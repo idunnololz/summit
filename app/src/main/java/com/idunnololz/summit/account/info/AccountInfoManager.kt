@@ -87,6 +87,7 @@ class AccountInfoManager @Inject constructor(
         }
 
         coroutineScope.launch {
+            @Suppress("OPT_IN_USAGE")
             unreadCountInvalidates.debounce(1000)
                 .collect {
                     val account = accountManager.currentAccount.asAccount ?: return@collect

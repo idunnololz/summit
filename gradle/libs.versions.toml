@@ -105,7 +105,7 @@ recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.4.0
 preference-ktx = { module = "androidx.preference:preference-ktx", version = "1.2.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.0" }
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.1.0" }
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.5" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.6" }
 activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.10.0" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
 transition-ktx = { module = "androidx.transition:transition-ktx", version = "1.5.1" }

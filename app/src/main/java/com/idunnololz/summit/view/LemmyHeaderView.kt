@@ -108,6 +108,13 @@ class LemmyHeaderView : FrameLayout {
         return iconImageView!!
     }
 
+    fun ensureNoIconImageView() {
+        if (iconImageView == null) {
+            return
+        }
+        iconImageView?.visibility = View.GONE
+    }
+
     private fun LinkifyTextView.style(): LinkifyTextView {
         maxLines = 1
         includeFontPadding = false
