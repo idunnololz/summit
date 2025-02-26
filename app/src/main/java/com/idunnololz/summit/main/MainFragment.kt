@@ -303,11 +303,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         changeCommunity(requireNotNull(tabsManager.currentTab.value))
 
-        viewModel.userCommunitiesChangedEvents.observe(viewLifecycleOwner) {
-            it.contentIfNotHandled ?: return@observe
-
-            purgeUnusedFragments()
-        }
         viewModel.userCommunitiesUpdated.observe(viewLifecycleOwner) {
             val userCommunityItem = it.contentIfNotHandled ?: return@observe
             val tab = userCommunityItem.toTab()
@@ -332,47 +327,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         }
         deferredNavigationRequests.clear()
 
-        fun updatePaneBackPressHandler() {
-            if (!isBindingAvailable()) return
-
-            paneOnBackPressHandler.remove()
-
-            Log.d(
-                TAG,
-                "updatePaneBackPressHandler(): selected panel: ${binding.rootView.getSelectedPanel()}",
-            )
-            if (binding.rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
-                requireMainActivity().onBackPressedDispatcher
-                    .addCallback(viewLifecycleOwner, paneOnBackPressHandler)
-            }
-        }
-
         binding.rootView
             .registerStartPanelStateListeners(
                 object : OverlappingPanelsLayout.PanelStateListener {
                     override fun onPanelStateChange(panelState: PanelState) {
-                        when (panelState) {
-                            PanelState.Closed -> {
-                                getMainActivity()?.let {
-                                    it.setNavUiOpenPercent(0f)
-                                    Utils.hideKeyboard(it)
-                                }
-
-                                updatePaneBackPressHandler()
-                            }
-                            is PanelState.Closing -> {
-                                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
-                            }
-                            PanelState.Opened -> {
-                                getMainActivity()?.setNavUiOpenPercent(100f)
-                                communitiesPaneController.onShown()
-
-                                updatePaneBackPressHandler()
-                            }
-                            is PanelState.Opening -> {
-                                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
-                            }
-                        }
+                        this@MainFragment.onPanelStateChange()
                     }
                 },
             )
@@ -488,6 +447,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         )
 
         updateBackHandler()
+        onPanelStateChange()
     }
 
     override fun onPause() {
@@ -508,6 +468,20 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         Log.d(TAG, "onDestroyView()")
     }
 
+    private fun updatePaneBackPressHandler() {
+        if (!isBindingAvailable()) return
+
+        val rootView = binding.rootView
+
+        paneOnBackPressHandler.remove()
+
+        Log.d(TAG, "updatePaneBackPressHandler(): selected panel: ${rootView.getSelectedPanel()}")
+        if (rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
+            requireMainActivity().onBackPressedDispatcher
+                .addCallback(viewLifecycleOwner, paneOnBackPressHandler)
+        }
+    }
+
     private fun updateBackHandler() {
         val shouldUsePredictiveBack = isPredictiveBackSupported() &&
             preferences.usePredictiveBack
@@ -525,6 +499,31 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         }
 
         onBackPressedCallback.isEnabled = false
+    }
+
+    private fun onPanelStateChange() {
+        when (val panelState = binding.root.startPanelState) {
+            PanelState.Closed -> {
+                getMainActivity()?.let {
+                    it.setNavUiOpenPercent(0f)
+                    Utils.hideKeyboard(it)
+                }
+
+                updatePaneBackPressHandler()
+            }
+            is PanelState.Closing -> {
+                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
+            }
+            PanelState.Opened -> {
+                getMainActivity()?.setNavUiOpenPercent(100f)
+                communitiesPaneController.onShown()
+
+                updatePaneBackPressHandler()
+            }
+            is PanelState.Opening -> {
+                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
+            }
+        }
     }
 
     private fun getCurrentFragment(): Fragment? {
@@ -604,15 +603,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         return selectedFragment
     }
 
-    private fun purgeUnusedFragments() {
-//        val unusedFragmentTags = fragmentTags
-//            .mapNotNull { getIdFromTag(it) }
-//            .filter { userCommunitiesManager.getTab(it) == null }
-//            .map { getTagForTab(it) }
-//
-//        purgeFragments(unusedFragmentTags)
-    }
-
     private fun purgeFragments(fragmentsToRemoveTags: List<String>) {
         val fragmentManager = childFragmentManager
         val fragmentsToRemove = arrayListOf<Fragment>()
@@ -651,10 +641,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
     fun expandStartPane() {
         binding.rootView.openStartPanel()
-    }
-
-    fun forceBack() {
-        onBackPressedCallback.handleOnBackPressed()
     }
 
     private fun resetCurrentTab(tab: TabsManager.Tab) {

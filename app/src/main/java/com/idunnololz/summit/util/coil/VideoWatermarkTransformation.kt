@@ -6,8 +6,8 @@ import android.graphics.Paint
 import android.graphics.Rect
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
-import coil.size.Size
-import coil.transform.Transformation
+import coil3.size.Size
+import coil3.transform.Transformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.safeConfig
@@ -16,7 +16,7 @@ import kotlin.math.min
 class VideoWatermarkTransformation(
     private val context: Context,
     private val sampling: Float = 1f,
-) : Transformation {
+) : Transformation() {
 
     private val overlay by lazy {
         context.getDrawableCompat(R.drawable.video_overlay)

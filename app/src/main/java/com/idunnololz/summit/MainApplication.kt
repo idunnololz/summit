@@ -7,13 +7,15 @@ import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
-import coil.Coil
-import coil.ImageLoader
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.transition.CrossfadeTransition
-import coil.util.DebugLogger
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.gif.AnimatedImageDecoder
+import coil3.gif.GifDecoder
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.transitionFactory
+import coil3.svg.SvgDecoder
+import coil3.transition.CrossfadeTransition
+import coil3.util.DebugLogger
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -29,7 +31,7 @@ import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
 import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.coil.CustomVideoFrameDecoder
+import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
 import com.idunnololz.summit.util.isFirebaseInitialized
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
@@ -144,7 +146,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         OfflineScheduleManager.instance.setupAlarms()
 
-        Coil.setImageLoader(
+        SingletonImageLoader.setSafe {
             ImageLoader.Builder(context)
                 .transitionFactory(
                     CrossfadeTransition.Factory(
@@ -152,14 +154,22 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                         preferExactIntrinsicSize = true,
                     ),
                 )
-                .okHttpClient(Client.get())
+                .components {
+                    add(
+                        OkHttpNetworkFetcherFactory(
+                            callFactory = {
+                                Client.get()
+                            },
+                        ),
+                    )
+                }
                 .components {
                     if (SDK_INT >= 28) {
-                        add(ImageDecoderDecoder.Factory())
+                        add(AnimatedImageDecoder.Factory())
                     } else {
                         add(GifDecoder.Factory())
                     }
-                    add(CustomVideoFrameDecoder.Factory())
+                    add(VideoFrameDecoder.Factory())
                     add(SvgDecoder.Factory())
                 }
                 .apply {
@@ -167,8 +177,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                         logger(DebugLogger())
                     }
                 }
-                .build(),
-        )
+                .build()
+        }
 
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)

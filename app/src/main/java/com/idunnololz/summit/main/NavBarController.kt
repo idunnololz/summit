@@ -141,16 +141,14 @@ class NavBarController(
         val metrics = WindowMetricsCalculator.getOrCreate()
             .computeCurrentWindowMetrics(activity)
 
-        val widthDp = metrics.bounds.width() /
-            activity.resources.displayMetrics.density
+        val widthDp = metrics.bounds.width() / activity.resources.displayMetrics.density
         val widthWindowSizeClass = when {
             widthDp < 600f -> WindowSizeClass.COMPACT
             widthDp < 840f -> WindowSizeClass.MEDIUM
             else -> WindowSizeClass.EXPANDED
         }
 
-        val heightDp = metrics.bounds.height() /
-            activity.resources.displayMetrics.density
+        val heightDp = metrics.bounds.height() / activity.resources.displayMetrics.density
         val heightWindowSizeClass = when {
             heightDp < 480f -> WindowSizeClass.COMPACT
             heightDp < 900f -> WindowSizeClass.MEDIUM
@@ -451,7 +449,7 @@ class NavBarController(
                         NavBarDestinations.Saved -> {
                             add(
                                 Menu.NONE,
-                                R.id.savedFragment,
+                                R.id.filteredPostsAndCommentsTabbedFragment,
                                 Menu.NONE,
                                 context.getString(R.string.saved),
                             ).apply {

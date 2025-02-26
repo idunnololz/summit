@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 225
-        versionName = "1.55.2"
+        versionCode = 226
+        versionName = "1.55.3"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -106,6 +106,7 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
     implementation(libs.coil.video)
+    implementation(libs.coil.okhttp)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)

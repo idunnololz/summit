@@ -9,12 +9,14 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.text.buildSpannedString
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import coil.load
+import coil3.load
+import coil3.request.allowHardware
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -31,6 +33,8 @@ import com.idunnololz.summit.databinding.CustomAppBarSmallBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -128,6 +132,9 @@ class LemmyAppBarController(
             val icon: ImageView,
             val subscribe: TextView,
             val info: TextView,
+            val titleHotspot: View,
+            val feedInfoText: TextView,
+            val communities: TextView,
         ) : ViewHolder {
             override fun setSortOrderText(text: String) {
                 communitySortOrder.text = text
@@ -219,16 +226,10 @@ class LemmyAppBarController(
         }
 
         if (vh is ViewHolder.LargeAppBarViewHolder) {
-            vh.title.setOnClickListener {
+            vh.titleHotspot.setOnClickListener {
                 showCommunitySelectorInternal()
             }
-            vh.title.setOnLongClickListener {
-                onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
-            }
-            vh.subtitle.setOnClickListener {
-                showCommunitySelectorInternal()
-            }
-            vh.subtitle.setOnLongClickListener {
+            vh.titleHotspot.setOnLongClickListener {
                 onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
             }
             vh.communitySortOrder2.setOnClickListener {
@@ -321,6 +322,8 @@ class LemmyAppBarController(
                 @Suppress("SetTextI18n")
                 vh.subtitle.text = "$communityName@$communityInstance"
             }
+
+            vh.feedInfoText.visibility = View.GONE
 
             when (val value = communityInfoViewModel.siteOrCommunity.value) {
                 is StatefulData.Error -> {}
@@ -429,6 +432,49 @@ class LemmyAppBarController(
                             )
                         }
                     }
+
+                    vh.feedInfoText.visibility = View.VISIBLE
+                    vh.feedInfoText.text = buildSpannedString {
+                        val mau = value.data.response.fold(
+                            { it.site_view.counts.users_active_month },
+                            { it.community_view.counts.users_active_month },
+                        )
+                        val totalUsers = value.data.response.fold(
+                            { it.site_view.counts.users },
+                            { it.community_view.counts.subscribers },
+                        )
+                        val posts = value.data.response.fold(
+                            { it.site_view.counts.posts },
+                            { it.community_view.counts.posts },
+                        )
+                        val comments = value.data.response.fold(
+                            { it.site_view.counts.comments },
+                            { it.community_view.counts.comments },
+                        )
+                        append(
+                            context.getString(
+                                R.string.users_format, LemmyUtils.abbrevNumber(totalUsers.toLong()),
+                            ),
+                        )
+                        appendSeparator()
+                        append(
+                            context.getString(
+                                R.string.mau_format, LemmyUtils.abbrevNumber(mau.toLong()),
+                            ),
+                        )
+                        appendSeparator()
+                        append(
+                            context.getString(
+                                R.string.posts_format, LemmyUtils.abbrevNumber(posts.toLong()),
+                            ),
+                        )
+                        appendSeparator()
+                        append(
+                            context.getString(
+                                R.string.comments_format, LemmyUtils.abbrevNumber(comments.toLong()),
+                            ),
+                        )
+                    }
                 }
             }
 
@@ -460,6 +506,18 @@ class LemmyAppBarController(
                     vh.info.visibility = View.GONE
                 }
             }
+
+            if (currentCommunity is CommunityRef.All || currentCommunity is CommunityRef.Local) {
+                vh.communities.visibility = View.VISIBLE
+                vh.communities.setOnClickListener {
+                    mainActivity.showCommunities(
+                        currentCommunity.instance ?: communityInfoViewModel.instance,
+                    )
+                }
+            } else {
+                vh.communities.visibility = View.GONE
+            }
+
             vh.info.setOnClickListener {
                 if (currentCommunity != null) {
                     mainActivity.showCommunityInfo(currentCommunity)
@@ -707,6 +765,9 @@ class LemmyAppBarController(
                 b.icon,
                 b.subscribe,
                 b.info,
+                b.titleHotspot,
+                b.feedInfoText,
+                b.communities,
             )
         } else {
             val b = CustomAppBarSmallBinding.inflate(inflater, parentContainer, false)

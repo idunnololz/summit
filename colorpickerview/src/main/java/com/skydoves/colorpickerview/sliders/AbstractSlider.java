@@ -82,7 +82,6 @@ abstract class AbstractSlider extends FrameLayout {
     onCreate();
   }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public AbstractSlider(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
     getAttrs(attrs);

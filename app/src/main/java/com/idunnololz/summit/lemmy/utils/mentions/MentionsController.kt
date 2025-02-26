@@ -60,7 +60,6 @@ class MentionsController @AssistedInject constructor(
         ): MentionsController
     }
 
-    private val coroutineScope = lifecycleOwner.lifecycleScope
     private val mentionsAutoCompleteRepository = MentionsAutoCompleteRepository(
         lifecycleOwner.lifecycleScope,
         apiClient,

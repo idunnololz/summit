@@ -33,7 +33,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/enable_switch"
             app:layout_constraintEnd_toEndOf="@+id/enable_switch" />
 
-        <Switch
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/enable_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

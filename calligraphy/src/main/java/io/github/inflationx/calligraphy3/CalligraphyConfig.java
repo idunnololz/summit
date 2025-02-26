@@ -68,9 +68,7 @@ public class CalligraphyConfig {
         DEFAULT_STYLES.put(AppCompatMultiAutoCompleteTextView.class, android.R.attr.autoCompleteTextViewStyle);
         DEFAULT_STYLES.put(AppCompatCheckBox.class, android.R.attr.checkboxStyle);
         DEFAULT_STYLES.put(AppCompatRadioButton.class, android.R.attr.radioButtonStyle);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            DEFAULT_STYLES.put(AppCompatCheckedTextView.class, android.R.attr.checkedTextViewStyle);
-        }
+        DEFAULT_STYLES.put(AppCompatCheckedTextView.class, android.R.attr.checkedTextViewStyle);
     }
 
     /**

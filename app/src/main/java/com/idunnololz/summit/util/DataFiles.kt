@@ -2,9 +2,7 @@ package com.idunnololz.summit.util
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -106,13 +104,5 @@ class DataFiles private constructor(private val context: Context) : IDataCache {
         if (f.exists()) {
             f.delete()
         }
-    }
-
-    /**
-     * Updates the cache directory based on the preferences
-     */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    fun updateCacheDir() {
-        setupDataDir()
     }
 }

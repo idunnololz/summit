@@ -191,7 +191,7 @@ class CommunityFragment :
     }
 
     private val _sortByMenu: BottomMenu by lazy {
-        makeSortByMenu(requireContext()).apply {
+        makeSortByMenu().apply {
             addDivider()
 
             addItem(
@@ -232,7 +232,7 @@ class CommunityFragment :
     }
 
     private val _defaultSortOrderSortByMenu by lazy {
-        makeSortByMenu(requireContext()).apply {
+        makeSortByMenu().apply {
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.id) {
                     R.id.sort_order_top ->
@@ -256,7 +256,7 @@ class CommunityFragment :
         }
     }
 
-    private fun makeSortByMenu(context: Context) = BottomMenu(requireContext()).apply {
+    private fun makeSortByMenu() = BottomMenu(requireContext()).apply {
         setTitle(R.string.sort_by)
         addItem(R.id.sort_order_active, R.string.sort_order_active)
         addItem(R.id.sort_order_hot, R.string.sort_order_hot)
@@ -1181,10 +1181,6 @@ class CommunityFragment :
                 }
             }
 
-            if (!binding.slidingPaneLayout.isOpaque) {
-                getMainActivity()?.setNavUiOpenPercent(0f)
-            }
-
             adapter?.updateWithPreferences(preferences)
             adapter?.updateNsfwMode(nsfwModeManager)
 
@@ -1558,7 +1554,7 @@ class CommunityFragment :
                         }
                         NavBarDestinations.Saved -> {
                             addItemWithIcon(
-                                R.id.savedFragment,
+                                R.id.filteredPostsAndCommentsTabbedFragment,
                                 getString(R.string.saved),
                                 R.drawable.baseline_bookmark_24,
                             )
@@ -1756,7 +1752,7 @@ class CommunityFragment :
             R.id.mainFragment -> {
                 getMainActivity()?.navigateTopLevel(actionId)
             }
-            R.id.savedFragment -> {
+            R.id.filteredPostsAndCommentsTabbedFragment -> {
                 getMainActivity()?.navigateTopLevel(actionId)
             }
             R.id.searchHomeFragment -> {

@@ -9,8 +9,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.navigation.fragment.navArgs
-import coil.dispose
-import coil.load
+import coil3.dispose
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentSaveForLaterBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding

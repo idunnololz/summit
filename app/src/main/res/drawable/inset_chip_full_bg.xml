@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<inset
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/full_chip_bg"
-    android:insetTop="8dp"
-    android:insetBottom="8dp"
-    android:insetLeft="0dp"
-    android:insetRight="0dp"/>

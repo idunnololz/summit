@@ -101,7 +101,7 @@ class StorageUsageView : ConstraintLayout {
 
         detailsContainer.removeAllViews()
 
-        storageUsage.withIndex().forEach { (index, item) ->
+        storageUsage.forEach { item ->
             val drawable = ShapeDrawable(RectShape())
             drawable.paint.color = item.color
             drawable.intrinsicWidth = Utils.convertDpToPixel(16f).toInt()

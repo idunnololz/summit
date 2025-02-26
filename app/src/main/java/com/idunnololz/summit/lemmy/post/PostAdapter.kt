@@ -935,14 +935,6 @@ class PostAdapter(
         }
     }
 
-    private fun toggleItemForScreenshot(id: String) {
-        if (includedInScreenshot.contains(id)) {
-            deselectItemForScreenshot(id)
-        } else {
-            selectItemForScreenshot(id)
-        }
-    }
-
     fun selectItemForScreenshot(id: String) {
         includedInScreenshot.add(id)
     }

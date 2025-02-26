@@ -49,11 +49,6 @@ class OldAlertDialogFragment : DialogFragment() {
             return this
         }
 
-        fun setCancelable(b: Boolean): Builder {
-            args.putBoolean(EXTRA_CANCELABLE, b)
-            return this
-        }
-
         fun setExtra(key: String, extra: String): Builder {
             args.putString(key, extra)
             return this

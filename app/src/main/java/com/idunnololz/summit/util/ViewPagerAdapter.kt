@@ -70,13 +70,7 @@ class ViewPagerAdapter(
         items.add(PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes))
     }
 
-    fun findIndexOfPage(className: String): Int = items.indexOfFirst { it.clazz.name == className }
-
-    fun getIdForPosition(position: Int): String = items[position].clazz.simpleName
-
     fun getTitleForPosition(position: Int): CharSequence = items[position].title
-
-    fun getClassForPosition(position: Int): Class<*> = items[position].clazz
 
     override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
         val item = items[position]

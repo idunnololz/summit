@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.load
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.utils.fullName

@@ -12,10 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.load
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitiesLoadItemBinding
 import com.idunnololz.summit.databinding.CommunityDetailsItemBinding
 import com.idunnololz.summit.databinding.EmptyItemBinding
@@ -32,11 +33,8 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.TextMeasurementUtils
-import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
-import com.idunnololz.summit.util.ext.tint
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -57,6 +55,9 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var avatarHelper: AvatarHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,6 +117,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                 offlineManager = offlineManager,
                 instance = viewModel.apiInstance,
                 params = params,
+                avatarHelper = avatarHelper,
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
@@ -215,6 +217,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
         private val offlineManager: OfflineManager,
         private val instance: String,
         private val params: TextMeasurementUtils.TextMeasurementParams,
+        private val avatarHelper: AvatarHelper,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
         private val showMoreOptionsMenu: (CommunityView) -> Unit,
@@ -297,10 +300,8 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                 }
 
                 if (community.community.banner.isNullOrBlank()) {
-                    b.banner.visibility = View.GONE
+                    b.banner.load("file:///android_asset/banner_placeholder.svg")
                 } else {
-                    b.banner.visibility = View.VISIBLE
-
                     b.banner.load(newShimmerDrawable16to9(context))
                     offlineManager.fetchImageWithError(
                         rootView,
@@ -314,24 +315,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                     )
                 }
 
-                if (community.community.icon == null) {
-                    context.getDrawableCompat(R.drawable.ic_community_24)
-                        ?.tint(
-                            context.getColorFromAttribute(
-                                androidx.appcompat.R.attr.colorControlNormal,
-                            ),
-                        )
-                        ?.let {
-                            b.icon.setImageDrawable(it)
-                        }
-                        ?: run {
-                            b.icon.setImageDrawable(null)
-                        }
-                } else {
-                    offlineManager.fetchImage(rootView, community.community.icon) {
-                        b.icon.load(it)
-                    }
-                }
+                avatarHelper.loadCommunityIcon(b.icon, community.community)
 
                 h.itemView.setOnClickListener {
                     onPageClick(community.community.toCommunityRef())

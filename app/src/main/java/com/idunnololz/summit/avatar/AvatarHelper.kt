@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
-import coil.dispose
-import coil.imageLoader
-import coil.load
-import coil.request.ImageRequest
-import coil.target.Target
-import coil.transform.CircleCropTransformation
+import coil3.asImage
+import coil3.dispose
+import coil3.imageLoader
+import coil3.load
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.api.dto.Community
@@ -96,14 +98,14 @@ class AvatarHelper @Inject constructor(
             imageView.setTag(R.id.generate_profile_icon_job, job)
         } else {
             imageView.load(imageUrl) {
-                placeholder(newShimmerDrawableSquare(context))
+                placeholder(newShimmerDrawableSquare(context).asImage())
                 allowHardware(false)
             }
         }
     }
 
     fun loadAvatar(
-        target: Target,
+        target: coil3.target.Target,
         imageUrl: String?,
         personName: String,
         personId: PersonId,
@@ -119,7 +121,7 @@ class AvatarHelper @Inject constructor(
                 )
 
                 withContext(Dispatchers.Main) {
-                    target.onSuccess(d)
+                    target.onSuccess(d.asImage())
                 }
             }
         } else {
@@ -129,7 +131,7 @@ class AvatarHelper @Inject constructor(
                         .data(imageUrl)
                         .transformations(CircleCropTransformation())
                         .target(target)
-                        .placeholder(newShimmerDrawableSquare(context))
+                        .placeholder(newShimmerDrawableSquare(context).asImage())
                         .allowHardware(false)
                         .build(),
                 )
@@ -173,7 +175,7 @@ class AvatarHelper @Inject constructor(
              */
             imageView.load(iconUrl) {
                 allowHardware(false)
-                placeholder(newShimmerDrawableSquare(context))
+                placeholder(newShimmerDrawableSquare(context).asImage())
                 listener(
                     onError = { _, _ ->
                         loadCommunityIcon(imageView, communityRef, null)
@@ -207,7 +209,7 @@ class AvatarHelper @Inject constructor(
         } else {
             imageView.load(iconUrl) {
                 allowHardware(false)
-                placeholder(newShimmerDrawableSquare(context))
+                placeholder(newShimmerDrawableSquare(context).asImage())
                 listener(
                     onError = { _, _ ->
                         loadInstanceIcon(imageView, siteView, null)

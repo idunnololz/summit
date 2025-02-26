@@ -19,17 +19,6 @@ class ModeratedCommunitiesDataSource(
     private val dataSourceFactory: MultiCommunityDataSource.Factory,
 ) : PostsDataSource {
 
-    companion object {
-        private const val TAG = "ModeratedCommunitiesDataSource"
-
-        private const val DEFAULT_PAGE_SIZE = 10
-
-        /**
-         * Maximum number of communities that can be added into one multi-community.
-         */
-        const val MULTI_COMMUNITY_DATA_SOURCE_LIMIT = 30
-    }
-
     class Factory @Inject constructor(
         private val apiClient: AccountAwareLemmyClient,
         private val accountInfoManager: AccountInfoManager,

@@ -4,8 +4,9 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.widget.ImageView
 import androidx.core.widget.ImageViewCompat
-import coil.dispose
-import coil.load
+import coil3.dispose
+import coil3.load
+import coil3.request.allowHardware
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 

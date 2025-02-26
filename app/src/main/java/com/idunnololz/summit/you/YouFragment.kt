@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil.dispose
+import coil3.dispose
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
@@ -157,7 +157,10 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             ) {
                 when (it) {
                     R.id.saved -> {
-                        val direction = YouFragmentDirections.actionYouFragmentToSavedFragment()
+                        val direction = YouFragmentDirections
+                            .actionYouFragmentToFilteredPostsAndCommentsTabbedFragment(
+                                type = FilteredPostAndCommentsType.Saved,
+                            )
                         findNavController().navigateSafe(direction)
                     }
                     R.id.history -> {
@@ -180,15 +183,17 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         findNavController().navigateSafe(direction)
                     }
                     R.id.upvoted -> {
-                        val direction = YouFragmentDirections.actionYouFragmentToSavedFragment(
-                            type = FilteredPostAndCommentsType.Upvoted,
-                        )
+                        val direction = YouFragmentDirections
+                            .actionYouFragmentToFilteredPostsAndCommentsTabbedFragment(
+                                type = FilteredPostAndCommentsType.Upvoted,
+                            )
                         findNavController().navigateSafe(direction)
                     }
                     R.id.downvoted -> {
-                        val direction = YouFragmentDirections.actionYouFragmentToSavedFragment(
-                            type = FilteredPostAndCommentsType.Downvoted,
-                        )
+                        val direction = YouFragmentDirections
+                            .actionYouFragmentToFilteredPostsAndCommentsTabbedFragment(
+                                type = FilteredPostAndCommentsType.Downvoted,
+                            )
                         findNavController().navigateSafe(direction)
                     }
                     R.id.drafts -> {

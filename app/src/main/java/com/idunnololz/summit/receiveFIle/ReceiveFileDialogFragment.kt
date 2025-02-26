@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.fragment.navArgs
-import coil.load
+import coil3.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager

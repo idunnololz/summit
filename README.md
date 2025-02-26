@@ -37,3 +37,7 @@ $dir1 = Get-ChildItem -Recurse -path C:\Users\idunnololz\Downloads\LemmyBackward
 $dir2 = Get-ChildItem -Recurse -path C:\Users\idunnololz\Downloads\LemmyBackwardsCompatibleAPI-master\app\src\commonMain\kotlin\it\vercruysse\lemmyapi\v0\x19\x4
 Compare-Object -ReferenceObject $dir1 -DifferenceObject $dir2
 ```
+
+## Dependency updates
+
+`./gradlew dependencyUpdates -Drevision=release`

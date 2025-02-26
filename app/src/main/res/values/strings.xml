@@ -1950,6 +1950,8 @@
     <string name="local_feed_desc">Posts from communities on this instance</string>
     <string name="moderated_feed_desc">Posts from communities you moderate</string>
     <string name="all_subscribed_feed_desc">Posts from your communities across all accounts</string>
+    <string name="users_format">%1$s Users</string>
+    <string name="comments_format">%1$s Comments</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

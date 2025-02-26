@@ -12,8 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
-import coil.dispose
+import coil3.dispose
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
 import com.idunnololz.summit.databinding.BookmarkedCommunityHeaderItemBinding
@@ -23,6 +24,7 @@ import com.idunnololz.summit.databinding.HomeCommunityItemBinding
 import com.idunnololz.summit.databinding.NoSubscriptionsItemBinding
 import com.idunnololz.summit.databinding.TabStateItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.tabs.TabsManager
@@ -140,6 +142,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 val userCommunityItem: UserCommunityItem,
                 val isSelected: Boolean,
                 val resetTabOnClick: Boolean,
+                val needsDisambiguation: Boolean,
             ) : Item
             data class SubscriptionHeaderItem(
                 val isRefreshing: Boolean,
@@ -149,6 +152,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 val iconUrl: String?,
                 val isSelected: Boolean,
                 val resetTabOnClick: Boolean,
+                val needsDisambiguation: Boolean,
             ) : Item
             data object NoSubscriptionsItem : Item
 
@@ -210,8 +214,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 clazz = Item.HomeCommunityItem::class,
                 inflateFn = HomeCommunityItemBinding::inflate,
             ) { item, b, _ ->
-                b.title.text = context.getString(R.string.home)
-                b.subtitle.text = item.communityRef.getLocalizedFullName(context)
+                b.title.text = context.getString(R.string.home) + " (${item.communityRef.getLocalizedFullName(context)})"
                 b.selectedIndicator.visibility = if (item.isSelected) {
                     View.VISIBLE
                 } else {
@@ -292,7 +295,12 @@ class CommunitiesPaneController @AssistedInject constructor(
                 }
 
                 b.title.text = item.communityRef.getName(context)
-                b.subtitle.text = item.communityRef.getLocalizedFullNameSpannable(context)
+                if (item.needsDisambiguation && item.communityRef.instance != null) {
+                    b.subtitle.visibility = View.VISIBLE
+                    b.subtitle.text = "@${item.communityRef.instance}"
+                } else {
+                    b.subtitle.visibility = View.GONE
+                }
                 b.root.setOnClickListener {
                     onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)
                 }
@@ -347,7 +355,12 @@ class CommunitiesPaneController @AssistedInject constructor(
                     View.GONE
                 }
                 b.title.text = item.communityRef.getName(context)
-                b.subtitle.text = item.communityRef.getLocalizedFullNameSpannable(context)
+                if (item.needsDisambiguation && item.communityRef.instance != null) {
+                    b.subtitle.visibility = View.VISIBLE
+                    b.subtitle.text = "@${item.communityRef.instance}"
+                } else {
+                    b.subtitle.visibility = View.GONE
+                }
 
                 b.root.setOnClickListener {
                     onCommunitySelected(Either.Right(item.communityRef), item.resetTabOnClick)
@@ -394,6 +407,28 @@ class CommunitiesPaneController @AssistedInject constructor(
 
             val newItems = mutableListOf<Item>()
 
+            fun UserCommunityItem.getKey() = "uc:" + communityRef.getName(context).lowercase()
+            fun AccountSubscription.getKey() = "sc:" + toCommunityRef().getName(context).lowercase()
+
+            val seenCount = mutableMapOf<String, Int>()
+            for (userCommunity in data.userCommunities) {
+                val key = userCommunity.getKey()
+                val count = seenCount.getOrDefault(key, 0)
+                seenCount[key] = count + 1
+            }
+            for (subscriptionCommunity in data.subscriptionCommunities) {
+                val key = subscriptionCommunity.getKey()
+                val count = seenCount.getOrDefault(key, 0)
+                seenCount[key] = count + 1
+            }
+
+            val needsDisambiguate = mutableSetOf<String>()
+            for ((key, count) in seenCount) {
+                if (count > 1) {
+                    needsDisambiguate.add(key)
+                }
+            }
+
             if (filter.isNullOrBlank()) {
                 newItems.add(Item.BookmarkHeaderItem)
 
@@ -428,6 +463,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                             userCommunityItem = userCommunity,
                             isSelected = isSelected && tabStateItem == null,
                             resetTabOnClick = tabStateItem != null,
+                            needsDisambiguation =
+                            needsDisambiguate.contains(userCommunity.getKey()),
                         )
                     }
 
@@ -466,6 +503,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                             iconUrl = subscriptionCommunity.icon,
                             isSelected = isSelected && tabStateItem == null,
                             resetTabOnClick = tabStateItem != null,
+                            needsDisambiguation =
+                            needsDisambiguate.contains(subscriptionCommunity.getKey()),
                         )
                         if (tabStateItem != null) {
                             newItems += tabStateItem
@@ -514,6 +553,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                             userCommunityItem = userCommunity,
                             isSelected = isSelected && tabStateItem == null,
                             resetTabOnClick = tabStateItem != null,
+                            needsDisambiguation =
+                            needsDisambiguate.contains(userCommunity.getKey()),
                         )
                     }
 
@@ -554,6 +595,8 @@ class CommunitiesPaneController @AssistedInject constructor(
                         iconUrl = subscriptionCommunity.icon,
                         isSelected = isSelected && tabStateItem == null,
                         resetTabOnClick = tabStateItem != null,
+                        needsDisambiguation =
+                        needsDisambiguate.contains(subscriptionCommunity.getKey()),
                     )
                     if (tabStateItem != null) {
                         newItems += tabStateItem

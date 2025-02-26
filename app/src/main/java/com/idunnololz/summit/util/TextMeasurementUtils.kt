@@ -187,23 +187,21 @@ object TextMeasurementUtils {
                             view.width -
                                 view.compoundPaddingLeft - view.compoundPaddingRight,
                         )
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        result.lineSpacingExtra(view.lineSpacingExtra)
-                            .lineSpacingMultiplier(view.lineSpacingMultiplier)
-                            .includeFontPadding(view.includeFontPadding)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            result.breakStrategy(view.breakStrategy)
-                                .hyphenationFrequency(view.hyphenationFrequency)
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            result.justificationMode(view.justificationMode)
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            result.useFallbackLineSpacing(view.isFallbackLineSpacing)
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            result.textDirectionHeuristic(view.textDirectionHeuristic)
-                        }
+                    result.lineSpacingExtra(view.lineSpacingExtra)
+                        .lineSpacingMultiplier(view.lineSpacingMultiplier)
+                        .includeFontPadding(view.includeFontPadding)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        result.breakStrategy(view.breakStrategy)
+                            .hyphenationFrequency(view.hyphenationFrequency)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        result.justificationMode(view.justificationMode)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        result.useFallbackLineSpacing(view.isFallbackLineSpacing)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        result.textDirectionHeuristic(view.textDirectionHeuristic)
                     }
                     return result
                 }

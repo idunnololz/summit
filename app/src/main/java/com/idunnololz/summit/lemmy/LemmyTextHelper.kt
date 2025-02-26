@@ -12,7 +12,7 @@ import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
 import androidx.core.text.getSpans
-import coil.imageLoader
+import coil3.imageLoader
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.links.LinkContext

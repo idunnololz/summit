@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
@@ -37,10 +36,8 @@ object FileUriUtils {
     }
 
     private fun getPathFromLocalUri(context: Context, uri: Uri): String? {
-        val isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
-
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             when {
                 isExternalStorageDocument(uri) -> {
@@ -150,22 +147,6 @@ object FileUriUtils {
         return null
     }
 
-    private fun getFilePath(context: Context, uri: Uri): String? {
-        var cursor: Cursor? = null
-        val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
-
-        try {
-            cursor = context.contentResolver.query(uri, projection, null, null, null)
-            if (cursor != null && cursor.moveToFirst()) {
-                val index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-                return cursor.getString(index)
-            }
-        } finally {
-            cursor?.close()
-        }
-        return null
-    }
-
     private fun getPathFromRemoteUri(context: Context, uri: Uri): String? {
         // The code below is why Java now has try-with-resources and the Files utility.
         var file: File? = null
@@ -222,15 +203,6 @@ object FileUriUtils {
         }
 
         return ".$extension"
-    }
-
-    /**
-     * Get Image Extension i.e. .png, .jpg
-     *
-     * @return extension of image with dot, or default .jpg if it none.
-     */
-    fun getImageExtension(context: Context, file: File): String {
-        return getImageExtension(context, Uri.fromFile(file))
     }
 
     fun getImageExtensionFormat(context: Context, uri: Uri): Bitmap.CompressFormat {
