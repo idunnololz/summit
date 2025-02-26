@@ -1,29 +1,11 @@
 package com.idunnololz.summit.util.ext
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.core.graphics.applyCanvas
 import androidx.core.view.ViewCompat
-
-fun View.drawToBitmap(
-    backgroundColor: Int = Color.TRANSPARENT,
-    config: Bitmap.Config = Bitmap.Config.ARGB_8888,
-): Bitmap {
-    if (!ViewCompat.isLaidOut(this)) {
-        throw IllegalStateException("View needs to be laid out before calling drawToBitmap()")
-    }
-    return Bitmap.createBitmap(width, height, config)
-        .apply { eraseColor(backgroundColor) }
-        .applyCanvas {
-            translate(-scrollX.toFloat(), -scrollY.toFloat())
-            draw(this)
-        }
-}
 
 fun View.runAfterLayout(callback: () -> Unit) {
     if (this.isLaidOut) {

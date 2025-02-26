@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import coil.load
+import coil3.load
 import com.google.android.material.textview.MaterialTextView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils

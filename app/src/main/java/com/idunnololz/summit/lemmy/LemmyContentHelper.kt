@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.text.Spanned
 import android.text.TextUtils
@@ -19,7 +18,9 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
-import coil.load
+import coil3.load
+import coil3.request.allowHardware
+import coil3.request.transformations
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
@@ -46,7 +47,6 @@ import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
-import com.idunnololz.summit.util.ext.getSize
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -275,17 +275,14 @@ class LemmyContentHelper(
                             }
 
                             listener { _, result ->
-                                val d = result.drawable
-                                if (d is BitmapDrawable) {
-                                    offlineManager.setImageSizeHint(
-                                        imageUrl,
-                                        d.bitmap.width,
-                                        d.bitmap.height,
-                                    )
-                                    Log.d(TAG, "w: ${d.bitmap.width} h: ${d.bitmap.height}")
+                                offlineManager.setImageSizeHint(
+                                    imageUrl,
+                                    result.image.width,
+                                    result.image.height,
+                                )
+                                Log.d(TAG, "w: ${result.image.width} h: ${result.image.height}")
 
-                                    updateLayoutParams()
-                                }
+                                updateLayoutParams()
                             }
                         }
                     },
@@ -480,7 +477,9 @@ class LemmyContentHelper(
                             }
 
                             listener { _, result ->
-                                result.drawable.getSize(tempSize)
+                                tempSize.width = result.image.width
+                                tempSize.height = result.image.height
+
                                 Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
 
                                 if (tempSize.width > 0 && tempSize.height > 0) {

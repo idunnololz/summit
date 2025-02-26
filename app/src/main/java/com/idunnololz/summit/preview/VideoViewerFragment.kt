@@ -76,6 +76,16 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
 
+            if (!isBindingAvailable()) {
+                return
+            }
+
+            if (playbackState == Player.STATE_BUFFERING) {
+                binding.loadingView.showProgressBar()
+            } else {
+                binding.loadingView.hideAll()
+            }
+
             binding.playerView.keepScreenOn =
                 !(playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED)
         }
@@ -212,7 +222,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     override fun onDestroyView() {
         requireMainActivity().showSystemUI()
+        binding.playerView.onPause()
         binding.playerView.player?.removeListener(playerListener)
+        binding.playerView.player?.release()
 
         super.onDestroyView()
     }

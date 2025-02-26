@@ -255,4 +255,9 @@
     <item name="ghost_item" type="id"/>
     <item name="your_actions" type="id" />
     <item name="rate" type="id" />
+    <item name="ca_share" type="id" />
+    <item name="expanded" type="id" />
+    <item name="sort_comments_by" type="id"/>
+    <item name="refresh" type="id"/>
+    <item name="share_link" type="id"/>
 </resources>

@@ -21,8 +21,12 @@ import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
-import coil.dispose
-import coil.load
+import coil3.asImage
+import coil3.dispose
+import coil3.load
+import coil3.request.allowHardware
+import coil3.request.error
+import coil3.request.transformations
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.imageview.ShapeableImageView
@@ -75,7 +79,8 @@ import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
-import com.idunnololz.summit.util.ext.getSize
+import com.idunnololz.summit.util.getErrorDrawable
+import com.idunnololz.summit.util.getErrorImage
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.ExoPlayerManagerManager
@@ -819,6 +824,11 @@ class PostListViewBuilder @Inject constructor(
 
                             contentMaxWidth - imageLp.marginStart - imageLp.marginEnd
                         }
+                        is ListingItemListWithCardsBinding -> {
+                            val lp = rb.cardView.layoutParams as MarginLayoutParams
+
+                            contentMaxWidth - lp.marginStart - lp.marginEnd
+                        }
                         is ListingItemFullWithCardsBinding -> {
                             val lp = rb.cardView.layoutParams as MarginLayoutParams
 
@@ -894,6 +904,9 @@ class PostListViewBuilder @Inject constructor(
                         ) {
                             if (!useBackupUrl && backupImageUrl != null) {
                                 loadImage(true)
+                            } else {
+                                imageView.dispose()
+                                imageView.setImageDrawable(context.getErrorDrawable())
                             }
                         }
                     }
@@ -1538,7 +1551,7 @@ class PostListViewBuilder @Inject constructor(
                 if (w != null && h != null) {
                     this.size(w, h)
                 }
-                placeholder(newShimmerDrawable16to9(context))
+                placeholder(newShimmerDrawable16to9(context).asImage())
 
                 if (shouldBlur) {
                     val sampling = (imageViewWidth * 0.04f).coerceAtLeast(10f)
@@ -1552,18 +1565,7 @@ class PostListViewBuilder @Inject constructor(
                         transformations(BlurTransformation(context, sampling = sampling))
                     }
                 }
-
-                listener { _, result ->
-                    result.drawable.getSize(size)
-
-                    if (size.width > 0 && size.height > 0) {
-                        offlineManager.setImageSizeHint(
-                            imageUrl,
-                            size.width,
-                            size.height,
-                        )
-                    }
-                }
+                this.error { context.getErrorImage() }
             }
         }
 

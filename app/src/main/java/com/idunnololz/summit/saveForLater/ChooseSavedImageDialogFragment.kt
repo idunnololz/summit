@@ -15,8 +15,9 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import coil.dispose
-import coil.load
+import coil3.asImage
+import coil3.dispose
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentChooseSavedImageBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
@@ -123,7 +124,7 @@ class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSa
 
                 if (file.exists()) {
                     b.preview.load(file) {
-                        placeholder(newShimmerDrawable16to9(context))
+                        placeholder(newShimmerDrawable16to9(context).asImage())
                     }
                 } else {
                     b.preview.dispose()

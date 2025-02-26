@@ -19,8 +19,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.window.layout.WindowMetricsCalculator
-import coil.decode.SvgDecoder
-import coil.load
+import coil3.load
+import coil3.request.allowHardware
+import coil3.svg.SvgDecoder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView

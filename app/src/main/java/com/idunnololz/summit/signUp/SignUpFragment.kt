@@ -20,8 +20,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.viewbinding.ViewBinding
-import coil.dispose
-import coil.load
+import coil3.asImage
+import coil3.dispose
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
@@ -357,7 +358,7 @@ class SignUpFragment :
 
                 if (isInitialRender) {
                     serverIcon.load(scene.site.icon) {
-                        placeholder(newShimmerDrawableSquare(context))
+                        placeholder(newShimmerDrawableSquare(context).asImage())
                     }
                     serverName.text = scene.site.name
                     serverDesc.text = scene.site.description
@@ -389,7 +390,7 @@ class SignUpFragment :
             is SignUpScene.AnswerForm -> with(currentBinding as SignUpAnswerFormBinding) {
                 val localSite = scene.site.localSite
                 serverIcon.load(scene.site.icon) {
-                    placeholder(newShimmerDrawableSquare(context))
+                    placeholder(newShimmerDrawableSquare(context).asImage())
                 }
                 serverName.text = scene.site.name
                 serverDesc.text = scene.site.description
@@ -449,7 +450,7 @@ class SignUpFragment :
             }
             is SignUpScene.CaptchaForm -> with(currentBinding as SignUpCaptchaFormBinding) {
                 serverIcon.load(scene.site.icon) {
-                    placeholder(newShimmerDrawableSquare(context))
+                    placeholder(newShimmerDrawableSquare(context).asImage())
                 }
                 serverName.text = scene.site.name
                 serverDesc.text = scene.site.description
@@ -486,7 +487,7 @@ class SignUpFragment :
                 } else if (captchaImage.tag != scene.captchaUuid) {
                     captchaImage.tag = scene.captchaUuid
                     captchaImage.load(scene.captchaImage) {
-                        placeholder(shimmerDrawable)
+                        placeholder(shimmerDrawable.asImage())
                     }
                 }
 
@@ -552,7 +553,7 @@ class SignUpFragment :
                 currentBinding as SignUpSubmitApplicationBinding,
             ) {
                 serverIconExpanded.load(scene.site.icon) {
-                    placeholder(newShimmerDrawableSquare(context))
+                    placeholder(newShimmerDrawableSquare(context).asImage())
                 }
 
                 if (isInitialRender) {
@@ -584,7 +585,7 @@ class SignUpFragment :
                 )
 
                 serverIconExpanded.load(scene.site.icon) {
-                    placeholder(newShimmerDrawableSquare(context))
+                    placeholder(newShimmerDrawableSquare(context).asImage())
                 }
 
                 if (loginResponse.jwt != null) {

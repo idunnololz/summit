@@ -3,7 +3,7 @@ package com.idunnololz.summit.util.ext
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.DrawableCompat
-import coil.drawable.ScaleDrawable
+import coil3.size.ScaleDrawable
 import com.idunnololz.summit.util.Size
 
 fun Drawable.tint(color: Int): Drawable {

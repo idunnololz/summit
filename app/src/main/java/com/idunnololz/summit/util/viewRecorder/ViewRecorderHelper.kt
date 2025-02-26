@@ -2,7 +2,6 @@ package com.idunnololz.summit.util.viewRecorder
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
@@ -11,16 +10,13 @@ import android.util.Log
 import android.view.View
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.fileprovider.FileProviderHelper
-import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.UriResult
 import com.idunnololz.summit.util.gif.AnimatedGifEncoder
 import com.idunnololz.summit.util.viewRecorder.RecordingType.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.BufferedOutputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
 import javax.inject.Inject
-import kotlin.math.max
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -318,68 +314,6 @@ class ViewRecorderHelper @Inject constructor(
                 20_000_000
             }
         }
-    }
-
-    private suspend fun generateGif(view: View, name: String, reason: UriResult.Reason) {
-        val gifEncoder = AnimatedGifEncoder()
-        val output = ByteArrayOutputStream()
-//            gifEncoder.init(view.width, view.height, file.path, GifEncoder.EncodingType.ENCODING_TYPE_NORMAL_LOW_MEMORY)
-
-        gifEncoder.setFrameRate(24f)
-        gifEncoder.start(output)
-
-        val thread = Thread {
-            val durationMs = 5_000
-            var lastTimeMs = System.currentTimeMillis()
-            var currentDurationMs = 0L
-
-            val bitmaps = mutableListOf<Bitmap>()
-            while (true) {
-                val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
-                val canvas = Canvas(bitmap)
-                val s = System.currentTimeMillis()
-                view.draw(canvas)
-                Log.d(TAG, "drawtime: ${System.currentTimeMillis() - s}")
-
-                val now = System.currentTimeMillis()
-                val delay = now - lastTimeMs
-                lastTimeMs = now
-
-                currentDurationMs += delay
-
-                if (currentDurationMs > durationMs) {
-                    break
-                }
-                Thread.sleep(max(1, 42L - delay)) // 24FPS
-                bitmaps.add(bitmap)
-            }
-
-            Log.d(TAG, "Encoding ${bitmaps.size} frames...")
-
-            for ((index, b) in bitmaps.withIndex()) {
-                gifEncoder.addFrame(b)
-                b.recycle()
-
-                Log.d(TAG, "Encoding $index / ${bitmaps.size}")
-            }
-        }.apply {
-            start()
-        }
-
-        thread.join()
-
-        gifEncoder.finish()
-
-        val uri = FileProviderHelper(context)
-            .openTempFile("Summit_$name.gif") {
-                it.write(output.toByteArray())
-            }
-
-        UriResult(
-            uri = uri,
-            reason = reason,
-            fileType = UriResult.FileType.Gif,
-        )
     }
 
     private fun RecordingStatsBuilder.build() = RecordingStats(

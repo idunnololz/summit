@@ -49,7 +49,7 @@
             android:textAppearance="?textAppearanceTitleMedium"
             android:layout_marginStart="@dimen/padding"
             android:layout_marginEnd="@dimen/content_horizontal_padding"
-            android:layout_marginTop="@dimen/padding_half"
+            android:layout_marginTop="@dimen/padding_three_quarters"
             app:layout_constraintTop_toBottomOf="@+id/header_container"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

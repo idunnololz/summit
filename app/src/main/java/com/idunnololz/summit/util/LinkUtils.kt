@@ -20,8 +20,6 @@ object LinkUtils {
     const val USER_AGENT =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0"
 
-    const val APP_PERMISSIONS_HELP_ARTICLE = "https://support.google.com/android/answer/9431959"
-
     fun downloadSite(url: String, cache: Boolean = false): String {
         val response = doRequest(url, cache)
         val responseCode = response.code

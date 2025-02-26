@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import coil.load
+import coil3.load
+import coil3.request.error
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentLinkPreviewBinding
 import com.idunnololz.summit.preferences.Preferences
@@ -118,7 +119,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
 
         imageError.visibility = View.GONE
         image.load(data.imageUrl) {
-            error(R.drawable.thumbnail_placeholder_16_9)
+            this.error(R.drawable.thumbnail_placeholder_16_9)
             listener(
                 onError = { _, _ ->
                     imageError.visibility = View.VISIBLE

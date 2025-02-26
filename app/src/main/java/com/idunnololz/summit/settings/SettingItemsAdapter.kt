@@ -11,7 +11,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import coil3.load
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R

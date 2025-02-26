@@ -8,7 +8,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -32,7 +31,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@UnstableApi
+@SuppressLint("UnsafeOptInUsageError")
 @Singleton
 class ExoPlayerManagerManager @Inject constructor(
     @ApplicationContext private val context: Context,

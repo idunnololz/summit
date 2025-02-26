@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonView

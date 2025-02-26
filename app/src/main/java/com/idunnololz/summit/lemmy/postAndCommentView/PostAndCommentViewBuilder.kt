@@ -1991,13 +1991,15 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     private fun CommentExpandedViewHolder.scaleTextSizes() {
+        // Apply the text size first just in case scoreCount is a text view within headerView.
+        // In that case we want the header view text size to be set second.
+        scoreCount?.textSize = commentUiConfig.footerTextSizeSp.toCommentTextSize()
         headerView.textSize = if (useCondensedTypefaceForCommentHeaders) {
             commentUiConfig.headerTextSizeSp.toCommentTextSize() * 0.9f
         } else {
             commentUiConfig.headerTextSizeSp.toCommentTextSize()
         }
         text.textSize = commentUiConfig.contentTextSizeSp.toCommentTextSize()
-        scoreCount?.textSize = commentUiConfig.footerTextSizeSp.toCommentTextSize()
     }
 
     private fun PostCommentCollapsedItemBinding.scaleTextSizes() {

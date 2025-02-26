@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.utils.mentions
 
 import android.view.ViewGroup
+import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
@@ -9,14 +10,13 @@ import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.MentionQueryResultItemBinding
 import com.idunnololz.summit.databinding.MentionsEmptyItemBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 class MentionsResultAdapter @AssistedInject constructor(
     private val avatarHelper: AvatarHelper,
-    private val offlineManager: OfflineManager,
 ) : Adapter<ViewHolder>() {
 
     @AssistedFactory
@@ -52,8 +52,11 @@ class MentionsResultAdapter @AssistedInject constructor(
                 item.communityView.counts.users_active_month.toLong(),
             )
             @Suppress("SetTextI18n")
-            b.subtitle.text = "${b.root.context.getString(R.string.community)} " +
-                "● ${b.root.context.getString(R.string.mau_format, mauString)}"
+            b.subtitle.text = buildSpannedString {
+                append(b.root.context.getString(R.string.community))
+                appendSeparator()
+                append(b.root.context.getString(R.string.mau_format, mauString))
+            }
 
             b.root.setOnClickListener {
                 onResultSelected?.invoke(item)
@@ -66,8 +69,11 @@ class MentionsResultAdapter @AssistedInject constructor(
             avatarHelper.loadAvatar(b.icon, item.personView.person)
             b.text.text = item.personView.person.fullName
             @Suppress("SetTextI18n")
-            b.subtitle.text = "${b.root.context.getString(R.string.person)} " +
-                "● ${item.bio ?: b.root.context.getString(R.string.no_bio)}"
+            b.subtitle.text = buildSpannedString {
+                append(b.root.context.getString(R.string.person))
+                appendSeparator()
+                append(item.bio ?: b.root.context.getString(R.string.no_bio))
+            }
 
             b.root.setOnClickListener {
                 onResultSelected?.invoke(item)

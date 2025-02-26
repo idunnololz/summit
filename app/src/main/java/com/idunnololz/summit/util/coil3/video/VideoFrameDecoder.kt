@@ -1,0 +1,296 @@
+package com.idunnololz.summit.util.coil3.video
+
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.media.MediaMetadataRetriever
+import android.media.MediaMetadataRetriever.METADATA_KEY_DURATION
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION
+import android.media.MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH
+import android.os.Build.VERSION.SDK_INT
+import androidx.core.graphics.applyCanvas
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.AssetMetadata
+import coil3.decode.ContentMetadata
+import coil3.decode.DecodeResult
+import coil3.decode.DecodeUtils
+import coil3.decode.Decoder
+import coil3.decode.ImageSource
+import coil3.decode.ResourceMetadata
+import coil3.fetch.SourceFetchResult
+import coil3.request.Options
+import coil3.request.bitmapConfig
+import coil3.request.maxBitmapSize
+import coil3.size.Dimension.Pixels
+import coil3.size.Precision
+import coil3.size.Size
+import coil3.size.pxOrElse
+import coil3.toAndroidUri
+import coil3.util.component1
+import coil3.util.component2
+import coil3.video.MediaDataSourceFetcher.MediaSourceMetadata
+import com.idunnololz.summit.R
+import com.idunnololz.summit.util.coil3.video.internal.FileHandleMediaDataSource
+import com.idunnololz.summit.util.coil3.video.internal.getFrameAtIndex
+import com.idunnololz.summit.util.coil3.video.internal.getFrameAtTime
+import com.idunnololz.summit.util.coil3.video.internal.getScaledFrameAtTime
+import com.idunnololz.summit.util.coil3.video.internal.use
+import com.idunnololz.summit.util.ext.getDrawableCompat
+import kotlin.math.min
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
+import okio.FileSystem
+
+/**
+ * A [Decoder] that uses [MediaMetadataRetriever] to fetch and decode a frame from a video.
+ */
+class VideoFrameDecoder(
+    private val source: ImageSource,
+    private val options: Options,
+) : Decoder {
+    private val overlay by lazy {
+        options.context.getDrawableCompat(R.drawable.video_overlay)
+    }
+
+    override suspend fun decode() = MediaMetadataRetriever().use { retriever ->
+        retriever.setDataSource(source)
+
+        // Resolve the dimensions to decode the video frame at accounting
+        // for the source's aspect ratio and the target's size.
+        var srcWidth: Int
+        var srcHeight: Int
+        val rotation = retriever.extractMetadata(METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
+        if (rotation == 90 || rotation == 270) {
+            srcWidth = retriever.extractMetadata(METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 0
+            srcHeight = retriever.extractMetadata(METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
+        } else {
+            srcWidth = retriever.extractMetadata(METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
+            srcHeight = retriever.extractMetadata(METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 0
+        }
+
+        val dstSize = if (srcWidth > 0 && srcHeight > 0) {
+            val (dstWidth, dstHeight) = DecodeUtils.computeDstSize(
+                srcWidth = srcWidth,
+                srcHeight = srcHeight,
+                targetSize = options.size,
+                scale = options.scale,
+                maxSize = options.maxBitmapSize,
+            )
+            val rawScale = DecodeUtils.computeSizeMultiplier(
+                srcWidth = srcWidth,
+                srcHeight = srcHeight,
+                dstWidth = dstWidth,
+                dstHeight = dstHeight,
+                scale = options.scale,
+            )
+            val scale = if (options.precision == Precision.INEXACT) {
+                rawScale.coerceAtMost(1.0)
+            } else {
+                rawScale
+            }
+            val width = (scale * srcWidth).roundToInt()
+            val height = (scale * srcHeight).roundToInt()
+            Size(width, height)
+        } else {
+            // We were unable to decode the video's dimensions.
+            // Fall back to decoding the video frame at the original size.
+            // We'll scale the resulting bitmap after decoding if necessary.
+            Size.ORIGINAL
+        }
+
+        val frameMicros = computeFrameMicros(retriever)
+        val (dstWidth, dstHeight) = dstSize
+        val rawBitmap: Bitmap? = if (SDK_INT >= 28 && options.videoFrameIndex >= 0) {
+            retriever.getFrameAtIndex(
+                frameIndex = options.videoFrameIndex,
+                config = options.bitmapConfig,
+            )?.also {
+                srcWidth = it.width
+                srcHeight = it.height
+            }
+        } else if (SDK_INT >= 27 && dstWidth is Pixels && dstHeight is Pixels) {
+            retriever.getScaledFrameAtTime(
+                timeUs = frameMicros,
+                option = options.videoFrameOption,
+                dstWidth = dstWidth.px,
+                dstHeight = dstHeight.px,
+                config = options.bitmapConfig,
+            )
+        } else {
+            retriever.getFrameAtTime(
+                timeUs = frameMicros,
+                option = options.videoFrameOption,
+                config = options.bitmapConfig,
+            )?.also {
+                srcWidth = it.width
+                srcHeight = it.height
+            }
+        }
+
+        // If you encounter this exception make sure your video is encoded in a supported codec.
+        // https://developer.android.com/guide/topics/media/media-formats#video-formats
+        checkNotNull(rawBitmap) { "Failed to decode frame at $frameMicros microseconds." }
+
+        val bitmap = normalizeBitmap(rawBitmap, dstSize)
+
+        val isSampled = if (srcWidth > 0 && srcHeight > 0) {
+            DecodeUtils.computeSizeMultiplier(
+                srcWidth = srcWidth,
+                srcHeight = srcHeight,
+                dstWidth = bitmap.width,
+                dstHeight = bitmap.height,
+                scale = options.scale,
+            ) < 1.0
+        } else {
+            // We were unable to determine the original size of the video. Assume it is sampled.
+            true
+        }
+        Canvas(bitmap).apply {
+            val overlay = overlay
+            if (overlay != null) {
+                val size = min(bitmap.width, bitmap.height) * 0.33
+                val w = size.toInt()
+                val h = size.toInt()
+                val start = (bitmap.width - w) / 2
+                val top = (bitmap.height - h) / 2
+                overlay.bounds = Rect(
+                    start,
+                    top,
+                    start + w,
+                    top + h,
+                )
+                overlay.draw(this)
+            }
+        }
+        DecodeResult(
+            image = bitmap.toDrawable(options.context.resources).asImage(),
+            isSampled = isSampled,
+        )
+    }
+
+    private fun computeFrameMicros(retriever: MediaMetadataRetriever): Long {
+        val frameMicros = options.videoFrameMicros
+        if (frameMicros >= 0) {
+            return frameMicros
+        }
+
+        val framePercent = options.videoFramePercent
+        if (framePercent >= 0) {
+            val durationMillis = retriever.extractMetadata(METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+            return 1000 * (framePercent * durationMillis).roundToLong()
+        }
+
+        return 0
+    }
+
+    /** Return [inBitmap] or a copy of [inBitmap] that is valid for the input [options] and [size]. */
+    private fun normalizeBitmap(inBitmap: Bitmap, size: Size): Bitmap {
+        // Fast path: if the input bitmap is valid, return it.
+        if (isConfigValid(inBitmap, options) && isSizeValid(inBitmap, options, size)) {
+            return inBitmap
+        }
+
+        // Slow path: re-render the bitmap with the correct size + config.
+        val scale = DecodeUtils.computeSizeMultiplier(
+            srcWidth = inBitmap.width,
+            srcHeight = inBitmap.height,
+            dstWidth = size.width.pxOrElse { inBitmap.width },
+            dstHeight = size.height.pxOrElse { inBitmap.height },
+            scale = options.scale,
+        ).toFloat()
+        val dstWidth = (scale * inBitmap.width).roundToInt()
+        val dstHeight = (scale * inBitmap.height).roundToInt()
+        val safeConfig = when {
+            SDK_INT >= 26 && options.bitmapConfig == Bitmap.Config.HARDWARE -> Bitmap.Config.ARGB_8888
+            else -> options.bitmapConfig
+        }
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+        val outBitmap = createBitmap(dstWidth, dstHeight, safeConfig)
+        outBitmap.applyCanvas {
+            scale(scale, scale)
+            drawBitmap(inBitmap, 0f, 0f, paint)
+        }
+        inBitmap.recycle()
+
+        return outBitmap
+    }
+
+    private fun isConfigValid(bitmap: Bitmap, options: Options): Boolean {
+        return SDK_INT < 26 ||
+            bitmap.config != Bitmap.Config.HARDWARE ||
+            options.bitmapConfig == Bitmap.Config.HARDWARE
+    }
+
+    private fun isSizeValid(bitmap: Bitmap, options: Options, size: Size): Boolean {
+        if (options.precision == Precision.INEXACT) return true
+        val multiplier = DecodeUtils.computeSizeMultiplier(
+            srcWidth = bitmap.width,
+            srcHeight = bitmap.height,
+            dstWidth = size.width.pxOrElse { bitmap.width },
+            dstHeight = size.height.pxOrElse { bitmap.height },
+            scale = options.scale,
+        )
+        return multiplier == 1.0
+    }
+
+    private fun MediaMetadataRetriever.setDataSource(source: ImageSource) {
+        val metadata = source.metadata
+        when {
+            SDK_INT >= 23 && metadata is MediaSourceMetadata -> {
+                setDataSource(metadata.mediaDataSource)
+            }
+
+            metadata is AssetMetadata -> {
+                options.context.assets.openFd(metadata.filePath).use {
+                    setDataSource(it.fileDescriptor, it.startOffset, it.length)
+                }
+            }
+
+            metadata is ContentMetadata -> {
+                setDataSource(options.context, metadata.uri.toAndroidUri())
+            }
+
+            metadata is ResourceMetadata -> {
+                setDataSource("android.resource://${metadata.packageName}/${metadata.resId}")
+            }
+
+            source.fileSystem === FileSystem.SYSTEM -> {
+                setDataSource(source.file().toFile().path)
+            }
+
+            SDK_INT >= 23 -> {
+                val handle = source.fileSystem.openReadOnly(source.file())
+                setDataSource(FileHandleMediaDataSource(handle))
+            }
+
+            else -> {
+                error(
+                    "Unable to read ${source.file()} as a custom file system " +
+                        "(${source.fileSystem}) is used and the device is API 22 or earlier.",
+                )
+            }
+        }
+    }
+
+    class Factory : Decoder.Factory {
+
+        override fun create(
+            result: SourceFetchResult,
+            options: Options,
+            imageLoader: ImageLoader,
+        ): Decoder? {
+            if (!isApplicable(result.mimeType)) return null
+            return VideoFrameDecoder(result.source, options)
+        }
+
+        private fun isApplicable(mimeType: String?): Boolean {
+            return mimeType != null && mimeType.startsWith("video/")
+        }
+    }
+}

@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -26,7 +27,7 @@ import kotlin.math.max
 class LemmyHeaderView : FrameLayout {
 
     companion object {
-        const val DEFAULT_ICON_SIZE_DP = 32f
+        const val DEFAULT_ICON_SIZE_DP = 30f
     }
 
     private var originalTypeface: Typeface? = null
@@ -127,6 +128,7 @@ class LemmyHeaderView : FrameLayout {
             ),
         )
         ellipsize = TextUtils.TruncateAt.END
+        gravity = Gravity.CENTER_VERTICAL
 
         return this
     }

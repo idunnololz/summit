@@ -37,7 +37,6 @@ class BottomMenu(
 
     companion object {
 
-        @Suppress("unused")
         private val TAG = BottomMenu::class.java.simpleName
     }
 

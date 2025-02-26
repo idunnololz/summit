@@ -26,7 +26,7 @@ android {
 
 dependencies {
     implementation(libs.appcompat)
-    implementation("io.github.inflationx:viewpump:1.0.0")
+    implementation(libs.viewpump)
 //    compileOnly 'androidx.appcompat:appcompat:1.0.2'
 //    implementation 'io.github.inflationx:viewpump:1.0.0'
 //

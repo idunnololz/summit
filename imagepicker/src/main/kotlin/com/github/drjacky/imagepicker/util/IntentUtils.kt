@@ -27,11 +27,9 @@ object IntentUtils {
      */
     @JvmStatic
     fun getGalleryIntent(context: Context, mimeTypes: Array<String>): Intent {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            val intent = getGalleryDocumentIntent(mimeTypes)
-            if (intent.resolveActivity(context.packageManager) != null) {
-                return intent
-            }
+        val intent = getGalleryDocumentIntent(mimeTypes)
+        if (intent.resolveActivity(context.packageManager) != null) {
+            return intent
         }
         return getLegacyGalleryPickIntent(mimeTypes)
     }
@@ -107,18 +105,17 @@ object IntentUtils {
                     intent.putExtra("default_camera", "1")
                     intent.putExtra("default_mode", "com.huawei.camera2.mode.photo.PhotoMode")
                 }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 &&
-                    Build.VERSION.SDK_INT < Build.VERSION_CODES.O -> {
-
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
                     intent.putExtra(
                         CAMERA_FACING_EXTRA,
                         CameraCharacteristics.LENS_FACING_FRONT,
                     ) // Tested on API 24 Android version 7.0(Samsung S6)
                 }
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1 -> intent.putExtra(
+                // Tested API 21 Android version 5.0.1(Samsung S4)
+                else -> intent.putExtra(
                     CAMERA_FACING_EXTRA,
                     1,
-                ) // Tested API 21 Android version 5.0.1(Samsung S4)
+                )
             }
         }
 

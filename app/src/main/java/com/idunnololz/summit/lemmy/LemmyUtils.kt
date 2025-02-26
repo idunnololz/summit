@@ -9,25 +9,17 @@ import android.os.Build
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.util.NumberFormatUtil
-import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.video.VideoSizeHint
 import java.util.Locale
-import java.util.regex.Pattern
 
 object LemmyUtils {
-
-    private val TAG = LemmyUtils::class.java.canonicalName
-
-    private val GIPHY_REGEX = Pattern.compile("\\(giphy\\|([^\\s]*)\\)")
 
     private var compactDecimalFormat: DecimalFormat? = null
 
@@ -97,34 +89,6 @@ object LemmyUtils {
         }
     }
 
-    fun needsWebView(html: String): Boolean = html.contains("&lt;table&gt;")
-
-    fun isUrlAGif(url: String): Boolean = url.endsWith(".gif", ignoreCase = true)
-
-    fun setImageViewSizeBasedOnPreview(
-        context: Context,
-        previewInfo: PreviewInfo?,
-        rootView: View,
-        imageView: ImageView,
-    ) {
-        previewInfo ?: return
-        val width = previewInfo.width
-        val height = previewInfo.height
-        val screenSize = Utils.getScreenSize(context)
-
-        rootView.measure(
-            View.MeasureSpec.makeMeasureSpec(screenSize.x, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(screenSize.y, View.MeasureSpec.AT_MOST),
-        )
-        if (width != 0 && height != 0) {
-            val thumbnailHeight = (imageView.measuredWidth * (height.toDouble() / width)).toInt()
-            imageView.layoutParams = imageView.layoutParams.apply {
-                this.width = imageView.measuredWidth
-                this.height = thumbnailHeight
-            }
-        }
-    }
-
     fun cleanUrl(url: String, desiredFormat: String = ""): String {
         val uri = Uri.parse(url)
         val path = uri.path ?: ""
@@ -139,24 +103,6 @@ object LemmyUtils {
         return uri.buildUpon().apply {
             path("$cleanPath$desiredFormat")
         }.build().toString()
-    }
-
-    fun isUrlRedirect(url: String): Boolean = isUriRedirect(Uri.parse(url))
-
-    fun isUriRedirect(uri: Uri): Boolean = uri.host == "redd.it"
-
-    fun isUriGallery(uri: Uri): Boolean = uri.pathSegments[0] == "gallery"
-
-    fun findGiphyLinks(s: String): List<String> {
-        val matcher = GIPHY_REGEX.matcher(s)
-        val matches = mutableListOf<String>()
-        while (matcher.find()) {
-            val g1 = matcher.group(1)
-            if (g1 != null) {
-                matches.add(g1)
-            }
-        }
-        return matches
     }
 }
 

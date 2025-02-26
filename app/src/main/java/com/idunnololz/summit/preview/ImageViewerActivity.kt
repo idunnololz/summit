@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.transition.Fade
@@ -22,11 +21,14 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.navArgs
-import coil.imageLoader
-import coil.load
-import coil.request.ImageRequest
-import coil.size.Dimension
-import coil.target.Target
+import coil3.Image
+import coil3.asDrawable
+import coil3.imageLoader
+import coil3.load
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.size.Dimension
+import coil3.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
@@ -623,7 +625,7 @@ class ImageViewerActivity :
                     .allowHardware(false)
                     .target(
                         object : Target {
-                            override fun onError(error: Drawable?) {
+                            override fun onError(error: Image?) {
                                 super.onError(error)
                                 binding.progressBar.visibility = View.GONE
                                 binding.loadingView.showErrorWithRetry(
@@ -631,14 +633,17 @@ class ImageViewerActivity :
                                 )
                             }
 
-                            override fun onSuccess(result: Drawable) {
+                            override fun onSuccess(result: Image) {
                                 super.onSuccess(result)
+
                                 binding.progressBar.visibility = View.GONE
 
                                 Log.d(
                                     TAG,
-                                    "Image drawable size: w${result.intrinsicWidth} h${result.intrinsicHeight}",
+                                    "Image drawable size: w${result.width} h${result.height}",
                                 )
+
+                                val drawable = result.asDrawable(this@ImageViewerActivity.resources)
 
                                 if (result is BitmapDrawable) {
                                     val bitmap = result.bitmap
@@ -677,11 +682,11 @@ class ImageViewerActivity :
                                 startPostponedEnterTransition()
                                 binding.loadingView.hideAll()
 
-                                binding.dummyImageView.setImageDrawable(result)
-                                binding.imageView.setImageDrawable(result)
+                                binding.dummyImageView.setImageDrawable(drawable)
+                                binding.imageView.setImageDrawable(drawable)
 
-                                if (result is Animatable) {
-                                    result.start()
+                                if (drawable is Animatable) {
+                                    drawable.start()
                                 }
                             }
                         },
@@ -690,7 +695,7 @@ class ImageViewerActivity :
                         if (forceSize != null) {
                             size(Dimension(forceSize.width), Dimension(forceSize.height))
                         } else {
-                            size(coil.size.Size.ORIGINAL)
+                            size(coil3.size.Size.ORIGINAL)
                         }
                     }
                     .build()

@@ -29,8 +29,9 @@ import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.window.layout.WindowMetricsCalculator
-import coil.decode.SvgDecoder
-import coil.load
+import coil3.asImage
+import coil3.load
+import coil3.svg.SvgDecoder
 import com.github.rubensousa.gravitySnapHelper.GravitySnapHelper
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
@@ -1012,7 +1013,7 @@ class SearchHomeFragment :
             ) { item, b, _ ->
                 if (item.community.banner != null) {
                     b.image.load(item.community.banner) {
-                        placeholder(newShimmerDrawable16to9(context))
+                        placeholder(newShimmerDrawable16to9(context).asImage())
                     }
                 } else {
                     b.image.load("file:///android_asset/banner_placeholder.svg") {

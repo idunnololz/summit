@@ -70,7 +70,7 @@
         </action>
     </fragment>
     <fragment
-        android:id="@+id/savedFragment"
+        android:id="@+id/filteredPostsAndCommentsTabbedFragment"
         android:name="com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment"
         android:label="FilteredPostsAndCommentsTabbedFragment" >
         <argument
@@ -309,8 +309,8 @@
         android:name="com.idunnololz.summit.you.YouFragment"
         android:label="YouFragment" >
         <action
-            android:id="@+id/action_youFragment_to_savedFragment"
-            app:destination="@id/savedFragment"
+            android:id="@+id/action_youFragment_to_filteredPostsAndCommentsTabbedFragment"
+            app:destination="@id/filteredPostsAndCommentsTabbedFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
@@ -344,13 +344,6 @@
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_youFragment_to_votedTabbedFragment"
-            app:destination="@id/votedTabbedFragment"
-            app:enterAnim="@animator/nav_default_enter_anim"
-            app:exitAnim="@animator/nav_default_exit_anim"
-            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
-        <action
             android:id="@+id/action_youFragment_to_draftsTabbedFragment"
             app:destination="@id/draftsTabbedFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
@@ -377,15 +370,6 @@
         android:name="com.idunnololz.summit.settings.hiddenPosts.HiddenPostsFragment"
         android:label="HiddenPostsFragment" />
     <fragment
-        android:id="@+id/votedTabbedFragment"
-        android:name="com.idunnololz.summit.you.voted.VotedTabbedFragment"
-        android:label="VotedTabbedFragment" >
-        <argument
-            android:name="isDownvote"
-            app:argType="boolean"
-            android:defaultValue="false" />
-    </fragment>
-    <fragment
         android:id="@+id/draftsFragment"
         android:name="com.idunnololz.summit.drafts.DraftsFragment"
         android:label="DraftsFragment">
@@ -402,4 +386,11 @@
         android:name="com.idunnololz.summit.lemmy.userTags.UserTagsFragment"
         android:label="UserTagsFragment" />
     <include app:graph="@navigation/actions" />
+    <action
+        android:id="@+id/action_global_communitiesFragment"
+        app:destination="@id/communitiesFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
 </navigation>

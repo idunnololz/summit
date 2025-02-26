@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -35,7 +34,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import coil.target.Target
+import coil3.Image
+import coil3.asDrawable
+import coil3.target.Target
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
@@ -61,6 +62,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -359,8 +361,10 @@ class MainActivity :
                 val account = accountView.account
                 avatarHelper.loadAvatar(
                     object : Target {
-                        override fun onSuccess(result: Drawable) {
-                            icon = result
+                        override fun onSuccess(result: Image) {
+                            navBarController.navBar.post {
+                                icon = result.asDrawable(binding.contentView.context.resources)
+                            }
                         }
                     },
                     imageUrl = accountView.profileImage.toString(),
@@ -926,33 +930,6 @@ class MainActivity :
         }
     }
 
-    fun insetViewAutomaticallyByMarginAndNavUi(
-        lifecycleOwner: LifecycleOwner,
-        rootView: View,
-        applyTopInset: Boolean = true,
-        additionalPaddingBottom: Int = 0,
-    ) {
-        insets.observe(lifecycleOwner) {
-            rootView.post {
-                var bottomPadding = getBottomNavHeight()
-                if (bottomPadding == 0) {
-                    bottomPadding = it.bottomInset
-                }
-
-                rootView.updateLayoutParams<MarginLayoutParams> {
-                    leftMargin = navBarController.newLeftInset
-                    topMargin = if (applyTopInset) {
-                        it.topInset
-                    } else {
-                        this.topMargin
-                    }
-                    rightMargin = navBarController.newRightInset
-                    bottomMargin = bottomPadding + additionalPaddingBottom
-                }
-            }
-        }
-    }
-
     fun getSnackbarContainer(): View = binding.snackbarContainer
     fun getBottomNavHeight() = navBarController.bottomNavHeight
 
@@ -1063,6 +1040,16 @@ class MainActivity :
         currentNavController?.navigateSafe(direction)
     }
 
+    fun showDownloadsSettings() {
+        val direction = MainDirections.actionGlobalSettingsFragment("downloads")
+        currentNavController?.navigateSafe(direction)
+    }
+
+    fun showCommunities(instance: String) {
+        val directions = MainDirections.actionGlobalCommunitiesFragment(instance)
+        currentNavController?.navigateSafe(directions)
+    }
+
     fun showCommunityInfo(communityRef: CommunityRef) {
         if (communityRef is CommunityRef.MultiCommunity) {
             val userCommunityItem = userCommunitiesManager.getAllUserCommunities()
@@ -1103,11 +1090,6 @@ class MainActivity :
         } else {
             NavigationUI.onNavDestinationSelected(menuItem, currentNavController)
         }
-    }
-
-    fun showDownloadsSettings() {
-        val direction = MainDirections.actionGlobalSettingsFragment("downloads")
-        currentNavController?.navigateSafe(direction)
     }
 
     suspend fun requestScreenshot(): File {

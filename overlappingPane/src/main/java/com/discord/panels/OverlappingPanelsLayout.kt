@@ -92,8 +92,10 @@ open class OverlappingPanelsLayout : FrameLayout {
     private var startPanelLockState: LockState = LockState.UNLOCKED
     private var endPanelLockState: LockState = LockState.UNLOCKED
 
-    private var startPanelState: PanelState = PanelState.Closed
-    private var endPanelState: PanelState = PanelState.Closed
+    var startPanelState: PanelState = PanelState.Closed
+        private set
+    var endPanelState: PanelState = PanelState.Closed
+        private set
 
     private var useFullWidthForStartPanel: Boolean = false
 

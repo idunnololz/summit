@@ -8,7 +8,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionManager
-import coil.load
+import coil3.load
 import com.google.gson.Gson
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Comment
