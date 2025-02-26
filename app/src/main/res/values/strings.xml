@@ -1,10 +1,8 @@
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation">
-
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!-- Please DO NOT change this. This is a specific value that is used by the app to select what language the champion/item/rune/mastery data should be in.
     This string is specifically chosen by me so DO NOT change it. -->
     <string name="locale">en</string>
-
     <!-- Error string. -->
     <string name="error_network">Network error. Please check your internet connection and try again.</string>
     <!-- Error string. -->
@@ -19,7 +17,6 @@
     <string name="error_external_activity_not_found">Could not find an app on this device for file type %1$s.</string>
     <!-- Error string. -->
     <string name="error_downloading_image">There was an error downloading the image.</string>
-
     <!--
     Retry is defined by the navigation component library.
     <string name="retry">Retry</string>
@@ -122,7 +119,6 @@
     <string name="sort_order_scaled">Hot (scaled by community size)</string>
     <!-- Sort order name. -->
     <string name="sort_order_scaled_short">Hot (scaled)</string>
-
     <!-- Keep short. Button text to pick the layout for posts in the post list. -->
     <string name="layout">Layout</string>
     <!-- Post layout style. -->
@@ -141,7 +137,6 @@
     <string name="full">Full</string>
     <!-- Post layout style. -->
     <string name="compact">Compact</string>
-
     <!-- Info text shown when viewing a post that was deleted by the original poster. -->
     <string name="removed_by_op_message">This post was deleted by the person who originally posted it.</string>
     <!-- Info text for a browsing history entry. Shows which community and page a user browsed. -->
@@ -176,7 +171,6 @@
     <string name="home_page_set">Home page will be changed on next app start.</string>
     <!-- Keep short. Button text of a link action. When clicked, opens the link in an external browser. -->
     <string name="open_in_browser">Open in browser</string>
-
     <!-- Placeholder text. Shown in place of the original content if the original content was deleted by the creator. -->
     <string name="deleted_special">[deleted]</string>
     <!-- Placeholder text. Shown in place of the original content if the original content was removed by a moderator. -->
@@ -187,7 +181,6 @@
     <string name="blank">Blank</string>
     <!-- Placeholder text. Shown in place of a missing comment. -->
     <string name="missing_comment_special">[missing comment (removed or deleted)]</string>
-
     <!-- Error text displaying a generic server error. -->
     <string name="error_server">Server error. Code: %1$s.</string>
     <!-- Keep short. Button text of login button. -->
@@ -252,7 +245,6 @@
     <string name="error_page_not_found">Page not found.</string>
     <!-- Hint text for input field where the comment body is entered. -->
     <string name="comment">Comment</string>
-
     <!-- TextFieldToolbarOption -->
 
     <!-- Keep short. Button text. Shows a preview of the content when clicked. -->
@@ -281,7 +273,6 @@
     <string name="insert_link">Insert link</string>
     <!-- Keep short. Button text. Applies a sarcasm filter to selected text in the text editor. -->
     <string name="sarcasm">Sarcasm</string>
-
     <!-- Settings -->
 
     <!-- Keep short. Button/title text of settings page. -->
@@ -843,8 +834,6 @@
     <string name="check_interval">Check interval</string>
     <!-- Description text for a list of accounts. Lets the user know that the toggle for each account will enable notifications for that account. -->
     <string name="notifications_per_account_settings_desc">Choose which accounts to check notifications for.</string>
-
-
     <!-- Keep short. Button text of send comment button. -->
     <string name="send_comment">Send comment</string>
     <!-- Keep short. Button text of refresh button. -->
@@ -1090,7 +1079,6 @@
     <string name="is_regex">Is regex</string>
     <!-- Error text. -->
     <string name="error_content_type_filter_too_aggressive">Your content type filters are too aggressive for this community/instance. Please relax your content type filters or choose a different community/instance.</string>
-
     <!-- Keep short. Text used to display how long ago something happened. -->
     <string name="elapsed_time_just_now">now</string>
     <!-- Keep short. Text used to display how long ago something happened. 1m = 1 minute ago -->
@@ -1283,7 +1271,6 @@
     <string name="error_no_moderated_communities">User is not the moderator of any communities.</string>
     <!-- Keep short. Button text. -->
     <string name="preview_link">Preview link</string>
-
     <!-- Keep short. Button text. -->
     <string name="take_screenshot">Take screenshot</string>
     <!-- Keep short. Button text. Changes the screenshot mode when tapped. -->
@@ -1300,7 +1287,6 @@
     <string name="post_title_only">Post title only</string>
     <!-- A screenshot mode. -->
     <string name="post_title_and_image_only">Post title and image only</string>
-
     <!-- Input field label. -->
     <string name="screenshot_width">Screenshot width</string>
     <!-- Message shown when a screenshot is saved. -->
@@ -1475,7 +1461,6 @@
     <string name="community_actions">Community actions</string>
     <!-- Keep short. Button text. -->
     <string name="view_mod_logs">View mod logs</string>
-
     <!-- Keep short. Title text. -->
     <string name="mod_logs">Mod logs</string>
     <!-- Text describing the type of action taken. -->
@@ -1532,7 +1517,6 @@
     <string name="transferred_ownership_of_community_format">Transferred ownership of the community %1$s to %2$s.</string>
     <!-- Description of a mod action taken. Shows the mod/admin reason given for the action. -->
     <string name="reason_format">Reason: %1$s</string>
-
     <!-- Error text. -->
     <string name="error_unable_to_upload_image">Unable to upload image due to an unknown issue.</string>
     <!-- Keep short. Button text. Shown when "Subscribe" was tapped on a community, but it's pending. -->
@@ -1952,10 +1936,7 @@
     <string name="all_subscribed_feed_desc">Posts from your communities across all accounts</string>
     <string name="users_format">%1$s Users</string>
     <string name="comments_format">%1$s Comments</string>
-
-
     <string name="colorPickerDialog_reset">Reset</string>
-
     <string name="colorPickerDialog_red">R</string>
     <string name="colorPickerDialog_blue">B</string>
     <string name="colorPickerDialog_green">G</string>
