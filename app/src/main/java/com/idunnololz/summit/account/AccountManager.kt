@@ -44,11 +44,14 @@ class AccountManager @Inject constructor(
     private val onAccountChangeListeners = mutableListOf<OnAccountChangedListener>()
 
     private val _currentAccount = MutableStateFlow<GuestOrUserAccount?>(null)
+    private val _numAccounts = MutableStateFlow<Int>(0)
 
     private val accountByIdCache = mutableMapOf<Long, Account?>()
 
     val currentAccount: StateFlow<GuestOrUserAccount?> = _currentAccount
     val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
+
+    val numAccounts: StateFlow<Int> = _numAccounts
 
     val mutex = Mutex()
 
@@ -57,9 +60,10 @@ class AccountManager @Inject constructor(
             val curAccount = accountDao.getCurrentAccount()?.fix()
             preferenceManager.getComposedPreferencesForAccount(curAccount)
             _currentAccount.emit(curAccount)
+            updateNumAccounts()
         }
         coroutineScope.launch {
-            Log.d("dbdb", "accountDao: ${accountDao.count()}")
+            Log.d("dbdb", "accountDao: ${_numAccounts.value}")
         }
     }
 
@@ -70,6 +74,7 @@ class AccountManager @Inject constructor(
             doSwitchAccountWork(account)
 
             _currentAccount.emit(account)
+            updateNumAccounts()
         }
     }
 
@@ -99,6 +104,7 @@ class AccountManager @Inject constructor(
                 .apply()
 
             updateCurrentAccount()
+            updateNumAccounts()
         }
 
         deferred.await()
@@ -200,6 +206,10 @@ class AccountManager @Inject constructor(
         listeners.forEach {
             it.onAccountSigningOut(account)
         }
+    }
+
+    private suspend fun updateNumAccounts() {
+        _numAccounts.value = accountDao.count()
     }
 }
 

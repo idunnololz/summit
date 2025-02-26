@@ -49,6 +49,8 @@ import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.relativeTimeToConcise
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.toErrorMessage
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class LemmyAppBarController(
@@ -98,6 +100,7 @@ class LemmyAppBarController(
     val appBarRoot
         get() = vh.root
     val percentShown = MutableLiveData<Float>(0f)
+    val expandDescription = MutableStateFlow(false)
 
     private sealed interface ViewHolder {
         val root: View
@@ -257,6 +260,7 @@ class LemmyAppBarController(
         }
 
         state.currentCommunity = communityRef
+        expandDescription.value = false
 
         updateCommunityButton()
     }
@@ -323,16 +327,21 @@ class LemmyAppBarController(
                 vh.subtitle.text = "$communityName@$communityInstance"
             }
 
-            vh.feedInfoText.visibility = View.GONE
-
             when (val value = communityInfoViewModel.siteOrCommunity.value) {
-                is StatefulData.Error -> {}
+                is StatefulData.Error -> {
+                    vh.body.text = value.error.toErrorMessage(context)
+                    vh.feedInfoText.text = "-"
+                }
                 is StatefulData.Loading -> {
                     vh.banner.load("file:///android_asset/banner_placeholder.svg") {
                         allowHardware(false)
                     }
                     vh.icon.load(newShimmerDrawableSquare(context))
-                    vh.body.visibility = View.GONE
+                    vh.body.text = buildSpannedString {
+                        appendLine(context.getString(R.string.loading))
+                        appendLine(context.getString(R.string.loading))
+                    }
+                    vh.feedInfoText.text = context.getString(R.string.loading)
                 }
 
                 is StatefulData.NotStarted -> {}
@@ -358,44 +367,8 @@ class LemmyAppBarController(
                                 it.community_view.community.icon
                             },
                         )
-                    val body = value.data.response
-                        .fold(
-                            { it.site_view.site.description },
-                            { it.community_view.community.description },
-                        )
 
-                    if (body.isNullOrBlank()) {
-                        vh.body.visibility = View.GONE
-                    } else {
-                        vh.body.visibility = View.VISIBLE
-                        LemmyTextHelper.bindText(
-                            vh.body,
-                            body,
-                            communityInfoViewModel.instance,
-                            onImageClick = { url ->
-                                mainActivity.openImage(
-                                    sharedElement = null,
-                                    appBar = appBarRoot,
-                                    title = null,
-                                    url = url,
-                                    mimeType = null,
-                                )
-                            },
-                            onVideoClick = { url ->
-                                mainActivity.openVideo(url, VideoType.Unknown, null)
-                            },
-                            onPageClick = {
-                                mainActivity.launchPage(it)
-                            },
-                            onLinkClick = { url, text, linkType ->
-                                baseFragment.onLinkClick(url, text, linkType)
-                            },
-                            onLinkLongClick = { url, text ->
-                                mainActivity.showMoreLinkOptions(url, text)
-                            },
-                        )
-                        vh.body.addEllipsizeToSpannedOnLayout()
-                    }
+                    updateDescription()
 
                     if (bannerUrl == null) {
                         vh.banner.load("file:///android_asset/banner_placeholder.svg") {
@@ -527,6 +500,65 @@ class LemmyAppBarController(
 
         if (currentCommunity != null) {
             communityInfoViewModel.onCommunityChanged(currentCommunity)
+        }
+    }
+
+    private fun updateDescription() {
+        val vh = vh
+        if (vh !is ViewHolder.LargeAppBarViewHolder) {
+            return
+        }
+
+        val siteOrCommunity = communityInfoViewModel.siteOrCommunity.valueOrNull
+            ?: return
+        val body = siteOrCommunity.response
+            .fold(
+                { it.site_view.site.description },
+                { it.community_view.community.description },
+            )
+
+        if (body.isNullOrBlank()) {
+            vh.body.visibility = View.GONE
+            vh.body.setOnClickListener(null)
+        } else {
+            vh.body.visibility = View.VISIBLE
+            LemmyTextHelper.bindText(
+                vh.body,
+                body,
+                communityInfoViewModel.instance,
+                onImageClick = { url ->
+                    mainActivity.openImage(
+                        sharedElement = null,
+                        appBar = appBarRoot,
+                        title = null,
+                        url = url,
+                        mimeType = null,
+                    )
+                },
+                onVideoClick = { url ->
+                    mainActivity.openVideo(url, VideoType.Unknown, null)
+                },
+                onPageClick = {
+                    mainActivity.launchPage(it)
+                },
+                onLinkClick = { url, text, linkType ->
+                    baseFragment.onLinkClick(url, text, linkType)
+                },
+                onLinkLongClick = { url, text ->
+                    mainActivity.showMoreLinkOptions(url, text)
+                },
+            )
+            if (expandDescription.value) {
+                vh.body.maxLines = Integer.MAX_VALUE
+            } else {
+                vh.body.maxLines = 2
+                vh.body.addEllipsizeToSpannedOnLayout()
+            }
+            vh.body.setOnClickListener {
+                expandDescription.value = !expandDescription.value
+
+                updateDescription()
+            }
         }
     }
 

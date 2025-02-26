@@ -834,14 +834,16 @@ class CommunitySelectorController @AssistedInject constructor(
                         )
                     }
 
-                    newItems.add(
-                        Item.StaticChildItem(
-                            context.getString(R.string.all_subscribed),
-                            context.getString(R.string.all_subscribed_feed_desc),
-                            R.drawable.baseline_groups_24,
-                            CommunityRef.AllSubscribed(),
-                        ),
-                    )
+                    if (accountManager.numAccounts.value > 1) {
+                        newItems.add(
+                            Item.StaticChildItem(
+                                context.getString(R.string.all_subscribed),
+                                context.getString(R.string.all_subscribed_feed_desc),
+                                R.drawable.baseline_groups_24,
+                                CommunityRef.AllSubscribed(),
+                            ),
+                        )
+                    }
                 } else {
                     newItems.add(
                         Item.StaticChildItem(

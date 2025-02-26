@@ -1,8 +1,11 @@
 package com.idunnololz.summit.util.coil
 
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
 import android.text.Spanned
 import android.widget.TextView
 import coil3.ImageLoader
@@ -10,6 +13,8 @@ import coil3.asDrawable
 import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
+import coil3.size.Dimension
+import coil3.size.Scale
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory
@@ -64,12 +69,21 @@ class CoilImagesPlugin internal constructor(
     ) : AsyncDrawableLoader() {
 
         private val cache: MutableMap<AsyncDrawable, Disposable?> = HashMap(2)
+        private val handler = Handler(Looper.getMainLooper())
 
         override fun load(drawable: AsyncDrawable) {
+            if (!drawable.hasKnownDimensions()) {
+                handler.post {
+                    load(drawable)
+                }
+                return
+            }
+
             val loaded = AtomicBoolean(false)
             val target = AsyncDrawableTarget(drawable, loaded, drawable.destination)
             val request = coilStore.load(drawable).newBuilder()
                 .target(target)
+                .size(Dimension.Pixels(drawable.lastKnownCanvasWidth), Dimension.Undefined)
                 .build()
             // @since 4.5.1 execute can return result _before_ disposable is created,
             //  thus `execute` would finish before we put disposable in cache (and thus result is
@@ -108,7 +122,18 @@ class CoilImagesPlugin internal constructor(
                     // mark
                     loaded.set(true)
                     if (drawable.isAttached) {
+                        val scaleFactor = drawable.lastKnownCanvasWidth / image.width.toFloat()
                         val loadedDrawable = image.asDrawable(context.resources)
+
+//                        if (loadedDrawable.bounds.isEmpty) {
+//                            loadedDrawable.bounds = Rect(
+//                                0,
+//                                0,
+//                                (image.width * scaleFactor).toInt(),
+//                                (image.height * scaleFactor).toInt(),
+//                            )
+//                        }
+
                         DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
                         drawable.result = loadedDrawable
 
