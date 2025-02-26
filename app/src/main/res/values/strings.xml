@@ -1960,7 +1960,7 @@
     <string name="open_in_app">Open in app</string>
     <string name="open_in_app_desc">Detected link is a lemmy instance. Tap to open in app.</string>
     <string name="disable_shake_to_give_feedback">Disable shake to give feedback</string>
-
+    
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
