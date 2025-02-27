@@ -39,7 +39,7 @@
     <string name="auto_load_more_posts_desc">Όταν είναι ενεργό, περισσότερες αναρτήσεις θα φορτώνονται αυτόματα όταν πλησιάζεις στο τέλος της λίστας.</string>
     <string name="less_dark_background_theme_desc">Χρησιμοποιεί πιο φωτεινό χρώμα ως χρώμα παρασκηνίου</string>
     <string name="restore_settings_desc">Φόρτωση/επαναφορά ρυθμίσεων από αρχείο, κωδικό ρύθμισης ή αντίγραφο ασφαλείας εσωτερικής ρύθμισης.</string>
-    <string name="sort_order_scaled_short">Σε τάση (κλιμακούμενο)</string>
+    <string name="sort_order_scaled_short">Σε τάση (κλιμακωτό)</string>
     <string name="large_list">Μεγάλη λίστα</string>
     <string name="locked_post_message">Αυτή η ανάρτηση έχει κλειδωθεί από τους συντονιστές του %1$s. Δε μπορούν να αναρτηθούν νέα σχόλια.</string>
     <string name="error_history_entry_corrupt">Σφάλμα. Το επιλεγμένο στοιχείο ιστορικού είναι κατεστραμμένο και δεν μπορεί να χρησιμοποιηθεί.</string>
@@ -1146,4 +1146,15 @@
     <string name="error_unable_to_submit_feedback">Δεν είναι δυνατή η υποβολή σχολίων</string>
     <string name="help_and_feedback_desc">Δώσε σχόλια από οπουδήποτε στην εφαρμογή κουνώντας τη συσκευή σου.</string>
     <string name="post_feedback_or_question_to_community">Δημοσίευσε σχόλια/ερώτηση στην κοινότητα</string>
+    <string name="use_posts_feed_header_desc">Εμφάνιση μια περιγραφικής κεφαλίδας στο πάνω μέρος της ροής αναρτήσεων.</string>
+    <string name="subscribed_feed_desc">Αναρτήσεις από εγγεγραμμένες κοινότητες</string>
+    <string name="all_subscribed_feed_desc">Αναρτήσεις από τις κοινότητές σου σ\' όλους τους λογαριασμούς</string>
+    <string name="auto_convert_ip_addresses_to_links">Αυτόματη μετατροπή διευθύνσεων IP σε συνδέσμους</string>
+    <string name="full_with_cards">Πλήρης με κάρτες</string>
+    <string name="use_posts_feed_header">Χρήση κεφαλίδας ροής αναρτήσεων</string>
+    <string name="sign_in_or_sign_up">Σύνδεση ή εγγραφή</string>
+    <string name="all_feed_desc">Αναρτήσεις από όλες τις κοινότητες</string>
+    <string name="local_feed_desc">Αναρτήσεις από κοινότητες σ\' αυτήν την οντότητα</string>
+    <string name="moderated_feed_desc">Αναρτήσεις από κοινότητες που συντονίζεις</string>
+    <string name="users_format">%1$s Χρήστες</string>
 </resources>
