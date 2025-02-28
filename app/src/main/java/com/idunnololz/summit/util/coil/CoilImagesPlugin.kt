@@ -122,9 +122,9 @@ class CoilImagesPlugin internal constructor(
                     // mark
                     loaded.set(true)
                     if (drawable.isAttached) {
-                        val scaleFactor = drawable.lastKnownCanvasWidth / image.width.toFloat()
                         val loadedDrawable = image.asDrawable(context.resources)
 
+//                        val maxScaleFactor = drawable.lastKnownCanvasWidth / image.width.toFloat()
 //                        if (loadedDrawable.bounds.isEmpty) {
 //                            loadedDrawable.bounds = Rect(
 //                                0,

@@ -2,7 +2,6 @@ package com.idunnololz.summit.settings.util
 
 import android.view.View
 import com.google.android.material.slider.Slider
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.BasicSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.RadioGroupTitleSettingItemBinding
@@ -22,8 +21,8 @@ import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
-import com.skydoves.colorpickerview.ColorPickerDialog
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
+import com.idunnololz.summit.util.colorPicker.view.ColorPicker
 
 fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Unit) {
     if (this.icon == null) {
@@ -276,35 +275,50 @@ fun ColorSettingItem.bindTo(
     )
 
     b.root.setOnClickListener {
-        ColorPickerDialog.Builder(context)
-            .setTitle(title)
-            .setPositiveButton(
-                context.getString(android.R.string.ok),
-                ColorEnvelopeListener { envelope, _ ->
-                    onValueChanged(envelope.color)
+//        ColorPickerDialog.Builder(context)
+//            .setTitle(title)
+//            .setPositiveButton(
+//                context.getString(android.R.string.ok),
+//                ColorEnvelopeListener { envelope, _ ->
+//                    onValueChanged(envelope.color)
+//
+//                    b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
+//                },
+//            )
+//            .setNegativeButton(
+//                context.getString(android.R.string.cancel),
+//            ) { dialogInterface, i -> dialogInterface.dismiss() }
+//            .attachAlphaSlideBar(true) // the default value is true.
+//            .attachBrightnessSlideBar(true) // the default value is true.
+//            .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
+//            .apply {
+//                if (defaultValue != null) {
+//                    setNeutralButton(
+//                        context.getString(R.string.reset_to_default),
+//                    ) { dialogInterface, i ->
+//                        dialogInterface.dismiss()
+//
+//                        onValueChanged(defaultValue())
+//
+//                        b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
+//                    }
+//                }
+//            }
+//            .show()
 
+        com.idunnololz.summit.util.colorPicker.ColorPickerDialog(
+            context = context,
+            title = title,
+            color = getCurrentValue() ?: defaultValue(),
+            defaultColor = defaultValue()
+        )
+            .withAlphaEnabled(true)
+            .withListener(object : OnColorPickedListener {
+                override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
+                    onValueChanged(color)
                     b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
-                },
-            )
-            .setNegativeButton(
-                context.getString(android.R.string.cancel),
-            ) { dialogInterface, i -> dialogInterface.dismiss() }
-            .attachAlphaSlideBar(true) // the default value is true.
-            .attachBrightnessSlideBar(true) // the default value is true.
-            .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
-            .apply {
-                if (defaultValue != null) {
-                    setNeutralButton(
-                        context.getString(R.string.reset_to_default),
-                    ) { dialogInterface, i ->
-                        dialogInterface.dismiss()
-
-                        onValueChanged(defaultValue())
-
-                        b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
-                    }
                 }
-            }
+            })
             .show()
     }
 }

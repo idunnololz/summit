@@ -147,43 +147,7 @@ class AccountInfoManager @Inject constructor(
     }
 
     suspend fun updateAccountInfoWith(account: Account, response: GetSiteResponse) {
-        val localUserView = response.my_user?.local_user_view
-        val accountInfo = AccountInfo(
-            accountId = account.id,
-            subscriptions = response.my_user
-                ?.follows
-                ?.map { it.community.toAccountSubscription() }
-                ?: listOf(),
-            miscAccountInfo = MiscAccountInfo(
-                avatar = localUserView?.person?.avatar,
-                defaultCommunitySortType = localUserView?.local_user?.default_sort_type,
-                showReadPosts = localUserView?.local_user?.show_read_posts,
-                modCommunityIds = response.my_user?.moderates?.map { it.community.id },
-                isAdmin = response.admins.firstOrNull { it.person.id == account.id } != null,
-                blockedPersons = response.my_user?.person_blocks?.map {
-                    BlockedPerson(
-                        personId = it.target.id,
-                        personRef = it.target.toPersonRef(),
-                    )
-                },
-                blockedCommunities = response.my_user?.community_blocks?.map {
-                    BlockedCommunity(
-                        it.community.id,
-                        it.community.toCommunityRef(),
-                    )
-                },
-                blockedInstances = response.my_user?.instance_blocks?.map {
-                    BlockedInstance(
-                        it.instance.id,
-                        it.instance.domain,
-                    )
-                },
-            ),
-        )
-        val fullAccount = FullAccount(
-            account,
-            accountInfo,
-        )
+        val fullAccount = response.toFullAccount(account)
         currentFullAccount.emit(fullAccount)
 
 //        fullAccount.accountInfo
@@ -197,9 +161,9 @@ class AccountInfoManager @Inject constructor(
 //                    )
 //            }
 
-        accountInfoDao.insert(accountInfo)
+        accountInfoDao.insert(fullAccount.accountInfo)
 
-        subscribedCommunities.emit(accountInfo.subscriptions ?: listOf())
+        subscribedCommunities.emit(fullAccount.accountInfo.subscriptions ?: listOf())
     }
 
     private suspend fun updateUnreadCount(account: Account) {
@@ -292,21 +256,3 @@ class AccountInfoManager @Inject constructor(
 //        val taglines: List<Tagline>?,
 //    )
 }
-
-private fun Community.toAccountSubscription() = AccountSubscription(
-    this.id,
-    this.name,
-    this.title,
-    this.removed,
-    this.published,
-    this.updated,
-    this.deleted,
-    this.nsfw,
-    this.actor_id,
-    this.local,
-    this.icon,
-    this.banner,
-    this.hidden,
-    this.posting_restricted_to_mods,
-    this.instance_id,
-)

@@ -1953,6 +1953,21 @@
     <string name="users_format">%1$s Users</string>
     <string name="comments_format">%1$s Comments</string>
 
+
+    <string name="colorPickerDialog_reset">Reset</string>
+
+    <string name="colorPickerDialog_red">R</string>
+    <string name="colorPickerDialog_blue">B</string>
+    <string name="colorPickerDialog_green">G</string>
+    <string name="colorPickerDialog_alpha">A</string>
+    <string name="colorPickerDialog_hue">H</string>
+    <string name="colorPickerDialog_saturation">S</string>
+    <string name="colorPickerDialog_brightness">V</string>
+    <string name="colorPickerDialog_rgb">RGB</string>
+    <string name="colorPickerDialog_hsv">HSV</string>
+    <string name="colorPickerDialog_preset">Preset</string>
+    <string name="multi_community_desc">Merged feed of multiple communities</string>
+
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
         <item quantity="one">(%1$d child)</item>
