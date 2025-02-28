@@ -12,6 +12,7 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
@@ -139,3 +140,21 @@ class AccountInfoConverters(private val json: Json) {
         null
     }
 }
+
+fun Community.toAccountSubscription() = AccountSubscription(
+    this.id,
+    this.name,
+    this.title,
+    this.removed,
+    this.published,
+    this.updated,
+    this.deleted,
+    this.nsfw,
+    this.actor_id,
+    this.local,
+    this.icon,
+    this.banner,
+    this.hidden,
+    this.posting_restricted_to_mods,
+    this.instance_id,
+)

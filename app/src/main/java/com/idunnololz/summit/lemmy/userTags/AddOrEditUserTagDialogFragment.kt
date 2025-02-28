@@ -14,11 +14,12 @@ import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.DialogFragmentAddOrEditUserTagBinding
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.colorPicker.ColorPickerDialog
+import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
+import com.idunnololz.summit.util.colorPicker.view.ColorPicker
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
-import com.skydoves.colorpickerview.ColorPickerDialog
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -193,23 +194,18 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
 
     private fun showColorPicker(initialColor: Int, onColorPicked: (Int) -> Unit) {
         val context = requireContext()
-        ColorPickerDialog.Builder(context)
-            .setTitle(R.string.tag_fill_color)
-            .setPositiveButton(
-                context.getString(android.R.string.ok),
-                ColorEnvelopeListener { envelope, _ ->
-                    onColorPicked(envelope.color)
-                },
-            )
-            .setNegativeButton(
-                context.getString(android.R.string.cancel),
-            ) { dialogInterface, i -> dialogInterface.dismiss() }
-            .attachAlphaSlideBar(true) // the default value is true.
-            .attachBrightnessSlideBar(true) // the default value is true.
-            .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
-            .apply {
-                colorPickerView.setInitialColor(initialColor)
-            }
+
+        ColorPickerDialog(
+            context = context,
+            title = context.getString(R.string.tag_fill_color),
+            color = initialColor
+        )
+            .withAlphaEnabled(true)
+            .withListener(object : OnColorPickedListener {
+                override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
+                    onColorPicked(color)
+                }
+            })
             .show()
     }
 }

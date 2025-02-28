@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 227
-        versionName = "1.55.4"
+        versionCode = 228
+        versionName = "1.55.5"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -59,7 +59,6 @@ android {
 
 dependencies {
     implementation(project(":calligraphy"))
-    implementation(project(":colorpickerview"))
     implementation(project(":gravitySnapHelper"))
     implementation(project(":imagepicker"))
     implementation(project(":overlappingPane"))

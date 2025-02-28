@@ -1,5 +1,6 @@
 package com.idunnololz.summit.main
 
+import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import coil3.dispose
 import coil3.load
 import coil3.request.allowHardware
 import com.google.android.material.appbar.AppBarLayout
@@ -45,6 +47,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.relativeTimeToConcise
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
@@ -317,190 +320,283 @@ class LemmyAppBarController(
         }
 
         if (vh is ViewHolder.LargeAppBarViewHolder) {
-            vh.title.text = communityName
-            if (currentCommunity == null) {
-                vh.subtitle.visibility = View.GONE
-            } else {
-                val communityInstance = currentCommunity.instance ?: communityInfoViewModel.instance
-                vh.subtitle.visibility = View.VISIBLE
-                @Suppress("SetTextI18n")
-                vh.subtitle.text = "$communityName@$communityInstance"
-            }
-
-            when (val value = communityInfoViewModel.siteOrCommunity.value) {
-                is StatefulData.Error -> {
-                    vh.body.text = value.error.toErrorMessage(context)
-                    vh.feedInfoText.text = "-"
-                }
-                is StatefulData.Loading -> {
-                    vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-                        allowHardware(false)
-                    }
-                    vh.icon.load(newShimmerDrawableSquare(context))
-                    vh.body.text = buildSpannedString {
-                        appendLine(context.getString(R.string.loading))
-                        appendLine(context.getString(R.string.loading))
-                    }
-                    vh.feedInfoText.text = context.getString(R.string.loading)
-                }
-
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    vh.icon.transitionName = "app_bar_icon"
-                    val bannerUrl = value.data.response
-                        .fold(
-                            {
-                                avatarHelper.loadInstanceIcon(vh.icon, it.site_view)
-                                it.site_view.site.banner
-                            },
-                            {
-                                avatarHelper.loadCommunityIcon(vh.icon, it.community_view.community)
-                                it.community_view.community.banner
-                            },
-                        )
-                    val iconUrl = value.data.response
-                        .fold(
-                            {
-                                it.site_view.site.icon
-                            },
-                            {
-                                it.community_view.community.icon
-                            },
-                        )
-
-                    updateDescription()
-
-                    if (bannerUrl == null) {
-                        vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-                            allowHardware(false)
-                        }
-                        vh.banner.setOnClickListener(null)
-                        vh.banner.isClickable = false
-                    } else {
-                        vh.banner.transitionName = "app_bar_banner"
-                        vh.banner.load(bannerUrl) {
-                            allowHardware(false)
-                        }
-                        vh.banner.setOnClickListener {
-                            mainActivity.openImage(
-                                sharedElement = vh.banner,
-                                appBar = appBarRoot,
-                                title = null,
-                                url = bannerUrl,
-                                mimeType = null,
-                            )
-                        }
-                    }
-                    if (iconUrl == null) {
-                        vh.icon.setOnClickListener(null)
-                        vh.icon.isClickable = false
-                    } else {
-                        vh.icon.setOnClickListener {
-                            mainActivity.openImage(
-                                sharedElement = vh.icon,
-                                appBar = appBarRoot,
-                                title = null,
-                                url = iconUrl,
-                                mimeType = null,
-                            )
-                        }
-                    }
-
-                    vh.feedInfoText.visibility = View.VISIBLE
-                    vh.feedInfoText.text = buildSpannedString {
-                        val mau = value.data.response.fold(
-                            { it.site_view.counts.users_active_month },
-                            { it.community_view.counts.users_active_month },
-                        )
-                        val totalUsers = value.data.response.fold(
-                            { it.site_view.counts.users },
-                            { it.community_view.counts.subscribers },
-                        )
-                        val posts = value.data.response.fold(
-                            { it.site_view.counts.posts },
-                            { it.community_view.counts.posts },
-                        )
-                        val comments = value.data.response.fold(
-                            { it.site_view.counts.comments },
-                            { it.community_view.counts.comments },
-                        )
-                        append(
-                            context.getString(
-                                R.string.users_format, LemmyUtils.abbrevNumber(totalUsers.toLong()),
-                            ),
-                        )
-                        appendSeparator()
-                        append(
-                            context.getString(
-                                R.string.mau_format, LemmyUtils.abbrevNumber(mau.toLong()),
-                            ),
-                        )
-                        appendSeparator()
-                        append(
-                            context.getString(
-                                R.string.posts_format, LemmyUtils.abbrevNumber(posts.toLong()),
-                            ),
-                        )
-                        appendSeparator()
-                        append(
-                            context.getString(
-                                R.string.comments_format, LemmyUtils.abbrevNumber(comments.toLong()),
-                            ),
-                        )
-                    }
-                }
-            }
-
-            updateSubscribeButton()
-
-            when (currentCommunity) {
-                is CommunityRef.All,
-                is CommunityRef.Local,
-                -> {
-                    vh.info.visibility = View.VISIBLE
-                    vh.info.text = context.getString(R.string.instance_info)
-                }
-                is CommunityRef.MultiCommunity -> {
-                    vh.info.visibility = View.VISIBLE
-                    vh.info.text = context.getString(R.string.multi_community_info)
-                }
-                is CommunityRef.Subscribed,
-                is CommunityRef.AllSubscribed,
-                is CommunityRef.ModeratedCommunities,
-                -> {
-                    vh.info.visibility = View.VISIBLE
-                    vh.info.text = context.getString(R.string.feed_info)
-                }
-                is CommunityRef.CommunityRefByName -> {
-                    vh.info.visibility = View.VISIBLE
-                    vh.info.text = context.getString(R.string.community_info)
-                }
-                null -> {
-                    vh.info.visibility = View.GONE
-                }
-            }
-
-            if (currentCommunity is CommunityRef.All || currentCommunity is CommunityRef.Local) {
-                vh.communities.visibility = View.VISIBLE
-                vh.communities.setOnClickListener {
-                    mainActivity.showCommunities(
-                        currentCommunity.instance ?: communityInfoViewModel.instance,
-                    )
-                }
-            } else {
-                vh.communities.visibility = View.GONE
-            }
-
-            vh.info.setOnClickListener {
-                if (currentCommunity != null) {
-                    mainActivity.showCommunityInfo(currentCommunity)
-                }
-            }
+            loadLargeAppBar(vh)
         }
 
         if (currentCommunity != null) {
             communityInfoViewModel.onCommunityChanged(currentCommunity)
         }
+    }
+
+    private fun loadLargeAppBar(vh: ViewHolder.LargeAppBarViewHolder) {
+        val currentCommunity = state.currentCommunity
+        val communityName = currentCommunity?.getName(context) ?: ""
+
+        vh.title.text = communityName
+        if (currentCommunity == null) {
+            vh.subtitle.visibility = View.GONE
+        } else {
+            val communityInstance = currentCommunity.instance ?: communityInfoViewModel.instance
+            vh.subtitle.visibility = View.VISIBLE
+            @Suppress("SetTextI18n")
+            vh.subtitle.text = when (currentCommunity) {
+                is CommunityRef.All -> context.getString(R.string.all_feed_desc)
+                is CommunityRef.AllSubscribed -> context.getString(R.string.all_subscribed_feed_desc)
+                is CommunityRef.CommunityRefByName -> "$communityName@$communityInstance"
+                is CommunityRef.Local -> context.getString(R.string.local_feed_desc)
+                is CommunityRef.ModeratedCommunities -> context.getString(R.string.moderated_feed_desc)
+                is CommunityRef.MultiCommunity -> context.getString(R.string.multi_community_desc)
+                is CommunityRef.Subscribed -> context.getString(R.string.subscribed_feed_desc)
+            }
+        }
+
+        when (val value = communityInfoViewModel.siteOrCommunity.value) {
+            is StatefulData.Error -> {
+                vh.body.text = value.error.toErrorMessage(context)
+                vh.feedInfoText.text = "-"
+            }
+            is StatefulData.Loading -> {
+                vh.banner.load("file:///android_asset/banner_placeholder.svg") {
+                    allowHardware(false)
+                }
+                vh.icon.forCoil()
+                vh.icon.load(newShimmerDrawableSquare(context))
+                vh.body.text = buildSpannedString {
+                    appendLine(context.getString(R.string.loading))
+                    appendLine(context.getString(R.string.loading))
+                }
+                vh.feedInfoText.text = context.getString(R.string.loading)
+            }
+
+            is StatefulData.NotStarted -> {}
+            is StatefulData.Success -> {
+                vh.icon.transitionName = "app_bar_icon"
+                val bannerUrl = value.data.response
+                    .fold(
+                        {
+                            avatarHelper.loadInstanceIcon(vh.icon, it.site_view)
+                            it.site_view.site.banner
+                        },
+                        {
+                            avatarHelper.loadCommunityIcon(vh.icon, it.community_view.community)
+                            it.community_view.community.banner
+                        },
+                    )
+                val iconUrl = value.data.response
+                    .fold(
+                        {
+                            it.site_view.site.icon
+                        },
+                        {
+                            it.community_view.community.icon
+                        },
+                    )
+
+                updateDescription()
+
+                if (bannerUrl == null) {
+                    vh.banner.load("file:///android_asset/banner_placeholder.svg") {
+                        allowHardware(false)
+                    }
+                    vh.banner.setOnClickListener(null)
+                    vh.banner.isClickable = false
+                } else {
+                    vh.banner.transitionName = "app_bar_banner"
+                    vh.banner.load(bannerUrl) {
+                        allowHardware(false)
+                    }
+                    vh.banner.setOnClickListener {
+                        mainActivity.openImage(
+                            sharedElement = vh.banner,
+                            appBar = appBarRoot,
+                            title = null,
+                            url = bannerUrl,
+                            mimeType = null,
+                        )
+                    }
+                }
+                if (iconUrl == null) {
+                    vh.icon.setOnClickListener(null)
+                    vh.icon.isClickable = false
+                } else {
+                    vh.icon.setOnClickListener {
+                        mainActivity.openImage(
+                            sharedElement = vh.icon,
+                            appBar = appBarRoot,
+                            title = null,
+                            url = iconUrl,
+                            mimeType = null,
+                        )
+                    }
+                }
+
+                vh.feedInfoText.visibility = View.VISIBLE
+                vh.feedInfoText.text = buildSpannedString {
+                    val mau = value.data.response.fold(
+                        { it.site_view.counts.users_active_month },
+                        { it.community_view.counts.users_active_month },
+                    )
+                    val totalUsers = value.data.response.fold(
+                        { it.site_view.counts.users },
+                        { it.community_view.counts.subscribers },
+                    )
+                    val posts = value.data.response.fold(
+                        { it.site_view.counts.posts },
+                        { it.community_view.counts.posts },
+                    )
+                    val comments = value.data.response.fold(
+                        { it.site_view.counts.comments },
+                        { it.community_view.counts.comments },
+                    )
+                    append(
+                        context.getString(
+                            R.string.users_format, LemmyUtils.abbrevNumber(totalUsers.toLong()),
+                        ),
+                    )
+                    appendSeparator()
+                    append(
+                        context.getString(
+                            R.string.mau_format, LemmyUtils.abbrevNumber(mau.toLong()),
+                        ),
+                    )
+                    appendSeparator()
+                    append(
+                        context.getString(
+                            R.string.posts_format, LemmyUtils.abbrevNumber(posts.toLong()),
+                        ),
+                    )
+                    appendSeparator()
+                    append(
+                        context.getString(
+                            R.string.comments_format, LemmyUtils.abbrevNumber(comments.toLong()),
+                        ),
+                    )
+                }
+            }
+        }
+
+        updateSubscribeButton()
+
+
+
+        when (currentCommunity) {
+            is CommunityRef.MultiCommunity -> {
+                vh.banner.load("file:///android_asset/banner_placeholder.svg") {
+                    allowHardware(false)
+                }
+                vh.icon.forCoil()
+                vh.icon.load(currentCommunity.icon)
+                vh.body.visibility = View.VISIBLE
+                vh.body.text = currentCommunity.communities.joinToString {
+                    it.getLocalizedFullName(context)
+                }
+                vh.body.maxLines = 2
+                vh.body.addEllipsizeToSpannedOnLayout()
+                vh.feedInfoText.visibility = View.GONE
+            }
+            is CommunityRef.Subscribed -> {
+                vh.banner.load("file:///android_asset/banner_placeholder.svg") {
+                    allowHardware(false)
+                }
+                vh.icon.forIcon()
+                vh.icon.setImageResource(R.drawable.baseline_subscriptions_24)
+                vh.body.visibility = View.GONE
+                vh.feedInfoText.visibility = View.GONE
+            }
+            is CommunityRef.AllSubscribed -> {
+                vh.banner.load("file:///android_asset/banner_placeholder.svg") {
+                    allowHardware(false)
+                }
+                vh.icon.forIcon()
+                vh.icon.setImageResource(R.drawable.outline_groups_24)
+                vh.body.visibility = View.GONE
+                vh.feedInfoText.visibility = View.GONE
+            }
+            is CommunityRef.ModeratedCommunities -> {
+                vh.banner.load("file:///android_asset/banner_placeholder.svg") {
+                    allowHardware(false)
+                }
+                vh.icon.forIcon()
+                vh.icon.setImageResource(R.drawable.outline_shield_24)
+                vh.body.visibility = View.GONE
+                vh.feedInfoText.visibility = View.GONE
+            }
+            is CommunityRef.CommunityRefByName,
+            is CommunityRef.All,
+            is CommunityRef.Local,
+            null -> {
+            }
+        }
+
+        when (currentCommunity) {
+            is CommunityRef.All,
+            is CommunityRef.Local,
+                -> {
+                vh.info.visibility = View.VISIBLE
+                vh.info.text = context.getString(R.string.instance_info)
+            }
+            is CommunityRef.MultiCommunity -> {
+                vh.info.visibility = View.VISIBLE
+                vh.info.text = context.getString(R.string.multi_community_info)
+            }
+            is CommunityRef.Subscribed,
+            is CommunityRef.AllSubscribed,
+            is CommunityRef.ModeratedCommunities,
+                -> {
+                vh.info.visibility = View.VISIBLE
+                vh.info.text = context.getString(R.string.feed_info)
+            }
+            is CommunityRef.CommunityRefByName -> {
+                vh.info.visibility = View.VISIBLE
+                vh.info.text = context.getString(R.string.community_info)
+            }
+            null -> {
+                vh.info.visibility = View.GONE
+            }
+        }
+
+        if (currentCommunity is CommunityRef.All || currentCommunity is CommunityRef.Local) {
+            vh.communities.visibility = View.VISIBLE
+            vh.communities.setOnClickListener {
+                mainActivity.showCommunities(
+                    currentCommunity.instance ?: communityInfoViewModel.instance,
+                )
+            }
+        } else {
+            vh.communities.visibility = View.GONE
+        }
+
+        vh.info.setOnClickListener {
+            if (currentCommunity != null) {
+                mainActivity.showCommunityInfo(currentCommunity)
+            }
+        }
+    }
+
+    private fun ImageView.forIcon() {
+        dispose()
+        scaleType = ImageView.ScaleType.CENTER
+        setBackgroundColor(
+            context.getColorFromAttribute(
+                com.google.android.material.R.attr.colorSurfaceContainerHighest,
+            ),
+        )
+        imageTintList = ColorStateList.valueOf(
+            context.getColorFromAttribute(
+                com.google.android.material.R.attr.colorOnSurface,
+            ),
+        )
+    }
+
+    private fun ImageView.forCoil() {
+        dispose()
+        scaleType = ImageView.ScaleType.CENTER_CROP
+        setBackgroundColor(
+            context.getColorFromAttribute(
+                com.google.android.material.R.attr.backgroundColor,
+            ),
+        )
+        imageTintList = null
     }
 
     private fun updateDescription() {

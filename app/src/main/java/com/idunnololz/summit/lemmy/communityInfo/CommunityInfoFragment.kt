@@ -963,7 +963,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                         is CommunityRef.MultiCommunity -> TODO()
                         is CommunityRef.Subscribed ->
                             context.getString(R.string.subscribed_communities)
-                        is CommunityRef.AllSubscribed -> TODO()
+                        is CommunityRef.AllSubscribed ->
+                            context.getString(R.string.all_subscribed)
                     },
                     subtitle = multiCommunityData.instance,
                 )

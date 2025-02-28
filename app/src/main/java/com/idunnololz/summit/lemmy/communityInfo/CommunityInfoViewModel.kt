@@ -7,7 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.toAccountSubscription
+import com.idunnololz.summit.account.info.toFullAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NotAuthenticatedException
@@ -38,6 +41,8 @@ import kotlinx.coroutines.launch
 class CommunityInfoViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val noAuthApiClient: LemmyApiClient,
+    private val apiClientFactor: LemmyApiClient.Factory,
+    private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
@@ -85,6 +90,10 @@ class CommunityInfoViewModel @Inject constructor(
                 siteOrCommunity.setIdle()
                 fetchSubscribedCommunities(communityRef)
                 return@launch
+            } else if (communityRef is CommunityRef.AllSubscribed) {
+                siteOrCommunity.setIdle()
+                fetchAllSubscribedCommunities(communityRef)
+                return@launch
             }
 
             val result = when (communityRef) {
@@ -112,7 +121,7 @@ class CommunityInfoViewModel @Inject constructor(
                 }
                 is CommunityRef.MultiCommunity -> error("unreachable code")
                 is CommunityRef.ModeratedCommunities -> error("unreachable code")
-                is CommunityRef.AllSubscribed -> TODO()
+                is CommunityRef.AllSubscribed -> error("unreachable code")
             }
 
             result
@@ -234,6 +243,51 @@ class CommunityInfoViewModel @Inject constructor(
                 val result = apiClient
                     .fetchCommunityWithRetry(Either.Left(subscription.id), false)
                 emit(result)
+            }
+        }.flowOn(Dispatchers.Default).toList()
+
+        val successResults = mutableListOf<GetCommunityResponse>()
+        for (result in results) {
+            if (result.isSuccess) {
+                successResults.add(result.getOrThrow())
+            } else {
+                multiCommunity.setError(requireNotNull(result.exceptionOrNull()))
+                return
+            }
+        }
+
+        multiCommunity.setValue(
+            MultiCommunityData(
+                communityRef = communityRef,
+                instance = instance,
+                icon = R.drawable.baseline_subscriptions_24,
+                communitiesData = successResults,
+            ),
+        )
+    }
+
+    private suspend fun fetchAllSubscribedCommunities(communityRef: CommunityRef) {
+        multiCommunity.setIsLoading()
+
+        val oneUseClient = apiClientFactor.create()
+        val results = flow {
+            val fullAccounts = accountManager.getAccounts()
+                .mapNotNull {
+                    oneUseClient.changeInstance(it.instance)
+                    val site = oneUseClient.fetchSiteWithRetry(auth = it.jwt, force = false)
+                    site.getOrNull()?.toFullAccount(it)
+                }
+            for (fullAccount in fullAccounts) {
+                val subscriptions = fullAccount
+                    .accountInfo
+                    .subscriptions
+                    ?: listOf()
+                oneUseClient.changeInstance(fullAccount.account.instance)
+                subscriptions.forEach { subscription ->
+                    val result = oneUseClient
+                        .getCommunity(fullAccount.account, Either.Left(subscription.id), false)
+                    emit(result)
+                }
             }
         }.flowOn(Dispatchers.Default).toList()
 
