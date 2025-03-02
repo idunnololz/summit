@@ -4,7 +4,9 @@ import android.graphics.Rect
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
+import android.widget.HorizontalScrollView
 import androidx.annotation.UiThread
+import androidx.core.view.doOnLayout
 import com.discord.panels.PanelsChildGestureRegionObserver.GestureRegionsListener
 import java.lang.ref.WeakReference
 
@@ -48,14 +50,22 @@ class PanelsChildGestureRegionObserver : View.OnLayoutChangeListener {
         if (!viewIdToListenerMap.keys.contains(view.id)) {
             return
         }
+
+        if (view is HorizontalScrollView) {
+            if (!view.isScrollable) {
+                viewIdToGestureRegionMap.remove(view.id)
+                return
+            }
+        }
+
         val coordinates = intArrayOf(0, 0)
         view.getLocationInWindow(coordinates)
 
         val x = coordinates[0]
         val y = coordinates[1]
 
-        val absoluteRight = x + right
-        val absoluteBottom = y + bottom
+        val absoluteRight = x + (right - left)
+        val absoluteBottom = y + (bottom - top)
 
         viewIdToGestureRegionMap[view.id] = Rect(
             x,
@@ -70,14 +80,13 @@ class PanelsChildGestureRegionObserver : View.OnLayoutChangeListener {
     @UiThread
     fun register(view: View) {
         if (viewIdToListenerMap.contains(view.id)) {
+            val resourceName = view.context.resources.getResourceEntryName(view.id)
             Log.w(
                 javaClass.simpleName,
-                "failed to register view with ID ${view.id}. already registered",
+                "failed to register view with ID ${resourceName ?: view.id}. already registered",
             )
             return
         }
-
-        view.addOnLayoutChangeListener(this)
 
         val listener = ViewTreeObserver.OnScrollChangedListener {
             onLayoutChange(
@@ -92,9 +101,25 @@ class PanelsChildGestureRegionObserver : View.OnLayoutChangeListener {
                 oldBottom = 0,
             )
         }
+        viewIdToListenerMap[view.id] = listener
+
+        view.addOnLayoutChangeListener(this)
 
         view.viewTreeObserver.addOnScrollChangedListener(listener)
-        viewIdToListenerMap[view.id] = listener
+
+        if (view.isLaidOut) {
+            onLayoutChange(
+                view = view,
+                left = view.left,
+                top = view.top,
+                right = view.right,
+                bottom = view.bottom,
+                oldLeft = 0,
+                oldTop = 0,
+                oldRight = 0,
+                oldBottom = 0,
+            )
+        }
     }
 
     /**

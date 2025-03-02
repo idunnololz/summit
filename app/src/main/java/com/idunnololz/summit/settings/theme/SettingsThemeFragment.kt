@@ -12,6 +12,7 @@ import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentSettingsThemeBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.BaseTheme
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.GlobalFontColorId
@@ -50,6 +51,9 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
 
     @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+
+    @Inject
+    lateinit var globalStateStorage: GlobalStateStorage
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -222,6 +226,7 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
             binding.voteColors.title.text = getString(R.string.vote_colors)
             settings.upvoteColor.bindTo(
                 binding.upvoteColor,
+                globalStateStorage,
                 { preferences.upvoteColor },
                 {
                     preferences.upvoteColor = it
@@ -232,6 +237,7 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
             )
             settings.downvoteColor.bindTo(
                 binding.downvoteColor,
+                globalStateStorage,
                 { preferences.downvoteColor },
                 {
                     preferences.downvoteColor = it

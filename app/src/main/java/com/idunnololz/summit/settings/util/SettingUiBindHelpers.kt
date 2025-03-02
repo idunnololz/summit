@@ -12,6 +12,7 @@ import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.ColorSettingItem
@@ -22,7 +23,8 @@ import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
-import com.idunnololz.summit.util.colorPicker.view.ColorPicker
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
+import javax.inject.Inject
 
 fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Unit) {
     if (this.icon == null) {
@@ -248,6 +250,7 @@ fun RadioGroupSettingItem.bindToMultiView(
 
 fun ColorSettingItem.bindTo(
     b: SettingColorItemBinding,
+    globalStateStorage: GlobalStateStorage,
     getCurrentValue: () -> Int?,
     onValueChanged: (Int) -> Unit,
     defaultValue: (() -> Int),
@@ -275,42 +278,12 @@ fun ColorSettingItem.bindTo(
     )
 
     b.root.setOnClickListener {
-//        ColorPickerDialog.Builder(context)
-//            .setTitle(title)
-//            .setPositiveButton(
-//                context.getString(android.R.string.ok),
-//                ColorEnvelopeListener { envelope, _ ->
-//                    onValueChanged(envelope.color)
-//
-//                    b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
-//                },
-//            )
-//            .setNegativeButton(
-//                context.getString(android.R.string.cancel),
-//            ) { dialogInterface, i -> dialogInterface.dismiss() }
-//            .attachAlphaSlideBar(true) // the default value is true.
-//            .attachBrightnessSlideBar(true) // the default value is true.
-//            .setBottomSpace(12) // set a bottom space between the last slidebar and buttons.
-//            .apply {
-//                if (defaultValue != null) {
-//                    setNeutralButton(
-//                        context.getString(R.string.reset_to_default),
-//                    ) { dialogInterface, i ->
-//                        dialogInterface.dismiss()
-//
-//                        onValueChanged(defaultValue())
-//
-//                        b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
-//                    }
-//                }
-//            }
-//            .show()
-
         com.idunnololz.summit.util.colorPicker.ColorPickerDialog(
             context = context,
             title = title,
             color = getCurrentValue() ?: defaultValue(),
-            defaultColor = defaultValue()
+            defaultColor = defaultValue(),
+            globalStateStorage = globalStateStorage,
         )
             .withAlphaEnabled(true)
             .withListener(object : OnColorPickedListener {

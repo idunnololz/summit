@@ -361,6 +361,9 @@ class PostFragment :
             is HistoryFragment -> {
                 fragment.closePost(this@PostFragment)
             }
+            is PostTabbedFragment -> {
+                fragment.closePost(this@PostFragment)
+            }
         }
     }
 

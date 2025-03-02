@@ -50,6 +50,7 @@ class LemmyHeaderView : FrameLayout {
         }
 
     var iconSize = Utils.convertDpToPixel(DEFAULT_ICON_SIZE_DP).toInt()
+    private val marginBetweenLines = Utils.convertDpToPixel(4f).toInt()
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -203,19 +204,23 @@ class LemmyHeaderView : FrameLayout {
             if (textView1.visibility != View.GONE) {
                 totalTextHeight += getViewHeight(textView1)
             }
-            val textView2Height =
-                if (textView2.visibility != View.GONE) {
-                    getViewHeight(textView2)
-                } else {
-                    0
-                }
-            val textView3Height =
-                if (textView3.visibility != View.GONE) {
-                    getViewHeight(textView3)
-                } else {
-                    0
-                }
-            totalTextHeight += max(textView2Height, textView3Height)
+            if (textView2.visibility != View.GONE || textView3.visibility != View.GONE) {
+                val textView2Height =
+                    if (textView2.visibility != View.GONE) {
+                        getViewHeight(textView2)
+                    } else {
+                        0
+                    }
+                val textView3Height =
+                    if (textView3.visibility != View.GONE) {
+                        getViewHeight(textView3)
+                    } else {
+                        0
+
+                    }
+                totalTextHeight += marginBetweenLines
+                totalTextHeight += max(textView2Height, textView3Height)
+            }
 
             var viewHeight = totalTextHeight
             var viewWidth = 0
@@ -310,7 +315,6 @@ class LemmyHeaderView : FrameLayout {
                 start += child.measuredWidth + layoutParams.rightMargin
             }
 
-            val marginBetweenLines = Utils.convertDpToPixel(4f).toInt()
             val textChildrenTotalHeight =
                 textView1.measuredHeight + max(textView2.measuredHeight, textView3.measuredHeight) +
                     marginBetweenLines

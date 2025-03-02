@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsGesturesBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.GestureSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
@@ -36,6 +37,9 @@ class SettingsGesturesFragment :
 
     @Inject
     lateinit var settings: GestureSettings
+
+    @Inject
+    lateinit var globalStateStorage: GlobalStateStorage
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,6 +103,7 @@ class SettingsGesturesFragment :
         )
         settings.postGestureActionColor1.bindTo(
             binding.postGestureAction1Color,
+            globalStateStorage,
             { preferences.postGestureActionColor1 },
             {
                 preferences.postGestureActionColor1 = it
@@ -116,6 +121,7 @@ class SettingsGesturesFragment :
         )
         settings.postGestureActionColor2.bindTo(
             binding.postGestureAction2Color,
+            globalStateStorage,
             { preferences.postGestureActionColor2 },
             {
                 preferences.postGestureActionColor2 = it
@@ -133,6 +139,7 @@ class SettingsGesturesFragment :
         )
         settings.postGestureActionColor3.bindTo(
             binding.postGestureAction3Color,
+            globalStateStorage,
             { preferences.postGestureActionColor3 },
             {
                 preferences.postGestureActionColor3 = it
@@ -158,6 +165,7 @@ class SettingsGesturesFragment :
         )
         settings.commentGestureActionColor1.bindTo(
             binding.commentGestureAction1Color,
+            globalStateStorage,
             { preferences.commentGestureActionColor1 },
             {
                 preferences.commentGestureActionColor1 = it
@@ -175,6 +183,7 @@ class SettingsGesturesFragment :
         )
         settings.commentGestureActionColor2.bindTo(
             binding.commentGestureAction2Color,
+            globalStateStorage,
             { preferences.commentGestureActionColor2 },
             {
                 preferences.commentGestureActionColor2 = it
@@ -192,6 +201,7 @@ class SettingsGesturesFragment :
         )
         settings.commentGestureActionColor3.bindTo(
             binding.commentGestureAction3Color,
+            globalStateStorage,
             { preferences.commentGestureActionColor3 },
             {
                 preferences.commentGestureActionColor3 = it

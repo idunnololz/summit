@@ -8,6 +8,7 @@ import android.graphics.Matrix
 import android.graphics.Point
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -24,20 +25,22 @@ import androidx.annotation.Px
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
 import androidx.core.content.ContextCompat
-import androidx.core.view.doOnLayout
-import androidx.core.view.doOnNextLayout
+import androidx.core.graphics.alpha
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.ColorWheelPickerBinding
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
-import com.idunnololz.summit.util.colorPicker.utils.ActionMode
-import com.idunnololz.summit.util.colorPicker.utils.ColorEnvelope
+import com.idunnololz.summit.util.colorPicker.SeekBarBackgroundDrawable
 import com.idunnololz.summit.util.colorPicker.utils.ColorHsvPalette
-import com.idunnololz.summit.util.colorPicker.listeners.ColorEnvelopeListener
 import com.idunnololz.summit.util.colorPicker.listeners.ColorListener
 import com.idunnololz.summit.util.colorPicker.listeners.ColorPickerViewListener
+import com.idunnololz.summit.util.colorPicker.utils.AlphaTileDrawable
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
+import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
+import com.idunnololz.summit.util.colorPicker.utils.PointMapper
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -45,50 +48,12 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-/**
- * ColorPickerView implements getting HSV colors, ARGB values, Hex color codes from any image
- * drawables.
- *
- *
- * [ColorPickerViewListener] will be invoked whenever ColorPickerView is triggered by
- * [ActionMode] rules.
- *
- *
- * Implements [FlagView], [AlphaSlideBar] and [BrightnessSlideBar] optional.
- */
-@Suppress("unused")
 class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorPickerContainer {
-    /**
-     * gets the selected pure color without alpha and brightness.
-     *
-     * @return the selected pure color.
-     */
-    /**
-     * sets the pure color.
-     *
-     * @param color the pure color.
-     */
-    @get:ColorInt
-    @ColorInt
-    var pureColor: Int = 0
-
-    private var queuedColor: Int? = null
-    override fun setColor(color: Int, animate: Boolean) {
-        if (!palette.isLaidOut) {
-            queuedColor = color
-        } else {
-            selectByHsvColor(color)
-        }
-    }
-
-    override fun setListener(listener: OnColorPickedListener?) {
-        _listener = listener
-    }
 
     override val view: View
         get() = this
 
-    override var isAlphaEnabled: Boolean = true
+    private var selectedWheelColor: Int = 0
 
     /**
      * gets the selected color.
@@ -100,17 +65,14 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
     override var color: Int = 0
         private set
     override val name: String
-        get() = "Wheel"
-    override val isTrackingTouch: Boolean
-        get() = false
+        get() = context.getString(R.string.color_wheel)
 
     /**
      * gets a selector's selected coordinate.
      *
      * @return a selected coordinate [Point].
      */
-    var selectedPoint: Point? = null
-        private set
+    private var selectedPoint: Point? = null
     lateinit var palette: ImageView
 
     /**
@@ -118,70 +80,28 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
      *
      * @return selector.
      */
-    lateinit var selector: ImageView
-        private set
+    private lateinit var selector: ImageView
     private var paletteDrawable: Drawable? = null
-    private var selectorDrawable: Drawable? = null
 
-    /**
-     * gets an [AlphaSlideBar].
-     *
-     * @return [AlphaSlideBar].
-     */
-    var alphaSlideBar: AlphaSlideBar? = null
+    lateinit var alphaSlideBar: Slider
+        private set
+    lateinit var brightnessSlider: Slider
         private set
 
-    /**
-     * gets an [BrightnessSlideBar].
-     *
-     * @return [BrightnessSlideBar].
-     */
-    var brightnessSlider: BrightnessSlideBar? = null
-        private set
     var _listener: OnColorPickedListener? = null
-    var colorListener: ColorPickerViewListener = object : ColorListener {
+    private var colorListener: ColorPickerViewListener = object : ColorListener {
         override fun onColorSelected(color: Int, fromUser: Boolean) {
             if (fromUser) {
                 _listener?.onColorPicked(this@ColorPickerView, color)
             }
         }
     }
-    /**
-     * gets a debounce duration.
-     *
-     *
-     * only emit a color to the listener if a particular timespan has passed without it emitting
-     * another value.
-     *
-     * @return debounceDuration.
-     */
-    /**
-     * sets a debounce duration.
-     *
-     *
-     * only emit a color to the listener if a particular timespan has passed without it emitting
-     * another value.
-     *
-     * @param debounceDuration intervals.
-     */
     private var debounceDuration: Long = 0
     private val debounceHandler = Handler()
 
-    private var actionMode: ActionMode? = ActionMode.ALWAYS
-
-    @FloatRange(from = 0.0, to = 1.0)
-    private var selectorAlpha = 1.0f
-
-    @FloatRange(from = 0.0, to = 1.0)
-    private var flagAlpha = 1.0f
-
-    private val flagIsFlipAble = true
-
-    @Px
-    private var selectorSize = 0
-
-    private var visibleFlag = false
     private var handleTouch = true
+
+    private var alphaTileDrawable = AlphaTileDrawable()
 
     constructor(context: Context) : super(context) {
         onCreate()
@@ -209,35 +129,34 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
     }
 
     private fun onCreate() {
-        val b = ColorWheelPickerBinding.inflate(
-            LayoutInflater.from(context), this)
-        palette = b.palette
+        val b = ColorWheelPickerBinding.inflate(LayoutInflater.from(context), this)
 
-        pureColor = Color.WHITE
-        notifyToSlideBars()
+        palette = b.palette
+        alphaSlideBar = b.alphaSlideBar
+        brightnessSlider = b.brightnessSlideBar
+
+        updateSliders()
 
         selector = b.selector
-        if (selectorDrawable != null) {
-            selector.setImageDrawable(selectorDrawable)
-        } else {
-            selector.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    R.drawable.colorpickerview_wheel
-                )
+        selector.setImageDrawable(
+            ContextCompat.getDrawable(
+                context,
+                R.drawable.colorpickerview_wheel
             )
+        )
+
+        selector.alpha = 1f
+
+        alphaSlideBar.addOnChangeListener { slider, value, fromUser ->
+            if (fromUser) {
+                notifyColorChanged()
+            }
         }
-
-        selector.alpha = selectorAlpha
-
-        if (!visibleFlag) {
-            visibleFlag = true
-            selectorAlpha = selector.alpha
-            selector.alpha = 0.0f
+        brightnessSlider.addOnChangeListener { slider, value, fromUser ->
+            if (fromUser) {
+                notifyColorChanged()
+            }
         }
-
-        attachAlphaSlider(b.alphaSlideBar)
-        attachBrightnessSlider(b.brightnessSlideBar)
 
         viewTreeObserver
             .addOnGlobalLayoutListener(
@@ -252,13 +171,10 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
                 val bitmap = Bitmap.createBitmap(
                     palette.measuredWidth, palette.measuredHeight, Bitmap.Config.ARGB_8888)
                 palette.setImageDrawable(ColorHsvPalette(resources, bitmap))
-
-                if (queuedColor != null) {
-                    this.selectByHsvColor(queuedColor!!)
-                    queuedColor = null
-                }
             }
         }
+
+        updateSliders()
     }
 
     private fun onFinishInflated() {
@@ -316,33 +232,20 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
             PointMapper.getColorPoint(this, Point(event.x.toInt(), event.y.toInt()))
         val pixelColor = getColorFromBitmap(snapPoint.x.toFloat(), snapPoint.y.toFloat())
 
-        this.pureColor = pixelColor
-        this.color = pixelColor
+        this.selectedWheelColor = pixelColor
         this.selectedPoint =
             PointMapper.getColorPoint(this, Point(snapPoint.x, snapPoint.y))
         setCoordinate(snapPoint.x, snapPoint.y)
 
-        if (actionMode === ActionMode.LAST) {
-            if (event.action == MotionEvent.ACTION_UP) {
-                notifyColorChanged()
-            }
-        } else {
-            notifyColorChanged()
-        }
+        notifyColorChanged()
         return true
     }
 
-    val isHuePalette: Boolean = true
-
-    /**
-     * notifies color changes to [ColorListener], [FlagView]. [AlphaSlideBar],
-     * [BrightnessSlideBar] with the debounce duration.
-     */
     private fun notifyColorChanged() {
         debounceHandler.removeCallbacksAndMessages(null)
         val debounceRunnable =
             Runnable {
-                fireColorListener(color, true)
+                fireColorListener(selectedWheelColor, true)
             }
         debounceHandler.postDelayed(debounceRunnable, this.debounceDuration)
     }
@@ -354,7 +257,7 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
      * @param y coordinate y.
      * @return selected color.
      */
-    fun getColorFromBitmap(x: Float, y: Float): Int {
+    private fun getColorFromBitmap(x: Float, y: Float): Int {
         val lp = palette.layoutParams as LayoutParams
         var x = x - lp.marginStart
         var y = y - lp.topMargin
@@ -385,60 +288,38 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
                 hsv[1] =
                     max(0.0, min(1.0, (r / radius).toFloat().toDouble())).toFloat()
                 return Color.HSVToColor(hsv)
-            } else {
-                val rect = palette.drawable.bounds
-                val scaleX = mappedPoints[0] / rect.width()
-                val x1 = (scaleX * (palette.drawable as BitmapDrawable).bitmap.width).toInt()
-                val scaleY = mappedPoints[1] / rect.height()
-                val y1 = (scaleY * (palette.drawable as BitmapDrawable).bitmap.height).toInt()
-                return (palette.drawable as BitmapDrawable).bitmap.getPixel(x1, y1)
             }
         }
         return 0
     }
 
-    /**
-     * invokes [ColorListener] or [ColorEnvelopeListener] with a color value.
-     *
-     * @param color    color.
-     * @param fromUser triggered by user or not.
-     */
-    fun fireColorListener(@ColorInt color: Int, fromUser: Boolean) {
+    private fun fireColorListener(@ColorInt color: Int, fromUser: Boolean) {
         this.color = color
-        if (alphaSlideBar != null) {
-            alphaSlideBar!!.notifyColor()
-            this.color = alphaSlideBar!!.assembleColor()
-        }
-        if (brightnessSlider != null) {
-            brightnessSlider!!.notifyColor()
-            this.color = brightnessSlider!!.assembleColor()
-        }
+        val hsv = FloatArray(3)
+        Color.colorToHSV(this.color, hsv)
+        hsv[2] = brightnessSlider.value / 255f
+        val alpha = (alphaSlideBar.value).toInt()
+        this.color = Color.HSVToColor(alpha, hsv)
+        updateSliders()
 
         if (colorListener is ColorListener) {
             (colorListener as ColorListener).onColorSelected(this.color, fromUser)
-        } else if (colorListener is ColorEnvelopeListener) {
-            val envelope = ColorEnvelope(this.color)
-            (colorListener as ColorEnvelopeListener).onColorSelected(envelope, fromUser)
-        }
-
-        if (visibleFlag) {
-            visibleFlag = false
-            selector.alpha = selectorAlpha
         }
     }
 
     /**
      * notify to sliders about a new trigger.
      */
-    private fun notifyToSlideBars() {
-        if (alphaSlideBar != null) alphaSlideBar!!.notifyColor()
-        if (brightnessSlider != null) {
-            brightnessSlider!!.notifyColor()
-
-            if (brightnessSlider!!.assembleColor() != Color.WHITE) {
-                color = brightnessSlider!!.assembleColor()
-            } else if (alphaSlideBar != null) color = alphaSlideBar!!.assembleColor()
-        }
+    private fun updateSliders() {
+        alphaTileDrawable.gradientColor = selectedWheelColor
+        alphaSlideBar.background = alphaTileDrawable
+        alphaSlideBar.invalidate()
+        brightnessSlider.background = SeekBarBackgroundDrawable(
+            GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                intArrayOf(Color.BLACK, selectedWheelColor)
+            ).mutate().constantState!!.newDrawable(),
+        )
     }
 
     /**
@@ -451,68 +332,18 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
         return Color.alpha(color) / 255f
     }
 
-    val colorEnvelope: ColorEnvelope
-        /**
-         * gets the [ColorEnvelope] of the selected color.
-         *
-         * @return [ColorEnvelope].
-         */
-        get() = ColorEnvelope(color)
-
-    /**
-     * gets center coordinate of the selector.
-     *
-     * @param x coordinate x.
-     * @param y coordinate y.
-     * @return the center coordinate of the selector.
-     */
-    private fun getCenterPoint(x: Int, y: Int): Point {
-        return Point(x - (selector.width / 2), y - (selector.measuredHeight / 2))
-    }
-
-    val selectorX: Float
-        /**
-         * gets a selector's selected coordinate x.
-         *
-         * @return a selected coordinate x.
-         */
-        get() = selector.x - (selector.width * 0.5f)
-
-    val selectorY: Float
-        /**
-         * gets a selector's selected coordinate y.
-         *
-         * @return a selected coordinate y.
-         */
-        get() = selector.y - (selector.measuredHeight * 0.5f)
-
     /**
      * changes selector's selected point with notifies about changes manually.
      *
      * @param x coordinate x of the selector.
      * @param y coordinate y of the selector.
      */
-    fun setSelectorPoint(x: Int, y: Int) {
+    private fun setSelectorPoint(x: Int, y: Int) {
         val mappedPoint: Point = PointMapper.getColorPoint(this, Point(x, y))
         val color = getColorFromBitmap(mappedPoint.x.toFloat(), mappedPoint.y.toFloat())
-        pureColor = color
         this.color = color
         selectedPoint = Point(mappedPoint.x, mappedPoint.y)
         setCoordinate(mappedPoint.x, mappedPoint.y)
-        fireColorListener(this.color, false)
-    }
-
-    /**
-     * moves selector's selected point with notifies about changes manually.
-     *
-     * @param x coordinate x of the selector.
-     * @param y coordinate y of the selector.
-     */
-    fun moveSelectorPoint(x: Int, y: Int, @ColorInt color: Int) {
-        pureColor = color
-        this.color = color
-        selectedPoint = Point(x, y)
-        setCoordinate(x, y)
         fireColorListener(this.color, false)
     }
 
@@ -522,35 +353,9 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
      * @param x coordinate x of the selector.
      * @param y coordinate y of the selector.
      */
-    fun setCoordinate(x: Int, y: Int) {
+    private fun setCoordinate(x: Int, y: Int) {
         selector.x = x - (selector.width * 0.5f)
         selector.y = y - (selector.measuredHeight * 0.5f)
-    }
-
-    /**
-     * select a point by a specific color. this method will not work if the default palette drawable
-     * is not [ColorHsvPalette].
-     *
-     * @param color a starting color.
-     */
-    fun setInitialColor(@ColorInt color: Int) {
-        post {
-            try {
-                selectByHsvColor(color)
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    /**
-     * select a point by a specific color resource. this method will not work if the default palette
-     * drawable is not [ColorHsvPalette].
-     *
-     * @param colorRes a starting color resource.
-     */
-    fun setInitialColorRes(@ColorRes colorRes: Int) {
-        setInitialColor(ContextCompat.getColor(context, colorRes))
     }
 
     /**
@@ -578,51 +383,22 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
             val pointY = (-radius * sin(Math.toRadians(hsv[0].toDouble())) + centerY).toInt()
 
             val mappedPoint: Point = PointMapper.getColorPoint(this, Point(pointX, pointY))
-            pureColor = color
             this.color = color
             selectedPoint = Point(mappedPoint.x, mappedPoint.y)
-            if (alphaSlideBar != null) {
-                alphaSlideBar!!.setSelectorByHalfSelectorPosition(alpha)
-            }
-            if (brightnessSlider != null) {
-                brightnessSlider!!.setSelectorByHalfSelectorPosition(hsv[2])
-            }
+            alphaSlideBar.value = color.alpha.toFloat()
+            brightnessSlider.value = hsv[2] * 255f
+
             setCoordinate(mappedPoint.x, mappedPoint.y)
+            updateSliders()
+            this.selectedWheelColor = getColorFromBitmap(mappedPoint.x.toFloat(), mappedPoint.y.toFloat())
             fireColorListener(this.color, false)
-        } else {
-//            throw IllegalAccessException(
-//                "selectByHsvColor(@ColorInt int color) can be called only "
-//                        + "when the palette is an instance of ColorHsvPalette. Use setHsvPaletteDrawable();"
-//            )
         }
-    }
-
-    /**
-     * changes selector's selected point by a specific color resource.
-     *
-     *
-     * It may not work properly if change the default palette drawable.
-     *
-     * @param resource a color resource.
-     */
-    @Throws(IllegalAccessException::class)
-    fun selectByHsvColorRes(@ColorRes resource: Int) {
-        selectByHsvColor(ContextCompat.getColor(context, resource))
-    }
-
-    /**
-     * changes selector drawable manually.
-     *
-     * @param drawable selector drawable.
-     */
-    fun setSelectorDrawable(drawable: Drawable?) {
-        selector.setImageDrawable(drawable)
     }
 
     /**
      * selects the center of the palette manually.
      */
-    fun selectCenter() {
+    private fun selectCenter() {
         setSelectorPoint(width / 2, measuredHeight / 2)
     }
 
@@ -637,13 +413,8 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
         selector.visibility =
             if (enabled) VISIBLE else INVISIBLE
 
-        if (alphaSlideBar != null) {
-            alphaSlideBar!!.isEnabled = enabled
-        }
-
-        if (brightnessSlider != null) {
-            brightnessSlider!!.isEnabled = enabled
-        }
+        alphaSlideBar.isEnabled = enabled
+        brightnessSlider.isEnabled = enabled
 
         if (enabled) {
             palette.clearColorFilter()
@@ -653,71 +424,19 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
         }
     }
 
-    /**
-     * gets an [ActionMode].
-     *
-     * @return [ActionMode].
-     */
-    fun getActionMode(): ActionMode? {
-        return this.actionMode
-    }
-
-    /**
-     * sets an [ActionMode].
-     *
-     * @param actionMode [ActionMode].
-     */
-    fun setActionMode(actionMode: ActionMode?) {
-        this.actionMode = actionMode
-    }
-
-    /**
-     * linking an [AlphaSlideBar] on the [ColorPickerView].
-     *
-     * @param alphaSlideBar [AlphaSlideBar].
-     */
-    fun attachAlphaSlider(alphaSlideBar: AlphaSlideBar) {
-        this.alphaSlideBar = alphaSlideBar
-        alphaSlideBar.attachColorPickerView(this)
-        alphaSlideBar.notifyColor()
-    }
-
-    /**
-     * linking an [BrightnessSlideBar] on the [ColorPickerView].
-     *
-     * @param brightnessSlider [BrightnessSlideBar].
-     */
-    fun attachBrightnessSlider(brightnessSlider: BrightnessSlideBar) {
-        this.brightnessSlider = brightnessSlider
-        brightnessSlider.attachColorPickerView(this)
-        brightnessSlider.notifyColor()
-    }
-
-    /**
-     * sets the [LifecycleOwner].
-     *
-     * @param lifecycleOwner [LifecycleOwner].
-     */
-    fun setLifecycleOwner(lifecycleOwner: LifecycleOwner) {
-        lifecycleOwner.lifecycle.addObserver(this)
-    }
-
-    /**
-     * removes this color picker observer from the the [LifecycleOwner].
-     *
-     * @param lifecycleOwner [LifecycleOwner].
-     */
-    fun removeLifecycleOwner(lifecycleOwner: LifecycleOwner) {
-        lifecycleOwner.lifecycle.removeObserver(this)
-    }
-
-    private fun makePaletteLayoutParams() =
-        LayoutParams(0, 0).apply {
-            startToStart = PARENT_ID
-            endToEnd = PARENT_ID
-            topToTop = PARENT_ID
-            dimensionRatio = "1:1"
+    override fun setColor(color: Int, animate: Boolean) {
+        if (!palette.isLaidOut) {
+            post {
+                selectByHsvColor(color)
+            }
+        } else {
+            selectByHsvColor(color)
         }
+    }
+
+    override fun setListener(listener: OnColorPickedListener?) {
+        _listener = listener
+    }
 
     override val colorPicker: ColorPicker
         get() = this

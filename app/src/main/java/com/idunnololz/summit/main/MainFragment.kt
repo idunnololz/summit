@@ -1,5 +1,6 @@
 package com.idunnololz.summit.main
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +24,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
+import com.discord.panels.PanelsChildGestureRegionObserver
+import com.discord.panels.PanelsChildGestureRegionObserver.GestureRegionsListener
 import com.google.android.material.navigation.NavigationBarView
 import com.idunnololz.summit.CommunityDirections
 import com.idunnololz.summit.R
@@ -61,7 +64,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : BaseFragment<FragmentMainBinding>() {
+class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener {
 
     companion object {
         private const val TAG = "MainFragment"
@@ -181,6 +184,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 }
             }
         }
+
+    // Keep a reference here so it's not released
+    private val panelsChildGestureRegionObserver = PanelsChildGestureRegionObserver.Provider.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -448,9 +454,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
 
         updateBackHandler()
         onPanelStateChange()
+        panelsChildGestureRegionObserver.addGestureRegionsUpdateListener(this)
     }
 
     override fun onPause() {
+        panelsChildGestureRegionObserver.removeGestureRegionsUpdateListener(this)
         requireMainActivity().unregisterOnNavigationItemReselectedListener(
             onNavigationItemReselectedListener,
         )
@@ -654,5 +662,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
                 tab = tab,
             ).toBundle(),
         )
+    }
+
+    override fun onGestureRegionsUpdate(gestureRegions: List<Rect>) {
+        binding.rootView.setChildGestureRegions(gestureRegions)
     }
 }

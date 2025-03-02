@@ -1,30 +1,22 @@
 package com.idunnololz.summit.util.colorPicker.view
 
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import android.graphics.drawable.LayerDrawable
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
-import android.widget.SeekBar
 import android.widget.TextView
 import androidx.annotation.ColorInt
-import androidx.appcompat.widget.AppCompatSeekBar
-import androidx.core.view.doOnPreDraw
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
-import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.colorPicker.ColorUtils
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.SeekBarBackgroundDrawable
-import com.idunnololz.summit.util.colorPicker.SeekBarDrawable
-import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.colorPicker.utils.AlphaTileDrawable
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
+import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
 import com.idunnololz.summit.util.ext.getDimen
 import java.util.Locale
 
@@ -36,15 +28,6 @@ abstract class PickerView :
     private var alpha: Slider? = null
     private var alphaLayout: View? = null
     private var alphaTileDrawable: AlphaTileDrawable? = null
-
-    /**
-     * Determine whether the view is currently tracking a touch interaction.
-     * This is useful for determining when the next color update will occur
-     * and deciding whether to animate a value change.
-     *
-     * @return Whether the view is currently tracking a touch interaction.
-     */
-    override var isTrackingTouch: Boolean = false
 
     constructor(context: Context?) : super(context) {
         init()
@@ -123,28 +106,6 @@ abstract class PickerView :
      */
     abstract override val name: String
 
-    override var isAlphaEnabled: Boolean
-        /**
-         * Determine whether the color's alpha value can be modified.
-         *
-         * @return Whether the color's alpha value can be modified.
-         */
-        get() = alphaLayout != null && alphaLayout!!.visibility == VISIBLE
-        /**
-         * Set whether the color's alpha value can be changed.
-         *
-         * @param isAlpha       Whether the color's alpha value can be changed.
-         */
-        set(isAlpha) {
-            if (alphaLayout == null) return
-
-            if (isAlpha) {
-                alphaLayout!!.visibility = VISIBLE
-            } else {
-                alphaLayout!!.visibility = GONE
-            }
-        }
-
     /**
      * Set the color's alpha, between 0-1 (inclusive).
      *
@@ -214,23 +175,7 @@ abstract class PickerView :
         val background: Drawable = SeekBarBackgroundDrawable(
             drawable.mutate().constantState!!.newDrawable(),
         )
-        background.alpha = 127
 
-        val layers = LayerDrawable(
-            arrayOf(
-                SeekBarDrawable(drawable),
-                background,
-            ),
-        )
-
-        layers.setId(0, android.R.id.progress)
-        layers.setId(1, android.R.id.background)
-        this.background = InsetDrawable(
-            layers,
-            context.getDimen(R.dimen.padding),
-            0,
-            context.getDimen(R.dimen.padding),
-            0,
-        )
+        this.background = background
     }
 }

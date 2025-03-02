@@ -94,9 +94,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             pagerAdapter.setPages(it)
         }
 
-        fun onPageChanged() {
-        }
-
         val slidingPaneController = SlidingPaneController(
             fragment = this,
             slidingPaneLayout = binding.slidingPaneLayout,
@@ -191,7 +188,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             }
         }
 
-        onPageChanged()
         viewModel.updateUnreadCount()
     }
 

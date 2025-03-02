@@ -1,9 +1,8 @@
-package com.idunnololz.summit.util.colorPicker.view
+package com.idunnololz.summit.util.colorPicker.utils
 
-import android.graphics.Color
 import android.graphics.Point
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlin.math.abs
+import com.idunnololz.summit.util.colorPicker.view.ColorPickerView
 import kotlin.math.min
 import kotlin.math.sqrt
 

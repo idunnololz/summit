@@ -89,7 +89,7 @@ class PostListAdapter(
     var blurNsfwPosts: Boolean = true
     var nsfwMode: Boolean = false
 
-    var items: List<Item> = listOf()
+    var items: List<PostListEngineItem> = listOf()
         private set
 
     /**
@@ -125,7 +125,7 @@ class PostListAdapter(
     var seenItemPositions = mutableSetOf<Int>()
 
     override fun getItemViewType(position: Int): Int = when (items[position]) {
-        is Item.VisiblePostItem -> when (layout) {
+        is PostListEngineItem.VisiblePostItem -> when (layout) {
             CommunityLayout.Compact -> R.layout.listing_item_compact
             CommunityLayout.List -> R.layout.listing_item_list
             CommunityLayout.LargeList -> R.layout.listing_item_large_list
@@ -136,16 +136,16 @@ class PostListAdapter(
             CommunityLayout.ListWithCards -> R.layout.listing_item_list_with_cards
             CommunityLayout.FullWithCards -> R.layout.listing_item_full_with_cards
         }
-        is Item.FilteredPostItem -> R.layout.filtered_post_item
-        is Item.FooterItem -> R.layout.main_footer_item
-        is Item.AutoLoadItem -> R.layout.auto_load_item
-        Item.EndItem -> R.layout.post_list_end_item
-        Item.FooterSpacerItem -> R.layout.generic_space_footer_item
-        is Item.ErrorItem -> R.layout.loading_view_item
-        is Item.PersistentErrorItem -> R.layout.persistent_error_item
-        is Item.ManualLoadItem -> R.layout.manual_load_item
-        is Item.PageTitle -> R.layout.page_title_item
-        Item.HeaderItem -> R.layout.item_generic_header
+        is PostListEngineItem.FilteredPostItem -> R.layout.filtered_post_item
+        is PostListEngineItem.FooterItem -> R.layout.main_footer_item
+        is PostListEngineItem.AutoLoadItem -> R.layout.auto_load_item
+        PostListEngineItem.EndItem -> R.layout.post_list_end_item
+        PostListEngineItem.FooterSpacerItem -> R.layout.generic_space_footer_item
+        is PostListEngineItem.ErrorItem -> R.layout.loading_view_item
+        is PostListEngineItem.PersistentErrorItem -> R.layout.persistent_error_item
+        is PostListEngineItem.ManualLoadItem -> R.layout.manual_load_item
+        is PostListEngineItem.PageTitle -> R.layout.page_title_item
+        PostListEngineItem.HeaderItem -> R.layout.item_generic_header
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -201,7 +201,7 @@ class PostListAdapter(
         payloads: MutableList<Any>,
     ) {
         when (val item = items[position]) {
-            is Item.VisiblePostItem -> {
+            is PostListEngineItem.VisiblePostItem -> {
                 if (payloads.isEmpty()) {
                     super.onBindViewHolder(holder, position, payloads)
                 } else {
@@ -276,15 +276,15 @@ class PostListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is Item.FooterSpacerItem -> {}
-            is Item.FooterItem -> {
+            is PostListEngineItem.FooterSpacerItem -> {}
+            is PostListEngineItem.FooterItem -> {
                 val b = holder.getBinding<MainFooterItemBinding>()
                 if (item.hasMore) {
                     b.nextButton.visibility = View.VISIBLE
                     b.nextButton.setOnClickListener {
                         if (markPostsAsReadOnScroll) {
                             seenItemPositions.forEach {
-                                (items.getOrNull(it) as? Item.VisiblePostItem)?.let {
+                                (items.getOrNull(it) as? PostListEngineItem.VisiblePostItem)?.let {
                                     onPostRead(
                                         it.fetchedPost.source.accountId,
                                         it.fetchedPost.postView,
@@ -306,7 +306,7 @@ class PostListAdapter(
                     b.prevButton.visibility = View.INVISIBLE
                 }
             }
-            is Item.VisiblePostItem -> {
+            is PostListEngineItem.VisiblePostItem -> {
                 val h: ListingItemViewHolder = holder as ListingItemViewHolder
                 val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
                     !blurNsfwPosts ||
@@ -367,7 +367,7 @@ class PostListAdapter(
                 h.root.setTag(R.id.post_item, true)
             }
 
-            is Item.FilteredPostItem -> {
+            is PostListEngineItem.FilteredPostItem -> {
                 val b = holder.getBinding<FilteredPostItemBinding>()
 
                 b.text.text = context.getString(R.string.post_filtered_format, item.filterReason)
@@ -379,13 +379,13 @@ class PostListAdapter(
                 b.root.setTag(R.id.post_item, true)
             }
 
-            is Item.AutoLoadItem -> {
+            is PostListEngineItem.AutoLoadItem -> {
                 val b = holder.getBinding<AutoLoadItemBinding>()
                 b.loadingView.showProgressBar()
             }
 
-            Item.EndItem -> {}
-            is Item.ErrorItem -> {
+            PostListEngineItem.EndItem -> {}
+            is PostListEngineItem.ErrorItem -> {
                 val b = holder.getBinding<LoadingViewItemBinding>()
                 if (item.isLoading) {
                     b.loadingView.showProgressBar()
@@ -401,12 +401,12 @@ class PostListAdapter(
                 }
             }
 
-            is Item.PersistentErrorItem -> {
+            is PostListEngineItem.PersistentErrorItem -> {
                 val b = holder.getBinding<PersistentErrorItemBinding>()
                 b.errorText.text = item.exception.toErrorMessage(context)
             }
 
-            is Item.ManualLoadItem -> {
+            is PostListEngineItem.ManualLoadItem -> {
                 val b = holder.getBinding<ManualLoadItemBinding>()
                 b.loadMoreText.text = context.getString(
                     R.string.load_more_page_format,
@@ -430,7 +430,7 @@ class PostListAdapter(
                 }
             }
 
-            is Item.PageTitle -> {
+            is PostListEngineItem.PageTitle -> {
                 val b = holder.getBinding<PageTitleItemBinding>()
 
                 b.title.text = context.getString(
@@ -438,7 +438,7 @@ class PostListAdapter(
                     (item.pageIndex + 1).toString(),
                 )
             }
-            Item.HeaderItem -> {}
+            PostListEngineItem.HeaderItem -> {}
         }
     }
 
@@ -534,32 +534,32 @@ class PostListAdapter(
                     val newItem = newItems[newItemPosition]
 
                     return oldItem::class == newItem::class && when (oldItem) {
-                        is Item.FooterItem -> true
-                        is Item.PostItem ->
+                        is PostListEngineItem.FooterItem -> true
+                        is PostListEngineItem.PostItem ->
                             oldItem.fetchedPost.postView.getUniqueKey() ==
-                                (newItem as Item.PostItem).fetchedPost.postView.getUniqueKey()
-                        is Item.AutoLoadItem ->
+                                (newItem as PostListEngineItem.PostItem).fetchedPost.postView.getUniqueKey()
+                        is PostListEngineItem.AutoLoadItem ->
                             oldItem.pageToLoad ==
-                                (newItem as Item.AutoLoadItem).pageToLoad
+                                (newItem as PostListEngineItem.AutoLoadItem).pageToLoad
 
-                        Item.EndItem -> true
-                        Item.FooterSpacerItem -> true
-                        is Item.ErrorItem ->
+                        PostListEngineItem.EndItem -> true
+                        PostListEngineItem.FooterSpacerItem -> true
+                        is PostListEngineItem.ErrorItem ->
                             oldItem.pageToLoad ==
-                                (newItem as Item.ErrorItem).pageToLoad
+                                (newItem as PostListEngineItem.ErrorItem).pageToLoad
 
-                        is Item.PersistentErrorItem ->
-                            oldItem.exception == (newItem as Item.PersistentErrorItem).exception
+                        is PostListEngineItem.PersistentErrorItem ->
+                            oldItem.exception == (newItem as PostListEngineItem.PersistentErrorItem).exception
 
-                        is Item.ManualLoadItem ->
+                        is PostListEngineItem.ManualLoadItem ->
                             oldItem.pageToLoad ==
-                                (newItem as Item.ManualLoadItem).pageToLoad
+                                (newItem as PostListEngineItem.ManualLoadItem).pageToLoad
 
-                        is Item.PageTitle ->
+                        is PostListEngineItem.PageTitle ->
                             oldItem.pageIndex ==
-                                (newItem as Item.PageTitle).pageIndex
+                                (newItem as PostListEngineItem.PageTitle).pageIndex
 
-                        Item.HeaderItem -> true
+                        PostListEngineItem.HeaderItem -> true
                     }
                 }
 

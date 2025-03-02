@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:cardPreventCornerOverlap="false"
-        app:layout_constraintDimensionRatio="H,3:1">
+        app:layout_constraintDimensionRatio="H,4:1">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                 android:singleLine="true"
                 android:textColor="@android:color/white"
                 android:textCursorDrawable="@null"
-                android:textSize="24sp"
+                android:textAppearance="?textAppearanceBodyLarge"
                 tools:text="#000000"/>
         </FrameLayout>
 

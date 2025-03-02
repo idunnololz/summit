@@ -48,6 +48,9 @@
         <action
             android:id="@+id/action_communityFragment_to_login"
             app:destination="@id/login" />
+        <action
+            android:id="@+id/action_communityFragment_to_postTabbedFragment"
+            app:destination="@id/postTabbedFragment" />
     </fragment>
     <fragment
         android:id="@+id/postFragment"
@@ -217,4 +220,12 @@
         app:exitAnim="@animator/fade_out"
         app:popEnterAnim="@animator/fade_in"
         app:popExitAnim="@animator/fade_out"/>
+    <fragment
+        android:id="@+id/postTabbedFragment"
+        android:name="com.idunnololz.summit.lemmy.post.PostTabbedFragment"
+        android:label="PostTabbedFragment">
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
 </navigation>

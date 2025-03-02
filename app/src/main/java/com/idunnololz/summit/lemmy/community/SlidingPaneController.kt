@@ -21,10 +21,13 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
+import com.idunnololz.summit.lemmy.post.PostTabbedFragment
+import com.idunnololz.summit.lemmy.post.PostTabbedFragmentArgs
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.video.VideoState
+import com.idunnololz.summit.view.FixedSlidingPaneLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -33,7 +36,7 @@ import kotlinx.coroutines.withContext
 
 class SlidingPaneController(
     private val fragment: BaseFragment<*>,
-    private val slidingPaneLayout: SlidingPaneLayout,
+    private val slidingPaneLayout: FixedSlidingPaneLayout,
     private val childFragmentManager: FragmentManager,
     private val viewModel: PostViewPagerViewModel,
     private val globalLayoutMode: GlobalLayoutMode,
@@ -44,6 +47,7 @@ class SlidingPaneController(
     @IdRes private val fragmentContainerId: Int,
     val lockPanes: Boolean = false,
     private val retainClosedPosts: Boolean = false,
+    private val useSwipeBetweenPosts: Boolean = false,
 ) {
 
     interface PostViewPagerViewModel {
@@ -152,6 +156,8 @@ class SlidingPaneController(
                 width = SlidingPaneLayout.LayoutParams.MATCH_PARENT
             }
         }
+
+        slidingPaneLayout.isSwipeEnabled = !useSwipeBetweenPosts
     }
 
     fun openPost(
@@ -174,7 +180,7 @@ class SlidingPaneController(
 
                 if (id == args.post?.post?.id) {
                     openPostInternal(
-                        args = Bundle(),
+                        args = null,
                         itemRef = Either.Left(PostRef(instance, id)),
                         postFragmentOverride = lastPostFragment,
                     )
@@ -203,7 +209,7 @@ class SlidingPaneController(
                 currentCommunity = currentCommunity,
                 videoState = videoState,
                 accountId = accountId ?: 0L,
-            ).toBundle(),
+            ),
             itemRef = Either.Left(PostRef(instance, id)),
         )
 
@@ -218,13 +224,13 @@ class SlidingPaneController(
                 commentId = commentId,
                 currentCommunity = null,
                 isSinglePage = false,
-            ).toBundle(),
+            ),
             Either.Right(CommentRef(instance, commentId)),
         )
     }
 
     private fun openPostInternal(
-        args: Bundle,
+        args: PostFragmentArgs?,
         itemRef: Either<PostRef, CommentRef>? = null,
         postFragmentOverride: PostFragment? = null,
     ) {
@@ -236,8 +242,16 @@ class SlidingPaneController(
         activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
             val fragment =
                 postFragmentOverride
-                    ?: PostFragment().apply {
-                        arguments = args
+                    ?: if (useSwipeBetweenPosts) {
+                        PostTabbedFragment().apply {
+                            arguments = PostTabbedFragmentArgs(
+                                id = args?.id ?: 0
+                            ).toBundle()
+                        }
+                    } else {
+                        PostFragment().apply {
+                            arguments = args?.toBundle() ?: Bundle()
+                        }
                     }
 
             childFragmentManager.commit(allowStateLoss = true) {

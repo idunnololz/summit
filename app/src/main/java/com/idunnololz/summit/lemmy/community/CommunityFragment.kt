@@ -121,7 +121,7 @@ class CommunityFragment :
 
     private val args: CommunityFragmentArgs by navArgs()
 
-    private val viewModel: CommunityViewModel by viewModels()
+    val viewModel: CommunityViewModel by viewModels()
     private val communityInfoViewModel: CommunityInfoViewModel by viewModels()
 
     private var adapter: PostListAdapter? = null
@@ -667,6 +667,7 @@ class CommunityFragment :
                 retainClosedPosts = preferences.retainLastPost,
                 emptyScreenText = getString(R.string.select_a_post),
                 fragmentContainerId = R.id.post_fragment_container,
+                useSwipeBetweenPosts = preferences.swipeBetweenPosts,
             ).apply {
                 onPageSelectedListener = a@{ isOpen ->
                     if (!isBindingAvailable()) {
@@ -853,7 +854,7 @@ class CommunityFragment :
                 val items = adapter?.items ?: return
 
                 for (p in positions) {
-                    val pageToFetch = (items.getOrNull(p) as? Item.AutoLoadItem)
+                    val pageToFetch = (items.getOrNull(p) as? PostListEngineItem.AutoLoadItem)
                         ?.pageToLoad
                         ?: continue
 
@@ -885,7 +886,7 @@ class CommunityFragment :
                         val adapter = adapter ?: return
                         val firstPos = layoutManager.findFirstVisibleItemPosition()
                         val lastPos = layoutManager.findLastVisibleItemPosition()
-                        (adapter.items.getOrNull(firstPos) as? Item.VisiblePostItem)
+                        (adapter.items.getOrNull(firstPos) as? PostListEngineItem.VisiblePostItem)
                             ?.pageIndex
                             ?.let { pageIndex ->
                                 if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
@@ -1663,7 +1664,7 @@ class CommunityFragment :
                     it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
                 }
                 range?.mapNotNullTo(anchors) {
-                    (adapter?.items?.getOrNull(it) as? Item.VisiblePostItem)
+                    (adapter?.items?.getOrNull(it) as? PostListEngineItem.VisiblePostItem)
                         ?.fetchedPost?.postView?.post?.id
                 }
                 viewModel.onHideRead(anchors)

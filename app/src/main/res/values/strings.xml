@@ -1967,6 +1967,7 @@
     <string name="colorPickerDialog_hsv">HSV</string>
     <string name="colorPickerDialog_preset">Preset</string>
     <string name="multi_community_desc">Merged feed of multiple communities</string>
+    <string name="color_wheel">Wheel</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
