@@ -100,7 +100,6 @@ class HsvPickerView : PickerView {
         }
 
     override var name: String = context.getString(R.string.colorPickerDialog_hsv)
-    override var isTrackingTouch: Boolean = true
 
     override fun onColorPicked() {
         super.onColorPicked()

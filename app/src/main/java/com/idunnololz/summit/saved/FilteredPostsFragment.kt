@@ -13,7 +13,7 @@ import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
-import com.idunnololz.summit.lemmy.community.Item
+import com.idunnololz.summit.lemmy.community.PostListEngineItem
 import com.idunnololz.summit.lemmy.community.PostListAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -186,7 +186,7 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
         val viewModel = parentFragment.viewModel
 
         fun fetchPageIfLoadItem(position: Int) {
-            (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
+            (adapter?.items?.getOrNull(position) as? PostListEngineItem.AutoLoadItem)
                 ?.pageToLoad
                 ?.let {
                     viewModel.fetchPostPage(it, false)

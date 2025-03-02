@@ -124,6 +124,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_UPVOTE_PERCENTAG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_VIDEO_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SWIPE_BETWEEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TEXT_FIELD_TOOLBAR_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TRACK_BROWSING_HISTORY
@@ -563,6 +564,9 @@ class Preferences(
 
     var uploadImagesToImgur: Boolean
         by booleanPreference(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
+
+    var swipeBetweenPosts: Boolean
+        by booleanPreference(KEY_SWIPE_BETWEEN_POSTS, true)
 
     var animationLevel: AnimationsHelper.AnimationLevel
         get() = AnimationsHelper.AnimationLevel.parse(

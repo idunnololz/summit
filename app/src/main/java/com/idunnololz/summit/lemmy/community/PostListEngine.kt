@@ -19,11 +19,11 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-sealed interface Item {
+sealed interface PostListEngineItem {
 
-    data object HeaderItem : Item
+    data object HeaderItem : PostListEngineItem
 
-    sealed interface PostItem : Item {
+    sealed interface PostItem : PostListEngineItem {
         val fetchedPost: FetchedPost
     }
 
@@ -52,20 +52,20 @@ sealed interface Item {
     data class FooterItem(
         val hasMore: Boolean,
         val hasLess: Boolean,
-    ) : Item
+    ) : PostListEngineItem
 
-    data class AutoLoadItem(val pageToLoad: Int) : Item
+    data class AutoLoadItem(val pageToLoad: Int) : PostListEngineItem
 
-    data class ManualLoadItem(val pageToLoad: Int) : Item
+    data class ManualLoadItem(val pageToLoad: Int) : PostListEngineItem
 
-    data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : Item
+    data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : PostListEngineItem
 
-    data class PersistentErrorItem(val exception: Exception) : Item
+    data class PersistentErrorItem(val exception: Exception) : PostListEngineItem
 
-    data class PageTitle(val pageIndex: Int) : Item
+    data class PageTitle(val pageIndex: Int) : PostListEngineItem
 
-    data object EndItem : Item
-    data object FooterSpacerItem : Item
+    data object EndItem : PostListEngineItem
+    data object FooterSpacerItem : PostListEngineItem
 }
 
 class PostListEngine @AssistedInject constructor(
@@ -146,13 +146,13 @@ class PostListEngine @AssistedInject constructor(
     val pages: List<LoadedPostsData>
         get() = _pages
 
-    private var persistentErrors: List<Item> = listOf()
+    private var persistentErrors: List<PostListEngineItem> = listOf()
     private var expandedItems = mutableSetOf<String>()
     private var actionsExpandedItems = mutableSetOf<String>()
     private var postToHighlightForever: PostRef? = null
     private var postToHighlight: PostRef? = null
 
-    private var _items: List<Item> = listOf()
+    private var _items: List<PostListEngineItem> = listOf()
 
     private var displayFirstItemsIndex: Int = -1
     private var displayLastItemsIndex: Int = -1
@@ -182,7 +182,7 @@ class PostListEngine @AssistedInject constructor(
 
     fun setPersistentErrors(persistentErrors: List<Exception>) {
         this.persistentErrors = persistentErrors.map {
-            Item.PersistentErrorItem(it)
+            PostListEngineItem.PersistentErrorItem(it)
         }
     }
 
@@ -215,30 +215,30 @@ class PostListEngine @AssistedInject constructor(
             return
         }
 
-        val items = mutableListOf<Item>()
+        val items = mutableListOf<PostListEngineItem>()
 
         val firstPage = pages.first()
         val lastPage = pages.last()
 
-        items.add(Item.HeaderItem)
+        items.add(PostListEngineItem.HeaderItem)
 
         if (isCommunityBlocked) {
-            items.add(Item.PersistentErrorItem(CommunityBlockedError()))
+            items.add(PostListEngineItem.PersistentErrorItem(CommunityBlockedError()))
         }
 
         items.addAll(persistentErrors)
 
         if (infinity && firstPage.pageIndex > 0) {
-            items.add(Item.AutoLoadItem(firstPage.pageIndex - 1))
+            items.add(PostListEngineItem.AutoLoadItem(firstPage.pageIndex - 1))
         }
         for (page in pages) {
             if (infinity && usePageIndicators) {
-                items.add(Item.PageTitle(pageIndex = page.pageIndex))
+                items.add(PostListEngineItem.PageTitle(pageIndex = page.pageIndex))
             }
 
             if (page.error != null) {
                 items.add(
-                    Item.ErrorItem(
+                    PostListEngineItem.ErrorItem(
                         message = page.error.errorMessage,
                         pageToLoad = page.pageIndex,
                         isLoading = page.error.isLoading,
@@ -253,7 +253,7 @@ class PostListEngine @AssistedInject constructor(
                         val isExpanded = expandedItems.contains(key)
 
                         if (it.filterReason != null && !unfilteredItems.contains(postView.post.id)) {
-                            Item.FilteredPostItem(
+                            PostListEngineItem.FilteredPostItem(
                                 fetchedPost = it.fetchedPost,
                                 instance = page.instance,
                                 isExpanded = isExpanded,
@@ -264,7 +264,7 @@ class PostListEngine @AssistedInject constructor(
                                 filterReason = it.filterReason,
                             )
                         } else {
-                            Item.VisiblePostItem(
+                            PostListEngineItem.VisiblePostItem(
                                 fetchedPost = it.fetchedPost,
                                 instance = page.instance,
                                 isExpanded = isExpanded,
@@ -283,30 +283,30 @@ class PostListEngine @AssistedInject constructor(
                 // add nothing!
             } else if (lastPage.hasMore) {
                 if (autoLoadMoreItems) {
-                    items.add(Item.AutoLoadItem(lastPage.pageIndex + 1))
+                    items.add(PostListEngineItem.AutoLoadItem(lastPage.pageIndex + 1))
                 } else {
-                    items.add(Item.ManualLoadItem(lastPage.pageIndex + 1))
+                    items.add(PostListEngineItem.ManualLoadItem(lastPage.pageIndex + 1))
                 }
-                items += Item.FooterSpacerItem
+                items += PostListEngineItem.FooterSpacerItem
             } else {
-                items.add(Item.EndItem)
-                items += Item.FooterSpacerItem
+                items.add(PostListEngineItem.EndItem)
+                items += PostListEngineItem.FooterSpacerItem
             }
         } else {
             items.add(
-                Item.FooterItem(
+                PostListEngineItem.FooterItem(
                     hasMore = lastPage.hasMore,
                     hasLess = lastPage.pageIndex != 0,
                 ),
             )
 
-            items += Item.FooterSpacerItem
+            items += PostListEngineItem.FooterSpacerItem
         }
 
         _items = items
     }
 
-    val items: List<Item>
+    val items: List<PostListEngineItem>
         get() = _items
 
     fun clearHighlight() {
@@ -340,17 +340,17 @@ class PostListEngine @AssistedInject constructor(
 
         return _items.indexOfFirst {
             when (it) {
-                is Item.HeaderItem -> false
-                is Item.FooterItem -> false
-                is Item.AutoLoadItem -> false
-                Item.EndItem -> false
-                Item.FooterSpacerItem -> false
-                is Item.ErrorItem -> false
-                is Item.PostItem ->
+                is PostListEngineItem.HeaderItem -> false
+                is PostListEngineItem.FooterItem -> false
+                is PostListEngineItem.AutoLoadItem -> false
+                PostListEngineItem.EndItem -> false
+                PostListEngineItem.FooterSpacerItem -> false
+                is PostListEngineItem.ErrorItem -> false
+                is PostListEngineItem.PostItem ->
                     it.fetchedPost.postView.post.id == postToHighlight.id
-                is Item.PersistentErrorItem -> false
-                is Item.ManualLoadItem -> false
-                is Item.PageTitle -> false
+                is PostListEngineItem.PersistentErrorItem -> false
+                is PostListEngineItem.ManualLoadItem -> false
+                is PostListEngineItem.PageTitle -> false
             }
         }
     }
@@ -360,17 +360,17 @@ class PostListEngine @AssistedInject constructor(
         this.postToHighlightForever = postToHighlight
         return _items.indexOfFirst {
             when (it) {
-                is Item.HeaderItem -> false
-                is Item.FooterItem -> false
-                is Item.AutoLoadItem -> false
-                Item.EndItem -> false
-                Item.FooterSpacerItem -> false
-                is Item.ErrorItem -> false
-                is Item.PostItem ->
+                is PostListEngineItem.HeaderItem -> false
+                is PostListEngineItem.FooterItem -> false
+                is PostListEngineItem.AutoLoadItem -> false
+                PostListEngineItem.EndItem -> false
+                PostListEngineItem.FooterSpacerItem -> false
+                is PostListEngineItem.ErrorItem -> false
+                is PostListEngineItem.PostItem ->
                     it.fetchedPost.postView.post.id == postToHighlight.id
-                is Item.PersistentErrorItem -> false
-                is Item.ManualLoadItem -> false
-                is Item.PageTitle -> false
+                is PostListEngineItem.PersistentErrorItem -> false
+                is PostListEngineItem.ManualLoadItem -> false
+                is PostListEngineItem.PageTitle -> false
             }
         }
     }
@@ -395,12 +395,12 @@ class PostListEngine @AssistedInject constructor(
             return listOf()
         }
 
-        var firstPost: Item.VisiblePostItem? = null
-        var lastPost: Item.VisiblePostItem? = null
+        var firstPost: PostListEngineItem.VisiblePostItem? = null
+        var lastPost: PostListEngineItem.VisiblePostItem? = null
         var i = displayFirstItemsIndex
         while (i < _items.size) {
             val item = _items.getOrNull(i)
-            if (item is Item.VisiblePostItem) {
+            if (item is PostListEngineItem.VisiblePostItem) {
                 firstPost = item
                 break
             }
@@ -410,7 +410,7 @@ class PostListEngine @AssistedInject constructor(
         i = displayLastItemsIndex
         while (i > displayFirstItemsIndex) {
             val item = _items.getOrNull(i)
-            if (item is Item.VisiblePostItem) {
+            if (item is PostListEngineItem.VisiblePostItem) {
                 lastPost = item
                 break
             }
@@ -441,7 +441,7 @@ class PostListEngine @AssistedInject constructor(
         for (i in start until end) {
             val item = _items[i]
 
-            if (item is Item.VisiblePostItem) {
+            if (item is PostListEngineItem.VisiblePostItem) {
                 results.add(item.fetchedPost)
             }
         }

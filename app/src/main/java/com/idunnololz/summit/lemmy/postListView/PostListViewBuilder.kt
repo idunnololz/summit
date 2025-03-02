@@ -61,6 +61,7 @@ import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
+import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
@@ -265,23 +266,12 @@ class PostListViewBuilder @Inject constructor(
         }
 
         val postView = fetchedPost.postView
-        val accountId: Long?
-        val accountInstance: String?
+        val accountId: Long? = fetchedPost.source.accountId
+        val accountInstance: String? = fetchedPost.source.instance
         val url = postView.post.url
         val thumbnailUrl = postView.post.thumbnail_url
         val showCommunityIcon = postUiConfig.showCommunityIcon
         val useMultilineHeader = showCommunityIcon
-
-        when (val source = fetchedPost.source) {
-            is Source.AccountSource -> {
-                accountId = source.accountId
-                accountInstance = source.instance
-            }
-            is Source.StandardSource -> {
-                accountId = null
-                accountInstance = null
-            }
-        }
 
         with(holder) {
             if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {

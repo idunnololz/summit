@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -13,14 +14,16 @@ import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.DialogFragmentAddOrEditUserTagBinding
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.colorPicker.ColorPickerDialog
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
-import com.idunnololz.summit.util.colorPicker.view.ColorPicker
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEditUserTagBinding>() {
@@ -45,6 +48,9 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
     private val args: AddOrEditUserTagDialogFragmentArgs by navArgs()
 
     private val viewModel: AddOrEditUserTagViewModel by viewModels()
+
+    @Inject
+    lateinit var globalStateStorage: GlobalStateStorage
 
     override fun onStart() {
         super.onStart()
@@ -113,6 +119,11 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             personEditText.setOnFocusChangeListener { view, b ->
                 showPersonPicker()
             }
+            tagEditText.addTextChangedListener(
+                onTextChanged = { text, start, before, count ->
+                    viewModel.tag = text?.toString() ?: ""
+                }
+            )
 
             changeFillColorButton.setOnClickListener {
                 showColorPicker(viewModel.fillColor) {
@@ -121,7 +132,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             }
             changeStrokeColorButton.setOnClickListener {
                 showColorPicker(viewModel.strokeColor) {
-                    viewModel.fillColor = it
+                    viewModel.strokeColor = it
                 }
             }
 
@@ -179,7 +190,9 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             personEditText.setText(model.personName)
             personInputLayout.error = model.personNameError
 
-            tagEditText.setText(model.tag)
+            if (!tagEditText.isFocused) {
+                tagEditText.setText(model.tag)
+            }
             tagInputLayout.error = model.tagError
 
             tagFillColorInner.background = ColorDrawable(model.fillColor)
@@ -198,7 +211,8 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
         ColorPickerDialog(
             context = context,
             title = context.getString(R.string.tag_fill_color),
-            color = initialColor
+            color = initialColor,
+            globalStateStorage = globalStateStorage,
         )
             .withAlphaEnabled(true)
             .withListener(object : OnColorPickedListener {

@@ -535,7 +535,8 @@ class LemmyContentHelper(
 
                     val videoInfo = postView.getVideoInfo()
                     if (videoInfo != null) {
-                        val videoType = getVideoType(videoInfo.videoUrl)
+                        val urlWithoutParams = videoInfo.videoUrl.split("?").getOrElse(0) { "" }
+                        val videoType = getVideoType(urlWithoutParams)
 
                         val bestSize = LemmyUtils.calculateBestVideoSize(
                             context,

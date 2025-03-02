@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.userTags
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,10 @@ class AddOrEditUserTagViewModel @Inject constructor(
     private val userTagsManager: UserTagsManager,
     private val state: SavedStateHandle,
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "AddOrEditUserTagViewModel"
+    }
 
     data class Model(
         val personName: String,
@@ -86,8 +91,9 @@ class AddOrEditUserTagViewModel @Inject constructor(
     }
 
     fun generateModel(validate: Boolean = false) {
+        Log.d(TAG, "generateModel()")
         val last = model.value
-        model.value = Model(
+        val newModel = Model(
             personName = personName,
             personNameError = if (validate) {
                 if (personName.isBlank()) {
@@ -113,6 +119,12 @@ class AddOrEditUserTagViewModel @Inject constructor(
             isSubmitted = isSubmitted.value ?: false,
             showDeleteButton = showDeleteButton,
         )
+
+        if (last == newModel) {
+            return
+        }
+
+        model.value = newModel
     }
 
     fun addTag() {

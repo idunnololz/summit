@@ -17,6 +17,8 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
         private val sEdgeSizeUsingSystemGestureInsets = Build.VERSION.SDK_INT >= 29
     }
 
+    var isSwipeEnabled: Boolean = true
+
     // We only construct a drag helper to get the width of the drag region.
     private val dragHelper = ViewDragHelper.create(
         this,
@@ -37,6 +39,8 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     )
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        if (!isSwipeEnabled) return false
+
         val intercept = super.onInterceptTouchEvent(ev)
 
         if (ev == null) {
@@ -71,6 +75,15 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
         return true
     }
 
+    override fun onTouchEvent(ev: MotionEvent?): Boolean {
+        if (!isSwipeEnabled) {
+            // Careful here, view might be null
+            getChildAt(1).dispatchTouchEvent(ev);
+            return true
+        }
+        return super.onTouchEvent(ev)
+    }
+
     private fun getSystemGestureInsets(): Insets? {
         var gestureInsets: Insets? = null
         if (sEdgeSizeUsingSystemGestureInsets) {
@@ -83,6 +96,6 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     }
 
     private fun isLayoutRtlSupport(): Boolean {
-        return ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL
+        return this.layoutDirection == View.LAYOUT_DIRECTION_RTL
     }
 }

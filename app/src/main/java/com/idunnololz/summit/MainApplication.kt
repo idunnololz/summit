@@ -56,8 +56,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         private val TAG = MainApplication::class.java.simpleName
     }
 
-    private var originalLocale: Locale? = null
-
     override fun attachBaseContext(base: Context) {
         PreferenceUtils.initialize(base)
         super.attachBaseContext(base)
@@ -66,14 +64,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
+        Log.d(TAG, "LOCALE >> " + newConfig.locale)
         themeManager.updateTextConfig()
-
-        onLocaleMightHaveChanged()
-    }
-
-    private fun onLocaleMightHaveChanged() {
-        val newLocale = getString(R.string.locale)
-        Log.d(TAG, "onConfigurationChanged() - locale: ${getString(R.string.locale)}")
     }
 
     override fun onCreate() {
@@ -99,33 +91,11 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 //        }
 //        LeakCanary.install(this)
 
-        var startTime = System.currentTimeMillis()
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Perf. Crashlytics: " + (System.currentTimeMillis() - startTime))
-            startTime = System.currentTimeMillis()
-        }
-
-        originalLocale = Locale.getDefault()
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Perf. MobileAds: " + (System.currentTimeMillis() - startTime))
-            startTime = System.currentTimeMillis()
-        }
 
         // Needs to be initialized first
         DataFiles.initialize(context)
         DataCache.initialize(context)
         OfflineScheduleManager.initialize(context)
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Perf. Everything else: " + (System.currentTimeMillis() - startTime))
-            startTime = System.currentTimeMillis()
-        }
-
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Perf. setLocaleFromPrefs: " + (System.currentTimeMillis() - startTime))
-        }
 
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()

@@ -3,7 +3,6 @@ package com.idunnololz.summit.util.colorPicker
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,18 +14,18 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.ColorpickerDialogColorPickerBinding
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.colorPicker.view.HsvPickerView
-import com.idunnololz.summit.util.colorPicker.view.ColorPicker
-import com.idunnololz.summit.util.colorPicker.view.ColorPickerContainer
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
+import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
+import com.idunnololz.summit.util.colorPicker.view.ColorPickerHistoryView
 import com.idunnololz.summit.util.colorPicker.view.ColorPickerView
+import com.idunnololz.summit.util.colorPicker.view.HsvPickerView
 import com.idunnololz.summit.util.colorPicker.view.RgbPickerView
 import com.idunnololz.summit.util.colorPicker.view.SmoothColorView
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import kotlin.math.min
 
 class ColorPickerDialog(
@@ -34,6 +33,7 @@ class ColorPickerDialog(
     private val title: String,
     color: Int,
     private val defaultColor: Int? = null,
+    private val globalStateStorage: GlobalStateStorage,
 ) : AlertDialog(context),
     OnColorPickedListener {
 
@@ -88,13 +88,14 @@ class ColorPickerDialog(
             ColorPickerView(context),
             HsvPickerView(context),
             RgbPickerView(context),
+            ColorPickerHistoryView(context, globalStateStorage),
         )
 
         for (p in pickers) {
             p.colorPicker.setColor(color)
         }
 
-        val slidersAdapter = ColorPickerPagerAdapter(context, pickers)
+        val slidersAdapter = ColorPickerPagerAdapter(context, pickers, b.slidersPager)
         this.slidersAdapter = slidersAdapter
         slidersAdapter.setListener(this)
         slidersAdapter.setAlphaEnabled(isAlphaEnabled)
@@ -104,27 +105,36 @@ class ColorPickerDialog(
         slidersPager.addOnPageChangeListener(slidersAdapter)
         tabLayout.setupWithViewPager(slidersPager)
 
-        colorHex.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
+        colorHex.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {
+                }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            }
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                }
 
-            override fun afterTextChanged(s: Editable) {
-                val editable = colorHex.getText()
-                if (editable != null && !shouldIgnoreNextHex) {
-                    val str = editable.toString()
+                override fun afterTextChanged(s: Editable) {
+                    val editable = colorHex.getText()
+                    if (editable != null && !shouldIgnoreNextHex) {
+                        val str = editable.toString()
 
-                    if (str.length == (if (isAlphaEnabled) 9 else 7)) {
-                        try {
-                            slidersAdapter.updateColor(Color.parseColor(str), true)
-                        } catch (ignored: Exception) {
+                        if (str.length == (if (isAlphaEnabled) 9 else 7)) {
+                            try {
+                                val color = Color.parseColor(str)
+                                slidersAdapter.updateColor(color, true)
+                                updateColorPicked(color, updateFromEditText = true)
+                            } catch (ignored: Exception) {
+                            }
                         }
-                    }
-                } else shouldIgnoreNextHex = false
-            }
-        })
+                    } else shouldIgnoreNextHex = false
+                }
+            },
+        )
 
         b.card.setOnClickListener {
             Utils.copyToClipboard(context, colorHex.text.toString())
@@ -140,7 +150,8 @@ class ColorPickerDialog(
             if (defaultColor != null) {
                 button3.text = context.getString(R.string._default)
                 button3.setOnClickListener {
-                    if (listener != null) listener!!.onColorPicked(null, defaultColor)
+                    saveColorToHistory(defaultColor)
+                    listener?.onColorPicked(null, defaultColor)
 
                     dismiss()
                 }
@@ -181,23 +192,30 @@ class ColorPickerDialog(
 
 
     override fun onColorPicked(pickerView: ColorPicker?, @ColorInt color: Int) {
+        updateColorPicked(color, updateFromEditText = false)
+    }
+
+    private fun updateColorPicked(color: Int, updateFromEditText: Boolean) {
         this.color = color
-        colorView.setColor(color, pickerView != null && !pickerView.isTrackingTouch)
+        colorView.setColor(color, false)
 
         shouldIgnoreNextHex = true
-        colorHex.setText(
-            String.format(
-                if (isAlphaEnabled) "#%08X" else "#%06X",
-                if (isAlphaEnabled) color else (0xFFFFFF and color)
+
+        if (!updateFromEditText) {
+            colorHex.setText(
+                String.format(
+                    if (isAlphaEnabled) "#%08X" else "#%06X",
+                    if (isAlphaEnabled) color else (0xFFFFFF and color),
+                ),
             )
-        )
-        colorHex.clearFocus()
+            colorHex.clearFocus()
+        }
 
         val textColor = if (ColorUtils.isColorDark(
                 ColorUtils.withBackground(
                     color,
-                    Color.WHITE
-                )
+                    Color.WHITE,
+                ),
             )
         ) Color.WHITE else Color.BLACK
         colorHex.setTextColor(textColor)
@@ -213,10 +231,11 @@ class ColorPickerDialog(
         window.setLayout(
             min(
                 Utils.convertDpToPixel(
-                    if (displayMetrics.widthPixels > displayMetrics.heightPixels) 800f else 500f),
-                displayMetrics.widthPixels * 0.9f
+                    if (displayMetrics.widthPixels > displayMetrics.heightPixels) 800f else 500f,
+                ),
+                displayMetrics.widthPixels * 0.9f,
             ).toInt(),
-            WindowManager.LayoutParams.WRAP_CONTENT
+            WindowManager.LayoutParams.WRAP_CONTENT,
         )
 
         window.setBackgroundDrawableResource(R.drawable.dialog_background)
@@ -233,10 +252,23 @@ class ColorPickerDialog(
         return this
     }
 
-    protected fun confirm() {
-        if (listener != null) listener!!.onColorPicked(null, color)
+    fun confirm() {
+        saveColorToHistory(color)
+        listener?.onColorPicked(null, color)
 
         dismiss()
+    }
+
+    private fun saveColorToHistory(color: Int) {
+        val currentHistory = globalStateStorage.colorPickerHistory ?: ""
+        val colors = currentHistory.split(",")
+        val colorStr = java.lang.String.format("#%08X", (0xFFFFFFFF and color.toLong()))
+        val newColorsList = (listOf(colorStr) + colors)
+        val orderedSet = LinkedHashSet<String>()
+        orderedSet.addAll(newColorsList)
+
+        globalStateStorage.colorPickerHistory =
+            orderedSet.toList().take(50).joinToString(separator = ",")
     }
 
 }

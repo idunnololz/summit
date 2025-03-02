@@ -1,4 +1,4 @@
-package com.idunnololz.summit.util.colorPicker.view
+package com.idunnololz.summit.util.colorPicker.utils
 
 import android.view.View
 import androidx.annotation.ColorInt
@@ -13,9 +13,7 @@ interface ColorPickerContainer {
 interface ColorPicker {
     fun setColor(@ColorInt color: Int, animate: Boolean = false)
     fun setListener(listener: OnColorPickedListener?)
-    var isAlphaEnabled: Boolean
     val color: Int
     val name: String
-    val isTrackingTouch: Boolean
     val view: View
 }

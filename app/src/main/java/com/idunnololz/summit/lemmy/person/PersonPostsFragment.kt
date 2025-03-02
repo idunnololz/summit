@@ -11,7 +11,7 @@ import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
-import com.idunnololz.summit.lemmy.community.Item
+import com.idunnololz.summit.lemmy.community.PostListEngineItem
 import com.idunnololz.summit.lemmy.community.PostListAdapter
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -181,7 +181,7 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
         val layoutManager = LinearLayoutManager(context)
 
         fun fetchPageIfLoadItem(position: Int) {
-            (adapter?.items?.getOrNull(position) as? Item.AutoLoadItem)
+            (adapter?.items?.getOrNull(position) as? PostListEngineItem.AutoLoadItem)
                 ?.pageToLoad
                 ?.let {
                     parentFragment.viewModel.fetchPage(it)

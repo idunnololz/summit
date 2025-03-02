@@ -1,4 +1,4 @@
-package com.idunnololz.summit.util.colorPicker.view
+package com.idunnololz.summit.util.colorPicker.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
@@ -7,11 +7,11 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
-import androidx.annotation.ColorInt
 import com.idunnololz.summit.util.Utils
 
 /**
@@ -23,6 +23,9 @@ class AlphaTileDrawable : Drawable {
     private var tileSize: Int = 25
     private var tileOddColor: Int = -0x1
     private var tileEvenColor: Int = -0x343435
+    private var path: Path = Path()
+    private val height: Float = Utils.convertDpToPixel(16f)
+    private val horizontalMargin = Utils.convertDpToPixel(8f)
     var gradientColor: Int? = null
 
     constructor() : super() {
@@ -62,16 +65,15 @@ class AlphaTileDrawable : Drawable {
     }
 
     override fun draw(canvas: Canvas) {
-        val height = Utils.convertDpToPixel(16f)
         val width = bounds.width()
         val b = Rect(
-            (height).toInt(),
+            horizontalMargin.toInt(),
             (bounds.centerY() - height / 2).toInt(),
-            (width - height).toInt(),
+            (width - horizontalMargin).toInt(),
             (bounds.centerY() + height / 2).toInt()
         )
         canvas.save()
-        canvas.clipRect(b)
+        canvas.clipPath(path)
         canvas.drawRect(b, paint)
 
         val gradientColor = gradientColor
@@ -106,5 +108,23 @@ class AlphaTileDrawable : Drawable {
 
     override fun getOpacity(): Int {
         return PixelFormat.OPAQUE
+    }
+
+    override fun onBoundsChange(bounds: Rect) {
+        super.onBoundsChange(bounds)
+
+        val cornerRadius = Utils.convertDpToPixel(bounds.height().toFloat())
+
+        path.reset()
+        path.addRoundRect(
+            bounds.left.toFloat() + horizontalMargin,
+            (bounds.centerY() - height / 2),
+            bounds.right.toFloat() - horizontalMargin,
+            (bounds.centerY() + height / 2),
+            cornerRadius,
+            cornerRadius,
+            Path.Direction.CW,
+        )
+        path.close()
     }
 }

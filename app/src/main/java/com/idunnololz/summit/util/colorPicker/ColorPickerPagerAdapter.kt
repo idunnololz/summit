@@ -5,13 +5,15 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.idunnololz.summit.util.colorPicker.view.ColorPicker
-import com.idunnololz.summit.util.colorPicker.view.ColorPickerContainer
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
+import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
 
 class ColorPickerPagerAdapter(
     private val context: Context,
-    private val pickers: List<ColorPickerContainer>
+    private val pickers: List<ColorPickerContainer>,
+    private val viewPager: ViewPager,
 ) : HeightablePagerAdapter(), OnColorPickedListener, ViewPager.OnPageChangeListener {
 
     private var listener: OnColorPickedListener? = null
@@ -120,5 +122,11 @@ class ColorPickerPagerAdapter(
     }
 
     override fun onPageScrollStateChanged(state: Int) {
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            viewPager.requestLayout()
+            viewPager.post {
+                pickers[viewPager.currentItem].colorPicker.setColor(color)
+            }
+        }
     }
 }

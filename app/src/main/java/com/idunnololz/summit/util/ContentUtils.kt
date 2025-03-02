@@ -4,7 +4,7 @@ import com.idunnololz.summit.preview.VideoType
 
 object ContentUtils {
     fun isUrlImage(url: String): Boolean {
-        val urlWithoutParams = url.split("?")[0]
+        val urlWithoutParams = url.split("?").getOrElse(0) { "" }
         return urlWithoutParams.endsWith(".jpg", ignoreCase = true) ||
             urlWithoutParams.endsWith(".jpeg", ignoreCase = true) ||
             urlWithoutParams.endsWith(".png", ignoreCase = true) ||
@@ -15,10 +15,13 @@ object ContentUtils {
             urlWithoutParams.endsWith("/image_proxy", ignoreCase = true)
     }
 
-    fun isUrlVideo(url: String) = isUrlMp4(url) ||
-        isUrlWebm(url) ||
-        isUrlHls(url) ||
-        isUrlDash(url)
+    fun isUrlVideo(url: String): Boolean {
+        val urlWithoutParams = url.split("?").getOrElse(0) { "" }
+        return isUrlMp4(urlWithoutParams) ||
+            isUrlWebm(urlWithoutParams) ||
+            isUrlHls(urlWithoutParams) ||
+            isUrlDash(urlWithoutParams)
+    }
 
     fun isUrlMp4(url: String) = url.endsWith(".mp4", ignoreCase = true)
 
@@ -28,13 +31,13 @@ object ContentUtils {
 
     fun isUrlDash(url: String) = url.endsWith(".mpd", ignoreCase = true)
 
-    fun getVideoType(url: String) = if (isUrlMp4(url)) {
+    fun getVideoType(urlWithoutParams: String) = if (isUrlMp4(urlWithoutParams)) {
         VideoType.Mp4
-    } else if (isUrlHls(url)) {
+    } else if (isUrlHls(urlWithoutParams)) {
         VideoType.Hls
-    } else if (isUrlWebm(url)) {
+    } else if (isUrlWebm(urlWithoutParams)) {
         VideoType.Webm
-    } else if (isUrlDash(url)) {
+    } else if (isUrlDash(urlWithoutParams)) {
         VideoType.Dash
     } else {
         VideoType.Unknown

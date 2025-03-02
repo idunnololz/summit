@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.ColorpickerLayoutRgbPickerBinding
+import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
 
 class RgbPickerView : PickerView, ColorPickerContainer {
     private lateinit var red: Slider

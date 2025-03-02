@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import coil3.dispose
 import coil3.load
 import coil3.request.allowHardware
+import com.discord.panels.PanelsChildGestureRegionObserver
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -84,7 +85,7 @@ class LemmyAppBarController(
     private var vh: ViewHolder
 
     private var isScrimListenerEnabled = false
-    private var isToolbarElementsVisible = true
+    private var isToolbarElementsVisible: Boolean? = null
     private var currentOffset = 0
     private val onOffsetChangedListener = object : OnOffsetChangedListener {
 
@@ -102,8 +103,9 @@ class LemmyAppBarController(
     val state: State = state ?: State()
     val appBarRoot
         get() = vh.root
-    val percentShown = MutableLiveData<Float>(0f)
+    val percentShown = MutableLiveData(0f)
     val expandDescription = MutableStateFlow(false)
+    private var isInfinity: Boolean = true
 
     private sealed interface ViewHolder {
         val root: View
@@ -141,6 +143,7 @@ class LemmyAppBarController(
             val titleHotspot: View,
             val feedInfoText: TextView,
             val communities: TextView,
+            val scrollView: View,
         ) : ViewHolder {
             override fun setSortOrderText(text: String) {
                 communitySortOrder.text = text
@@ -241,6 +244,7 @@ class LemmyAppBarController(
             vh.communitySortOrder2.setOnClickListener {
                 onSortOrderClick()
             }
+            registerOverlappingPanelsRegionIfNeeded()
         }
         vh.customActionBar.setOnClickListener {
             showCommunitySelectorInternal()
@@ -476,8 +480,6 @@ class LemmyAppBarController(
         }
 
         updateSubscribeButton()
-
-
 
         when (currentCommunity) {
             is CommunityRef.MultiCommunity -> {
@@ -720,13 +722,8 @@ class LemmyAppBarController(
     }
 
     fun setIsInfinity(isInfinity: Boolean) {
-        if (isInfinity) {
-            vh.communitySortOrder.visibility = View.VISIBLE
-            vh.pageTextView.visibility = View.GONE
-        } else {
-            vh.communitySortOrder.visibility = View.GONE
-            vh.pageTextView.visibility = View.VISIBLE
-        }
+        this.isInfinity = isInfinity
+        updateToolbarVisibility(animate = false)
     }
 
     fun setUseHeader(useHeader: Boolean) {
@@ -814,6 +811,35 @@ class LemmyAppBarController(
                     animate = animate,
                 )
             }
+        } else {
+            setToolbarElementsVisibility(
+                visible = true,
+                animate = animate,
+            )
+        }
+    }
+
+    private fun View.hide(animate: Boolean) {
+        if (animate) {
+            this.animate()
+                .alpha(0f)
+                .withEndAction {
+                    this.visibility = View.INVISIBLE
+                }
+        } else {
+            this.alpha = 0f
+            this.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun View.show(animate: Boolean) {
+        if (animate) {
+            this.visibility = View.VISIBLE
+            this.animate()
+                .alpha(1f)
+        } else {
+            this.alpha = 1f
+            this.visibility = View.VISIBLE
         }
     }
 
@@ -823,32 +849,31 @@ class LemmyAppBarController(
         }
         isToolbarElementsVisible = visible
 
-        if (animate) {
-            if (isToolbarElementsVisible) {
-                vh.communityTextView.animate()
-                    .alpha(1f)
-                vh.communitySortOrder.animate()
-                    .alpha(1f)
-                vh.pageTextView.animate()
-                    .alpha(1f)
-            } else {
-                vh.communityTextView.animate()
-                    .alpha(0f)
-                vh.communitySortOrder.animate()
-                    .alpha(0f)
-                vh.pageTextView.animate()
-                    .alpha(0f)
-            }
+        var isSortOrderVisible = visible
+        var isPageVisible = visible
+
+        if (isInfinity) {
+            isPageVisible = false
         } else {
-            if (isToolbarElementsVisible) {
-                vh.communityTextView.alpha = 1f
-                vh.communitySortOrder.alpha = 1f
-                vh.pageTextView.alpha = 1f
-            } else {
-                vh.communityTextView.alpha = 0f
-                vh.communitySortOrder.alpha = 0f
-                vh.pageTextView.alpha = 0f
-            }
+            isSortOrderVisible = false
+        }
+
+        if (visible) {
+            vh.communityTextView.show(animate = animate)
+        } else {
+            vh.communityTextView.hide(animate = animate)
+        }
+
+        if (isSortOrderVisible) {
+            vh.communitySortOrder.show(animate = animate)
+        } else {
+            vh.communitySortOrder.hide(animate = animate)
+        }
+
+        if (isPageVisible) {
+            vh.pageTextView.show(animate = animate)
+        } else {
+            vh.pageTextView.hide(animate = animate)
         }
     }
 
@@ -868,6 +893,11 @@ class LemmyAppBarController(
         vh = createViewHolder(useHeader)
         parentContainer.addView(vh.root, 0)
         return vh
+    }
+
+    private fun registerOverlappingPanelsRegionIfNeeded() {
+        val vh = vh as ViewHolder.LargeAppBarViewHolder
+        PanelsChildGestureRegionObserver.Provider.get().register(vh.scrollView)
     }
 
     private fun createViewHolder(useHeader: Boolean): ViewHolder {
@@ -896,6 +926,7 @@ class LemmyAppBarController(
                 b.titleHotspot,
                 b.feedInfoText,
                 b.communities,
+                b.scrollView,
             )
         } else {
             val b = CustomAppBarSmallBinding.inflate(inflater, parentContainer, false)
