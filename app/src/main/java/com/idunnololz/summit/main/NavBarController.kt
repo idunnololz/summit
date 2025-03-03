@@ -68,6 +68,7 @@ class NavBarController(
     var useBottomNavBar = true
     private var navRailMode = NavigationRailModeId.Auto
     private var globalLayoutMode: GlobalLayoutMode = GlobalLayoutModes.Auto
+    private var showLabels = true
 
     lateinit var navBar: NavigationBarView
     private lateinit var navBarContainer: View
@@ -416,6 +417,7 @@ class NavBarController(
         useCustomNavBar = preferences.useCustomNavBar
         navBarConfig = preferences.navBarConfig
         globalLayoutMode = preferences.globalLayoutMode
+        showLabels = preferences.showLabelsInNavBar
 
         navRailMode =
             if (globalLayoutMode == GlobalLayoutModes.SmallScreen) {
@@ -425,6 +427,12 @@ class NavBarController(
             }
 
         onWindowSizeChanged()
+
+        navBar.labelVisibilityMode = if (showLabels) {
+            NavigationBarView.LABEL_VISIBILITY_LABELED
+        } else {
+            NavigationBarView.LABEL_VISIBILITY_UNLABELED
+        }
 
         if (!useBottomNavBar) {
             navBar.visibility = View.GONE

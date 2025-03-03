@@ -1,0 +1,15 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml:17:1-51
+INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml:17:1-51
+	package
+		ADDED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml:17:11-49
+		INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml
+uses-sdk
+INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml
+INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/garyguo/src/summit/colorpickerview/src/main/AndroidManifest.xml

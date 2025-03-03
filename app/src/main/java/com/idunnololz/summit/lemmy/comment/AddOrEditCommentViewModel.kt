@@ -212,11 +212,17 @@ class AddOrEditCommentViewModel @Inject constructor(
         messages.value = (messages.value ?: listOf()).filter { it != message }
     }
 
-    fun showFullContext(commentView: CommentView, force: Boolean) {
+    fun showFullContext(postOrComment: Either<PostView, CommentView>, force: Boolean) {
         contextModel.setIsLoading()
 
-        val postId = commentView.post.id
-        val commentPath = commentView.comment.path
+        val postId = postOrComment.fold(
+            { it.post.id },
+            { it.post.id }
+        )
+        val commentPath = postOrComment.fold(
+            { null },
+            { it.comment.path }
+        )
 
         viewModelScope.launch {
             val finalTopCommentId = if (commentPath != null) {
@@ -279,7 +285,7 @@ class AddOrEditCommentViewModel @Inject constructor(
 
             contextModel.postValue(
                 ContextModel(
-                    originalCommentView = commentView,
+                    originalCommentView = postOrComment.getOrNull(),
                     post = requireNotNull(postResult.getOrNull()),
                     commentTree = tree.firstOrNull(),
                 ),
@@ -288,7 +294,7 @@ class AddOrEditCommentViewModel @Inject constructor(
     }
 
     data class ContextModel(
-        val originalCommentView: CommentView,
+        val originalCommentView: CommentView?,
         val post: PostView,
         val commentTree: CommentNodeData?,
     )

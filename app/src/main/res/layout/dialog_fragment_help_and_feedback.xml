@@ -182,7 +182,7 @@
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginTop="@dimen/padding"
         app:layout_constraintTop_toBottomOf="@+id/other_links_title"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_space"
+        app:layout_constraintBottom_toTopOf="@+id/disable_gesture_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         style="?attr/materialCardViewOutlinedStyle">
@@ -212,6 +212,47 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/community_icon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/disable_gesture_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintTop_toBottomOf="@+id/community_button"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_space"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="?attr/materialCardViewOutlinedStyle">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding">
+
+            <ImageView
+                android:id="@+id/disable_gesture_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/baseline_remove_24"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="?colorControlNormal" />
+
+            <TextView
+                android:id="@+id/disable_gesture_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/disable_shake_to_give_feedback"
+                android:layout_marginStart="@dimen/padding"
+                android:textAppearance="?textAppearanceBodyMedium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/disable_gesture_icon"
                 app:layout_constraintEnd_toEndOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

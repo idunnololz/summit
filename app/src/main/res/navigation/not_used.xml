@@ -350,6 +350,11 @@ safeargs.
             android:name="userTag"
             app:argType="com.idunnololz.summit.lemmy.userTags.UserTag"
             app:nullable="true" />
+        <argument
+            android:name="personRef"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </dialog>
     <dialog
         android:id="@+id/personPickerDialogFragment"

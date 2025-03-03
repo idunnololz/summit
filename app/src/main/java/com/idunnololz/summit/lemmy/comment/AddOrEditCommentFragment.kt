@@ -437,6 +437,7 @@ class AddOrEditCommentFragment :
             }
 
             val commentView = args.commentView ?: args.editCommentView
+            val postView = args.postView
 
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
@@ -513,12 +514,7 @@ class AddOrEditCommentFragment :
                         true
                     }
                     R.id.show_full_context -> {
-                        if (commentView != null) {
-                            viewModel.showFullContext(
-                                commentView = commentView,
-                                force = true,
-                            )
-                        }
+                        showFullContext()
                         true
                     }
                     R.id.hide_full_context -> {
@@ -534,17 +530,12 @@ class AddOrEditCommentFragment :
             mentionsHelper.installMentionsSupportOn(viewLifecycleOwner, commentEditText)
 
             viewModel.contextModel.observe(viewLifecycleOwner) {
-                if (commentView == null) {
-                    toolbar.menu.findItem(R.id.show_full_context)?.isVisible = false
+                if (it is StatefulData.NotStarted) {
+                    toolbar.menu.findItem(R.id.show_full_context)?.isVisible = true
                     toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = false
                 } else {
-                    if (it is StatefulData.NotStarted) {
-                        toolbar.menu.findItem(R.id.show_full_context)?.isVisible = true
-                        toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = false
-                    } else {
-                        toolbar.menu.findItem(R.id.show_full_context)?.isVisible = false
-                        toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = true
-                    }
+                    toolbar.menu.findItem(R.id.show_full_context)?.isVisible = false
+                    toolbar.menu.findItem(R.id.hide_full_context)?.isVisible = true
                 }
 
                 when (it) {
@@ -594,6 +585,21 @@ class AddOrEditCommentFragment :
                 commentEditText.requestFocus()
             }
             setup(savedInstanceState)
+        }
+    }
+
+    private fun showFullContext(force: Boolean = false) {
+        val commentView = args.commentView
+        val postView = args.postView
+        val postOrComment = if (postView != null) {
+            Either.Left(postView)
+        } else if (commentView != null) {
+            Either.Right(commentView)
+        } else {
+            null
+        }
+        if (postOrComment != null) {
+            viewModel.showFullContext(postOrComment, force = force)
         }
     }
 
@@ -918,7 +924,6 @@ class AddOrEditCommentFragment :
             val adapter = PostAdapter(
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
                 context = context,
-                containerView = recyclerView,
                 lifecycleOwner = viewLifecycleOwner,
                 instance = args.instance,
                 accountId = null,
@@ -928,10 +933,7 @@ class AddOrEditCommentFragment :
                 videoState = null,
                 autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
                 onRefreshClickCb = {
-                    val commentView = args.commentView
-                    if (commentView != null) {
-                        viewModel.showFullContext(commentView, force = true)
-                    }
+                    showFullContext(force = true)
                 },
                 onSignInRequired = {
                     PreAuthDialogFragment.newInstance()
@@ -987,7 +989,10 @@ class AddOrEditCommentFragment :
             }
 
             recyclerView.doOnLayout {
-                adapter.contentMaxWidth = recyclerView.measuredWidth
+                adapter.setContentMaxSize(
+                    recyclerView.measuredWidth,
+                    recyclerView.measuredHeight,
+                )
             }
 
             recyclerView.setup(animationsHelper)
@@ -1014,11 +1019,13 @@ class AddOrEditCommentFragment :
                 ),
             )
 
-            val position =
-                adapter.highlightCommentForever(data.originalCommentView.comment.id)
+            if (data.originalCommentView != null) {
+                val position =
+                    adapter.highlightCommentForever(data.originalCommentView.comment.id)
 
-            if (position != null) {
-                recyclerView.scrollToPosition(position)
+                if (position != null) {
+                    recyclerView.scrollToPosition(position)
+                }
             }
         }
     }

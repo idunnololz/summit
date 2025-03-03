@@ -1,6 +1,8 @@
 package com.idunnololz.summit.links
 
 import android.webkit.URLUtil
+import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.util.LinkUtils
 import java.net.URI
 import java.net.URISyntaxException
@@ -8,8 +10,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LinkMetadataHelper {
+@Singleton
+class LinkMetadataHelper @Inject constructor(
+    private val apiClient: AccountAwareLemmyClient,
+    private val linkFixer: LinkFixer,
+) {
 
     suspend fun loadLinkMetadata(url: String): LinkMetadata {
         val doc = runInterruptible(Dispatchers.IO) {
@@ -158,6 +166,13 @@ class LinkMetadataHelper {
         }
         val host = uri?.host ?: url
 
+        val pageRef = LinkResolver.parseUrl(url, apiClient.instance, mustHandle = true)
+        val fixedPageRef = if (pageRef != null) {
+            linkFixer.fixPageRef(pageRef)
+        } else {
+            null
+        }
+
         return LinkMetadata(
             url = url,
             title = title,
@@ -168,6 +183,7 @@ class LinkMetadataHelper {
             host = host,
             siteName = siteName,
             imageUrl = imageUrls.firstOrNull(),
+            pageRef = fixedPageRef,
         )
     }
 
@@ -197,5 +213,6 @@ class LinkMetadataHelper {
         val host: String?,
         val siteName: String?,
         val imageUrl: String?,
+        val pageRef: PageRef?,
     )
 }

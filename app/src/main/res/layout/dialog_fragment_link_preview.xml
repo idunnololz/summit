@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -30,7 +31,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toTopOf="@+id/button_bar">
+        app:layout_constraintBottom_toTopOf="@+id/open_in_app">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -133,7 +134,26 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/open_in_app"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/button_bar">
+
+        <TextView
+            android:padding="@dimen/padding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_in_app_desc"
+            android:textAppearance="?textAppearanceBodyMedium"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.idunnololz.summit.view.ButtonBarLayout
         android:id="@+id/button_bar"
         android:orientation="horizontal"
         android:layout_width="0dp"
@@ -159,6 +179,6 @@
             android:layout_height="wrap_content"
             android:text="@string/open_link"
             android:layout_marginEnd="@dimen/padding"/>
-    </LinearLayout>
+    </com.idunnololz.summit.view.ButtonBarLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

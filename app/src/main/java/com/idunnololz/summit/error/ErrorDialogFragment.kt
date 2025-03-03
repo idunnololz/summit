@@ -2,6 +2,7 @@ package com.idunnololz.summit.error
 
 import android.os.Bundle
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,8 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
             val pw = PrintWriter(sw)
             error.printStackTrace(pw)
             val stackTrace = sw.toString() // stack trace as a string
+
+            Log.d("ErrorDialogFragment", "Displaying error dialog for error.", error)
 
             ErrorDialogFragment()
                 .apply {

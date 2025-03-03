@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AlphaSlideBar">
+    
+    <attr format="integer" name="selector_AlphaSlideBar"/>
+    
+    <attr format="color" name="borderColor_AlphaSlideBar"/>
+    
+    <attr format="integer" name="borderSize_AlphaSlideBar"/>
+  </declare-styleable>
+    <declare-styleable name="AlphaTileView">
+    
+    <attr format="integer" name="tileSize"/>
+    
+    <attr format="color" name="tileOddColor"/>
+    
+    <attr format="color" name="tileEvenColor"/>
+  </declare-styleable>
+    <declare-styleable name="BrightnessSlideBar">
+    
+    <attr format="integer" name="selector_BrightnessSlider"/>
+    
+    <attr format="color" name="borderColor_BrightnessSlider"/>
+    
+    <attr format="integer" name="borderSize_BrightnessSlider"/>
+  </declare-styleable>
+    <declare-styleable name="ColorPickerView">
+    
+    <attr format="reference" name="palette"/>
+    
+    <attr format="integer" name="selector"/>
+    
+    <attr format="dimension" name="selector_size"/>
+    
+    <attr format="float" name="selector_alpha"/>
+    
+    <attr format="float" name="flag_alpha"/>
+    
+    <attr format="boolean" name="flag_isFlipAble"/>
+    
+    <attr format="string" name="preferenceName"/>
+    
+    <attr format="integer" name="debounceDuration"/>
+    
+    <attr format="color" name="initialColor"/>
+    
+    <attr format="enum" name="actionMode">
+      <!-- trigger the listener always when tapped by a user.  -->
+      <enum name="always" value="0"/>
+      <!-- trigger the listener only the last color when user release tapping. -->
+      <enum name="last" value="1"/>
+    </attr>
+  </declare-styleable>
+</resources>

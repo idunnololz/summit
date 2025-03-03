@@ -2,6 +2,7 @@ package com.idunnololz.summit.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.util.Base64
 import android.util.Log
 import androidx.datastore.core.DataStore
@@ -94,6 +95,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERV
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
+import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FEED_SHOW_SCROLL_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_2
@@ -114,10 +116,12 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SEARCH_HOME_CONFIG
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_IMAGE_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_UPVOTE_PERCENTAGE
@@ -173,15 +177,19 @@ class Preferences(
     }
 
     private val coroutineScope = coroutineScopeFactory.create()
-
-    val onPreferenceChangeFlow = MutableSharedFlow<Unit>()
-
-    init {
-        prefs.registerOnSharedPreferenceChangeListener { _, _ ->
+    @Suppress("ObjectLiteralToLambda")
+    private val preferenceChangeListener = object : OnSharedPreferenceChangeListener {
+        override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
             coroutineScope.launch {
                 onPreferenceChangeFlow.emit(Unit)
             }
         }
+    }
+
+    val onPreferenceChangeFlow = MutableSharedFlow<Unit>()
+
+    init {
+        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     val all: MutableMap<String, *>
@@ -565,9 +573,6 @@ class Preferences(
     var uploadImagesToImgur: Boolean
         by booleanPreference(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
 
-    var swipeBetweenPosts: Boolean
-        by booleanPreference(KEY_SWIPE_BETWEEN_POSTS, true)
-
     var animationLevel: AnimationsHelper.AnimationLevel
         get() = AnimationsHelper.AnimationLevel.parse(
             prefs.getInt(
@@ -616,9 +621,16 @@ class Preferences(
         by booleanPreference(KEY_HIDE_DUPLICATE_POSTS_ON_READ, false)
     var usePostsFeedHeader: Boolean
         by booleanPreference(KEY_USE_POSTS_FEED_HEADER, false)
-
     var inlineVideoDefaultVolume: Float
         by floatPreference(KEY_INLINE_VIDEO_DEFAULT_VOLUME, 0f)
+    var swipeBetweenPosts: Boolean
+        by booleanPreference(KEY_SWIPE_BETWEEN_POSTS, false)
+    var postFabQuickAction: Int
+        by intPreference(KEY_POST_FAB_QUICK_ACTION, PostFabQuickActions.NONE)
+    var shakeToSendFeedback: Boolean
+        by booleanPreference(KEY_SHAKE_TO_SEND_FEEDBACK, true)
+    var showLabelsInNavBar: Boolean
+        by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
 
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

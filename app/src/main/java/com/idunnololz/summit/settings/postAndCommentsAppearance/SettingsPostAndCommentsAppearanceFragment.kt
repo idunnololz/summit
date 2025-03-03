@@ -115,6 +115,7 @@ class SettingsPostAndCommentsAppearanceFragment :
             binding.demoViewContainer,
             postAndCommentViewBuilder,
             binding.demoViewContainer.width,
+            binding.demoViewContainer.height,
             viewLifecycleOwner,
             viewModel.preferences,
         )
@@ -271,6 +272,7 @@ class SettingsPostAndCommentsAppearanceFragment :
         private val container: View,
         private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val contentMaxWidth: Int,
+        private val contentMaxHeight: Int,
         private val viewLifecycleOwner: LifecycleOwner,
         private val preferences: Preferences,
     ) : Adapter<ViewHolder>() {
@@ -308,12 +310,12 @@ class SettingsPostAndCommentsAppearanceFragment :
 
                 postAndCommentViewBuilder.bindPostView(
                     b,
-                    container = container,
                     postView = item,
                     instance = "https://fake.instance",
                     accountId = null,
                     isRevealed = true,
                     contentMaxWidth = contentMaxWidth,
+                    contentMaxHeight = contentMaxHeight,
                     viewLifecycleOwner = viewLifecycleOwner,
                     updateContent = true,
                     highlightTextData = null,

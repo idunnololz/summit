@@ -90,15 +90,16 @@
                     android:id="@+id/page_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:gravity="center"
-                    android:paddingHorizontal="@dimen/padding_three_quarters"
-                    android:background="@drawable/secondary_chip_bg"
                     android:textAppearance="?textAppearanceLabelLarge"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/secondary_chip_bg"
+                    android:paddingHorizontal="@dimen/padding_three_quarters"
+                    android:drawablePadding="@dimen/padding_half"
                     android:layout_marginEnd="@dimen/padding"
                     app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/community_sort_order"
                     app:layout_constraintEnd_toStartOf="@+id/account_image_view"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/guideline" />
 
 

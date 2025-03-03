@@ -34,6 +34,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -75,11 +76,7 @@ class SettingsMiscFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
+            setupToolbar(binding.toolbar, settings.getPageName(context))
         }
 
         updateRendering()
@@ -252,9 +249,7 @@ class SettingsMiscFragment :
             settings.rotateInstanceOnUploadFail.bindTo(
                 binding.rotateInstanceOnUploadFail,
                 { preferences.rotateInstanceOnUploadFail },
-                {
-                    preferences.rotateInstanceOnUploadFail = it
-                },
+                { preferences.rotateInstanceOnUploadFail = it },
             )
         } else {
             binding.rotateInstanceOnUploadFail.root.visibility = View.GONE
@@ -266,6 +261,16 @@ class SettingsMiscFragment :
                 .actionSettingMiscFragmentToSettingPerCommunityFragment()
             findNavController().navigateSafe(direction)
         }
+        settings.shakeToSendFeedback.bindTo(
+            binding.shakeToSendFeedback,
+            { preferences.shakeToSendFeedback },
+            { preferences.shakeToSendFeedback = it },
+        )
+        settings.showLabelsInNavBar.bindTo(
+            binding.showLabelsInNavBar,
+            { preferences.showLabelsInNavBar },
+            { preferences.showLabelsInNavBar = it },
+        )
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {

@@ -58,6 +58,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
     @Parcelize
     data class Local(
         val instance: String?,
+        val rawUrl: String? = null,
     ) : CommunityRef
 
     @Serializable

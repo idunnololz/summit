@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util.coil
 
 import android.graphics.Rect
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Looper
 import android.os.SystemClock
@@ -88,6 +89,10 @@ object AsyncDrawableSchedulerFixed {
         if (!spans.isNullOrEmpty()) {
             for (span in spans) {
                 span.drawableSpan.drawable.setCallback2(null)
+                val result = span.drawableSpan.drawable.result
+                if (result is Animatable) {
+                    result.start()
+                }
             }
         }
     }

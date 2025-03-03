@@ -722,6 +722,7 @@ class LemmyAppBarController(
     }
 
     fun setIsInfinity(isInfinity: Boolean) {
+        isToolbarElementsVisible = null
         this.isInfinity = isInfinity
         updateToolbarVisibility(animate = false)
     }

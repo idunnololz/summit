@@ -53,8 +53,20 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/swipe_between_posts"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/customize_post_quick_actions"
                     layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/post_fab_quick_action"
+                    layout="@layout/setting_text_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

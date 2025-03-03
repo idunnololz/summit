@@ -19,6 +19,7 @@ import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.util.openAppOnPlayStore
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -53,11 +54,7 @@ class SettingsAboutFragment : BaseFragment<FragmentSettingsAboutBinding>() {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = aboutSettings.getPageName(context)
+            setupToolbar(binding.toolbar, aboutSettings.getPageName(context))
         }
 
         updateRendering()

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/garyguo/src/summit/colorpickerview/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/garyguo/src/summit/colorpickerview/src/main/res"><file name="colorpickerview_fade_in" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/anim/colorpickerview_fade_in.xml" qualifiers="" type="anim"/><file name="colorpickerview_fade_out" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/anim/colorpickerview_fade_out.xml" qualifiers="" type="anim"/><file name="colorpickerview_ic_bubble_big" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/drawable/colorpickerview_ic_bubble_big.xml" qualifiers="" type="drawable"/><file name="colorpickerview_wheel" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/drawable/colorpickerview_wheel.png" qualifiers="" type="drawable"/><file name="colorpickerview_ic_bubble_small" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/drawable/colorpickerview_ic_bubble_small.xml" qualifiers="" type="drawable"/><file name="colorpickerview_dialog_colorpicker" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/layout/colorpickerview_dialog_colorpicker.xml" qualifiers="" type="layout"/><file name="colorpickerview_flag_bubble" path="/Users/garyguo/src/summit/colorpickerview/src/main/res/layout/colorpickerview_flag_bubble.xml" qualifiers="" type="layout"/><file path="/Users/garyguo/src/summit/colorpickerview/src/main/res/values/attrs_colorpicker.xml" qualifiers=""><declare-styleable name="ColorPickerView">
+    
+    <attr format="reference" name="palette"/>
+    
+    <attr format="integer" name="selector"/>
+    
+    <attr format="dimension" name="selector_size"/>
+    
+    <attr format="float" name="selector_alpha"/>
+    
+    <attr format="float" name="flag_alpha"/>
+    
+    <attr format="boolean" name="flag_isFlipAble"/>
+    
+    <attr format="string" name="preferenceName"/>
+    
+    <attr format="integer" name="debounceDuration"/>
+    
+    <attr format="color" name="initialColor"/>
+    
+    <attr format="enum" name="actionMode">
+      
+      <enum name="always" value="0"/>
+      
+      <enum name="last" value="1"/>
+    </attr>
+  </declare-styleable><declare-styleable name="AlphaSlideBar">
+    
+    <attr format="integer" name="selector_AlphaSlideBar"/>
+    
+    <attr format="color" name="borderColor_AlphaSlideBar"/>
+    
+    <attr format="integer" name="borderSize_AlphaSlideBar"/>
+  </declare-styleable><declare-styleable name="BrightnessSlideBar">
+    
+    <attr format="integer" name="selector_BrightnessSlider"/>
+    
+    <attr format="color" name="borderColor_BrightnessSlider"/>
+    
+    <attr format="integer" name="borderSize_BrightnessSlider"/>
+  </declare-styleable><declare-styleable name="AlphaTileView">
+    
+    <attr format="integer" name="tileSize"/>
+    
+    <attr format="color" name="tileOddColor"/>
+    
+    <attr format="color" name="tileEvenColor"/>
+  </declare-styleable></file></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/garyguo/src/summit/colorpickerview/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/garyguo/src/summit/colorpickerview/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/garyguo/src/summit/colorpickerview/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/garyguo/src/summit/colorpickerview/build/generated/res/resValues/debug"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="BrightnessSlideBar">
+    
+    <attr format="integer" name="selector_BrightnessSlider"/>
+    
+    <attr format="color" name="borderColor_BrightnessSlider"/>
+    
+    <attr format="integer" name="borderSize_BrightnessSlider"/>
+  </declare-styleable><declare-styleable name="AlphaSlideBar">
+    
+    <attr format="integer" name="selector_AlphaSlideBar"/>
+    
+    <attr format="color" name="borderColor_AlphaSlideBar"/>
+    
+    <attr format="integer" name="borderSize_AlphaSlideBar"/>
+  </declare-styleable><declare-styleable name="AlphaTileView">
+    
+    <attr format="integer" name="tileSize"/>
+    
+    <attr format="color" name="tileOddColor"/>
+    
+    <attr format="color" name="tileEvenColor"/>
+  </declare-styleable><declare-styleable name="ColorPickerView">
+    
+    <attr format="reference" name="palette"/>
+    
+    <attr format="integer" name="selector"/>
+    
+    <attr format="dimension" name="selector_size"/>
+    
+    <attr format="float" name="selector_alpha"/>
+    
+    <attr format="float" name="flag_alpha"/>
+    
+    <attr format="boolean" name="flag_isFlipAble"/>
+    
+    <attr format="string" name="preferenceName"/>
+    
+    <attr format="integer" name="debounceDuration"/>
+    
+    <attr format="color" name="initialColor"/>
+    
+    <attr format="enum" name="actionMode">
+      
+      <enum name="always" value="0"/>
+      
+      <enum name="last" value="1"/>
+    </attr>
+  </declare-styleable></configuration></mergedItems></merger>

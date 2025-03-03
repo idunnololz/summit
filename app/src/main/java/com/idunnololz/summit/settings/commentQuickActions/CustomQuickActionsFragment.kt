@@ -26,6 +26,7 @@ import com.idunnololz.summit.databinding.QuickActionsTitleBinding
 import com.idunnololz.summit.preferences.CommentQuickActionId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -34,6 +35,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
 import javax.inject.Inject
@@ -70,13 +72,9 @@ class CustomQuickActionsFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.contentContainer)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
+            setupToolbar(binding.toolbar, getString(R.string.customize_comment_quick_actions))
 
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.customize_comment_quick_actions)
-
-            addMenuProvider2(
+            binding.toolbar.addMenuProvider(
                 object : MenuProvider {
                     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                         menuInflater.inflate(R.menu.menu_custom_quick_actions, menu)
@@ -95,7 +93,7 @@ class CustomQuickActionsFragment :
 
                             else -> false
                         }
-                },
+                }
             )
         }
 

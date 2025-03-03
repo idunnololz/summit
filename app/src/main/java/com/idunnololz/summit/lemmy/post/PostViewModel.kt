@@ -202,12 +202,11 @@ class PostViewModel @Inject constructor(
     val apiInstance: String
         get() = lemmyApiClient.instance
 
-    private val maxDepth: Int?
-        get() = if (preferences.collapseChildCommentsByDefault) {
-            1
-        } else {
-            null
-        }
+    var maxDepth: Int? = if (preferences.collapseChildCommentsByDefault) {
+        1
+    } else {
+        null
+    }
 
     fun forceAccount(accountId: Long) {
         currentAccountIdOverride = accountId
