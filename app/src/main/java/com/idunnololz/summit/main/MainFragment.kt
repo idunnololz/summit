@@ -103,7 +103,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     @Inject
     lateinit var preferences: Preferences
 
-    lateinit var communitiesPaneController: CommunitiesPaneController
+    private var communitiesPaneController: CommunitiesPaneController? = null
 
     private var currentNavController: NavController? = null
 
@@ -343,22 +343,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
             )
         binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
-        addMenuProvider2(
-            object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {}
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    val currentNavController = currentNavController
-                    if (menuItem.itemId == android.R.id.home && currentNavController != null) {
-                        return currentNavController.navigateUp()
-                    }
-                    return false
-                }
-            },
-        )
-
         requireMainActivity().apply {
-            this.insetViewAutomaticallyByPadding(this, binding.startPanel.root)
+            this.insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPanel.root)
         }
 
         tabsManager.currentTab.observe(viewLifecycleOwner) {
@@ -471,6 +457,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
         view?.let { view ->
             Navigation.setViewNavController(view, findNavController())
         }
+        communitiesPaneController = null
 
         super.onDestroyView()
         Log.d(TAG, "onDestroyView()")
@@ -524,7 +511,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
             }
             PanelState.Opened -> {
                 getMainActivity()?.setNavUiOpenPercent(100f)
-                communitiesPaneController.onShown()
+                communitiesPaneController?.onShown()
 
                 updatePaneBackPressHandler()
             }

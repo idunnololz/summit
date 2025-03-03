@@ -157,6 +157,24 @@ class CommunityViewModel @Inject constructor(
     private var hiddenPostObserverJob: Job? = null
     private var fetchPageJob: Job? = null
 
+    private val onAccountChangeListener = object : AccountManager.OnAccountChangedListener {
+        override suspend fun onAccountChanged(newAccount: Account?) {
+            fetchPageJob?.cancel()
+            fetchingPages.clear()
+
+            postsRepository.onAccountChanged()
+
+            registerHiddenPostObserver()
+
+            preferences = preferenceManager.getComposedPreferencesForAccount(newAccount)
+
+            withContext(Dispatchers.Main) {
+                recheckPreferences()
+                recheckNsfwMode()
+            }
+        }
+    }
+
     init {
         isHideReadEnabled.value?.let {
             postsRepository.hideRead = it
@@ -172,25 +190,7 @@ class CommunityViewModel @Inject constructor(
 
         currentCommunityRef.observeForever(communityRefChangeObserver)
 
-        accountManager.addOnAccountChangedListener(
-            object : AccountManager.OnAccountChangedListener {
-                override suspend fun onAccountChanged(newAccount: Account?) {
-                    fetchPageJob?.cancel()
-                    fetchingPages.clear()
-
-                    postsRepository.onAccountChanged()
-
-                    registerHiddenPostObserver()
-
-                    preferences = preferenceManager.getComposedPreferencesForAccount(newAccount)
-
-                    withContext(Dispatchers.Main) {
-                        recheckPreferences()
-                        recheckNsfwMode()
-                    }
-                }
-            },
-        )
+        accountManager.addOnAccountChangedListener(onAccountChangeListener)
 
         viewModelScope.launch {
             userCommunitiesManager.defaultCommunity
@@ -776,9 +776,10 @@ class CommunityViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
-
         currentCommunityRef.removeObserver(communityRefChangeObserver)
+        accountManager.removeOnAccountChangedListener(onAccountChangeListener)
+
+        super.onCleared()
     }
 
     private fun reset(

@@ -307,7 +307,7 @@ class MoreActionsHelper @Inject constructor(
         currentPageInstance = instance
     }
 
-    fun downloadVideo(context: Context, url: String) {
+    fun downloadVideo(url: String) {
         downloadVideoResult.setIsLoading()
 
         coroutineScope.launch {
@@ -357,7 +357,6 @@ class MoreActionsHelper @Inject constructor(
     }
 
     fun downloadImage(
-        context: Context,
         destFileName: String,
         url: String,
         mimeType: String? = null,

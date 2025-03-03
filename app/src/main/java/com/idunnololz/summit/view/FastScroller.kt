@@ -96,6 +96,39 @@ class FastScroller : LinearLayout {
         }
     }
 
+    private val adapterListener =
+        object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                updateScrollerPosition()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                super.onItemRangeChanged(positionStart, itemCount)
+                updateScrollerPosition()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                super.onItemRangeChanged(positionStart, itemCount, payload)
+                updateScrollerPosition()
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                updateScrollerPosition()
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                super.onItemRangeRemoved(positionStart, itemCount)
+                updateScrollerPosition()
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                updateScrollerPosition()
+            }
+        }
+
     private var downY: Float = 0f
     private var lastY: Float = 0f
 
@@ -159,7 +192,17 @@ class FastScroller : LinearLayout {
             )
         handle.layoutParams = ViewGroup.LayoutParams(handleWidth, handleHeight)
         addView(handle)
-        ViewCompat.setElevation(handle, Utils.convertDpToPixel(2f))
+        handle.elevation = Utils.convertDpToPixel(2f)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        recyclerView?.adapter?.registerAdapterDataObserver(adapterListener)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        recyclerView?.adapter?.unregisterAdapterDataObserver(adapterListener)
     }
 
     /**
@@ -171,40 +214,6 @@ class FastScroller : LinearLayout {
     fun setRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
         recyclerView.addOnScrollListener(scrollListener)
-        recyclerView.adapter?.registerAdapterDataObserver(
-            object :
-                RecyclerView.AdapterDataObserver() {
-                override fun onChanged() {
-                    super.onChanged()
-                    updateScrollerPosition()
-                }
-
-                override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeChanged(positionStart, itemCount)
-                    updateScrollerPosition()
-                }
-
-                override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
-                    super.onItemRangeChanged(positionStart, itemCount, payload)
-                    updateScrollerPosition()
-                }
-
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    updateScrollerPosition()
-                }
-
-                override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeRemoved(positionStart, itemCount)
-                    updateScrollerPosition()
-                }
-
-                override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-                    super.onItemRangeMoved(fromPosition, toPosition, itemCount)
-                    updateScrollerPosition()
-                }
-            },
-        )
         invalidateVisibility()
         recyclerView.setOnHierarchyChangeListener(
             object : ViewGroup.OnHierarchyChangeListener {
@@ -217,6 +226,10 @@ class FastScroller : LinearLayout {
                 }
             },
         )
+
+        if (isAttachedToWindow) {
+            recyclerView.adapter?.registerAdapterDataObserver(adapterListener)
+        }
     }
 
     private fun updateScrollerPosition() {

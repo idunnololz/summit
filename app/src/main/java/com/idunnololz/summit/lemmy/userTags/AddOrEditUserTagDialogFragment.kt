@@ -13,6 +13,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.DialogFragmentAddOrEditUserTagBinding
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -33,12 +34,14 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             fragmentManager: FragmentManager,
             person: Person? = null,
             userTag: UserTag? = null,
+            personRef: PersonRef? = null,
         ) {
             AddOrEditUserTagDialogFragment()
                 .apply {
                     arguments = AddOrEditUserTagDialogFragmentArgs(
                         person = person,
                         userTag = userTag,
+                        personRef = personRef,
                     ).toBundle()
                 }
                 .show(fragmentManager, "AddOrEditUserTagDialogFragment")
@@ -81,11 +84,15 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
         if (savedInstanceState == null) {
             val person = args.person
             val userTag = args.userTag
+            val personRef = args.personRef
             if (person != null) {
                 viewModel.personName = person.fullName
             }
             if (userTag != null) {
                 viewModel.personName = userTag.personName
+            }
+            if (personRef != null) {
+                viewModel.personName = personRef.fullName
             }
 
             viewModel.fillColor =

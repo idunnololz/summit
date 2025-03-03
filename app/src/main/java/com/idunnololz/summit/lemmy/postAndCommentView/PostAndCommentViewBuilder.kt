@@ -31,6 +31,7 @@ import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
@@ -44,7 +45,6 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
@@ -119,13 +119,10 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val accountActionsManager: AccountActionsManager,
     private val preferenceManager: PreferenceManager,
     private val accountManager: AccountManager,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
     private val avatarHelper: AvatarHelper,
     private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
     private val exoPlayerManagerManager: ExoPlayerManagerManager,
 ) {
-
-    private val coroutineScope = coroutineScopeFactory.create()
 
     private var preferences = preferenceManager.currentPreferences
 
@@ -202,7 +199,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     init {
         lemmyContentHelper.config = uiConfig.postUiConfig.fullContentConfig
 
-        coroutineScope.launch {
+        fragment.lifecycleScope.launch {
             accountManager.currentAccount.collect {
                 val account = it as? Account
                 currentUser = account
@@ -265,12 +262,12 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     fun bindPostView(
         binding: PostHeaderItemBinding,
-        container: View,
         postView: PostView,
         accountId: Long?,
         instance: String,
         isRevealed: Boolean,
         contentMaxWidth: Int,
+        contentMaxHeight: Int,
         viewLifecycleOwner: LifecycleOwner,
         videoState: VideoState?,
         updateContent: Boolean,
@@ -436,7 +433,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             reveal = isRevealed,
             tempSize = tempSize,
             videoViewMaxHeight = (
-                container.height -
+                contentMaxHeight -
                     Utils.convertDpToPixel(56f) -
                     Utils.convertDpToPixel(16f)
                 ).toInt(),

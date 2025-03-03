@@ -34,6 +34,7 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -86,12 +87,7 @@ class SettingsPostsFeedFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
-            supportActionBar?.subtitle = args.account?.fullName
+            setupToolbar(binding.toolbar, settings.getPageName(context), args.account?.fullName)
 
             childFragmentManager.setFragmentResultListener(
                 CommunityPickerDialogFragment.REQUEST_KEY,

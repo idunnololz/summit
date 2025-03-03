@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.utils.actions
 
+import android.content.Context
 import android.content.Intent
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 fun BaseFragment<*>.installOnActionResultHandler(
+    context: Context,
     moreActionsHelper: MoreActionsHelper,
     snackbarContainer: View,
     onSavePostChanged: ((SavePostResult) -> Unit)? = null,
@@ -31,8 +33,6 @@ fun BaseFragment<*>.installOnActionResultHandler(
     onBlockCommunityChanged: (() -> Unit)? = null,
     onBlockPersonChanged: (() -> Unit)? = null,
 ) {
-    val context = snackbarContainer.context
-
     childFragmentManager.setFragmentResultListener(
         ModActionResult.REQUEST_KEY,
         viewLifecycleOwner,
@@ -273,7 +273,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
         }
     }
 
-    moreActionsHelper.downloadResult.observe(this) {
+    moreActionsHelper.downloadResult.observe(viewLifecycleOwner) {
         when (it) {
             is StatefulData.NotStarted -> {}
             is StatefulData.Error -> {

@@ -128,7 +128,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
             )
         }
 
-        if (data.description.isNullOrBlank()) {
+        if (data.description.isBlank()) {
             description.visibility = View.GONE
         } else {
             description.visibility = View.VISIBLE
@@ -141,6 +141,16 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
         copyLink.setOnClickListener {
             Utils.copyToClipboard(context, args.url)
             copyLink.text = getString(R.string.copied)
+        }
+
+        if (data.pageRef != null) {
+            openInApp?.visibility = View.VISIBLE
+            openInApp?.setOnClickListener {
+                dismiss()
+                getMainActivity()?.launchPage(data.pageRef)
+            }
+        } else {
+            openInApp?.visibility = View.GONE
         }
     }
 }

@@ -64,7 +64,6 @@ import java.util.LinkedList
 class PostAdapter(
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
     private val context: Context,
-    private val containerView: View,
     private val lifecycleOwner: LifecycleOwner,
     var instance: String,
     private val accountId: Long?,
@@ -268,24 +267,8 @@ class PostAdapter(
             refreshItems()
         }
 
-    var contentMaxWidth = 0
-        set(value) {
-            if (value == field) {
-                return
-            }
-            field = value
-
-            val indentationPerLevelPx = Utils.convertDpToPixel(
-                postAndCommentViewBuilder.commentUiConfig.indentationPerLevelDp.toFloat(),
-            )
-            maxDepth = ((contentMaxWidth / 2) / indentationPerLevelPx).toInt()
-
-            for (i in 0..items.lastIndex) {
-                if (items[i] is HeaderItem) {
-                    notifyItemChanged(i)
-                }
-            }
-        }
+    private var contentMaxWidth = 0
+    private var contentMaxHeight = 0
 
     var maxDepth: Int = Int.MAX_VALUE
 
@@ -434,7 +417,7 @@ class PostAdapter(
 
                     postAndCommentViewBuilder.bindPostView(
                         binding = b,
-                        container = containerView,
+                        contentMaxHeight = contentMaxHeight,
                         postView = item.postView,
                         accountId = accountId,
                         instance = instance,
@@ -527,12 +510,12 @@ class PostAdapter(
 
                 postAndCommentViewBuilder.bindPostView(
                     binding = b,
-                    container = containerView,
                     postView = item.postView,
                     accountId = accountId,
                     instance = instance,
                     isRevealed = revealAll || revealedItems.contains(postKey),
                     contentMaxWidth = contentMaxWidth,
+                    contentMaxHeight = contentMaxHeight,
                     viewLifecycleOwner = lifecycleOwner,
                     videoState = item.videoState,
                     updateContent = true,
@@ -1581,4 +1564,23 @@ class PostAdapter(
     }
 
     fun isPost(position: Int): Boolean = items[position] is HeaderItem
+
+    fun setContentMaxSize(width: Int, height: Int) {
+        if (width == contentMaxWidth && height == contentMaxHeight) {
+            return
+        }
+        contentMaxWidth = width
+        contentMaxHeight = height
+
+        val indentationPerLevelPx = Utils.convertDpToPixel(
+            postAndCommentViewBuilder.commentUiConfig.indentationPerLevelDp.toFloat(),
+        )
+        maxDepth = ((contentMaxWidth / 2) / indentationPerLevelPx).toInt()
+
+        for (i in 0..items.lastIndex) {
+            if (items[i] is HeaderItem) {
+                notifyItemChanged(i)
+            }
+        }
+    }
 }

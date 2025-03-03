@@ -26,6 +26,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.view.StorageUsageItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -80,11 +81,7 @@ class SettingsCacheFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = cacheSettings.getPageName(context)
+            setupToolbar(binding.toolbar, cacheSettings.getPageName(context))
         }
 
 //        doStandardOfflineButton.setOnClickListener {

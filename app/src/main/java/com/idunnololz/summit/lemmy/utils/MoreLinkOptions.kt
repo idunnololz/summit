@@ -11,6 +11,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
@@ -234,6 +235,17 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                                 title = context.getString(R.string.send_message),
                                 icon = R.drawable.baseline_message_24,
                             )
+                            addItemWithIcon(
+                                R.id.tag_user,
+                                context.getString(
+                                    R.string.tag_user_format,
+                                    when (pageRef) {
+                                        is PersonRef.PersonRefById -> pageRef.id
+                                        is PersonRef.PersonRefByName -> pageRef.name
+                                    },
+                                ),
+                                R.drawable.outline_sell_24,
+                            )
 
                             if (moreActionsHelper.fullAccount?.isPersonBlocked(pageRef) == true) {
                                 addItemWithIcon(
@@ -387,7 +399,6 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         }
         R.id.download -> {
             moreActionsHelper.downloadImage(
-                context = context,
                 destFileName = fileName,
                 url = url,
                 mimeType = mimeType,
@@ -483,6 +494,16 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
                     moreActionsHelper.updateSubscription(
                         communityRef = it,
                         subscribe = id == R.id.subscribe,
+                    )
+                }
+            }
+        }
+        R.id.tag_user -> {
+            (advancedLink as? AdvancedLink.PageLink)?.let {
+                (it.pageRef as? PersonRef)?.let { personRef ->
+                    AddOrEditUserTagDialogFragment.show(
+                        fragmentManager = fragmentManager,
+                        personRef = personRef,
                     )
                 }
             }

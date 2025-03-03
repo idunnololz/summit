@@ -60,6 +60,7 @@ import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -135,10 +136,10 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         val mainActivity = requireMainActivity()
 
         requireMainActivity().apply {
-            setSupportActionBar(binding.toolbar)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = ""
+            setupToolbar(
+                binding.toolbar,
+                "",
+            )
 
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
@@ -281,7 +282,11 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 }
             }
 
-            installOnActionResultHandler(moreActionsHelper, coordinatorLayout)
+            installOnActionResultHandler(
+                context = context,
+                moreActionsHelper = moreActionsHelper,
+                snackbarContainer = coordinatorLayout,
+            )
         }
 
         binding.fab.setOnClickListener {

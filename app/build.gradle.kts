@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 228
-        versionName = "1.55.5"
+        versionCode = 229
+        versionName = "1.56.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -156,4 +156,6 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(libs.kotlinx.serialization.json)
+
+//    implementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

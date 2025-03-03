@@ -20,6 +20,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import coil3.asImage
 import coil3.dispose
@@ -101,13 +102,10 @@ class PostListViewBuilder @Inject constructor(
     private val preferenceManager: PreferenceManager,
     private val themeManager: ThemeManager,
     private val accountManager: AccountManager,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
     private val avatarHelper: AvatarHelper,
     private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
     private val exoPlayerManagerManager: ExoPlayerManagerManager,
 ) {
-
-    private val coroutineScope = coroutineScopeFactory.create()
 
     companion object {
         private const val TAG = "PostListViewBuilder"
@@ -174,7 +172,7 @@ class PostListViewBuilder @Inject constructor(
     init {
         onPostUiConfigUpdated()
 
-        coroutineScope.launch {
+        fragment.lifecycleScope.launch {
             accountManager.currentAccount.collect {
                 val account = it as? Account
                 currentUser = account
