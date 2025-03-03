@@ -28,8 +28,6 @@ import org.jsoup.HttpStatusException
 
 @Singleton
 class LinkFixer @Inject constructor(
-    coroutineScopeFactory: CoroutineScopeFactory,
-    private val apiClient: LemmyApiClient,
     private val json: Json,
 ) {
 
@@ -37,7 +35,6 @@ class LinkFixer @Inject constructor(
         private const val TAG = "LinkFixer"
     }
 
-    private val coroutineScope = coroutineScopeFactory.create()
     private var knownInstances: Set<String> = setOf(
         "lemmy.world",
         "lemmy.ml",

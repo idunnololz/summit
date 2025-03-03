@@ -15,11 +15,11 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 class ImgurModule {
 
     @Provides
-    fun provideImgurApi(): ImgurApi = Retrofit.Builder()
+    fun provideImgurApi(json: Json): ImgurApi = Retrofit.Builder()
         .baseUrl("https://api.imgur.com")
         .client(get())
         .addConverterFactory(
-            Json.asConverterFactory(
+            json.asConverterFactory(
                 "application/json; charset=UTF8".toMediaType(),
             ),
         )

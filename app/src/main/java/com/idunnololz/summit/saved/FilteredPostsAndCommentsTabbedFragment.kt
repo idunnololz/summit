@@ -144,6 +144,7 @@ class FilteredPostsAndCommentsTabbedFragment :
             }
 
             installOnActionResultHandler(
+                context = context,
                 moreActionsHelper = moreActionsHelper,
                 snackbarContainer = binding.coordinatorLayout,
                 onSavePostChanged = {

@@ -37,6 +37,7 @@ import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -185,11 +186,45 @@ class HistoryFragment :
                     navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
                 }
 
-                setSupportActionBar(binding.toolbar)
+                setupToolbar(toolbar, getString(R.string.history))
+                toolbar.addMenuProvider(
+                    object : MenuProvider {
+                        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                            menuInflater.inflate(R.menu.menu_fragment_history, menu)
 
-                supportActionBar?.setDisplayShowHomeEnabled(true)
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
-                supportActionBar?.title = getString(R.string.history)
+                            val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
+                            searchView.setOnQueryTextListener(
+                                object : SearchView.OnQueryTextListener {
+                                    override fun onQueryTextSubmit(query: String?): Boolean {
+                                        return true
+                                    }
+
+                                    override fun onQueryTextChange(newText: String?): Boolean {
+                                        if (newText != null) {
+                                            adapter.setQuery(newText)
+                                            viewModel.query(newText)
+                                        }
+
+                                        return true
+                                    }
+                                },
+                            )
+                        }
+
+                        override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                            when (menuItem.itemId) {
+                                R.id.search -> {
+                                    true
+                                }
+                                R.id.clear_history -> {
+                                    viewModel.clearHistory()
+                                    true
+                                }
+                                else ->
+                                    false
+                            }
+                    }
+                )
             }
 
             recyclerView.setHasFixedSize(true)
@@ -236,45 +271,6 @@ class HistoryFragment :
                 init()
             }
         }
-
-        addMenuProvider2(
-            object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.menu_fragment_history, menu)
-
-                    val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
-                    searchView.setOnQueryTextListener(
-                        object : SearchView.OnQueryTextListener {
-                            override fun onQueryTextSubmit(query: String?): Boolean {
-                                return true
-                            }
-
-                            override fun onQueryTextChange(newText: String?): Boolean {
-                                if (newText != null) {
-                                    adapter.setQuery(newText)
-                                    viewModel.query(newText)
-                                }
-
-                                return true
-                            }
-                        },
-                    )
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                    when (menuItem.itemId) {
-                        R.id.search -> {
-                            true
-                        }
-                        R.id.clear_history -> {
-                            viewModel.clearHistory()
-                            true
-                        }
-                        else ->
-                            false
-                    }
-            },
-        )
     }
 
     override fun onDestroyView() {

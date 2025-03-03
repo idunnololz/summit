@@ -544,6 +544,7 @@ class CommunityFragment :
             }
 
             installOnActionResultHandler(
+                context = context,
                 moreActionsHelper = moreActionsHelper,
                 snackbarContainer = coordinatorLayout,
                 onPostUpdated = { postId, accountId ->
@@ -1241,6 +1242,12 @@ class CommunityFragment :
         Log.d(TAG, "onDestroyView()")
 
         itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
+        itemTouchHelper = null
+
+        slidingPaneController = null
+        lemmyAppBarController = null
+        swipeActionCallback = null
+        binding.recyclerView.adapter = null
 
         super.onDestroyView()
     }

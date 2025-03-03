@@ -36,14 +36,13 @@ class CreateOrEditPostViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
     private val state: SavedStateHandle,
+    private val linkMetadataHelper: LinkMetadataHelper,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "CreateOrEditPostViewModel"
     }
-
-    private val linkMetadataHelper = LinkMetadataHelper()
 
     var postPrefilled: Boolean = false
     val createOrEditPostResult = StatefulLiveData<PostView>()

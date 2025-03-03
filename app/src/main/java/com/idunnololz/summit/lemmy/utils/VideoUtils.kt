@@ -55,7 +55,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
         setOnMenuItemClickListener {
             when (it.id) {
                 R.id.download -> {
-                    moreActionsHelper.downloadVideo(context, url)
+                    moreActionsHelper.downloadVideo(url)
                 }
                 R.id.copy_link -> {
                     Utils.copyToClipboard(context, originalUrl)

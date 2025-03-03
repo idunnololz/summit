@@ -390,6 +390,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
 
         installOnActionResultHandler(
+            context = context,
             moreActionsHelper = moreActionsHelper,
             snackbarContainer = binding.root,
         )
@@ -475,7 +476,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 adapter = PostAdapter(
                     postAndCommentViewBuilder = postAndCommentViewBuilder,
                     context = context,
-                    containerView = binding.recyclerView,
                     lifecycleOwner = viewLifecycleOwner,
                     instance = args.instance,
                     accountId = null,
@@ -580,7 +580,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 recyclerView.adapter = adapter
                 recyclerView.doOnLayout {
                     recyclerView.post {
-                        adapter.contentMaxWidth = recyclerView.measuredWidth
+                        adapter.setContentMaxSize(
+                            recyclerView.measuredWidth,
+                            recyclerView.measuredHeight,
+                        )
                     }
                 }
                 recyclerView.setup(animationsHelper)

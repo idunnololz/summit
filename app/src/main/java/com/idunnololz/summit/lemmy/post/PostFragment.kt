@@ -72,6 +72,7 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentGestureAction
+import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
@@ -422,7 +423,6 @@ class PostFragment :
                 adapter = PostAdapter(
                     postAndCommentViewBuilder = postAndCommentViewBuilder,
                     context = context,
-                    containerView = binding.recyclerView,
                     lifecycleOwner = this@PostFragment,
                     instance = getInstance(),
                     accountId = accountId,
@@ -442,18 +442,7 @@ class PostFragment :
                         onInstanceMismatch(accountInstance, apiInstance)
                     },
                     onAddCommentClick = { postOrComment ->
-                        if (accountManager.currentAccount.value == null) {
-                            PreAuthDialogFragment.newInstance(R.id.action_add_comment)
-                                .show(childFragmentManager, "asdf")
-                            return@PostAdapter
-                        }
-
-                        AddOrEditCommentFragment.showReplyDialog(
-                            instance = getInstance(),
-                            postOrCommentView = postOrComment,
-                            fragmentManager = childFragmentManager,
-                            accountId = accountId,
-                        )
+                        onAddCommentClick(postOrComment)
                     },
                     onImageClick = { postOrCommentView, imageView, url ->
                         getMainActivity()?.openImage(
@@ -540,6 +529,7 @@ class PostFragment :
             }
 
             installOnActionResultHandler(
+                context = context,
                 moreActionsHelper = moreActionsHelper,
                 snackbarContainer = binding.fabSnackbarCoordinatorLayout,
                 onPostUpdated = { postId, accountId ->
@@ -554,18 +544,49 @@ class PostFragment :
                 },
             )
 
-            binding.fab.setup(preferences)
+            fab.setup(preferences)
             if (preferences.commentsNavigationFab) {
-                binding.fab.setImageResource(R.drawable.outline_navigation_24)
-                binding.fab.show()
-                binding.fab.setOnClickListener {
+                fab.setImageResource(R.drawable.outline_navigation_24)
+                fab.show()
+                fab.setOnClickListener {
                     viewModel.toggleCommentNavControls()
                 }
             } else {
-                binding.fab.setImageResource(R.drawable.baseline_more_horiz_24)
-                binding.fab.show()
-                binding.fab.setOnClickListener {
+                fab.setImageResource(R.drawable.baseline_more_horiz_24)
+                fab.show()
+                fab.setOnClickListener {
                     onMoreClick()
+                }
+            }
+
+            when (preferences.postFabQuickAction) {
+                PostFabQuickActions.NONE -> {}
+                PostFabQuickActions.ADD_COMMENT -> {
+                    fab.setOnLongClickListener {
+                        val postView = viewModel.postData.valueOrNull?.postView?.post
+                        if (postView != null) {
+                            onAddCommentClick(Either.Left(postView))
+                        }
+                        true
+                    }
+                }
+                PostFabQuickActions.COLLAPSE_ALL_COMMENTS -> {
+                    fab.setOnLongClickListener {
+                        if (viewModel.maxDepth == 1) {
+                            viewModel.maxDepth = null
+                        } else {
+                            viewModel.maxDepth = 1
+                        }
+                        forceRefresh()
+                        true
+                    }
+                }
+                PostFabQuickActions.SCROLL_TO_TOP -> {
+                    fab.setOnLongClickListener {
+                        appBar.setExpanded(true, true)
+                        recyclerView.smoothScrollToPosition(0)
+                        true
+                    }
                 }
             }
 
@@ -754,7 +775,10 @@ class PostFragment :
             runAfterLayout {
                 if (!isBindingAvailable()) return@runAfterLayout
 
-                adapter?.contentMaxWidth = binding.recyclerView.width
+                adapter?.setContentMaxSize(
+                    binding.recyclerView.width,
+                    binding.recyclerView.height
+                )
 
                 setup()
             }
@@ -765,6 +789,21 @@ class PostFragment :
                 }
             }
         }
+    }
+
+    private fun onAddCommentClick(postOrComment: Either<PostView, CommentView>) {
+        if (accountManager.currentAccount.value == null) {
+            PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                .show(childFragmentManager, "asdf")
+            return
+        }
+
+        AddOrEditCommentFragment.showReplyDialog(
+            instance = getInstance(),
+            postOrCommentView = postOrComment,
+            fragmentManager = childFragmentManager,
+            accountId = accountId,
+        )
     }
 
     private fun onInstanceMismatch(accountInstance: String, apiInstance: String) {
@@ -828,9 +867,7 @@ class PostFragment :
     }
 
     private fun highlightMatch(match: QueryMatchHelper.QueryResult) {
-        layoutManager?.let {
-            it.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop)
-        }
+        layoutManager?.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop)
     }
 
     private fun goToNextComment() {
@@ -876,6 +913,12 @@ class PostFragment :
         Log.d(TAG, "onDestroyView()")
 
         itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
+        itemTouchHelper = null
+
+        commentNavViewController = null
+        swipeActionCallback = null
+        binding.recyclerView.adapter = null
+        binding.recyclerView.layoutManager = null
 
         super.onDestroyView()
     }
@@ -1045,7 +1088,10 @@ class PostFragment :
         }
 
         binding.root.doOnPreDraw {
-            adapter.contentMaxWidth = binding.recyclerView.width
+            adapter.setContentMaxSize(
+                binding.recyclerView.width,
+                binding.recyclerView.height
+            )
         }
     }
 
@@ -1189,7 +1235,10 @@ class PostFragment :
         }
 
         runAfterLayout {
-            adapter?.contentMaxWidth = binding.recyclerView.width
+            adapter?.setContentMaxSize(
+                binding.recyclerView.width,
+                binding.recyclerView.height
+            )
 
             attachGestureHandlerToRecyclerViewIfNeeded()
         }

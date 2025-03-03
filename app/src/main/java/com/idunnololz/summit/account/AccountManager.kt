@@ -161,6 +161,10 @@ class AccountManager @Inject constructor(
         onAccountChangeListeners.add(onAccountChangeListener)
     }
 
+    fun removeOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
+        onAccountChangeListeners.add(onAccountChangeListener)
+    }
+
     fun getLocalAccountId(account: Account): Int {
         val accountKey = account.fullName
         if (accountIdsSharedPreference.contains(accountKey)) {

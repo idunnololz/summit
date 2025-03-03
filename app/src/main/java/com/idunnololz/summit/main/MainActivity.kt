@@ -331,8 +331,6 @@ class MainActivity :
             },
         )
 
-        onPreferencesChanged()
-
         navBarController.setup()
 
         if (savedInstanceState == null) {
@@ -347,6 +345,14 @@ class MainActivity :
         if (isVersionUpdate || newInstall) {
             binding.rootView.post {
                 onUpdateComplete()
+            }
+        }
+
+        onPreferencesChanged()
+
+        lifecycleScope.launch {
+            preferences.onPreferenceChangeFlow.collect {
+                onPreferencesChanged()
             }
         }
     }
@@ -387,6 +393,12 @@ class MainActivity :
             binding.notificationBarBgContainer.visibility = View.VISIBLE
         }
 
+        if (preferences.shakeToSendFeedback) {
+            shakeFeedbackHelper.start()
+        } else {
+            shakeFeedbackHelper.stop()
+        }
+
         navBarController.onPreferencesChanged(preferences)
 
         updateUserAvatar()
@@ -421,7 +433,10 @@ class MainActivity :
         super.onResume()
 
         viewModel.updateUnreadCount()
-        shakeFeedbackHelper.start()
+
+        if (preferences.shakeToSendFeedback) {
+            shakeFeedbackHelper.start()
+        }
     }
 
     override fun onPause() {

@@ -1968,6 +1968,17 @@
     <string name="colorPickerDialog_preset">Preset</string>
     <string name="multi_community_desc">Merged feed of multiple communities</string>
     <string name="color_wheel">Wheel</string>
+    <string name="swipe_between_posts">Swipe between posts</string>
+    <string name="swipe_between_posts_desc">When enabled, swiping left and right will show the previous or next post.</string>
+    <string name="post_fab_quick_action">FAB quick action</string>
+    <string name="post_fab_quick_action_desc">Choose an action to perform when the floating action button on the post screen (button near the bottom of the screen) is long pressed.</string>
+    <string name="collapse_all_comments">Collapse all comments</string>
+    <string name="scroll_to_top">Scroll to top</string>
+    <string name="shake_to_send_feedback">Shake to send feedback</string>
+    <string name="show_labels_in_navigation_bar">Show labels in navigation bar</string>
+    <string name="open_in_app">Open in app</string>
+    <string name="open_in_app_desc">Detected link is a lemmy instance. Tap to open in app.</string>
+    <string name="disable_shake_to_give_feedback">Disable shake to give feedback</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

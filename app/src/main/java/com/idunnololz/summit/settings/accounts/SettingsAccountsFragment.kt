@@ -13,6 +13,7 @@ import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.databinding.FragmentSettingsAccountsBinding
+import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -21,6 +22,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -56,11 +58,7 @@ class SettingsAccountsFragment : BaseFragment<FragmentSettingsAccountsBinding>()
             setupForFragment<SettingsFragment>()
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.choose_an_account)
+            setupToolbar(binding.toolbar, context.getString(R.string.choose_an_account))
         }
 
         val adapter = AccountAdapter(

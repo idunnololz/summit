@@ -12,6 +12,7 @@ import com.idunnololz.summit.databinding.FragmentSettingsPostAndCommentsBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
+import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences
@@ -28,6 +29,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -66,11 +68,7 @@ class SettingsPostAndCommentsFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
+            setupToolbar(binding.toolbar, settings.getPageName(context))
         }
 
         updateRendering()
@@ -102,11 +100,24 @@ class SettingsPostAndCommentsFragment :
                     .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
             },
         )
+        settings.postFabQuickAction.bindTo(
+            binding.postFabQuickAction,
+            { preferences.postFabQuickAction },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "postFabQuickAction")
+            },
+        )
 
         settings.relayStyleNavigation.bindTo(
             binding.relayStyleNavigation,
             { preferences.commentsNavigationFab },
             { preferences.commentsNavigationFab = it },
+        )
+        settings.swipeBetweenPosts.bindTo(
+            binding.swipeBetweenPosts,
+            { preferences.swipeBetweenPosts },
+            { preferences.swipeBetweenPosts = it },
         )
         settings.useVolumeButtonNavigation.bindTo(
             binding.useVolumeButtonNavigation,
@@ -285,6 +296,9 @@ class SettingsPostAndCommentsFragment :
                         preferences.commentShowUpAndDownVotes = false
                     }
                 }
+            }
+            settings.postFabQuickAction.id -> {
+                preferences.postFabQuickAction = value as Int
             }
         }
 

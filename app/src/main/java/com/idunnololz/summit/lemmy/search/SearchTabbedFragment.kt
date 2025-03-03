@@ -275,6 +275,7 @@ class SearchTabbedFragment :
             }
 
             installOnActionResultHandler(
+                context = context,
                 moreActionsHelper = moreActionsHelper,
                 snackbarContainer = binding.coordinatorLayout,
             )

@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.MarginPageTransformer
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
@@ -22,6 +23,7 @@ import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +32,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class PostTabbedFragment :
     BaseFragment<TabbedFragmentPostBinding>() {
 
-        private val args: PostTabbedFragmentArgs by navArgs()
+    private val args: PostTabbedFragmentArgs by navArgs()
+
+    private var argumentsHandled = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +68,17 @@ class PostTabbedFragment :
         with(binding) {
             viewPager.adapter = pagerAdapter
             viewPager.offscreenPageLimit = 1
+            viewPager.setPageTransformer(
+                MarginPageTransformer(Utils.convertDpToPixel(16f).toInt()))
+
+            if (savedInstanceState == null && !argumentsHandled) {
+                argumentsHandled = true
+
+                val index = pagerAdapter.findPageIndex(args.id.toLong())
+                if (index >= 0) {
+                    viewPager.setCurrentItem(index, false)
+                }
+            }
         }
     }
 
@@ -166,6 +181,14 @@ class PostTabbedFragment :
             )
             this.items = newItems
             diff.dispatchUpdatesTo(this)
+        }
+
+        fun findPageIndex(id: Long): Int {
+            return items.indexOfLast {
+                when(it) {
+                    is Item.PostItem -> it.id == id
+                }
+            }
         }
     }
 }

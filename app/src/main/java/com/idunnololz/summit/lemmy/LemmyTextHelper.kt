@@ -355,16 +355,16 @@ object LemmyTextHelper {
     }
 
     fun getMarkwonTheme(context: Context): MarkwonTheme {
-        return getMarkwon(context).configuration().theme()
+        return getMarkwon(context.applicationContext).configuration().theme()
     }
 
     private fun getMarkwon(context: Context) =
-        markwon ?: createMarkwon(context, inlineMedia = true).also {
+        markwon ?: createMarkwon(context.applicationContext, inlineMedia = true).also {
             markwon = it
         }
 
     private fun getNoMediaMarkwon(context: Context) =
-        noMediaMarkwon ?: createMarkwon(context, inlineMedia = false).also {
+        noMediaMarkwon ?: createMarkwon(context.applicationContext, inlineMedia = false).also {
             noMediaMarkwon = it
         }
 

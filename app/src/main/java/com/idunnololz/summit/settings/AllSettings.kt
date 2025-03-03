@@ -12,6 +12,7 @@ import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
+import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
@@ -66,6 +67,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERV
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
+import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FEED_SHOW_SCROLL_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_2
@@ -82,10 +84,12 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SEARCH_HOME_CONFIG
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_IMAGE_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_UPVOTE_PERCENTAGE
@@ -1122,6 +1126,43 @@ class PostAndCommentsSettings @Inject constructor(
         ),
         relatedKeys = listOf(KEY_HIDE_COMMENT_SCORES, KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES),
     )
+    val swipeBetweenPosts = OnOffSettingItem(
+        null,
+        context.getString(R.string.swipe_between_posts),
+        context.getString(R.string.swipe_between_posts_desc),
+    )
+    val postFabQuickAction = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.post_fab_quick_action),
+        context.getString(R.string.post_fab_quick_action_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                PostFabQuickActions.NONE,
+                context.getString(R.string.no_action),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostFabQuickActions.ADD_COMMENT,
+                context.getString(R.string.add_comment),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostFabQuickActions.COLLAPSE_ALL_COMMENTS,
+                context.getString(R.string.collapse_all_comments),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                PostFabQuickActions.SCROLL_TO_TOP,
+                context.getString(R.string.scroll_to_top),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(KEY_POST_FAB_QUICK_ACTION),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         defaultCommentsSortOrder,
@@ -1130,6 +1171,8 @@ class PostAndCommentsSettings @Inject constructor(
         commentHeaderLayout,
         settingPostAndCommentsAppearance,
         commentScores,
+        swipeBetweenPosts,
+        postFabQuickAction,
     )
 }
 
@@ -1947,6 +1990,18 @@ class MiscSettings @Inject constructor(
             KEY_ANIMATION_LEVEL,
         ),
     )
+    val shakeToSendFeedback = OnOffSettingItem(
+        null,
+        context.getString(R.string.shake_to_send_feedback),
+        null,
+        relatedKeys = listOf(KEY_SHAKE_TO_SEND_FEEDBACK),
+    )
+    val showLabelsInNavBar = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_labels_in_navigation_bar),
+        null,
+        relatedKeys = listOf(KEY_SHOW_LABELS_IN_NAV_BAR),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -1962,6 +2017,8 @@ class MiscSettings @Inject constructor(
         autoPlayVideos,
         uploadImagesToImgur,
         animationLevel,
+        shakeToSendFeedback,
+        showLabelsInNavBar,
     )
 }
 

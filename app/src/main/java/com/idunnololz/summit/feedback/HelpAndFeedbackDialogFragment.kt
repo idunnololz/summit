@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.databinding.DialogFragmentHelpAndFeedbackBinding
-import com.idunnololz.summit.preferences.ThemeManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.openAppOnPlayStore
 import com.idunnololz.summit.util.startFeedbackIntent
 import com.idunnololz.summit.util.summitCommunityPage
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class HelpAndFeedbackDialogFragment :
     BaseBottomSheetDialogFragment<DialogFragmentHelpAndFeedbackBinding>(),
     FullscreenDialogFragment {
@@ -24,7 +26,7 @@ class HelpAndFeedbackDialogFragment :
     }
 
     @Inject
-    lateinit var themeManager: ThemeManager
+    lateinit var preferences: Preferences
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +65,16 @@ class HelpAndFeedbackDialogFragment :
             communityButton.setOnClickListener {
                 getMainActivity()?.launchPage(summitCommunityPage)
                 dismiss()
+            }
+
+            if (preferences.shakeToSendFeedback) {
+                disableGestureButton.visibility = View.VISIBLE
+                disableGestureButton.setOnClickListener {
+                    preferences.shakeToSendFeedback = false
+                    disableGestureButton.visibility = View.GONE
+                }
+            } else {
+                disableGestureButton.visibility = View.GONE
             }
         }
     }

@@ -55,7 +55,7 @@ object LinkResolver {
 
         val uri = Uri.parse(url)
         val instance = uri.host ?: return null
-        val defaultResult = CommunityRef.Local(instance)
+        val defaultResult = CommunityRef.Local(instance, url)
 
         when (uri.pathSegments.firstOrNull()) {
             null -> { // This is likely a link to the front page
