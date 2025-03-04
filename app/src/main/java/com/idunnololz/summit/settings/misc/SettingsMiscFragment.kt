@@ -271,6 +271,11 @@ class SettingsMiscFragment :
             { preferences.showLabelsInNavBar },
             { preferences.showLabelsInNavBar = it },
         )
+        settings.showNewPersonWarning.bindTo(
+            binding.showNewPersonWarning,
+            { preferences.warnNewPerson },
+            { preferences.warnNewPerson = it },
+        )
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {
