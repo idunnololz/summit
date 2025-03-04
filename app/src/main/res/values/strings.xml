@@ -1934,8 +1934,6 @@
     <string name="local_feed_desc">Posts from communities on this instance</string>
     <string name="moderated_feed_desc">Posts from communities you moderate</string>
     <string name="all_subscribed_feed_desc">Posts from your communities across all accounts</string>
-    <string name="users_format">%1$s Users</string>
-    <string name="comments_format">%1$s Comments</string>
     <string name="colorPickerDialog_reset">Reset</string>
     <string name="colorPickerDialog_preset">Preset</string>
     <string name="multi_community_desc">Merged feed of multiple communities</string>
@@ -1970,13 +1968,18 @@
     </plurals>
     <!-- Text for the number of posts. -->
     <plurals name="posts_format">
-        <item quantity="one">%1$s post</item>
-        <item quantity="other">%1$s posts</item>
+        <item quantity="one">%1$s Post</item>
+        <item quantity="other">%1$s Posts</item>
     </plurals>
     <!-- Text for the number of comments. -->
     <plurals name="comments_format">
-        <item quantity="one">%1$s comment</item>
-        <item quantity="other">%1$s comments</item>
+        <item quantity="one">%1$s Comment</item>
+        <item quantity="other">%1$s Comments</item>
+    </plurals>
+    <!-- Text for the number of Users. -->
+    <plurals name="users_format">
+        <item quantity="one">%1$s User</item>
+        <item quantity="other">%1$s Users</item>
     </plurals>
     <!-- Text which displays a time interval in days. -->
     <plurals name="day_format">

@@ -46,6 +46,7 @@ import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -453,9 +454,11 @@ class LemmyAppBarController(
                         { it.community_view.counts.comments },
                     )
                     append(
-                        context.getString(
-                            R.string.users_format, LemmyUtils.abbrevNumber(totalUsers.toLong()),
-                        ),
+                        context.resources.getQuantityString(
+                            R.plurals.users_format,
+                            totalUsers,
+                            LemmyUtils.abbrevNumber(totalUsers.toLong()),
+                        )
                     )
                     appendSeparator()
                     append(
@@ -465,15 +468,19 @@ class LemmyAppBarController(
                     )
                     appendSeparator()
                     append(
-                        context.getString(
-                            R.string.posts_format, LemmyUtils.abbrevNumber(posts.toLong()),
-                        ),
+                        context.resources.getQuantityString(
+                            R.plurals.posts_format,
+                            posts,
+                            LemmyUtils.abbrevNumber(posts.toLong()),
+                        )
                     )
                     appendSeparator()
                     append(
-                        context.getString(
-                            R.string.comments_format, LemmyUtils.abbrevNumber(comments.toLong()),
-                        ),
+                        context.resources.getQuantityString(
+                            R.plurals.comments_format,
+                            comments,
+                            LemmyUtils.abbrevNumber(comments.toLong()),
+                        )
                     )
                 }
             }
