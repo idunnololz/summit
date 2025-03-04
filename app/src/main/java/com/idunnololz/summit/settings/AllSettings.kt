@@ -113,6 +113,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -2002,6 +2003,12 @@ class MiscSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_SHOW_LABELS_IN_NAV_BAR),
     )
+    val showNewPersonWarning = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_new_person_tag),
+        context.getString(R.string.show_new_person_tag_desc),
+        relatedKeys = listOf(KEY_WARN_NEW_PERSON)
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -2019,6 +2026,7 @@ class MiscSettings @Inject constructor(
         animationLevel,
         shakeToSendFeedback,
         showLabelsInNavBar,
+        showNewPersonWarning,
     )
 }
 

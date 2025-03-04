@@ -149,6 +149,12 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/show_new_person_warning"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/rotate_instance_on_upload_fail"
                     layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
