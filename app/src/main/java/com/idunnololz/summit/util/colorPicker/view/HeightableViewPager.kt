@@ -20,9 +20,11 @@ class HeightableViewPager : ViewPager {
         var height = 0
 
         val adapter = adapter
-        if (adapter != null && adapter is Heightable) height = (adapter as Heightable).getHeightAt(
-            currentItem, widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-        )
+        if (adapter != null && adapter is Heightable) {
+            height = (adapter as Heightable).getHeightAt(
+                currentItem, widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+            )
+        }
 
         if (height <= 0) {
             val v = getChildAt(currentItem)

@@ -36,8 +36,9 @@ import kotlin.math.max
  * or [GravitySnapHelper.setMaxFlingDistance]
  */
 class GravitySnapHelper @JvmOverloads constructor(
-    gravity: Int, enableSnapLastItem: Boolean = false,
-    snapListener: SnapListener? = null
+    gravity: Int,
+    enableSnapLastItem: Boolean = false,
+    snapListener: SnapListener? = null,
 ) :
     LinearSnapHelper() {
     var snapPadding: Int = 0
@@ -102,9 +103,11 @@ class GravitySnapHelper @JvmOverloads constructor(
     constructor(gravity: Int, snapListener: SnapListener) : this(gravity, false, snapListener)
 
     init {
-        require(!(gravity != Gravity.START && gravity != Gravity.END && gravity != Gravity.BOTTOM && gravity != Gravity.TOP && gravity != Gravity.CENTER)) {
+        require(
+            !(gravity != Gravity.START && gravity != Gravity.END && gravity != Gravity.BOTTOM && gravity != Gravity.TOP && gravity != Gravity.CENTER),
+        ) {
             "Invalid gravity value. Use START " +
-                    "| END | BOTTOM | TOP | CENTER constants"
+                "| END | BOTTOM | TOP | CENTER constants"
         }
         this.snapLastItem = enableSnapLastItem
         this.gravity = gravity
@@ -119,8 +122,10 @@ class GravitySnapHelper @JvmOverloads constructor(
         if (recyclerView != null) {
             recyclerView.onFlingListener = null
             if (gravity == Gravity.START || gravity == Gravity.END) {
-                isRtl = (TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-                        == ViewCompat.LAYOUT_DIRECTION_RTL)
+                isRtl = (
+                    TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
+                        == ViewCompat.LAYOUT_DIRECTION_RTL
+                    )
             }
             recyclerView.addOnScrollListener(scrollListener)
             this.recyclerView = recyclerView
@@ -140,33 +145,33 @@ class GravitySnapHelper @JvmOverloads constructor(
         when (gravity) {
             Gravity.START -> snapView = findView(
                 lm,
-                getHorizontalHelper(lm)!!, Gravity.START, checkEdgeOfList
+                getHorizontalHelper(lm)!!, Gravity.START, checkEdgeOfList,
             )
 
             Gravity.END -> snapView = findView(
                 lm,
-                getHorizontalHelper(lm)!!, Gravity.END, checkEdgeOfList
+                getHorizontalHelper(lm)!!, Gravity.END, checkEdgeOfList,
             )
 
             Gravity.TOP -> snapView = findView(
                 lm,
-                getVerticalHelper(lm)!!, Gravity.START, checkEdgeOfList
+                getVerticalHelper(lm)!!, Gravity.START, checkEdgeOfList,
             )
 
             Gravity.BOTTOM -> snapView = findView(
                 lm,
-                getVerticalHelper(lm)!!, Gravity.END, checkEdgeOfList
+                getVerticalHelper(lm)!!, Gravity.END, checkEdgeOfList,
             )
 
             Gravity.CENTER -> snapView = if (lm.canScrollHorizontally()) {
                 findView(
                     lm, getHorizontalHelper(lm)!!, Gravity.CENTER,
-                    checkEdgeOfList
+                    checkEdgeOfList,
                 )
             } else {
                 findView(
                     lm, getVerticalHelper(lm)!!, Gravity.CENTER,
-                    checkEdgeOfList
+                    checkEdgeOfList,
                 )
             }
         }
@@ -180,7 +185,7 @@ class GravitySnapHelper @JvmOverloads constructor(
 
     override fun calculateDistanceToFinalSnap(
         layoutManager: RecyclerView.LayoutManager,
-        targetView: View
+        targetView: View,
     ): IntArray {
         if (gravity == Gravity.CENTER) {
             return super.calculateDistanceToFinalSnap(layoutManager, targetView)!!
@@ -211,22 +216,29 @@ class GravitySnapHelper @JvmOverloads constructor(
     }
 
     override fun calculateScrollDistance(velocityX: Int, velocityY: Int): IntArray {
-        if (recyclerView == null || (verticalHelper == null && horizontalHelper == null)
-            || (maxFlingDistance == FLING_DISTANCE_DISABLE
-                    && maxFlingSizeFraction == FLING_SIZE_FRACTION_DISABLE)
+        if (recyclerView == null || (verticalHelper == null && horizontalHelper == null) ||
+            (
+                maxFlingDistance == FLING_DISTANCE_DISABLE &&
+                    maxFlingSizeFraction == FLING_SIZE_FRACTION_DISABLE
+                )
         ) {
             return super.calculateScrollDistance(velocityX, velocityY)
         }
         val out = IntArray(2)
         val scroller = Scroller(
             recyclerView!!.context,
-            DecelerateInterpolator()
+            DecelerateInterpolator(),
         )
         val maxDistance = flingDistance
         scroller.fling(
-            0, 0, velocityX, velocityY,
-            -maxDistance, maxDistance,
-            -maxDistance, maxDistance
+            0,
+            0,
+            velocityX,
+            velocityY,
+            -maxDistance,
+            maxDistance,
+            -maxDistance,
+            maxDistance,
         )
         out[0] = scroller.finalX
         out[1] = scroller.finalY
@@ -241,7 +253,7 @@ class GravitySnapHelper @JvmOverloads constructor(
             override fun onTargetFound(
                 targetView: View,
                 state: RecyclerView.State,
-                action: Action
+                action: Action,
             ) {
                 if (recyclerView == null || recyclerView!!.layoutManager == null) {
                     // The associated RecyclerView has been removed so there is no action to take.
@@ -249,13 +261,13 @@ class GravitySnapHelper @JvmOverloads constructor(
                 }
                 val snapDistances = calculateDistanceToFinalSnap(
                     recyclerView!!.layoutManager!!,
-                    targetView
+                    targetView,
                 )
                 val dx = snapDistances[0]
                 val dy = snapDistances[1]
                 val time = calculateTimeForDeceleration(
                     max(abs(dx.toDouble()), abs(dy.toDouble()))
-                        .toInt()
+                        .toInt(),
                 )
                 if (time > 0) {
                     action.update(dx, dy, time, mDecelerateInterpolator)
@@ -458,7 +470,7 @@ class GravitySnapHelper @JvmOverloads constructor(
                 if (viewHolder != null) {
                     val distances = calculateDistanceToFinalSnap(
                         recyclerView!!.layoutManager!!,
-                        viewHolder.itemView
+                        viewHolder.itemView,
                     )
                     recyclerView!!.scrollBy(distances[0], distances[1])
                     return true
@@ -513,7 +525,7 @@ class GravitySnapHelper @JvmOverloads constructor(
         layoutManager: RecyclerView.LayoutManager,
         helper: OrientationHelper,
         gravity: Int,
-        checkEdgeOfList: Boolean
+        checkEdgeOfList: Boolean,
     ): View? {
         if (layoutManager.childCount == 0 || layoutManager !is LinearLayoutManager) {
             return null
@@ -535,11 +547,11 @@ class GravitySnapHelper @JvmOverloads constructor(
             helper.end / 2
         }
 
-        val snapToStart = (gravity == Gravity.START && !isRtl)
-                || (gravity == Gravity.END && isRtl)
+        val snapToStart = (gravity == Gravity.START && !isRtl) ||
+            (gravity == Gravity.END && isRtl)
 
-        val snapToEnd = (gravity == Gravity.START && isRtl)
-                || (gravity == Gravity.END && !isRtl)
+        val snapToEnd = (gravity == Gravity.START && isRtl) ||
+            (gravity == Gravity.END && !isRtl)
 
         for (i in 0 until lm.childCount) {
             val currentView = lm.getChildAt(i)
@@ -548,26 +560,34 @@ class GravitySnapHelper @JvmOverloads constructor(
                     abs(helper.getDecoratedStart(currentView).toDouble()).toInt()
                 } else {
                     abs(
-                        (helper.startAfterPadding
-                                - helper.getDecoratedStart(currentView)).toDouble()
+                        (
+                            helper.startAfterPadding -
+                                helper.getDecoratedStart(currentView)
+                            ).toDouble(),
                     ).toInt()
                 }
             } else if (snapToEnd) {
                 if (!snapToPadding) {
                     abs(
-                        (helper.getDecoratedEnd(currentView)
-                                - helper.end).toDouble()
+                        (
+                            helper.getDecoratedEnd(currentView) -
+                                helper.end
+                            ).toDouble(),
                     ).toInt()
                 } else {
                     abs(
-                        (helper.endAfterPadding
-                                - helper.getDecoratedEnd(currentView)).toDouble()
+                        (
+                            helper.endAfterPadding -
+                                helper.getDecoratedEnd(currentView)
+                            ).toDouble(),
                     ).toInt()
                 }
             } else {
                 abs(
-                    (helper.getDecoratedStart(currentView)
-                            + (helper.getDecoratedMeasurement(currentView) / 2) - center).toDouble()
+                    (
+                        helper.getDecoratedStart(currentView) +
+                            (helper.getDecoratedMeasurement(currentView) / 2) - center
+                        ).toDouble(),
                 ).toInt()
             }
             if (currentViewDistance < distanceToTarget) {
@@ -579,15 +599,17 @@ class GravitySnapHelper @JvmOverloads constructor(
     }
 
     private fun isAtEdgeOfList(lm: LinearLayoutManager): Boolean {
-        return if ((!lm.reverseLayout && gravity == Gravity.START)
-            || (lm.reverseLayout && gravity == Gravity.END)
-            || (!lm.reverseLayout && gravity == Gravity.TOP)
-            || (lm.reverseLayout && gravity == Gravity.BOTTOM)
+        return if ((!lm.reverseLayout && gravity == Gravity.START) ||
+            (lm.reverseLayout && gravity == Gravity.END) ||
+            (!lm.reverseLayout && gravity == Gravity.TOP) ||
+            (lm.reverseLayout && gravity == Gravity.BOTTOM)
         ) {
             lm.findLastCompletelyVisibleItemPosition() == lm.itemCount - 1
         } else if (gravity == Gravity.CENTER) {
-            (lm.findFirstCompletelyVisibleItemPosition() == 0
-                    || lm.findLastCompletelyVisibleItemPosition() == lm.itemCount - 1)
+            (
+                lm.findFirstCompletelyVisibleItemPosition() == 0 ||
+                    lm.findLastCompletelyVisibleItemPosition() == lm.itemCount - 1
+                )
         } else {
             lm.findFirstCompletelyVisibleItemPosition() == 0
         }

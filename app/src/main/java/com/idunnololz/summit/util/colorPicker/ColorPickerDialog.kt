@@ -60,7 +60,7 @@ class ColorPickerDialog(
     /**
      * Get the current color int selected by the picker.
      *
-     * @return                  The current color of the picker.
+     * @return The current color of the picker.
      */
     @get:ColorInt
     @ColorInt
@@ -68,7 +68,6 @@ class ColorPickerDialog(
         private set
 
     private var listener: OnColorPickedListener? = null
-
 
     init {
         val inflater = LayoutInflater.from(
@@ -131,7 +130,9 @@ class ColorPickerDialog(
                             } catch (ignored: Exception) {
                             }
                         }
-                    } else shouldIgnoreNextHex = false
+                    } else {
+                        shouldIgnoreNextHex = false
+                    }
                 }
             },
         )
@@ -190,7 +191,6 @@ class ColorPickerDialog(
         return this
     }
 
-
     override fun onColorPicked(pickerView: ColorPicker?, @ColorInt color: Int) {
         updateColorPicked(color, updateFromEditText = false)
     }
@@ -217,7 +217,11 @@ class ColorPickerDialog(
                     Color.WHITE,
                 ),
             )
-        ) Color.WHITE else Color.BLACK
+        ) {
+            Color.WHITE
+        } else {
+            Color.BLACK
+        }
         colorHex.setTextColor(textColor)
         colorHex.backgroundTintList = ColorStateList.valueOf(textColor)
     }
@@ -245,7 +249,7 @@ class ColorPickerDialog(
      * Specify a listener to receive updates when a new color is selected.
      *
      * @param listener         The listener to receive updates.
-     * @return                "This" dialog instance, for method chaining.
+     * @return "This" dialog instance, for method chaining.
      */
     fun withListener(listener: OnColorPickedListener?): ColorPickerDialog {
         this.listener = listener
@@ -270,5 +274,4 @@ class ColorPickerDialog(
         globalStateStorage.colorPickerHistory =
             orderedSet.toList().take(50).joinToString(separator = ",")
     }
-
 }

@@ -57,16 +57,21 @@ class ColorHsvPalette(resources: Resources?, bitmap: Bitmap?) :
                     Color.CYAN,
                     Color.GREEN,
                     Color.YELLOW,
-                    Color.RED
+                    Color.RED,
                 ),
-                floatArrayOf(0.000f, 0.166f, 0.333f, 0.499f, 0.666f, 0.833f, 0.999f)
+                floatArrayOf(0.000f, 0.166f, 0.333f, 0.499f, 0.666f, 0.833f, 0.999f),
             )
 
         huePaint.setShader(sweepShader)
 
         val saturationShader: Shader =
             RadialGradient(
-                centerX, centerY, radius, Color.WHITE, 0x00FFFFFF, Shader.TileMode.CLAMP
+                centerX,
+                centerY,
+                radius,
+                Color.WHITE,
+                0x00FFFFFF,
+                Shader.TileMode.CLAMP,
             )
         saturationPaint.setShader(saturationShader)
 

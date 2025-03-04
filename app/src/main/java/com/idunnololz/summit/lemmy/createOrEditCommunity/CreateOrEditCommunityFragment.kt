@@ -156,7 +156,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     getString(R.string.create_community)
                 } else {
                     getString(R.string.edit_community)
-                }
+                },
             )
 
             binding.toolbar.addMenuProvider(
@@ -200,7 +200,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                             }
                         }
                     }
-                }
+                },
             )
 
             hideBottomNav()

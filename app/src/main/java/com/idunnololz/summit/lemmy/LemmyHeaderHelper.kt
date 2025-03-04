@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
@@ -22,6 +23,7 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
 import com.idunnololz.summit.spans.HorizontalDividerSpan
@@ -31,6 +33,7 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.tsToConcise
@@ -42,6 +45,7 @@ import dagger.assisted.AssistedInject
 class LemmyHeaderHelper @AssistedInject constructor(
     @Assisted private val context: Context,
     private val userTagsManager: UserTagsManager,
+    private val preferences: Preferences,
 ) {
 
     @AssistedFactory
@@ -51,6 +55,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
     companion object {
         private val TAG = "LemmyHeaderHelper"
+
+        private const val NEW_PERSON_DURATION = 30 * 24 * 60 * 60 * 1000L
 
         const val SEPARATOR = " ● "
 
@@ -65,10 +71,12 @@ class LemmyHeaderHelper @AssistedInject constructor(
     private val infoColor: Int = ContextCompat.getColor(context, R.color.style_blue_gray)
     private val criticalWarningColor: Int = ContextCompat.getColor(context, R.color.style_red)
     private val modColor: Int = context.getColorCompat(R.color.style_green)
+    private val newPersonColor: Int = context.getColorCompat(R.color.style_amber)
     private val adminColor: Int = context.getColorCompat(R.color.style_red)
     private val savedColor: Int = context.getColorCompat(R.color.style_blue)
     private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
     private val whiteTextColor: Int = context.getColorCompat(R.color.white97)
+    private val blackTextColor: Int = context.getColorCompat(R.color.black97)
 
     fun populateHeaderSpan(
         headerContainer: LemmyHeaderView,
@@ -303,6 +311,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
                 )
             }
 
+            sb.appendNewUserWarningIfNeeded(postView.creator)
+
             val tag = userTagsManager.getUserTag(postView.creator.fullName)
             if (tag != null) {
                 sb.append(" ")
@@ -489,6 +499,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
             }
         }
 
+        sb.appendNewUserWarningIfNeeded(commentView.creator)
+
         val tag = userTagsManager.getUserTag(commentView.creator.fullName)
         if (tag != null) {
             sb.append(" ")
@@ -614,6 +626,30 @@ class LemmyHeaderHelper @AssistedInject constructor(
                     onLinkClick(url, text, LinkContext.Text)
                 }
                 return true
+            }
+        }
+    }
+
+    private fun SpannableStringBuilder.appendNewUserWarningIfNeeded(person: Person) {
+        if (preferences.warnNewPerson) {
+            val personCreationTs = dateStringToTs(person.published)
+            val isPersonNew =
+                System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
+
+            if (isPersonNew) {
+                append(" ")
+                val s = length
+                append(tsToConcise(context, person.published))
+                val e = length
+                setSpan(
+                    RoundedBackgroundSpan(
+                        backgroundColor = newPersonColor,
+                        textColor = blackTextColor),
+                    s,
+                    e,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+                append(" ")
             }
         }
     }

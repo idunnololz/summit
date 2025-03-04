@@ -60,7 +60,7 @@ class SeekBarBackgroundDrawable(private val drawable: Drawable) : Drawable() {
         val bitmap = Bitmap.createBitmap(
             (bounds.width() - horizontalMargin * 2).toInt(),
             bounds.height(),
-            Bitmap.Config.RGB_565
+            Bitmap.Config.RGB_565,
         )
         drawable.setBounds(0, 0, bounds.width(), bounds.height())
         drawable.draw(Canvas(bitmap))

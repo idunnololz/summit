@@ -16,7 +16,7 @@ class GlobalStateStorage(
     var colorPickerHistory: String?
         get() = prefs.getString(
             "COLOR_PICKER_HISTORY",
-            "#ffff4500,#ff7193ff,#FFF44336,#FFFFC107,#FFFF9800,#FF4CAF50,#FF2196F3,#FF607D8B"
+            "#ffff4500,#ff7193ff,#FFF44336,#FFFFC107,#FFFF9800,#FF4CAF50,#FF2196F3,#FF607D8B",
         )
         set(value) {
             prefs.edit()

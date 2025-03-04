@@ -18,26 +18,22 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.annotation.FloatRange
 import androidx.annotation.MainThread
-import androidx.annotation.Px
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.PARENT_ID
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.alpha
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.ColorWheelPickerBinding
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.SeekBarBackgroundDrawable
-import com.idunnololz.summit.util.colorPicker.utils.ColorHsvPalette
 import com.idunnololz.summit.util.colorPicker.listeners.ColorListener
 import com.idunnololz.summit.util.colorPicker.listeners.ColorPickerViewListener
 import com.idunnololz.summit.util.colorPicker.utils.AlphaTileDrawable
+import com.idunnololz.summit.util.colorPicker.utils.ColorHsvPalette
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
 import com.idunnololz.summit.util.colorPicker.utils.PointMapper
@@ -114,7 +110,7 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         onCreate()
     }
@@ -123,7 +119,7 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
         context: Context,
         attrs: AttributeSet?,
         defStyleAttr: Int,
-        defStyleRes: Int
+        defStyleRes: Int,
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         onCreate()
     }
@@ -141,8 +137,8 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
         selector.setImageDrawable(
             ContextCompat.getDrawable(
                 context,
-                R.drawable.colorpickerview_wheel
-            )
+                R.drawable.colorpickerview_wheel,
+            ),
         )
 
         selector.alpha = 1f
@@ -165,11 +161,15 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
                         viewTreeObserver.removeOnGlobalLayoutListener(this)
                         onFinishInflated()
                     }
-                })
+                },
+            )
         palette.doOnPreDraw {
             if (palette.drawable == null && palette.measuredWidth > 0 && palette.measuredHeight > 0) {
                 val bitmap = Bitmap.createBitmap(
-                    palette.measuredWidth, palette.measuredHeight, Bitmap.Config.ARGB_8888)
+                    palette.measuredWidth,
+                    palette.measuredHeight,
+                    Bitmap.Config.ARGB_8888,
+                )
                 palette.setImageDrawable(ColorHsvPalette(resources, bitmap))
             }
         }
@@ -279,10 +279,12 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
                 x = x - palette.width * 0.5f
                 y = y - palette.height * 0.5f
                 val r = sqrt((x * x + y * y).toDouble())
-                val radius = (min(
-                    palette.width.toDouble(),
-                    palette.height.toDouble()
-                ) * 0.5f).toFloat()
+                val radius = (
+                    min(
+                        palette.width.toDouble(),
+                        palette.height.toDouble(),
+                    ) * 0.5f
+                    ).toFloat()
                 val hsv = floatArrayOf(0f, 0f, 1f)
                 hsv[0] = (atan2(y.toDouble(), -x.toDouble()) / Math.PI * 180f).toFloat() + 180
                 hsv[1] =
@@ -317,7 +319,7 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
         brightnessSlider.background = SeekBarBackgroundDrawable(
             GradientDrawable(
                 GradientDrawable.Orientation.LEFT_RIGHT,
-                intArrayOf(Color.BLACK, selectedWheelColor)
+                intArrayOf(Color.BLACK, selectedWheelColor),
             ).mutate().constantState!!.newDrawable(),
         )
     }
@@ -375,10 +377,12 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
             val lp = palette.layoutParams as LayoutParams
             val centerX = palette.width * 0.5f + lp.marginStart
             val centerY = palette.height * 0.5f + lp.topMargin
-            val radius = (hsv[1] * min(
-                palette.width,
-                palette.height,
-            ) * 0.5f)
+            val radius = (
+                hsv[1] * min(
+                    palette.width,
+                    palette.height,
+                ) * 0.5f
+                )
             val pointX = (radius * cos(Math.toRadians(hsv[0].toDouble())) + centerX).toInt()
             val pointY = (-radius * sin(Math.toRadians(hsv[0].toDouble())) + centerY).toInt()
 

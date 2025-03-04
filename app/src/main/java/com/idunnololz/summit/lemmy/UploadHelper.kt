@@ -63,7 +63,7 @@ class UploadHelper @Inject constructor(
         onSuccess: (UploadImageResult) -> Unit,
         onFailure: (Throwable) -> Unit,
     ) {
-        val file = File(directoryHelper.miscDir, "upload_file_$id")
+        val file = File(directoryHelper.miscCacheDir, "upload_file_$id")
         file.parentFile?.mkdirs()
 
         val inputStream = context.contentResolver.openInputStream(uri)

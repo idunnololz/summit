@@ -1,6 +1,5 @@
 package com.idunnololz.summit.actions
 
-import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -16,7 +15,6 @@ import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.utils.VotableRef
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,7 +30,6 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class PendingActionsManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     coroutineScopeFactory: CoroutineScopeFactory,
     private val actionsDao: LemmyActionsDao,
     private val failedActionsDao: LemmyFailedActionsDao,

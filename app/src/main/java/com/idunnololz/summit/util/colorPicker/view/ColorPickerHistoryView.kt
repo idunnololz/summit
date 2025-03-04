@@ -2,7 +2,6 @@ package com.idunnololz.summit.util.colorPicker.view
 
 import android.content.Context
 import android.graphics.Color
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,7 +65,7 @@ class ColorPickerHistoryView(
                 val colorString: String,
                 val color: Int,
                 val textColor: Int,
-            ): Item
+            ) : Item
         }
 
         private val adapterHelper = AdapterHelper<Item>(
@@ -75,9 +74,12 @@ class ColorPickerHistoryView(
                     is Item.ColorItem ->
                         old.color == (new as Item.ColorItem).color
                 }
-            }
+            },
         ).apply {
-            addItemType(Item.ColorItem::class, ItemColorPickerHistoryBinding::inflate) { item, b, h ->
+            addItemType(
+                Item.ColorItem::class,
+                ItemColorPickerHistoryBinding::inflate,
+            ) { item, b, h ->
                 b.card.setCardBackgroundColor(item.color)
                 b.text.text = item.colorString
                 b.text.setTextColor(item.textColor)
@@ -91,14 +93,12 @@ class ColorPickerHistoryView(
             refreshData()
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -115,14 +115,18 @@ class ColorPickerHistoryView(
                                 Color.WHITE,
                             ),
                         )
-                    ) Color.WHITE else Color.BLACK
+                    ) {
+                        Color.WHITE
+                    } else {
+                        Color.BLACK
+                    }
 
                     items.add(
                         Item.ColorItem(
                             colorString = it,
                             color = color,
                             textColor = textColor,
-                        )
+                        ),
                     )
                 } catch (e: Exception) {
                     // do nothing
@@ -131,6 +135,5 @@ class ColorPickerHistoryView(
 
             adapterHelper.setItems(items, this)
         }
-
     }
 }

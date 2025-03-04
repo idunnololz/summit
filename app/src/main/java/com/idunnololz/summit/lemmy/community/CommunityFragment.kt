@@ -26,6 +26,7 @@ import com.discord.panels.OverlappingPanelsLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.isCommunityBlocked
@@ -168,6 +169,9 @@ class CommunityFragment :
     @Inject
     lateinit var json: Json
 
+    @Inject
+    lateinit var accountImageGenerator: AccountImageGenerator
+
     lateinit var preferences: Preferences
 
     private var slidingPaneController: SlidingPaneController? = null
@@ -215,7 +219,7 @@ class CommunityFragment :
     }
 
     private val _sortByTopMenu: BottomMenu by lazy {
-        makeSortByTopMenu(requireContext()).apply {
+        makeSortByTopMenu().apply {
             setOnMenuItemClickListener { menuItem ->
                 idToSortOrder(menuItem.id)?.let {
                     viewModel.setSortOrder(it)
@@ -247,7 +251,7 @@ class CommunityFragment :
     }
 
     private val _defaultSortOrderSortByTopMenu by lazy {
-        makeSortByTopMenu(requireContext()).apply {
+        makeSortByTopMenu().apply {
             setOnMenuItemClickListener { menuItem ->
                 idToSortOrder(menuItem.id)?.let {
                     viewModel.setDefaultSortOrder(it)
@@ -273,7 +277,7 @@ class CommunityFragment :
         addItem(R.id.sort_order_scaled, R.string.sort_order_scaled)
     }
 
-    private fun makeSortByTopMenu(context: Context) = BottomMenu(requireContext()).apply {
+    private fun makeSortByTopMenu() = BottomMenu(requireContext()).apply {
         setTitle(R.string.sort_by_top)
         addItem(R.id.sort_order_top_last_hour, R.string.time_frame_last_hour)
         addItem(
@@ -316,6 +320,7 @@ class CommunityFragment :
                 postListViewBuilder = postListViewBuilder,
                 context = context,
                 postListEngine = viewModel.postListEngine,
+                accountImageGenerator = accountImageGenerator,
                 onNextClick = {
                     viewModel.fetchNextPage(clearPagePosition = true)
                 },

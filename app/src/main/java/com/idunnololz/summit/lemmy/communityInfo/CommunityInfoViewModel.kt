@@ -9,7 +9,6 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
-import com.idunnololz.summit.account.info.toAccountSubscription
 import com.idunnololz.summit.account.info.toFullAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient

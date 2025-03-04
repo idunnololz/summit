@@ -78,7 +78,7 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     override fun onTouchEvent(ev: MotionEvent?): Boolean {
         if (!isSwipeEnabled) {
             // Careful here, view might be null
-            getChildAt(1).dispatchTouchEvent(ev);
+            getChildAt(1).dispatchTouchEvent(ev)
             return true
         }
         return super.onTouchEvent(ev)

@@ -39,7 +39,10 @@ class AlphaTileDrawable : Drawable {
 
     private fun drawTiles() {
         val bitmap = Bitmap.createBitmap(
-            tileSize * 2, tileSize * 2, Bitmap.Config.ARGB_8888)
+            tileSize * 2,
+            tileSize * 2,
+            Bitmap.Config.ARGB_8888,
+        )
         val canvas = Canvas(bitmap)
         val rect = Rect(0, 0, tileSize, tileSize)
 
@@ -55,7 +58,7 @@ class AlphaTileDrawable : Drawable {
         drawTile(canvas, rect, bitmapPaint, tileSize, -tileSize)
 
         paint.setShader(
-            BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT)
+            BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT),
         )
     }
 
@@ -70,7 +73,7 @@ class AlphaTileDrawable : Drawable {
             horizontalMargin.toInt(),
             (bounds.centerY() - height / 2).toInt(),
             (width - horizontalMargin).toInt(),
-            (bounds.centerY() + height / 2).toInt()
+            (bounds.centerY() + height / 2).toInt(),
         )
         canvas.save()
         canvas.clipPath(path)
@@ -90,7 +93,7 @@ class AlphaTileDrawable : Drawable {
                     bounds.bottom.toFloat(),
                     startColor,
                     endColor,
-                    Shader.TileMode.CLAMP
+                    Shader.TileMode.CLAMP,
                 )
             gradientPaint.setShader(shader)
             canvas.drawRect(b, gradientPaint)

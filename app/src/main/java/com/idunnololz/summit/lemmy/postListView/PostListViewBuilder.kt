@@ -41,7 +41,6 @@ import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
 import com.idunnololz.summit.databinding.ListingItemCardBinding
@@ -60,7 +59,6 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
-import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.toCommunityRef

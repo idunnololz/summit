@@ -8,13 +8,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
-import com.idunnololz.summit.lemmy.community.PostListEngineItem
 import com.idunnololz.summit.lemmy.community.PostListAdapter
+import com.idunnololz.summit.lemmy.community.PostListEngineItem
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -52,6 +53,9 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
     @Inject
     lateinit var nsfwModeManager: NsfwModeManager
 
+    @Inject
+    lateinit var accountImageGenerator: AccountImageGenerator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -62,6 +66,7 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
             postListViewBuilder,
             requireContext(),
             viewModel.postListEngine,
+            accountImageGenerator = accountImageGenerator,
             onNextClick = {
 //                viewModel.fetchNextPage(clearPagePosition = true)
             },

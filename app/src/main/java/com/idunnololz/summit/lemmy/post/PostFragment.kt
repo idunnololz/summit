@@ -777,7 +777,7 @@ class PostFragment :
 
                 adapter?.setContentMaxSize(
                     binding.recyclerView.width,
-                    binding.recyclerView.height
+                    binding.recyclerView.height,
                 )
 
                 setup()
@@ -1090,7 +1090,7 @@ class PostFragment :
         binding.root.doOnPreDraw {
             adapter.setContentMaxSize(
                 binding.recyclerView.width,
-                binding.recyclerView.height
+                binding.recyclerView.height,
             )
         }
     }
@@ -1237,7 +1237,7 @@ class PostFragment :
         runAfterLayout {
             adapter?.setContentMaxSize(
                 binding.recyclerView.width,
-                binding.recyclerView.height
+                binding.recyclerView.height,
             )
 
             attachGestureHandlerToRecyclerViewIfNeeded()

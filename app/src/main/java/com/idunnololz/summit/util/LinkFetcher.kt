@@ -1,18 +1,18 @@
 package com.idunnololz.summit.util
 
 import com.idunnololz.summit.api.GetNetworkException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class LinkFetcher @Inject constructor(
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
 ) {
 
     suspend fun downloadSite(url: String, cache: Boolean = false): String =

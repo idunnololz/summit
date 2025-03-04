@@ -79,8 +79,6 @@ class DraftsFragment :
 
         viewModel.draftType = args.draftType
 
-        val parentFragment = parentFragment as DraftsTabbedFragment
-
         with(binding) {
             val adapter = DraftsAdapter(
                 onDraftClick = {

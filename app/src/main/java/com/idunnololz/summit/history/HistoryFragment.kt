@@ -192,7 +192,9 @@ class HistoryFragment :
                         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                             menuInflater.inflate(R.menu.menu_fragment_history, menu)
 
-                            val searchView: SearchView = menu.findItem(R.id.search).actionView as SearchView
+                            val searchView: SearchView = menu.findItem(
+                                R.id.search,
+                            ).actionView as SearchView
                             searchView.setOnQueryTextListener(
                                 object : SearchView.OnQueryTextListener {
                                     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -223,7 +225,7 @@ class HistoryFragment :
                                 else ->
                                     false
                             }
-                    }
+                    },
                 )
             }
 

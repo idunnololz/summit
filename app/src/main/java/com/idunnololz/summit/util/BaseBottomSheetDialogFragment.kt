@@ -13,7 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.idunnololz.summit.R
 import com.idunnololz.summit.main.MainActivity
 
-open class BaseBottomSheetDialogFragment<T : ViewBinding>() : BottomSheetDialogFragment() {
+open class BaseBottomSheetDialogFragment<T : ViewBinding> : BottomSheetDialogFragment() {
     fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
 

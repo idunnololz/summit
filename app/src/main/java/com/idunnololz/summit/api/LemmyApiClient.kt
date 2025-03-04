@@ -744,9 +744,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getUnreadCountNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getUnreadCountNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getUnreadCount(authorization = account?.bearer, form.serializeToMap())
+                api.getUnreadCount(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -791,7 +791,7 @@ class LemmyApiClient(
                 auth = account.jwt,
             )
 
-            retrofitErrorHandler { api.likePost(authorization = account?.bearer, form) }
+            retrofitErrorHandler { api.likePost(authorization = account.bearer, form) }
                 .fold(
                     onSuccess = {
                         Result.success(it.post_view)
@@ -813,7 +813,7 @@ class LemmyApiClient(
             auth = account.jwt,
         )
 
-        retrofitErrorHandler { api.likeComment(authorization = account?.bearer, form) }
+        retrofitErrorHandler { api.likeComment(authorization = account.bearer, form) }
             .fold(
                 onSuccess = {
                     Result.success(it.comment_view)
@@ -835,7 +835,7 @@ class LemmyApiClient(
             auth = account.jwt,
         )
 
-        retrofitErrorHandler { api.followCommunity(authorization = account?.bearer, form) }
+        retrofitErrorHandler { api.followCommunity(authorization = account.bearer, form) }
             .fold(
                 onSuccess = {
                     Result.success(it.community_view)
@@ -866,7 +866,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.banUserFromCommunity(authorization = account?.bearer, form)
+            api.banUserFromCommunity(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -887,7 +887,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.modUser(authorization = account?.bearer, form)
+            api.modUser(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -906,7 +906,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.distinguishComment(authorization = account?.bearer, form)
+            api.distinguishComment(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
@@ -948,7 +948,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.createComment(authorization = account?.bearer, form)
+            api.createComment(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it.comment_view) },
             onFailure = { Result.failure(it) },
@@ -967,7 +967,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.editComment(authorization = account?.bearer, form)
+            api.editComment(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -986,7 +986,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.deleteComment(authorization = account?.bearer, form)
+            api.deleteComment(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -1015,7 +1015,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.createPost(authorization = account?.bearer, form)
+            api.createPost(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -1044,7 +1044,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.editPost(authorization = account?.bearer, form)
+            api.editPost(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -1063,7 +1063,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.deletePost(authorization = account?.bearer, form)
+            api.deletePost(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -1088,7 +1088,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.featurePost(authorization = account?.bearer, form)
+            api.featurePost(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -1107,7 +1107,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.lockPost(authorization = account?.bearer, form)
+            api.lockPost(authorization = account.bearer, form)
         }.fold(
             onSuccess = { Result.success(it.post_view) },
             onFailure = { Result.failure(it) },
@@ -1178,7 +1178,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.blockCommunity(authorization = account?.bearer, form)
+            api.blockCommunity(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.community_view)
@@ -1201,7 +1201,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.blockPerson(authorization = account?.bearer, form)
+            api.blockPerson(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.person_view)
@@ -1224,7 +1224,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.blockInstance(authorization = account?.bearer, form)
+            api.blockInstance(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1314,9 +1314,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getRepliesNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getRepliesNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getReplies(authorization = account?.bearer, form.serializeToMap())
+                api.getReplies(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1346,9 +1346,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPersonMentionsNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getPersonMentionsNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getPersonMentions(authorization = account?.bearer, form.serializeToMap())
+                api.getPersonMentions(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1379,11 +1379,11 @@ class LemmyApiClient(
         return retrofitErrorHandler {
             if (force) {
                 api.getPrivateMessagesNoCache(
-                    authorization = account?.bearer,
+                    authorization = account.bearer,
                     form.serializeToMap(),
                 )
             } else {
-                api.getPrivateMessages(authorization = account?.bearer, form.serializeToMap())
+                api.getPrivateMessages(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1411,9 +1411,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getReportMessagesNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getReportMessagesNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getReportMessages(authorization = account?.bearer, form.serializeToMap())
+                api.getReportMessages(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1442,9 +1442,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getPostReportsNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getPostReportsNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getPostReports(authorization = account?.bearer, form.serializeToMap())
+                api.getPostReports(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1468,7 +1468,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.resolvePostReport(authorization = account?.bearer, form)
+            api.resolvePostReport(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1496,9 +1496,9 @@ class LemmyApiClient(
 
         return retrofitErrorHandler {
             if (force) {
-                api.getCommentReportsNoCache(authorization = account?.bearer, form.serializeToMap())
+                api.getCommentReportsNoCache(authorization = account.bearer, form.serializeToMap())
             } else {
-                api.getCommentReports(authorization = account?.bearer, form.serializeToMap())
+                api.getCommentReports(authorization = account.bearer, form.serializeToMap())
             }
         }.fold(
             onSuccess = {
@@ -1522,7 +1522,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.resolveCommentReport(authorization = account?.bearer, form)
+            api.resolveCommentReport(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1544,7 +1544,7 @@ class LemmyApiClient(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markCommentReplyAsRead(authorization = account?.bearer, form)
+            api.markCommentReplyAsRead(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -1566,7 +1566,7 @@ class LemmyApiClient(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markPersonMentionAsRead(authorization = account?.bearer, form)
+            api.markPersonMentionAsRead(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.person_mention_view)
@@ -1588,7 +1588,7 @@ class LemmyApiClient(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markPrivateMessageAsRead(authorization = account?.bearer, form)
+            api.markPrivateMessageAsRead(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.private_message_view)
@@ -1604,7 +1604,7 @@ class LemmyApiClient(
             account.jwt,
         )
         return retrofitErrorHandler {
-            api.markAllAsRead(authorization = account?.bearer, form)
+            api.markAllAsRead(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1626,7 +1626,7 @@ class LemmyApiClient(
             auth = account.jwt,
         )
         return retrofitErrorHandler {
-            api.createPrivateMessage(authorization = account?.bearer, form)
+            api.createPrivateMessage(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.private_message_view)
@@ -1641,7 +1641,7 @@ class LemmyApiClient(
         val form = SavePost(postId, save, account.jwt)
 
         return retrofitErrorHandler {
-            api.savePost(authorization = account?.bearer, form)
+            api.savePost(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.post_view)
@@ -1660,7 +1660,7 @@ class LemmyApiClient(
         val form = SaveComment(commentId, save, account.jwt)
 
         return retrofitErrorHandler {
-            api.saveComment(authorization = account?.bearer, form)
+            api.saveComment(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it.comment_view)
@@ -1706,7 +1706,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.createCommentReport(authorization = account?.bearer, form)
+            api.createCommentReport(authorization = account.bearer, form)
         }.fold(
             onSuccess = {
                 Result.success(it)
@@ -1737,7 +1737,7 @@ class LemmyApiClient(
         )
 
         return retrofitErrorHandler {
-            api.resolveObject(authorization = account?.bearer, form.serializeToMap())
+            api.resolveObject(authorization = account.bearer, form.serializeToMap())
         }.fold(
             onSuccess = {
                 Result.success(it)

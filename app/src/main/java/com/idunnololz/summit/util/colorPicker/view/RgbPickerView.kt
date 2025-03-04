@@ -26,19 +26,22 @@ class RgbPickerView : PickerView, ColorPickerContainer {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     )
 
     constructor(
         context: Context?,
         attrs: AttributeSet?,
         defStyleAttr: Int,
-        defStyleRes: Int
+        defStyleRes: Int,
     ) : super(context, attrs, defStyleAttr, defStyleRes)
 
     override fun init() {
         val b = ColorpickerLayoutRgbPickerBinding.inflate(
-            LayoutInflater.from(context), this, true)
+            LayoutInflater.from(context),
+            this,
+            true,
+        )
         red = b.red
         redInt = b.redInt
         green = b.green
@@ -64,19 +67,19 @@ class RgbPickerView : PickerView, ColorPickerContainer {
         red.setProgressBarDrawable(
             GradientDrawable(
                 GradientDrawable.Orientation.LEFT_RIGHT,
-                intArrayOf(Color.WHITE, Color.RED)
+                intArrayOf(Color.WHITE, Color.RED),
             ),
         )
         green.setProgressBarDrawable(
             GradientDrawable(
                 GradientDrawable.Orientation.LEFT_RIGHT,
-                intArrayOf(Color.WHITE, Color.GREEN)
+                intArrayOf(Color.WHITE, Color.GREEN),
             ),
         )
         blue.setProgressBarDrawable(
             GradientDrawable(
                 GradientDrawable.Orientation.LEFT_RIGHT,
-                intArrayOf(Color.WHITE, Color.BLUE)
+                intArrayOf(Color.WHITE, Color.BLUE),
             ),
         )
     }

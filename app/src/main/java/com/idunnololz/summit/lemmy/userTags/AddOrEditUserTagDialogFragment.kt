@@ -129,7 +129,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             tagEditText.addTextChangedListener(
                 onTextChanged = { text, start, before, count ->
                     viewModel.tag = text?.toString() ?: ""
-                }
+                },
             )
 
             changeFillColorButton.setOnClickListener {

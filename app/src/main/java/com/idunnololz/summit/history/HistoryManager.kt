@@ -1,6 +1,5 @@
 package com.idunnololz.summit.history
 
-import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostView
@@ -10,7 +9,6 @@ import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.TabCommunityState
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +19,6 @@ import kotlinx.serialization.json.Json
 
 @Singleton
 class HistoryManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val historyDao: HistoryDao,
     private val apiClient: AccountAwareLemmyClient,

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentCustomQuickActionsBinding
 import com.idunnololz.summit.databinding.InactiveActionsTitleBinding

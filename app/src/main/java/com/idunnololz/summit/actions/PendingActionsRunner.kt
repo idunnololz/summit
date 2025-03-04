@@ -6,9 +6,7 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult.Failure
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.connectivity.ConnectivityChangedWorker
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
@@ -33,8 +31,6 @@ import kotlinx.coroutines.withContext
 
 class PendingActionsRunner @AssistedInject constructor(
     @ApplicationContext private val context: Context,
-    private val accountManager: AccountManager,
-    private val apiClient: LemmyApiClient,
     private val actionsRunnerHelper: ActionsRunnerHelper,
 
     @Assisted private val actions: LinkedList<LemmyPendingAction>,

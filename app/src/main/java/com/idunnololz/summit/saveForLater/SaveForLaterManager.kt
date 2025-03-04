@@ -1,14 +1,10 @@
 package com.idunnololz.summit.saveForLater
 
-import android.content.Context
 import com.idunnololz.summit.util.DirectoryHelper
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
-import kotlin.math.max
 
 class SaveForLaterManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val directoryHelper: DirectoryHelper,
 ) {
     companion object {
@@ -22,11 +18,5 @@ class SaveForLaterManager @Inject constructor(
         }
 
         return files
-    }
-
-    fun getFreeSlots(): Int {
-        val usedSlots = getSlotFiles().count { it.exists() }
-
-        return max(SLOTS - usedSlots, 0)
     }
 }

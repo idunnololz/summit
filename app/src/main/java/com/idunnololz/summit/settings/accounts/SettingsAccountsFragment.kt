@@ -13,7 +13,6 @@ import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.accountUi.AccountAdapter
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.databinding.FragmentSettingsAccountsBinding
-import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment

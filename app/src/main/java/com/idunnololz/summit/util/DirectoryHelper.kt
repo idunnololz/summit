@@ -25,17 +25,19 @@ class DirectoryHelper @Inject constructor(
 
     val cacheDir = context.cacheDir
     val okHttpCacheDir = File(context.cacheDir, "okhttp_cache")
+    val videoCacheDir = File(context.cacheDir, "videos")
+    val tabsCacheDir = File(context.cacheDir, "tabs")
+    val miscCacheDir = File(context.cacheDir, "misc")
+
+    val settingBackupsDir = File(context.filesDir, "sb")
+    val saveForLaterDir = File(context.filesDir, "sfl")
+    val accountDir = File(context.filesDir, "account")
     val downloadInProgressDir = File(context.filesDir, "dl")
     val imagesDir = File(context.filesDir, "imgs")
     val videosDir = File(context.filesDir, "videos")
-    val videoCacheDir = File(context.cacheDir, "videos")
-    val tabsDir = File(context.cacheDir, "tabs")
-    val miscDir = File(context.cacheDir, "misc")
-    val settingBackupsDir = File(context.filesDir, "sb")
-    val saveForLaterDir = File(context.filesDir, "sfl")
 
     val tabsDiskCache = JsonDiskCache
-        .create(json, tabsDir, 1, 10L * 1024L * 1024L /* 10MB */)
+        .create(json, tabsCacheDir, 1, 10L * 1024L * 1024L /* 10MB */)
 
     fun cleanup() {
         var purgedFiles = 0
@@ -57,7 +59,7 @@ class DirectoryHelper @Inject constructor(
         imagesDir.cleanupDir()
         videosDir.cleanupDir()
         FileProviderHelper(context).fileProviderDir.cleanupDir()
-        miscDir.cleanupDir()
+        miscCacheDir.cleanupDir()
 
         Log.d(TAG, "Deleted $purgedFiles files.")
     }
@@ -74,7 +76,7 @@ class DirectoryHelper @Inject constructor(
     fun addPage(key: String?, secondaryKey: String?, data: LoadedPostsData, totalPages: Int) {
         key ?: return
 
-        tabsDir.mkdirs()
+        tabsCacheDir.mkdirs()
 
         val keyPrefix = "$key|$secondaryKey"
         val infoKey = "$keyPrefix|info"
@@ -91,7 +93,7 @@ class DirectoryHelper @Inject constructor(
     fun clearPages(key: String?, secondaryKey: String?) {
         key ?: return
 
-        tabsDir.mkdirs()
+        tabsCacheDir.mkdirs()
 
         val keyPrefix = "$key|$secondaryKey"
         val infoKey = "$keyPrefix|info"
@@ -102,7 +104,7 @@ class DirectoryHelper @Inject constructor(
     fun getPages(key: String?, secondaryKey: String?): List<LoadedPostsData>? {
         key ?: return null
 
-        tabsDir.mkdirs()
+        tabsCacheDir.mkdirs()
 
         val keyPrefix = "$key|$secondaryKey"
         val infoKey = "$keyPrefix|info"

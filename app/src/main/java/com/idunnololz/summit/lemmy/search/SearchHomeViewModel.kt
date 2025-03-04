@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.search
 
-import android.app.Application
 import android.app.SearchManager
 import android.app.SearchableInfo
 import android.content.ComponentName
@@ -22,7 +21,6 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.PersonFilter
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.getStringOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,10 +35,8 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class SearchHomeViewModel @Inject constructor(
-    private val application: Application,
     @ApplicationContext private val context: Context,
     private val accountInfoManager: AccountInfoManager,
-    private val userCommunitiesManager: UserCommunitiesManager,
     private val summitServerClient: SummitServerClient,
     private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {

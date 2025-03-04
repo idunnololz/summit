@@ -74,7 +74,7 @@ class FilteredPostsAndCommentsTabbedFragment :
                     FilteredPostAndCommentsType.Saved -> getString(R.string.saved)
                     FilteredPostAndCommentsType.Upvoted -> getString(R.string.upvoted)
                     FilteredPostAndCommentsType.Downvoted -> getString(R.string.downvoted)
-                }
+                },
             )
 
             insetViewAutomaticallyByPaddingAndNavUi(

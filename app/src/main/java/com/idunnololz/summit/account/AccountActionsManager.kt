@@ -40,7 +40,6 @@ import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -50,7 +49,6 @@ import retrofit2.Response
 
 @Singleton
 class AccountActionsManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val accountManager: AccountManager,
     private val pendingActionsManager: PendingActionsManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
@@ -66,7 +64,7 @@ class AccountActionsManager @Inject constructor(
     }
 
     private var preferences = preferenceManager.currentPreferences
-    private val votesManager = VotesManager(context, preferences)
+    private val votesManager = VotesManager(preferences)
     private var nextId: Long = 1
 
     interface Registration {

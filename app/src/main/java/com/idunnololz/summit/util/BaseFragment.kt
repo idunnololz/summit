@@ -5,9 +5,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.CallSuper
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.main.MainActivity

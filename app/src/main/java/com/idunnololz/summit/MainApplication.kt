@@ -35,7 +35,6 @@ import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
 import com.idunnololz.summit.util.isFirebaseInitialized
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -90,7 +89,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 //            return
 //        }
 //        LeakCanary.install(this)
-
 
         // Needs to be initialized first
         DataFiles.initialize(context)

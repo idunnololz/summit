@@ -6,6 +6,7 @@ import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 
 interface ColorPickerContainer {
     val colorPicker: ColorPicker
+
     // To avoid naming conflict with View.getRootView()
     val rootView2: View
 }

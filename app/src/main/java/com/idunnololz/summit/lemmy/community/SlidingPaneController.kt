@@ -245,7 +245,7 @@ class SlidingPaneController(
                     ?: if (useSwipeBetweenPosts) {
                         PostTabbedFragment().apply {
                             arguments = PostTabbedFragmentArgs(
-                                id = args?.id ?: 0
+                                id = args?.id ?: 0,
                             ).toBundle()
                         }
                     } else {

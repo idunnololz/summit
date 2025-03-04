@@ -7,7 +7,6 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.R
-import androidx.core.view.ViewCompat
 import kotlin.math.max
 
 /**
@@ -84,13 +83,17 @@ class ButtonBarLayout(context: Context, attrs: AttributeSet?) :
         if (firstVisible >= 0) {
             val firstButton = getChildAt(firstVisible)
             val firstParams = firstButton.layoutParams as LayoutParams
-            minHeight += (paddingTop + firstButton.measuredHeight
-                    + firstParams.topMargin + firstParams.bottomMargin)
+            minHeight += (
+                paddingTop + firstButton.measuredHeight +
+                    firstParams.topMargin + firstParams.bottomMargin
+                )
             if (isStacked) {
                 val secondVisible = getNextVisibleChildIndex(firstVisible + 1)
                 if (secondVisible >= 0) {
-                    minHeight += (getChildAt(secondVisible).paddingTop
-                            + (PEEK_BUTTON_DP * resources.displayMetrics.density).toInt())
+                    minHeight += (
+                        getChildAt(secondVisible).paddingTop +
+                            (PEEK_BUTTON_DP * resources.displayMetrics.density).toInt()
+                        )
                 }
             } else {
                 minHeight += paddingBottom

@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.person
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
@@ -40,7 +39,6 @@ class PersonTabbedViewModel @Inject constructor(
     private val context: Application,
     private val apiClient: AccountAwareLemmyClient,
     private val apiClientFactory: LemmyApiClient.Factory,
-    private val state: SavedStateHandle,
     private val accountInfoManager: AccountInfoManager,
     private val commentListEngineFactory: CommentListEngine.Factory,
     private val postListEngineFactory: PostListEngine.Factory,

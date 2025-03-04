@@ -356,11 +356,7 @@ class MoreActionsHelper @Inject constructor(
         )
     }
 
-    fun downloadImage(
-        destFileName: String,
-        url: String,
-        mimeType: String? = null,
-    ) {
+    fun downloadImage(destFileName: String, url: String, mimeType: String? = null) {
         offlineManager.fetchImage(
             url = url,
             listener = {

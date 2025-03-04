@@ -1,17 +1,11 @@
 package com.idunnololz.summit.actions
 
-import android.content.Context
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.preferences.Preferences
 
 class VotesManager(
-    private val context: Context,
     private var preferences: Preferences,
 ) {
-
-    companion object {
-        const val NO_INFO = 0x100000
-    }
 
     private val votes = hashMapOf<VotableRef, Int>()
     private val pendingVotes = hashMapOf<VotableRef, Int>()

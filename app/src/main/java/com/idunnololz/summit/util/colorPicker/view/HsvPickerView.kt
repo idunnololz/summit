@@ -39,7 +39,10 @@ class HsvPickerView : PickerView {
 
     override fun init() {
         val b = ColorpickerLayoutHsvPickerBinding.inflate(
-            LayoutInflater.from(context), this, true)
+            LayoutInflater.from(context),
+            this,
+            true,
+        )
         hue = b.hue
         hueInt = b.hueInt
         saturation = b.saturation
@@ -52,11 +55,13 @@ class HsvPickerView : PickerView {
                 R.id.hue -> hueInt.text = String.format("%s", (value).toInt())
                 R.id.saturation ->
                     saturationInt.text = String.format(
-                        Locale.getDefault(), "%.2f", value / 255f)
+                        Locale.getDefault(), "%.2f", value / 255f,
+                    )
 
                 R.id.brightness ->
                     brightnessInt.text = String.format(
-                        Locale.getDefault(), "%.2f", value / 255f)
+                        Locale.getDefault(), "%.2f", value / 255f,
+                    )
             }
             if (fromUser) {
                 onColorPicked()

@@ -1,10 +1,8 @@
 package com.idunnololz.summit.api
 
-import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.api.summit.CommunitySuggestionsDto
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -18,7 +16,6 @@ import retrofit2.Call
 
 @Singleton
 class SummitServerClient @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val summitServerApi: SummitServerApi,
 ) {
 
