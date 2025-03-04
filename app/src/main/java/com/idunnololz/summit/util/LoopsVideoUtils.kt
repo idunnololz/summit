@@ -1,8 +1,8 @@
 package com.idunnololz.summit.util
 
+import com.fleeksoft.ksoup.Ksoup
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jsoup.Jsoup
 
 object LoopsVideoUtils {
     fun extractVideoUrl(okHttpClient: OkHttpClient, loopsVideoUrl: String): String? {
@@ -15,7 +15,7 @@ object LoopsVideoUtils {
         val pageHtml = response.body?.string()
 
         return if (pageHtml != null) {
-            val doc = Jsoup.parse(pageHtml)
+            val doc = Ksoup.parse(pageHtml)
             val videoPlayerElements = doc.getElementsByTag("video-player")
             val videoPlayerElement = videoPlayerElements.firstOrNull()
             val videoUrl = videoPlayerElement?.attr("video-src")

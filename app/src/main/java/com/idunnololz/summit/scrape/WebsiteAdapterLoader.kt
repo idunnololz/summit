@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.GetNetworkException
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.NETWORK_ERROR
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.NETWORK_TIMEOUT_ERROR
 import com.idunnololz.summit.scrape.WebsiteAdapter.Companion.PAGE_NOT_FOUND
@@ -23,7 +24,6 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
-import org.jsoup.HttpStatusException
 
 class WebsiteAdapterLoader {
 
@@ -286,12 +286,10 @@ class WebsiteAdapterLoader {
                                     if (successfulResponse || tl.handleStatusCodes) {
                                         success = true
                                     } else {
-                                        val ex = HttpStatusException(
+                                        val ex = GetNetworkException(
                                             "Status not 200 on first try. Status=" +
                                                 response.code + ", URL=" +
                                                 request.url.toString(),
-                                            response.code,
-                                            request.url.toString(),
                                         )
                                         crashlytics?.setCustomKey(KEY_URL, tl.url)
                                         crashlytics?.recordException(ex)

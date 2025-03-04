@@ -1,16 +1,16 @@
 package com.idunnololz.summit.scrape
 
 import android.util.Log
+import com.fleeksoft.ksoup.Ksoup
 import com.idunnololz.summit.util.isGif
 import java.net.URL
-import org.jsoup.Jsoup
 
 class ImgurWebsiteAdapter(
     val url: String,
 ) : WebsiteAdapter<ImgurWebsiteAdapter.PreviewInfo>() {
 
     companion object {
-        private val TAG = "ImgurWebsiteAdapter"
+        private const val TAG = "ImgurWebsiteAdapter"
     }
 
     data class PreviewInfo(
@@ -40,9 +40,9 @@ class ImgurWebsiteAdapter(
             return
         }
 
-        val doc = Jsoup.parse(s)
+        val doc = Ksoup.parse(s)
 
-        doc.head().select("link[rel='image_src']")?.let { elems ->
+        doc.head().select("link[rel='image_src']").let { elems ->
             if (elems.size > 0) {
                 val base = URL(url)
                 val relativeUrl = elems.attr("href")
@@ -51,7 +51,7 @@ class ImgurWebsiteAdapter(
             }
         }
 
-        doc.select("meta[name=twitter:image]")?.let { elems ->
+        doc.select("meta[name=twitter:image]").let { elems ->
             if (elems.size > 0) {
                 previewInfo = PreviewInfo(elems.attr("content"))
                 return

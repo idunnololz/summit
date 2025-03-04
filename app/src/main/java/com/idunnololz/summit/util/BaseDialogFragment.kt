@@ -169,11 +169,6 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        MyLog.d(logTag, "Lifecycle: onActivityCreated()")
-        super.onActivityCreated(savedInstanceState)
-    }
-
     override fun onDestroyView() {
         MyLog.d(logTag, "Lifecycle: onDestroyView()")
         super.onDestroyView()

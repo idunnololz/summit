@@ -2,33 +2,29 @@ package com.idunnololz.summit.links
 
 import android.util.Log
 import com.idunnololz.summit.api.ClientApiException
-import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.NoInternetException
-import com.idunnololz.summit.api.ServerApiException
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.LinkFetcher
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import org.json.JSONException
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runInterruptible
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import org.json.JSONException
-import org.jsoup.HttpStatusException
 
 @Singleton
 class LinkFixer @Inject constructor(
     private val json: Json,
+    private val linkFetcher: LinkFetcher,
 ) {
 
     companion object {
@@ -245,10 +241,7 @@ class LinkFixer @Inject constructor(
     private suspend fun fetchVersionObject(instance: String): Result<VersionObject> =
         withContext(Dispatchers.Default) {
             try {
-                val jsonStr =
-                    runInterruptible(Dispatchers.IO) {
-                        LinkUtils.downloadSite("https://$instance/version", cache = true)
-                    }
+                val jsonStr = linkFetcher.downloadSite("https://$instance/version", cache = true)
                 val versionObject = json.decodeFromString<VersionObject?>(jsonStr)
 
                 if (versionObject == null) {
@@ -264,12 +257,6 @@ class LinkFixer @Inject constructor(
                 Result.failure(NoInternetException())
             } catch (e: InterruptedIOException) {
                 throw CancellationException()
-            } catch (e: HttpStatusException) {
-                if (e.statusCode in 400 until 500) {
-                    Result.failure(ClientApiException("Server did not return 200.", e.statusCode))
-                } else {
-                    Result.failure(ServerApiException(e.statusCode))
-                }
             } catch (e: JSONException) {
                 Result.failure(
                     ClientApiException("API returns a different object than expected.", 0),
