@@ -1156,5 +1156,4 @@
     <string name="all_feed_desc">Αναρτήσεις από όλες τις κοινότητες</string>
     <string name="local_feed_desc">Αναρτήσεις από κοινότητες σ\' αυτήν την οντότητα</string>
     <string name="moderated_feed_desc">Αναρτήσεις από κοινότητες που συντονίζεις</string>
-    <string name="users_format">%1$s Χρήστες</string>
 </resources>
