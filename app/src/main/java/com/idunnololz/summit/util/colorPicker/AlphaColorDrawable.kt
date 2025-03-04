@@ -38,7 +38,7 @@ class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
                         y.toFloat(),
                         (x + size).toFloat(),
                         (y + size).toFloat(),
-                        bitmapPaint
+                        bitmapPaint,
                     )
                     y += size * 2
                 }
@@ -49,7 +49,6 @@ class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
         paint = Paint()
         paint.color = color
     }
-
 
     override fun draw(canvas: Canvas) {
         val b = bounds
@@ -71,7 +70,7 @@ class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
             b.top.toFloat(),
             b.right.toFloat(),
             b.bottom.toFloat(),
-            paint
+            paint,
         )
     }
 
@@ -81,7 +80,7 @@ class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
             alpha,
             Color.red(color),
             Color.green(color),
-            Color.blue(color)
+            Color.blue(color),
         )
     }
 

@@ -23,7 +23,7 @@ open class SmoothColorView : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         init()
     }
@@ -33,7 +33,7 @@ open class SmoothColorView : View {
         context: Context?,
         attrs: AttributeSet?,
         defStyleAttr: Int,
-        defStyleRes: Int
+        defStyleRes: Int,
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         init()
     }
@@ -65,7 +65,9 @@ open class SmoothColorView : View {
             val transition = TransitionDrawable(arrayOf(previous, current))
             background = transition
             transition.startTransition(100)
-        } else background = current
+        } else {
+            background = current
+        }
 
         previous = current
     }

@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
@@ -80,8 +79,8 @@ class ColorPickerPagerAdapter(
             view,
             ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            ),
         )
         return view
     }

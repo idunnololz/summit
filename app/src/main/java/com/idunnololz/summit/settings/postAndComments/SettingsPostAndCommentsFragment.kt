@@ -12,7 +12,6 @@ import com.idunnololz.summit.databinding.FragmentSettingsPostAndCommentsBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
-import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.preferences.Preferences

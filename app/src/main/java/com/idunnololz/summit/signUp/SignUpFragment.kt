@@ -504,9 +504,9 @@ class SignUpFragment :
                         }
 
                         lifecycleScope.launch {
-                            directoryHelper.miscDir.mkdirs()
+                            directoryHelper.miscCacheDir.mkdirs()
 
-                            val file = File(directoryHelper.miscDir, "captcha_sound.wav")
+                            val file = File(directoryHelper.miscCacheDir, "captcha_sound.wav")
                             val waveData = Base64.Mime
                                 .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
                                 .decode(scene.captchaWav)

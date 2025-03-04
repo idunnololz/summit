@@ -19,7 +19,6 @@ class RichTextValueViewModel @Inject constructor(
     private val context: Application,
     private val authedApiClient: AccountAwareLemmyClient,
     private val accountManager: AccountManager,
-    private val accountActionsManager: AccountActionsManager,
 ) : ViewModel() {
 
     val uploadImageEvent = StatefulLiveData<UploadImageResult>()

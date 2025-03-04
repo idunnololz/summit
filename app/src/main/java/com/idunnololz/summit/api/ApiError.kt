@@ -43,7 +43,7 @@ class NoInternetException() : NetworkException("No internet")
 
 sealed class NetworkException(msg: String) : RuntimeException(msg)
 
-class GetNetworkException(msg: String): NetworkException(msg)
+class GetNetworkException(msg: String) : NetworkException(msg)
 
 class NotAModOrAdmin() : ClientApiException("Not a mod or admin", 400)
 

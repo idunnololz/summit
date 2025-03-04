@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.comment
 
-import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -28,7 +27,6 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -37,12 +35,10 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AddOrEditCommentViewModel @Inject constructor(
-    private val context: Application,
     private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
     val accountManager: AccountManager,
     private val accountActionsManager: AccountActionsManager,
     private val state: SavedStateHandle,
-    private val preferences: Preferences,
     private val contentFiltersManager: ContentFiltersManager,
     val draftsManager: DraftsManager,
 ) : ViewModel() {
@@ -217,11 +213,11 @@ class AddOrEditCommentViewModel @Inject constructor(
 
         val postId = postOrComment.fold(
             { it.post.id },
-            { it.post.id }
+            { it.post.id },
         )
         val commentPath = postOrComment.fold(
             { null },
-            { it.comment.path }
+            { it.comment.path },
         )
 
         viewModelScope.launch {

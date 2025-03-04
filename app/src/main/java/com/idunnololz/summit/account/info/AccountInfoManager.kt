@@ -1,6 +1,5 @@
 package com.idunnololz.summit.account.info
 
-import android.content.Context
 import android.net.Uri
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
@@ -9,13 +8,9 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.util.StatefulData
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,7 +25,6 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class AccountInfoManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val accountManager: AccountManager,
     private val accountAwareLemmyClient: AccountAwareLemmyClient,
     private val coroutineScopeFactory: CoroutineScopeFactory,
@@ -41,8 +35,6 @@ class AccountInfoManager @Inject constructor(
     private val coroutineScope = coroutineScopeFactory.create()
 
     private val unreadCountInvalidates = MutableSharedFlow<Unit>()
-
-    val accountDir = File(context.filesDir, "account")
 
     val subscribedCommunities = MutableStateFlow<List<AccountSubscription>>(listOf())
     val accountInfoUpdateState = MutableStateFlow<StatefulData<Account?>>(StatefulData.NotStarted())
@@ -56,7 +48,7 @@ class AccountInfoManager @Inject constructor(
                 override suspend fun onAccountSigningOut(account: Account) {
                     accountInfoDao.delete(account.id)
 
-                    accountImageGenerator.getImageForAccount(accountDir, account).let {
+                    accountImageGenerator.getImageForAccount(account).let {
                         if (it.exists()) {
                             it.delete()
                         }
@@ -126,7 +118,7 @@ class AccountInfoManager @Inject constructor(
     }
 
     private fun getImageForAccount(account: Account): File {
-        return accountImageGenerator.getOrGenerateImageForAccount(accountDir, account)
+        return accountImageGenerator.getOrGenerateImageForAccount(account)
     }
 
     private suspend fun getFullAccount(account: Account): FullAccount? {

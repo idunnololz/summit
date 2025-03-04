@@ -26,7 +26,6 @@ import com.idunnololz.summit.databinding.QuickActionsTitleBinding
 import com.idunnololz.summit.preferences.CommentQuickActionId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
-import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -93,7 +92,7 @@ class CustomQuickActionsFragment :
 
                             else -> false
                         }
-                }
+                },
             )
         }
 

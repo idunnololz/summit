@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
@@ -122,7 +121,7 @@ class SettingsWebFragment :
                             else -> false
                         }
                     }
-                }
+                },
             )
 
             onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressHandler)

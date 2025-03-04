@@ -5,12 +5,12 @@ import com.fleeksoft.ksoup.Ksoup
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.util.LinkFetcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.net.URI
 import java.net.URISyntaxException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Singleton
 class LinkMetadataHelper @Inject constructor(

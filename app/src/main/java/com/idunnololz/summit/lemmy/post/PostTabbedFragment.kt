@@ -11,22 +11,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.MarginPageTransformer
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentPostBinding
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.PostListEngineItem
-import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment.InboxPagerAdapter
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.PageItem
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -75,7 +68,8 @@ class PostTabbedFragment :
             viewPager.adapter = pagerAdapter
             viewPager.offscreenPageLimit = 1
             viewPager.setPageTransformer(
-                MarginPageTransformer(Utils.convertDpToPixel(16f).toInt()))
+                MarginPageTransformer(Utils.convertDpToPixel(16f).toInt()),
+            )
 
             if (savedInstanceState == null && !argumentsHandled) {
                 argumentsHandled = true
@@ -104,23 +98,22 @@ class PostTabbedFragment :
                 override val id: Long,
                 val fetchedPost: FetchedPost,
                 val instance: String,
-            ): Item
+            ) : Item
         }
 
         var items: List<Item> = listOf()
         private var nsfwMode: Boolean = false
 
         override fun getItemId(position: Int): Long {
-            return when(val item = items[position]) {
+            return when (val item = items[position]) {
                 is Item.PostItem -> item.id
             }
         }
 
-        override fun containsItem(itemId: Long): Boolean =
-            items.any { it.id == itemId }
+        override fun containsItem(itemId: Long): Boolean = items.any { it.id == itemId }
 
         override fun createFragment(position: Int): Fragment {
-            return when(val item = items[position]) {
+            return when (val item = items[position]) {
                 is Item.PostItem ->
                     PostFragment().apply {
                         arguments = PostFragmentArgs(
@@ -154,13 +147,16 @@ class PostTabbedFragment :
                     is PostListEngineItem.ManualLoadItem,
                     is PostListEngineItem.PageTitle,
                     is PostListEngineItem.PersistentErrorItem,
-                    is PostListEngineItem.FilteredPostItem -> {}
+                    is PostListEngineItem.FilteredPostItem,
+                    -> {}
                     is PostListEngineItem.VisiblePostItem -> {
-                        newItems.add(Item.PostItem(
-                            id = it.fetchedPost.postView.post.id.toLong(),
-                            fetchedPost = it.fetchedPost,
-                            instance = it.instance,
-                        ))
+                        newItems.add(
+                            Item.PostItem(
+                                id = it.fetchedPost.postView.post.id.toLong(),
+                                fetchedPost = it.fetchedPost,
+                                instance = it.instance,
+                            ),
+                        )
                     }
                 }
             }
@@ -192,7 +188,7 @@ class PostTabbedFragment :
 
         fun findPageIndex(id: Long): Int {
             return items.indexOfLast {
-                when(it) {
+                when (it) {
                     is Item.PostItem -> it.id == id
                 }
             }

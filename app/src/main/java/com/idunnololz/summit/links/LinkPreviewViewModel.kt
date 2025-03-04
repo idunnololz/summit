@@ -2,7 +2,6 @@ package com.idunnololz.summit.links
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.net.URI
@@ -12,7 +11,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LinkPreviewViewModel @Inject constructor(
-    private val linkMetadataHelper: LinkMetadataHelper
+    private val linkMetadataHelper: LinkMetadataHelper,
 ) : ViewModel() {
 
     val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()

@@ -199,6 +199,7 @@ object PreferenceUtils {
     const val KEY_POST_FAB_QUICK_ACTION = "KEY_POST_FAB_QUICK_ACTION"
     const val KEY_SHAKE_TO_SEND_FEEDBACK = "KEY_SHAKE_TO_SEND_FEEDBACK"
     const val KEY_SHOW_LABELS_IN_NAV_BAR = "KEY_SHOW_LABELS_IN_NAV_BAR"
+    const val KEY_WARN_NEW_PERSON = "KEY_WARN_NEW_PERSON"
 
     // Unused/dead keys
     @Suppress("unused")

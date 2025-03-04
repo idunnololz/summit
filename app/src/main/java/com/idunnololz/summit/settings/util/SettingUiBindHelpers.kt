@@ -24,7 +24,6 @@ import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
-import javax.inject.Inject
 
 fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Unit) {
     if (this.icon == null) {

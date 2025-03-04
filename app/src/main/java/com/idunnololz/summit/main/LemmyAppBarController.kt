@@ -46,7 +46,6 @@ import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -458,7 +457,7 @@ class LemmyAppBarController(
                             R.plurals.users_format,
                             totalUsers,
                             LemmyUtils.abbrevNumber(totalUsers.toLong()),
-                        )
+                        ),
                     )
                     appendSeparator()
                     append(
@@ -472,7 +471,7 @@ class LemmyAppBarController(
                             R.plurals.posts_format,
                             posts,
                             LemmyUtils.abbrevNumber(posts.toLong()),
-                        )
+                        ),
                     )
                     appendSeparator()
                     append(
@@ -480,7 +479,7 @@ class LemmyAppBarController(
                             R.plurals.comments_format,
                             comments,
                             LemmyUtils.abbrevNumber(comments.toLong()),
-                        )
+                        ),
                     )
                 }
             }
@@ -533,14 +532,15 @@ class LemmyAppBarController(
             is CommunityRef.CommunityRefByName,
             is CommunityRef.All,
             is CommunityRef.Local,
-            null -> {
+            null,
+            -> {
             }
         }
 
         when (currentCommunity) {
             is CommunityRef.All,
             is CommunityRef.Local,
-                -> {
+            -> {
                 vh.info.visibility = View.VISIBLE
                 vh.info.text = context.getString(R.string.instance_info)
             }
@@ -551,7 +551,7 @@ class LemmyAppBarController(
             is CommunityRef.Subscribed,
             is CommunityRef.AllSubscribed,
             is CommunityRef.ModeratedCommunities,
-                -> {
+            -> {
                 vh.info.visibility = View.VISIBLE
                 vh.info.text = context.getString(R.string.feed_info)
             }

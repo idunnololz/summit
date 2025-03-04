@@ -26,7 +26,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -55,7 +54,6 @@ class VideoDownloadManager @Inject constructor(
     private val dataSourceFactory = DefaultHttpDataSource.Factory()
     private val downloadExecutor = Executor(Runnable::run)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val downloadRequestsContext = Dispatchers.IO.limitedParallelism(1)
 
     private val downloadManager =

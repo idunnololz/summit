@@ -9,17 +9,17 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.LinkFetcher
+import java.io.InterruptedIOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.json.JSONException
-import java.io.InterruptedIOException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class LinkFixer @Inject constructor(

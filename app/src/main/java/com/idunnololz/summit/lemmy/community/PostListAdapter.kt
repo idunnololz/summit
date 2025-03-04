@@ -51,6 +51,7 @@ class PostListAdapter(
     private val postListViewBuilder: PostListViewBuilder,
     private val context: Context,
     private var postListEngine: PostListEngine,
+    private val accountImageGenerator: AccountImageGenerator,
     private val onNextClick: () -> Unit,
     private val onPrevClick: () -> Unit,
     private val onSignInRequired: () -> Unit,
@@ -82,7 +83,6 @@ class PostListAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val inflater = LayoutInflater.from(context)
-    private val accountImageGenerator = AccountImageGenerator(context)
 
     var markPostsAsReadOnScroll: Boolean = false
     var alwaysRenderAsUnread: Boolean = false

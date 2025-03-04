@@ -19,4 +19,4 @@ package com.idunnololz.summit.util.colorPicker.listeners
  * ColorPickerViewListener is invoked whenever [com.skydoves.colorpickerview.ColorPickerView]
  * is triggered.
  */
-interface ColorPickerViewListener 
+interface ColorPickerViewListener

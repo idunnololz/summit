@@ -3,8 +3,6 @@ package com.idunnololz.summit.util.colorPicker.view
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.InsetDrawable
-import android.graphics.drawable.LayerDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
@@ -17,7 +15,6 @@ import com.idunnololz.summit.util.colorPicker.SeekBarBackgroundDrawable
 import com.idunnololz.summit.util.colorPicker.utils.AlphaTileDrawable
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
-import com.idunnololz.summit.util.ext.getDimen
 import java.util.Locale
 
 abstract class PickerView :
@@ -42,7 +39,7 @@ abstract class PickerView :
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         init()
         postInit()
@@ -52,7 +49,7 @@ abstract class PickerView :
         context: Context?,
         attrs: AttributeSet?,
         defStyleAttr: Int,
-        defStyleRes: Int
+        defStyleRes: Int,
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         init()
         postInit()
@@ -125,6 +122,7 @@ abstract class PickerView :
          * @return The color's alpha, from 0-255.
          */
         get() = if (alpha != null) alpha!!.value.toInt() else 255
+
         /**
          * Set the color's alpha, from 0-255. Change in values
          * will not be animated.

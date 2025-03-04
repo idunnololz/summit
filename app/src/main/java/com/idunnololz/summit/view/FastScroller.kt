@@ -13,7 +13,6 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.recyclerview.widget.RecyclerView
@@ -216,7 +215,7 @@ class FastScroller : LinearLayout {
         recyclerView.addOnScrollListener(scrollListener)
         invalidateVisibility()
         recyclerView.setOnHierarchyChangeListener(
-            object : ViewGroup.OnHierarchyChangeListener {
+            object : OnHierarchyChangeListener {
                 override fun onChildViewAdded(parent: View, child: View) {
                     invalidateVisibility()
                 }
@@ -228,7 +227,11 @@ class FastScroller : LinearLayout {
         )
 
         if (isAttachedToWindow) {
-            recyclerView.adapter?.registerAdapterDataObserver(adapterListener)
+            try {
+                recyclerView.adapter?.registerAdapterDataObserver(adapterListener)
+            } catch (e: Exception) {
+                // do nothing
+            }
         }
     }
 

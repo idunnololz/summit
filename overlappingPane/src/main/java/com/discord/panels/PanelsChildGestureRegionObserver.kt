@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.HorizontalScrollView
 import androidx.annotation.UiThread
-import androidx.core.view.doOnLayout
 import com.discord.panels.PanelsChildGestureRegionObserver.GestureRegionsListener
 import java.lang.ref.WeakReference
 

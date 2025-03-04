@@ -8,12 +8,10 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -22,13 +20,9 @@ class CommunityPickerViewModel @Inject constructor(
 ) : ViewModel() {
 
     val searchResults = StatefulLiveData<List<CommunityView>>()
-    val selectedCommunitiesFlow = MutableStateFlow<List<CommunityRef.CommunityRefByName>>(listOf())
     val communityName = MutableLiveData<String>()
 
     private var searchJob: Job? = null
-
-    init {
-    }
 
     fun doQuery(query: String) {
         searchResults.setIsLoading()

@@ -216,7 +216,6 @@ class LemmyHeaderView : FrameLayout {
                         getViewHeight(textView3)
                     } else {
                         0
-
                     }
                 totalTextHeight += marginBetweenLines
                 totalTextHeight += max(textView2Height, textView3Height)

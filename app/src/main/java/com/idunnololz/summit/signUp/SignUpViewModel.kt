@@ -29,7 +29,6 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,7 +64,6 @@ class SignUpViewModel @Inject constructor(
 
     val fetchSiteLiveData = StatefulLiveData<Unit>()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val backgroundContext = Dispatchers.Default.limitedParallelism(1)
 
     init {

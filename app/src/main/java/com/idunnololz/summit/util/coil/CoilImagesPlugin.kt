@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util.coil
 
 import android.content.Context
-import android.graphics.Rect
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Handler
@@ -14,7 +13,6 @@ import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.size.Dimension
-import coil3.size.Scale
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory

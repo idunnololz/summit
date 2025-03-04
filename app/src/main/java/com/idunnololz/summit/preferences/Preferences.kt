@@ -146,6 +146,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.StringPreferenceDelegate
@@ -177,6 +178,7 @@ class Preferences(
     }
 
     private val coroutineScope = coroutineScopeFactory.create()
+
     @Suppress("ObjectLiteralToLambda")
     private val preferenceChangeListener = object : OnSharedPreferenceChangeListener {
         override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
@@ -631,6 +633,8 @@ class Preferences(
         by booleanPreference(KEY_SHAKE_TO_SEND_FEEDBACK, true)
     var showLabelsInNavBar: Boolean
         by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
+    var warnNewPerson: Boolean
+        by booleanPreference(KEY_WARN_NEW_PERSON, true)
 
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
