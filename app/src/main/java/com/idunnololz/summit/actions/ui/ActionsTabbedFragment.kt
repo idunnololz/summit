@@ -16,6 +16,7 @@ import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -66,10 +67,7 @@ class ActionsTabbedFragment :
         requireMainActivity().apply {
             setupForFragment<ActionsTabbedFragment>()
 
-            setSupportActionBar(binding.toolbar)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.user_actions)
+            setupToolbar(binding.toolbar, getString(R.string.user_actions))
 
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
         }

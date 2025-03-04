@@ -25,7 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/padding_half">
+            android:paddingHorizontal="@dimen/padding_half"
+            android:paddingBottom="@dimen/padding">
 
             <include
                 android:id="@+id/search_suggestions"

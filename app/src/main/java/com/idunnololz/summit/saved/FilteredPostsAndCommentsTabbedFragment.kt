@@ -26,6 +26,7 @@ import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -67,15 +68,14 @@ class FilteredPostsAndCommentsTabbedFragment :
         requireMainActivity().apply {
             setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
 
-            setSupportActionBar(binding.toolbar)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title =
-                when (args.type) {
+            setupToolbar(
+                toolbar = binding.toolbar,
+                title = when (args.type) {
                     FilteredPostAndCommentsType.Saved -> getString(R.string.saved)
                     FilteredPostAndCommentsType.Upvoted -> getString(R.string.upvoted)
                     FilteredPostAndCommentsType.Downvoted -> getString(R.string.downvoted)
                 }
+            )
 
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,

@@ -21,6 +21,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -54,11 +55,7 @@ class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.translators)
+            setupToolbar(binding.toolbar, getString(R.string.translators))
         }
 
         val adapter = TranslatorsAdapter()

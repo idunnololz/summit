@@ -19,6 +19,8 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
@@ -35,6 +37,7 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,8 +45,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsWebFragment :
     BaseFragment<FragmentSettingsWebBinding>(),
-    SettingValueUpdateCallback,
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+    SettingValueUpdateCallback {
 
     private val viewModel: SettingsWebViewModel by viewModels()
 
@@ -55,14 +57,22 @@ class SettingsWebFragment :
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    private val saveChangesDialogLauncher = newAlertDialogLauncher("unsaved_changes") {
+        if (it.isOk) {
+            save()
+        } else {
+            findNavController().navigateUp()
+        }
+    }
+
     private val backPressHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            OldAlertDialogFragment.Builder()
-                .setTitle(R.string.error_unsaved_changes)
-                .setMessage(R.string.error_web_settings_unsaved_changes_desc)
-                .setPositiveButton(R.string.save)
-                .setNegativeButton(R.string.discard_saves)
-                .createAndShow(childFragmentManager, "unsaved_changes")
+            saveChangesDialogLauncher.launchDialog {
+                titleResId = R.string.error_unsaved_changes
+                messageResId = R.string.error_web_settings_unsaved_changes_desc
+                positionButtonResId = R.string.save
+                negativeButtonResId = R.string.discard_saves
+            }
         }
     }
     private val launcher =
@@ -96,11 +106,24 @@ class SettingsWebFragment :
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
+            setupToolbar(binding.toolbar, lemmyWebSettings.getPageName(context))
+            binding.toolbar.addMenuProvider(
+                object : MenuProvider {
+                    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                        menuInflater.inflate(R.menu.menu_setting_web, menu)
+                    }
 
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = lemmyWebSettings.getPageName(context)
+                    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                        return when (menuItem.itemId) {
+                            R.id.ca_save -> {
+                                save()
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                }
+            )
 
             onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressHandler)
         }
@@ -125,11 +148,12 @@ class SettingsWebFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    OldAlertDialogFragment.Builder()
-                        .setTitle(R.string.error_save_failed)
-                        .setMessage(it.error.toErrorMessage(context))
-                        .setPositiveButton(android.R.string.ok)
-                        .createAndShow(childFragmentManager, "asdf")
+
+                    launchAlertDialog("no_changes") {
+                        titleResId = R.string.error_save_failed
+                        message = it.error.toErrorMessage(context)
+                        positionButtonResId = android.R.string.ok
+                    }
                 }
                 is StatefulData.Loading -> binding.loadingView.showProgressBar()
                 is StatefulData.NotStarted -> {}
@@ -146,11 +170,11 @@ class SettingsWebFragment :
             when (it) {
                 is StatefulData.Error -> {
                     binding.loadingView.hideAll()
-                    OldAlertDialogFragment.Builder()
-                        .setTitle(R.string.error_upload_failed)
-                        .setMessage(it.error.toErrorMessage(context))
-                        .setPositiveButton(android.R.string.ok)
-                        .createAndShow(childFragmentManager, "asdf")
+                    launchAlertDialog("upload_error") {
+                        titleResId = R.string.error_upload_failed
+                        message = it.error.toErrorMessage(context)
+                        positionButtonResId = android.R.string.ok
+                    }
                 }
                 is StatefulData.Loading -> binding.loadingView.showProgressBar()
                 is StatefulData.NotStarted -> {}
@@ -162,33 +186,16 @@ class SettingsWebFragment :
         }
 
         viewModel.fetchAccountInfo()
-
-        addMenuProvider2(
-            object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.menu_setting_web, menu)
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    return when (menuItem.itemId) {
-                        R.id.ca_save -> {
-                            save()
-                            true
-                        }
-                        else -> false
-                    }
-                }
-            },
-        )
     }
 
     private fun save() {
         val updatedSettingValues = adapter?.updatedSettingValues
         if (updatedSettingValues.isNullOrEmpty()) {
-            OldAlertDialogFragment.Builder()
-                .setTitle(R.string.error_no_settings_changed)
-                .setMessage(R.string.error_no_settings_changed_desc)
-                .createAndShow(childFragmentManager, "esadfsadf")
+            launchAlertDialog("no_changes") {
+                titleResId = R.string.error_no_settings_changed
+                messageResId = R.string.error_no_settings_changed_desc
+                positionButtonResId = android.R.string.ok
+            }
             return
         }
 
@@ -314,19 +321,5 @@ class SettingsWebFragment :
 
     override fun updateValue(key: Int, value: Any?) {
         adapter?.updateSettingValue(key, value)
-    }
-
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        if (tag == "unsaved_changes") {
-            // save changes
-            save()
-        }
-    }
-
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-        if (tag == "unsaved_changes") {
-            // discard changes
-            findNavController().navigateUp()
-        }
     }
 }

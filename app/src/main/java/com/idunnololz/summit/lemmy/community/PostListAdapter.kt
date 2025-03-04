@@ -87,10 +87,11 @@ class PostListAdapter(
     var markPostsAsReadOnScroll: Boolean = false
     var alwaysRenderAsUnread: Boolean = false
     var blurNsfwPosts: Boolean = true
-    var nsfwMode: Boolean = false
 
     var items: List<PostListEngineItem> = listOf()
         private set
+
+    private var nsfwMode: Boolean = false
 
     /**
      * Set of items that is hidden by default but is reveals (ie. nsfw or spoiler tagged)
@@ -216,7 +217,6 @@ class PostListAdapter(
                     h.root.setTag(R.id.fetched_post, item.fetchedPost)
 
                     val source = item.fetchedPost.source
-                    val accountId: Long?
                     val themeColor: Int?
                     if (source is Source.AccountSource) {
                         themeColor = accountImageGenerator.getColorForPerson(
@@ -224,10 +224,8 @@ class PostListAdapter(
                             source.id,
                             source.instance,
                         )
-                        accountId = source.id
                     } else {
                         themeColor = null
-                        accountId = null
                     }
 
                     postListViewBuilder.bind(

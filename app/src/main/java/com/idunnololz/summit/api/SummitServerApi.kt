@@ -21,28 +21,4 @@ interface SummitServerApi {
     @GET("/v1/community-suggestions")
     @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
     fun communitySuggestionsNoCache(): Call<CommunitySuggestionsDto>
-
-    companion object {
-
-        fun newInstance(
-            context: Context,
-            userAgent: String,
-            cachePolicyManager: CachePolicyManager,
-            directoryHelper: DirectoryHelper,
-        ): SummitServerApi {
-            return Retrofit.Builder()
-                .baseUrl("https://summitforlemmyserver.idunnololz.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(
-                    getOkHttpClient(
-                        context = context,
-                        userAgent = userAgent,
-                        cachePolicyManager = cachePolicyManager,
-                        cacheDir = directoryHelper.okHttpCacheDir,
-                    ),
-                )
-                .build()
-                .create(SummitServerApi::class.java)
-        }
-    }
 }

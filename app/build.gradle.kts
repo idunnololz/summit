@@ -59,7 +59,6 @@ android {
 
 dependencies {
     implementation(project(":calligraphy"))
-    implementation(project(":gravitySnapHelper"))
     implementation(project(":imagepicker"))
     implementation(project(":overlappingPane"))
     implementation(project(":markwon:markwon-ext-tables"))

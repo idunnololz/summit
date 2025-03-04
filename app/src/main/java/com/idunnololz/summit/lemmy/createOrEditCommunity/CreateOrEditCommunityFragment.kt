@@ -53,6 +53,7 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
@@ -149,16 +150,58 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title =
+            setupToolbar(
+                binding.toolbar,
                 if (isCreateCommunity) {
                     getString(R.string.create_community)
                 } else {
                     getString(R.string.edit_community)
                 }
+            )
+
+            binding.toolbar.addMenuProvider(
+                object : MenuProvider {
+                    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                        menuInflater.inflate(R.menu.menu_create_or_edit_community, menu)
+
+                        if (isCreateCommunity) {
+                            menu.findItem(R.id.publish).isVisible = true
+                            menu.findItem(R.id.save).isVisible = false
+                        } else {
+                            menu.findItem(R.id.publish).isVisible = false
+                            menu.findItem(R.id.save).isVisible = true
+                        }
+                    }
+
+                    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                        return when (menuItem.itemId) {
+                            R.id.publish -> {
+                                viewModel.update {
+                                    it.copy(
+                                        title = binding.displayNameEditText.text?.toString() ?: it.title,
+                                        description = binding.descriptionEditText.text?.toString(),
+                                    )
+                                }
+                                viewModel.createCommunity()
+                                true
+                            }
+                            R.id.save -> {
+                                viewModel.update {
+                                    it.copy(
+                                        title = binding.displayNameEditText.text?.toString() ?: it.title,
+                                        description = binding.descriptionEditText.text?.toString(),
+                                    )
+                                }
+                                viewModel.saveChanges()
+                                true
+                            }
+                            else -> {
+                                false
+                            }
+                        }
+                    }
+                }
+            )
 
             hideBottomNav()
         }
@@ -444,50 +487,6 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 onUploadComplete(result, it, target)
             }
         }
-
-        addMenuProvider2(
-            object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.menu_create_or_edit_community, menu)
-
-                    if (isCreateCommunity) {
-                        menu.findItem(R.id.publish).isVisible = true
-                        menu.findItem(R.id.save).isVisible = false
-                    } else {
-                        menu.findItem(R.id.publish).isVisible = false
-                        menu.findItem(R.id.save).isVisible = true
-                    }
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    return when (menuItem.itemId) {
-                        R.id.publish -> {
-                            viewModel.update {
-                                it.copy(
-                                    title = binding.displayNameEditText.text?.toString() ?: it.title,
-                                    description = binding.descriptionEditText.text?.toString(),
-                                )
-                            }
-                            viewModel.createCommunity()
-                            true
-                        }
-                        R.id.save -> {
-                            viewModel.update {
-                                it.copy(
-                                    title = binding.displayNameEditText.text?.toString() ?: it.title,
-                                    description = binding.descriptionEditText.text?.toString(),
-                                )
-                            }
-                            viewModel.saveChanges()
-                            true
-                        }
-                        else -> {
-                            false
-                        }
-                    }
-                }
-            },
-        )
 
         with(binding) {
             nameEditText.doOnTextChanged a@{ text, start, before, count ->
