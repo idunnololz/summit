@@ -1,15 +1,14 @@
 package com.idunnololz.summit.links
 
 import android.webkit.URLUtil
+import com.fleeksoft.ksoup.Ksoup
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.LinkFetcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URI
 import java.net.URISyntaxException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runInterruptible
-import org.jsoup.Connection
-import org.jsoup.Jsoup
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,15 +16,13 @@ import javax.inject.Singleton
 class LinkMetadataHelper @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val linkFixer: LinkFixer,
+    private val linkFetcher: LinkFetcher,
 ) {
 
     suspend fun loadLinkMetadata(url: String): LinkMetadata {
-        val doc = runInterruptible(Dispatchers.IO) {
-            val connection: Connection = Jsoup.connect(url)
-                .timeout(30 * 1000)
-                .userAgent(LinkUtils.USER_AGENT)
-
-            connection.get()
+        val html = linkFetcher.downloadSite(url)
+        val doc = withContext(Dispatchers.Default) {
+            Ksoup.parse(html)
         }
 
         val elements = doc.getElementsByTag("meta")
@@ -191,11 +188,11 @@ class LinkMetadataHelper @Inject constructor(
         return if (URLUtil.isValidUrl(part)) {
             part
         } else {
-            var base_uri: URI? = null
+            var baseUri: URI? = null
             try {
-                base_uri = URI(url)
-                base_uri = base_uri.resolve(part)
-                return base_uri.toString()
+                baseUri = URI(url)
+                baseUri = baseUri.resolve(part)
+                return baseUri.toString()
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -10,44 +10,13 @@ import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.MainActivity
-import okhttp3.CacheControl
-import okhttp3.Request
-import okhttp3.Response
-import org.jsoup.HttpStatusException
 
 object LinkUtils {
-
     const val USER_AGENT =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0"
 
-    fun downloadSite(url: String, cache: Boolean = false): String {
-        val response = doRequest(url, cache)
-        val responseCode = response.code
-        if (response.isSuccessful) {
-            return response.body?.string() ?: ""
-        } else {
-            response.body?.close()
-            throw HttpStatusException(
-                "Response was not 200. Response code: $responseCode",
-                responseCode,
-                url,
-            )
-        }
-    }
-
-    private fun doRequest(url: String, cache: Boolean): Response {
-        val builder = Request.Builder()
-            .url(url)
-            .header("User-Agent", USER_AGENT)
-        if (!cache) {
-            builder.cacheControl(CacheControl.FORCE_NETWORK)
-                .header("Cache-Control", "no-cache, no-store")
-        }
-        val request = builder.build()
-        return Client.get().newCall(request).execute()
-    }
-
-    fun getLinkForCommunity(communityRef: CommunityRef): String = communityRef.toUrl("lemmy.world")
+    fun getLinkForCommunity(communityRef: CommunityRef): String =
+        communityRef.toUrl("lemmy.world")
 
     fun convertToHttps(url: String): String {
         val uri = Uri.parse(url)

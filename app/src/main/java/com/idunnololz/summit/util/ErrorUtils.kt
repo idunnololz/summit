@@ -7,6 +7,7 @@ import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.CouldntFindObjectError
+import com.idunnololz.summit.api.GetNetworkException
 import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NewApiException
 import com.idunnololz.summit.api.NoInternetException
@@ -69,6 +70,9 @@ fun Throwable.toErrorMessage(context: Context): String {
                     context.getString(R.string.error_socket_timeout)
 
                 is NoInternetException ->
+                    context.getString(R.string.error_network)
+
+                is GetNetworkException ->
                     context.getString(R.string.error_network)
             }
         is MultiCommunityDataSource.CommunityNotFoundException ->

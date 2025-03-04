@@ -18,8 +18,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 229
-        versionName = "1.56.0"
+        versionCode = 230
+        versionName = "1.56.1"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -75,7 +75,7 @@ dependencies {
     implementation(libs.preference.ktx)
     implementation(libs.gson)
     implementation(libs.constraintlayout)
-    implementation(libs.jsoup)
+    implementation(libs.ksoup)
     implementation(libs.swiperefreshlayout)
     implementation(libs.transition.ktx)
     implementation(libs.kotlinx.coroutine.android)
@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.media3.ui)
     implementation(libs.media3.dash)
     implementation(libs.media3.hls)
+    implementation(libs.media3.transformer)
 
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
@@ -146,7 +147,6 @@ dependencies {
 
     implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
-    implementation(libs.media3.transformer)
 
     implementation(libs.exifinterface)
 
