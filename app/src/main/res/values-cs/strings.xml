@@ -952,12 +952,12 @@
     <string name="solve_captcha_desc">Abyste se mohli zaregistrovat, musíte vyřešit captcha. Zadejte prosím kód z obrázku níže.</string>
     <plurals name="posts_format">
         <item quantity="one">%1$s příspěvek</item>
-        <item quantity="few"/>
+        <item quantity="few"></item>
         <item quantity="other">%1$s příspěvků</item>
     </plurals>
     <plurals name="comments_format">
         <item quantity="one">%1$s komentář</item>
-        <item quantity="few"/>
+        <item quantity="few"></item>
         <item quantity="other">Komentáře: %1$s</item>
     </plurals>
     <string name="text_emoji">Textové emotikony</string>
