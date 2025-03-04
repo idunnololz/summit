@@ -25,6 +25,16 @@
 
     <string name="pref_key_app_language">app_language</string>
 
+    <string name="colorPickerDialog_red">R</string>
+    <string name="colorPickerDialog_blue">B</string>
+    <string name="colorPickerDialog_green">G</string>
+    <string name="colorPickerDialog_alpha">A</string>
+    <string name="colorPickerDialog_hue">H</string>
+    <string name="colorPickerDialog_saturation">S</string>
+    <string name="colorPickerDialog_brightness">V</string>
+    <string name="colorPickerDialog_rgb">RGB</string>
+    <string name="colorPickerDialog_hsv">HSV</string>
+
 
     <string-array name="theme_type_values">
         <item>day</item>
