@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentCustomQuickActionsBinding
 import com.idunnololz.summit.databinding.InactiveActionsTitleBinding
 import com.idunnololz.summit.databinding.QuickActionBinding
@@ -34,19 +35,25 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Collections
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostQuickActionsFragment :
-    BaseFragment<FragmentCustomQuickActionsBinding>(),
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+    BaseFragment<FragmentCustomQuickActionsBinding>() {
 
     private val viewModel: PostQuickActionsViewModel by viewModels()
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    private val resetSettingsDialogLauncher = newAlertDialogLauncher("reset_settings") {
+        if (it.isOk) {
+            viewModel.resetSettings()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,13 +77,8 @@ class PostQuickActionsFragment :
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.contentContainer)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.customize_post_quick_actions)
-
-            addMenuProvider2(
+            setupToolbar(binding.toolbar, getString(R.string.customize_post_quick_actions))
+            binding.toolbar.addMenuProvider(
                 object : MenuProvider {
                     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                         menuInflater.inflate(R.menu.menu_custom_quick_actions, menu)
@@ -85,11 +87,11 @@ class PostQuickActionsFragment :
                     override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
                         when (menuItem.itemId) {
                             R.id.reset_settings -> {
-                                OldAlertDialogFragment.Builder()
-                                    .setMessage(R.string.warn_reset_settings)
-                                    .setPositiveButton(R.string.reset_settings)
-                                    .setNegativeButton(R.string.cancel)
-                                    .createAndShow(childFragmentManager, "reset_settings")
+                                resetSettingsDialogLauncher.launchDialog {
+                                    this.messageResId = R.string.warn_reset_settings
+                                    this.positionButtonResId = R.string.reset_settings
+                                    this.negativeButtonResId = R.string.cancel
+                                }
                                 true
                             }
 
@@ -378,12 +380,5 @@ class PostQuickActionsFragment :
             quickActions = newQuickActions
             onQuickActionsChanged(newQuickActions)
         }
-    }
-
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        viewModel.resetSettings()
-    }
-
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
     }
 }

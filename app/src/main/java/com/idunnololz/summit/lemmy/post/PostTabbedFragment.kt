@@ -21,12 +21,14 @@ import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment.InboxPagerAdapter
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PostTabbedFragment :
@@ -35,6 +37,9 @@ class PostTabbedFragment :
     private val args: PostTabbedFragmentArgs by navArgs()
 
     private var argumentsHandled = false
+
+    @Inject
+    lateinit var nsfwModeManager: NsfwModeManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +59,6 @@ class PostTabbedFragment :
         val context = requireContext()
         val items = (parentFragment as? CommunityFragment)?.viewModel?.postListEngine?.items
             ?: listOf()
-//        items.
 
         val pagerAdapter = PostAdapter(
             context,
@@ -62,6 +66,8 @@ class PostTabbedFragment :
         ).apply {
             stateRestorationPolicy =
                 RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+            updateNsfwMode(nsfwModeManager)
         }
         pagerAdapter.setPages(items)
 
@@ -102,6 +108,7 @@ class PostTabbedFragment :
         }
 
         var items: List<Item> = listOf()
+        private var nsfwMode: Boolean = false
 
         override fun getItemId(position: Int): Long {
             return when(val item = items[position]) {
@@ -119,7 +126,7 @@ class PostTabbedFragment :
                         arguments = PostFragmentArgs(
                             instance = item.instance,
                             id = item.fetchedPost.postView.post.id,
-                            reveal = false,
+                            reveal = nsfwMode,
                             post = item.fetchedPost.postView,
                             jumpToComments = false,
                             currentCommunity = item.fetchedPost.postView.community.toCommunityRef(),
@@ -189,6 +196,18 @@ class PostTabbedFragment :
                     is Item.PostItem -> it.id == id
                 }
             }
+        }
+
+        fun updateNsfwMode(nsfwModeManager: NsfwModeManager) {
+            val newValue = nsfwModeManager.nsfwModeEnabled.value
+            if (nsfwMode == newValue) {
+                return
+            }
+
+            nsfwMode = newValue
+
+            @Suppress("NotifyDataSetChanged")
+            notifyDataSetChanged()
         }
     }
 }

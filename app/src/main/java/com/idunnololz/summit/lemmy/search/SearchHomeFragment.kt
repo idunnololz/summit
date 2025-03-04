@@ -32,7 +32,6 @@ import androidx.window.layout.WindowMetricsCalculator
 import coil3.asImage
 import coil3.load
 import coil3.svg.SvgDecoder
-import com.github.rubensousa.gravitySnapHelper.GravitySnapHelper
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
@@ -65,6 +64,7 @@ import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.GravitySnapHelper
 import com.idunnololz.summit.util.GridAutofitLayoutManager
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils

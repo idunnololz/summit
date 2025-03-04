@@ -43,6 +43,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
@@ -86,11 +87,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.mod_logs)
+            setupToolbar(binding.toolbar, getString(R.string.mod_logs))
 
             binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
         }

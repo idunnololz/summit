@@ -39,6 +39,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -84,14 +85,9 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = getString(R.string.communities)
+            setupToolbar(binding.toolbar, getString(R.string.communities))
 
             navBarController.updatePaddingForNavBar(binding.contentContainer)
-//            binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
         }
 
         viewModel.setCommunitiesInstance(args.instance)

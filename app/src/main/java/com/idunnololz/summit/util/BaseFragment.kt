@@ -63,10 +63,6 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         binding.root.runAfterLayout(callback)
     }
 
-    fun addMenuProvider2(menuProvider: MenuProvider) {
-        requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         MyLog.d(logTag, "Lifecycle: onCreate()")
         super.onCreate(savedInstanceState)
