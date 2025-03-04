@@ -634,7 +634,7 @@ class Preferences(
     var showLabelsInNavBar: Boolean
         by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
     var warnNewPerson: Boolean
-        by booleanPreference(KEY_WARN_NEW_PERSON, true)
+        by booleanPreference(KEY_WARN_NEW_PERSON, false)
 
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

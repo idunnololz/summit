@@ -1950,6 +1950,8 @@
     <string name="open_in_app">Open in app</string>
     <string name="open_in_app_desc">Detected link is a lemmy instance. Tap to open in app.</string>
     <string name="disable_shake_to_give_feedback">Disable shake to give feedback</string>
+    <string name="show_new_person_tag">Show new user tag</string>
+    <string name="show_new_person_tag_desc">When enabled a tag is shown for any account that is less than 30 days old.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">
