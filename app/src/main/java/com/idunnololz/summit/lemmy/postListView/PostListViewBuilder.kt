@@ -1064,10 +1064,15 @@ class PostListViewBuilder @Inject constructor(
                 }
             }
 
+            val postTitle = postView.post.name
             if (parseMarkdownInPostTitles) {
                 LemmyTextHelper.bindText(
                     title,
-                    postView.post.name,
+                    if (postTitle.isNotEmpty() && postTitle[0] == '#') {
+                        "\\${postTitle}"
+                    } else {
+                        postTitle
+                    },
                     instance,
                     showMediaAsLinks = true,
                     onImageClick = {
@@ -1087,7 +1092,7 @@ class PostListViewBuilder @Inject constructor(
                     },
                 )
             } else {
-                title.text = postView.post.name
+                title.text = postTitle
             }
 
             val renderAsRead = (postView.read || isDuplicatePost) && !alwaysRenderAsUnread

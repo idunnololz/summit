@@ -11,12 +11,18 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.video.VideoSizeHint
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.ZoneOffset
 import java.util.Locale
 
 object LemmyUtils {
@@ -140,4 +146,31 @@ fun SpannableStringBuilder.appendNameWithInstance(
         end,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
+}
+
+fun Person.getAccountAgeString(): String {
+    val ts = dateStringToTs(published)
+    val accountCreationTime = LocalDateTime
+        .ofEpochSecond(ts / 1000, 0, ZoneOffset.UTC)
+        .toLocalDate()
+    val period = Period.between(accountCreationTime, LocalDate.now())
+
+    val years = period.years
+    val months = period.months
+    val days = period.days
+
+    return buildString {
+        if (years > 0) {
+            append(years)
+            append("y ")
+        }
+        if (months > 0) {
+            append(months)
+            append("m ")
+        }
+        if (days > 0 && years == 0) {
+            append(days)
+            append("d ")
+        }
+    }.trim()
 }

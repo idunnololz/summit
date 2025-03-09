@@ -23,6 +23,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.browser.customtabs.CustomTabsIntent
@@ -92,11 +93,10 @@ object Utils {
         return a === b || a != null && a == b
     }
 
-    fun tint(context: Context, @DrawableRes res: Int, @ColorRes color: Int): Drawable {
+    fun tint(context: Context, @DrawableRes res: Int, @ColorInt color: Int): Drawable {
         val drawable = checkNotNull(ContextCompat.getDrawable(context, res))
-        val c = ContextCompat.getColor(context, color)
         val wrappedDrawable = DrawableCompat.wrap(drawable)
-        DrawableCompat.setTint(wrappedDrawable, c)
+        DrawableCompat.setTint(wrappedDrawable, color)
         return wrappedDrawable
     }
 
@@ -173,7 +173,25 @@ object Utils {
     }
 
     var openExternalLinksInBrowser = false
-    fun openExternalLink(context: Context, url: String, openNewIncognitoTab: Boolean = false) {
+    var defaultAppPackage: String? = null
+    fun openExternalLink(
+        context: Context,
+        url: String,
+        openNewIncognitoTab: Boolean = false,
+    ) {
+        val defaultAppPackage = defaultAppPackage
+        if (defaultAppPackage != null) {
+            val intent = context.packageManager.getLaunchIntentForPackage(defaultAppPackage)
+                ?.apply {
+                    action = Intent.ACTION_VIEW
+                    data = Uri.parse(url)
+                }
+            if (intent != null) {
+                safeLaunchExternalIntent(context, intent)
+                return
+            }
+        }
+
         if (openExternalLinksInBrowser) {
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(url)

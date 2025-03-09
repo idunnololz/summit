@@ -10,6 +10,7 @@ import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
+import com.idunnololz.summit.preferences.GestureSwipeDirectionIds
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.PostFabQuickActions
@@ -44,6 +45,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ENABLE_HIDDEN_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT_SIZE
@@ -78,6 +80,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_COLOR_
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFERRED_LOCALE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_RETAIN_LAST_POST
@@ -117,6 +120,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.PrettyPrintUtils
+import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -180,6 +184,12 @@ object SettingPath {
             HapticSettings::class ->
                 context.getString(R.string.vibration_and_haptics)
 
+            VideoPlayerSettings::class ->
+                context.getString(R.string.video_player)
+
+            DefaultAppsSettings::class ->
+                context.getString(R.string.default_apps)
+
             else -> error("No name for $this")
         }
     }
@@ -187,9 +197,8 @@ object SettingPath {
     fun SearchableSettings.getPageName(context: Context): String = this::class.getPageName(context)
 }
 
-@Singleton
 class MainSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf()
 
@@ -295,6 +304,16 @@ class MainSettings @Inject constructor(
         context.getString(R.string.vibration_and_haptics),
         null,
     )
+    val videoPlayerSettings = BasicSettingItem(
+        R.drawable.outline_video_player_24,
+        context.getString(R.string.video_player),
+        context.getString(R.string.video_player_desc),
+    )
+    val defaultAppsSettings = BasicSettingItem(
+        R.drawable.outline_apps_24,
+        context.getString(R.string.default_apps),
+        context.getString(R.string.default_apps_desc),
+    )
 
     override val allSettings = listOf(
         SubgroupItem(
@@ -305,6 +324,7 @@ class MainSettings @Inject constructor(
                 settingPostAndComments,
                 settingGestures,
                 hapticSettings,
+                videoPlayerSettings,
                 miscSettings,
             ),
         ),
@@ -326,6 +346,7 @@ class MainSettings @Inject constructor(
                 userActionsSettings,
                 downloadSettings,
                 notificationSettings,
+                defaultAppsSettings,
                 backupAndRestoreSettings,
             ),
         ),
@@ -339,9 +360,8 @@ class MainSettings @Inject constructor(
     )
 }
 
-@Singleton
 class LemmyWebSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -459,9 +479,8 @@ class LemmyWebSettings @Inject constructor(
     )
 }
 
-@Singleton
 class GestureSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -556,6 +575,32 @@ class GestureSettings @Inject constructor(
         context.getString(R.string.use_gesture_actions),
         context.getString(R.string.use_gesture_actions_desc),
         relatedKeys = listOf(KEY_USE_GESTURE_ACTIONS),
+    )
+    val gestureSwipeDirection = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.gesture_swipe_direction),
+        null,
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                GestureSwipeDirectionIds.LEFT,
+                context.getString(R.string.right_to_left),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                GestureSwipeDirectionIds.RIGHT,
+                context.getString(R.string.left_to_right),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                GestureSwipeDirectionIds.ANY,
+                context.getString(R.string.any_direction),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(KEY_GESTURE_SWIPE_DIRECTION),
     )
     val postGestureAction1 = RadioGroupSettingItem(
         null,
@@ -655,6 +700,7 @@ class GestureSettings @Inject constructor(
         postGestureAction2,
         postGestureAction3,
         postGestureSize,
+        gestureSwipeDirection,
 
         commentGestureAction1,
         commentGestureAction2,
@@ -663,9 +709,8 @@ class GestureSettings @Inject constructor(
     )
 }
 
-@Singleton
 class PostsFeedSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -921,9 +966,8 @@ class PostsFeedSettings @Inject constructor(
     )
 }
 
-@Singleton
 class PostAndCommentsSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1177,9 +1221,8 @@ class PostAndCommentsSettings @Inject constructor(
     )
 }
 
-@Singleton
 class PostAndCommentsAppearanceSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1297,9 +1340,8 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
     )
 }
 
-@Singleton
 class ThemeSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val baseTheme = RadioGroupSettingItem(
@@ -1501,9 +1543,8 @@ class ThemeSettings @Inject constructor(
     )
 }
 
-@Singleton
 class PostsFeedAppearanceSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val baseViewType = TextOnlySettingItem(
@@ -1589,9 +1630,8 @@ class PostsFeedAppearanceSettings @Inject constructor(
     )
 }
 
-@Singleton
 class AboutSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1630,9 +1670,8 @@ class AboutSettings @Inject constructor(
     )
 }
 
-@Singleton
 class CacheSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1680,9 +1719,8 @@ class CacheSettings @Inject constructor(
     )
 }
 
-@Singleton
 class HiddenPostsSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1715,9 +1753,8 @@ class HiddenPostsSettings @Inject constructor(
     )
 }
 
-@Singleton
 class HapticSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1740,9 +1777,8 @@ class HapticSettings @Inject constructor(
     )
 }
 
-@Singleton
 class MiscSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -1951,12 +1987,6 @@ class MiscSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT),
     )
-    val autoPlayVideos = OnOffSettingItem(
-        null,
-        context.getString(R.string.auto_play_videos),
-        null,
-        relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
-    )
     val uploadImagesToImgur = OnOffSettingItem(
         null,
         context.getString(R.string.use_imgur),
@@ -2009,6 +2039,12 @@ class MiscSettings @Inject constructor(
         context.getString(R.string.show_new_person_tag_desc),
         relatedKeys = listOf(KEY_WARN_NEW_PERSON)
     )
+    val preferredLocale = BasicSettingItem(
+        null,
+        context.getString(R.string.preferred_locale),
+        null,
+        relatedKeys = listOf(KEY_PREFERRED_LOCALE)
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -2021,21 +2057,20 @@ class MiscSettings @Inject constructor(
         largeScreenSupport,
         showEditedDate,
         imagePreviewHideUiByDefault,
-        autoPlayVideos,
         uploadImagesToImgur,
         animationLevel,
         shakeToSendFeedback,
         showLabelsInNavBar,
         showNewPersonWarning,
+        preferredLocale,
     )
 }
 
 /**
  * User actions.
  */
-@Singleton
 class ActionsSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
@@ -2043,9 +2078,8 @@ class ActionsSettings @Inject constructor(
     override val allSettings: List<SettingItem> = listOf()
 }
 
-@Singleton
 class LoggingSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val useFirebase = OnOffSettingItem(
@@ -2064,9 +2098,8 @@ class LoggingSettings @Inject constructor(
     )
 }
 
-@Singleton
 class HistorySettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val viewHistory = BasicSettingItem(
@@ -2091,9 +2124,8 @@ class HistorySettings @Inject constructor(
     )
 }
 
-@Singleton
 class NavigationSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     private val navBarDestOptions =
@@ -2247,9 +2279,8 @@ class NavigationSettings @Inject constructor(
     )
 }
 
-@Singleton
 class ImportAndExportSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val importSettings = BasicSettingItem(
@@ -2294,9 +2325,8 @@ class ImportAndExportSettings @Inject constructor(
     )
 }
 
-@Singleton
 class PerAccountSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val settingTheme = BasicSettingItem(
@@ -2407,9 +2437,8 @@ class PerAccountSettings @Inject constructor(
     )
 }
 
-@Singleton
 class DownloadSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val downloadDirectory = TextValueSettingItem(
@@ -2435,9 +2464,8 @@ class DownloadSettings @Inject constructor(
     )
 }
 
-@Singleton
 class PerCommunitySettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val usePerCommunitySettings = OnOffSettingItem(
@@ -2464,9 +2492,8 @@ class PerCommunitySettings @Inject constructor(
     )
 }
 
-@Singleton
 class NotificationSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     private val refreshIntervalOptions =
@@ -2533,9 +2560,8 @@ class NotificationSettings @Inject constructor(
     )
 }
 
-@Singleton
 class SearchHomeSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
     val searchSuggestions = OnOffSettingItem(
@@ -2586,8 +2612,68 @@ class SearchHomeSettings @Inject constructor(
     )
 }
 
+class VideoPlayerSettings @Inject constructor(
+    @ActivityContext private val context: Context,
+) : SearchableSettings {
+
+    val inlineVideoVolume = SliderSettingItem(
+        context.getString(R.string.default_volume),
+        0f,
+        1f,
+        null,
+    )
+    val autoPlayVideos = OnOffSettingItem(
+        null,
+        context.getString(R.string.auto_play_videos),
+        null,
+        relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        inlineVideoVolume,
+        autoPlayVideos,
+    )
+}
+
+class DefaultAppsSettings @Inject constructor(
+    @ActivityContext private val context: Context,
+) : SearchableSettings {
+
+    val defaultWebApp = BasicSettingItem(
+        null,
+        context.getString(R.string.default_web_app),
+        null,
+    )
+
+    val inlineVideoVolume = SliderSettingItem(
+        context.getString(R.string.default_volume),
+        0f,
+        1f,
+        null,
+    )
+    val autoPlayVideos = OnOffSettingItem(
+        null,
+        context.getString(R.string.auto_play_videos),
+        null,
+        relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
+    )
+
+    override val parents: List<KClass<out SearchableSettings>> = listOf(
+        MainSettings::class,
+    )
+
+    override val allSettings: List<SettingItem> = listOf(
+        inlineVideoVolume,
+        autoPlayVideos,
+    )
+}
+
 class AllSettings @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ActivityContext private val context: Context,
     mainSettings: MainSettings,
     lemmyWebSettings: LemmyWebSettings,
     gestureSettings: GestureSettings,
@@ -2611,6 +2697,8 @@ class AllSettings @Inject constructor(
     notificationSettings: NotificationSettings,
     searchHomeSettings: SearchHomeSettings,
     hapticSettings: HapticSettings,
+    videoPlayerSettings: VideoPlayerSettings,
+    defaultAppsSettings: DefaultAppsSettings,
 ) {
     val allSearchableSettings: List<SearchableSettings> = listOf(
         mainSettings,
@@ -2636,6 +2724,8 @@ class AllSettings @Inject constructor(
         notificationSettings,
         searchHomeSettings,
         hapticSettings,
+        videoPlayerSettings,
+        defaultAppsSettings,
     )
 
     init {

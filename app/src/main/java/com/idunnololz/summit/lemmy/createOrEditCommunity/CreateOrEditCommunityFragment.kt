@@ -41,6 +41,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragmentArgs
 import com.idunnololz.summit.util.BaseFragment
@@ -90,6 +91,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
     @Inject
     lateinit var textFieldToolbarManager: TextFieldToolbarManager
+
+    @Inject
+    lateinit var preferences: Preferences
 
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -610,9 +614,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 icon.setOnClickListener {
                     getMainActivity()?.let {
                         it.showAdvancedLinkOptions(
-                            community.icon,
-                            it.moreActionsHelper,
-                            childFragmentManager,
+                            url = community.icon,
+                            moreActionsHelper = it.moreActionsHelper,
+                            fragmentManager = childFragmentManager,
                         )
                     }
                 }
@@ -650,9 +654,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 banner.setOnClickListener {
                     getMainActivity()?.let {
                         it.showAdvancedLinkOptions(
-                            community.banner,
-                            it.moreActionsHelper,
-                            childFragmentManager,
+                            url = community.banner,
+                            moreActionsHelper = it.moreActionsHelper,
+                            fragmentManager = childFragmentManager,
                         )
                     }
                 }

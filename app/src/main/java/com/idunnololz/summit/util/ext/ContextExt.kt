@@ -11,8 +11,11 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
-import com.google.android.material.resources.TextAppearance
+import androidx.core.os.LocaleListCompat
 import com.idunnololz.summit.R
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
+import java.io.IOException
 
 fun Context.getColorFromAttribute(attribute: Int): Int {
     val attributes = obtainStyledAttributes(intArrayOf(attribute))
@@ -89,4 +92,25 @@ fun Context.hasInternet(): Boolean {
         isConnected = true
     }
     return isConnected
+}
+
+fun Context.getLocaleListFromXml(): LocaleListCompat {
+    val tagsList = mutableListOf<CharSequence>()
+    try {
+        val xpp: XmlPullParser = resources.getXml(R.xml.locales_config)
+        while (xpp.eventType != XmlPullParser.END_DOCUMENT) {
+            if (xpp.eventType == XmlPullParser.START_TAG) {
+                if (xpp.name == "locale") {
+                    tagsList.add(xpp.getAttributeValue(0))
+                }
+            }
+            xpp.next()
+        }
+    } catch (e: XmlPullParserException) {
+        e.printStackTrace()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+
+    return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
 }

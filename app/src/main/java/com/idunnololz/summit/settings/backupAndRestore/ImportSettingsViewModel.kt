@@ -26,7 +26,6 @@ class ImportSettingsViewModel @Inject constructor(
     private val settingsBackupManager: SettingsBackupManager,
     private val preferences: Preferences,
     private val stateHandle: SavedStateHandle,
-    private val allSettings: AllSettings,
 ) : ViewModel() {
 
     val state =
@@ -124,8 +123,6 @@ class ImportSettingsViewModel @Inject constructor(
             return
         }
 
-        val keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems()
-
         val currentSettingsJson = preferences.asJson()
 
         val allKeys = json.keys().asSequence().toMutableSet()
@@ -169,7 +166,6 @@ class ImportSettingsViewModel @Inject constructor(
             State.ConfirmImportSettings(
                 SettingsDataPreview(
                     keys = json.keys().asSequence().toList(),
-                    keyToSettingItems = keyToSettingItems,
                     diffs = diffs,
                     settingsPreview = settingsPreview,
                     keyToType = keyToType,

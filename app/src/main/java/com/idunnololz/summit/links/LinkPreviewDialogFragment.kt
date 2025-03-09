@@ -115,7 +115,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
     private fun setup(data: LinkMetadataHelper.LinkMetadata) = with(binding) {
         val context = requireContext()
         domain.text = data.host
-        title.text = data.title
+        title.text = data.title ?: data.url
 
         imageError.visibility = View.GONE
         image.load(data.imageUrl) {

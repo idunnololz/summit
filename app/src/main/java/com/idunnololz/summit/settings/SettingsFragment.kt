@@ -46,6 +46,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var allSettings: dagger.Lazy<AllSettings>
+
     private val viewModel: SettingsViewModel by viewModels()
 
     private var adapter: SettingItemsAdapter? = null
@@ -85,6 +88,8 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
         }
+
+        viewModel.searchableSettings = allSettings
 
         with(binding) {
             searchBar.setOnClickListener {
@@ -218,6 +223,18 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             mainSettings.hapticSettings.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingsHapticsFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.videoPlayerSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingsVideoPlayerFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.defaultAppsSettings.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToSettingsDefaultAppsFragment()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -393,6 +410,18 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
                         is SearchHomeSettings -> {
                             SearchHomeConfigDialogFragment.show(childFragmentManager)
+                        }
+
+                        is VideoPlayerSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingsVideoPlayerFragment()
+                            findNavController().navigateSafe(directions)
+                        }
+
+                        is DefaultAppsSettings -> {
+                            val directions = SettingsFragmentDirections
+                                .actionSettingsFragmentToSettingsDefaultAppsFragment()
+                            findNavController().navigateSafe(directions)
                         }
 
                         null -> {

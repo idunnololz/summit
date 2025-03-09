@@ -916,7 +916,7 @@ class CreateOrEditPostFragment :
                 val title = linkMetadata.data.title
 
                 if (linkMetadata.data.url == binding.urlEditText.text.toString() &&
-                    title.isNotBlank() &&
+                    !title.isNullOrBlank() &&
                     title != binding.titleEditText.text.toString()
                 ) {
                     binding.titleSuggestionContainer.visibility = View.VISIBLE

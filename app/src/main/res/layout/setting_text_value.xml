@@ -42,7 +42,7 @@
         android:ellipsize="end"
         android:layout_marginTop="@dimen/padding_half"
         android:textStyle="bold"
-        app:layout_goneMarginTop="0dp"
+        app:layout_goneMarginTop="@dimen/padding_quarter"
         app:layout_constraintStart_toStartOf="@+id/title"
         app:layout_constraintTop_toBottomOf="@+id/desc"
         app:layout_constraintBottom_toBottomOf="parent"

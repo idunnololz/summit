@@ -59,6 +59,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -471,6 +472,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private fun showOverflowMenu(communityView: CommunityView, mods: List<Person>) {
         if (!isBindingAvailable()) return
 
+        val context = requireContext()
+
         val bottomMenu = BottomMenu(requireContext()).apply {
             val fullAccount = moreActionsHelper.accountInfoManager.currentFullAccount.value
             val isMod = mods.firstOrNull { it.id == fullAccount?.accountId } != null
@@ -483,6 +486,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 )
                 addDivider()
             }
+
+            addItemWithIcon(
+                id = R.id.share,
+                title = R.string.share,
+                icon = R.drawable.baseline_share_24,
+            )
 
             addItemWithIcon(
                 id = R.id.block_community,
@@ -549,6 +558,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                             )
                         findNavController().navigateSafe(directions)
                     }
+                    R.id.share -> {
+                        val url = LinkUtils.getLinkForCommunity(
+                            communityView.community.toCommunityRef())
+                        Utils.shareLink(context, url)
+                    }
                     R.id.block_community -> {
                         moreActionsHelper.blockCommunity(communityView.community.id, true)
                     }
@@ -585,6 +599,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private fun showOverflowMenu(siteView: SiteView) {
         if (!isBindingAvailable()) return
 
+        val context = requireContext()
+
         val bottomMenu = BottomMenu(requireContext()).apply {
             if (siteView.site.instance == viewModel.instance) {
                 addItemWithIcon(
@@ -592,6 +608,13 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     title = getString(R.string.create_community),
                     icon = R.drawable.baseline_add_24,
                 )
+
+                addItemWithIcon(
+                    id = R.id.share,
+                    title = R.string.share,
+                    icon = R.drawable.baseline_share_24,
+                )
+
                 addDivider()
             }
 
@@ -620,6 +643,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                                 null,
                             )
                         findNavController().navigateSafe(directions)
+                    }
+                    R.id.share -> {
+                        val url = LinkUtils.getLinkForInstance(siteView.site.instance)
+                        Utils.shareLink(context, url)
                     }
                     R.id.block_instance -> {
                         moreActionsHelper.blockInstance(siteView.site.instance_id, true)

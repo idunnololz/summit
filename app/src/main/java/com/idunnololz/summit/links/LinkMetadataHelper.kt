@@ -30,13 +30,13 @@ class LinkMetadataHelper @Inject constructor(
         // getTitle doc.select("meta[property=og:title]")
 
         // getTitle doc.select("meta[property=og:title]")
-        var title = doc.select("meta[property=og:title]").attr("content")
+        var title: String? = doc.select("meta[property=og:title]").attr("content")
 
-        if (title.isEmpty()) {
+        if (title.isNullOrBlank()) {
             title = doc.title()
         }
         if (title.isEmpty()) {
-            title = url
+            title = null
         }
 
         // getDescription
@@ -202,7 +202,7 @@ class LinkMetadataHelper @Inject constructor(
 
     data class LinkMetadata(
         val url: String,
-        val title: String,
+        val title: String?,
         val description: String,
         val mediaType: String,
         val favIcon: String?,

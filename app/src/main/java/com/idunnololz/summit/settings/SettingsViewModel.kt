@@ -13,9 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val searchableSettings: Lazy<AllSettings>,
-) : ViewModel() {
+class SettingsViewModel @Inject constructor() : ViewModel() {
 
     val showSearch = MutableLiveData<Boolean>()
 
@@ -24,6 +22,13 @@ class SettingsViewModel @Inject constructor(
 
     val searchResults = MutableLiveData<List<SettingSearchResultItem>>()
     var searchIdToPage: Map<Int, SearchableSettings> = mapOf()
+    var searchableSettings: Lazy<AllSettings>? = null
+        set(value) {
+            field = value
+            viewModelScope.launch {
+                generateSearchItems()
+            }
+        }
 
     init {
         viewModelScope.launch {
@@ -40,6 +45,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun generateSearchItems() = withContext(Dispatchers.Default) {
+        val searchableSettings = searchableSettings ?: return@withContext
         val allSettings = searchableSettings.get().allSearchableSettings
         val query = currentQuery.value
 

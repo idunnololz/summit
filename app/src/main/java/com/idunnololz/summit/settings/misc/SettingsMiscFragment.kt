@@ -1,5 +1,6 @@
 package com.idunnololz.summit.settings.misc
 
+import android.app.LocaleConfig
 import android.graphics.RectF
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.LocaleManagerCompat
+import androidx.core.os.LocaleListCompat
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
@@ -14,22 +18,27 @@ import com.idunnololz.summit.databinding.FragmentSettingsMiscBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.DefaultAppPreference
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.getLocaleListFromXml
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
@@ -77,6 +86,13 @@ class SettingsMiscFragment :
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
             setupToolbar(binding.toolbar, settings.getPageName(context))
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            LocalePickerBottomSheetFragment.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            updateRendering()
         }
 
         updateRendering()
@@ -206,13 +222,6 @@ class SettingsMiscFragment :
                 preferences.imagePreviewHideUiByDefault = it
             },
         )
-        settings.autoPlayVideos.bindTo(
-            binding.autoPlayVideos,
-            { preferences.autoPlayVideos },
-            {
-                preferences.autoPlayVideos = it
-            },
-        )
         settings.uploadImagesToImgur.bindTo(
             binding.uploadImagesToImgur,
             { preferences.uploadImagesToImgur },
@@ -276,6 +285,21 @@ class SettingsMiscFragment :
             { preferences.warnNewPerson },
             { preferences.warnNewPerson = it },
         )
+        binding.preferredLocale.apply {
+            settings.preferredLocale.bindTo(this) {
+                LocalePickerBottomSheetFragment.show(childFragmentManager)
+            }
+
+            val appLocale = AppCompatDelegate.getApplicationLocales()
+            val localeText = if (appLocale.size() == 0) {
+                context.getString(R.string.use_system_language)
+            } else {
+                appLocale.get(0)?.displayLanguage
+            }
+
+            desc.visibility = View.VISIBLE
+            desc.text = localeText
+        }
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {
