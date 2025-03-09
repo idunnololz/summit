@@ -154,6 +154,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         hiltEntryPoint.themeManager().onPreferencesChanged()
         Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
+        Utils.defaultAppPackage = preferences.defaultWebApp?.packageName
         LemmyTextHelper.autoLinkPhoneNumbers = preferences.autoLinkPhoneNumbers
         LemmyTextHelper.autoLinkIpAddresses = preferences.autoLinkIpAddresses
         notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()

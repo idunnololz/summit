@@ -1128,6 +1128,7 @@ class CommunityFragment :
                 },
                 gestureSize = preferences.postGestureSize,
                 hapticsEnabled = preferences.hapticsEnabled,
+                swipeDirection = preferences.gestureSwipeDirection,
             )
             itemTouchHelper = ItemTouchHelper(
                 requireNotNull(swipeActionCallback) {
@@ -1146,6 +1147,7 @@ class CommunityFragment :
         val context = requireContext()
         this.gestureSize = preferences.postGestureSize
         this.hapticsEnabled = preferences.hapticsEnabled
+        this.swipeDirection = preferences.gestureSwipeDirection
         this.actions = preferences.getPostSwipeActions(context)
     }
 

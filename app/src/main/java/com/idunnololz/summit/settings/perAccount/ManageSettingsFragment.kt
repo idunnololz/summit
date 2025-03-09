@@ -16,6 +16,7 @@ import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentManageSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingItemBinding
 import com.idunnololz.summit.databinding.ManageSettingsInstructionItemBinding
+import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
@@ -37,6 +38,8 @@ class ManageSettingsFragment :
     private val args: ManageSettingsFragmentArgs by navArgs()
     private val viewModel: ManageSettingsViewModel by viewModels()
 
+    @Inject
+    lateinit var allSettings: AllSettings
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
@@ -75,6 +78,7 @@ class ManageSettingsFragment :
         with(binding) {
             val adapter = ManageSettingsDataAdapter(
                 context = context,
+                keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems(),
                 onClearSettingClick = { settingKey ->
                     if (args.account != null) {
                         OldAlertDialogFragment.Builder()
@@ -118,6 +122,7 @@ class ManageSettingsFragment :
 
     private class ManageSettingsDataAdapter(
         private val context: Context,
+        private val keyToSettingItems: MutableMap<String, MutableList<SettingItem>>,
         private val onClearSettingClick: (key: String) -> Unit,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -210,7 +215,7 @@ class ManageSettingsFragment :
                     Item.SettingListItem(
                         settingKey = it.key,
                         value = it.value,
-                        newData.keyToSettingItems[it.key] ?: listOf(),
+                        keyToSettingItems[it.key] ?: listOf(),
                     )
                 }
             }

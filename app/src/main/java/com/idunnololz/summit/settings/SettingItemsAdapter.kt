@@ -21,8 +21,8 @@ import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.SettingDescriptionItemBinding
 import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingOnOffBinding
+import com.idunnololz.summit.databinding.SettingSliderItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
-import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
@@ -269,7 +269,7 @@ class SettingItemsAdapter(
             b.root.tag = settingItem
             b.root.setOnClickListener(onSettingClickListener)
         }
-        addItemType(Item.SliderItem::class, SliderSettingItemBinding::inflate) { item, b, h ->
+        addItemType(Item.SliderItem::class, SettingSliderItemBinding::inflate) { item, b, h ->
             val settingItem = item.settingItem
 
             b.root.tag = settingItem

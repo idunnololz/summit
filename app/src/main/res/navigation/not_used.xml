@@ -365,4 +365,12 @@ safeargs.
             app:argType="string"
             app:nullable="true" />
     </dialog>
+    <dialog
+        android:id="@+id/chooseDefaultAppBottomSheetFragment"
+        android:name="com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragment"
+        android:label="ChooseDefaultAppBottomSheetFragment" >
+        <argument
+            android:name="intent"
+            app:argType="android.content.Intent" />
+    </dialog>
 </navigation>

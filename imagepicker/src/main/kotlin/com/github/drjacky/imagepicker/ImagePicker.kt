@@ -18,7 +18,6 @@ import java.io.File
  * @version 1.0
  * @since 04 January 2019
  */
-@Suppress("unused")
 open class ImagePicker {
 
     companion object {

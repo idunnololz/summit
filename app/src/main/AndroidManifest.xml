@@ -10,6 +10,14 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -19,9 +27,9 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:theme="@style/Theme.App.Splash"
+        android:localeConfig="@xml/locales_config"
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="@bool/enableOnBackInvokedCallback">
-
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
@@ -32,7 +40,7 @@
             />
 
         <activity
-            android:configChanges="layoutDirection|locale"
+            android:configChanges="layoutDirection"
             android:launchMode="singleTask"
             android:name=".main.MainActivity"
             android:theme="@style/Theme.App.Splash"
@@ -179,7 +187,7 @@
                 android:resource="@xml/searchable"/>
         </activity>
         <activity
-            android:configChanges="layoutDirection|locale"
+            android:configChanges="layoutDirection"
             android:name=".preview.ImageViewerActivity"
             android:theme="@style/Theme.App.Transparent"
             android:parentActivityName=".main.MainActivity"
@@ -243,5 +251,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
     </application>
 </manifest>

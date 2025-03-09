@@ -68,7 +68,7 @@ retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", v
 retrofit2-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 
 transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformations" }
-ucropnedit = { module = "com.github.jens-muenker:uCrop-n-Edit", version = "4.0.4" }
+ucropnedit = { module = "com.github.jens-muenker:uCrop-n-Edit", version = "4.0.4-non-native" }
 viewpump = { module = "io.github.inflationx:viewpump", version.ref = "viewpump" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 

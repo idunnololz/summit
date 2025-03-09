@@ -10,12 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentViewCurrentSettingsBinding
+import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViewCurrentSettingsFragment :
@@ -23,6 +25,9 @@ class ViewCurrentSettingsFragment :
     OldAlertDialogFragment.AlertDialogFragmentListener {
 
     private val viewModel: ViewCurrentSettingsViewModel by viewModels()
+
+    @Inject
+    lateinit var allSettings: AllSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,

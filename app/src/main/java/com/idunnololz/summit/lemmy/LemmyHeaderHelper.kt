@@ -56,7 +56,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     companion object {
         private val TAG = "LemmyHeaderHelper"
 
-        private const val NEW_PERSON_DURATION = 30 * 24 * 60 * 60 * 1000L
+        const val NEW_PERSON_DURATION = 30 * 24 * 60 * 60 * 1000L
 
         const val SEPARATOR = " ● "
 
@@ -125,7 +125,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
         }
 
         if (postView.saved) {
-            val d = Utils.tint(context, R.drawable.baseline_bookmark_24, R.color.style_blue)
+            val d = Utils.tint(
+                context = context,
+                res = R.drawable.baseline_bookmark_24,
+                color = context.getColorCompat(R.color.style_blue)
+            )
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
             val s = sb.length
@@ -141,7 +145,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
         }
 
         if (postView.post.removed || postView.post.deleted) {
-            val d = Utils.tint(context, R.drawable.baseline_delete_24, R.color.style_red)
+            val d = Utils.tint(
+                context = context,
+                res = R.drawable.baseline_delete_24,
+                color = context.getColorCompat(R.color.style_red)
+            )
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
             val s = sb.length
@@ -157,7 +165,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
         }
 
         if (postView.post.featured_local || postView.post.featured_community) {
-            val d = Utils.tint(context, R.drawable.baseline_push_pin_24, R.color.style_green)
+            val d = Utils.tint(
+                context = context,
+                res = R.drawable.baseline_push_pin_24,
+                color = context.getColorCompat(R.color.style_green)
+            )
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
             val s = sb.length
@@ -172,7 +184,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
             sb.appendSeparator()
         }
         if (postView.post.locked) {
-            val d = Utils.tint(context, R.drawable.outline_lock_24, R.color.style_amber)
+            val d = Utils.tint(
+                context = context,
+                res = R.drawable.outline_lock_24,
+                color = context.getColorCompat(R.color.style_amber)
+            )
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
             val s = sb.length
@@ -391,7 +407,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
         }
 
         if (commentView.saved) {
-            val d = Utils.tint(context, R.drawable.baseline_bookmark_24, R.color.style_blue)
+            val d = Utils.tint(
+                context = context,
+                res = R.drawable.baseline_bookmark_24,
+                color = context.getColorCompat(R.color.style_blue)
+            )
             val size: Int = Utils.convertDpToPixel(16f).toInt()
             d.setBounds(0, 0, size, size)
             val s = sb.length
@@ -483,7 +503,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
         if (commentView.creator.id == commentView.post.creator_id) {
             run {
-                val d = Utils.tint(context, R.drawable.ic_op, R.color.style_blue)
+                val d = Utils.tint(
+                    context = context,
+                    res = R.drawable.ic_op,
+                    color = context.getColorCompat(R.color.style_blue)
+                )
                 val size: Int = Utils.convertDpToPixel(14f).toInt()
                 d.setBounds(0, 0, size, size)
                 sb.append(" ")
