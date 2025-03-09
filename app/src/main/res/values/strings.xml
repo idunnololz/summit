@@ -1952,6 +1952,25 @@
     <string name="disable_shake_to_give_feedback">Disable shake to give feedback</string>
     <string name="show_new_person_tag">Show new user tag</string>
     <string name="show_new_person_tag_desc">When enabled a tag is shown for any account that is less than 30 days old.</string>
+    <string name="gesture_swipe_direction">Swipe gesture direction</string>
+    <string name="right_to_left">Right to left</string>
+    <string name="left_to_right">Left to right</string>
+    <string name="any_direction">Any direction</string>
+    <string name="video_player">Video player</string>
+    <string name="inline_video_player">Inline video player</string>
+    <string name="default_volume">Default volume</string>
+    <string name="default_apps">Default apps</string>
+    <string name="video_player_desc">Change settings related to the video player</string>
+    <string name="default_apps_desc">Choose which apps should be used for certain actions</string>
+    <string name="new_account_desc_format">Account is relatively new. Age: %1$s.</string>
+    <string name="account_age_format">%1$s Account age</string>
+    <string name="default_web_app">Default web app</string>
+    <string name="none_set">None set</string>
+    <string name="choose_default_app">Choose default app</string>
+    <string name="use_system_default">Use system default</string>
+    <string name="preferred_locale">Preferred locale</string>
+    <string name="choose_app_language">Choose app language</string>
+    <string name="use_system_language">Use system language</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

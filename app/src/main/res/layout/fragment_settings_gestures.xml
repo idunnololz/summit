@@ -39,6 +39,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <include
+                    android:id="@+id/gesture_swipe_direction"
+                    layout="@layout/setting_text_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <TextView
                     android:id="@+id/post_actions"
                     android:text="@string/post_actions"
@@ -84,7 +90,7 @@
 
                 <include
                     android:id="@+id/post_gesture_size"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -133,7 +139,7 @@
 
                 <include
                     android:id="@+id/comment_gesture_size"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

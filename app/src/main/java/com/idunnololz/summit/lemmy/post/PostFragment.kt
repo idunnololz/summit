@@ -1151,6 +1151,7 @@ class PostFragment :
                 },
                 gestureSize = preferences.commentGestureSize,
                 hapticsEnabled = preferences.hapticsEnabled,
+                swipeDirection = preferences.gestureSwipeDirection,
             )
             itemTouchHelper = ItemTouchHelper(requireNotNull(swipeActionCallback))
         }
@@ -1161,6 +1162,7 @@ class PostFragment :
             postOnlyActions = preferences.getPostSwipeActions(context)
             postOnlyGestureSize = preferences.postGestureSize
             hapticsEnabled = preferences.hapticsEnabled
+            swipeDirection = preferences.gestureSwipeDirection
 
             updateCommentSwipeActions()
         }

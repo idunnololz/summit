@@ -16,11 +16,13 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.preferences.CommentGestureAction
+import com.idunnololz.summit.preferences.GestureSwipeDirectionIds
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
+import kotlin.math.abs
 
 class LemmySwipeActionCallback(
     private val context: Context,
@@ -28,6 +30,7 @@ class LemmySwipeActionCallback(
     val onActionSelected: (SwipeAction, ViewHolder) -> Unit,
     var gestureSize: Float,
     var hapticsEnabled: Boolean,
+    var swipeDirection: Int,
 ) : ItemTouchHelper.Callback() {
 
     companion object {
@@ -66,7 +69,16 @@ class LemmySwipeActionCallback(
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
         return if (viewHolder.isSwipeable()) {
-            makeMovementFlags(0, ItemTouchHelper.LEFT)
+            when (swipeDirection) {
+                GestureSwipeDirectionIds.RIGHT ->
+                    makeMovementFlags(0, ItemTouchHelper.RIGHT)
+                GestureSwipeDirectionIds.ANY ->
+                    makeMovementFlags(
+                        0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
+//                GestureSwipeDirectionIds.LEFT,
+                else ->
+                    makeMovementFlags(0, ItemTouchHelper.LEFT)
+            }
         } else {
             0
         }
@@ -174,10 +186,10 @@ class LemmySwipeActionCallback(
         val usableSpace = maxActionW - deadSpace
         val actionSpace = usableSpace / actions.size
 
-        val negDx = -dX
+        val absDx = abs(dX)
         val currentSwipeAction = currentSwipeAction
         if (isCurrentlyActive || currentSwipeAction == null) {
-            if (negDx < deadSpace) {
+            if (absDx < deadSpace) {
                 background.color = noActionColor
 //                drawable = actions.first().icon.apply {
 //                    val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
@@ -192,7 +204,7 @@ class LemmySwipeActionCallback(
                 var thresholdX = deadSpace + actionSpace
                 var index = 0
                 while (index < actions.size) {
-                    if (negDx < thresholdX || index == actions.lastIndex) {
+                    if (absDx < thresholdX || index == actions.lastIndex) {
                         val swipeAction = actions[index]
                         background.color = swipeAction.color
                         if (currentSwipeAction != swipeAction) {
@@ -215,11 +227,19 @@ class LemmySwipeActionCallback(
                         }
 
                         drawable = icon.apply {
-                            val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
-                            val iconLeft = itemView.right - marginEnd - intrinsicWidth
-                            val iconRight = itemView.right - marginEnd
-                            val iconBottom = iconTop + intrinsicHeight
-                            setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                            if (dX < 0) {
+                                val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
+                                val iconLeft = itemView.right - marginEnd - intrinsicWidth
+                                val iconRight = itemView.right - marginEnd
+                                val iconBottom = iconTop + intrinsicHeight
+                                setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                            } else {
+                                val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
+                                val iconLeft = itemView.left + marginEnd
+                                val iconRight = itemView.left + marginEnd + intrinsicWidth
+                                val iconBottom = iconTop + intrinsicHeight
+                                setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                            }
                             alpha = 255
                         }
                         break
@@ -231,21 +251,38 @@ class LemmySwipeActionCallback(
         } else {
             background.color = currentSwipeAction.color
             drawable = currentSwipeAction.icon.apply {
-                val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
-                val iconLeft = itemView.right - marginEnd - intrinsicWidth
-                val iconRight = itemView.right - marginEnd
-                val iconBottom = iconTop + intrinsicHeight
-                setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                if (dX < 0) {
+                    val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
+                    val iconLeft = itemView.right - marginEnd - intrinsicWidth
+                    val iconRight = itemView.right - marginEnd
+                    val iconBottom = iconTop + intrinsicHeight
+                    setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                } else {
+                    val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
+                    val iconLeft = itemView.left + marginEnd
+                    val iconRight = itemView.left + marginEnd + intrinsicWidth
+                    val iconBottom = iconTop + intrinsicHeight
+                    setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                }
                 alpha = 255
             }
         }
 
-        background.setBounds(
-            itemView.right + dX.toInt(),
-            itemView.top,
-            itemView.right,
-            itemView.bottom,
-        )
+        if (dX < 0) {
+            background.setBounds(
+                itemView.right + dX.toInt(),
+                itemView.top,
+                itemView.right,
+                itemView.bottom,
+            )
+        } else {
+            background.setBounds(
+                itemView.left,
+                itemView.top,
+                itemView.left + dX.toInt(),
+                itemView.bottom,
+            )
+        }
         background.draw(c)
         drawable?.draw(c)
 

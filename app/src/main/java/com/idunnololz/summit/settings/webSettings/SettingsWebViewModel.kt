@@ -34,7 +34,6 @@ class SettingsWebViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
     private val lemmyApiClient: LemmyApiClient,
-    private val lemmyWebSettings: LemmyWebSettings,
     private val state: SavedStateHandle,
     private val accountImageGenerator: AccountImageGenerator,
     private val directoryHelper: DirectoryHelper,
@@ -47,7 +46,7 @@ class SettingsWebViewModel @Inject constructor(
     val saveUserSettings = StatefulLiveData<Unit>()
     val uploadImageStatus = StatefulLiveData<Pair<Int, String>>()
 
-    fun fetchAccountInfo() {
+    fun fetchAccountInfo(lemmyWebSettings: LemmyWebSettings) {
         accountData.setIsLoading()
 
         viewModelScope.launch {
@@ -65,7 +64,7 @@ class SettingsWebViewModel @Inject constructor(
                             ),
                         )
                     } else {
-                        updateValue(account, data)
+                        updateValue(lemmyWebSettings, account, data)
                     }
                 }
                 .onFailure {
@@ -74,7 +73,7 @@ class SettingsWebViewModel @Inject constructor(
         }
     }
 
-    fun save(updatedValues: Map<Int, Any?>) {
+    fun save(lemmyWebSettings: LemmyWebSettings, updatedValues: Map<Int, Any?>) {
         val accountData = accountData.valueOrNull ?: return
         val myUser = accountData.accountInfo.my_user ?: return
         val localUser = myUser.local_user_view.local_user
@@ -177,7 +176,7 @@ class SettingsWebViewModel @Inject constructor(
         }
     }
 
-    private fun updateValue(account: Account, data: GetSiteResponse) {
+    private fun updateValue(lemmyWebSettings: LemmyWebSettings, account: Account, data: GetSiteResponse) {
         val myUser = data.my_user ?: return
         val localUser = myUser.local_user_view.local_user
         val person = myUser.local_user_view.person

@@ -31,6 +31,7 @@ import com.idunnololz.summit.databinding.ItemYouMenuBinding
 import com.idunnololz.summit.databinding.ItemYouProfileBinding
 import com.idunnololz.summit.databinding.ItemYouSignInOrSignUpBinding
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
 import com.idunnololz.summit.util.BaseFragment
@@ -38,7 +39,6 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.computeWindowMetrics
 import com.idunnololz.summit.util.convertPixelToSp
-import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.excludeRegionFromSystemGestures
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getTextSizeFromTextAppearance
@@ -48,10 +48,6 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.Period
-import java.time.ZoneOffset
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -403,30 +399,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         item.person.counts.comment_count.toLong(),
                     )
 
-                    val ts = dateStringToTs(item.person.person.published)
-                    val accountCreationTime = LocalDateTime
-                        .ofEpochSecond(ts / 1000, 0, ZoneOffset.UTC)
-                        .toLocalDate()
-                    val period = Period.between(accountCreationTime, LocalDate.now())
-
-                    val years = period.years
-                    val months = period.months
-                    val days = period.days
-
-                    b.accountAge.text = buildString {
-                        if (years > 0) {
-                            append(years)
-                            append("y ")
-                        }
-                        if (months > 0) {
-                            append(months)
-                            append("m ")
-                        }
-                        if (days > 0 && years == 0) {
-                            append(days)
-                            append("d ")
-                        }
-                    }.trim()
+                    b.accountAge.text = item.person.person.getAccountAgeString()
 
                     b.statCard1.setOnClickListener {
                         onPostsClick()

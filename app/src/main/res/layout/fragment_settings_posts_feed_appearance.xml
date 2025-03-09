@@ -101,19 +101,19 @@
 
                 <include
                     android:id="@+id/text_scaling_setting"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/image_scaling_setting"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/horizontal_margin_size_setting"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

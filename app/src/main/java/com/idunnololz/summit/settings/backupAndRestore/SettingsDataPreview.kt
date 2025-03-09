@@ -7,7 +7,6 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class SettingsDataPreview(
     val keys: List<String>,
-    val keyToSettingItems: Map<String, List<SettingItem>>,
     val diffs: List<Diff>,
     val settingsPreview: Map<String, String>,
     val keyToType: Map<String, String>,

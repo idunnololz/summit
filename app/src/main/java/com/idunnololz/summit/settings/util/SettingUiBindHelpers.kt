@@ -8,8 +8,8 @@ import com.idunnololz.summit.databinding.RadioGroupTitleSettingItemBinding
 import com.idunnololz.summit.databinding.SettingColorItemBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffMasterBinding
+import com.idunnololz.summit.databinding.SettingSliderItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
-import com.idunnololz.summit.databinding.SliderSettingItemBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
@@ -114,7 +114,7 @@ fun OnOffSettingItem.bindTo(
 }
 
 fun SliderSettingItem.bindTo(
-    b: SliderSettingItemBinding,
+    b: SettingSliderItemBinding,
     getCurrentValue: () -> Float,
     onValueChanged: (Float) -> Unit,
 ) {
