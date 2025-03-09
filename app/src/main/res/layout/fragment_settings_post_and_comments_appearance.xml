@@ -76,7 +76,7 @@
 
                 <include
                     android:id="@+id/text_scaling_setting1"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -114,13 +114,13 @@
 
                 <include
                     android:id="@+id/text_scaling_setting2"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/indentation_per_level"
-                    layout="@layout/slider_setting_item"
+                    layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"

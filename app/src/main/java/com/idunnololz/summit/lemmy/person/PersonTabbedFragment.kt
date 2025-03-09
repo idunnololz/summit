@@ -32,10 +32,12 @@ import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonBinding
+import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATION
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.toPersonRef
@@ -56,11 +58,14 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
+import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
+import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -167,8 +172,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         onPersonChanged()
 
         with(binding) {
-            binding.fab.hide()
-            binding.tabLayoutContainer.visibility = View.GONE
+            fab.hide()
+            tabLayoutContainer.visibility = View.GONE
 
             appBar.addOnOffsetChangedListener { appBar, offset ->
                 val topInset = mainActivity.insets.value?.topInset ?: 0
@@ -247,37 +252,36 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 init()
             }
 
-            binding.title.alpha = 0f
+            title.alpha = 0f
             isAnimatingTitleIn = false
             isAnimatingTitleOut = false
 
-            binding.cakeDate.visibility = View.GONE
+            body.visibility = View.GONE
 
-            binding.banner.transitionName = "banner_image"
+            banner.transitionName = "banner_image"
 
             val actionBarHeight = context.getDimenFromAttribute(
                 androidx.appcompat.R.attr.actionBarSize,
             )
-            binding.appBar.addOnOffsetChangedListener { _, verticalOffset ->
+            appBar.addOnOffsetChangedListener { _, verticalOffset ->
                 if (!isBindingAvailable()) {
                     return@addOnOffsetChangedListener
                 }
 
-                val percentCollapsed =
-                    -verticalOffset / binding.collapsingToolbarLayout.height.toDouble()
-                val absPixelsShowing = binding.collapsingToolbarLayout.height + verticalOffset
+                val percentCollapsed = -verticalOffset / collapsingToolbarLayout.height.toDouble()
+                val absPixelsShowing = collapsingToolbarLayout.height + verticalOffset
 
                 if (absPixelsShowing <= actionBarHeight) {
                     if (!isAnimatingTitleIn) {
                         isAnimatingTitleIn = true
                         isAnimatingTitleOut = false
-                        binding.title.animate().alpha(1f)
+                        title.animate().alpha(1f)
                     }
                 } else if (percentCollapsed < 0.66) {
                     if (!isAnimatingTitleOut) {
                         isAnimatingTitleOut = true
                         isAnimatingTitleIn = false
-                        binding.title.animate().alpha(0f)
+                        title.animate().alpha(0f)
                     }
                 }
             }
@@ -420,27 +424,22 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         if (!isBindingAvailable()) return
 
         val data = viewModel.personData.valueOrNull ?: return
+        val person = data.personView.person
         val context = requireContext()
 
-        Log.d(TAG, "user id: ${data.personView.person.id}")
-        Log.d(TAG, "actor id: ${data.personView.person.actor_id}")
+        Log.d(TAG, "user id: ${person.id}")
+        Log.d(TAG, "actor id: ${person.actor_id}")
 
         TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 
         with(binding) {
-            val displayName = data.personView.person.display_name
-                ?: data.personView.person.name
+            val displayName = person.display_name
+                ?: person.name
 
-            binding.title.text = displayName
+            title.text = displayName
 
-            val bannerUrl = data.personView.person.banner
+            val bannerUrl = person.banner
             if (bannerUrl != null) {
-                profileIcon.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    this.topToBottom = bannerDummy.id
-                    this.topToTop = ConstraintLayout.LayoutParams.UNSET
-                    this.topMargin = -Utils.convertDpToPixel(32f).toInt()
-                }
-
                 bannerDummy.setOnClickListener {
                     getMainActivity()?.openImage(
                         banner,
@@ -456,10 +455,13 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     }
                 }
             } else {
+                banner.load("file:///android_asset/banner_placeholder.svg") {
+                    allowHardware(false)
+                }
                 bannerDummy.setOnClickListener(null)
             }
-            avatarHelper.loadAvatar(profileIcon, data.personView.person)
-            if (data.personView.person.avatar.isNullOrBlank()) {
+            avatarHelper.loadAvatar(profileIcon, person)
+            if (person.avatar.isNullOrBlank()) {
                 profileIcon.setOnClickListener {
                     OldAlertDialogFragment.Builder()
                         .setMessage(R.string.error_user_has_no_profile_image)
@@ -472,14 +474,55 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                     getMainActivity()?.openImage(
                         profileIcon,
                         toolbar,
-                        data.personView.person.fullName,
-                        data.personView.person.avatar,
+                        person.fullName,
+                        person.avatar,
                         null,
                     )
                 }
             }
             name.text = displayName
-            subtitle2.text = buildSpannedString {
+
+            val dateTime = LocalDateTime.ofEpochSecond(
+                dateStringToTs(person.published) / 1000,
+                0,
+                ZoneOffset.UTC,
+            )
+            val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+            val cakeDrawable = context.getDrawableCompat(R.drawable.baseline_cake_24)
+            val drawableSize = Utils.convertDpToPixel(13f).toInt()
+            cakeDrawable?.setBounds(0, 0, drawableSize, drawableSize)
+            cakeDate.setCompoundDrawablesRelative(
+                cakeDrawable,
+                null,
+                null,
+                null,
+            )
+            cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
+            cakeDate.visibility = View.VISIBLE
+
+
+            val personCreationTs = dateStringToTs(person.published)
+            val isPersonNew =
+                System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
+            body.text = buildSpannedString {
+                if (isPersonNew) {
+                    val s = length
+                    append(context.getString(
+                        R.string.new_account_desc_format, tsToConcise(context, person.published)))
+                    val e = length
+                    setSpan(
+                        RoundedBackgroundSpan(
+                            backgroundColor = context.getColorCompat(R.color.style_amber),
+                            textColor = context.getColorCompat(R.color.black97)
+                        ),
+                        s,
+                        e,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                    appendLine()
+                    appendLine()
+                }
+
                 append(
                     context.resources.getQuantityString(
                         R.plurals.posts_format,
@@ -497,16 +540,16 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         defaultDecimalFormat.format(data.personView.counts.comment_count),
                     ),
                 )
-            }
 
-            val dateTime = LocalDateTime.ofEpochSecond(
-                dateStringToTs(data.personView.person.published) / 1000,
-                0,
-                ZoneOffset.UTC,
-            )
-            val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
-            cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
-            binding.cakeDate.visibility = View.VISIBLE
+                appendSeparator()
+
+                append(
+                    context.getString(
+                        R.string.account_age_format,
+                        person.getAccountAgeString(),
+                    ),
+                )
+            }
 
             if (viewPager.adapter == null) {
                 viewPager.offscreenPageLimit = 5
@@ -524,6 +567,12 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                 binding.viewPager,
                 binding.viewPager.adapter as ViewPagerAdapter,
             ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
+
+            if (body.text.isNullOrBlank()) {
+                body.visibility = View.GONE
+            } else {
+                body.visibility = View.VISIBLE
+            }
         }
         onUserTagChanged()
     }

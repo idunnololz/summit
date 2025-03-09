@@ -374,10 +374,15 @@ class PostAndCommentViewBuilder @Inject constructor(
             title.setTag(R.id.show_community_icon, showCommunityIcon)
         }
 
+        val postTitle = postView.post.name
         if (parseMarkdownInPostTitles) {
             LemmyTextHelper.bindText(
                 textView = title,
-                text = postView.post.name,
+                text = if (postTitle.isNotEmpty() && postTitle[0] == '#') {
+                    "\\${postTitle}"
+                } else {
+                    postTitle
+                },
                 instance = instance,
                 showMediaAsLinks = true,
                 highlight = if (highlightTextData?.targetSubtype == 0) {
@@ -396,7 +401,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 onLinkLongClick = onLinkLongClick,
             )
         } else {
-            title.text = postView.post.name
+            title.text = postTitle
         }
 
         if (postView.counts.comments == postView.unread_comments ||

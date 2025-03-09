@@ -186,6 +186,20 @@
             app:exitAnim="@animator/fade_out"
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsVideoPlayerFragment"
+            app:destination="@id/settingsVideoPlayerFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsDefaultAppsFragment"
+            app:destination="@id/settingsDefaultAppsFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -459,4 +473,12 @@
         android:name="com.idunnololz.summit.settings.haptics.SettingsHapticsFragment"
         android:label="SettingsHapticsFragment" />
     <include app:graph="@navigation/actions" />
+    <fragment
+        android:id="@+id/settingsVideoPlayerFragment"
+        android:name="com.idunnololz.summit.settings.videoPlayer.SettingsVideoPlayerFragment"
+        android:label="SettingsVideoPlayerFragment" />
+    <fragment
+        android:id="@+id/settingsDefaultAppsFragment"
+        android:name="com.idunnololz.summit.settings.defaultApps.SettingsDefaultAppsFragment"
+        android:label="SettingsDefaultAppsFragment" />
 </navigation>

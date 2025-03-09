@@ -60,6 +60,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_THREAD_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DATE_SCREENSHOTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_APP_WEB_BROWSER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_PAGE
@@ -67,6 +68,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ENABLE_HIDDEN_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT_COLOR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT_SIZE
@@ -107,6 +109,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFERRED_LOCALE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREVIEW_LINKS
@@ -634,7 +637,13 @@ class Preferences(
     var showLabelsInNavBar: Boolean
         by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
     var warnNewPerson: Boolean
-        by booleanPreference(KEY_WARN_NEW_PERSON, false)
+        by booleanPreference(KEY_WARN_NEW_PERSON, true)
+    var gestureSwipeDirection: Int
+        by intPreference(KEY_GESTURE_SWIPE_DIRECTION, GestureSwipeDirectionIds.LEFT)
+    var defaultWebApp: DefaultAppPreference?
+        by jsonPreference(KEY_DEFAULT_APP_WEB_BROWSER) { null }
+    var preferredLocale: String?
+        by stringPreference(KEY_PREFERRED_LOCALE)
 
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

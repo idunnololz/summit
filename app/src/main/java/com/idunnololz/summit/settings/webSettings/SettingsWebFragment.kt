@@ -132,7 +132,7 @@ class SettingsWebFragment :
                 is StatefulData.Error -> {
                     binding.loadingView.showDefaultErrorMessageFor(it.error)
                     binding.loadingView.setOnRefreshClickListener {
-                        viewModel.fetchAccountInfo()
+                        viewModel.fetchAccountInfo(lemmyWebSettings)
                     }
                 }
                 is StatefulData.Loading -> binding.loadingView.showProgressBar()
@@ -184,7 +184,7 @@ class SettingsWebFragment :
             }
         }
 
-        viewModel.fetchAccountInfo()
+        viewModel.fetchAccountInfo(lemmyWebSettings)
     }
 
     private fun save() {
@@ -198,7 +198,7 @@ class SettingsWebFragment :
             return
         }
 
-        viewModel.save(updatedSettingValues)
+        viewModel.save(lemmyWebSettings, updatedSettingValues)
     }
 
     private fun loadWith(data: SettingsWebViewModel.AccountData) {

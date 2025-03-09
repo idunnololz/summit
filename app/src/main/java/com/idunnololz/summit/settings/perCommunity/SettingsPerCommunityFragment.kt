@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsPerCommunityBinding
+import com.idunnololz.summit.settings.PerCommunitySettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
@@ -27,6 +28,9 @@ class SettingsPerCommunityFragment : BaseFragment<FragmentSettingsPerCommunityBi
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var settings: PerCommunitySettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +65,7 @@ class SettingsPerCommunityFragment : BaseFragment<FragmentSettingsPerCommunityBi
             val adapter = SettingItemsAdapter(
                 context = context,
                 onSettingClick = {
-                    viewModel.onSettingClick(it)
+                    viewModel.onSettingClick(settings, it)
                     true
                 },
                 fragmentManager = childFragmentManager,
@@ -86,5 +90,7 @@ class SettingsPerCommunityFragment : BaseFragment<FragmentSettingsPerCommunityBi
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(context)
         }
+
+        viewModel.loadData(settings)
     }
 }

@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 class ManageSettingsViewModel @Inject constructor(
     private val preferences: Preferences,
     private val preferenceManager: PreferenceManager,
-    private val allSettings: AllSettings,
 ) : ViewModel() {
 
     val manageSettingsData = StatefulLiveData<ManageSettingsData>()
@@ -32,8 +31,6 @@ class ManageSettingsViewModel @Inject constructor(
             } else {
                 preferenceManager.getOnlyPreferencesForAccount(account)
             }
-
-            val keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems()
 
             val currentSettingsJson = preferences.asJson()
 
@@ -89,7 +86,6 @@ class ManageSettingsViewModel @Inject constructor(
             manageSettingsData.postValue(
                 ManageSettingsData(
                     keys = currentSettingsJson.keys().asSequence().toList(),
-                    keyToSettingItems = keyToSettingItems,
                     settingsPreview = settingsPreview,
                     keyToType = keyToType,
                 ),
@@ -112,7 +108,6 @@ class ManageSettingsViewModel @Inject constructor(
 
     class ManageSettingsData(
         val keys: List<String>,
-        val keyToSettingItems: Map<String, List<SettingItem>>,
         val settingsPreview: Map<String, String>,
         val keyToType: Map<String, String>,
     )

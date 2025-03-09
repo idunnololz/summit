@@ -92,6 +92,14 @@ class SettingsGesturesFragment :
                 updateRendering()
             },
         )
+        settings.gestureSwipeDirection.bindTo(
+            binding.gestureSwipeDirection,
+            { preferences.gestureSwipeDirection },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
+            },
+        )
 
         settings.postGestureAction1.bindTo(
             binding.postGestureAction1,
@@ -237,6 +245,9 @@ class SettingsGesturesFragment :
             }
             settings.commentGestureAction3.id -> {
                 preferences.commentGestureAction3 = value as Int
+            }
+            settings.gestureSwipeDirection.id -> {
+                preferences.gestureSwipeDirection = value as Int
             }
         }
 

@@ -10,7 +10,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewCurrentSettingsViewModel @Inject constructor(
     private val preferences: Preferences,
-    private val allSettings: AllSettings,
 ) : ViewModel() {
 
     val model = StatefulLiveData<Model>()
@@ -20,8 +19,6 @@ class ViewCurrentSettingsViewModel @Inject constructor(
     )
 
     fun generatePreviewFromSettingsJson() {
-        val keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems()
-
         val currentSettingsJson = preferences.asJson()
 
         val allKeys = currentSettingsJson.keys().asSequence()
@@ -42,7 +39,6 @@ class ViewCurrentSettingsViewModel @Inject constructor(
             Model(
                 SettingsDataPreview(
                     keys = currentSettingsJson.keys().asSequence().toList(),
-                    keyToSettingItems = keyToSettingItems,
                     diffs = diffs,
                     settingsPreview = settingsPreview,
                     keyToType = keyToType,

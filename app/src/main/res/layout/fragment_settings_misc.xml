@@ -119,12 +119,6 @@
                     android:layout_height="wrap_content"/>
 
                 <include
-                    android:id="@+id/auto_play_videos"
-                    layout="@layout/setting_item_on_off"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <include
                     android:id="@+id/upload_images_to_imgur"
                     layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
@@ -151,6 +145,12 @@
                 <include
                     android:id="@+id/show_new_person_warning"
                     layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/preferred_locale"
+                    layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
