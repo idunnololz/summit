@@ -38,6 +38,7 @@ import com.idunnololz.summit.image.ImageInfoDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
+import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
@@ -259,15 +260,7 @@ class ImageViewerActivity :
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-                    val mimeType = MimeTypeMap.getSingleton()
-                        .getMimeTypeFromExtension(it.data.toString())
-                        ?: "image/jpeg"
-
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = mimeType
-                        putExtra(Intent.EXTRA_STREAM, it.data)
-                    }
-                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                    showShareSheetForImage(this, it.data)
                 }
             }
         }

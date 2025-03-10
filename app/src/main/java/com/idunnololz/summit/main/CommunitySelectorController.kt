@@ -118,6 +118,7 @@ class CommunitySelectorController @AssistedInject constructor(
     private var coroutineScope = coroutineScopeFactory.create()
 
     private val adapter = CommunitiesAdapter(
+        preferences = preferences,
         onCurrentInstanceClick = {
             onChangeInstanceClick?.invoke()
         },
@@ -409,6 +410,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
     private inner class CommunitiesAdapter(
         private val onCurrentInstanceClick: () -> Unit,
+        private val preferences: Preferences,
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private var rawData: List<CommunityView> = listOf()
@@ -856,34 +858,40 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
 
                 addRecentItems(query)
-                newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
 
-                val filteredPopularCommunities = rawData.filter {
-                    query.isNullOrBlank() || it.community.name.contains(query, ignoreCase = true)
-                }
+                if (preferences.communitySelectorShowCommunitySuggestions) {
+                    newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
 
-                filteredPopularCommunities
-                    .sortedByDescending { it.counts.users_active_month }
-                    .mapTo(newItems) {
-                        Item.CommunityChildItem(
-                            text = SpannableStringBuilder().apply {
-                                appendNameWithInstance(
-                                    context,
-                                    it.community.name,
-                                    it.community.instance,
-                                )
-                            },
-                            community = it,
-                            monthlyActiveUsers = it.counts.users_active_month,
-                        ).also {
-                            communityRefs.add(
-                                CommunityRef.CommunityRefByName(
-                                    name = it.community.community.name,
-                                    instance = it.community.community.instance,
-                                ),
-                            )
-                        }
+                    val filteredPopularCommunities = rawData.filter {
+                        query.isNullOrBlank() || it.community.name.contains(
+                            query,
+                            ignoreCase = true
+                        )
                     }
+
+                    filteredPopularCommunities
+                        .sortedByDescending { it.counts.users_active_month }
+                        .mapTo(newItems) {
+                            Item.CommunityChildItem(
+                                text = SpannableStringBuilder().apply {
+                                    appendNameWithInstance(
+                                        context,
+                                        it.community.name,
+                                        it.community.instance,
+                                    )
+                                },
+                                community = it,
+                                monthlyActiveUsers = it.counts.users_active_month,
+                            ).also {
+                                communityRefs.add(
+                                    CommunityRef.CommunityRefByName(
+                                        name = it.community.community.name,
+                                        instance = it.community.community.instance,
+                                    ),
+                                )
+                            }
+                        }
+                }
             }
 
             if (!query.isNullOrBlank()) {

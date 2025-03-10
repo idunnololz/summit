@@ -1971,6 +1971,11 @@
     <string name="preferred_locale">Preferred locale</string>
     <string name="choose_app_language">Choose app language</string>
     <string name="use_system_language">Use system language</string>
+    <string name="show_community_suggestions_in_community_selector">Show suggestions in community selector</string>
+    <string name="show_community_suggestions_in_community_selector_desc">When enabled, a list of suggested communities will be shown in the community selector bottom sheet.</string>
+    <string name="loading_more_posts">Loading more posts…</string>
+    <string name="full_bleed_image">Full bleed image</string>
+    <string name="screenshot_generated">Screenshot generated</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

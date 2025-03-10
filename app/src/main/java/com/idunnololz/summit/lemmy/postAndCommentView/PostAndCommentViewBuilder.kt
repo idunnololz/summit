@@ -155,6 +155,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     ).also {
         it.globalFontSizeMultiplier = globalFontSizeMultiplier
+        it.fullBleedImage = preferences.postFullBleedImage
     }
     val voteUiHandler = accountActionsManager.voteUiHandler
 
@@ -218,6 +219,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         globalFontSizeMultiplier = GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
+        lemmyContentHelper.fullBleedImage = preferences.postFullBleedImage
         displayInstanceStyle = preferences.displayInstanceStyle
         showPostUpvotePercentage = preferences.showPostUpvotePercentage
         showCommentUpvotePercentage = preferences.showCommentUpvotePercentage

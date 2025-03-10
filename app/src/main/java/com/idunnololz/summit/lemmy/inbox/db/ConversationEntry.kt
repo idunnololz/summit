@@ -19,7 +19,7 @@ data class ConversationEntry(
     val personInstance: String,
     @ColumnInfo(name = "person_name")
     val personName: String?,
-    @ColumnInfo(name = "title")
+    @ColumnInfo(name = "title") @Deprecated("don't use")
     val title: String, // Usually the name of the person you are conversing with
     @ColumnInfo(name = "icon_url")
     val iconUrl: String?,

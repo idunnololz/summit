@@ -130,6 +130,8 @@ class PostListViewBuilder @Inject constructor(
         { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     ).also {
         it.globalFontSizeMultiplier = globalFontSizeMultiplier
+        it.fullBleedImage = preferences.postFullBleedImage
+        it.config = postUiConfig.fullContentConfig
     }
 
     private val padding = context.getDimen(R.dimen.padding)
@@ -193,7 +195,9 @@ class PostListViewBuilder @Inject constructor(
         globalFontSizeMultiplier =
             GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
         lemmyContentHelper.globalFontSizeMultiplier = globalFontSizeMultiplier
+        lemmyContentHelper.config = postUiConfig.fullContentConfig
         lemmyContentHelper.alwaysShowLinkBelowPost = preferences.alwaysShowLinkButtonBelowPost
+        lemmyContentHelper.fullBleedImage = preferences.postFullBleedImage
         singleTapToViewImage = preferences.postListViewImageOnSingleTap
         showUpAndDownVotes = preferences.postShowUpAndDownVotes
         displayInstanceStyle = preferences.displayInstanceStyle

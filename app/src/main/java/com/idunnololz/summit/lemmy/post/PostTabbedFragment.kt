@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.idunnololz.summit.databinding.TabbedFragmentPostBinding
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.PostListEngineItem
@@ -19,7 +20,10 @@ import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.runAfterLayout
+import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -49,9 +53,10 @@ class PostTabbedFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        fun getViewModel() =
+            (parentFragment as? CommunityFragment)?.viewModel
+
         val context = requireContext()
-        val items = (parentFragment as? CommunityFragment)?.viewModel?.postListEngine?.items
-            ?: listOf()
 
         val pagerAdapter = PostAdapter(
             context,
@@ -62,7 +67,7 @@ class PostTabbedFragment :
 
             updateNsfwMode(nsfwModeManager)
         }
-        pagerAdapter.setPages(items)
+        pagerAdapter.setPages(getViewModel()?.postListEngine?.items ?: listOf())
 
         with(binding) {
             viewPager.adapter = pagerAdapter
@@ -70,6 +75,20 @@ class PostTabbedFragment :
             viewPager.setPageTransformer(
                 MarginPageTransformer(Utils.convertDpToPixel(16f).toInt()),
             )
+            viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+
+                    if (position + 1 == pagerAdapter.itemCount) {
+                        val pageToFetch = pagerAdapter.items[position] as? PostAdapter.Item.AutoLoadItem
+
+                        // end reached; load more items
+                        if (pageToFetch != null) {
+                            getViewModel()?.fetchPage(pageToFetch.pageToLoad)
+                        }
+                    }
+                }
+            })
 
             if (savedInstanceState == null && !argumentsHandled) {
                 argumentsHandled = true
@@ -77,6 +96,21 @@ class PostTabbedFragment :
                 val index = pagerAdapter.findPageIndex(args.id.toLong())
                 if (index >= 0) {
                     viewPager.setCurrentItem(index, false)
+                }
+            }
+
+            getViewModel()?.loadedPostsData?.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Loading -> {}
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Error,
+                    is StatefulData.Success -> {
+                        val position = viewPager.currentItem
+                        pagerAdapter.setPages(getViewModel()?.postListEngine?.items ?: listOf())
+                        viewPager.runPredrawDiscardingFrame {
+                            viewPager.setCurrentItem(position, true)
+                        }
+                    }
                 }
             }
         }
@@ -99,6 +133,11 @@ class PostTabbedFragment :
                 val fetchedPost: FetchedPost,
                 val instance: String,
             ) : Item
+
+            data class AutoLoadItem(
+                override val id: Long,
+                val pageToLoad: Int
+            ) : Item
         }
 
         var items: List<Item> = listOf()
@@ -107,6 +146,7 @@ class PostTabbedFragment :
         override fun getItemId(position: Int): Long {
             return when (val item = items[position]) {
                 is Item.PostItem -> item.id
+                is Item.AutoLoadItem -> item.id
             }
         }
 
@@ -127,6 +167,8 @@ class PostTabbedFragment :
                             accountId = item.fetchedPost.source.accountId ?: 0L,
                         ).toBundle()
                     }
+                is Item.AutoLoadItem ->
+                    PostListLoadingPageFragment()
             }
         }
 
@@ -138,7 +180,6 @@ class PostTabbedFragment :
 
             data.forEach {
                 when (it) {
-                    is PostListEngineItem.AutoLoadItem,
                     PostListEngineItem.EndItem,
                     is PostListEngineItem.ErrorItem,
                     is PostListEngineItem.FooterItem,
@@ -149,6 +190,14 @@ class PostTabbedFragment :
                     is PostListEngineItem.PersistentErrorItem,
                     is PostListEngineItem.FilteredPostItem,
                     -> {}
+                    is PostListEngineItem.AutoLoadItem -> {
+                        newItems.add(
+                            Item.AutoLoadItem(
+                                id = it.pageToLoad * -1L,
+                                pageToLoad = it.pageToLoad,
+                            ),
+                        )
+                    }
                     is PostListEngineItem.VisiblePostItem -> {
                         newItems.add(
                             Item.PostItem(
@@ -190,6 +239,7 @@ class PostTabbedFragment :
             return items.indexOfLast {
                 when (it) {
                     is Item.PostItem -> it.id == id
+                    is Item.AutoLoadItem -> false
                 }
             }
         }

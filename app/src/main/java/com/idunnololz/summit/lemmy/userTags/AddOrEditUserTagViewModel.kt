@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.userTags
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -16,7 +17,6 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class AddOrEditUserTagViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val userTagsManager: UserTagsManager,
     private val state: SavedStateHandle,
 ) : ViewModel() {
@@ -27,9 +27,9 @@ class AddOrEditUserTagViewModel @Inject constructor(
 
     data class Model(
         val personName: String,
-        val personNameError: String?,
+        @StringRes val personNameError: Int?,
         val tag: String,
-        val tagError: String?,
+        @StringRes val tagError: Int?,
         val fillColor: Int,
         val strokeColor: Int,
         val isSubmitted: Boolean,
@@ -97,7 +97,7 @@ class AddOrEditUserTagViewModel @Inject constructor(
             personName = personName,
             personNameError = if (validate) {
                 if (personName.isBlank()) {
-                    context.getString(R.string.error_cannot_be_blank)
+                    R.string.error_cannot_be_blank
                 } else {
                     null
                 }
@@ -107,7 +107,7 @@ class AddOrEditUserTagViewModel @Inject constructor(
             tag = tag,
             tagError = if (validate) {
                 if (tag.isBlank()) {
-                    context.getString(R.string.error_cannot_be_blank)
+                    R.string.error_cannot_be_blank
                 } else {
                     null
                 }

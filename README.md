@@ -7,10 +7,11 @@
 3. Push latest translations: https://translate.idunnololz.com/projects/summit/summit/#repository.
 4. Merge latest translations to main. (https://github.com/idunnololz/summit)
 5. Pull latest translations on local.
-6. Bump version code and string.
-7. Create a release build.
-8. Add to play store.
-9. Commit & tag release.
+6. Check patreon and update patreon list.
+7. Bump version code and string.
+8. Create a release build.
+9. Add to play store.
+10. Commit & tag release.
 
 ### Update translation credit
 

@@ -285,6 +285,11 @@ class SettingsMiscFragment :
             { preferences.warnNewPerson },
             { preferences.warnNewPerson = it },
         )
+        settings.communitySelectorShowCommunitySuggestions.bindTo(
+            binding.communitySelectorShowCommunitySuggestions,
+            { preferences.communitySelectorShowCommunitySuggestions },
+            { preferences.communitySelectorShowCommunitySuggestions = it }
+        )
         binding.preferredLocale.apply {
             settings.preferredLocale.bindTo(this) {
                 LocalePickerBottomSheetFragment.show(childFragmentManager)

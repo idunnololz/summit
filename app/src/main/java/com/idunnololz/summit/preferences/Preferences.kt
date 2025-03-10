@@ -59,6 +59,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_HEADER_LAYOUT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_THREAD_STYLE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DATE_SCREENSHOTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_APP_WEB_BROWSER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMENTS_SORT_ORDER
@@ -99,6 +100,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TIT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FEED_SHOW_SCROLL_BAR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FULL_BLEED_IMAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_3
@@ -644,6 +646,10 @@ class Preferences(
         by jsonPreference(KEY_DEFAULT_APP_WEB_BROWSER) { null }
     var preferredLocale: String?
         by stringPreference(KEY_PREFERRED_LOCALE)
+    var communitySelectorShowCommunitySuggestions: Boolean
+        by booleanPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, true)
+    var postFullBleedImage: Boolean
+        by booleanPreference(KEY_POST_FULL_BLEED_IMAGE, true)
 
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

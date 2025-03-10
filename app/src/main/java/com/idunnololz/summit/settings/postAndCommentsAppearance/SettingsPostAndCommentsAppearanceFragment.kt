@@ -166,6 +166,15 @@ class SettingsPostAndCommentsAppearanceFragment :
                 updateRendering()
             },
         )
+        settings.fullBleedImage.bindTo(
+            binding.fullBleedImage,
+            { viewModel.preferences.postFullBleedImage },
+            {
+                viewModel.preferences.postFullBleedImage = it
+
+                updateRendering()
+            },
+        )
         settings.commentFontSize.bindTo(
             binding.textScalingSetting2,
             { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
