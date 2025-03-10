@@ -20,7 +20,6 @@ data class Conversation(
     val personId: Long, // the person you are conversing with
     val personInstance: String,
     val personName: String?,
-    val title: String, // Usually the name of the person you are conversing with
     val iconUrl: String?,
     val content: String?, // Usually the last message sent
     val isRead: Boolean,
@@ -34,7 +33,6 @@ fun ConversationEntry.toConversation() = Conversation(
     personId = personId,
     personInstance = personInstance,
     personName = personName,
-    title = title,
     iconUrl = iconUrl,
     content = content,
     isRead = isRead,
@@ -42,15 +40,15 @@ fun ConversationEntry.toConversation() = Conversation(
 )
 
 fun Conversation.toEntry() = ConversationEntry(
-    id,
-    ts,
-    accountStableId,
-    personId,
-    personInstance,
-    personName,
-    title,
-    iconUrl,
-    content,
-    isRead,
-    mostRecentMessageId,
+    id = id,
+    ts = ts,
+    accountStableId = accountStableId,
+    personId = personId,
+    personInstance = personInstance,
+    personName = personName,
+    title = "",
+    iconUrl = iconUrl,
+    content = content,
+    isRead = isRead,
+    mostRecentMessageId = mostRecentMessageId,
 )

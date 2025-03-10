@@ -25,6 +25,18 @@ fun View.runAfterLayout(callback: () -> Unit) {
     )
 }
 
+fun View.runPredrawDiscardingFrame(callback: () -> Unit) {
+    this.viewTreeObserver.addOnPreDrawListener(
+        object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                this@runPredrawDiscardingFrame.viewTreeObserver.removeOnPreDrawListener(this)
+                callback()
+                return false
+            }
+        },
+    )
+}
+
 fun View.focusAndShowKeyboard() {
     /**
      * This is to be called when the window already has focus.

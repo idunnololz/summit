@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,6 +46,10 @@ class ScreenshotModeViewModel @Inject constructor(
         generateImage(view, name, UriResult.Reason.Save)
     }
 
+    fun generateImageToShare(view: View, name: String) {
+        generateImage(view, name, UriResult.Reason.Share)
+    }
+
     fun recordScreenshot(
         view: View,
         name: String,
@@ -74,7 +79,8 @@ class ScreenshotModeViewModel @Inject constructor(
                     }
                     is ViewRecorderHelper.ViewRecordingState.Encoding -> {
                         generatedImageUri.postIsLoading(
-                            statusDesc = context.getString(R.string.encoding),
+                            statusDesc = ContextCompat.getContextForLanguage(context)
+                                .getString(R.string.encoding),
                             progress = (it.progress * 100).toInt(),
                             maxProgress = 100,
                             isIndeterminate = false,
@@ -85,7 +91,8 @@ class ScreenshotModeViewModel @Inject constructor(
                     }
                     is ViewRecorderHelper.ViewRecordingState.RecordingState -> {
                         generatedImageUri.postIsLoading(
-                            statusDesc = context.getString(R.string.recording),
+                            statusDesc = ContextCompat.getContextForLanguage(context)
+                                .getString(R.string.recording),
                             progress = (it.progress * 100).toInt(),
                             maxProgress = 100,
                             isIndeterminate = false,

@@ -39,6 +39,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_GESTURE_ACTION_COL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.util.PreferenceUtils.KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMUNITY_SORT_ORDER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DISPLAY_INSTANCE_STYLE
@@ -71,6 +72,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TIT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FEED_SHOW_SCROLL_BAR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FULL_BLEED_IMAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_1
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_2
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_ACTION_3
@@ -1272,6 +1274,14 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
         relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
     )
 
+    val fullBleedImage = OnOffSettingItem(
+        null,
+        context.getString(R.string.full_bleed_image),
+        null,
+        relatedKeys = listOf(KEY_POST_FULL_BLEED_IMAGE),
+    )
+
+
     val commentsThreadStyle = RadioGroupSettingItem(
         null,
         context.getString(R.string.comments_thread_style),
@@ -2045,6 +2055,12 @@ class MiscSettings @Inject constructor(
         null,
         relatedKeys = listOf(KEY_PREFERRED_LOCALE)
     )
+    val communitySelectorShowCommunitySuggestions = OnOffSettingItem(
+        null,
+        context.getString(R.string.show_community_suggestions_in_community_selector),
+        context.getString(R.string.show_community_suggestions_in_community_selector_desc),
+        relatedKeys = listOf(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS)
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         openLinksInExternalBrowser,
@@ -2063,6 +2079,7 @@ class MiscSettings @Inject constructor(
         showLabelsInNavBar,
         showNewPersonWarning,
         preferredLocale,
+        communitySelectorShowCommunitySuggestions,
     )
 }
 

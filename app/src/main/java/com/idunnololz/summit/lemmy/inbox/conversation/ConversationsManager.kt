@@ -30,7 +30,6 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class ConversationsManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val apiClient: AccountAwareLemmyClient,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val accountManager: AccountManager,
@@ -305,7 +304,6 @@ class ConversationsManager @Inject constructor(
                 personId = otherPersonId,
                 personInstance = otherPersonInstance,
                 personName = otherPersonName,
-                title = otherPersonName ?: context.getString(R.string.unknown),
                 isRead = isRead,
                 mostRecentMessageId = messageId,
             )

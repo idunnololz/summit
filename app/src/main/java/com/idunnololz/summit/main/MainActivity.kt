@@ -1,6 +1,7 @@
 package com.idunnololz.summit.main
 
 import android.annotation.SuppressLint
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -19,6 +20,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
 import android.webkit.MimeTypeMap
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.IntentCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -67,6 +69,7 @@ import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFrag
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.getFeedbackScreenshotFile
+import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
 import com.idunnololz.summit.links.LinkFixer
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.ResolvingLinkDialog
@@ -233,15 +236,7 @@ class MainActivity :
                 is StatefulData.Loading -> {}
                 is StatefulData.NotStarted -> {}
                 is StatefulData.Success -> {
-                    val mimeType = MimeTypeMap.getSingleton()
-                        .getMimeTypeFromExtension(it.data.toString())
-                        ?: "image/jpeg"
-
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = mimeType
-                        putExtra(Intent.EXTRA_STREAM, it.data)
-                    }
-                    startActivity(Intent.createChooser(shareIntent, "Share Image"))
+                    showShareSheetForImage(this, it.data)
                 }
             }
         }

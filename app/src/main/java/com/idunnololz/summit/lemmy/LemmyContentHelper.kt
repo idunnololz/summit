@@ -45,12 +45,12 @@ import com.idunnololz.summit.util.ContentUtils.getVideoType
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
-import com.idunnololz.summit.video.getVideoState
 import com.idunnololz.summit.view.CustomPlayerView
 import com.idunnololz.summit.view.LoadingView
 
@@ -65,6 +65,8 @@ class LemmyContentHelper(
         private const val TAG = "LemmyContentHelper"
     }
 
+    private val inflater = LayoutInflater.from(context)
+
     var config: FullContentConfig = FullContentConfig()
         set(value) {
             field = value
@@ -72,11 +74,10 @@ class LemmyContentHelper(
             textSizeMultiplier = config.textSizeMultiplier
         }
 
-    private val inflater = LayoutInflater.from(context)
-
     private var textSizeMultiplier: Float = config.textSizeMultiplier
     var globalFontSizeMultiplier: Float = 1f
     var alwaysShowLinkBelowPost: Boolean = false
+    var fullBleedImage: Boolean = true
 
     /**
      * @param lazyUpdate If true, content will not be refreshed. Only non content related things
@@ -124,182 +125,60 @@ class LemmyContentHelper(
         val showLink = postViewType == null ||
             screenshotConfig.postViewType == PostViewType.Full
         val onlyImage = postViewType == PostViewType.ImageOnly
+        val thumbnailUrl = postView.post.thumbnail_url
+        val isThumbnailUrlValid = thumbnailUrl != null && ContentUtils.isUrlImage(thumbnailUrl)
+        val imageMaxWidth = if (fullBleedImage) {
+            contentMaxWidth
+        } else {
+            contentMaxWidth - (context.resources.getDimensionPixelOffset(
+                R.dimen.post_list_image_view_horizontal_margin) * 2)
+        }.toInt()
 
-        @Suppress("UNCHECKED_CAST")
-        fun <T : View> getView(@LayoutRes resId: Int): T = (
-            viewRecycler.getRecycledView(resId)
-                ?: inflater.inflate(
-                    resId,
-                    fullContentContainerView,
-                    false,
-                )
-            )
-            .also {
-                it.setTag(R.id.view_type, resId)
-                fullContentContainerView.addView(it)
-            } as T
-
-        fun addFooter() {
-            if (lazyUpdate) {
-                // remove previous footers...
-                for (i in fullContentContainerView.childCount - 1 downTo 0) {
-                    val v = fullContentContainerView[i]
-                    if (v.getTag(R.id.is_footer) == true) {
-                        fullContentContainerView.removeViewAt(i)
-                    }
-                }
-            }
-
-            if (postView.post.locked) {
-                val postRemovedView = getView<View>(R.layout.full_content_post_locked_view)
-                postRemovedView.setTag(R.id.is_footer, true)
-                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
-                val textView: TextView = postRemovedView.findViewById(R.id.text)
-
-                textView.textSize = config.bodyTextSizeSp.toTextSize()
-
-                postRemovedView.layoutParams =
-                    (postRemovedView.layoutParams as MarginLayoutParams).apply {
-                        topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
-                    }
-
-                textView.text = context.getString(
-                    R.string.locked_post_message,
-                    postView.community.name,
-                )
-
-                // workaround a cardview bug
-                cardView.setContentPadding(0, 0, 0, 0)
-            }
-
-            if (postView.post.removed) {
-                val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
-                postRemovedView.setTag(R.id.is_footer, true)
-                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
-                val textView: TextView = postRemovedView.findViewById(R.id.text)
-
-                textView.textSize = config.bodyTextSizeSp.toTextSize()
-
-                postRemovedView.layoutParams =
-                    (postRemovedView.layoutParams as MarginLayoutParams).apply {
-                        topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
-                    }
-
-                textView.text = context.getString(
-                    R.string.removed_by_mod_message,
-                    postView.community.name,
-                )
-
-                // workaround a cardview bug
-                cardView.setContentPadding(0, 0, 0, 0)
-            } else if (postView.post.deleted) {
-                val postRemovedView = getView<View>(R.layout.full_content_post_removed_view)
-                postRemovedView.setTag(R.id.is_footer, true)
-                val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
-                val textView: TextView = postRemovedView.findViewById(R.id.text)
-
-                textView.textSize = config.bodyTextSizeSp.toTextSize()
-
-                postRemovedView.layoutParams =
-                    (postRemovedView.layoutParams as MarginLayoutParams).apply {
-                        topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
-                    }
-
-                textView.text = context.getString(R.string.removed_by_op_message)
-
-                // workaround a cardview bug
-                cardView.setContentPadding(0, 0, 0, 0)
-            }
-        }
+        fun <T : View> getAndEnsureView(@LayoutRes resId: Int): T =
+            fullContentContainerView.getAndEnsureView(resId)
 
         if (postView.shouldHideItem() && !reveal && !lazyUpdate) {
-            val fullContentHiddenView = getView<View>(R.layout.full_content_hidden_view)
+            val fullContentHiddenView = if (fullBleedImage) {
+                getAndEnsureView<View>(R.layout.full_content_hidden_view)
+            } else {
+                getAndEnsureView<View>(R.layout.full_content_hidden_view2)
+            }
             val fullImageView = fullContentHiddenView.findViewById<ImageView>(R.id.full_image)
             val textView = fullContentHiddenView.findViewById<TextView>(R.id.message)
             val button = fullContentHiddenView.findViewById<Button>(R.id.button)
+            val loadingView = fullContentHiddenView.findViewById<LoadingView>(R.id.loading_view)
 
             fullImageView.load(null)
             textView.textSize = config.bodyTextSizeSp.toTextSize()
 
             val imageUrl = postView.getImageUrl(false)
 
-            fun updateLayoutParams() {
-                imageUrl ?: return
-
-                offlineManager.getImageSizeHint(imageUrl, tempSize)
-                if (tempSize.width > 0 && tempSize.height > 0) {
-                    val thumbnailMaxHeight =
-                        (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                    fullImageView.updateLayoutParams<LayoutParams> {
-                        this.height = thumbnailMaxHeight
-                    }
-                } else {
-                    fullImageView.updateLayoutParams<LayoutParams> {
-                        this.height = WRAP_CONTENT
-                    }
-                }
-            }
-
-            fun fetchFullImage() {
-                imageUrl ?: return
-
-                offlineManager.fetchImageWithError(
-                    rootView,
-                    imageUrl,
-                    b@{
-                        offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                        Log.d(TAG, "image size: $tempSize")
-
-                        var w: Int? = null
-                        var h: Int? = null
-                        if (tempSize.height > 0 && tempSize.width > 0) {
-                            val heightToWidthRatio = tempSize.height / tempSize.width
-
-                            if (heightToWidthRatio > 10) {
-                                // shrink the image if needed
-                                w = tempSize.width
-                                h = tempSize.height
-                            }
-                        }
-
-                        fullImageView.load(it) {
-                            allowHardware(false)
-                            val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-                            this.transformations(BlurTransformation(context, sampling = sampling))
-
-                            val finalW = w
-                            val finalH = h
-                            if (finalW != null && finalH != null) {
-                                this.size(finalW, finalH)
-                            }
-
-                            listener { _, result ->
-                                offlineManager.setImageSizeHint(
-                                    imageUrl,
-                                    result.image.width,
-                                    result.image.height,
-                                )
-                                Log.d(TAG, "w: ${result.image.width} h: ${result.image.height}")
-
-                                updateLayoutParams()
-                            }
-                        }
-                    },
-                    {
-                    },
-                )
-            }
-
             if (imageUrl != null) {
-                updateLayoutParams()
+                fullImageView.updateLayoutParams(imageMaxWidth, imageUrl, tempSize)
                 fullImageView.setOnLongClickListener {
                     onLinkLongClick(imageUrl, null)
                     true
                 }
 
+                fun fetchFullImage() =
+                    fetchFullImage(
+                        imageUrl = imageUrl,
+                        originalImageUrl = imageUrl,
+                        fallbackUrl = null,
+                        contentMaxWidth = imageMaxWidth,
+                        blur = true,
+                        tempSize = tempSize,
+                        rootView = fullContentContainerView,
+                        loadingView = loadingView,
+                        fullImageView = fullImageView,
+                    )
+
+                loadingView?.setOnRefreshClickListener {
+                    fetchFullImage()
+                }
                 fetchFullImage()
             } else {
+                loadingView.hideAll()
                 fullImageView.visibility = View.GONE
             }
 
@@ -319,7 +198,11 @@ class LemmyContentHelper(
                 onRevealContentClickedFn()
             }
 
-            addFooter()
+            addFooter(
+                lazyUpdate = lazyUpdate,
+                root = fullContentContainerView,
+                postView = postView,
+            )
             return
         }
 
@@ -358,7 +241,7 @@ class LemmyContentHelper(
 
         fun appendUiForExternalOrInternalUrl(url: String) {
             val externalContentView =
-                getView<View>(R.layout.full_content_external_content_view)
+                getAndEnsureView<View>(R.layout.full_content_external_content_view)
             val thumbnailView = externalContentView.findViewById<ImageView>(R.id.thumbnail)
             val externalContentTextView =
                 externalContentView.findViewById<TextView>(R.id.external_content_text)
@@ -385,7 +268,7 @@ class LemmyContentHelper(
                         ?.split("-")
                         ?.get(0)
                         ?: ""
-                    val thumbnailUrl = requireNotNull(postView.post.thumbnail_url)
+                    val thumbnailUrl = requireNotNull(thumbnailUrl)
                     val startIndex = thumbnailUrl.indexOf(keyLowerCase, ignoreCase = true)
                     if (startIndex > -1 && keyLowerCase.isNotBlank()) {
                         val key =
@@ -409,10 +292,15 @@ class LemmyContentHelper(
                 true
             }
         }
-        fun insertAndLoadFullImage(originalImageUrl: String, fallback: String? = null) {
+        fun insertAndLoadFullImage(imageUrl: String, fallback: String? = null) {
             if (!showImage) return
 
-            val fullContentImageView = getView<View>(R.layout.full_content_image_view)
+            val fullContentImageView =
+                if (fullBleedImage) {
+                    getAndEnsureView<View>(R.layout.full_content_image_view)
+                } else {
+                    getAndEnsureView<View>(R.layout.full_content_image_view2)
+                }
             val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.full_image)
             val loadingView =
                 fullContentImageView.findViewById<LoadingView>(R.id.loading_view)
@@ -425,96 +313,34 @@ class LemmyContentHelper(
 
             fullImageView.load(null)
             fullImageView.setOnLongClickListener {
-                onLinkLongClick(originalImageUrl, null)
+                onLinkLongClick(imageUrl, null)
                 true
             }
 
-            fun updateLayoutParams() {
-                offlineManager.getImageSizeHint(originalImageUrl, tempSize)
-                if (tempSize.width > 0 && tempSize.height > 0) {
-                    val thumbnailMaxHeight =
-                        (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-                    fullImageView.updateLayoutParams<LayoutParams> {
-                        this.height = thumbnailMaxHeight
-                    }
-                } else {
-                    fullImageView.updateLayoutParams<LayoutParams> {
-                        this.height = WRAP_CONTENT
-                    }
-                }
-            }
+            fullImageView.updateLayoutParams(imageMaxWidth, imageUrl, tempSize)
+            offlineManager.getImageSizeHint(imageUrl, tempSize)
 
-            fun fetchFullImage(imageUrl: String) {
-                loadingView?.showProgressBar()
-                offlineManager.fetchImageWithError(
-                    rootView,
-                    imageUrl,
-                    b@{
-                        loadingView?.hideAll(animate = false)
-                        offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                        Log.d(TAG, "image size: $tempSize")
-
-                        var w: Int? = null
-                        var h: Int? = null
-                        if (tempSize.height > 0 && tempSize.width > 0) {
-                            val heightToWidthRatio = tempSize.height / tempSize.width
-
-                            if (heightToWidthRatio > 10) {
-                                // shrink the image if needed
-                                w = tempSize.width
-                                h = tempSize.height
-                            }
-                        }
-
-                        fullImageView.load(it) {
-                            allowHardware(false)
-
-                            val finalW = w
-                            val finalH = h
-                            if (finalW != null && finalH != null) {
-                                this.size(finalW, finalH)
-                            }
-
-                            listener { _, result ->
-                                tempSize.width = result.image.width
-                                tempSize.height = result.image.height
-
-                                Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
-
-                                if (tempSize.width > 0 && tempSize.height > 0) {
-                                    offlineManager.setImageSizeHint(
-                                        originalImageUrl,
-                                        tempSize.width,
-                                        tempSize.height,
-                                    )
-                                }
-
-                                updateLayoutParams()
-                            }
-                        }
-                    },
-                    {
-                        if (imageUrl != fallback && fallback != null) {
-                            fetchFullImage(fallback)
-                        } else {
-                            loadingView?.showDefaultErrorMessageFor(it)
-                        }
-                    },
+            fun fetchFullImage() =
+                fetchFullImage(
+                    imageUrl = imageUrl,
+                    originalImageUrl = imageUrl,
+                    fallbackUrl = fallback,
+                    contentMaxWidth = imageMaxWidth,
+                    blur = false,
+                    tempSize = tempSize,
+                    rootView = fullContentContainerView,
+                    loadingView = loadingView,
+                    fullImageView = fullImageView,
                 )
-            }
-
-            updateLayoutParams()
-            offlineManager.getImageSizeHint(originalImageUrl, tempSize)
 
             loadingView?.setOnRefreshClickListener {
-                fetchFullImage(originalImageUrl)
+                fetchFullImage()
             }
-            fetchFullImage(originalImageUrl)
+            fetchFullImage()
 
             fullImageView.transitionName = fullImageViewTransitionName
             fullImageView.setOnClickListener {
-                onFullImageViewClickListener(it, originalImageUrl)
+                onFullImageViewClickListener(it, imageUrl)
             }
         }
 
@@ -523,12 +349,12 @@ class LemmyContentHelper(
             when (postType) {
                 PostType.Image -> {
                     insertAndLoadFullImage(
-                        originalImageUrl = requireNotNull(postView.post.url),
-                        fallback = postView.post.thumbnail_url,
+                        imageUrl = requireNotNull(postView.post.url),
+                        fallback = thumbnailUrl,
                     )
                 }
                 PostType.Video -> {
-                    val containerView = getView<View>(R.layout.full_content_video_view)
+                    val containerView = getAndEnsureView<View>(R.layout.full_content_video_view)
                     val playerView = containerView.findViewById<CustomPlayerView>(R.id.player_view)
 
                     customPlayerView = playerView
@@ -592,15 +418,14 @@ class LemmyContentHelper(
                     }
                 }
                 PostType.Text, PostType.Link -> {
-                    val thumbnail = postView.post.thumbnail_url
-                    if (thumbnail != null && ContentUtils.isUrlImage(thumbnail)) {
-                        insertAndLoadFullImage(thumbnail)
+                    if (thumbnailUrl != null && isThumbnailUrlValid) {
+                        insertAndLoadFullImage(thumbnailUrl)
                     }
                 }
             }
 
             if (!postView.post.body.isNullOrBlank() && showText) {
-                val fullTextView = getView<View>(R.layout.full_content_text_view)
+                val fullTextView = getAndEnsureView<View>(R.layout.full_content_text_view)
                 val bodyTextView: TextView = fullTextView.findViewById(R.id.body)
                 fullContentContainerView.setTag(R.id.body, bodyTextView)
 
@@ -628,7 +453,7 @@ class LemmyContentHelper(
                 if (postView.post.embed_video_url != null) {
                     appendUiForExternalOrInternalUrl(postView.post.embed_video_url)
                 } else if (postView.post.url != null &&
-                    postView.post.thumbnail_url != postView.post.url
+                    (thumbnailUrl != postView.post.url || !isThumbnailUrlValid)
                 ) {
                     appendUiForExternalOrInternalUrl(postView.post.url)
                 }
@@ -654,7 +479,11 @@ class LemmyContentHelper(
             onTextBound(spannable)
         }
 
-        addFooter()
+        addFooter(
+            lazyUpdate = lazyUpdate,
+            root = fullContentContainerView,
+            postView = postView,
+        )
     }
 
     fun recycleFullContent(fullContentContainerView: ViewGroup): RecycledState =
@@ -691,6 +520,211 @@ class LemmyContentHelper(
         }
 
         return stateBuilder.build()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : View> ViewGroup.getAndEnsureView(@LayoutRes resId: Int): T = (
+        viewRecycler.getRecycledView(resId)
+            ?: inflater.inflate(
+                resId,
+                this,
+                false,
+            )
+        )
+        .also {
+            it.setTag(R.id.view_type, resId)
+            this.addView(it)
+        } as T
+
+    fun addFooter(
+        lazyUpdate: Boolean,
+        root: ViewGroup,
+        postView: PostView,
+    ) {
+        if (lazyUpdate) {
+            // remove previous footers...
+            for (i in root.childCount - 1 downTo 0) {
+                val v = root[i]
+                if (v.getTag(R.id.is_footer) == true) {
+                    root.removeViewAt(i)
+                }
+            }
+        }
+
+        if (postView.post.locked) {
+            val postRemovedView =
+                root.getAndEnsureView<View>(R.layout.full_content_post_locked_view)
+            postRemovedView.setTag(R.id.is_footer, true)
+            val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
+            val textView: TextView = postRemovedView.findViewById(R.id.text)
+
+            textView.textSize = config.bodyTextSizeSp.toTextSize()
+
+            postRemovedView.layoutParams =
+                (postRemovedView.layoutParams as MarginLayoutParams).apply {
+                    topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
+                }
+
+            textView.text = context.getString(
+                R.string.locked_post_message,
+                postView.community.name,
+            )
+
+            // workaround a cardview bug
+            cardView.setContentPadding(0, 0, 0, 0)
+        }
+
+        if (postView.post.removed) {
+            val postRemovedView =
+                root.getAndEnsureView<View>(R.layout.full_content_post_removed_view)
+            postRemovedView.setTag(R.id.is_footer, true)
+            val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
+            val textView: TextView = postRemovedView.findViewById(R.id.text)
+
+            textView.textSize = config.bodyTextSizeSp.toTextSize()
+
+            postRemovedView.layoutParams =
+                (postRemovedView.layoutParams as MarginLayoutParams).apply {
+                    topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
+                }
+
+            textView.text = context.getString(
+                R.string.removed_by_mod_message,
+                postView.community.name,
+            )
+
+            // workaround a cardview bug
+            cardView.setContentPadding(0, 0, 0, 0)
+        } else if (postView.post.deleted) {
+            val postRemovedView =
+                root.getAndEnsureView<View>(R.layout.full_content_post_removed_view)
+            postRemovedView.setTag(R.id.is_footer, true)
+            val cardView: MaterialCardView = postRemovedView.findViewById(R.id.card_view)
+            val textView: TextView = postRemovedView.findViewById(R.id.text)
+
+            textView.textSize = config.bodyTextSizeSp.toTextSize()
+
+            postRemovedView.layoutParams =
+                (postRemovedView.layoutParams as MarginLayoutParams).apply {
+                    topMargin = context.resources.getDimensionPixelOffset(R.dimen.padding)
+                }
+
+            textView.text = context.getString(R.string.removed_by_op_message)
+
+            // workaround a cardview bug
+            cardView.setContentPadding(0, 0, 0, 0)
+        }
+    }
+
+    private fun fetchFullImage(
+        imageUrl: String,
+        originalImageUrl: String,
+        fallbackUrl: String?,
+        contentMaxWidth: Int,
+        blur: Boolean,
+        tempSize: Size,
+        rootView: ViewGroup,
+        loadingView: LoadingView?,
+        fullImageView: ImageView,
+    ) {
+        loadingView?.showProgressBar()
+        offlineManager.fetchImageWithError(
+            rootView,
+            imageUrl,
+            b@{
+                loadingView?.hideAll(animate = false)
+                offlineManager.getMaxImageSizeHint(it, tempSize)
+
+                Log.d(TAG, "image size: $tempSize")
+
+                var w: Int? = null
+                var h: Int? = null
+                if (tempSize.height > 0 && tempSize.width > 0) {
+                    val heightToWidthRatio = tempSize.height / tempSize.width
+
+                    if (heightToWidthRatio > 10) {
+                        // shrink the image if needed
+                        w = tempSize.width
+                        h = tempSize.height
+                    }
+                }
+
+                fullImageView.load(it) {
+                    allowHardware(false)
+
+                    if (blur) {
+                        val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+                        this.transformations(BlurTransformation(context, sampling = sampling))
+                    }
+
+                    val finalW = w
+                    val finalH = h
+                    if (finalW != null && finalH != null) {
+                        this.size(finalW, finalH)
+                    }
+
+                    listener { _, result ->
+                        tempSize.width = result.image.width
+                        tempSize.height = result.image.height
+
+                        Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
+
+                        if (!blur && tempSize.width > 0 && tempSize.height > 0) {
+                            // don't save the image size if blur is on because blurring will modify
+                            // the size of the original image
+                            offlineManager.setImageSizeHint(
+                                originalImageUrl,
+                                tempSize.width,
+                                tempSize.height,
+                            )
+                        }
+
+                        fullImageView.updateLayoutParams(
+                            contentMaxWidth = contentMaxWidth,
+                            imageUrl = originalImageUrl,
+                            tempSize = tempSize,
+                        )
+                    }
+                }
+            },
+            {
+                if (imageUrl != fallbackUrl && fallbackUrl != null) {
+                    fetchFullImage(
+                        imageUrl = fallbackUrl,
+                        originalImageUrl = originalImageUrl,
+                        fallbackUrl = fallbackUrl,
+                        contentMaxWidth = contentMaxWidth,
+                        blur = blur,
+                        tempSize = tempSize,
+                        rootView = rootView,
+                        loadingView = loadingView,
+                        fullImageView = fullImageView
+                    )
+                } else {
+                    loadingView?.showDefaultErrorMessageFor(it)
+                }
+            },
+        )
+    }
+
+    private fun ImageView.updateLayoutParams(
+        contentMaxWidth: Int,
+        imageUrl: String,
+        tempSize: Size,
+    ) {
+        val fullImageView = this
+        offlineManager.getImageSizeHint(imageUrl, tempSize)
+        if (tempSize.width > 0 && tempSize.height > 0) {
+            val thumbnailMaxHeight =
+                (contentMaxWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
+            fullImageView.updateLayoutParams<LayoutParams> {
+                this.height = thumbnailMaxHeight
+            }
+        } else {
+            fullImageView.updateLayoutParams<LayoutParams> {
+                this.height = WRAP_CONTENT
+            }
+        }
     }
 
     private fun Float.toTextSize(): Float = this * textSizeMultiplier * globalFontSizeMultiplier

@@ -3,6 +3,9 @@ package com.idunnololz.summit.lemmy.screenshotMode
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,9 +35,12 @@ import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.screenshotMode.record.RecordScreenshotDialogFragment
+import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ScreenshotWatermarkId
+import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FileSizeUtils
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.MimeTypes
@@ -47,7 +53,6 @@ import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
-import com.idunnololz.summit.util.shareUri
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -173,15 +178,10 @@ class ScreenshotModeDialogFragment :
         generateScreenshot(adapter)
 
         binding.fab.setOnClickListener {
-            val infographicsView = binding.zoomLayout.children.firstOrNull()
-            if (infographicsView != null) {
-                val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-                viewModel.generateImageToSave(infographicsView, "post_screenshot_$ts")
-            }
-
             if (preferences.hapticsOnActions) {
                 view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
             }
+            showCompleteOptions()
         }
         binding.zoomLayout.isClickable = false
 
@@ -320,16 +320,7 @@ class ScreenshotModeDialogFragment :
 
                     when (it.data.reason) {
                         ScreenshotModeViewModel.UriResult.Reason.Share ->
-                            when (it.data.fileType) {
-                                ScreenshotModeViewModel.UriResult.FileType.Gif ->
-                                    shareUri(it.data.uri, MimeTypes.GIF)
-                                ScreenshotModeViewModel.UriResult.FileType.Png ->
-                                    shareUri(it.data.uri, MimeTypes.PNG)
-                                ScreenshotModeViewModel.UriResult.FileType.Mp4 ->
-                                    shareUri(it.data.uri, MimeTypes.MP4)
-                                ScreenshotModeViewModel.UriResult.FileType.Webm ->
-                                    shareUri(it.data.uri, MimeTypes.WEBM)
-                            }
+                            showShareSheetForImage(context, it.data.uri)
                         ScreenshotModeViewModel.UriResult.Reason.Save -> {
                             uriToSave = it.data.uri
                             val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -350,6 +341,44 @@ class ScreenshotModeDialogFragment :
                 }
             }
         }
+    }
+
+    private fun showCompleteOptions() {
+        BottomMenu(requireContext())
+            .apply {
+                setTitle(R.string.screenshot_generated)
+                addItemWithIcon(R.id.save, R.string.save, R.drawable.baseline_save_24)
+                addItemWithIcon(R.id.share, R.string.share, R.drawable.baseline_share_24)
+
+                setOnMenuItemClickListener {
+                    when (it.id) {
+                        R.id.save -> {
+                            val infographicsView = binding.zoomLayout.children.firstOrNull()
+                            if (infographicsView != null) {
+                                val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+                                    .format(Date())
+                                viewModel.generateImageToSave(
+                                    infographicsView, "post_screenshot_$ts")
+                            }
+                        }
+                        R.id.share -> {
+                            val infographicsView = binding.zoomLayout.children.firstOrNull()
+                            if (infographicsView != null) {
+                                val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+                                    .format(Date())
+                                viewModel.generateImageToShare(
+                                    infographicsView, "post_screenshot_$ts")
+                            }
+                        }
+                    }
+                }
+            }
+            .show(
+                bottomMenuContainer = requireMainActivity(),
+                bottomSheetContainer = binding.root,
+                handleBackPress = false,
+                expandFully = true,
+            )
     }
 
     fun generateScreenshot() {

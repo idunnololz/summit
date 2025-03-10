@@ -195,12 +195,20 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
 
         with(binding) {
             personEditText.setText(model.personName)
-            personInputLayout.error = model.personNameError
+            if (model.personNameError != null) {
+                personInputLayout.error = getString(model.personNameError)
+            } else {
+                personInputLayout.isErrorEnabled = false
+            }
 
             if (!tagEditText.isFocused) {
                 tagEditText.setText(model.tag)
             }
-            tagInputLayout.error = model.tagError
+            if (model.tagError != null) {
+                tagInputLayout.error = getString(model.tagError)
+            } else {
+                tagInputLayout.isErrorEnabled = false
+            }
 
             tagFillColorInner.background = ColorDrawable(model.fillColor)
             tagStrokeColorInner.background = ColorDrawable(model.strokeColor)

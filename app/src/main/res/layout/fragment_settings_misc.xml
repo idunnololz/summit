@@ -155,6 +155,12 @@
                     android:layout_height="wrap_content"/>
 
                 <include
+                    android:id="@+id/community_selector_show_community_suggestions"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
                     android:id="@+id/rotate_instance_on_upload_fail"
                     layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"

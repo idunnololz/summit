@@ -31,6 +31,7 @@ import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
 import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.coil.BetterDebugLogger
 import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
 import com.idunnololz.summit.util.isFirebaseInitialized
 import dagger.hilt.android.EntryPointAccessors
@@ -142,7 +143,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                 }
                 .apply {
                     if (BuildConfig.DEBUG) {
-                        logger(DebugLogger())
+                        logger(BetterDebugLogger())
                     }
                 }
                 .build()

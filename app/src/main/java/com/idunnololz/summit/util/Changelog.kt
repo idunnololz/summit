@@ -8,7 +8,7 @@ import com.idunnololz.summit.main.MainActivity
  */
 
 val changeLogPostRef
-    get() = PostRef("lemmy.world", 26275531)
+    get() = PostRef("lemmy.world", 26604491)
 
 fun MainActivity.launchChangelog() {
     launchPage(changeLogPostRef, switchToNativeInstance = true)
