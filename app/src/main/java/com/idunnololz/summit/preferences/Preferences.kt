@@ -455,7 +455,7 @@ class Preferences(
         }
 
     var screenshotWidthDp: Int
-        by intPreference(KEY_SCREENSHOT_WIDTH_DP, 500)
+        by intPreference(KEY_SCREENSHOT_WIDTH_DP, 360)
 
     var dateScreenshots: Boolean
         by booleanPreference(KEY_DATE_SCREENSHOTS, true)
