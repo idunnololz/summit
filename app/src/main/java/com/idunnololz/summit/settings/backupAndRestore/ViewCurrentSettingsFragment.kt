@@ -1,6 +1,7 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentViewCurrentSettingsBinding
+import com.idunnololz.summit.db.MainDatabase.Companion.DATABASE_NAME
 import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -100,14 +102,20 @@ class ViewCurrentSettingsFragment :
                 }
             }
 
-            viewModel.generatePreviewFromSettingsJson()
+            viewModel.generatePreviewFromSettingsJson(
+                databaseFile = context.getDatabasePath(DATABASE_NAME)
+            )
         }
     }
 
     override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+        val context = requireContext()
         if (tag == "reset_setting") {
             val settingKey = dialog.getExtra("key")
-            viewModel.resetSetting(settingKey)
+            viewModel.resetSetting(
+                settingKey = settingKey,
+                databaseFile = context.getDatabasePath(DATABASE_NAME)
+            )
         }
     }
 

@@ -314,14 +314,14 @@ class JsonPreferenceDelegate<T>(
     val default: () -> T,
 ) : ReadWriteProperty<Any, T> {
 
-    var isCached: Boolean = false
-    var cache: T? = null
+//    var isCached: Boolean = false
+//    var cache: T? = null
 
     override fun getValue(thisRef: Any, property: KProperty<*>): T {
-        if (isCached) {
-            @Suppress("UNCHECKED_CAST")
-            return cache as T
-        }
+//        if (isCached) {
+//            @Suppress("UNCHECKED_CAST")
+//            return cache as T
+//        }
 
         val s = prefs.getString(key, null)
         return try {
@@ -334,9 +334,10 @@ class JsonPreferenceDelegate<T>(
         } catch (e: Exception) {
             Log.e(TAG, "Error reading json. Key: $key", e)
             default()
-        }.also {
-            cache(it)
         }
+//            .also {
+//            cache(it)
+//        }
     }
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
@@ -350,12 +351,12 @@ class JsonPreferenceDelegate<T>(
             .putString(key, s)
             .apply()
 
-        cache(value)
+//        cache(value)
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun cache(value: T?) {
-        isCached = true
-        cache = value
-    }
+//    @Suppress("NOTHING_TO_INLINE")
+//    inline fun cache(value: T?) {
+//        isCached = true
+//        cache = value
+//    }
 }

@@ -109,6 +109,8 @@ abstract class MainDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: MainDatabase? = null
 
+        const val DATABASE_NAME = "main.db"
+
         fun getInstance(context: Context, json: Json): MainDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildDatabase(context, json).also { INSTANCE = it }
@@ -125,7 +127,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .databaseBuilder(
                     context.applicationContext,
                     MainDatabase::class.java,
-                    "main.db",
+                    DATABASE_NAME,
                 )
                 .apply {
                     if (!BuildConfig.DEBUG) {

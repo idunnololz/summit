@@ -10,7 +10,7 @@ import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.PersonRef
 import kotlinx.parcelize.Parcelize
 
-@Entity
+@Entity(tableName = "Account")
 @Parcelize
 data class Account(
     @PrimaryKey

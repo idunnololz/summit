@@ -100,7 +100,7 @@ class ThemeManager @Inject constructor(
             }
     }
 
-    fun applyThemeFromPreferences(currentConfig: ThemeOverlayConfig) {
+    private fun applyThemeFromPreferences(currentConfig: ThemeOverlayConfig) {
         val fontAsset = currentConfig.globalFont.toFontAsset()
         fontAsset?.let {
             ViewPump.init(
