@@ -627,6 +627,7 @@ class LemmyContentHelper(
         loadingView: LoadingView?,
         fullImageView: ImageView,
     ) {
+        fullImageView.alpha = 0f
         loadingView?.showProgressBar()
         offlineManager.fetchImageWithError(
             rootView,
@@ -678,7 +679,7 @@ class LemmyContentHelper(
                                 tempSize.height,
                             )
                         }
-
+                        fullImageView.alpha = 1f
                         fullImageView.updateLayoutParams(
                             contentMaxWidth = contentMaxWidth,
                             imageUrl = originalImageUrl,
