@@ -105,8 +105,12 @@ class SettingsDefaultAppsFragment :
         binding.browserDefaultApp.desc.visibility = View.VISIBLE
         binding.browserDefaultApp.desc.text =
             preferences.defaultWebApp?.let {
-                pm.getApplicationInfo(it.packageName, 0).let {
-                    pm.getApplicationLabel(it)
+                try {
+                    pm.getApplicationInfo(it.packageName, 0).let {
+                        pm.getApplicationLabel(it)
+                    }
+                } catch (e: Exception) {
+                    null
                 } ?: it.appName ?: "Unnamed app"
             } ?: getString(R.string.none_set)
     }
