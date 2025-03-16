@@ -135,6 +135,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.Call
+import java.net.ConnectException
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -2006,6 +2007,9 @@ class LemmyApiClient(
             if (e is InterruptedIOException) {
                 return Result.failure(e)
             }
+            if (e is ConnectException) {
+                return Result.failure(ConnectionException())
+            }
             Log.e(TAG, "Exception fetching url", e)
             return Result.failure(e)
         }
@@ -2023,6 +2027,10 @@ class LemmyApiClient(
                     return Result.failure(NoInternetException())
                 }
                 return Result.failure(ServerApiException(errorCode))
+            }
+
+            if (errorCode == 429) {
+                return Result.failure(RateLimitException(0L))
             }
 
             val errorBody = res.errorBody()?.string()
@@ -2048,13 +2056,13 @@ class LemmyApiClient(
             if (errMsg?.contains("not_logged_in", ignoreCase = true) == true) {
                 return Result.failure(NotAuthenticatedException())
             }
-            if (errMsg == "rate_limit_error") {
+            if (errMsg == "rate_limit_error") { // might be safe to delete
                 return Result.failure(RateLimitException(0L))
             }
             if (errMsg == "not_a_mod_or_admin") {
                 return Result.failure(NotAModOrAdmin())
             }
-            if (errMsg == "couldnt_find_object") {
+            if (errMsg == "couldnt_find_object" || errMsg == "couldnt_find_community") {
                 return Result.failure(CouldntFindObjectError())
             }
             // TODO: Remove these checks once v0.19 is out for everyone.

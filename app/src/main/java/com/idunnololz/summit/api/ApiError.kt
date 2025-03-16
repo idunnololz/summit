@@ -41,6 +41,11 @@ class SocketTimeoutException() :
 
 class NoInternetException() : NetworkException("No internet")
 
+/**
+ * 50/50 could be the server or the user network
+ */
+class ConnectionException() : NetworkException("Unable to connect to host")
+
 sealed class NetworkException(msg: String) : RuntimeException(msg)
 
 class GetNetworkException(msg: String) : NetworkException(msg)

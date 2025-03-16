@@ -217,7 +217,6 @@ object AsyncDrawableSchedulerFixed {
     ) :
         DrawableCallbackImpl.Invalidator, Runnable {
         override fun invalidate() {
-            Log.d("HAHA", "invalidate")
             textView.removeCallbacks(this)
             textView.post(this)
         }

@@ -341,7 +341,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
         coroutineScope.launch {
             val result = withContext(Dispatchers.IO) {
-                lemmyApiClient.search(
+                lemmyApiClient.searchWithRetry(
                     sortType = SortType.TopMonth,
                     listingType = ListingType.All,
                     searchType = SearchType.Communities,
@@ -709,6 +709,7 @@ class CommunitySelectorController @AssistedInject constructor(
             if (!isQueryActive) {
                 val currentCommunityData = currentCommunityData
                 val currentCommunityRef = currentCommunityRef
+
                 if (currentCommunityRef is CommunityRef.MultiCommunity ||
                     currentCommunityRef is CommunityRef.ModeratedCommunities
                 ) {
@@ -904,7 +905,13 @@ class CommunitySelectorController @AssistedInject constructor(
                 val serverQueryItems = serverQueryResults
                     .map {
                         Item.CommunityChildItem(
-                            text = it.community.name,
+                            text = SpannableStringBuilder().apply {
+                                appendNameWithInstance(
+                                    context,
+                                    it.community.name,
+                                    it.community.instance,
+                                )
+                            },
                             community = it,
                             monthlyActiveUsers = it.counts.users_active_month,
                         )

@@ -2,14 +2,19 @@ package com.idunnololz.summit.lemmy.contentDetails
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionManager
 import coil3.load
 import com.google.gson.Gson
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Comment
 import com.idunnololz.summit.api.dto.CommentAggregates
@@ -25,10 +30,12 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToFullDateTime
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import org.json.JSONObject
 
@@ -61,6 +68,9 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
 
     @Inject
     lateinit var postListViewBuilder: PostListViewBuilder
+
+    @Inject
+    lateinit var json: Json
 
     override fun onStart() {
         super.onStart()
@@ -188,6 +198,31 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             )
             toolbar.setNavigationOnClickListener {
                 dismiss()
+            }
+
+            if (BuildConfig.DEBUG) {
+                toolbar.addMenuProvider(
+                    object : MenuProvider {
+                        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                            menu.add(0, R.id.copy, 0, R.string.copy_value)
+                                .apply {
+                                    setIcon(R.drawable.baseline_content_copy_24)
+                                }
+                        }
+
+                        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                            when (menuItem.itemId) {
+                                R.id.copy -> {
+                                    Utils.copyToClipboard(context, Gson().toJson(
+                                        args.postView
+                                            ?: args.commentView
+                                    ))
+                                }
+                            }
+                            return true
+                        }
+                    }
+                )
             }
 
             if (o.creator.avatar != null) {

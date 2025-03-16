@@ -19,6 +19,7 @@ import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AdvancedLink
+import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.LinkUtils
@@ -418,7 +419,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             moreActionsHelper.downloadAndShareImage(url)
         }
         R.id.open_in_browser -> {
-            mainActivity?.onLinkClick(
+            activity?.onLinkClick(
                 context = context,
                 application = mainApplication,
                 fragmentManager = fragmentManager,

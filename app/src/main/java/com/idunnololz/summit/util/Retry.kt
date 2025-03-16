@@ -33,8 +33,12 @@ suspend fun <T> retry(
             return result
         }
         val exception = requireNotNull(result.exceptionOrNull())
-        if (exception is RateLimitException && exception.timeout > 0L) {
-            delay(exception.timeout)
+        if (exception is RateLimitException) {
+            if (exception.timeout > 0L) {
+                delay(exception.timeout)
+            } else {
+                delay(1000)
+            }
         } else {
             if (!retry(exception)) {
                 return result

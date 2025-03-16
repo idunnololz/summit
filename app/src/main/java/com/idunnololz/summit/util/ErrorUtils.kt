@@ -6,12 +6,14 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommunityBlockedError
+import com.idunnololz.summit.api.ConnectionException
 import com.idunnololz.summit.api.CouldntFindObjectError
 import com.idunnololz.summit.api.GetNetworkException
 import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NewApiException
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.NotAuthenticatedException
+import com.idunnololz.summit.api.RateLimitException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
@@ -51,6 +53,10 @@ fun Throwable.toErrorMessage(context: Context): String {
                             context.getString(R.string.error_community_blocked)
                         }
 
+                        is RateLimitException -> {
+                            context.getString(R.string.too_many_requests)
+                        }
+
                         else -> {
                             if (t.errorCode == 404) {
                                 context.getString(R.string.error_page_not_found)
@@ -74,6 +80,9 @@ fun Throwable.toErrorMessage(context: Context): String {
 
                 is GetNetworkException ->
                     context.getString(R.string.error_network)
+
+                is ConnectionException ->
+                    context.getString(R.string.error_connection)
             }
         is MultiCommunityDataSource.CommunityNotFoundException ->
             context.getString(

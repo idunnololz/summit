@@ -231,7 +231,7 @@ object LemmyTextHelper {
          * 3) Matches against full community names (!a@b.com)
          */
         private val largeRegex = Pattern.compile(
-            """\^(\S+)|(?m)^(#+)(\S*.*)${'$'}|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""",
+            """\^(\S+)|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""",
         )
 
         private fun processAll(s: String): String {
@@ -245,20 +245,10 @@ object LemmyTextHelper {
                     continue
                 }
 
-                val formattingChar = matcher.group(2)?.trim()
-                val rest = matcher.group(3)?.trim()
-                if (formattingChar != null && rest != null) {
-                    matcher.appendReplacement(
-                        sb,
-                        Matcher.quoteReplacement("$formattingChar $rest"),
-                    )
-                    Log.d(TAG, "Fixed ${"$formattingChar $rest"}")
-                }
-
-                val linkStart = matcher.group(4)
-                val referenceTypeToken = matcher.group(5)
-                val name = matcher.group(6)
-                val instance = matcher.group(7)
+                val linkStart = matcher.group(2)
+                val referenceTypeToken = matcher.group(3)
+                val name = matcher.group(4)
+                val instance = matcher.group(5)
 
                 if (linkStart == null &&
                     referenceTypeToken != null &&

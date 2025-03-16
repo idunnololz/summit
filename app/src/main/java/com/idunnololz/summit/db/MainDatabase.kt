@@ -113,10 +113,10 @@ abstract class MainDatabase : RoomDatabase() {
 
         fun getInstance(context: Context, json: Json): MainDatabase =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: buildDatabase(context, json).also { INSTANCE = it }
+                INSTANCE ?: buildDatabase(context, DATABASE_NAME, json).also { INSTANCE = it }
             }
 
-        private fun buildDatabase(context: Context, json: Json): MainDatabase {
+        fun buildDatabase(context: Context, dbName: String, json: Json): MainDatabase {
 //            if (BuildConfig.DEBUG) {
 //                context.deleteDatabase("main.db")
 //                val db = context.openOrCreateDatabase("main.db", 0, null)
@@ -127,7 +127,7 @@ abstract class MainDatabase : RoomDatabase() {
                 .databaseBuilder(
                     context.applicationContext,
                     MainDatabase::class.java,
-                    DATABASE_NAME,
+                    dbName,
                 )
                 .apply {
                     if (!BuildConfig.DEBUG) {

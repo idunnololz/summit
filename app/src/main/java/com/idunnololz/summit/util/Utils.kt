@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -24,7 +25,6 @@ import android.util.TypedValue
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
@@ -41,6 +41,7 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.preferences.DefaultAppPreference
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.tint
@@ -126,7 +127,7 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    private fun compress(data: ByteArray, flags: Int): String {
+    fun compress(data: ByteArray, flags: Int): String {
         val deflater = Deflater()
         deflater.setInput(data)
 
@@ -144,7 +145,7 @@ object Utils {
     }
 
     @Throws(DataFormatException::class, IOException::class)
-    fun decompressZlib(s: String): String {
+    fun decompressZlibRaw(s: String): ByteArray {
         val bytes = Base64.decode(s, Base64.DEFAULT)
 
         val decompresser = Inflater()
@@ -160,7 +161,12 @@ object Utils {
         val output = outputStream.toByteArray()
         decompresser.end()
 
-        return String(output)
+        return output
+    }
+
+    @Throws(DataFormatException::class, IOException::class)
+    fun decompressZlib(s: String): String {
+        return String(decompressZlibRaw(s))
     }
 
     fun safeLaunchExternalIntent(context: Context, intent: Intent): Boolean {
@@ -173,18 +179,37 @@ object Utils {
     }
 
     var openExternalLinksInBrowser = false
-    var defaultAppPackage: String? = null
+    var defaultWebApp: DefaultAppPreference? = null
     fun openExternalLink(
         context: Context,
         url: String,
         openNewIncognitoTab: Boolean = false,
     ) {
-        val defaultAppPackage = defaultAppPackage
+        val defaultAppPackage = defaultWebApp?.packageName
         if (defaultAppPackage != null) {
-            val intent = context.packageManager.getLaunchIntentForPackage(defaultAppPackage)
-                ?.apply {
-                    action = Intent.ACTION_VIEW
-                    data = Uri.parse(url)
+            val componentName = defaultWebApp?.componentName
+            val intent =
+//                if (defaultAppPackage == "org.mozilla.firefox") {
+//                    Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+//                        setComponent(ComponentName(
+//                            "org.mozilla.firefox","org.mozilla.fenix.IntentReceiverActivity"))
+//                    }
+//                } else
+                    if (componentName != null) {
+                    Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                        setComponent(
+                            ComponentName(
+                                defaultAppPackage,
+                                componentName,
+                            )
+                        )
+                    }
+                } else {
+                    context.packageManager.getLaunchIntentForPackage(defaultAppPackage)
+                        ?.apply {
+                            action = Intent.ACTION_VIEW
+                            data = Uri.parse(url)
+                        }
                 }
             if (intent != null) {
                 safeLaunchExternalIntent(context, intent)

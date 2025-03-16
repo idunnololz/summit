@@ -16,9 +16,12 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.BackupItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentImportSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingsFromBackupsBinding
+import com.idunnololz.summit.db.MainDatabase.Companion.DATABASE_NAME
+import com.idunnololz.summit.db.preview.TableDetailsDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -149,9 +152,9 @@ class ImportSettingsDialogFragment :
                             }
                         }
 
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(errorMessage)
-                            .createAndShow(childFragmentManager, "error_dialog")
+                        launchAlertDialog("error_dialog") {
+                            message = errorMessage
+                        }
 
                         viewModel.state.postValue(ImportSettingsViewModel.State.NotStarted)
                     }
@@ -232,12 +235,21 @@ class ImportSettingsDialogFragment :
             confirmImportView.visibility = View.VISIBLE
 
             val adapter = SettingDataAdapter(
+                context = binding.root.context,
+                isImporting = true,
                 onSettingPreviewClick = { settingKey, settingsDataPreview ->
                     ImportSettingItemPreviewDialogFragment.show(
                         childFragmentManager,
                         settingKey,
                         settingsDataPreview.settingsPreview[settingKey] ?: "",
                         settingsDataPreview.keyToType[settingKey] ?: "?",
+                    )
+                },
+                onTableClick = {
+                    TableDetailsDialogFragment.show(
+                        childFragmentManager,
+                        requireContext().getDatabasePath(DATABASE_NAME).toUri(),
+                        it,
                     )
                 },
                 onDeleteClick = {
@@ -252,7 +264,7 @@ class ImportSettingsDialogFragment :
             recyclerView.adapter = adapter
 
             confirmImport.setOnClickListener {
-                viewModel.confirmImport(adapter.excludeKeys)
+                viewModel.confirmImport(adapter.excludeKeys, adapter.tableResolutions)
             }
         }
     }

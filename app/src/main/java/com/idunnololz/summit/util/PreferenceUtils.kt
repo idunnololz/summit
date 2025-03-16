@@ -207,6 +207,8 @@ object PreferenceUtils {
         "KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS"
     const val KEY_POST_FULL_BLEED_IMAGE = "KEY_POST_FULL_BLEED_IMAGE"
 
+    const val KEY_DATABASE_MAIN = "_key_database_main"
+
     // Unused/dead keys
     @Suppress("unused")
     const val DEAD_KEY_SHARE_IMAGES_DIRECTLY = "KEY_SHARE_IMAGES_DIRECTLY"

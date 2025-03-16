@@ -241,7 +241,7 @@ class QueryEngine(
             }
 
             apiClient
-                .search(
+                .searchWithRetry(
                     communityId = communityIdFilter,
                     communityName = null,
                     sortType = currentSortType,

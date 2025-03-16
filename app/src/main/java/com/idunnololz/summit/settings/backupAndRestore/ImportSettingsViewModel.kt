@@ -7,9 +7,15 @@ import android.util.Base64
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.db.MainDatabase
+import com.idunnololz.summit.db.raw.DbHelper
+import com.idunnololz.summit.db.raw.TableInfo
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.AllSettings
+import com.idunnololz.summit.settings.backupAndRestore.export.ExportableTable
+import com.idunnololz.summit.settings.backupAndRestore.export.SYSTEM_TABLES
+import com.idunnololz.summit.settings.backupAndRestore.export.tableNameToExportableTable
 import com.idunnololz.summit.util.PreferenceUtils
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DATABASE_MAIN
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,7 +24,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.json.Json
 import org.json.JSONObject
+import java.io.File
 
 @HiltViewModel
 class ImportSettingsViewModel @Inject constructor(
@@ -26,6 +34,8 @@ class ImportSettingsViewModel @Inject constructor(
     private val settingsBackupManager: SettingsBackupManager,
     private val preferences: Preferences,
     private val stateHandle: SavedStateHandle,
+    private val json: Json,
+    private val mainDatabase: MainDatabase,
 ) : ViewModel() {
 
     val state =
@@ -59,16 +69,166 @@ class ImportSettingsViewModel @Inject constructor(
     }
 
     private fun performImportSettings(settingsData: SettingsData) {
-        // before we overwrite existing settings, create a backup just in case
-        settingsBackupManager.saveBackup(
-            backup = preferences.generateCode(),
-            backupName = "import_settings_backup_%datetime%",
-        )
+        viewModelScope.launch {
+            // before we overwrite existing settings, create a backup just in case
+            settingsBackupManager.saveBackup(
+                backup = preferences.generateCode(),
+                backupName = "import_settings_backup_%datetime%",
+            )
 
-        val settingsToImport = JSONObject(settingsData.rawData)
-        preferences.importSettings(settingsToImport, settingsData.excludeKeys)
+            val settingsToImport = JSONObject(settingsData.rawData)
+            preferences.importSettings(settingsToImport, settingsData.excludeKeys)
 
-        state.postValue(State.ImportSettingsCompleted)
+            if (settingsData.tablePath != null) {
+                importDb(settingsData.tablePath, settingsData.tableResolutions)
+            }
+
+            state.postValue(State.ImportSettingsCompleted)
+        }
+    }
+
+    private suspend fun importDb(
+        tablePath: String,
+        tableResolutions: Map<String, SettingDataAdapter.ImportTableResolution>,
+    ) {
+        val f = File(tablePath)
+        val tempDatabase = MainDatabase.buildDatabase(context, f.name, json)
+
+        DbHelper(tempDatabase.openHelper.readableDatabase, true).use { dbHelper ->
+            val tableNames = dbHelper.getTableNames()
+
+            for (tableName in tableNames) {
+                val exportableTable = tableNameToExportableTable(tableName)
+                    ?: continue
+                val resolution = tableResolutions[tableName]
+                    ?: SettingDataAdapter.ImportTableResolution.Ignore
+
+                if (resolution == SettingDataAdapter.ImportTableResolution.Ignore) {
+                    continue
+                }
+
+                when (exportableTable) {
+                    ExportableTable.UserCommunities -> {
+                        val userCommunitiesDao = mainDatabase.userCommunitiesDao()
+                        val allEntries = tempDatabase.userCommunitiesDao().getAllCommunities()
+
+                        when (resolution) {
+                            SettingDataAdapter.ImportTableResolution.Merge -> {
+                                for (entry in allEntries) {
+                                    userCommunitiesDao.insertCommunity(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Overwrite -> {
+                                userCommunitiesDao.deleteAll()
+                                for (entry in allEntries) {
+                                    userCommunitiesDao.insertCommunity(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Ignore -> continue
+                        }
+                    }
+                    ExportableTable.HiddenPosts -> {
+                        val hiddenPostsDao = mainDatabase.hiddenPostsDao()
+                        val allEntries = tempDatabase.hiddenPostsDao().getAllHiddenPosts()
+
+                        when (resolution) {
+                            SettingDataAdapter.ImportTableResolution.Merge -> {
+                                for (entry in allEntries) {
+                                    hiddenPostsDao.insertHiddenPost(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Overwrite -> {
+                                hiddenPostsDao.clear()
+                                for (entry in allEntries) {
+                                    hiddenPostsDao.insertHiddenPost(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Ignore -> continue
+                        }
+                    }
+                    ExportableTable.ContentFilters -> {
+                        val contentFiltersDao = mainDatabase.contentFiltersDao()
+                        val allEntries = tempDatabase.contentFiltersDao().getAllFilters()
+
+                        when (resolution) {
+                            SettingDataAdapter.ImportTableResolution.Merge -> {
+                                for (entry in allEntries) {
+                                    contentFiltersDao.insertFilter(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Overwrite -> {
+                                contentFiltersDao.clear()
+                                for (entry in allEntries) {
+                                    contentFiltersDao.insertFilter(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Ignore -> continue
+                        }
+                    }
+                    ExportableTable.Drafts -> {
+                        val draftsDao = mainDatabase.draftsDao()
+                        val allEntries = tempDatabase.draftsDao().getAllDrafts()
+
+                        when (resolution) {
+                            SettingDataAdapter.ImportTableResolution.Merge -> {
+                                for (entry in allEntries) {
+                                    draftsDao.insert(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Overwrite -> {
+                                draftsDao.deleteAll()
+                                for (entry in allEntries) {
+                                    draftsDao.insert(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Ignore -> continue
+                        }
+                    }
+                    ExportableTable.TextEmojis -> {
+                        val textEmojiDao = mainDatabase.textEmojiDao()
+                        val allEntries = tempDatabase.textEmojiDao().getAll()
+
+                        when (resolution) {
+                            SettingDataAdapter.ImportTableResolution.Merge -> {
+                                for (entry in allEntries) {
+                                    textEmojiDao.insert(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Overwrite -> {
+                                textEmojiDao.deleteAll()
+                                for (entry in allEntries) {
+                                    textEmojiDao.insert(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Ignore -> continue
+                        }
+                    }
+                    ExportableTable.UserTags -> {
+                        val userTagsDao = mainDatabase.userTagsDao()
+                        val allEntries = tempDatabase.userTagsDao().getAllUserTags()
+
+                        when (resolution) {
+                            SettingDataAdapter.ImportTableResolution.Merge -> {
+                                for (entry in allEntries) {
+                                    userTagsDao.insertUserTag(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Overwrite -> {
+                                userTagsDao.clear()
+                                for (entry in allEntries) {
+                                    userTagsDao.insertUserTag(entry)
+                                }
+                            }
+                            SettingDataAdapter.ImportTableResolution.Ignore -> continue
+                        }
+                    }
+                }
+            }
+
+        }
+
+        tempDatabase.close()
+        f.delete()
     }
 
     fun importSettings(settingsText: String) {
@@ -108,31 +268,58 @@ class ImportSettingsViewModel @Inject constructor(
         state.postValue(State.Error(ErrorType.UnableToDecipherInput, RuntimeException()))
     }
 
-    private fun generatePreviewFromSettingsJson(settingsJson: String) {
-        val json = try {
-            JSONObject(settingsJson)
+    private suspend fun generatePreviewFromSettingsJson(settingsJsonStr: String) {
+        val settingsJson = try {
+            JSONObject(settingsJsonStr)
         } catch (e: Exception) {
             state.postValue(State.Error(ErrorType.InvalidJson, e))
             return
         }
 
-        val o = json.opt(PreferenceUtils.PREFERENCE_VERSION_CODE)
+        val o = settingsJson.opt(PreferenceUtils.PREFERENCE_VERSION_CODE)
+        val rawString = settingsJson.optJSONObject(KEY_DATABASE_MAIN)?.optString("db_1")
+        settingsJson.remove(KEY_DATABASE_MAIN)
 
         if (o == null) {
             state.postValue(State.Error(ErrorType.InvalidSettingsJson, RuntimeException()))
             return
         }
 
+        val tablesInfo: Map<String, TableInfo>
+        val dbPath: File?
+        if (!rawString.isNullOrBlank()) {
+            val byteArr = Utils.decompressZlibRaw(rawString)
+            val tempDb = context.getDatabasePath("_temp_import_db")
+
+            dbPath = tempDb
+
+            tempDb.delete()
+            tempDb.outputStream().use { it.write(byteArr) }
+
+            val mainDatabase = MainDatabase.buildDatabase(context, tempDb.name, json)
+            tablesInfo = DbHelper(mainDatabase.openHelper.readableDatabase, true)
+                .use { dbHelper ->
+                    dbHelper.getTableNames()
+                        .map { dbHelper.getTableInfo(it) }
+                        .filter { it.rowCount > 0 }
+                        .filter { !SYSTEM_TABLES.contains(it.tableName) }
+                        .associateBy { it.tableName }
+                }
+        } else {
+            tablesInfo = mapOf()
+            dbPath = null
+        }
+
         val currentSettingsJson = preferences.asJson()
 
-        val allKeys = json.keys().asSequence().toMutableSet()
+        val allKeys = settingsJson.keys().asSequence().toMutableSet()
         allKeys.addAll(currentSettingsJson.keys().asSequence())
 
         // diff current vs the json we are importing
         val diffs = mutableListOf<Diff>()
         for (key in allKeys) {
             val currentValue = currentSettingsJson.opt(key)
-            val importValue = json.opt(key)
+            val importValue = settingsJson.opt(key)
 
             if (currentValue == null && importValue != null) {
                 diffs.add(Diff(DiffType.Added, "null", importValue.toString()))
@@ -157,19 +344,21 @@ class ImportSettingsViewModel @Inject constructor(
             }
         }
 
-        val settingsPreview = json.keys().asSequence()
-            .associateWith { (json.opt(it)?.toString() ?: "null") }
-        val keyToType = json.keys().asSequence()
-            .associateWith { (json.opt(it)?.javaClass?.simpleName ?: "?") }
+        val settingsPreview = settingsJson.keys().asSequence()
+            .associateWith { (settingsJson.opt(it)?.toString() ?: "null") }
+        val keyToType = settingsJson.keys().asSequence()
+            .associateWith { (settingsJson.opt(it)?.javaClass?.simpleName ?: "?") }
 
         state.postValue(
             State.ConfirmImportSettings(
                 SettingsDataPreview(
-                    keys = json.keys().asSequence().toList(),
+                    keys = settingsJson.keys().asSequence().toList(),
                     diffs = diffs,
                     settingsPreview = settingsPreview,
                     keyToType = keyToType,
-                    rawData = settingsJson,
+                    rawData = settingsJsonStr,
+                    tablePath = dbPath?.path,
+                    databaseTablePreview = tablesInfo,
                 ),
             ),
         )
@@ -198,15 +387,20 @@ class ImportSettingsViewModel @Inject constructor(
         }
     }
 
-    fun confirmImport(excludeKeys: MutableSet<String>) {
+    fun confirmImport(
+        excludeKeys: MutableSet<String>,
+        tableResolutions: Map<String, SettingDataAdapter.ImportTableResolution>
+    ) {
         val currentState = state.value as? State.ConfirmImportSettings
             ?: return
 
         state.postValue(
             State.PerformImportSettings(
                 SettingsData(
-                    currentState.preview.rawData,
-                    excludeKeys,
+                    rawData = currentState.preview.rawData,
+                    tablePath = currentState.preview.tablePath,
+                    excludeKeys = excludeKeys,
+                    tableResolutions = tableResolutions,
                 ),
             ),
         )

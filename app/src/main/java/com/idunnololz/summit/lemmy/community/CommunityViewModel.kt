@@ -13,6 +13,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.GuestAccount
 import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
@@ -36,6 +37,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
+import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -567,6 +569,13 @@ class CommunityViewModel @Inject constructor(
 
         if (currentCommunityRef.value == communityRefSafe && !instanceChange) {
             return
+        }
+
+        if (newApiInstance != null &&
+            currentAccount != null &&
+            newApiInstance != currentAccount.instance) {
+
+            accountManager.setCurrentAccount(GuestAccount(newApiInstance))
         }
 
         initialPageFetched.value = false

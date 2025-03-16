@@ -109,6 +109,8 @@ class ImageViewerActivity :
         get() = this
     override val mainApplication: MainApplication
         get() = application as MainApplication
+    override val activity: BaseActivity
+        get() = this
 
     private val urlAlt: String?
         get() {

@@ -21,6 +21,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
+    fun getBaseActivity(): BaseActivity? = activity as? BaseActivity
 
     private var _binding: T? = null
     val binding get() = _binding!!
