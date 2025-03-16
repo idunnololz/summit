@@ -90,6 +90,8 @@ class OfflineManager @Inject constructor(
         listener: TaskListener,
         errorListener: TaskFailedListener?,
     ) {
+
+        CoroutineScope(SupervisorJob())
         Log.d(TAG, "fetchImageWithError(): $url")
         url ?: return
         val registrations: MutableList<Registration> = (

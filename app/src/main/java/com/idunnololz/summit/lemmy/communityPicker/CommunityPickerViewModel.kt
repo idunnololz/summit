@@ -35,7 +35,7 @@ class CommunityPickerViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             apiClient
-                .search(
+                .searchWithRetry(
                     sortType = SortType.TopAll,
                     listingType = ListingType.All,
                     searchType = SearchType.Communities,

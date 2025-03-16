@@ -42,7 +42,7 @@ class PersonPickerViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             apiClient
-                .search(
+                .searchWithRetry(
                     sortType = SortType.Active,
                     listingType = ListingType.All,
                     searchType = SearchType.Users,

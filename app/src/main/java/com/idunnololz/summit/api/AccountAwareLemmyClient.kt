@@ -298,7 +298,7 @@ class AccountAwareLemmyClient @Inject constructor(
             .autoSignOut(account)
     }
 
-    suspend fun search(
+    suspend fun searchWithRetry(
         communityId: Int? = null,
         communityName: String? = null,
         sortType: SortType,
@@ -310,20 +310,23 @@ class AccountAwareLemmyClient @Inject constructor(
         creatorId: Long? = null,
         account: Account? = accountForInstance(),
         force: Boolean = false,
-    ): Result<SearchResponse> = apiClient.search(
-        account = account,
-        communityId = communityId,
-        communityName = communityName,
-        sortType = sortType,
-        listingType = listingType,
-        searchType = searchType,
-        page = page,
-        limit = limit,
-        query = query,
-        creatorId = creatorId,
-        force = force,
-    )
-        .autoSignOut(account)
+    ): Result<SearchResponse> = retry {
+        apiClient
+            .search(
+                account = account,
+                communityId = communityId,
+                communityName = communityName,
+                sortType = sortType,
+                listingType = listingType,
+                searchType = searchType,
+                page = page,
+                limit = limit,
+                query = query,
+                creatorId = creatorId,
+                force = force,
+            )
+            .autoSignOut(account)
+    }
 
     suspend fun fetchCommunitiesWithRetry(
         sortType: SortType,

@@ -256,7 +256,6 @@ class TableRowSpan(
     }
 
     private fun makeNewLayouts() {
-        Log.d("HAHA", "makeNewLayouts")
         textPaint.isFakeBoldText = header
 
         val columns = cells.size

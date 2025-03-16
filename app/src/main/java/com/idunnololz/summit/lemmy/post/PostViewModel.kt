@@ -297,12 +297,8 @@ class PostViewModel @Inject constructor(
             lemmyApiClient.changeInstance(
                 postOrCommentRef
                     .fold(
-                        {
-                            it.instance
-                        },
-                        {
-                            it.instance
-                        },
+                        { it.instance },
+                        { it.instance },
                     ),
             )
 

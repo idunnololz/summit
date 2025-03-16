@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -123,7 +124,7 @@ class PostListAdapter(
 
     var viewLifecycleOwner: LifecycleOwner? = null
 
-    var seenItemPositions = mutableSetOf<Int>()
+    private val seenItemPositions = mutableSetOf<Int>()
 
     override fun getItemViewType(position: Int): Int = when (items[position]) {
         is PostListEngineItem.VisiblePostItem -> when (layout) {
@@ -448,6 +449,7 @@ class PostListAdapter(
         if (holder is ListingItemViewHolder) {
             if (markPostsAsReadOnScroll) {
                 val fetchedPost = holder.root.getTag(R.id.fetched_post) as? FetchedPost
+
                 if (fetchedPost != null && seenItemPositions.contains(position)) {
                     onPostRead(
                         fetchedPost.source.accountId,
@@ -609,5 +611,13 @@ class PostListAdapter(
         postListEngine.clearHighlight()
         postListEngine.createItems()
         refreshItems(animate = false)
+    }
+
+    fun markItemPositionSeen(position: Int) {
+        seenItemPositions.add(position)
+    }
+
+    fun clearItemPositionSeen() {
+        seenItemPositions.clear()
     }
 }

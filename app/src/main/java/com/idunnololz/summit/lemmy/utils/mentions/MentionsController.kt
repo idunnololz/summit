@@ -319,7 +319,7 @@ class MentionsAutoCompleteRepository(
                 } else {
                     val communityQuery: Deferred<Result<SearchResponse>> = async(Dispatchers.IO) {
                         apiClient
-                            .search(
+                            .searchWithRetry(
                                 sortType = SortType.TopMonth,
                                 listingType = ListingType.All,
                                 searchType = SearchType.Communities,
@@ -329,7 +329,7 @@ class MentionsAutoCompleteRepository(
                     }
                     val personQuery = async(Dispatchers.IO) {
                         apiClient
-                            .search(
+                            .searchWithRetry(
                                 sortType = SortType.TopMonth,
                                 listingType = ListingType.All,
                                 searchType = SearchType.Users,

@@ -15,9 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@android:color/transparent">
-
-        </com.google.android.material.appbar.MaterialToolbar>
+            android:background="@android:color/transparent"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -30,42 +28,72 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:orientation="vertical"
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:paddingHorizontal="@dimen/padding">
+                    android:layout_weight="1">
 
-                    <!--            <CheckBox-->
-                    <!--                android:layout_marginTop="16dp"-->
-                    <!--                android:checked="true"-->
-                    <!--                android:id="@+id/backupPreferencesCb"-->
-                    <!--                android:layout_width="wrap_content"-->
-                    <!--                android:layout_height="wrap_content"-->
-                    <!--                android:text="@string/backup_preferences"/>-->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/padding">
 
-                    <!--            <CheckBox-->
-                    <!--                android:checked="true"-->
-                    <!--                android:id="@+id/backupFavoritesCb"-->
-                    <!--                android:layout_width="wrap_content"-->
-                    <!--                android:layout_height="wrap_content"-->
-                    <!--                android:text="@string/backup_favorites"/>-->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                    <!--            <CheckBox-->
-                    <!--                android:checked="true"-->
-                    <!--                android:id="@+id/backupBuildsCb"-->
-                    <!--                android:layout_width="wrap_content"-->
-                    <!--                android:layout_height="wrap_content"-->
-                    <!--                android:text="@string/backup_builds"/>-->
+                            <CheckBox
+                                android:id="@+id/cb_include_database"
+                                android:checked="true"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:minHeight="0dp"
+                                android:minWidth="0dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
 
-                    <!--            <CheckBox-->
-                    <!--                android:checked="true"-->
-                    <!--                android:id="@+id/backup_tft_data_cb"-->
-                    <!--                android:layout_width="wrap_content"-->
-                    <!--                android:layout_height="wrap_content"-->
-                    <!--                android:text="@string/backup_tft_data"/>-->
-                </LinearLayout>
+                            <TextView
+                                android:id="@+id/title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/include_database"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:layout_marginStart="@dimen/padding_three_quarters"
+                                app:layout_constraintStart_toEndOf="@+id/cb_include_database"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="@+id/cb_include_database"
+                                app:layout_constraintBottom_toBottomOf="@+id/cb_include_database"/>
+
+                            <TextView
+                                android:id="@+id/body"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/include_database_desc"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:layout_marginTop="@dimen/padding_half"
+                                android:textColor="@color/colorTextFaint"
+                                app:layout_constraintStart_toStartOf="@+id/title"
+                                app:layout_constraintEnd_toEndOf="@+id/title"
+                                app:layout_constraintTop_toBottomOf="@+id/title"/>
+
+
+                            <TextView
+                                android:id="@+id/more"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/include_database_desc2"
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                android:paddingVertical="@dimen/padding_half"
+                                android:textColor="?colorPrimary"
+                                android:background="?selectableItemBackground"
+                                app:layout_constraintStart_toStartOf="@+id/title"
+                                app:layout_constraintEnd_toEndOf="@+id/title"
+                                app:layout_constraintTop_toBottomOf="@+id/body"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
+                </ScrollView>
 
                 <LinearLayout
                     android:orientation="vertical"

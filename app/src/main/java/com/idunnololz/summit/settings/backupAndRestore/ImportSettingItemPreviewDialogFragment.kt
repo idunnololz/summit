@@ -17,7 +17,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ImportSettingItemPreviewDialogFragment : BaseDialogFragment<DialogFragmentImportSettingItemPreviewBinding>() {
+class ImportSettingItemPreviewDialogFragment :
+    BaseDialogFragment<DialogFragmentImportSettingItemPreviewBinding>() {
 
     companion object {
         fun show(

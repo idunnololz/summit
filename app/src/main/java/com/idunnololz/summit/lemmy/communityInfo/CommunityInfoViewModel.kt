@@ -41,7 +41,7 @@ class CommunityInfoViewModel @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val noAuthApiClient: LemmyApiClient,
     private val apiClientFactor: LemmyApiClient.Factory,
-    private val accountManager: AccountManager,
+    val accountManager: AccountManager,
     private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
@@ -50,6 +50,7 @@ class CommunityInfoViewModel @Inject constructor(
     }
 
     private var communityRef: CommunityRef? = null
+    private var communityRefInstanceUsed: String? = null
 
     val siteOrCommunity = StatefulLiveData<SiteOrCommunityResult>()
     val multiCommunity = StatefulLiveData<MultiCommunityData>()
@@ -345,10 +346,11 @@ class CommunityInfoViewModel @Inject constructor(
     }
 
     fun onCommunityChanged(communityRef: CommunityRef) {
-        if (this.communityRef == communityRef) {
+        if (this.communityRef == communityRef && communityRefInstanceUsed == instance) {
             return
         }
 
+        communityRefInstanceUsed = instance
         this.communityRef = communityRef
 
         fetchCommunityOrSiteInfo(communityRef)

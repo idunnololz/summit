@@ -263,3 +263,22 @@ val CommunityRef.instance: String?
         is MultiCommunity -> null
         is Subscribed -> this.instance
     }
+
+/**
+ * Ensures that the instance field for the [CommunityRef] is filled in where possible.
+ */
+fun CommunityRef.ensureInstance(instance: String): CommunityRef {
+    if (this.instance != null) {
+        return this
+    }
+
+    return when (this) {
+        is All -> CommunityRef.All(instance)
+        is AllSubscribed -> this
+        is CommunityRefByName -> this
+        is Local -> CommunityRef.Local(instance)
+        is ModeratedCommunities -> CommunityRef.ModeratedCommunities(instance)
+        is MultiCommunity -> this
+        is Subscribed -> Subscribed(instance)
+    }
+}

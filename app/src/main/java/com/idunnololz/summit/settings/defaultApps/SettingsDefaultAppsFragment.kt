@@ -67,12 +67,13 @@ class SettingsDefaultAppsFragment :
                     preferences.defaultWebApp = DefaultAppPreference(
                         appName = result.selectedApp.name,
                         packageName = result.selectedApp.packageName,
+                        componentName = result.componentName,
                     )
-                    Utils.defaultAppPackage = preferences.defaultWebApp?.packageName
+                    Utils.defaultWebApp = preferences.defaultWebApp
                     updateRendering()
                 } else if (result.clear) {
                     preferences.defaultWebApp = null
-                    Utils.defaultAppPackage = null
+                    Utils.defaultWebApp = null
                     updateRendering()
                 }
             }

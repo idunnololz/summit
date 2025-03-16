@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyReque
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import javax.inject.Inject
+import kotlin.random.Random
 
 class ActionsRunnerHelper @Inject constructor(
     private val accountManager: AccountManager,
@@ -48,7 +49,8 @@ class ActionsRunnerHelper @Inject constructor(
                                 if (RateLimitManager.isRateLimitHit()) {
                                     Log.d(TAG, "429. Hard limit hit. Rescheduling action...")
 
-                                    val nextRefresh = RateLimitManager.getTimeUntilNextRefreshMs()
+                                    val nextRefresh = RateLimitManager.getTimeUntilNextRefreshMs() +
+                                        (Random.nextFloat() * 2000).toInt()
                                     Failure(RateLimit(recommendedTimeoutMs = nextRefresh))
                                 } else {
                                     Failure(TooManyRequests(retries + 1))

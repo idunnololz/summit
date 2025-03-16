@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
@@ -34,6 +35,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
@@ -182,6 +184,7 @@ class CommunityFragment :
 
     private var swipeActionCallback: LemmySwipeActionCallback? = null
     private var itemTouchHelper: ItemTouchHelper? = null
+    private var onScrollMarkPostAsReadScrollListener: OnScrollMarkPostAsReadScrollListener? = null
 
     private val onBackPressedHandler = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -836,20 +839,13 @@ class CommunityFragment :
             recyclerView.layoutManager = layoutManager
 
             if (preferences.markPostsAsReadOnScroll) {
-                recyclerView.addOnScrollListener(
-                    object : RecyclerView.OnScrollListener() {
-                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                            super.onScrolled(recyclerView, dx, dy)
-
-                            val range =
-                                layoutManager.findFirstCompletelyVisibleItemPosition()..layoutManager.findLastCompletelyVisibleItemPosition()
-
-                            range.forEach {
-                                adapter?.seenItemPositions?.add(it)
-                            }
-                        }
-                    },
+                val onScrollMarkPostAsReadScrollListener = OnScrollMarkPostAsReadScrollListener(
+                    { adapter },
+                    layoutManager,
                 )
+                recyclerView.addOnScrollListener(onScrollMarkPostAsReadScrollListener)
+                this@CommunityFragment.onScrollMarkPostAsReadScrollListener =
+                    onScrollMarkPostAsReadScrollListener
             }
 
             updateDecoratorAndGestureHandler(recyclerView)
@@ -988,8 +984,9 @@ class CommunityFragment :
                         if (it.data.isReadPostUpdate) {
                             adapter.onItemsChanged(animate = false)
                         } else {
-                            adapter.seenItemPositions.clear()
+                            adapter.clearItemPositionSeen()
                             adapter.onItemsChanged()
+                            onScrollMarkPostAsReadScrollListener?.resetCache()
 
                             if (it.data.scrollToTop) {
                                 recyclerView.scrollToPosition(0)
@@ -1667,9 +1664,9 @@ class CommunityFragment :
                     val shareIntent = Intent.createChooser(sendIntent, null)
                     startActivity(shareIntent)
                 } catch (e: MultiCommunityException) {
-                    OldAlertDialogFragment.Builder()
-                        .setMessage(R.string.error_cannot_share_multi_community)
-                        .createAndShow(childFragmentManager, "sdafx")
+                    launchAlertDialog("sdafx") {
+                        messageResId = R.string.error_cannot_share_multi_community
+                    }
                 }
             }
             R.id.hide_read -> {

@@ -373,4 +373,31 @@ safeargs.
             android:name="intent"
             app:argType="android.content.Intent" />
     </dialog>
+    <dialog
+        android:id="@+id/tableDetailsDialogFragment"
+        android:name="com.idunnololz.summit.db.preview.TableDetailsDialogFragment"
+        android:label="TableDetailsDialogFragment" >
+        <argument
+            android:name="dbUri"
+            app:argType="android.net.Uri" />
+        <argument
+            android:name="tableName"
+            app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/dbDetailsDialogFragment"
+        android:name="com.idunnololz.summit.db.preview.DbDetailsDialogFragment"
+        android:label="DbDetailsDialogFragment" >
+        <argument
+            android:name="databaseUri"
+            app:argType="android.net.Uri" />
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="tableNames"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 </navigation>

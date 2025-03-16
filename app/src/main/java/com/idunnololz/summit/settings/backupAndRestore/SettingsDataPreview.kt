@@ -1,8 +1,8 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.os.Parcelable
-import com.idunnololz.summit.settings.SettingItem
-import kotlinx.android.parcel.Parcelize
+import com.idunnololz.summit.db.raw.TableInfo
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SettingsDataPreview(
@@ -11,6 +11,8 @@ data class SettingsDataPreview(
     val settingsPreview: Map<String, String>,
     val keyToType: Map<String, String>,
     val rawData: String,
+    val tablePath: String?,
+    val databaseTablePreview: Map<String, TableInfo>
 ) : Parcelable
 
 @Parcelize
@@ -23,7 +25,15 @@ data class Diff(
 @Parcelize
 data class SettingsData(
     val rawData: String,
+    val tablePath: String?,
     val excludeKeys: Set<String>,
+    val tableResolutions: Map<String, SettingDataAdapter.ImportTableResolution>,
+) : Parcelable
+
+@Parcelize
+data class TableSummary(
+    val tableName: String,
+    val rows: Int,
 ) : Parcelable
 
 enum class DiffType {

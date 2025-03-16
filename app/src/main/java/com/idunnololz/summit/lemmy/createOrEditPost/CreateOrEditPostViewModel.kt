@@ -204,7 +204,7 @@ class CreateOrEditPostViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             apiClient
-                .search(
+                .searchWithRetry(
                     sortType = SortType.TopMonth,
                     listingType = ListingType.All,
                     searchType = SearchType.Communities,

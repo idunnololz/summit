@@ -112,6 +112,10 @@ class SettingsBackupAndRestoreFragment :
             "reset_settings" -> {
                 exportSettingsViewModel.saveToInternalBackups(
                     backupName = "reset_settings_backup_%datetime%",
+                    backupConfig = ExportSettingsViewModel.BackupConfig(
+                        backupOption = ExportSettingsViewModel.BackupOption.SaveInternal,
+                        includeDatabase = true,
+                    )
                 )
                 exportSettingsViewModel.resetSettings()
 

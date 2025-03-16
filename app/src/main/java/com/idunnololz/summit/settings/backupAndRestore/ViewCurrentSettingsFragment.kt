@@ -1,10 +1,10 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +12,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.databinding.FragmentViewCurrentSettingsBinding
 import com.idunnololz.summit.db.MainDatabase.Companion.DATABASE_NAME
+import com.idunnololz.summit.db.preview.TableDetailsDialogFragment
 import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -55,7 +56,7 @@ class ViewCurrentSettingsFragment :
 
         with(binding) {
             toolbar.title = getString(R.string.view_current_settings)
-            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+            toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
             toolbar.setNavigationIconTint(
                 context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
             )
@@ -64,12 +65,21 @@ class ViewCurrentSettingsFragment :
             }
 
             val adapter = SettingDataAdapter(
+                context = context,
+                isImporting = false,
                 onSettingPreviewClick = { settingKey, settingsDataPreview ->
                     ImportSettingItemPreviewDialogFragment.show(
                         childFragmentManager,
                         settingKey,
                         settingsDataPreview.settingsPreview[settingKey] ?: "",
                         settingsDataPreview.keyToType[settingKey] ?: "?",
+                    )
+                },
+                onTableClick = {
+                    TableDetailsDialogFragment.show(
+                        childFragmentManager,
+                        context.getDatabasePath(DATABASE_NAME).toUri(),
+                        it,
                     )
                 },
                 onDeleteClick = {

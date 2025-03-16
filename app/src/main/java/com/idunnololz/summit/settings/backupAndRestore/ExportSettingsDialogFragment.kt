@@ -2,19 +2,25 @@ package com.idunnololz.summit.settings.backupAndRestore
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.DialogFragmentBackupSettingsBinding
+import com.idunnololz.summit.db.MainDatabase
+import com.idunnololz.summit.db.preview.DbDetailsDialogFragment
+import com.idunnololz.summit.settings.backupAndRestore.ExportSettingsViewModel.BackupOption.SaveInternal
+import com.idunnololz.summit.settings.backupAndRestore.export.defaultTablesToExport
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
@@ -54,7 +60,7 @@ class ExportSettingsDialogFragment :
         ) { uri ->
             if (uri != null) {
                 viewModel.createBackupAndSave(
-                    ExportSettingsViewModel.BackupConfig(
+                    getBackupConfig(
                         backupOption = ExportSettingsViewModel.BackupOption.Save,
                         dest = uri,
                     ),
@@ -104,9 +110,9 @@ class ExportSettingsDialogFragment :
                 when (it) {
                     is StatefulData.Error -> {
                         progressBar.visibility = View.GONE
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(R.string.error_generating_backup)
-                            .createAndShow(childFragmentManager, "error_generating_backup")
+                        launchAlertDialog("error_generating_backup") {
+                            messageResId = R.string.error_generating_backup
+                        }
                     }
                     is StatefulData.Loading -> {
                         progressBar.visibility = View.VISIBLE
@@ -155,18 +161,15 @@ class ExportSettingsDialogFragment :
                                         }
                                     } else {
                                         withContext(Dispatchers.Main) {
-                                            OldAlertDialogFragment.Builder()
-                                                .setMessage(R.string.error_generating_backup)
-                                                .createAndShow(
-                                                    childFragmentManager,
-                                                    "error_generating_backup",
-                                                )
+                                            launchAlertDialog("error_generating_backup") {
+                                                messageResId = R.string.error_generating_backup
+                                            }
                                         }
                                     }
                                 }
                             }
 
-                            ExportSettingsViewModel.BackupOption.SaveInternal -> {
+                            SaveInternal -> {
                                 dismiss()
 
                                 Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
@@ -188,9 +191,17 @@ class ExportSettingsDialogFragment :
 
             share.setOnClickListener {
                 viewModel.createBackupAndSave(
-                    ExportSettingsViewModel.BackupConfig(
+                    getBackupConfig(
                         ExportSettingsViewModel.BackupOption.Share,
                     ),
+                )
+            }
+            more.setOnClickListener {
+                DbDetailsDialogFragment.show(
+                    fragmentManager = childFragmentManager,
+                    dbUri = context.getDatabasePath(MainDatabase.DATABASE_NAME).toUri(),
+                    title = context.getString(R.string.tables_to_be_exported),
+                    tableNames = defaultTablesToExport.toList(),
                 )
             }
             save.setOnClickListener {
@@ -198,14 +209,24 @@ class ExportSettingsDialogFragment :
             }
             copyToClipboard.setOnClickListener {
                 viewModel.createBackupAndSave(
-                    ExportSettingsViewModel.BackupConfig(
+                    getBackupConfig(
                         ExportSettingsViewModel.BackupOption.Copy,
                     ),
                 )
             }
             saveToInternalBackups.setOnClickListener {
-                viewModel.saveToInternalBackups()
+                viewModel.saveToInternalBackups(getBackupConfig(SaveInternal))
             }
         }
     }
+
+    private fun getBackupConfig(
+        backupOption: ExportSettingsViewModel.BackupOption,
+        dest: Uri? = null,
+    ) =
+        ExportSettingsViewModel.BackupConfig(
+            backupOption = backupOption,
+            includeDatabase = binding.cbIncludeDatabase.isChecked,
+            dest = dest,
+        )
 }

@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DefaultAppPreference(
-    var appName: String,
-    var packageName: String,
+    val appName: String,
+    val packageName: String,
+    val componentName: String? = null,
 )

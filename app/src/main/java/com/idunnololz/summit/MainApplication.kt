@@ -2,7 +2,12 @@ package com.idunnololz.summit
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.content.res.Configuration
+import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
@@ -15,7 +20,6 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
 import coil3.transition.CrossfadeTransition
-import coil3.util.DebugLogger
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -155,10 +159,12 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         hiltEntryPoint.themeManager().onPreferencesChanged()
         Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
-        Utils.defaultAppPackage = preferences.defaultWebApp?.packageName
+        Utils.defaultWebApp = preferences.defaultWebApp
         LemmyTextHelper.autoLinkPhoneNumbers = preferences.autoLinkPhoneNumbers
         LemmyTextHelper.autoLinkIpAddresses = preferences.autoLinkIpAddresses
         notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
+
+        correctDefaultWebApp()
 
         hiltEntryPoint.notificationsManager().start()
 
@@ -173,6 +179,39 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
             isFirebaseInitialized = true
         }
+    }
+
+    private fun correctDefaultWebApp() {
+        val defaultWebApp = Utils.defaultWebApp
+
+        if (defaultWebApp == null || defaultWebApp.componentName != null) {
+            return
+        }
+
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://google.com")
+        }
+        val pm = packageManager
+        val options: List<ResolveInfo> =
+            if (SDK_INT >= Build.VERSION_CODES.M) {
+                pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            } else {
+                pm.queryIntentActivities(intent, 0)
+            }.mapNotNull { it }
+
+        val option = options.filter {
+            it.activityInfo.applicationInfo.packageName == defaultWebApp.packageName
+        }
+
+        if (option.isEmpty()) {
+            return
+        }
+
+        val fixedDefaultApp = defaultWebApp.copy(
+            componentName = option.first().activityInfo.name
+        )
+        preferences.defaultWebApp = fixedDefaultApp
+        Utils.defaultWebApp = fixedDefaultApp
     }
 
     fun runNotificationsUpdate() {

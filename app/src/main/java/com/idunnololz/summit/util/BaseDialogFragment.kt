@@ -29,6 +29,7 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
     fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
+    fun getBaseActivity(): BaseActivity? = activity as? BaseActivity
 
     private val logTag: String = javaClass.canonicalName ?: "UNKNOWN_CLASS"
 

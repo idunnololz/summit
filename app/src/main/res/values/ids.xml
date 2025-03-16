@@ -260,4 +260,7 @@
     <item name="sort_comments_by" type="id"/>
     <item name="refresh" type="id"/>
     <item name="share_link" type="id"/>
+    <item name="import_table_strategy_merge" type="id" />
+    <item name="import_table_strategy_overwrite" type="id" />
+    <item name="import_table_strategy_ignore" type="id" />
 </resources>

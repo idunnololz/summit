@@ -481,6 +481,8 @@ class AccountActionsManager @Inject constructor(
         read: Boolean,
         accountId: Long? = null,
     ) {
+        Log.d(TAG, "markPostAsRead() id: $id")
+
         val account = accountOrDefault(accountId) ?: return
         pendingActionsManager.markPostAsRead(
             PostRef(instance, id),

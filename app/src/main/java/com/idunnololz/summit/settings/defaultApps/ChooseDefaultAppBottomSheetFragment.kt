@@ -48,6 +48,7 @@ class ChooseDefaultAppBottomSheetFragment :
     @Parcelize
     class Result(
         val selectedApp: ApplicationInfo?,
+        val componentName: String?,
         val clear: Boolean,
     ): Parcelable
 
@@ -82,13 +83,14 @@ class ChooseDefaultAppBottomSheetFragment :
             recyclerView.adapter = ResolveInfoAdapter(
                 pm,
                 options,
-                {
+                { appInfo, componentName ->
                     setFragmentResult(
                         REQUEST_KEY,
                         Bundle().apply {
                             putParcelable(RESULT_KEY, Result(
-                                selectedApp = it,
-                                clear = it == null,
+                                selectedApp = appInfo,
+                                componentName = componentName,
+                                clear = appInfo == null,
                             ))
                         }
                     )
@@ -103,7 +105,7 @@ class ChooseDefaultAppBottomSheetFragment :
     private class ResolveInfoAdapter(
         private val packageManager: PackageManager,
         private val options: List<ResolveInfo>,
-        private val onIntentClick: (ApplicationInfo?) -> Unit,
+        private val onIntentClick: (ApplicationInfo?, String?) -> Unit,
     ) : Adapter<ViewHolder>() {
 
         sealed interface Item {
@@ -130,12 +132,12 @@ class ChooseDefaultAppBottomSheetFragment :
                 b.title.text = packageManager.getApplicationLabel(appInfo)
 
                 b.root.setOnClickListener {
-                    onIntentClick(appInfo)
+                    onIntentClick(appInfo, item.resolveInfo.activityInfo.name)
                 }
             }
             addItemType(Item.ClearItem::class, ItemAppChoiceClearBinding::inflate) { item, b, h ->
                 b.root.setOnClickListener {
-                    onIntentClick(null)
+                    onIntentClick(null, null)
                 }
             }
         }

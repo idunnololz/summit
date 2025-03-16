@@ -1,14 +1,21 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
+import android.util.Base64
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.db.MainDatabase
+import com.idunnololz.summit.db.raw.DbHelper
 import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.backupAndRestore.export.defaultTablesToExport
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DATABASE_MAIN
 import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.text.SimpleDateFormat
@@ -17,12 +24,17 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
+import kotlinx.serialization.json.Json
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 
 @HiltViewModel
 class ExportSettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferences: Preferences,
     private val settingsBackupManager: SettingsBackupManager,
+    private val json: Json,
 ) : ViewModel() {
 
     companion object {
@@ -38,7 +50,7 @@ class ExportSettingsViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.Default) {
             try {
-                val encodedString = preferences.generateCode()
+                val encodedString = generateCode(backupConfig)
                 Log.d(TAG, encodedString)
 
                 val uri = if (backupConfig.dest == null) {
@@ -72,25 +84,70 @@ class ExportSettingsViewModel @Inject constructor(
         return "backup-${dateFormatter.format(Calendar.getInstance().time)}.summitbackup"
     }
 
-    fun saveToInternalBackups(backupName: String = "settings_backup_%datetime%") {
-        val file = settingsBackupManager.saveBackup(preferences.generateCode(), backupName)
+    fun saveToInternalBackups(
+        backupConfig: BackupConfig,
+        backupName: String = "settings_backup_%datetime%"
+    ) {
+        viewModelScope.launch {
+            val file = settingsBackupManager.saveBackup(generateCode(backupConfig), backupName)
 
-        backupFile.postValue(
-            BackupResult(
-                file.toUri(),
-                BackupConfig(
-                    BackupOption.SaveInternal,
+            backupFile.postValue(
+                BackupResult(
+                    file.toUri(),
+                    BackupConfig(
+                        BackupOption.SaveInternal,
+                    ),
                 ),
-            ),
-        )
+            )
+        }
     }
 
     fun resetSettings() {
         preferences.clear()
     }
 
+    private suspend fun generateCode(backupConfig: BackupConfig): String {
+        val prefJson = preferences.asJson()
+
+        if (backupConfig.includeDatabase) {
+            val file = context.getDatabasePath(MainDatabase.DATABASE_NAME)
+            val tempDb = context.getDatabasePath("_temp_main_db")
+
+            tempDb.delete()
+
+            file.copyTo(tempDb)
+
+            val tablesToKeep = defaultTablesToExport
+
+            val mainDatabase = MainDatabase.buildDatabase(context, tempDb.name, json)
+            DbHelper(mainDatabase.openHelper.writableDatabase, true).use { dbHelper ->
+                dbHelper.keepTables(tablesToKeep)
+            }
+            mainDatabase.close()
+
+            val byteArr = ByteArrayOutputStream().use { outputStream ->
+                tempDb.inputStream().use { inputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+                outputStream.toByteArray()
+            }
+
+            prefJson.put(
+                KEY_DATABASE_MAIN,
+                JSONObject().apply {
+                    put("db_1", Utils.compress(byteArr, Base64.NO_WRAP))
+                }
+            )
+
+            tempDb.delete()
+        }
+
+        return Utils.compress(prefJson.toString(), Base64.NO_WRAP)
+    }
+
     data class BackupConfig(
         val backupOption: BackupOption,
+        val includeDatabase: Boolean = true,
         val dest: Uri? = null,
     )
 

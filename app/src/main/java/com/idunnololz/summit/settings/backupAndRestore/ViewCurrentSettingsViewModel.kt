@@ -1,18 +1,15 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
-import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.sqlite.db.SupportSQLiteQueryBuilder
+import com.idunnololz.summit.db.raw.DbHelper
 import com.idunnololz.summit.db.MainDatabase
+import com.idunnololz.summit.db.raw.TableInfo
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.AllSettings
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runInterruptible
 import java.io.File
 import javax.inject.Inject
 
@@ -32,6 +29,11 @@ class ViewCurrentSettingsViewModel @Inject constructor(
         model.setIsLoading()
 
         viewModelScope.launch {
+            val dbHelper = DbHelper(
+                mainDatabase.openHelper.readableDatabase,
+                shouldClose = false
+            )
+
             val currentSettingsJson = preferences.asJson()
 
             val allKeys = currentSettingsJson.keys().asSequence()
@@ -48,22 +50,19 @@ class ViewCurrentSettingsViewModel @Inject constructor(
             val keyToType = currentSettingsJson.keys().asSequence()
                 .associateWith { (currentSettingsJson.opt(it)?.javaClass?.simpleName ?: "?") }
 
-//            val tableNames = mutableListOf<String>()
-//            runInterruptible(Dispatchers.Default) {
-//                val cursor = mainDatabase.query(
-//                    "SELECT name FROM sqlite_master WHERE type='table'", arrayOf())
-//                while(cursor.moveToNext()) {
-//                    val tableName = cursor.getString(0)
-//                    tableNames.add(tableName)
-//                }
-//            }
+
+
+            val tableNames = dbHelper.getTableNames()
 //            val systemTableNames = setOf(
 //                "android_metadata",
 //                "sqlite_sequence",
 //            )
-//            val roomMasterTableName = "room_master_table"
-//
-//            Log.d("HAHA", tableNames.joinToString(separator = ","))
+            val roomMasterTableName = "room_master_table"
+            val databaseTablePreview = mutableMapOf<String, TableInfo>()
+
+            tableNames.forEach { tableName ->
+                databaseTablePreview[tableName] = dbHelper.getTableInfo(tableName)
+            }
 
             model.postValue(
                 Model(
@@ -73,9 +72,13 @@ class ViewCurrentSettingsViewModel @Inject constructor(
                         settingsPreview = settingsPreview,
                         keyToType = keyToType,
                         rawData = currentSettingsJson.toString(),
+                        tablePath = null,
+                        databaseTablePreview = databaseTablePreview,
                     ),
                 ),
             )
+
+            dbHelper.close()
         }
     }
 

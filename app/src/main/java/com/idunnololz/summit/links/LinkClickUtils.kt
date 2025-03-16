@@ -8,12 +8,13 @@ import com.idunnololz.summit.links.PreviewLinkOptions.PreviewAllLinks
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewNoLinks
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    getMainActivity()?.onLinkClick(
+    getBaseActivity()?.onLinkClick(
         context ?: return,
         (activity?.application as? MainApplication) ?: return,
         childFragmentManager,
@@ -24,7 +25,7 @@ fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkCon
 }
 
 fun BaseDialogFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    getMainActivity()?.onLinkClick(
+    getBaseActivity()?.onLinkClick(
         context ?: return,
         (activity?.application as? MainApplication) ?: return,
         childFragmentManager,
@@ -34,7 +35,7 @@ fun BaseDialogFragment<*>.onLinkClick(url: String, text: String?, linkContext: L
     )
 }
 
-fun MainActivity.onLinkClick(
+fun BaseActivity.onLinkClick(
     context: Context,
     application: MainApplication,
     fragmentManager: FragmentManager,
@@ -47,11 +48,13 @@ fun MainActivity.onLinkClick(
     try {
         val uri = Uri.parse(url)
 
-        if (uri.host.equals("loops.video", ignoreCase = true) &&
-            uri.path?.startsWith("/v/", ignoreCase = true) == true
-        ) {
-            openVideo(url, VideoType.Unknown, null)
-            return
+        if (this is MainActivity) {
+            if (uri.host.equals("loops.video", ignoreCase = true) &&
+                uri.path?.startsWith("/v/", ignoreCase = true) == true
+            ) {
+                openVideo(url, VideoType.Unknown, null)
+                return
+            }
         }
     } catch (e: Exception) {
         // do nothing

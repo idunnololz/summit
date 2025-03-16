@@ -28,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 class PendingActionsRunner @AssistedInject constructor(
     @ApplicationContext private val context: Context,
@@ -160,7 +161,8 @@ class PendingActionsRunner @AssistedInject constructor(
                             if (result.failureReason.retries < PendingActionsManager.MAX_RETRIES) {
                                 // Prob just sending too fast...
                                 val delay =
-                                    (2.0.pow(result.failureReason.retries + 1) * 1000).toLong()
+                                    (2.0.pow(result.failureReason.retries + 1) * 1000).toLong() +
+                                        (Random.nextFloat() * 2000).toInt()
                                 Log.d(TAG, "429. Retrying after $delay...")
 
                                 delayAction(action, delay)
