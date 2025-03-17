@@ -852,72 +852,13 @@ class CommunityFragment :
 
             fastScroller.setRecyclerView(recyclerView)
 
-            fun fetchPageIfLoadItem(vararg positions: Int) {
-                val items = adapter?.items ?: return
-
-                for (p in positions) {
-                    val pageToFetch = (items.getOrNull(p) as? PostListEngineItem.AutoLoadItem)
-                        ?.pageToLoad
-                        ?: continue
-
-                    viewModel.fetchPage(pageToFetch)
-                }
-            }
-
-            recyclerView.addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                        super.onScrollStateChanged(recyclerView, newState)
-
-                        val firstPos = layoutManager.findFirstVisibleItemPosition()
-                        val lastPos = layoutManager.findLastVisibleItemPosition()
-                        if (newState == SCROLL_STATE_IDLE) {
-                            fetchPageIfLoadItem(
-                                firstPos,
-                                firstPos - 1,
-                                lastPos - 1,
-                                lastPos,
-                                lastPos + 1,
-                            )
-                        }
-                    }
-
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-
-                        val adapter = adapter ?: return
-                        val firstPos = layoutManager.findFirstVisibleItemPosition()
-                        val lastPos = layoutManager.findLastVisibleItemPosition()
-                        (adapter.items.getOrNull(firstPos) as? PostListEngineItem.VisiblePostItem)
-                            ?.pageIndex
-                            ?.let { pageIndex ->
-                                if (firstPos != 0 && lastPos == adapter.itemCount - 1) {
-                                    // firstPos != 0 - ensures that the page is scrollable even
-                                    viewModel.setPagePositionAtBottom(pageIndex)
-                                } else {
-                                    val firstView = layoutManager.findViewByPosition(firstPos)
-                                    viewModel.setPagePosition(
-                                        pageIndex,
-                                        firstPos,
-                                        firstView?.top ?: 0,
-                                    )
-                                }
-                            }
-
-                        if (viewModel.infinity) {
-                            fetchPageIfLoadItem(
-                                firstPos,
-                                firstPos - 1,
-                                lastPos - 1,
-                                lastPos,
-                                lastPos + 1,
-                            )
-                        }
-
-                        viewModel.postListEngine.updateViewingPosition(firstPos, lastPos)
-                    }
-                },
+            val listener = CommunityScrollListener(
+                { adapter },
+                layoutManager,
+                viewModel,
             )
+
+            recyclerView.addOnScrollListener(listener)
 
             rootView.post {
                 if (!isBindingAvailable()) return@post
@@ -987,6 +928,7 @@ class CommunityFragment :
                             adapter.clearItemPositionSeen()
                             adapter.onItemsChanged()
                             onScrollMarkPostAsReadScrollListener?.resetCache()
+                            listener.resetCache()
 
                             if (it.data.scrollToTop) {
                                 recyclerView.scrollToPosition(0)

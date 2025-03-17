@@ -153,9 +153,6 @@ object LinkResolver {
             }
             else -> {
                 if (mustHandle) {
-                    crashlytics?.recordException(
-                        RuntimeException("Unrecognized url format: $url"),
-                    )
                     return defaultResult
                 } else {
                     return null

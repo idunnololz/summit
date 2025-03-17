@@ -278,6 +278,8 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             return
         }
 
+        val type = type ?: return
+
         Log.d(TAG, "Fetching page $pageIndex")
 
         fetchingCommentPages.add(pageIndex)
@@ -313,7 +315,6 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
                         downvotedOnly = true,
                     )
                 }
-                null -> error("type not set!")
             }
 
             result
