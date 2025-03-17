@@ -10,12 +10,14 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.navigation.fragment.navArgs
 import coil3.dispose
+import coil3.imageLoader
 import coil3.load
+import coil3.memory.MemoryCache
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentSaveForLaterBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.humanReadableByteCountSi
+import com.idunnololz.summit.util.PrettyPrintUtils.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
 import com.idunnololz.summit.util.tsToShortDate
 import dagger.hilt.android.AndroidEntryPoint
@@ -92,9 +94,12 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
 
             saveForLaterManager.getSlotFiles().withIndex().forEach { (index, file) ->
                 val b = SaveSlotBinding.inflate(inflater, slotsContainer, false)
+                val memoryCacheKey = "summit._slot_${index}"
 
                 if (file.exists()) {
-                    b.preview.load(file)
+                    b.preview.load(file) {
+                        memoryCacheKey(memoryCacheKey)
+                    }
                 } else {
                     b.preview.dispose()
                     b.preview.setImageDrawable(null)
@@ -103,7 +108,7 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
                 b.text.text = getString(R.string.slot_format, (index + 1).toString())
 
                 if (file.exists()) {
-                    b.subtitle.text = "${humanReadableByteCountSi(file.length())} - " +
+                    b.subtitle.text = "${ humanReadableByteCountSi(file.length()) } - " +
                         "${tsToShortDate(file.lastModified())}"
                 } else {
                     b.subtitle.text = getString(R.string.empty)
@@ -119,6 +124,7 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
                         }
                     }
                     dismiss()
+                    context.imageLoader.memoryCache?.remove(MemoryCache.Key(memoryCacheKey))
 
                     Toast.makeText(context, getString(R.string.image_saved), Toast.LENGTH_SHORT)
                         .show()

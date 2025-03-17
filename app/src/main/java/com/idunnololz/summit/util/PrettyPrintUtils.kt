@@ -5,7 +5,9 @@ import android.content.Context
 import android.icu.text.CompactDecimalFormat
 import android.os.Build
 import com.idunnololz.summit.R
+import java.text.CharacterIterator
 import java.text.NumberFormat
+import java.text.StringCharacterIterator
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -32,6 +34,20 @@ object PrettyPrintUtils {
         get() = NumberFormat.getPercentInstance().apply {
             maximumFractionDigits = 0
         }
+
+    fun humanReadableByteCountSi(bytes: Long): String {
+        var bytesLeft = bytes
+        if (-1000 < bytesLeft && bytesLeft < 1000) {
+            return "$bytesLeft B"
+        }
+        val ci: CharacterIterator = StringCharacterIterator("kMGTPE")
+        while (bytesLeft <= -999950 || bytesLeft >= 999950) {
+            bytesLeft /= 1000
+            ci.next()
+        }
+        return String.format(Locale.US, "%.1f %cB", bytesLeft / 1000.0, ci.current())
+    }
+
 }
 
 private const val SECOND_MILLIS: Long = 1000
