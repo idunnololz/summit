@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
@@ -18,16 +17,15 @@ import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runInterruptible
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 
 @HiltViewModel
 class ExportSettingsViewModel @Inject constructor(
@@ -86,7 +84,7 @@ class ExportSettingsViewModel @Inject constructor(
 
     fun saveToInternalBackups(
         backupConfig: BackupConfig,
-        backupName: String = "settings_backup_%datetime%"
+        backupName: String = "settings_backup_%datetime%",
     ) {
         viewModelScope.launch {
             val file = settingsBackupManager.saveBackup(generateCode(backupConfig), backupName)
@@ -136,7 +134,7 @@ class ExportSettingsViewModel @Inject constructor(
                 KEY_DATABASE_MAIN,
                 JSONObject().apply {
                     put("db_1", Utils.compress(byteArr, Base64.NO_WRAP))
-                }
+                },
             )
 
             tempDb.delete()

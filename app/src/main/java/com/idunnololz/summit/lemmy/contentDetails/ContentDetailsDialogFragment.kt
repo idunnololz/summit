@@ -35,8 +35,8 @@ import com.idunnololz.summit.util.dateStringToFullDateTime
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
+import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
 @AndroidEntryPoint
@@ -213,15 +213,18 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                             when (menuItem.itemId) {
                                 R.id.copy -> {
-                                    Utils.copyToClipboard(context, Gson().toJson(
-                                        args.postView
-                                            ?: args.commentView
-                                    ))
+                                    Utils.copyToClipboard(
+                                        context,
+                                        Gson().toJson(
+                                            args.postView
+                                                ?: args.commentView,
+                                        ),
+                                    )
                                 }
                             }
                             return true
                         }
-                    }
+                    },
                 )
             }
 

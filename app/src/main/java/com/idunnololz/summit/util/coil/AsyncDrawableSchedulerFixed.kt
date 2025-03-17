@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import android.os.Looper
 import android.os.SystemClock
 import android.text.Spannable
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.idunnololz.summit.R

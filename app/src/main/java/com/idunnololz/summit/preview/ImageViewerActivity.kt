@@ -13,13 +13,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
-import android.webkit.MimeTypeMap
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navArgs
 import coil3.Image
 import coil3.asDrawable
@@ -41,8 +41,6 @@ import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.scrape.ImgurWebsiteAdapter
-import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
@@ -50,6 +48,7 @@ import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.InsetsHelper
 import com.idunnololz.summit.util.InsetsProvider
+import com.idunnololz.summit.util.LinkFetcher
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.Size
@@ -57,6 +56,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.ext.showAboveCutout
+import com.idunnololz.summit.util.imgur.ImgurPageParser
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,6 +64,7 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ImageViewerActivity :
@@ -92,8 +93,6 @@ class ImageViewerActivity :
     private lateinit var fileName: String
     private var mimeType: String? = null
 
-    private var websiteAdapterLoader: WebsiteAdapterLoader? = null
-
     private lateinit var binding: FragmentImageViewerBinding
 
     @Inject
@@ -104,6 +103,9 @@ class ImageViewerActivity :
 
     @Inject
     lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var linkFetcher: LinkFetcher
 
     override val context: Context
         get() = this
@@ -441,7 +443,6 @@ class ImageViewerActivity :
     override fun onDestroy() {
         offlineManager.cancelFetch(binding.root)
         showSystemUI()
-        websiteAdapterLoader?.destroy()
         super.onDestroy()
     }
 
@@ -458,30 +459,29 @@ class ImageViewerActivity :
         ) {
             binding.progressBar.visibility = View.VISIBLE
 
-            websiteAdapterLoader = WebsiteAdapterLoader().apply {
-                add(ImgurWebsiteAdapter(url), url, Utils.hashSha256(url))
-                setOnEachAdapterLoadedListener a@{
-                    if (it is ImgurWebsiteAdapter) {
-                        val rootView = binding.root
+            lifecycleScope.launch {
+                val html = linkFetcher.downloadSite(url)
+                val previewInfo = ImgurPageParser().parsePage(url, html)
 
-                        rootView.post {
-                            binding.progressBar.visibility = View.GONE
+                val rootView = binding.root
 
-                            if (it.isSuccess()) {
-                                if (it.get().wasUrlRawGif) {
-                                    loadImage(url, forceLoadAsImage = true)
-                                } else {
-                                    loadImage(it.get().url)
-                                }
-                            } else {
-                                binding.loadingView.showDefaultErrorMessageFor(it.error)
+                rootView.post {
+                    binding.progressBar.visibility = View.GONE
 
-                                showUi()
-                            }
+                    if (previewInfo == null) {
+                        binding.loadingView.showDefaultErrorMessageFor(RuntimeException())
+
+                        showUi()
+                    } else {
+                        if (previewInfo.wasUrlRawGif) {
+                            loadImage(url, forceLoadAsImage = true)
+                        } else {
+                            loadImage(previewInfo.url)
                         }
                     }
                 }
-            }.load()
+            }
+
             return
         }
 

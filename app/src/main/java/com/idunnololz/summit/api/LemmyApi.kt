@@ -1,9 +1,5 @@
 package com.idunnololz.summit.api
 
-import android.content.Context
-import android.util.Log
-import com.idunnololz.summit.api.LemmyApiClient.Companion.API_VERSION
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.BanFromCommunity
@@ -85,20 +81,8 @@ import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SuccessResponse
-import com.idunnololz.summit.cache.CachePolicy
-import com.idunnololz.summit.cache.CachePolicyManager
-import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.ext.hasInternet
-import java.io.File
-import java.util.concurrent.TimeUnit
-import okhttp3.Cache
-import okhttp3.CacheControl
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -742,185 +726,8 @@ interface LemmyApi {
 
     companion object {
 
-        private val apis = mutableMapOf<String, LemmyApiWithSite>()
-
-        private var okHttpClient: OkHttpClient? = null
-
         internal const val CACHE_CONTROL_HEADER = "Cache-Control"
         internal const val CACHE_CONTROL_NO_CACHE = "no-cache"
-
-        fun getInstance(
-            context: Context,
-            cachePolicyManager: CachePolicyManager,
-            cacheDir: File,
-            instance: String = DEFAULT_INSTANCE,
-        ): LemmyApiWithSite {
-            return apis[instance]
-                ?: buildInstance(context, cachePolicyManager, cacheDir, instance).also {
-                    apis[instance] = it
-                }
-        }
-
-        fun okHttpClient(
-            context: Context,
-            cachePolicyManager: CachePolicyManager,
-            cacheDir: File,
-            userAgent: String = LinkUtils.USER_AGENT,
-        ) = okHttpClient
-            ?: getOkHttpClient(context, userAgent, cachePolicyManager, cacheDir).also {
-                okHttpClient = it
-            }
-
-        private fun buildInstance(
-            context: Context,
-            cachePolicyManager: CachePolicyManager,
-            cacheDir: File,
-            instance: String = DEFAULT_INSTANCE,
-            userAgent: String = LinkUtils.USER_AGENT,
-        ): LemmyApiWithSite {
-            return buildApi(context, instance, userAgent, cachePolicyManager, cacheDir)
-        }
-
-        internal fun getOkHttpClient(
-            context: Context,
-            userAgent: String,
-            cachePolicyManager: CachePolicyManager,
-            cacheDir: File,
-        ): OkHttpClient {
-            okHttpClient?.let {
-                return it
-            }
-
-            val loggingInterceptor = HttpLoggingInterceptor()
-            loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
-
-            val myCache = Cache(
-                directory = cacheDir,
-                maxSize = 20L * 1024L * 1024L, // 20MB
-            )
-            val okHttpClient = OkHttpClient.Builder()
-                // Specify the cache we created earlier.
-                .cache(myCache)
-                // Add an Interceptor to the OkHttpClient.
-                .addInterceptor a@{ chain ->
-                    // Get the request from the chain.
-                    var request = chain.request()
-
-                    val shouldUseCache =
-                        request.header(CACHE_CONTROL_HEADER) != CACHE_CONTROL_NO_CACHE
-                    if (!shouldUseCache) {
-                        Log.d(TAG, "headers: ${request.headers} url ${request.url}")
-                        return@a chain.proceed(request)
-                    }
-
-                    /*
-                     *  Leveraging the advantage of using Kotlin,
-                     *  we initialize the request and change its header depending on whether
-                     *  the device is connected to Internet or not.
-                     */
-                    val cachePolicy = cachePolicyManager.cachePolicy
-
-                    request = if (cachePolicy == CachePolicy.Minimum) {
-                        request
-                    } else if (context.hasInternet()) {
-                        val cacheControl = CacheControl.Builder()
-                            .apply {
-                                when (cachePolicy) {
-                                    CachePolicy.Aggressive -> {
-                                        maxStale(30, TimeUnit.MINUTES)
-                                    }
-                                    CachePolicy.Moderate -> {
-                                        maxStale(10, TimeUnit.MINUTES)
-                                    }
-                                    CachePolicy.Lite -> {
-                                        maxStale(5, TimeUnit.MINUTES)
-                                    }
-                                    CachePolicy.Minimum -> TODO()
-                                }
-                            }
-                            .build()
-                            /*
-                             *  If there is Internet, get the cache that was stored 5 seconds ago.
-                             *  If the cache is older than 5 seconds, then discard it,
-                             *  and indicate an error in fetching the response.
-                             *  The 'max-age' attribute is responsible for this behavior.
-                             */
-                        request.newBuilder()
-                            .header(
-                                CACHE_CONTROL_HEADER,
-                                cacheControl.toString(),
-                            )
-                            .removeHeader("Pragma")
-                            .build()
-                    } else {
-                        /*
-                         *  If there is no Internet, get the cache that was stored 7 days ago.
-                         *  If the cache is older than 7 days, then discard it,
-                         *  and indicate an error in fetching the response.
-                         *  The 'max-stale' attribute is responsible for this behavior.
-                         *  The 'only-if-cached' attribute indicates to not retrieve new data;
-                         *  fetch the cache only instead.
-                         */
-                        request.newBuilder()
-                            .cacheControl(CacheControl.FORCE_CACHE)
-                            .removeHeader("Pragma")
-                            .build()
-                    }
-                    // End of if-else statement
-
-                    Log.d(TAG, "headers: ${request.headers} url ${request.url}")
-
-                    // Add the modified request to the chain.
-                    val response = chain.proceed(request)
-
-                    Log.d(TAG, "header: ${request.headers}")
-                    Log.d(TAG, "Response 1 response:          $response")
-                    Log.d(
-                        TAG,
-                        "Response 1 cache response:    ${response.cacheResponse}",
-                    )
-                    Log.d(
-                        TAG,
-                        "Response 1 network response:  ${response.networkResponse}",
-                    )
-
-                    response
-                }
-                .addInterceptor { chain ->
-                    val requestBuilder = chain.request().newBuilder()
-                        .header("User-Agent", userAgent)
-                    val newRequest = requestBuilder.build()
-                    chain.proceed(newRequest)
-                }
-                .addInterceptor(loggingInterceptor)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .build()
-                .also {
-                    okHttpClient = it
-                }
-
-            return okHttpClient
-        }
-
-        private fun buildApi(
-            context: Context,
-            instance: String,
-            userAgent: String,
-            cachePolicyManager: CachePolicyManager,
-            cacheDir: File,
-        ): LemmyApiWithSite {
-            return LemmyApiWithSite(
-                Retrofit.Builder()
-                    .baseUrl("https://$instance/api/$API_VERSION/")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(getOkHttpClient(context, userAgent, cachePolicyManager, cacheDir))
-                    .build()
-                    .create(LemmyApi::class.java),
-                instance,
-            )
-        }
     }
 }
 

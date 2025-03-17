@@ -176,7 +176,11 @@ class SettingsWebViewModel @Inject constructor(
         }
     }
 
-    private fun updateValue(lemmyWebSettings: LemmyWebSettings, account: Account, data: GetSiteResponse) {
+    private fun updateValue(
+        lemmyWebSettings: LemmyWebSettings,
+        account: Account,
+        data: GetSiteResponse,
+    ) {
         val myUser = data.my_user ?: return
         val localUser = myUser.local_user_view.local_user
         val person = myUser.local_user_view.person

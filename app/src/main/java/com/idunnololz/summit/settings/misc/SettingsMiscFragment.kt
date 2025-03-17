@@ -1,6 +1,5 @@
 package com.idunnololz.summit.settings.misc
 
-import android.app.LocaleConfig
 import android.graphics.RectF
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,23 +8,21 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.LocaleManagerCompat
-import androidx.core.os.LocaleListCompat
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.newAlertDialogLauncher
+import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.databinding.FragmentSettingsMiscBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.preferences.DefaultAppPreference
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragment
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
@@ -35,16 +32,15 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.getLocaleListFromXml
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -62,6 +58,15 @@ class SettingsMiscFragment :
 
     @Inject
     lateinit var settings: MiscSettings
+
+    @Inject
+    lateinit var accountAwareLemmyClient: AccountAwareLemmyClient
+
+    private val restartAppDialogLauncher = newAlertDialogLauncher("restart_app") {
+        if (it.isOk) {
+            ProcessPhoenix.triggerRebirth(requireContext())
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -288,7 +293,7 @@ class SettingsMiscFragment :
         settings.communitySelectorShowCommunitySuggestions.bindTo(
             binding.communitySelectorShowCommunitySuggestions,
             { preferences.communitySelectorShowCommunitySuggestions },
-            { preferences.communitySelectorShowCommunitySuggestions = it }
+            { preferences.communitySelectorShowCommunitySuggestions = it },
         )
         binding.preferredLocale.apply {
             settings.preferredLocale.bindTo(this) {
@@ -305,6 +310,14 @@ class SettingsMiscFragment :
             desc.visibility = View.VISIBLE
             desc.text = localeText
         }
+        settings.userAgentChoice.bindTo(
+            binding.userAgentChoice,
+            { preferences.userAgentChoice },
+            { setting, currentValue ->
+                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+                    .showAllowingStateLoss(childFragmentManager, "userAgentChoice")
+            },
+        )
     }
 
     private fun convertThresholdMsToOptionId(warnReplyToOldContentThresholdMs: Long): Int {
@@ -375,6 +388,9 @@ class SettingsMiscFragment :
             }
             settings.animationLevel.id -> {
                 preferences.animationLevel = convertOptionIdToAnimationLevel(value as Int)
+            }
+            settings.userAgentChoice.id -> {
+                preferences.userAgentChoice = value as Int
             }
         }
 

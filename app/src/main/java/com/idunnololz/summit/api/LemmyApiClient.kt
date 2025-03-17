@@ -1,6 +1,5 @@
 package com.idunnololz.summit.api
 
-import android.content.Context
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.BuildConfig
@@ -115,15 +114,13 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
-import com.idunnololz.summit.cache.CachePolicyManager
+import com.idunnololz.summit.network.Api
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.util.DirectoryHelper
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.InputStream
 import java.io.InterruptedIOException
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -132,20 +129,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runInterruptible
 import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.Call
-import java.net.ConnectException
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 const val COMMENTS_DEPTH_MAX = 6
 
-class LemmyApiClient(
-    @ApplicationContext private val context: Context,
+class LemmyApiClient @Inject constructor(
     private val apiListenerManager: ApiListenerManager,
-    private val userAgent: String,
     private val preferences: Preferences,
-    private val cachePolicyManager: CachePolicyManager,
-    private val directoryHelper: DirectoryHelper,
+    @Api val okHttpClient: OkHttpClient,
 ) {
 
     companion object {
@@ -180,61 +176,35 @@ class LemmyApiClient(
             "sopuli.xyz",
             "szmer.info",
         )
+
+        private val apis = mutableMapOf<String, LemmyApiWithSite>()
     }
 
-    private var api = LemmyApi.getInstance(
-        context = context,
-        cachePolicyManager = cachePolicyManager,
+    private var api = getApiWithInstance(
         instance = preferences.guestAccountSettings?.instance
             ?: DEFAULT_INSTANCE,
-        cacheDir = directoryHelper.okHttpCacheDir,
-    )
-    val okHttpClient = LemmyApi.okHttpClient(
-        context = context,
-        cachePolicyManager = cachePolicyManager,
-        userAgent = userAgent,
-        cacheDir = directoryHelper.okHttpCacheDir,
     )
 
+    private val Account.bearer: String
+        get() = "Bearer $jwt"
+
+    private fun String.toBearer(): String = "Bearer $this"
+
     class Factory @Inject constructor(
-        @ApplicationContext private val context: Context,
         private val apiListenerManager: ApiListenerManager,
         private val preferences: Preferences,
-        private val cachePolicyManager: CachePolicyManager,
-        private val directoryHelper: DirectoryHelper,
+        @Api private val okHttpClient: OkHttpClient,
     ) {
         fun create() = LemmyApiClient(
-            context = context,
             apiListenerManager = apiListenerManager,
             preferences = preferences,
-            cachePolicyManager = cachePolicyManager,
-            directoryHelper = directoryHelper,
+            okHttpClient = okHttpClient,
         )
     }
 
-    @Inject constructor(
-        @ApplicationContext context: Context,
-        apiListenerManager: ApiListenerManager,
-        preferences: Preferences,
-        cachePolicyManager: CachePolicyManager,
-        directoryHelper: DirectoryHelper,
-    ) : this(
-        context = context,
-        apiListenerManager = apiListenerManager,
-        userAgent = LinkUtils.USER_AGENT,
-        preferences = preferences,
-        cachePolicyManager = cachePolicyManager,
-        directoryHelper = directoryHelper,
-    )
-
     fun changeInstance(newInstance: String) {
         try {
-            api = LemmyApi.getInstance(
-                context = context,
-                cachePolicyManager = cachePolicyManager,
-                instance = newInstance,
-                cacheDir = directoryHelper.okHttpCacheDir,
-            )
+            api = getApiWithInstance(instance = newInstance)
 
             instanceFlow.value = api.instance
         } catch (e: Exception) {
@@ -242,13 +212,14 @@ class LemmyApiClient(
         }
     }
 
+    fun refreshClient() {
+        api = getApiWithInstance(instance = instance)
+    }
+
     fun defaultInstance() {
-        api = LemmyApi.getInstance(
-            context = context,
-            cachePolicyManager = cachePolicyManager,
+        api = getApiWithInstance(
             instance = preferences.guestAccountSettings?.instance
                 ?: DEFAULT_INSTANCE,
-            cacheDir = directoryHelper.okHttpCacheDir,
         )
 
         instanceFlow.value = api.instance
@@ -1987,7 +1958,7 @@ class LemmyApiClient(
     val instance: String
         get() = instanceFlow.value
 
-    val instanceFlow = MutableStateFlow<String>(api.instance)
+    val instanceFlow = MutableStateFlow(api.instance)
 
     private suspend fun <T> retrofitErrorHandler(call: () -> Call<T>): Result<T> {
         val res = try {
@@ -2070,6 +2041,10 @@ class LemmyApiClient(
                 return Result.failure(NewApiException("v0.19"))
             }
 
+            if (errorCode == 403) {
+                return Result.failure(ForbiddenException())
+            }
+
             if (BuildConfig.DEBUG) {
                 Log.e(
                     "ApiError",
@@ -2090,10 +2065,24 @@ class LemmyApiClient(
         }
     }
 
-    private val Account.bearer: String
-        get() = "Bearer $jwt"
+    private fun getApiWithInstance(instance: String = DEFAULT_INSTANCE): LemmyApiWithSite {
+        return apis[instance]
+            ?: newApi(instance).also {
+                apis[instance] = it
+            }
+    }
 
-    private fun String.toBearer(): String = "Bearer $this"
+    private fun newApi(instance: String = DEFAULT_INSTANCE): LemmyApiWithSite {
+        return LemmyApiWithSite(
+            Retrofit.Builder()
+                .baseUrl("https://$instance/api/$API_VERSION/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build()
+                .create(LemmyApi::class.java),
+            instance,
+        )
+    }
 }
 
 class UploadImageResult(

@@ -1,17 +1,16 @@
 package com.idunnololz.summit.settings.backupAndRestore
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.idunnololz.summit.db.raw.DbHelper
 import com.idunnololz.summit.db.MainDatabase
+import com.idunnololz.summit.db.raw.DbHelper
 import com.idunnololz.summit.db.raw.TableInfo
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ViewCurrentSettingsViewModel @Inject constructor(
@@ -31,7 +30,7 @@ class ViewCurrentSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val dbHelper = DbHelper(
                 mainDatabase.openHelper.readableDatabase,
-                shouldClose = false
+                shouldClose = false,
             )
 
             val currentSettingsJson = preferences.asJson()
@@ -49,8 +48,6 @@ class ViewCurrentSettingsViewModel @Inject constructor(
                 .associateWith { (currentSettingsJson.opt(it)?.toString() ?: "null") }
             val keyToType = currentSettingsJson.keys().asSequence()
                 .associateWith { (currentSettingsJson.opt(it)?.javaClass?.simpleName ?: "?") }
-
-
 
             val tableNames = dbHelper.getTableNames()
 //            val systemTableNames = setOf(

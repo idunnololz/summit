@@ -2,21 +2,18 @@ package com.idunnololz.summit.db.preview
 
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
-import androidx.core.database.getIntOrNull
 import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.db.raw.DbHelper
 import com.idunnololz.summit.db.raw.TableRow
 import com.idunnololz.summit.util.StatefulLiveData
-import com.idunnololz.summit.util.getStringOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
-class TableDetailsViewModel @Inject constructor(
-) : ViewModel() {
+class TableDetailsViewModel @Inject constructor() : ViewModel() {
 
     data class Model(
         val tableName: String,
@@ -32,7 +29,7 @@ class TableDetailsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val dbHelper = DbHelper(
-                SQLiteDatabase.openDatabase(dbUri.toFile().path, null, 0)
+                SQLiteDatabase.openDatabase(dbUri.toFile().path, null, 0),
             )
 
             val rowCount = dbHelper.getTableRowCount(tableName)
@@ -44,7 +41,7 @@ class TableDetailsViewModel @Inject constructor(
                     rowCount = rowCount,
                     columnNames = fullTable.columnNames,
                     rows = fullTable.tableRows,
-                )
+                ),
             )
 
             dbHelper.close()

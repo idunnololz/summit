@@ -22,7 +22,6 @@ import com.idunnololz.summit.databinding.ItemTableFooterBinding
 import com.idunnololz.summit.databinding.ItemTableHeaderBinding
 import com.idunnololz.summit.databinding.ItemTableRowBinding
 import com.idunnololz.summit.databinding.ItemTableRowHeaderBinding
-import com.idunnololz.summit.db.raw.TableInfo
 import com.idunnololz.summit.db.raw.TableRow
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -66,8 +65,13 @@ class TableDetailsDialogFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentTableDetailsBinding.inflate(
-            inflater, container, false))
+        setBinding(
+            DialogFragmentTableDetailsBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }
@@ -125,11 +129,11 @@ class TableDetailsDialogFragment :
             ) : Item
 
             data class RowHeaderItem(
-                val columnNames: List<String>
+                val columnNames: List<String>,
             ) : Item
 
             data class RowItem(
-                val tableRow: TableRow
+                val tableRow: TableRow,
             ) : Item
 
             data object FooterItem : Item
@@ -137,25 +141,32 @@ class TableDetailsDialogFragment :
 
         private var data: TableDetailsViewModel.Model? = null
 
-        private val rowOddColor = context.getColorFromAttribute(com.google.android.material.R.attr.colorSurfaceContainerHigh)
-        private val rowEvenColor = context.getColorFromAttribute(com.google.android.material.R.attr.colorSurfaceContainerLow)
+        private val rowOddColor = context.getColorFromAttribute(
+            com.google.android.material.R.attr.colorSurfaceContainerHigh,
+        )
+        private val rowEvenColor = context.getColorFromAttribute(
+            com.google.android.material.R.attr.colorSurfaceContainerLow,
+        )
 
         private val adapterHelper = AdapterHelper<Item>(
             areItemsTheSame = { old, new ->
-                old::class == new::class && when(old) {
+                old::class == new::class && when (old) {
                     is Item.HeaderItem -> true
                     is Item.RowHeaderItem -> true
                     is Item.RowItem ->
                         old.tableRow.primaryKey == (new as Item.RowItem).tableRow.primaryKey
                     Item.FooterItem -> true
                 }
-            }
+            },
         ).apply {
             addItemType(Item.HeaderItem::class, ItemTableHeaderBinding::inflate) { item, b, h ->
                 b.tableName.text = item.tableName
                 b.rowCount.text = PrettyPrintUtils.defaultDecimalFormat.format(item.rowCount)
             }
-            addItemType(Item.RowHeaderItem::class, ItemTableRowHeaderBinding::inflate) { item, b, h ->
+            addItemType(
+                Item.RowHeaderItem::class,
+                ItemTableRowHeaderBinding::inflate,
+            ) { item, b, h ->
                 if (b.root.childCount != item.columnNames.size) {
                     b.root.removeAllViews()
 
@@ -215,24 +226,23 @@ class TableDetailsDialogFragment :
             }
         }
 
-        private fun newColumnTextView(context: Context) =
-            AppCompatTextView(
-                context,
-                null,
-                com.google.android.material.R.attr.textAppearanceBodySmall
+        private fun newColumnTextView(context: Context) = AppCompatTextView(
+            context,
+            null,
+            com.google.android.material.R.attr.textAppearanceBodySmall,
+        ).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LayoutParams.WRAP_CONTENT,
             ).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topMargin = Utils.convertDpToPixel(4f).toInt()
-                    bottomMargin = Utils.convertDpToPixel(4f).toInt()
-                    marginStart = Utils.convertDpToPixel(4f).toInt()
-                    marginStart = Utils.convertDpToPixel(4f).toInt()
-                    marginEnd = Utils.convertDpToPixel(4f).toInt()
-                    weight = 1f
-                }
+                topMargin = Utils.convertDpToPixel(4f).toInt()
+                bottomMargin = Utils.convertDpToPixel(4f).toInt()
+                marginStart = Utils.convertDpToPixel(4f).toInt()
+                marginStart = Utils.convertDpToPixel(4f).toInt()
+                marginEnd = Utils.convertDpToPixel(4f).toInt()
+                weight = 1f
             }
+        }
 
         override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
@@ -242,8 +252,7 @@ class TableDetailsDialogFragment :
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         fun setData(data: TableDetailsViewModel.Model) {
             this.data = data

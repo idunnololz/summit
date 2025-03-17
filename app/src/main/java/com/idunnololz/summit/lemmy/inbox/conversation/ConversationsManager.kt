@@ -1,9 +1,7 @@
 package com.idunnololz.summit.lemmy.inbox.conversation
 
-import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.BuildConfig
-import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
@@ -18,7 +16,6 @@ import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.lemmy.utils.stateStorage.AccountStateStorage
 import com.idunnololz.summit.lemmy.utils.stateStorage.StateStorageManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min

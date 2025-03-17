@@ -31,8 +31,13 @@ class ScreenshotSettingsDialogFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentScreenshotSettingsBinding.inflate(
-            inflater, container, false))
+        setBinding(
+            DialogFragmentScreenshotSettingsBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }

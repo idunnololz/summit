@@ -19,6 +19,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_DATABASE_MAIN
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +27,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import java.io.File
 
 @HiltViewModel
 class ImportSettingsViewModel @Inject constructor(
@@ -224,7 +224,6 @@ class ImportSettingsViewModel @Inject constructor(
                     }
                 }
             }
-
         }
 
         tempDatabase.close()
@@ -389,7 +388,7 @@ class ImportSettingsViewModel @Inject constructor(
 
     fun confirmImport(
         excludeKeys: MutableSet<String>,
-        tableResolutions: Map<String, SettingDataAdapter.ImportTableResolution>
+        tableResolutions: Map<String, SettingDataAdapter.ImportTableResolution>,
     ) {
         val currentState = state.value as? State.ConfirmImportSettings
             ?: return

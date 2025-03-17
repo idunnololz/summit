@@ -1,15 +1,11 @@
 package com.idunnololz.summit.settings.defaultApps
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.registerForActivityResult
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsDefaultAppsBinding
 import com.idunnololz.summit.preferences.DefaultAppPreference
@@ -60,7 +56,8 @@ class SettingsDefaultAppsFragment :
             viewLifecycleOwner,
         ) { _, result ->
             val result = result.getParcelableCompat<ChooseDefaultAppBottomSheetFragment.Result>(
-                ChooseDefaultAppBottomSheetFragment.RESULT_KEY)
+                ChooseDefaultAppBottomSheetFragment.RESULT_KEY,
+            )
 
             if (result != null) {
                 if (result.selectedApp != null) {

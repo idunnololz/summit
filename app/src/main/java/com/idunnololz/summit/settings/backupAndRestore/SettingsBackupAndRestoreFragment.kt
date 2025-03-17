@@ -115,7 +115,7 @@ class SettingsBackupAndRestoreFragment :
                     backupConfig = ExportSettingsViewModel.BackupConfig(
                         backupOption = ExportSettingsViewModel.BackupOption.SaveInternal,
                         includeDatabase = true,
-                    )
+                    ),
                 )
                 exportSettingsViewModel.resetSettings()
 

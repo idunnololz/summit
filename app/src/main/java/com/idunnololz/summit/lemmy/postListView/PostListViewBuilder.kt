@@ -1073,7 +1073,7 @@ class PostListViewBuilder @Inject constructor(
                 LemmyTextHelper.bindText(
                     title,
                     if (postTitle.isNotEmpty() && postTitle[0] == '#') {
-                        "\\${postTitle}"
+                        "\\$postTitle"
                     } else {
                         postTitle
                     },

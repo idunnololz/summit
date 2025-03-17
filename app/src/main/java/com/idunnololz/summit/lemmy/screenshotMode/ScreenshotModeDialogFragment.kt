@@ -3,9 +3,6 @@ package com.idunnololz.summit.lemmy.screenshotMode
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -38,7 +35,6 @@ import com.idunnololz.summit.lemmy.screenshotMode.record.RecordScreenshotDialogF
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ScreenshotWatermarkId
-import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FileSizeUtils
@@ -358,7 +354,9 @@ class ScreenshotModeDialogFragment :
                                 val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
                                     .format(Date())
                                 viewModel.generateImageToSave(
-                                    infographicsView, "post_screenshot_$ts")
+                                    infographicsView,
+                                    "post_screenshot_$ts",
+                                )
                             }
                         }
                         R.id.share -> {
@@ -367,7 +365,9 @@ class ScreenshotModeDialogFragment :
                                 val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
                                     .format(Date())
                                 viewModel.generateImageToShare(
-                                    infographicsView, "post_screenshot_$ts")
+                                    infographicsView,
+                                    "post_screenshot_$ts",
+                                )
                             }
                         }
                     }

@@ -74,7 +74,9 @@ class LemmySwipeActionCallback(
                     makeMovementFlags(0, ItemTouchHelper.RIGHT)
                 GestureSwipeDirectionIds.ANY ->
                     makeMovementFlags(
-                        0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
+                        0,
+                        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+                    )
 //                GestureSwipeDirectionIds.LEFT,
                 else ->
                     makeMovementFlags(0, ItemTouchHelper.LEFT)

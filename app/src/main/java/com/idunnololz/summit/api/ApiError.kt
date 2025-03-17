@@ -26,6 +26,8 @@ class NewApiException(val minVersion: String) : ClientApiException(
     400,
 )
 
+class ForbiddenException : ClientApiException("Rate limit timed out.", 403)
+
 /**
  * This is 99% a server error. For client side timeout errors, use a different error.
  */

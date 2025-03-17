@@ -17,9 +17,7 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AdvancedLink
-import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.LinkUtils

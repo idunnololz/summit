@@ -61,7 +61,7 @@ object Utils {
 
     const val ANIMATION_DURATION_MS: Long = 300
 
-    val displayMetrics = Resources.getSystem().displayMetrics
+    val displayMetrics: DisplayMetrics = Resources.getSystem().displayMetrics
 
     val gson: Gson by lazy {
         GsonBuilder()
@@ -180,11 +180,7 @@ object Utils {
 
     var openExternalLinksInBrowser = false
     var defaultWebApp: DefaultAppPreference? = null
-    fun openExternalLink(
-        context: Context,
-        url: String,
-        openNewIncognitoTab: Boolean = false,
-    ) {
+    fun openExternalLink(context: Context, url: String, openNewIncognitoTab: Boolean = false) {
         val defaultAppPackage = defaultWebApp?.packageName
         if (defaultAppPackage != null) {
             val componentName = defaultWebApp?.componentName
@@ -195,13 +191,13 @@ object Utils {
 //                            "org.mozilla.firefox","org.mozilla.fenix.IntentReceiverActivity"))
 //                    }
 //                } else
-                    if (componentName != null) {
+                if (componentName != null) {
                     Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
                         setComponent(
                             ComponentName(
                                 defaultAppPackage,
                                 componentName,
-                            )
+                            ),
                         )
                     }
                 } else {

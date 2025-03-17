@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceBodyMedium"
         android:layout_marginHorizontal="@dimen/dialog_padding"
-        android:layout_marginVertical="@dimen/padding"
+        android:layout_marginVertical="@dimen/padding_half"
         android:singleLine="true"
         android:maxLines="1"
         android:ellipsize="end"

@@ -8,6 +8,7 @@ import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.ConnectionException
 import com.idunnololz.summit.api.CouldntFindObjectError
+import com.idunnololz.summit.api.ForbiddenException
 import com.idunnololz.summit.api.GetNetworkException
 import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NewApiException
@@ -19,15 +20,11 @@ import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.NoModeratedCommunitiesException
-import com.idunnololz.summit.scrape.LoaderException
-import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 
 private const val TAG = "ErrorUtils"
 
 fun Throwable.toErrorMessage(context: Context): String {
     return when (val t = this) {
-        is LoaderException ->
-            context.getString(WebsiteAdapterLoader.getDefaultErrorMessageFor(t.errorCode))
         is ApiException ->
             when (t) {
                 is ClientApiException -> {
@@ -55,6 +52,10 @@ fun Throwable.toErrorMessage(context: Context): String {
 
                         is RateLimitException -> {
                             context.getString(R.string.too_many_requests)
+                        }
+
+                        is ForbiddenException -> {
+                            context.getString(R.string.error_network_forbidden)
                         }
 
                         else -> {

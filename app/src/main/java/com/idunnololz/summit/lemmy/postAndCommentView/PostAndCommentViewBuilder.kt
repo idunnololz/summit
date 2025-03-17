@@ -381,7 +381,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             LemmyTextHelper.bindText(
                 textView = title,
                 text = if (postTitle.isNotEmpty() && postTitle[0] == '#') {
-                    "\\${postTitle}"
+                    "\\$postTitle"
                 } else {
                     postTitle
                 },

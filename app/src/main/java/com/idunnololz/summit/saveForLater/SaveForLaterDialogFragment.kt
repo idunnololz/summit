@@ -94,7 +94,7 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
 
             saveForLaterManager.getSlotFiles().withIndex().forEach { (index, file) ->
                 val b = SaveSlotBinding.inflate(inflater, slotsContainer, false)
-                val memoryCacheKey = "summit._slot_${index}"
+                val memoryCacheKey = "summit._slot_$index"
 
                 if (file.exists()) {
                     b.preview.load(file) {

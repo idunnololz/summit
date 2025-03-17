@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.AllSettings
-import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.settings.backupAndRestore.Diff
 import com.idunnololz.summit.settings.backupAndRestore.DiffType
 import com.idunnololz.summit.util.StatefulLiveData

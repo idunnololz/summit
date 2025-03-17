@@ -2016,6 +2016,15 @@
     <string name="import_table_strategy_overwrite">Overwrite</string>
     <string name="import_table_strategy_ignore">Ignore</string>
     <string name="error_connection">Unable to reach server. There maybe a problem with the server or your internet connection.</string>
+    <string name="error_network_forbidden">Forbidden. The server understood the request but is refusing to fulfill it.</string>
+    <string name="user_agent_choice">Client user-agent</string>
+    <string name="user_agent_choice_desc">Adjust the user-agent used by the app. User-agents are client identifiers used when making network calls. These are often used by servers to distinguish where traffic is coming from. Historically Summit has used a \"Mozilla\" user-agent which tends to be fine for things hoping to be identified as browsers however it\'s not good for API clients which Summit is.</string>
+    <string name="let_the_app_decide">Let the app decide</string>
+    <string name="use_legacy_user_agent">Use legacy user-agent</string>
+    <string name="use_test_user_agent">Use test user-agent</string>
+    <string name="use_test_user_agent_2">User test user-agent 2</string>
+    <string name="use_okhttp">Use okhttp</string>
+    <string name="use_flutter">Use flutter</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

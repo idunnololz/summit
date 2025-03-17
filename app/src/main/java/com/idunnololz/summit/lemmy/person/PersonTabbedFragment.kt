@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
@@ -500,20 +499,22 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
             cakeDate.visibility = View.VISIBLE
 
-
             val personCreationTs = dateStringToTs(person.published)
             val isPersonNew =
                 System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
             body.text = buildSpannedString {
                 if (isPersonNew) {
                     val s = length
-                    append(context.getString(
-                        R.string.new_account_desc_format, tsToConcise(context, person.published)))
+                    append(
+                        context.getString(
+                            R.string.new_account_desc_format, tsToConcise(context, person.published),
+                        ),
+                    )
                     val e = length
                     setSpan(
                         RoundedBackgroundSpan(
                             backgroundColor = context.getColorCompat(R.color.style_amber),
-                            textColor = context.getColorCompat(R.color.black97)
+                            textColor = context.getColorCompat(R.color.black97),
                         ),
                         s,
                         e,
