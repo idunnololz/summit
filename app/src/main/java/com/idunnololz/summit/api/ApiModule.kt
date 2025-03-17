@@ -1,14 +1,10 @@
 package com.idunnololz.summit.api
 
-import android.content.Context
-import com.idunnololz.summit.BuildConfig
-import com.idunnololz.summit.api.LemmyApi.Companion.getOkHttpClient
-import com.idunnololz.summit.cache.CachePolicyManager
+import com.idunnololz.summit.util.ClientFactory
 import com.idunnololz.summit.util.DirectoryHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
@@ -22,8 +18,7 @@ class ApiModule {
     @Provides
     @Singleton
     fun provideSummitServerApi(
-        @ApplicationContext context: Context,
-        cachePolicyManager: CachePolicyManager,
+        clientFactory: ClientFactory,
         directoryHelper: DirectoryHelper,
         json: Json,
     ): SummitServerApi {
@@ -35,11 +30,10 @@ class ApiModule {
                 ),
             )
             .client(
-                getOkHttpClient(
-                    context = context,
-                    userAgent = "Summit / ${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID}",
-                    cachePolicyManager = cachePolicyManager,
-                    cacheDir = directoryHelper.okHttpCacheDir,
+                clientFactory.newClient(
+                    "SummitApi",
+                    directoryHelper.okHttpCacheDir,
+                    ClientFactory.Purpose.SummitApiClient,
                 ),
             )
             .build()

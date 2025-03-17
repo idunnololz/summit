@@ -15,6 +15,7 @@ import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
+import com.idunnololz.summit.preferences.UserAgentChoiceIds
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
@@ -123,9 +124,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
 import com.idunnololz.summit.util.PrettyPrintUtils
 import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 sealed interface SearchableSettings {
@@ -1281,7 +1280,6 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
         relatedKeys = listOf(KEY_POST_FULL_BLEED_IMAGE),
     )
 
-
     val commentsThreadStyle = RadioGroupSettingItem(
         null,
         context.getString(R.string.comments_thread_style),
@@ -2047,19 +2045,65 @@ class MiscSettings @Inject constructor(
         null,
         context.getString(R.string.show_new_person_tag),
         context.getString(R.string.show_new_person_tag_desc),
-        relatedKeys = listOf(KEY_WARN_NEW_PERSON)
+        relatedKeys = listOf(KEY_WARN_NEW_PERSON),
     )
     val preferredLocale = BasicSettingItem(
         null,
         context.getString(R.string.preferred_locale),
         null,
-        relatedKeys = listOf(KEY_PREFERRED_LOCALE)
+        relatedKeys = listOf(KEY_PREFERRED_LOCALE),
     )
     val communitySelectorShowCommunitySuggestions = OnOffSettingItem(
         null,
         context.getString(R.string.show_community_suggestions_in_community_selector),
         context.getString(R.string.show_community_suggestions_in_community_selector_desc),
-        relatedKeys = listOf(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS)
+        relatedKeys = listOf(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS),
+    )
+    val userAgentChoice = RadioGroupSettingItem(
+        null,
+        context.getString(R.string.user_agent_choice),
+        context.getString(R.string.user_agent_choice_desc),
+        listOf(
+            RadioGroupSettingItem.RadioGroupOption(
+                UserAgentChoiceIds.UNSET,
+                context.getString(R.string.let_the_app_decide),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                UserAgentChoiceIds.LEGACY_USER_AGENT,
+                context.getString(R.string.use_legacy_user_agent),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                UserAgentChoiceIds.NEW_USER_AGENT,
+                context.getString(R.string.use_test_user_agent),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                UserAgentChoiceIds.NEW_USER_AGENT_2,
+                context.getString(R.string.use_test_user_agent_2),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                UserAgentChoiceIds.OKHTTP_USER_AGENT,
+                context.getString(R.string.use_okhttp),
+                null,
+                null,
+            ),
+            RadioGroupSettingItem.RadioGroupOption(
+                UserAgentChoiceIds.FLUTTER_USER_AGENT,
+                context.getString(R.string.use_flutter),
+                null,
+                null,
+            ),
+        ),
+        relatedKeys = listOf(
+            KEY_ANIMATION_LEVEL,
+        ),
     )
 
     override val allSettings: List<SettingItem> = listOf(

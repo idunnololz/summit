@@ -6,7 +6,6 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.dagger.json
 
 object LinkResolver {

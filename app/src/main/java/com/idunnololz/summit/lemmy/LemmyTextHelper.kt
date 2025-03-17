@@ -38,7 +38,6 @@ import io.noties.markwon.html.span.SuperScriptSpan
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
 import java.util.Locale
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 import org.commonmark.parser.Parser
 

@@ -22,7 +22,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentChooseSavedImageBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9

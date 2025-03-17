@@ -76,8 +76,10 @@ class SettingDataAdapter(
         ) { item, b, h ->
             b.icon.setImageResource(R.drawable.outline_backup_table_24)
             b.settingKey.text = item.tableName
-            b.settingValue.text = context.getString(R.string.row_count_format,
-                PrettyPrintUtils.defaultDecimalFormat.format(item.rowCount))
+            b.settingValue.text = context.getString(
+                R.string.row_count_format,
+                PrettyPrintUtils.defaultDecimalFormat.format(item.rowCount),
+            )
 
             if (isImporting) {
                 b.resolution.visibility = View.VISIBLE
@@ -100,19 +102,19 @@ class SettingDataAdapter(
                             0,
                             R.id.import_table_strategy_merge,
                             0,
-                            R.string.import_table_strategy_merge
+                            R.string.import_table_strategy_merge,
                         )
                         menu.add(
                             0,
                             R.id.import_table_strategy_overwrite,
                             0,
-                            R.string.import_table_strategy_overwrite
+                            R.string.import_table_strategy_overwrite,
                         )
                         menu.add(
                             0,
                             R.id.import_table_strategy_ignore,
                             0,
-                            R.string.import_table_strategy_ignore
+                            R.string.import_table_strategy_ignore,
                         )
 
                         setOnMenuItemClickListener {
@@ -221,7 +223,7 @@ class SettingDataAdapter(
                 rowCount = it.value.rowCount,
                 resolution = tableResolutions.getOrPut(it.value.tableName) {
                     ImportTableResolution.Merge
-                }
+                },
             )
         }
         newData.settingsPreview.mapTo(newItems) {

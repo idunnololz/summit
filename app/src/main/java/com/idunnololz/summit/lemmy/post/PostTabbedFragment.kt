@@ -22,7 +22,6 @@ import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -53,8 +52,7 @@ class PostTabbedFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fun getViewModel() =
-            (parentFragment as? CommunityFragment)?.viewModel
+        fun getViewModel() = (parentFragment as? CommunityFragment)?.viewModel
 
         val context = requireContext()
 
@@ -104,7 +102,8 @@ class PostTabbedFragment :
                     is StatefulData.Loading -> {}
                     is StatefulData.NotStarted -> {}
                     is StatefulData.Error,
-                    is StatefulData.Success -> {
+                    is StatefulData.Success,
+                    -> {
                         val position = viewPager.currentItem
                         pagerAdapter.setPages(getViewModel()?.postListEngine?.items ?: listOf())
                         viewPager.runPredrawDiscardingFrame {
@@ -136,7 +135,7 @@ class PostTabbedFragment :
 
             data class AutoLoadItem(
                 override val id: Long,
-                val pageToLoad: Int
+                val pageToLoad: Int,
             ) : Item
         }
 

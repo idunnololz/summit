@@ -223,10 +223,9 @@ class ExportSettingsDialogFragment :
     private fun getBackupConfig(
         backupOption: ExportSettingsViewModel.BackupOption,
         dest: Uri? = null,
-    ) =
-        ExportSettingsViewModel.BackupConfig(
-            backupOption = backupOption,
-            includeDatabase = binding.cbIncludeDatabase.isChecked,
-            dest = dest,
-        )
+    ) = ExportSettingsViewModel.BackupConfig(
+        backupOption = backupOption,
+        includeDatabase = binding.cbIncludeDatabase.isChecked,
+        dest = dest,
+    )
 }

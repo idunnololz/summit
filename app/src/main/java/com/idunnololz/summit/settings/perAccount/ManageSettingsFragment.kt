@@ -40,6 +40,7 @@ class ManageSettingsFragment :
 
     @Inject
     lateinit var allSettings: AllSettings
+
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 

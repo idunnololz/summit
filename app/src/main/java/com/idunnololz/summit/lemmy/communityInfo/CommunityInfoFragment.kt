@@ -560,7 +560,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     }
                     R.id.share -> {
                         val url = LinkUtils.getLinkForCommunity(
-                            communityView.community.toCommunityRef())
+                            communityView.community.toCommunityRef(),
+                        )
                         Utils.shareLink(context, url)
                     }
                     R.id.block_community -> {

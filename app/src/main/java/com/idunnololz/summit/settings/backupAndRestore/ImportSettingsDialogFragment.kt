@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.BackupItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentImportSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingsFromBackupsBinding
@@ -38,8 +38,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ImportSettingsDialogFragment :
     BaseDialogFragment<DialogFragmentImportSettingsBinding>(),
-    FullscreenDialogFragment,
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+    FullscreenDialogFragment {
 
     companion object {
 
@@ -63,6 +62,14 @@ class ImportSettingsDialogFragment :
                 viewModel.generatePreviewFromFile(uri)
             }
         }
+
+    private val restartAppDialogLauncher = newAlertDialogLauncher("restart_required") {
+        if (it.isOk) {
+            ProcessPhoenix.triggerRebirth(requireContext())
+        } else {
+            dismiss()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,12 +173,12 @@ class ImportSettingsDialogFragment :
                     }
                     ImportSettingsViewModel.State.NotStarted -> {}
                     ImportSettingsViewModel.State.ImportSettingsCompleted -> {
-                        OldAlertDialogFragment.Builder()
-                            .setTitle(R.string.app_restart_required)
-                            .setMessage(R.string.app_restart_required_desc)
-                            .setPositiveButton(R.string.restart_app)
-                            .setNegativeButton(R.string.restart_later)
-                            .createAndShow(childFragmentManager, "restart_required")
+                        restartAppDialogLauncher.launchDialog {
+                            titleResId = R.string.app_restart_required
+                            messageResId = R.string.app_restart_required_desc
+                            positionButtonResId = R.string.restart_app
+                            negativeButtonResId = R.string.restart_later
+                        }
                     }
                 }
             }
@@ -265,22 +272,6 @@ class ImportSettingsDialogFragment :
 
             confirmImport.setOnClickListener {
                 viewModel.confirmImport(adapter.excludeKeys, adapter.tableResolutions)
-            }
-        }
-    }
-
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "restart_required" -> {
-                ProcessPhoenix.triggerRebirth(requireContext())
-            }
-        }
-    }
-
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "restart_required" -> {
-                dismiss()
             }
         }
     }

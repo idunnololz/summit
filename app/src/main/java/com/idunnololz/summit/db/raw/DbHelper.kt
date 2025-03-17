@@ -6,9 +6,9 @@ import androidx.core.database.getIntOrNull
 import androidx.sqlite.db.SupportSQLiteDatabase
 import arrow.core.Either
 import com.idunnololz.summit.util.getStringOrNull
+import java.io.Closeable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
-import java.io.Closeable
 
 class DbHelper : Closeable {
     private val db: Either<SupportSQLiteDatabase, SQLiteDatabase>
@@ -27,46 +27,43 @@ class DbHelper : Closeable {
         this.shouldClose = true
     }
 
-    suspend fun getTableNames(): List<String> =
-        runInterruptible(Dispatchers.Default) {
-            val tableNames = mutableListOf<String>()
-            query("SELECT name FROM sqlite_master WHERE type='table'", arrayOf()).use { cursor ->
-                while(cursor.moveToNext()) {
-                    val tableName = cursor.getString(0)
-                    tableNames.add(tableName)
-                }
+    suspend fun getTableNames(): List<String> = runInterruptible(Dispatchers.Default) {
+        val tableNames = mutableListOf<String>()
+        query("SELECT name FROM sqlite_master WHERE type='table'", arrayOf()).use { cursor ->
+            while (cursor.moveToNext()) {
+                val tableName = cursor.getString(0)
+                tableNames.add(tableName)
             }
-
-            tableNames
         }
 
-    suspend fun getTableInfo(tableName: String): TableInfo =
-        runInterruptible(Dispatchers.Default) {
-            query("SELECT COUNT(*) FROM ${tableName}", arrayOf()).use { cursor ->
-                val count = if (cursor.moveToNext()) {
+        tableNames
+    }
+
+    suspend fun getTableInfo(tableName: String): TableInfo = runInterruptible(Dispatchers.Default) {
+        query("SELECT COUNT(*) FROM $tableName", arrayOf()).use { cursor ->
+            val count = if (cursor.moveToNext()) {
+                cursor.getInt(0)
+            } else {
+                0
+            }
+
+            TableInfo(
+                tableName = tableName,
+                rowCount = count,
+            )
+        }
+    }
+
+    suspend fun getTableRowCount(tableName: String): Int = runInterruptible(Dispatchers.Default) {
+        query("SELECT COUNT(*) FROM $tableName", arrayOf())
+            .use { cursor ->
+                if (cursor.moveToNext()) {
                     cursor.getInt(0)
                 } else {
                     0
                 }
-
-                TableInfo(
-                    tableName = tableName,
-                    rowCount = count
-                )
             }
-        }
-
-    suspend fun getTableRowCount(tableName: String): Int =
-        runInterruptible(Dispatchers.Default) {
-            query("SELECT COUNT(*) FROM $tableName", arrayOf())
-                .use { cursor ->
-                    if (cursor.moveToNext()) {
-                        cursor.getInt(0)
-                    } else {
-                        0
-                    }
-                }
-        }
+    }
 
     suspend fun getTableColumnsInfo(tableName: String): List<ColumnInfo> =
         runInterruptible(Dispatchers.Default) {
@@ -78,7 +75,7 @@ class DbHelper : Closeable {
                 val defaultValueIndex = cursor.getColumnIndex("dflt_value")
                 val primaryKeyIndex = cursor.getColumnIndex("pk")
 
-                while(cursor.moveToNext()) {
+                while (cursor.moveToNext()) {
                     val columnName = cursor.getString(nameIndex)
                     val columnInfo = ColumnInfo(
                         columnName = columnName,
@@ -86,7 +83,7 @@ class DbHelper : Closeable {
                         notNull = cursor.getIntOrNull(notNullIndex) == 1,
                         defaultValue = cursor.getStringOrNull(defaultValueIndex),
                         primaryKey = cursor.getIntOrNull(primaryKeyIndex) == 1,
-                        isSensitive = columnName.equals("jwt", ignoreCase = true)
+                        isSensitive = columnName.equals("jwt", ignoreCase = true),
                     )
 
                     columnsInfo.add(columnInfo)
@@ -120,7 +117,7 @@ class DbHelper : Closeable {
                         }
                     }
 
-                while(cursor.moveToNext()) {
+                while (cursor.moveToNext()) {
                     val pk = if (primaryKeyIndex >= 0) {
                         cursor.getString(primaryKeyIndex)
                     } else {
@@ -147,9 +144,8 @@ class DbHelper : Closeable {
                         TableRow(
                             primaryKey = pk,
                             columns = columns,
-                        )
+                        ),
                     )
-
                 }
             }
         }
@@ -173,17 +169,16 @@ class DbHelper : Closeable {
         }
     }
 
-    suspend fun getDbName(): String? =
-        runInterruptible(Dispatchers.Default) {
-            query("PRAGMA database_list", arrayOf())
-                .use { cursor ->
-                    if (cursor.moveToNext()) {
-                        cursor.getStringOrNull(1)
-                    } else {
-                        null
-                    }
+    suspend fun getDbName(): String? = runInterruptible(Dispatchers.Default) {
+        query("PRAGMA database_list", arrayOf())
+            .use { cursor ->
+                if (cursor.moveToNext()) {
+                    cursor.getStringOrNull(1)
+                } else {
+                    null
                 }
-        }
+            }
+    }
 
     override fun close() {
         if (!shouldClose) {
@@ -192,19 +187,17 @@ class DbHelper : Closeable {
 
         db.fold(
             { it.close() },
-            { it.close() }
+            { it.close() },
         )
     }
 
-    private fun query(q: String, bindArgs: Array<out String>): Cursor =
-        db.fold(
-            { it.query(q, bindArgs) },
-            { it.rawQuery(q, bindArgs) }
-        )
+    private fun query(q: String, bindArgs: Array<out String>): Cursor = db.fold(
+        { it.query(q, bindArgs) },
+        { it.rawQuery(q, bindArgs) },
+    )
 
-    private fun execSql(sql: String): Unit =
-        db.fold(
-            { it.execSQL(sql) },
-            { it.execSQL(sql) }
-        )
+    private fun execSql(sql: String): Unit = db.fold(
+        { it.execSQL(sql) },
+        { it.execSQL(sql) },
+    )
 }

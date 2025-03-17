@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.databinding.FragmentPostListLoadingPageBinding
 import com.idunnololz.summit.util.BaseFragment
 
@@ -27,7 +26,7 @@ class PostListLoadingPageFragment : BaseFragment<FragmentPostListLoadingPageBind
 
         binding.loadingView.apply {
             showProgressBarWithMessage(
-                context.getString(R.string.loading_more_posts)
+                context.getString(R.string.loading_more_posts),
             )
         }
     }

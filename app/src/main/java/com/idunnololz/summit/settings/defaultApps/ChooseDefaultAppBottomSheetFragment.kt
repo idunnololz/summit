@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil3.load
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentChooseDefaultAppBinding
 import com.idunnololz.summit.databinding.ItemAppChoiceBinding
 import com.idunnololz.summit.databinding.ItemAppChoiceClearBinding
@@ -39,7 +38,7 @@ class ChooseDefaultAppBottomSheetFragment :
             ChooseDefaultAppBottomSheetFragment()
                 .apply {
                     arguments = ChooseDefaultAppBottomSheetFragmentArgs(
-                        intent
+                        intent,
                     ).toBundle()
                 }
                 .show(fragmentManager, "ChooseDefaultAppBottomSheetFragment")
@@ -50,7 +49,7 @@ class ChooseDefaultAppBottomSheetFragment :
         val selectedApp: ApplicationInfo?,
         val componentName: String?,
         val clear: Boolean,
-    ): Parcelable
+    ) : Parcelable
 
     private val args: ChooseDefaultAppBottomSheetFragmentArgs by navArgs()
 
@@ -87,12 +86,15 @@ class ChooseDefaultAppBottomSheetFragment :
                     setFragmentResult(
                         REQUEST_KEY,
                         Bundle().apply {
-                            putParcelable(RESULT_KEY, Result(
-                                selectedApp = appInfo,
-                                componentName = componentName,
-                                clear = appInfo == null,
-                            ))
-                        }
+                            putParcelable(
+                                RESULT_KEY,
+                                Result(
+                                    selectedApp = appInfo,
+                                    componentName = componentName,
+                                    clear = appInfo == null,
+                                ),
+                            )
+                        },
                     )
                     dismiss()
                 },
@@ -110,8 +112,8 @@ class ChooseDefaultAppBottomSheetFragment :
 
         sealed interface Item {
             data class OptionItem(
-                val resolveInfo: ResolveInfo
-            ): Item
+                val resolveInfo: ResolveInfo,
+            ) : Item
 
             data object ClearItem : Item
         }
@@ -124,7 +126,7 @@ class ChooseDefaultAppBottomSheetFragment :
                         old.resolveInfo.resolvePackageName ==
                             (new as Item.OptionItem).resolveInfo.resolvePackageName
                 }
-            }
+            },
         ).apply {
             addItemType(Item.OptionItem::class, ItemAppChoiceBinding::inflate) { item, b, h ->
                 val appInfo = item.resolveInfo.activityInfo.applicationInfo
@@ -151,14 +153,12 @@ class ChooseDefaultAppBottomSheetFragment :
             adapterHelper.setItems(newItems, this)
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

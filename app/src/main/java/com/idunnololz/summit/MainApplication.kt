@@ -30,7 +30,6 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
-import com.idunnololz.summit.util.Client
 import com.idunnololz.summit.util.DataCache
 import com.idunnololz.summit.util.DataFiles
 import com.idunnololz.summit.util.PreferenceUtils
@@ -119,6 +118,17 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         OfflineScheduleManager.instance.setupAlarms()
 
+        val hiltEntryPoint =
+            EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
+        val preferences = hiltEntryPoint.preferences()
+
+        hiltEntryPoint.themeManager().onPreferencesChanged()
+        Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
+        Utils.defaultWebApp = preferences.defaultWebApp
+        LemmyTextHelper.autoLinkPhoneNumbers = preferences.autoLinkPhoneNumbers
+        LemmyTextHelper.autoLinkIpAddresses = preferences.autoLinkIpAddresses
+        notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
+
         SingletonImageLoader.setSafe {
             ImageLoader.Builder(context)
                 .transitionFactory(
@@ -131,7 +141,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                     add(
                         OkHttpNetworkFetcherFactory(
                             callFactory = {
-                                Client.get()
+                                hiltEntryPoint.browserLikeOkHttpClient()
                             },
                         ),
                     )
@@ -152,17 +162,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                 }
                 .build()
         }
-
-        val hiltEntryPoint =
-            EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
-        val preferences = hiltEntryPoint.preferences()
-
-        hiltEntryPoint.themeManager().onPreferencesChanged()
-        Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
-        Utils.defaultWebApp = preferences.defaultWebApp
-        LemmyTextHelper.autoLinkPhoneNumbers = preferences.autoLinkPhoneNumbers
-        LemmyTextHelper.autoLinkIpAddresses = preferences.autoLinkIpAddresses
-        notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
 
         correctDefaultWebApp()
 
@@ -208,7 +207,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         }
 
         val fixedDefaultApp = defaultWebApp.copy(
-            componentName = option.first().activityInfo.name
+            componentName = option.first().activityInfo.name,
         )
         preferences.defaultWebApp = fixedDefaultApp
         Utils.defaultWebApp = fixedDefaultApp

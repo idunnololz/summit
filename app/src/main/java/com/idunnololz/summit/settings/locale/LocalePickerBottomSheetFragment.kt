@@ -1,12 +1,6 @@
 package com.idunnololz.summit.settings.locale
 
-import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,26 +8,16 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil3.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.FragmentChooseDefaultAppBinding
 import com.idunnololz.summit.databinding.FragmentLocalePickerBottomSheetBinding
-import com.idunnololz.summit.databinding.ItemAppChoiceBinding
-import com.idunnololz.summit.databinding.ItemAppChoiceClearBinding
 import com.idunnololz.summit.databinding.ItemLocalePickerChoiceBinding
-import com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragment
-import com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragment.Companion
-import com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragment.Result
-import com.idunnololz.summit.settings.defaultApps.ChooseDefaultAppBottomSheetFragmentArgs
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getLocaleListFromXml
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import kotlinx.parcelize.Parcelize
 import java.util.Locale
 
 class LocalePickerBottomSheetFragment :
@@ -45,9 +29,8 @@ class LocalePickerBottomSheetFragment :
         const val RESULT_KEY = "LocalePickerBottomSheetFragment.result"
         const val REQUEST_KEY = "LocalePickerBottomSheetFragment.request"
 
-        fun show(fragmentManager: FragmentManager) =
-            LocalePickerBottomSheetFragment()
-                .show(fragmentManager, "LocalePickerBottomSheetFragment")
+        fun show(fragmentManager: FragmentManager) = LocalePickerBottomSheetFragment()
+            .show(fragmentManager, "LocalePickerBottomSheetFragment")
     }
 
     override fun onCreateView(
@@ -57,8 +40,13 @@ class LocalePickerBottomSheetFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentLocalePickerBottomSheetBinding.inflate(
-            inflater, container, false))
+        setBinding(
+            FragmentLocalePickerBottomSheetBinding.inflate(
+                inflater,
+                container,
+                false,
+            ),
+        )
 
         return binding.root
     }
@@ -74,7 +62,8 @@ class LocalePickerBottomSheetFragment :
                 {
                     if (it == null) {
                         AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.getEmptyLocaleList())
+                            LocaleListCompat.getEmptyLocaleList(),
+                        )
                     } else {
                         val appLocale: LocaleListCompat =
                             LocaleListCompat.forLanguageTags(it.toLanguageTag())
@@ -82,7 +71,7 @@ class LocalePickerBottomSheetFragment :
                     }
                     setFragmentResult(
                         REQUEST_KEY,
-                        Bundle()
+                        Bundle(),
                     )
 
                     dismiss()
@@ -100,8 +89,8 @@ class LocalePickerBottomSheetFragment :
 
         sealed interface Item {
             data class LocaleItem(
-                val locale: Locale
-            ): Item
+                val locale: Locale,
+            ) : Item
 
             data object ClearItem : Item
         }
@@ -114,9 +103,12 @@ class LocalePickerBottomSheetFragment :
                         old.locale.toLanguageTag() ==
                             (new as Item.LocaleItem).locale.toLanguageTag()
                 }
-            }
+            },
         ).apply {
-            addItemType(Item.LocaleItem::class, ItemLocalePickerChoiceBinding::inflate) { item, b, _ ->
+            addItemType(
+                Item.LocaleItem::class,
+                ItemLocalePickerChoiceBinding::inflate,
+            ) { item, b, _ ->
                 b.title.text = item.locale.displayLanguage
 
                 b.root.setOnClickListener {
@@ -142,14 +134,12 @@ class LocalePickerBottomSheetFragment :
             adapterHelper.setItems(newItems, this)
         }
 
-        override fun getItemViewType(position: Int): Int =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)

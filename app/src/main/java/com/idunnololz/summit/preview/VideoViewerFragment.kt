@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.network.BrowserLike
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
@@ -64,6 +65,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     lateinit var preferenceManager: PreferenceManager
 
     @Inject
+    @BrowserLike
     lateinit var okHttpClient: OkHttpClient
 
     @Inject

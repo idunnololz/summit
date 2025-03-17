@@ -1,12 +1,11 @@
 package com.idunnololz.summit.lemmy.community
 
-import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class OnScrollMarkPostAsReadScrollListener(
     private val getAdapter: () -> PostListAdapter?,
-    private val layoutManager: LinearLayoutManager
+    private val layoutManager: LinearLayoutManager,
 ) : RecyclerView.OnScrollListener() {
 
     var cacheFirstVisible = -1
@@ -41,7 +40,8 @@ class OnScrollMarkPostAsReadScrollListener(
 
         if (firstCompletelyVisibleItem != -1) {
             if (cacheRangeStart == firstCompletelyVisibleItem &&
-                cacheRangeEnd == lastCompletelyVisibleItem) {
+                cacheRangeEnd == lastCompletelyVisibleItem
+            ) {
                 return
             }
 

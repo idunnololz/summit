@@ -45,7 +45,6 @@ import com.idunnololz.summit.util.ContentUtils.getVideoType
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
-import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.ext.setup
@@ -130,8 +129,11 @@ class LemmyContentHelper(
         val imageMaxWidth = if (fullBleedImage) {
             contentMaxWidth
         } else {
-            contentMaxWidth - (context.resources.getDimensionPixelOffset(
-                R.dimen.post_list_image_view_horizontal_margin) * 2)
+            contentMaxWidth - (
+                context.resources.getDimensionPixelOffset(
+                    R.dimen.post_list_image_view_horizontal_margin,
+                ) * 2
+                )
         }.toInt()
 
         fun <T : View> getAndEnsureView(@LayoutRes resId: Int): T =
@@ -160,18 +162,17 @@ class LemmyContentHelper(
                     true
                 }
 
-                fun fetchFullImage() =
-                    fetchFullImage(
-                        imageUrl = imageUrl,
-                        originalImageUrl = imageUrl,
-                        fallbackUrl = null,
-                        contentMaxWidth = imageMaxWidth,
-                        blur = true,
-                        tempSize = tempSize,
-                        rootView = fullContentContainerView,
-                        loadingView = loadingView,
-                        fullImageView = fullImageView,
-                    )
+                fun fetchFullImage() = fetchFullImage(
+                    imageUrl = imageUrl,
+                    originalImageUrl = imageUrl,
+                    fallbackUrl = null,
+                    contentMaxWidth = imageMaxWidth,
+                    blur = true,
+                    tempSize = tempSize,
+                    rootView = fullContentContainerView,
+                    loadingView = loadingView,
+                    fullImageView = fullImageView,
+                )
 
                 loadingView?.setOnRefreshClickListener {
                     fetchFullImage()
@@ -320,18 +321,17 @@ class LemmyContentHelper(
             fullImageView.updateLayoutParams(imageMaxWidth, imageUrl, tempSize)
             offlineManager.getImageSizeHint(imageUrl, tempSize)
 
-            fun fetchFullImage() =
-                fetchFullImage(
-                    imageUrl = imageUrl,
-                    originalImageUrl = imageUrl,
-                    fallbackUrl = fallback,
-                    contentMaxWidth = imageMaxWidth,
-                    blur = false,
-                    tempSize = tempSize,
-                    rootView = fullContentContainerView,
-                    loadingView = loadingView,
-                    fullImageView = fullImageView,
-                )
+            fun fetchFullImage() = fetchFullImage(
+                imageUrl = imageUrl,
+                originalImageUrl = imageUrl,
+                fallbackUrl = fallback,
+                contentMaxWidth = imageMaxWidth,
+                blur = false,
+                tempSize = tempSize,
+                rootView = fullContentContainerView,
+                loadingView = loadingView,
+                fullImageView = fullImageView,
+            )
 
             loadingView?.setOnRefreshClickListener {
                 fetchFullImage()
@@ -536,11 +536,7 @@ class LemmyContentHelper(
             this.addView(it)
         } as T
 
-    fun addFooter(
-        lazyUpdate: Boolean,
-        root: ViewGroup,
-        postView: PostView,
-    ) {
+    fun addFooter(lazyUpdate: Boolean, root: ViewGroup, postView: PostView) {
         if (lazyUpdate) {
             // remove previous footers...
             for (i in root.childCount - 1 downTo 0) {
@@ -699,7 +695,7 @@ class LemmyContentHelper(
                         tempSize = tempSize,
                         rootView = rootView,
                         loadingView = loadingView,
-                        fullImageView = fullImageView
+                        fullImageView = fullImageView,
                     )
                 } else {
                     loadingView?.showDefaultErrorMessageFor(it)

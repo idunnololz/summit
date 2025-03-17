@@ -7,10 +7,7 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.idunnololz.summit.R
 
-fun showShareSheetForImage(
-    context: Context,
-    uri: Uri
-) {
+fun showShareSheetForImage(context: Context, uri: Uri) {
     val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
     val mimeType = MimeTypeMap.getSingleton()
         .getMimeTypeFromExtension(extension)

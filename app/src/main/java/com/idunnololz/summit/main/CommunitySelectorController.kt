@@ -866,7 +866,7 @@ class CommunitySelectorController @AssistedInject constructor(
                     val filteredPopularCommunities = rawData.filter {
                         query.isNullOrBlank() || it.community.name.contains(
                             query,
-                            ignoreCase = true
+                            ignoreCase = true,
                         )
                     }
 

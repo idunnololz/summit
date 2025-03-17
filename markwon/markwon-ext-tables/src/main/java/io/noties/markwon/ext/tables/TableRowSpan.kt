@@ -12,7 +12,6 @@ import android.text.Spanned
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.ReplacementSpan
-import android.util.Log
 import androidx.annotation.IntDef
 import androidx.annotation.IntRange
 import io.noties.markwon.core.spans.TextLayoutSpan

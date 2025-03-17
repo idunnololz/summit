@@ -336,7 +336,7 @@ class PostsRepository @AssistedInject constructor(
             val urlIterator = apiClient.apiClient.okHttpClient.cache?.urls() ?: return@withContext
             while (urlIterator.hasNext()) {
                 if (urlIterator.next().startsWith(
-                        "https://${apiClient.instance}/api/v3/post/list",
+                        prefix = "https://${apiClient.instance}/api/v3/post/list",
                         ignoreCase = true,
                     )
                 ) {

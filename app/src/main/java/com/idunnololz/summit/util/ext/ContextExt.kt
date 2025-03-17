@@ -13,9 +13,9 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import com.idunnololz.summit.R
+import java.io.IOException
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
-import java.io.IOException
 
 fun Context.getColorFromAttribute(attribute: Int): Int {
     val attributes = obtainStyledAttributes(intArrayOf(attribute))

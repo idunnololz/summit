@@ -1,15 +1,12 @@
 package com.idunnololz.summit.network
 
-import android.content.Context
-import com.idunnololz.summit.BuildConfig
-import com.idunnololz.summit.api.LemmyApi
-import com.idunnololz.summit.cache.CachePolicyManager
+import com.idunnololz.summit.util.ClientFactory
 import com.idunnololz.summit.util.DirectoryHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
 
@@ -18,14 +15,39 @@ import okhttp3.OkHttpClient
 class NetworkModule {
     @Provides
     @Singleton
-    fun provideOkHttpClient(
-        @ApplicationContext context: Context,
-        cachePolicyManager: CachePolicyManager,
+    @BrowserLike
+    fun provideBrowserLikeOkHttpClient(
+        clientFactory: ClientFactory,
         directoryHelper: DirectoryHelper,
-    ): OkHttpClient = LemmyApi.okHttpClient(
-        context = context,
-        cachePolicyManager = cachePolicyManager,
-        userAgent = "Summit / ${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID}",
+    ): OkHttpClient = clientFactory.newClient(
+        debugName = "BrowserLike",
         cacheDir = directoryHelper.okHttpCacheDir,
+        purpose = ClientFactory.Purpose.BrowserLike,
+    )
+
+    @Provides
+    @Singleton
+    @Api
+    fun provideApiOkHttpClient(
+        clientFactory: ClientFactory,
+        directoryHelper: DirectoryHelper,
+    ): OkHttpClient = clientFactory.newClient(
+        debugName = "Api",
+        cacheDir = directoryHelper.okHttpCacheDir,
+        purpose = ClientFactory.Purpose.LemmyApiClient,
     )
 }
+
+/**
+ * Used to make HTTP calls under the guise of a browser.
+ */
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class BrowserLike
+
+/**
+ * Used to make API calls.
+ */
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Api

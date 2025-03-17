@@ -4,11 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsVideoPlayerBinding
-import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.PostAndCommentsSettings
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.VideoPlayerSettings
@@ -38,7 +35,8 @@ class SettingsVideoPlayerFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         setBinding(
-            FragmentSettingsVideoPlayerBinding.inflate(inflater, container, false))
+            FragmentSettingsVideoPlayerBinding.inflate(inflater, container, false),
+        )
         return binding.root
     }
 
@@ -69,7 +67,7 @@ class SettingsVideoPlayerFragment :
         settings.inlineVideoVolume.bindTo(
             binding.inlineVideoVolume,
             { preferences.inlineVideoDefaultVolume },
-            { preferences.inlineVideoDefaultVolume = it }
+            { preferences.inlineVideoDefaultVolume = it },
         )
     }
 }

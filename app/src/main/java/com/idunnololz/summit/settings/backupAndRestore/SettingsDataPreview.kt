@@ -12,7 +12,7 @@ data class SettingsDataPreview(
     val keyToType: Map<String, String>,
     val rawData: String,
     val tablePath: String?,
-    val databaseTablePreview: Map<String, TableInfo>
+    val databaseTablePreview: Map<String, TableInfo>,
 ) : Parcelable
 
 @Parcelize

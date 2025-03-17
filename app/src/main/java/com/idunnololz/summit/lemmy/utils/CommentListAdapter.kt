@@ -98,9 +98,11 @@ class CommentListAdapter(
                 is Item.AutoLoadItem ->
                     old.pageToLoad == (new as Item.AutoLoadItem).pageToLoad
                 is Item.VisibleCommentItem ->
-                    old.commentView.comment.id == (new as Item.VisibleCommentItem).commentView.comment.id
+                    old.commentView.comment.id ==
+                        (new as Item.VisibleCommentItem).commentView.comment.id
                 is Item.FilteredCommentItem ->
-                    old.commentView.comment.id == (new as Item.FilteredCommentItem).commentView.comment.id
+                    old.commentView.comment.id ==
+                        (new as Item.FilteredCommentItem).commentView.comment.id
                 Item.EndItem -> true
                 is Item.ErrorItem ->
                     old.pageToLoad == (new as Item.ErrorItem).pageToLoad

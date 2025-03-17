@@ -12,7 +12,7 @@ import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.util.Client
+import com.idunnololz.summit.network.BrowserLike
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.LinkUtils.USER_AGENT
 import com.idunnololz.summit.util.PreferenceUtils
@@ -32,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSink
 import okio.buffer
@@ -43,6 +44,7 @@ class OfflineManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val directoryHelper: DirectoryHelper,
     private val lemmyApiClient: LemmyApiClient,
+    @BrowserLike private val okHttpClient: OkHttpClient,
 ) {
 
     companion object {
@@ -90,7 +92,6 @@ class OfflineManager @Inject constructor(
         listener: TaskListener,
         errorListener: TaskFailedListener?,
     ) {
-
         CoroutineScope(SupervisorJob())
         Log.d(TAG, "fetchImageWithError(): $url")
         url ?: return
@@ -329,7 +330,7 @@ class OfflineManager @Inject constructor(
             }
 
             try {
-                val response = Client.get().newCall(req).execute()
+                val response = okHttpClient.newCall(req).execute()
 
                 if (response.code == 200) {
                     val sink: BufferedSink = destFile.sink().buffer()

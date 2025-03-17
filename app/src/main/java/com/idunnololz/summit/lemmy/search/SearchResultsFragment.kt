@@ -637,7 +637,16 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onPageClick = { accountId, pageRef ->
                         onPageClick(pageRef)
                     },
-                    onItemClick = { accountId: Long?, instance: String, id: Int, currentCommunity: CommunityRef?, post: PostView, jumpToComments: Boolean, reveal: Boolean, videoState: VideoState? ->
+                    onItemClick = {
+                            _: Long?,
+                            instance: String,
+                            id: Int,
+                            currentCommunity: CommunityRef?,
+                            post: PostView,
+                            jumpToComments: Boolean,
+                            reveal: Boolean,
+                            videoState: VideoState? ->
+
                         onItemClick(
                             instance,
                             id,

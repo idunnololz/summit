@@ -16,7 +16,6 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import coil3.dispose
 import coil3.load
 import coil3.request.allowHardware
@@ -28,7 +27,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.loadProfileImageOrDefault
@@ -80,7 +78,7 @@ class LemmyAppBarController(
     data class State(
         var currentCommunity: CommunityRef? = null,
         var defaultCommunity: CommunityRef? = null,
-        var instance: String? = null
+        var instance: String? = null,
     )
 
     private val context = mainActivity
@@ -273,7 +271,8 @@ class LemmyAppBarController(
 
     fun setCommunity(communityRef: CommunityRef?) {
         if (state.currentCommunity == communityRef &&
-            state.instance == communityInfoViewModel.instance) {
+            state.instance == communityInfoViewModel.instance
+        ) {
             return
         }
 

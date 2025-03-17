@@ -11,7 +11,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.scrape.WebsiteAdapterLoader
 import com.idunnololz.summit.util.AnimationUtils
 import com.idunnololz.summit.util.toErrorMessage
 
@@ -210,10 +209,6 @@ class LoadingView : ConstraintLayout {
             onRefreshClickListener(v)
         }
         bindNegativeButton(context.getString(negativeButtonText), negativeButtonListener)
-    }
-
-    fun showDefaultErrorMessageFor(errorCode: Int) {
-        showErrorWithRetry(WebsiteAdapterLoader.getDefaultErrorMessageFor(errorCode))
     }
 
     fun showDefaultErrorMessageFor(t: Throwable) {

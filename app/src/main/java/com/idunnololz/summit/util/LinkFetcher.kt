@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import com.idunnololz.summit.api.GetNetworkException
+import com.idunnololz.summit.network.BrowserLike
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +13,7 @@ import okhttp3.Response
 
 @Singleton
 class LinkFetcher @Inject constructor(
-    private val okHttpClient: OkHttpClient,
+    @BrowserLike private val okHttpClient: OkHttpClient,
 ) {
 
     suspend fun downloadSite(url: String, cache: Boolean = false): String =

@@ -47,7 +47,6 @@ object PrettyPrintUtils {
         }
         return String.format(Locale.US, "%.1f %cB", bytesLeft / 1000.0, ci.current())
     }
-
 }
 
 private const val SECOND_MILLIS: Long = 1000

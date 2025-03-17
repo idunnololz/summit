@@ -140,6 +140,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_UPLOAD_IMAGES_TO_IMGUR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_UPVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_USER_AGENT_CHOICE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_CUSTOM_NAV_BAR
@@ -650,6 +651,8 @@ class Preferences(
         by booleanPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, true)
     var postFullBleedImage: Boolean
         by booleanPreference(KEY_POST_FULL_BLEED_IMAGE, true)
+    var userAgentChoice: Int
+        by intPreference(KEY_USER_AGENT_CHOICE, UserAgentChoiceIds.UNSET)
 
     suspend fun getOfflinePostCount(): Int =
         context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

@@ -6,10 +6,8 @@ import android.util.Log
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.UploadImageResult
-import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.imgur.ImgurApiClient
@@ -24,11 +22,10 @@ import kotlinx.coroutines.withContext
 class UploadHelper @Inject constructor(
     private val context: Application,
     private val accountManager: AccountManager,
-    private val apiListenerManager: ApiListenerManager,
     private val preferences: Preferences,
     private val directoryHelper: DirectoryHelper,
     private val imgurApiClient: ImgurApiClient,
-    private val cachePolicyManager: CachePolicyManager,
+    private val lemmyApiClientFactory: LemmyApiClient.Factory,
 ) {
 
     companion object {
@@ -39,13 +36,7 @@ class UploadHelper @Inject constructor(
 
     private val id = nextId++
 
-    private val uploaderApiClient = LemmyApiClient(
-        context = context,
-        apiListenerManager = apiListenerManager,
-        preferences = preferences,
-        cachePolicyManager = cachePolicyManager,
-        directoryHelper = directoryHelper,
-    )
+    private val uploaderApiClient = lemmyApiClientFactory.create()
 
     private var uploadJob: Job? = null
 

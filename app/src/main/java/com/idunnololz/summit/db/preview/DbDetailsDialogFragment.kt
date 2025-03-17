@@ -42,7 +42,7 @@ class DbDetailsDialogFragment :
                     arguments = DbDetailsDialogFragmentArgs(
                         dbUri,
                         title,
-                        tableNames?.joinToString(separator = ",")
+                        tableNames?.joinToString(separator = ","),
                     ).toBundle()
                 }
                 .show(fragmentManager, "DbDetailsDialogFragment")
@@ -75,7 +75,7 @@ class DbDetailsDialogFragment :
 
         val context = requireContext()
 
-        with (binding) {
+        with(binding) {
             toolbar.title = args.title ?: getString(R.string.database_details)
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
@@ -96,9 +96,12 @@ class DbDetailsDialogFragment :
             recyclerView.setHasFixedSize(false)
             recyclerView.adapter = adapter
 
-            viewModel.loadDbDetails(args.databaseUri, args.tableNames?.let {
-                it.split(",").toSet()
-            })
+            viewModel.loadDbDetails(
+                args.databaseUri,
+                args.tableNames?.let {
+                    it.split(",").toSet()
+                },
+            )
             viewModel.model.observe(viewLifecycleOwner) {
                 when (it) {
                     is StatefulData.Error -> {
@@ -148,7 +151,7 @@ class DbDetailsDialogFragment :
                         old.tableInfo.tableName == (new as Item.TableItem).tableInfo.tableName
                     is Item.FooterItem -> true
                 }
-            }
+            },
         ).apply {
             addItemType(Item.HeaderItem::class, ItemDbHeaderBinding::inflate) { item, b, h ->
                 b.databaseName.text = item.dbName
@@ -159,7 +162,8 @@ class DbDetailsDialogFragment :
                 b.body.text = item.description
                 b.subtitle.text = context.getString(
                     R.string.row_count_format,
-                    PrettyPrintUtils.defaultDecimalFormat.format(item.tableInfo.rowCount))
+                    PrettyPrintUtils.defaultDecimalFormat.format(item.tableInfo.rowCount),
+                )
 
                 b.root.setOnClickListener {
                     onTableClick(item.tableInfo)
@@ -169,14 +173,12 @@ class DbDetailsDialogFragment :
             }
         }
 
-        override fun getItemViewType(position: Int) =
-            adapterHelper.getItemViewType(position)
+        override fun getItemViewType(position: Int) = adapterHelper.getItemViewType(position)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
             adapterHelper.onCreateViewHolder(parent, viewType)
 
-        override fun getItemCount(): Int =
-            adapterHelper.itemCount
+        override fun getItemCount(): Int = adapterHelper.itemCount
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) =
             adapterHelper.onBindViewHolder(holder, position)
@@ -193,7 +195,8 @@ class DbDetailsDialogFragment :
             val newItems = mutableListOf<Item>()
 
             newItems += Item.HeaderItem(
-                data.databaseName ?: context.getString(R.string.unknown))
+                data.databaseName ?: context.getString(R.string.unknown),
+            )
 
             data.tablesInfo.mapTo(newItems) {
                 val icon: Int

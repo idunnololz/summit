@@ -113,7 +113,7 @@ class ViewCurrentSettingsFragment :
             }
 
             viewModel.generatePreviewFromSettingsJson(
-                databaseFile = context.getDatabasePath(DATABASE_NAME)
+                databaseFile = context.getDatabasePath(DATABASE_NAME),
             )
         }
     }
@@ -124,7 +124,7 @@ class ViewCurrentSettingsFragment :
             val settingKey = dialog.getExtra("key")
             viewModel.resetSetting(
                 settingKey = settingKey,
-                databaseFile = context.getDatabasePath(DATABASE_NAME)
+                databaseFile = context.getDatabasePath(DATABASE_NAME),
             )
         }
     }

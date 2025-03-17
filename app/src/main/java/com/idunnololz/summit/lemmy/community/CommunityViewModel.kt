@@ -573,8 +573,8 @@ class CommunityViewModel @Inject constructor(
 
         if (newApiInstance != null &&
             currentAccount != null &&
-            newApiInstance != currentAccount.instance) {
-
+            newApiInstance != currentAccount.instance
+        ) {
             accountManager.setCurrentAccount(GuestAccount(newApiInstance))
         }
 
