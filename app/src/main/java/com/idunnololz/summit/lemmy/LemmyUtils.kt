@@ -172,5 +172,8 @@ fun Person.getAccountAgeString(): String {
             append(days)
             append("d ")
         }
+        if (years == 0 && months == 0 && days == 0) {
+            append("0d")
+        }
     }.trim()
 }

@@ -15,6 +15,7 @@
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding_half"
         android:paddingVertical="@dimen/padding"
+        android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:drawableTint="?colorOnBackground"

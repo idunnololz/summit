@@ -1,8 +1,6 @@
 package com.idunnololz.summit.cache
 
 import android.util.Log
-import com.idunnololz.summit.util.DataCache
-import com.idunnololz.summit.util.IDataCache
 import com.jakewharton.disklrucache.DiskLruCache
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
@@ -24,7 +22,7 @@ class SimpleDiskCache(
     dir: File,
     private val appVersion: Int,
     maxSize: Long,
-) : IDataCache {
+)  {
 
     companion object {
 
@@ -71,7 +69,7 @@ class SimpleDiskCache(
         } ?: return null
     }
 
-    override fun hasCache(key: String): Boolean {
+    fun hasCache(key: String): Boolean {
         val snapshot: DiskLruCache.Snapshot?
         try {
             snapshot = cache.get(toInternalKey(key))
@@ -85,15 +83,12 @@ class SimpleDiskCache(
         return true
     }
 
-    override fun hasFreshCache(key: String): Boolean {
-        return hasFreshCache(key, DataCache.DEFAULT_FRESH_TIME_MS)
-    }
 
-    override fun hasFreshCache(key: String, freshTimeMs: Long): Boolean {
+    fun hasFreshCache(key: String, freshTimeMs: Long): Boolean {
         return System.currentTimeMillis() - getCachedDate(key) < freshTimeMs
     }
 
-    override fun getCachedDate(key: String): Long {
+    fun getCachedDate(key: String): Long {
         var snapshot: DiskLruCache.Snapshot? = null
         return try {
             snapshot = cache.get(toInternalKey(key))
@@ -112,7 +107,7 @@ class SimpleDiskCache(
     }
 
     @Throws(IOException::class)
-    override fun cacheData(key: String, s: String?) {
+    fun cacheData(key: String, s: String?) {
         put(key, s, HashMap())
         Log.d(
             TAG,
@@ -129,21 +124,13 @@ class SimpleDiskCache(
         )
     }
 
-    override fun cacheData(key: String, s: InputStream?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCachedDataStream(key: String): InputStream {
-        TODO("Not yet implemented")
-    }
-
     @Throws(IOException::class)
-    override fun getCachedData(key: String): String? {
+    fun getCachedData(key: String): String? {
         return getString(key)?.string
     }
 
     @Throws(IOException::class)
-    override fun evict(key: String) {
+    fun evict(key: String) {
         cache.remove(toInternalKey(key))
     }
 

@@ -1,14 +1,13 @@
 package com.idunnololz.summit.cache
 
 import android.util.Log
-import com.idunnololz.summit.util.IDataCache
 import java.io.File
 import kotlinx.serialization.json.Json
 
 class JsonDiskCache(
     val json: Json,
-    private val cache: SimpleDiskCache,
-) : IDataCache by cache {
+    val cache: SimpleDiskCache,
+) {
 
     companion object {
         const val TAG = "JsonDiskCache"
@@ -21,7 +20,7 @@ class JsonDiskCache(
 
     inline fun <reified T> getCachedObject(key: String): T? {
         return try {
-            val value = getCachedData(key)
+            val value = cache.getCachedData(key)
             if (value.isNullOrBlank()) {
                 null
             } else {
@@ -35,7 +34,7 @@ class JsonDiskCache(
 
     inline fun <reified T> cacheObject(key: String, obj: T?) {
         try {
-            cacheData(key, json.encodeToString(obj))
+            cache.cacheData(key, json.encodeToString(obj))
         } catch (e: Exception) {
             Log.e(TAG, "cacheObject()", e)
         }
@@ -43,5 +42,9 @@ class JsonDiskCache(
 
     fun printDebugInfo() {
         Log.d(TAG, "Cache size: ${cache.cache.size().toFloat() / (1024 * 1024)} MB")
+    }
+
+    fun evict(key: String) {
+        cache.evict(key)
     }
 }

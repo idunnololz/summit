@@ -11,12 +11,14 @@ import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.idunnololz.summit.R
+import com.idunnololz.summit.network.BrowserLike
 import com.idunnololz.summit.preferences.Preferences
 import java.io.File
 import java.io.OutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.runInterruptible
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSink
 import okio.buffer
@@ -26,6 +28,8 @@ import okio.source
 @Singleton
 class FileDownloadHelper @Inject constructor(
     private val preferences: Preferences,
+    @BrowserLike
+    private val okHttpClient: OkHttpClient,
 ) {
 
     companion object {
@@ -116,10 +120,9 @@ class FileDownloadHelper @Inject constructor(
                     } else {
                         val request = Request.Builder()
                             .url(checkNotNull(url))
-                            .header("User-Agent", LinkUtils.USER_AGENT)
                             .build()
 
-                        val response = Client.get().newCall(request).execute()
+                        val response = okHttpClient.newCall(request).execute()
                         try {
                             val body = response.body
                             if (body != null) {
