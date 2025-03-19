@@ -63,6 +63,8 @@
                         android:id="@+id/collapsing_toolbar_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/padding_quarter"
+                        android:clipToPadding="false"
                         app:layout_collapseMode="pin">
 
                         <View

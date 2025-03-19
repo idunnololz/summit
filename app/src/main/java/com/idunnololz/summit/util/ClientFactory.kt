@@ -71,8 +71,6 @@ class ClientFactory @Inject constructor(
     }
 
     fun newClient(debugName: String, cacheDir: File, purpose: Purpose): OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
 
         val myCache = Cache(
             directory = cacheDir,
@@ -170,6 +168,8 @@ class ClientFactory @Inject constructor(
             }
             .apply {
                 if (BuildConfig.DEBUG) {
+                    val loggingInterceptor = HttpLoggingInterceptor()
+                    loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
                     addInterceptor(loggingInterceptor)
                 }
             }

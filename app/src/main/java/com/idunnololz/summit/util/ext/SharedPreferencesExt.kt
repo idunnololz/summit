@@ -56,3 +56,30 @@ fun SharedPreferences.getLongSafe(key: String, defValue: Long): Long {
         }
     }
 }
+
+
+fun SharedPreferences.getFloatSafe(key: String, defValue: Float): Float {
+    try {
+        return getFloat(key, defValue)
+    } catch (e: Exception) {
+        if (!contains(key)) {
+            return defValue
+        }
+
+        try {
+            // sometimes this is an import issue and the value was converted to an int...
+            val value = getInt(key, 0).toFloat()
+
+            edit()
+                .putFloat(key, value)
+                .apply()
+
+            return value
+        } catch (e: Exception) {
+            edit().remove(key)
+                .apply()
+
+            return defValue
+        }
+    }
+}

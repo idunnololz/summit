@@ -17,7 +17,7 @@ class CommunityScrollListener(
 
         val firstPos = layoutManager.findFirstVisibleItemPosition()
 
-        if (firstPos == lastCachedPosition) {
+        if (newState != SCROLL_STATE_IDLE) {
             return
         }
 
@@ -26,16 +26,14 @@ class CommunityScrollListener(
         val adapter = getAdapter() ?: return
         val lastPos = layoutManager.findLastVisibleItemPosition()
 
-        if (newState == SCROLL_STATE_IDLE) {
-            fetchPageIfLoadItem(
-                adapter,
-                firstPos,
-                firstPos - 1,
-                lastPos - 1,
-                lastPos,
-                lastPos + 1,
-            )
-        }
+        fetchPageIfLoadItem(
+            adapter,
+            firstPos,
+            firstPos - 1,
+            lastPos - 1,
+            lastPos,
+            lastPos + 1,
+        )
     }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

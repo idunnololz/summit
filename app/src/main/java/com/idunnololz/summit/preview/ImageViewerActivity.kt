@@ -613,7 +613,7 @@ class ImageViewerActivity :
             url = url,
             listener = {
                 val tempSize = Size()
-                offlineManager.getMaxImageSizeHint(it, tempSize)
+                offlineManager.getImageSizeHint(it, tempSize)
 
                 val request = ImageRequest.Builder(binding.imageView.context)
                     .data(it)

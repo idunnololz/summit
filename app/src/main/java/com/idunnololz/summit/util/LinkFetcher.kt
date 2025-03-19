@@ -33,7 +33,6 @@ class LinkFetcher @Inject constructor(
     private fun doRequest(url: String, cache: Boolean): Response {
         val builder = Request.Builder()
             .url(url)
-            .header("User-Agent", LinkUtils.USER_AGENT)
         if (!cache) {
             builder.cacheControl(CacheControl.FORCE_NETWORK)
                 .header("Cache-Control", "no-cache, no-store")

@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
 import android.widget.TextView
@@ -22,15 +21,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
-import coil3.asImage
 import coil3.dispose
-import coil3.load
-import coil3.request.allowHardware
-import coil3.request.error
-import coil3.request.transformations
-import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.imageview.ShapeableImageView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -75,12 +67,10 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.coil.VideoWatermarkTransformation
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.getErrorDrawable
-import com.idunnololz.summit.util.getErrorImage
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.ExoPlayerManagerManager
@@ -538,10 +528,12 @@ class PostListViewBuilder @Inject constructor(
             }
 
             val preferFullSizeImages = postUiConfig.preferFullSizeImages &&
-                (rawBinding is ListingItemCardBinding) ||
-                (rawBinding is ListingItemCard2Binding) ||
-                (rawBinding is ListingItemCard3Binding) ||
-                (rawBinding is ListingItemLargeListBinding)
+                (
+                    (rawBinding is ListingItemCardBinding) ||
+                        (rawBinding is ListingItemCard2Binding) ||
+                        (rawBinding is ListingItemCard3Binding) ||
+                        (rawBinding is ListingItemLargeListBinding)
+                )
             if (holder.state.preferFullSizeImages != preferFullSizeImages) {
                 if (preferFullSizeImages) {
                     when (val rb = rawBinding) {
@@ -570,22 +562,22 @@ class PostListViewBuilder @Inject constructor(
                     when (val rb = rawBinding) {
                         is ListingItemCardBinding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                                this.dimensionRatio = "H,16:9"
+                                this.dimensionRatio = "16:9"
                             }
                         }
                         is ListingItemCard2Binding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                                this.dimensionRatio = "H,16:9"
+                                this.dimensionRatio = "16:9"
                             }
                         }
                         is ListingItemCard3Binding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                                this.dimensionRatio = "H,16:9"
+                                this.dimensionRatio = "16:9"
                             }
                         }
                         is ListingItemLargeListBinding -> {
                             rb.image.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                                this.dimensionRatio = "H,16:9"
+                                this.dimensionRatio = "16:9"
                             }
                         }
                     }
@@ -888,7 +880,7 @@ class PostListViewBuilder @Inject constructor(
                             rootView = itemView,
                             imageView = imageView,
                             imageUrl = urlToLoad,
-                            preferFullSizeImage = state.preferFullSizeImages,
+                            preferFullSizeImage = preferFullSizeImages,
                             imageViewWidth = postImageWidth,
                             shouldBlur = !isRevealed && postView.post.nsfw,
                         ) {
@@ -1024,7 +1016,7 @@ class PostListViewBuilder @Inject constructor(
                     PostType.Link,
                     PostType.Text,
                     -> {
-                        if (thumbnailUrl == null) {
+                        if (!hasThumbnail) {
                             // see if this text post has additional content
                             val hasAdditionalContent =
                                 !postView.post.body.isNullOrBlank() ||
@@ -1503,89 +1495,19 @@ class PostListViewBuilder @Inject constructor(
         shouldBlur: Boolean,
         errorListener: TaskFailedListener?,
     ) {
-        val isUrlMp4 = ContentUtils.isUrlMp4(imageUrl)
-
-        offlineManager.getImageSizeHint(imageUrl, tempSize)
-
-        if (preferFullSizeImage) {
-            if (tempSize.width > 0 && tempSize.height > 0) {
-                val thumbnailMaxHeight =
-                    (imageViewWidth * (tempSize.height.toDouble() / tempSize.width)).toInt()
-
-                Log.d(TAG, "Reserving space for image ${thumbnailMaxHeight}h")
-                imageView.updateLayoutParams<LayoutParams> {
-                    this.height = thumbnailMaxHeight
-                }
-            } else {
-                imageView.updateLayoutParams<LayoutParams> {
-                    this.height = LayoutParams.WRAP_CONTENT
-                }
-            }
-        }
-
-        fun loadImage(urlOrFile: Any, size: Size) {
-            Log.d(TAG, "loadImage() size: $size")
-            var w: Int? = null
-            var h: Int? = null
-
-            if (size.height > 0 && size.width > 0) {
-                val heightToWidthRatio = size.height / size.width
-
-                if (heightToWidthRatio > 10) {
-                    // shrink the image if needed
-                    w = size.width
-                    h = size.height
-                }
-            }
-
-            imageView.load(urlOrFile) {
-                if (imageView is ShapeableImageView) {
-                    allowHardware(false)
-                }
-
-                if (w != null && h != null) {
-                    this.size(w, h)
-                }
-                placeholder(newShimmerDrawable16to9(context).asImage())
-
-                if (shouldBlur) {
-                    val sampling = (imageViewWidth * 0.04f).coerceAtLeast(10f)
-
-                    if (isUrlMp4) {
-                        transformations(
-                            BlurTransformation(context, sampling = sampling),
-                            VideoWatermarkTransformation(context, sampling = 1f / sampling),
-                        )
-                    } else {
-                        transformations(BlurTransformation(context, sampling = sampling))
-                    }
-                }
-                this.error { context.getErrorImage() }
-            }
-        }
-
-        if (isUrlMp4) {
-            offlineManager.getMaxImageSizeHint(imageUrl, tempSize)
-
-            loadImage(
-                urlOrFile = imageUrl,
-                size = tempSize,
-            )
-        } else {
-            offlineManager.fetchImageWithError(
-                rootView = rootView,
-                url = imageUrl,
-                listener = {
-                    offlineManager.getMaxImageSizeHint(it, tempSize)
-
-                    loadImage(
-                        urlOrFile = it,
-                        size = tempSize,
-                    )
-                },
-                errorListener = errorListener,
-            )
-        }
+        lemmyContentHelper.loadThumbnailIntoImageView(
+            imageUrl = imageUrl,
+            imageSizeKey = "postList:$imageUrl",
+            fallbackUrl = null,
+            contentMaxWidth = imageViewWidth,
+            blur = shouldBlur,
+            tempSize = tempSize,
+            rootView = rootView,
+            loadingView = null,
+            imageView = imageView,
+            preferFullSizeImage = preferFullSizeImage,
+            errorListener = errorListener,
+        )
     }
 }
 

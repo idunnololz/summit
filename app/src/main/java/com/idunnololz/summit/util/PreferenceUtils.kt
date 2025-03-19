@@ -3,6 +3,7 @@ package com.idunnololz.summit.util
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.idunnololz.summit.util.ext.getFloatSafe
 import com.idunnololz.summit.util.ext.getIntOrNull
 import com.idunnololz.summit.util.ext.getLongSafe
 import kotlin.properties.ReadWriteProperty
@@ -251,7 +252,8 @@ class FloatPreferenceDelegate(
     val defaultValue: Float = 0f,
 ) : ReadWriteProperty<Any, Float> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getFloat(key, defaultValue)
+    override fun getValue(thisRef: Any, property: KProperty<*>) =
+        prefs.getFloatSafe(key, defaultValue)
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) =
         prefs.edit().putFloat(key, value).apply()

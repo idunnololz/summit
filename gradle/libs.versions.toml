@@ -55,7 +55,7 @@ media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = 
 media3-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
 
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "33.9.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version = "33.10.0" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 

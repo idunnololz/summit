@@ -2114,9 +2114,13 @@ class MiscSettings @Inject constructor(
         previewLinks,
         usePredictiveBack,
         perCommunitySettings,
+        indicatePostsAndCommentsCreatedByCurrentUser,
+        warnReplyToOldContentThresholdMs,
+        saveDraftsAutomatically,
         largeScreenSupport,
         showEditedDate,
         imagePreviewHideUiByDefault,
+        rotateInstanceOnUploadFail,
         uploadImagesToImgur,
         animationLevel,
         shakeToSendFeedback,
@@ -2124,6 +2128,7 @@ class MiscSettings @Inject constructor(
         showNewPersonWarning,
         preferredLocale,
         communitySelectorShowCommunitySuggestions,
+        userAgentChoice,
     )
 }
 
@@ -2522,6 +2527,7 @@ class DownloadSettings @Inject constructor(
 
     override val allSettings: List<SettingItem> = listOf(
         downloadDirectory,
+        resetDownloadDirectory,
     )
 }
 
@@ -2618,6 +2624,7 @@ class NotificationSettings @Inject constructor(
 
     override val allSettings: List<SettingItem> = listOf(
         isNotificationsEnabled,
+        checkInterval,
     )
 }
 
@@ -2710,26 +2717,12 @@ class DefaultAppsSettings @Inject constructor(
         null,
     )
 
-    val inlineVideoVolume = SliderSettingItem(
-        context.getString(R.string.default_volume),
-        0f,
-        1f,
-        null,
-    )
-    val autoPlayVideos = OnOffSettingItem(
-        null,
-        context.getString(R.string.auto_play_videos),
-        null,
-        relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
-    )
-
     override val parents: List<KClass<out SearchableSettings>> = listOf(
         MainSettings::class,
     )
 
     override val allSettings: List<SettingItem> = listOf(
-        inlineVideoVolume,
-        autoPlayVideos,
+        defaultWebApp,
     )
 }
 
