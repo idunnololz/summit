@@ -26,6 +26,7 @@ import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
@@ -271,7 +272,7 @@ class InboxFragment :
             onUpdate()
         }
         viewModel.currentFullAccount.observe(viewLifecycleOwner) {
-            if (it?.accountInfo?.miscAccountInfo?.modCommunityIds?.isNotEmpty() == true) {
+            if (it?.isMod() == true) {
                 setModReportsVisibility(isVisible = true)
             } else {
                 setModReportsVisibility(isVisible = false)

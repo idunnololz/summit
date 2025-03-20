@@ -44,7 +44,7 @@ class SettingsAccountBlockListViewModel @Inject constructor(
         communityBlockList.setIsLoading()
 
         viewModelScope.launch {
-            accountInfoManager.fetchAccountInfo()
+            accountInfoManager.fetchAccountInfo(force = true)
                 .onSuccess { data ->
                     val account = accountManager.getAccounts().firstOrNull {
                         it.id == data.my_user?.local_user_view?.local_user?.person_id

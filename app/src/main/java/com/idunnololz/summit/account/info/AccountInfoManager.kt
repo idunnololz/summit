@@ -1,6 +1,7 @@
 package com.idunnololz.summit.account.info
 
 import android.net.Uri
+import android.util.Log
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
@@ -11,10 +12,14 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
+import kotlinx.coroutines.Deferred
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -41,6 +46,7 @@ class AccountInfoManager @Inject constructor(
     val unreadCount = MutableStateFlow<UnreadCount>(UnreadCount())
     val currentFullAccount = MutableStateFlow<FullAccount?>(null)
     val currentFullAccountOnChange = currentFullAccount.asSharedFlow().drop(1)
+    var fetchAccountInfoJob: Deferred<Result<GetSiteResponse>>? = null
 
     fun init() {
         accountManager.addOnAccountChangedListener(
@@ -73,7 +79,7 @@ class AccountInfoManager @Inject constructor(
 
                 loadAccountInfo(it as? Account)
 
-                refreshAccountInfo(it as? Account)
+                refreshAccountInfo(it as? Account, force = true)
                 updateUnreadCount()
             }
         }
@@ -82,20 +88,20 @@ class AccountInfoManager @Inject constructor(
             @Suppress("OPT_IN_USAGE")
             unreadCountInvalidates.debounce(1000)
                 .collect {
-                    val account = accountManager.currentAccount.asAccount ?: return@collect
+                    val account = currentFullAccount.value ?: return@collect
                     updateUnreadCount(account)
                 }
         }
     }
 
-    fun refreshAccountInfo() {
+    fun refreshAccountInfo(force: Boolean) {
         coroutineScope.launch {
-            refreshAccountInfo(accountManager.currentAccount.asAccount)
+            refreshAccountInfo(accountManager.currentAccount.asAccount, force)
         }
     }
 
-    suspend fun fetchAccountInfo(): Result<GetSiteResponse> =
-        refreshAccountInfo(accountManager.currentAccount.asAccount)
+    suspend fun fetchAccountInfo(force: Boolean): Result<GetSiteResponse> =
+        refreshAccountInfo(accountManager.currentAccount.asAccount, force)
 
     fun updateUnreadCount() {
         coroutineScope.launch {
@@ -158,7 +164,8 @@ class AccountInfoManager @Inject constructor(
         subscribedCommunities.emit(fullAccount.accountInfo.subscriptions ?: listOf())
     }
 
-    private suspend fun updateUnreadCount(account: Account) {
+    private suspend fun updateUnreadCount(fullAccount: FullAccount) {
+        val account = fullAccount.account
         val j1 = coroutineScope.launch {
             accountAwareLemmyClient.fetchUnreadCountWithRetry(force = true, account)
                 .onSuccess {
@@ -172,46 +179,66 @@ class AccountInfoManager @Inject constructor(
                 }
         }
         val j2 = coroutineScope.launch {
-            accountAwareLemmyClient.fetchUnresolvedReportsCountWithRetry(force = true, account)
-                .onSuccess {
-                    unreadCount.emit(
-                        unreadCount.value.copy(
-                            lastUpdateTimeMs = System.currentTimeMillis(),
-                            account = account,
-                            totalUnresolvedReportsCount =
-                            it.comment_reports +
-                                it.post_reports +
-                                (it.private_message_reports ?: 0),
-                        ),
-                    )
-                }
+            if (fullAccount.isMod()) {
+                accountAwareLemmyClient.fetchUnresolvedReportsCountWithRetry(force = true, account)
+                    .onSuccess {
+                        unreadCount.emit(
+                            unreadCount.value.copy(
+                                lastUpdateTimeMs = System.currentTimeMillis(),
+                                account = account,
+                                totalUnresolvedReportsCount =
+                                it.comment_reports +
+                                    it.post_reports +
+                                    (it.private_message_reports ?: 0),
+                            ),
+                        )
+                    }
+            }
         }
 
         j1.join()
         j2.join()
     }
 
-    private suspend fun refreshAccountInfo(account: Account?): Result<GetSiteResponse> {
-        accountInfoUpdateState.emit(StatefulData.Loading())
-
-        if (account == null) {
-            currentFullAccount.emit(null)
-            accountInfoUpdateState.emit(StatefulData.Success(null))
-            return Result.failure(NotAuthenticatedException())
+    private suspend fun refreshAccountInfo(
+        account: Account?,
+        force: Boolean
+    ): Result<GetSiteResponse> {
+        fetchAccountInfoJob?.let {
+            if (!force) {
+                return it.await()
+            }
         }
 
-        val result = withContext(Dispatchers.IO) {
-            accountAwareLemmyClient.fetchSiteWithRetry(force = true, account.jwt)
-        }
+        fetchAccountInfoJob?.cancel()
+        val fetchAccountInfoJob = coroutineScope.async {
+            delay(100)
 
-        result
-            .onSuccess { response ->
-                updateAccountInfoWith(account, response)
+            accountInfoUpdateState.emit(StatefulData.Loading())
+
+            if (account == null) {
+                currentFullAccount.emit(null)
+                accountInfoUpdateState.emit(StatefulData.Success(null))
+                return@async Result.failure(NotAuthenticatedException())
             }
 
-        accountInfoUpdateState.emit(StatefulData.Success(account))
+            val result = withContext(Dispatchers.IO) {
+                accountAwareLemmyClient.fetchSiteWithRetry(force = true, account.jwt)
+            }
 
-        return result
+            result
+                .onSuccess { response ->
+                    updateAccountInfoWith(account, response)
+                }
+
+            accountInfoUpdateState.emit(StatefulData.Success(account))
+
+            return@async result
+        }.also {
+            this.fetchAccountInfoJob = it
+        }
+
+        return fetchAccountInfoJob.await()
     }
 
     private suspend fun loadAccountInfo(account: Account?) {

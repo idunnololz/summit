@@ -87,9 +87,9 @@ class CommunitiesPaneViewModel @Inject constructor(
         onAddBookmarkClick,
     )
 
-    fun loadCommunities() {
+    fun loadCommunities(force: Boolean) {
         userCommunities = userCommunitiesManager.getAllUserCommunities()
-        accountInfoManager.refreshAccountInfo()
+        accountInfoManager.refreshAccountInfo(force)
         updateCommunities()
     }
 

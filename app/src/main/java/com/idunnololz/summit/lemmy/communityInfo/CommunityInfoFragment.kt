@@ -46,6 +46,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel.CommunityInfo
 import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
@@ -726,7 +727,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 val title: String,
             ) : Item
             data class CommunityItem(
-                val communityView: CommunityView,
+                val communityInfo: CommunityInfo,
             ) : Item
         }
 
@@ -756,8 +757,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                     is Item.TitleItem ->
                         old.title == (new as Item.TitleItem).title
                     is Item.CommunityItem ->
-                        old.communityView.community.id ==
-                            (new as Item.CommunityItem).communityView.community.id
+                        old.communityInfo.communityRef ==
+                            (new as Item.CommunityItem).communityInfo.communityRef
 
                     is Item.CommunityHeaderItem -> true
                     is Item.InstanceHeaderItem -> true
@@ -898,21 +899,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 CommunityInfoCommunityItemBinding::inflate,
             ) { item, b, h ->
                 b.icon.load(R.drawable.ic_default_community)
-                offlineManager.fetchImage(h.itemView, item.communityView.community.icon) {
+                offlineManager.fetchImage(h.itemView, item.communityInfo.icon) {
                     b.icon.load(it)
                 }
 
-                b.title.text = item.communityView.community.name
-                val mauString = LemmyUtils.abbrevNumber(
-                    item.communityView.counts.users_active_month.toLong(),
-                )
-
-                @Suppress("SetTextI18n")
-                b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
-                    "(${item.communityView.community.instance})"
+                b.title.text = item.communityInfo.name
 
                 b.root.setOnClickListener {
-                    onCommunityInfoClick(item.communityView.community.toCommunityRef())
+                    onCommunityInfoClick(item.communityInfo.communityRef)
                 }
             }
         }
@@ -1000,7 +994,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 for (community in multiCommunityData.communitiesData) {
                     newItems.add(
                         Item.CommunityItem(
-                            community.community_view,
+                            community,
                         ),
                     )
                 }

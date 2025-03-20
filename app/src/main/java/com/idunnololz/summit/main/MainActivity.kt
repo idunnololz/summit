@@ -292,8 +292,6 @@ class MainActivity :
         }
 
         runOnReady(this) {
-            viewModel.loadCommunities()
-
             if (savedInstanceState == null) {
                 setupNavigationBar()
             } // Else, need to wait for onRestoreInstanceState

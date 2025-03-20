@@ -162,8 +162,6 @@ class ClientFactory @Inject constructor(
                     .header("User-Agent", getUserAgent(purpose))
                 val newRequest = requestBuilder.build()
 
-                Log.d("HAHA", "Setting user-agent: ${getUserAgent(purpose)}")
-
                 chain.proceed(newRequest)
             }
             .apply {

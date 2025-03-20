@@ -490,25 +490,8 @@ class LemmyApiClient @Inject constructor(
             "$name@$instance"
         }
 
-        val form = GetCommunity(name = finalName, auth = account?.jwt)
-
-        return retrofitErrorHandler {
-            if (force) {
-                api.getCommunityNoCache(
-                    authorization = account?.bearer,
-                    form = form.serializeToMap(),
-                )
-            } else {
-                api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
-            }
-        }.fold(
-            onSuccess = {
-                Result.success(it.community_view)
-            },
-            onFailure = {
-                Result.failure(it)
-            },
-        )
+        return getCommunity(account, Either.Right(finalName), force)
+            .map { it.community_view }
     }
 
     suspend fun getCommunity(
@@ -638,6 +621,7 @@ class LemmyApiClient @Inject constructor(
         page: Int = 1,
         limit: Int = 50,
     ): Result<List<CommunityView>> {
+        Log.d("HAHA", "fetchCommunities", RuntimeException())
         val form = ListCommunities(
             type_ = listingType,
             sort = sortType,
