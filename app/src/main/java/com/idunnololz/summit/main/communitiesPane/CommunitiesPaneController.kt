@@ -45,7 +45,6 @@ import dagger.assisted.AssistedInject
 typealias OnCommunitySelected = (Either<UserCommunityItem, CommunityRef>, resetTab: Boolean) -> Unit
 
 class CommunitiesPaneController @AssistedInject constructor(
-    private val offlineManager: OfflineManager,
     private val tabsManager: TabsManager,
     private val animationsHelper: AnimationsHelper,
     private val avatarHelper: AvatarHelper,
@@ -70,7 +69,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     }
 
     init {
-        viewModel.loadCommunities()
+        viewModel.loadCommunities(force = false)
 
         val context = binding.root.context
 
@@ -89,7 +88,7 @@ class CommunitiesPaneController @AssistedInject constructor(
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             binding.swipeRefreshLayout.isRefreshing = false
-            viewModel.loadCommunities()
+            viewModel.loadCommunities(force = true)
         }
 
         binding.titleEditText.addTextChangedListener {

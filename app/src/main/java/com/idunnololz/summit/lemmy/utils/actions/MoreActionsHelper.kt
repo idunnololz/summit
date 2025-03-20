@@ -422,7 +422,7 @@ class MoreActionsHelper @Inject constructor(
                     ),
                 )
 
-                accountInfoManager.refreshAccountInfo()
+                accountInfoManager.refreshAccountInfo(force = true)
             }
             .onFailure {
                 subscribeResult.postErrorAndClear(it)
@@ -435,7 +435,7 @@ class MoreActionsHelper @Inject constructor(
                 blockPersonResult.postErrorAndClear(it)
             }
             .onSuccess {
-                accountInfoManager.refreshAccountInfo()
+                accountInfoManager.refreshAccountInfo(force = true)
                 blockPersonResult.postValueAndClear(
                     BlockPersonResult(
                         blocked = block,
@@ -455,7 +455,7 @@ class MoreActionsHelper @Inject constructor(
                         communityId = id,
                     ),
                 )
-                accountInfoManager.refreshAccountInfo()
+                accountInfoManager.refreshAccountInfo(force = true)
             }
             .onFailure {
                 blockCommunityResult.postErrorAndClear(it)

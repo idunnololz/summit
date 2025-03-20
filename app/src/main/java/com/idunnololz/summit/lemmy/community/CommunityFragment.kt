@@ -529,6 +529,7 @@ class CommunityFragment :
                 avatarHelper = avatarHelper,
                 useHeader = preferences.usePostsFeedHeader,
                 moreActionsHelper = moreActionsHelper,
+                userCommunitiesManager = userCommunitiesManager,
                 state = lemmyAppBarController?.state,
             )
 

@@ -45,6 +45,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
+import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -66,6 +67,7 @@ class LemmyAppBarController(
     private val viewLifecycleOwner: LifecycleOwner,
     private val avatarHelper: AvatarHelper,
     private val moreActionsHelper: MoreActionsHelper,
+    private val userCommunitiesManager: UserCommunitiesManager,
     useHeader: Boolean,
     state: State? = null,
 ) {
@@ -303,6 +305,12 @@ class LemmyAppBarController(
         val isSubscribed = fullAccount?.accountInfo?.subscriptions?.any {
             it.toCommunityRef() == currentCommunity
         } == true
+        val isBookmarked: Boolean
+        if (currentCommunity == null) {
+            isBookmarked = false
+        } else {
+            isBookmarked = userCommunitiesManager.isCommunityBookmarked(currentCommunity)
+        }
 
         if (isHome) {
             vh.communityTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
@@ -325,6 +333,13 @@ class LemmyAppBarController(
                 0,
                 0,
             )
+        } else if (isBookmarked) {
+            vh.communityTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.outline_bookmark_check_18,
+                0,
+                0,
+                0,
+            )
         } else {
             vh.communityTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 0,
@@ -336,10 +351,10 @@ class LemmyAppBarController(
 
         if (vh is ViewHolder.LargeAppBarViewHolder) {
             loadLargeAppBar(vh)
-        }
 
-        if (currentCommunity != null) {
-            communityInfoViewModel.onCommunityChanged(currentCommunity)
+            if (currentCommunity != null) {
+                communityInfoViewModel.onCommunityChanged(currentCommunity)
+            }
         }
     }
 

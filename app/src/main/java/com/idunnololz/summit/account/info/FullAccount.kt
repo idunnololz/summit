@@ -20,6 +20,10 @@ fun FullAccount.isPersonBlocked(personRef: PersonRef): Boolean =
 fun FullAccount.isCommunityBlocked(communityRef: CommunityRef.CommunityRefByName): Boolean =
     accountInfo.miscAccountInfo?.blockedCommunities?.any { it.communityRef == communityRef } == true
 
+fun FullAccount.isMod(): Boolean =
+    accountInfo.miscAccountInfo?.modCommunityIds?.isNotEmpty() == true ||
+        accountInfo.miscAccountInfo?.isAdmin == true
+
 fun GetSiteResponse.toFullAccount(account: Account): FullAccount {
     val localUserView = this.my_user?.local_user_view
     val accountInfo = AccountInfo(

@@ -80,6 +80,10 @@ class MainActivityViewModel @Inject constructor(
 
             launch {
                 accountManager.currentAccount.collect {
+                    withContext(Dispatchers.Main) {
+                        loadCommunities()
+                    }
+
                     val account = it as? Account
                     val accountView = if (account != null) {
                         accountInfoManager.getAccountViewForAccount(account)
@@ -129,14 +133,6 @@ class MainActivityViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     Log.d(TAG, "'UserTagsManager' ready!")
                     readyCount.emit(readyCount.value + 1)
-                }
-            }
-
-            launch {
-                accountManager.currentAccount.collect {
-                    withContext(Dispatchers.Main) {
-                        loadCommunities()
-                    }
                 }
             }
 
@@ -233,7 +229,6 @@ class MainActivityViewModel @Inject constructor(
                     withContext(Dispatchers.Main) {
                         refetchCommunityOrSite(force = true)
                     }
-                    accountInfoManager.refreshAccountInfo()
 
                     Log.d(TAG, "subscription status: " + it.subscribed)
                 }

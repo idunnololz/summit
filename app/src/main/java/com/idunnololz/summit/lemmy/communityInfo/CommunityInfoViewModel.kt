@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.SubscribedType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -26,7 +27,6 @@ import com.idunnololz.summit.util.Event
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.lang.RuntimeException
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlin.RuntimeException
 
 @HiltViewModel
 class CommunityInfoViewModel @Inject constructor(
@@ -220,7 +221,15 @@ class CommunityInfoViewModel @Inject constructor(
                 communityRef = communityRef,
                 instance = instance,
                 icon = R.drawable.outline_shield_24,
-                communitiesData = successResults,
+                communitiesData = successResults.map {
+                    CommunityInfo(
+                        it.community_view.community.toCommunityRef(),
+                        it.community_view.community.id,
+                        it.community_view.community.name,
+                        it.community_view.community.title,
+                        it.community_view.community.icon,
+                    )
+                },
             ),
         )
     }
@@ -233,35 +242,25 @@ class CommunityInfoViewModel @Inject constructor(
             multiCommunity.setError(NotAuthenticatedException())
             return
         }
-
-        val results = flow {
-            val subscriptions = fullAccount
-                .accountInfo
-                .subscriptions
-                ?: listOf()
-            subscriptions.forEach { subscription ->
-                val result = apiClient
-                    .fetchCommunityWithRetry(Either.Left(subscription.id), false)
-                emit(result)
-            }
-        }.flowOn(Dispatchers.Default).toList()
-
-        val successResults = mutableListOf<GetCommunityResponse>()
-        for (result in results) {
-            if (result.isSuccess) {
-                successResults.add(result.getOrThrow())
-            } else {
-                multiCommunity.setError(requireNotNull(result.exceptionOrNull()))
-                return
-            }
-        }
+        val subscriptions = fullAccount
+            .accountInfo
+            .subscriptions
+            ?: listOf()
 
         multiCommunity.setValue(
             MultiCommunityData(
                 communityRef = communityRef,
                 instance = instance,
                 icon = R.drawable.baseline_subscriptions_24,
-                communitiesData = successResults,
+                communitiesData = subscriptions.map {
+                    CommunityInfo(
+                        it.toCommunityRef(),
+                        it.id,
+                        it.name,
+                        it.title,
+                        it.icon,
+                    )
+                },
             ),
         )
     }
@@ -270,43 +269,28 @@ class CommunityInfoViewModel @Inject constructor(
         multiCommunity.setIsLoading()
 
         val oneUseClient = apiClientFactor.create()
-        val results = flow {
-            val fullAccounts = accountManager.getAccounts()
-                .mapNotNull {
-                    oneUseClient.changeInstance(it.instance)
-                    val site = oneUseClient.fetchSiteWithRetry(auth = it.jwt, force = false)
-                    site.getOrNull()?.toFullAccount(it)
-                }
-            for (fullAccount in fullAccounts) {
-                val subscriptions = fullAccount
-                    .accountInfo
-                    .subscriptions
-                    ?: listOf()
-                oneUseClient.changeInstance(fullAccount.account.instance)
-                subscriptions.forEach { subscription ->
-                    val result = oneUseClient
-                        .getCommunity(fullAccount.account, Either.Left(subscription.id), false)
-                    emit(result)
-                }
+        val fullAccounts = accountManager.getAccounts()
+            .mapNotNull {
+                oneUseClient.changeInstance(it.instance)
+                val site = oneUseClient.fetchSiteWithRetry(auth = it.jwt, force = false)
+                site.getOrNull()?.toFullAccount(it)
             }
-        }.flowOn(Dispatchers.Default).toList()
-
-        val successResults = mutableListOf<GetCommunityResponse>()
-        for (result in results) {
-            if (result.isSuccess) {
-                successResults.add(result.getOrThrow())
-            } else {
-                multiCommunity.setError(requireNotNull(result.exceptionOrNull()))
-                return
-            }
-        }
+        val allSubscriptions = fullAccounts.flatMap { it.accountInfo.subscriptions ?: listOf() }
 
         multiCommunity.setValue(
             MultiCommunityData(
                 communityRef = communityRef,
                 instance = instance,
                 icon = R.drawable.baseline_subscriptions_24,
-                communitiesData = successResults,
+                communitiesData = allSubscriptions.map {
+                    CommunityInfo(
+                        it.toCommunityRef(),
+                        it.id,
+                        it.name,
+                        it.title,
+                        it.icon,
+                    )
+                },
             ),
         )
     }
@@ -338,7 +322,7 @@ class CommunityInfoViewModel @Inject constructor(
                     delay(1000)
 
                     refetchCommunityOrSite(force = true)
-                    accountInfoManager.refreshAccountInfo()
+                    accountInfoManager.refreshAccountInfo(force = true)
 
                     Log.d(TAG, "subscription status: " + it.subscribed)
                 }
@@ -389,10 +373,18 @@ class CommunityInfoViewModel @Inject constructor(
         val force: Boolean,
     )
 
+    data class CommunityInfo(
+        val communityRef: CommunityRef.CommunityRefByName,
+        val id: CommunityId,
+        val name: String,
+        val title: String,
+        val icon: String?,
+    )
+
     data class MultiCommunityData(
         val communityRef: CommunityRef,
         val instance: String,
         @DrawableRes val icon: Int,
-        val communitiesData: List<GetCommunityResponse>,
+        val communitiesData: List<CommunityInfo>,
     )
 }

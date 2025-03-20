@@ -50,7 +50,7 @@ class SettingsWebViewModel @Inject constructor(
         accountData.setIsLoading()
 
         viewModelScope.launch {
-            accountInfoManager.fetchAccountInfo()
+            accountInfoManager.fetchAccountInfo(force = true)
                 .onSuccess { data ->
 
                     val account = accountManager.getAccounts().firstOrNull {

@@ -453,12 +453,8 @@ class AccountAwareLemmyClient @Inject constructor(
     }
 
     suspend fun fetchUnresolvedReportsCountWithRetry(force: Boolean, account: Account) = retry {
-        if (account == null) {
-            createAccountErrorResult()
-        } else {
-            apiClient.fetchUnresolvedReportsCount(force, account)
-                .autoSignOut(account)
-        }
+        apiClient.fetchUnresolvedReportsCount(force, account)
+            .autoSignOut(account)
     }
 
     suspend fun deletePost(
