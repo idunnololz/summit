@@ -101,7 +101,7 @@ class DraftsDialogFragment :
             dismiss()
         }
         binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+            context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
         )
         binding.toolbar.inflateMenu(R.menu.menu_drafts)
         binding.toolbar.setOnMenuItemClickListener {

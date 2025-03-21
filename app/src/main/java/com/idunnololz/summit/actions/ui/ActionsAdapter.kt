@@ -22,6 +22,7 @@ import com.idunnololz.summit.video.VideoState
 
 class ActionsAdapter(
     private val context: Context,
+    private val lemmyTextHelper: LemmyTextHelper,
     private val onImageClick: (String, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (PageRef) -> Unit,
@@ -211,7 +212,7 @@ class ActionsAdapter(
             }
             b.date.text = tsToConcise(context, actionDate)
 
-            LemmyTextHelper.bindText(
+            lemmyTextHelper.bindText(
                 b.actionDesc,
                 actionDesc,
                 account?.instance ?: "lemmy.world",

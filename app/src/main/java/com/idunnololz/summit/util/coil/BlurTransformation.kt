@@ -7,7 +7,6 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import androidx.annotation.RequiresApi
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
 import coil3.size.Size
@@ -17,7 +16,7 @@ import com.idunnololz.summit.util.safeConfig
 class BlurTransformation @JvmOverloads constructor(
     private val context: Context,
     private val radius: Float = DEFAULT_RADIUS,
-    private val sampling: Float = DEFAULT_SAMPLING
+    private val sampling: Float = DEFAULT_SAMPLING,
 ) : Transformation() {
 
     init {
@@ -58,7 +57,6 @@ class BlurTransformation @JvmOverloads constructor(
             tmpOut?.destroy()
             blur?.destroy()
         }
-
 
         val originalSizeOutput = Bitmap.createScaledBitmap(output, input.width, input.height, true)
 

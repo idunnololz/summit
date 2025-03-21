@@ -72,6 +72,9 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
     @Inject
     lateinit var json: Json
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     override fun onStart() {
         super.onStart()
         setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -194,7 +197,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
         with(binding) {
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
                 dismiss()
@@ -263,7 +266,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 title.visibility = View.GONE
             } else {
                 title.visibility = View.VISIBLE
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     textView = title,
                     text = o.content.title,
                     instance = args.instance,
@@ -289,7 +292,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 text.visibility = View.GONE
             } else {
                 text.visibility = View.VISIBLE
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     textView = text,
                     text = o.content.content,
                     instance = args.instance,

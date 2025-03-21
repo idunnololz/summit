@@ -61,7 +61,6 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -87,9 +86,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     private val args by navArgs<SearchResultsFragmentArgs>()
 
     @Inject
-    lateinit var offlineManager: OfflineManager
-
-    @Inject
     lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
     @Inject
@@ -106,6 +102,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     private var adapter: SearchResultAdapter? = null
 
@@ -133,9 +132,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         with(binding) {
             adapter = SearchResultAdapter(
                 context = context,
-                instance = parentFragment.viewModel.instance,
                 viewLifecycleOwner = viewLifecycleOwner,
-                offlineManager = offlineManager,
+                lemmyTextHelper = lemmyTextHelper,
                 postAndCommentViewBuilder = postAndCommentViewBuilder,
                 postListViewBuilder = postListViewBuilder,
                 avatarHelper = avatarHelper,
@@ -349,9 +347,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
     private class SearchResultAdapter(
         private val context: Context,
-        private val instance: String,
         private val viewLifecycleOwner: LifecycleOwner,
-        private val offlineManager: OfflineManager,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
         private val postListViewBuilder: PostListViewBuilder,
         private val avatarHelper: AvatarHelper,
@@ -519,7 +516,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.commentView.comment.content,
                     instance = item.instance,
@@ -645,7 +642,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                             post: PostView,
                             jumpToComments: Boolean,
                             reveal: Boolean,
-                            videoState: VideoState? ->
+                            videoState: VideoState?,
+                        ->
 
                         onItemClick(
                             instance,

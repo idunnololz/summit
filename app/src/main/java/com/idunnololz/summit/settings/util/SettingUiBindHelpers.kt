@@ -11,7 +11,6 @@ import com.idunnololz.summit.databinding.SettingItemOnOffMasterBinding
 import com.idunnololz.summit.databinding.SettingSliderItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
-import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.settings.BasicSettingItem
@@ -24,6 +23,7 @@ import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
+import io.noties.markwon.Markwon
 
 fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Unit) {
     if (this.icon == null) {
@@ -63,7 +63,7 @@ fun OnOffSettingItem.bindTo(
     if (this.description != null) {
         b.desc.visibility = View.VISIBLE
 
-        b.desc.text = LemmyTextHelper.getSpannable(b.root.context, description)
+        Markwon.create(b.root.context).setMarkdown(b.desc, description)
     } else {
         b.desc.visibility = View.GONE
     }
@@ -91,7 +91,7 @@ fun OnOffSettingItem.bindTo(
     if (this.description != null) {
         b.desc.visibility = View.VISIBLE
 
-        b.desc.text = LemmyTextHelper.getSpannable(b.root.context, description)
+        Markwon.create(b.root.context).setMarkdown(b.desc, description)
     } else {
         b.desc.visibility = View.GONE
     }

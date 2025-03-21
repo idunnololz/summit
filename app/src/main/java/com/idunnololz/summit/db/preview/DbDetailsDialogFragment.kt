@@ -79,7 +79,7 @@ class DbDetailsDialogFragment :
             toolbar.title = args.title ?: getString(R.string.database_details)
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
                 dismiss()

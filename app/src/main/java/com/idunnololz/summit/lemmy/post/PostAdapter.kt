@@ -75,6 +75,7 @@ class PostAdapter(
     private val isEmbedded: Boolean,
     private val videoState: VideoState?,
     private var autoCollapseCommentThreshold: Float,
+    private val lemmyTextHelper: LemmyTextHelper,
     private val onRefreshClickCb: () -> Unit,
     private val onSignInRequired: () -> Unit,
     private val onInstanceMismatch: (String, String) -> Unit,
@@ -802,7 +803,7 @@ class PostAdapter(
                 val b = holder.getBinding<PostNotNativeInstanceItemBinding>()
 
                 b.title.text = context.getString(R.string.non_native_post_warning_title)
-                b.text.text = LemmyTextHelper.getSpannable(
+                b.text.text = lemmyTextHelper.getSpannable(
                     context,
                     context.getString(
                         R.string.non_native_post_warning_desc,

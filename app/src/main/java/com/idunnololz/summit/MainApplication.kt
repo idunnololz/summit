@@ -23,9 +23,7 @@ import coil3.transition.CrossfadeTransition
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.notifications.NotificationsUpdater
-import com.idunnololz.summit.offline.OfflineScheduleManager
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
@@ -85,16 +83,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
         super.onCreate()
 
-//        if (LeakCanary.isInAnalyzerProcess(this)) {
-//            // This process is dedicated to LeakCanary for heap analysis.
-//            // You should not init your app in this process.
-//            return
-//        }
-//        LeakCanary.install(this)
-
-        // Needs to be initialized first
-        OfflineScheduleManager.initialize(context)
-
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
 //                    .detectDiskReads()
@@ -112,8 +100,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 //                    .build())
 //        }
 
-        OfflineScheduleManager.instance.setupAlarms()
-
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
         val preferences = hiltEntryPoint.preferences()
@@ -121,8 +107,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         hiltEntryPoint.themeManager().onPreferencesChanged()
         Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
         Utils.defaultWebApp = preferences.defaultWebApp
-        LemmyTextHelper.autoLinkPhoneNumbers = preferences.autoLinkPhoneNumbers
-        LemmyTextHelper.autoLinkIpAddresses = preferences.autoLinkIpAddresses
         notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
 
         SingletonImageLoader.setSafe {

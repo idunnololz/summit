@@ -68,7 +68,7 @@ class DraftsTabbedFragment :
                 findNavController().navigateUp()
             }
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
 
             if (viewPager.adapter == null) {

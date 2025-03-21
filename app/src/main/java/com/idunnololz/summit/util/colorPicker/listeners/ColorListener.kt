@@ -17,16 +17,6 @@ package com.idunnololz.summit.util.colorPicker.listeners
 
 import androidx.annotation.ColorInt
 
-/**
- * ColorListener is invoked whenever [com.skydoves.colorpickerview.ColorPickerView] is
- * triggered.
- */
 interface ColorListener : ColorPickerViewListener {
-    /**
-     * invoked by [com.skydoves.colorpickerview.ColorPickerView].
-     *
-     * @param color the last selected color.
-     * @param fromUser triggered by the user(true) or not(false).
-     */
     fun onColorSelected(@ColorInt color: Int, fromUser: Boolean)
 }

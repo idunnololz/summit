@@ -71,7 +71,6 @@ class ClientFactory @Inject constructor(
     }
 
     fun newClient(debugName: String, cacheDir: File, purpose: Purpose): OkHttpClient {
-
         val myCache = Cache(
             directory = cacheDir,
             maxSize = 20L * 1024L * 1024L, // 20MB

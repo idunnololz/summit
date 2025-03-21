@@ -263,4 +263,5 @@
     <item name="import_table_strategy_merge" type="id" />
     <item name="import_table_strategy_overwrite" type="id" />
     <item name="import_table_strategy_ignore" type="id" />
+    <item name="none" type="id" />
 </resources>

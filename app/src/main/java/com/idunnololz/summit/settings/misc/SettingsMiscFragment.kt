@@ -62,6 +62,9 @@ class SettingsMiscFragment :
     @Inject
     lateinit var accountAwareLemmyClient: AccountAwareLemmyClient
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     private val restartAppDialogLauncher = newAlertDialogLauncher("restart_app") {
         if (it.isOk) {
             ProcessPhoenix.triggerRebirth(requireContext())
@@ -124,8 +127,7 @@ class SettingsMiscFragment :
             {
                 preferences.autoLinkPhoneNumbers = it
 
-                LemmyTextHelper.autoLinkPhoneNumbers = it
-                LemmyTextHelper.resetMarkwon(context)
+                lemmyTextHelper.resetMarkwon(context)
             },
         )
         settings.autoLinkIpAddresses.bindTo(
@@ -134,8 +136,7 @@ class SettingsMiscFragment :
             {
                 preferences.autoLinkIpAddresses = it
 
-                LemmyTextHelper.autoLinkIpAddresses = it
-                LemmyTextHelper.resetMarkwon(context)
+                lemmyTextHelper.resetMarkwon(context)
             },
         )
         settings.instanceNameStyle.bindTo(

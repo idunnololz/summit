@@ -1,17 +1,17 @@
 package com.idunnololz.summit.util.shimmer
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 
-fun newShimmerDrawable16to9(context: Context): ShimmerDrawable =
-    newShimmerDrawable(context, 9f / 16f)
+fun newShimmerDrawable16to9(context: Context): Drawable = newShimmerDrawable(context, 9f / 16f)
 
-fun newShimmerDrawableSquare(context: Context): ShimmerDrawable = newShimmerDrawable(context, 1f)
+fun newShimmerDrawableSquare(context: Context): Drawable = newShimmerDrawable(context, 1f)
 
-fun newShimmerDrawable(context: Context, ratio: Float): ShimmerDrawable {
-    val size = Utils.convertDpToPixel(24f)
+fun newShimmerDrawable(context: Context, ratio: Float): Drawable {
+    val size = Utils.convertDpToPixel(1f)
     val shimmer = Shimmer.ColorHighlightBuilder()
         .setBaseColor(0)
         .setHighlightColor(context.getColorCompat(R.color.colorText))

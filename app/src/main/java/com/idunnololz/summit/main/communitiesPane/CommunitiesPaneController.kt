@@ -26,7 +26,6 @@ import com.idunnololz.summit.databinding.TabStateItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.tabs.hasTabId
 import com.idunnololz.summit.tabs.isSubscribedCommunity

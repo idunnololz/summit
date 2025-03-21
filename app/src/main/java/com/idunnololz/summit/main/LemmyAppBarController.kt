@@ -68,6 +68,7 @@ class LemmyAppBarController(
     private val avatarHelper: AvatarHelper,
     private val moreActionsHelper: MoreActionsHelper,
     private val userCommunitiesManager: UserCommunitiesManager,
+    private val lemmyTextHelper: LemmyTextHelper,
     useHeader: Boolean,
     state: State? = null,
 ) {
@@ -653,10 +654,10 @@ class LemmyAppBarController(
             vh.body.setOnClickListener(null)
         } else {
             vh.body.visibility = View.VISIBLE
-            LemmyTextHelper.bindText(
-                vh.body,
-                body,
-                communityInfoViewModel.instance,
+            lemmyTextHelper.bindText(
+                textView = vh.body,
+                text = body,
+                instance = communityInfoViewModel.instance,
                 onImageClick = { url ->
                     mainActivity.openImage(
                         sharedElement = null,

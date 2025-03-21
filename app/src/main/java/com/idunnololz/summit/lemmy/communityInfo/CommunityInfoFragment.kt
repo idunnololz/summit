@@ -44,7 +44,6 @@ import com.idunnololz.summit.databinding.WarningItemBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel.CommunityInfo
 import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
@@ -98,6 +97,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     private var isAnimatingTitleIn: Boolean = false
     private var isAnimatingTitleOut: Boolean = false
@@ -170,6 +172,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             instance = viewModel.instance,
             offlineManager = offlineManager,
             preferences = preferences,
+            lemmyTextHelper = lemmyTextHelper,
             onImageClick = { imageName, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
@@ -676,6 +679,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val instance: String,
         private val offlineManager: OfflineManager,
         private val preferences: Preferences,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val onImageClick: (String, View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
@@ -839,7 +843,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 clazz = Item.DescriptionItem::class,
                 inflateFn = PageDataDescriptionItemBinding::inflate,
             ) { item, b, _ ->
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.content,
                     instance = instance,

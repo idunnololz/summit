@@ -60,6 +60,7 @@ import java.io.File
 class LemmyContentHelper(
     private val context: Context,
     private val offlineManager: OfflineManager,
+    private val lemmyTextHelper: LemmyTextHelper,
     private val getExoPlayerManager: () -> ExoPlayerManager,
     private val viewRecycler: ViewRecycler<View> = ViewRecycler(),
 ) {
@@ -329,7 +330,6 @@ class LemmyContentHelper(
                 true
             }
 
-
             fun fetchFullImage() = loadThumbnailIntoImageView(
                 imageUrl = imageUrl,
                 imageSizeKey = imageUrl,
@@ -471,7 +471,7 @@ class LemmyContentHelper(
         }
 
         (fullContentContainerView.getTag(R.id.body) as? TextView)?.let { textView ->
-            val spannable = LemmyTextHelper.bindText(
+            val spannable = lemmyTextHelper.bindText(
                 textView = textView,
                 text = postView.post.body ?: "",
                 instance = instance,
@@ -646,7 +646,7 @@ class LemmyContentHelper(
         fun onImageLoaded(urlOrFile: Either<String, File>) {
             urlOrFile.fold(
                 { offlineManager.getImageSizeHint(it, tempSize) },
-                { offlineManager.getImageSizeHint(it, tempSize) }
+                { offlineManager.getImageSizeHint(it, tempSize) },
             )
 
             Log.d(TAG, "image size: $tempSize")

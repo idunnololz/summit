@@ -193,6 +193,9 @@ class MainActivity :
     @Inject
     lateinit var exoPlayerManagerManager: ExoPlayerManagerManager
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     private val imageViewerLauncher = registerForActivityResult(
         ImageViewerContract(),
     ) { resultCode ->
@@ -215,7 +218,7 @@ class MainActivity :
         super.onCreate(savedInstanceState)
 
         // Markwon's Coil's imageloader breaks if the activity is destroyed... always recreate oncreate
-        LemmyTextHelper.resetMarkwon(this)
+        lemmyTextHelper.resetMarkwon(this)
 
         viewModel.communities.observe(this) {
             communitySelectorController?.setCommunities(it)

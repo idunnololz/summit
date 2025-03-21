@@ -20,6 +20,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":markwon:markwon-core"))
+    implementation(libs.annotation)
     implementation(libs.commonmark.table)
-    implementation(libs.markwon.core)
 }

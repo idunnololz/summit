@@ -1,6 +1,7 @@
 package com.idunnololz.summit.signUp
 
 import android.graphics.RectF
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -54,7 +55,6 @@ import com.idunnololz.summit.util.ext.requestFocusAndShowKeyboard
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.shimmer.ShimmerDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -79,6 +79,9 @@ class SignUpFragment :
 
     @Inject
     lateinit var directoryHelper: DirectoryHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     private var currentScene: SignUpScene? = null
 
@@ -204,7 +207,7 @@ class SignUpFragment :
     private fun renderCurrentScene(
         data: SignUpModel,
         isInitialRender: Boolean,
-        shimmerDrawable: ShimmerDrawable,
+        shimmerDrawable: Drawable,
     ) = with(binding) {
         val context = requireContext()
         val signUpFormData = data.signUpFormData
@@ -237,7 +240,7 @@ class SignUpFragment :
 
         when (val scene = data.currentScene) {
             is SignUpScene.InstanceForm -> with(currentBinding as SignUpInstanceFormBinding) {
-                body.text = LemmyTextHelper
+                body.text = lemmyTextHelper
                     .getSpannable(context, getString(R.string.sign_up_instance_desc))
                 signUp.text = if (scene.hasNext) {
                     getString(R.string.button_continue)
@@ -400,14 +403,14 @@ class SignUpFragment :
                     getString(R.string.submit)
                 }
 
-                val questionnaire = LemmyTextHelper
+                val questionnaire = lemmyTextHelper
                     .getSpannable(context, localSite.application_question ?: "")
 
                 if (isInitialRender) {
                     answerEditText.setText(signUpFormData.questionnaireAnswer)
                     answerExpandedEditText.setText(signUpFormData.questionnaireAnswer)
 
-                    warning.text = LemmyTextHelper
+                    warning.text = lemmyTextHelper
                         .getSpannable(context, getString(R.string.answer_required_to_sign_up_desc))
 
                     body.text = questionnaire

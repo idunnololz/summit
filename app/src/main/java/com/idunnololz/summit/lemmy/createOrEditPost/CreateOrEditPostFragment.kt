@@ -43,6 +43,7 @@ import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -105,6 +106,9 @@ class CreateOrEditPostFragment :
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -235,7 +239,7 @@ class CreateOrEditPostFragment :
             }
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
@@ -921,6 +925,7 @@ class CreateOrEditPostFragment :
                 ) {
                     binding.titleSuggestionContainer.visibility = View.VISIBLE
                     binding.titleSuggestion.setMarkdown(
+                        lemmyTextHelper,
                         getString(
                             R.string.use_suggested_title_format,
                             title,

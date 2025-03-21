@@ -1,7 +1,6 @@
 package com.idunnololz.summit.account.info
 
 import android.net.Uri
-import android.util.Log
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
@@ -12,12 +11,11 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
-import kotlinx.coroutines.Deferred
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -202,7 +200,7 @@ class AccountInfoManager @Inject constructor(
 
     private suspend fun refreshAccountInfo(
         account: Account?,
-        force: Boolean
+        force: Boolean,
     ): Result<GetSiteResponse> {
         fetchAccountInfoJob?.let {
             if (!force) {

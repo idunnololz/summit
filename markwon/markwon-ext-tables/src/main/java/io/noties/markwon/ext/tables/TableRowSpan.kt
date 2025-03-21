@@ -16,6 +16,7 @@ import androidx.annotation.IntDef
 import androidx.annotation.IntRange
 import io.noties.markwon.core.spans.TextLayoutSpan
 import io.noties.markwon.image.AsyncDrawableSpan
+import io.noties.markwon.tables.TableDrawableSpan
 import io.noties.markwon.utils.LeadingMarginUtils
 import io.noties.markwon.utils.SpanUtils
 

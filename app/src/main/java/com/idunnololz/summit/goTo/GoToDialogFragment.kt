@@ -63,7 +63,7 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
                     dismiss()
                 }
                 setNavigationIconTint(
-                    context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
                 )
             }
 

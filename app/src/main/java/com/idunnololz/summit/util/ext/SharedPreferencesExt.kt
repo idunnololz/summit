@@ -57,7 +57,6 @@ fun SharedPreferences.getLongSafe(key: String, defValue: Long): Long {
     }
 }
 
-
 fun SharedPreferences.getFloatSafe(key: String, defValue: Float): Float {
     try {
         return getFloat(key, defValue)

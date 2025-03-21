@@ -90,6 +90,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -135,7 +138,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             is InboxItem.MessageInboxItem,
             is InboxItem.ReplyInboxItem,
             -> {
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     binding.title,
                     inboxItem.title,
                     args.instance,
@@ -166,7 +169,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 binding.title.setText(R.string.report_on_post)
             }
         }
-        LemmyTextHelper.bindText(
+        lemmyTextHelper.bindText(
             binding.content,
             inboxItem.content,
             args.instance,
@@ -406,12 +409,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     override fun onResume() {
         super.onResume()
 
-        requireMainActivity().apply {
-            if (!navBarController.useNavigationRail) {
-                navBarController.hideNavBar(animate = true)
-            }
-        }
-
         if (preferences.leftHandMode) {
             binding.bottomAppBar.layoutDirection = View.LAYOUT_DIRECTION_RTL
             binding.fabContainer.layoutDirection = View.LAYOUT_DIRECTION_RTL
@@ -484,6 +481,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     isEmbedded = true,
                     videoState = null,
                     autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
+                    lemmyTextHelper = lemmyTextHelper,
                     onRefreshClickCb = {
                         loadContext(force = true)
                     },

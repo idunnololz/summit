@@ -68,7 +68,7 @@ class SearchHomeConfigDialogFragment : BaseDialogFragment<FragmentSearchHomeConf
                 dismiss()
             }
             binding.toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             updateUi()
         }

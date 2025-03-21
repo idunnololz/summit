@@ -35,7 +35,6 @@ import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.TextMeasurementUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.ext.setup
@@ -61,6 +60,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,16 +108,11 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         val context = context ?: return
 
         with(binding) {
-            val params = TextMeasurementUtils.TextMeasurementParams.Builder
-                .from(descriptionMeasurementObject).build()
-
             val adapter = ModEventsAdapter(
                 context = context,
-                rootView = root,
-                offlineManager = offlineManager,
                 instance = args.instance,
                 availableWidth = binding.recyclerView.width,
-                params = params,
+                lemmyTextHelper = lemmyTextHelper,
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
@@ -196,11 +193,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
     private class ModEventsAdapter(
         private val context: Context,
-        private val rootView: View,
-        private val offlineManager: OfflineManager,
         private val instance: String,
         private val availableWidth: Int,
-        private val params: TextMeasurementUtils.TextMeasurementParams,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
         private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -700,7 +695,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                         onLinkLongClick,
                     )
                 }
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     textView = b.title,
                     text = description,
                     instance = instance,

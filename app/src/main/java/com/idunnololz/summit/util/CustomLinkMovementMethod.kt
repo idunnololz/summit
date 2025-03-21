@@ -14,10 +14,10 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.TextView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.util.coil.AsyncDrawableSpan
 import com.idunnololz.summit.util.markwon.DetailsClickableSpan
 import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.tables.TableRowSpan
+import io.noties.markwon.image.AsyncDrawableSpan
 
 class CustomLinkMovementMethod : LinkMovementMethod() {
 

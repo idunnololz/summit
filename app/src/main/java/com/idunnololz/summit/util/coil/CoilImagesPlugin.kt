@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util.coil
 
 import android.content.Context
+import android.graphics.Rect
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Handler
@@ -11,38 +12,31 @@ import coil3.ImageLoader
 import coil3.asDrawable
 import coil3.request.Disposable
 import coil3.request.ImageRequest
-import coil3.request.allowHardware
 import coil3.size.Dimension
+import com.idunnololz.summit.util.Utils
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableLoader
 import io.noties.markwon.image.DrawableUtils
+import io.noties.markwon.image.ImageSpanFactory
 import java.util.concurrent.atomic.AtomicBoolean
 import org.commonmark.node.Image
 
-/**
- * @author Tyler Wong
- * @since 4.2.0
- */
-class CoilImagesPlugin internal constructor(
+class CoilImagesPlugin(
     private val context: Context,
     coilStore: CoilStore,
     imageLoader: ImageLoader,
-) :
-    AbstractMarkwonPlugin() {
+) : AbstractMarkwonPlugin() {
 
     interface CoilStore {
         fun load(drawable: AsyncDrawable): ImageRequest
         fun cancel(disposable: Disposable)
     }
 
-    private val coilAsyncDrawableLoader: CoilAsyncDrawableLoader
-
-    init {
-        coilAsyncDrawableLoader = CoilAsyncDrawableLoader(context, coilStore, imageLoader)
-    }
+    private val coilAsyncDrawableLoader: CoilAsyncDrawableLoader =
+        CoilAsyncDrawableLoader(context, coilStore, imageLoader)
 
     override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
         builder.setFactory(Image::class.java, ImageSpanFactory())
@@ -132,7 +126,17 @@ class CoilImagesPlugin internal constructor(
 //                            )
 //                        }
 
-                        DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
+                        if (drawable.imageText?.startsWith("emoji", ignoreCase = true) == true) {
+                            loadedDrawable.bounds = Rect(
+                                0,
+                                0,
+                                Utils.convertDpToPixel(24f).toInt(),
+                                Utils.convertDpToPixel(24f).toInt(),
+                            )
+                        } else {
+                            DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
+                        }
+
                         drawable.result = loadedDrawable
 
                         if (loadedDrawable is Animatable) {
@@ -159,35 +163,6 @@ class CoilImagesPlugin internal constructor(
                     }
                 }
             }
-        }
-    }
-
-    companion object {
-        fun create(context: Context, imageLoader: ImageLoader): CoilImagesPlugin {
-            return create(
-                context,
-                object : CoilStore {
-                    override fun load(drawable: AsyncDrawable): ImageRequest {
-                        return ImageRequest.Builder(context)
-                            .allowHardware(false) // Needed for the "take screenshot" feature
-                            .data(drawable.destination)
-                            .build()
-                    }
-
-                    override fun cancel(disposable: Disposable) {
-                        disposable.dispose()
-                    }
-                },
-                imageLoader,
-            )
-        }
-
-        fun create(
-            context: Context,
-            coilStore: CoilStore,
-            imageLoader: ImageLoader,
-        ): CoilImagesPlugin {
-            return CoilImagesPlugin(context, coilStore, imageLoader)
         }
     }
 }

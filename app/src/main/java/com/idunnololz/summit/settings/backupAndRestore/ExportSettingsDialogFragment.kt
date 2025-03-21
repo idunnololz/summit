@@ -183,7 +183,7 @@ class ExportSettingsDialogFragment :
             toolbar.title = getString(R.string.backup_settings)
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()

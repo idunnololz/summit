@@ -122,6 +122,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val avatarHelper: AvatarHelper,
     private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
     private val exoPlayerManagerManager: ExoPlayerManagerManager,
+    private val lemmyTextHelper: LemmyTextHelper,
 ) {
 
     private var preferences = preferenceManager.currentPreferences
@@ -152,6 +153,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
+        lemmyTextHelper,
         { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     ).also {
         it.globalFontSizeMultiplier = globalFontSizeMultiplier
@@ -378,7 +380,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         val postTitle = postView.post.name
         if (parseMarkdownInPostTitles) {
-            LemmyTextHelper.bindText(
+            lemmyTextHelper.bindText(
                 textView = title,
                 text = if (postTitle.isNotEmpty() && postTitle[0] == '#') {
                     "\\$postTitle"
@@ -727,7 +729,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 )
             }
         } else {
-            val spannable = LemmyTextHelper.bindText(
+            val spannable = lemmyTextHelper.bindText(
                 textView = text,
                 text = content,
                 spannedText = contentSpannable,
@@ -1073,7 +1075,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown_special))
         headerContainer.setTextSecondPart("")
 
-        LemmyTextHelper.bindText(
+        lemmyTextHelper.bindText(
             textView = text,
             text = content,
             instance = instance,
@@ -1336,7 +1338,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             item.title
         }
 
-        LemmyTextHelper.bindText(
+        lemmyTextHelper.bindText(
             textView = b.title,
             text = title,
             instance = instance,
@@ -1377,7 +1379,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 )
             }
         } else {
-            LemmyTextHelper.bindText(
+            lemmyTextHelper.bindText(
                 textView = b.content,
                 text = item.content,
                 instance = instance,

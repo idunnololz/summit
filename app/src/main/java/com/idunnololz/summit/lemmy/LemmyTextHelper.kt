@@ -13,10 +13,14 @@ import android.util.Log
 import android.widget.TextView
 import androidx.core.text.getSpans
 import coil3.imageLoader
+import coil3.request.Disposable
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.CustomLinkMovementMethod
@@ -24,6 +28,7 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.ImagesAsLinksPlugin
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.coil.CoilImagesPlugin
+import com.idunnololz.summit.util.coil.CoilImagesPlugin.CoilStore
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.markwon.SpoilerPlugin
@@ -35,20 +40,31 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.html.span.SubScriptSpan
 import io.noties.markwon.html.span.SuperScriptSpan
+import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
 import java.util.Locale
 import java.util.regex.Pattern
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.commonmark.parser.Parser
 
-object LemmyTextHelper {
-    private const val TAG = "LemmyTextHelper"
+@Singleton
+class LemmyTextHelper @Inject constructor(
+    private val preferences: Preferences,
+) {
+
+    companion object {
+        private const val TAG = "LemmyTextHelper"
+    }
 
     private var markwon: Markwon? = null
     private var noMediaMarkwon: Markwon? = null
 
-    var autoLinkPhoneNumbers: Boolean = true
-    var autoLinkIpAddresses: Boolean = true
+    private val autoLinkPhoneNumbers: Boolean
+        get() = preferences.autoLinkPhoneNumbers
+    private val autoLinkIpAddresses: Boolean
+        get() = preferences.autoLinkIpAddresses
 
     private val ipPattern = Pattern.compile(
         "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]" +
@@ -226,8 +242,7 @@ object LemmyTextHelper {
         /**
          * Combination of 4 regexes "or'd" (|) together.
          * 1) Matches against words where the first character is a caret. Eg. '^hello'
-         * 2) Matches against poorly formatted header tags. Eg. `##Asdf` (proper would be `## Asdf`)
-         * 3) Matches against full community names (!a@b.com)
+         * 2) Matches against full community names (!a@b.com)
          */
         private val largeRegex = Pattern.compile(
             """\^(\S+)|(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""",
@@ -343,10 +358,6 @@ object LemmyTextHelper {
         noMediaMarkwon = null
     }
 
-    fun getMarkwonTheme(context: Context): MarkwonTheme {
-        return getMarkwon(context.applicationContext).configuration().theme()
-    }
-
     private fun getMarkwon(context: Context) =
         markwon ?: createMarkwon(context.applicationContext, inlineMedia = true).also {
             markwon = it
@@ -362,7 +373,23 @@ object LemmyTextHelper {
             .apply {
                 if (inlineMedia) {
                     usePlugin(
-                        CoilImagesPlugin.create(context, context.applicationContext.imageLoader),
+                        CoilImagesPlugin(
+                            context,
+                            object : CoilStore {
+                                override fun load(drawable: AsyncDrawable): ImageRequest {
+                                    return ImageRequest.Builder(context)
+                                        // Needed for the "take screenshot" feature
+                                        .allowHardware(false)
+                                        .data(drawable.destination)
+                                        .build()
+                                }
+
+                                override fun cancel(disposable: Disposable) {
+                                    disposable.dispose()
+                                }
+                            },
+                            context.applicationContext.imageLoader,
+                        ),
                     )
                 } else {
                     usePlugin(ImagesAsLinksPlugin())

@@ -7,18 +7,19 @@ import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.util.crashlytics
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.core.CorePlugin
+import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
 
 abstract class DetailsClickableSpan : ClickableSpan()
 
 data class DetailsStartSpan(
+    val theme: MarkwonTheme,
     val title: CharSequence,
     var isExpanded: Boolean = false,
     var isProcessed: Boolean = false,
@@ -49,7 +50,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
             for (match in spoilerTitles) {
                 val spoilerTitle = match.groups[2]!!.value
                 visitor.builder().setSpan(
-                    DetailsStartSpan(spoilerTitle),
+                    DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
                     start,
                     start + match.groups[2]!!.range.last,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
@@ -123,7 +124,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
                     }
 
                     spoilerContent.setSpan(
-                        BlockQuoteSpan(LemmyTextHelper.getMarkwonTheme(textView.context)),
+                        BlockQuoteSpan(detailsStartSpan.theme),
                         0,
                         spoilerContent.length,
                         // SPAN_PRIORITY makes sure this span has highest priority, so it is always applied first

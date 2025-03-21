@@ -118,6 +118,9 @@ class InboxFragment :
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     private var lastPageType: PageType? = null
 
     private var adapter: InboxItemAdapter? = null
@@ -459,6 +462,7 @@ class InboxFragment :
             instance = viewModel.instance,
             lifecycleOwner = viewLifecycleOwner,
             avatarHelper = avatarHelper,
+            lemmyTextHelper = lemmyTextHelper,
             onImageClick = { url ->
                 getMainActivity()?.openImage(
                     sharedElement = null,
@@ -526,7 +530,7 @@ class InboxFragment :
                 getMainActivity()?.showBottomMenu(
                     BottomMenu(requireContext()).apply {
                         setTitle(R.string.message_actions)
-                        addItem(io.noties.markwon.R.id.none, R.string.no_options)
+                        addItem(R.id.none, R.string.no_options)
                     },
                 )
             },
@@ -637,6 +641,7 @@ class InboxFragment :
         private val instance: String,
         private val lifecycleOwner: LifecycleOwner,
         private val avatarHelper: AvatarHelper,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val onImageClick: (String) -> Unit,
         private val onVideoClick: (
             url: String,
@@ -761,7 +766,7 @@ class InboxFragment :
                     )
                 }
 
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     textView = b.content,
                     text = draftContent
                         ?: conversation.content

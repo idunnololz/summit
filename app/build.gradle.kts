@@ -58,12 +58,17 @@ dependencies {
     implementation(project(":calligraphy"))
     implementation(project(":imagepicker"))
     implementation(project(":overlappingPane"))
+    implementation(project(":markwon:markwon-core"))
+    implementation(project(":markwon:markwon-ext-strikethrough"))
     implementation(project(":markwon:markwon-ext-tables"))
+    implementation(project(":markwon:markwon-html"))
+    implementation(project(":markwon:markwon-linkify"))
+    implementation(project(":markwon:markwon-simple-ext"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.appcompat)
-    implementation(libs.core)
+    implementation(libs.core.ktx)
     implementation(libs.activity.ktx)
     implementation(libs.fragment.ktx)
     implementation(libs.material)
@@ -116,12 +121,6 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.retrofit2.converter.kotlinx.serialization)
 
-    implementation(libs.markwon.core)
-    implementation(libs.markwon.simple.ext)
-    implementation(libs.markwon.html)
-    implementation(libs.markwon.ext.strikethrough)
-    implementation(libs.markwon.linkify)
-
     implementation(libs.work.runtime.ktx)
 
     implementation(libs.browser)
@@ -152,6 +151,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.commonmark)
 
 //    implementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

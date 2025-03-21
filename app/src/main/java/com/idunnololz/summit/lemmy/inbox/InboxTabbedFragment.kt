@@ -189,6 +189,13 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         }
 
         viewModel.updateUnreadCount()
+
+        runAfterLayout {
+            // try to restore state...
+            // SlidingPaneLayout needs 1 layout pass in order to be in the right state. Otherwise
+            // it will always think there is enough room even if there isn't.
+            slidingPaneController.callPageSelected()
+        }
     }
 
     private val inboxFragment: InboxFragment?

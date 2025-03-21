@@ -55,6 +55,9 @@ class ActionDetailsFragment :
     @Inject
     lateinit var apiClient: LemmyApiClient
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     private val runActionAgainDialogLauncher = newAlertDialogLauncher("run_action_again") {
         if (it.isOk) {
             viewModel.retryAction(args.action)
@@ -101,6 +104,7 @@ class ActionDetailsFragment :
             val adapter = ActionDetailsAdapter(
                 context = context,
                 currentInstance = apiClient.instance,
+                lemmyTextHelper = lemmyTextHelper,
                 onImageClick = { url ->
                     getMainActivity()?.openImage(
                         sharedElement = null,
@@ -224,6 +228,7 @@ class ActionDetailsFragment :
     private class ActionDetailsAdapter(
         private val context: Context,
         private val currentInstance: String,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val onImageClick: (url: String) -> Unit,
         private val onVideoClick: (url: String) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
@@ -334,7 +339,7 @@ class ActionDetailsFragment :
                             com.google.android.material.R.attr.colorOnSurface,
                         ),
                     )
-                    LemmyTextHelper.bindText(
+                    lemmyTextHelper.bindText(
                         textView = b.value,
                         text = item.value,
                         instance = currentInstance,
@@ -363,7 +368,7 @@ class ActionDetailsFragment :
                 b.label.text = item.title
 
                 if (item.pageRef == null) {
-                    LemmyTextHelper.bindText(
+                    lemmyTextHelper.bindText(
                         textView = b.value,
                         text = item.value,
                         instance = currentInstance,

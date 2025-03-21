@@ -74,7 +74,7 @@ class ImageInfoDialogFragment :
 //                dismiss()
 //            }
 //            toolbar.setNavigationIconTint(
-//                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+//                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
 //            )
 
             val adapter = ImageInfoAdapter(context)

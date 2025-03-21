@@ -701,6 +701,6 @@ fun TextView.setSingleLineAvoidingRelayout(isSingleLine: Boolean) {
     this.setTag(R.id.is_single_line, isSingleLine)
 }
 
-fun TextView.setMarkdown(markdown: String) {
-    text = LemmyTextHelper.getSpannable(context, markdown)
+fun TextView.setMarkdown(lemmyTextHelper: LemmyTextHelper, markdown: String) {
+    text = lemmyTextHelper.getSpannable(context, markdown)
 }

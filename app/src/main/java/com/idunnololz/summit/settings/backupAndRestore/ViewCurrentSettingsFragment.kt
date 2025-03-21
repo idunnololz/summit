@@ -58,7 +58,7 @@ class ViewCurrentSettingsFragment :
             toolbar.title = getString(R.string.view_current_settings)
             toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()

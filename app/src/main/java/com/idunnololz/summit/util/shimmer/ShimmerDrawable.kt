@@ -12,10 +12,14 @@ import android.graphics.RadialGradient
 import android.graphics.Rect
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
 import android.view.animation.LinearInterpolator
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.tan
+
+private val mainThreadHandler = Handler(Looper.getMainLooper())
 
 class ShimmerDrawable : Drawable() {
     private val updateListener = AnimatorUpdateListener { invalidateSelf() }
@@ -155,7 +159,9 @@ class ShimmerDrawable : Drawable() {
             addUpdateListener(updateListener)
 
             if (wasAnimatorStarted) {
-                start()
+                mainThreadHandler.apply {
+                    start()
+                }
             }
         }
     }
@@ -170,7 +176,9 @@ class ShimmerDrawable : Drawable() {
             shimmer.autoStart &&
             callback != null
         ) {
-            valueAnimator.start()
+            mainThreadHandler.apply {
+                valueAnimator.start()
+            }
         }
     }
 

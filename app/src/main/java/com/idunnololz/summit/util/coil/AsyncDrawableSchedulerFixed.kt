@@ -12,6 +12,7 @@ import com.idunnololz.summit.R
 import io.noties.markwon.ext.tables.TableRowSpan
 import io.noties.markwon.ext.tables.TableRowSpan.Cell
 import io.noties.markwon.image.AsyncDrawable
+import io.noties.markwon.image.AsyncDrawableSpan
 
 object AsyncDrawableSchedulerFixed {
     fun schedule(textView: TextView) {

@@ -46,6 +46,7 @@ import com.idunnololz.summit.video.VideoState
 class CommentListAdapter(
     private val context: Context,
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
+    private val lemmyTextHelper: LemmyTextHelper,
     private val onLoadPage: (Int) -> Unit,
     private val onImageClick: (View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
@@ -194,7 +195,7 @@ class CommentListAdapter(
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
                 )
-            LemmyTextHelper.bindText(
+            lemmyTextHelper.bindText(
                 textView = b.text,
                 text = item.commentView.comment.content,
                 instance = item.instance,

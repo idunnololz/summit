@@ -342,7 +342,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 } else {
                     b.profileIcon.dispose()
                     b.profileIcon.imageTintList = ColorStateList.valueOf(
-                        context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
                     )
                     b.profileIcon.setImageResource(R.drawable.outline_account_circle_24)
                 }

@@ -93,6 +93,7 @@ class PostListViewBuilder @Inject constructor(
     private val avatarHelper: AvatarHelper,
     private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
     private val exoPlayerManagerManager: ExoPlayerManagerManager,
+    private val lemmyTextHelper: LemmyTextHelper,
 ) {
 
     companion object {
@@ -117,6 +118,7 @@ class PostListViewBuilder @Inject constructor(
     private val lemmyContentHelper = LemmyContentHelper(
         context,
         offlineManager,
+        lemmyTextHelper,
         { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     ).also {
         it.globalFontSizeMultiplier = globalFontSizeMultiplier
@@ -533,7 +535,7 @@ class PostListViewBuilder @Inject constructor(
                         (rawBinding is ListingItemCard2Binding) ||
                         (rawBinding is ListingItemCard3Binding) ||
                         (rawBinding is ListingItemLargeListBinding)
-                )
+                    )
             if (holder.state.preferFullSizeImages != preferFullSizeImages) {
                 if (preferFullSizeImages) {
                     when (val rb = rawBinding) {
@@ -1062,7 +1064,7 @@ class PostListViewBuilder @Inject constructor(
 
             val postTitle = postView.post.name
             if (parseMarkdownInPostTitles) {
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     title,
                     if (postTitle.isNotEmpty() && postTitle[0] == '#') {
                         "\\$postTitle"

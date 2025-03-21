@@ -2,7 +2,6 @@ package com.idunnololz.summit.offline
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
 import androidx.core.net.toUri
@@ -11,7 +10,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.ServerApiException
-import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.network.BrowserLike
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Size
@@ -33,7 +31,6 @@ import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okio.BufferedSink
 import okio.buffer
 import okio.sink
 

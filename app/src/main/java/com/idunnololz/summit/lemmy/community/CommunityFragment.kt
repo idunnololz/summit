@@ -48,6 +48,7 @@ import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.ContentTypeFilterTooAggressiveException
 import com.idunnololz.summit.lemmy.FilterTooAggressiveException
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MultiCommunityException
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
@@ -171,6 +172,9 @@ class CommunityFragment :
 
     @Inject
     lateinit var accountImageGenerator: AccountImageGenerator
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     lateinit var preferences: Preferences
 
@@ -531,6 +535,7 @@ class CommunityFragment :
                 moreActionsHelper = moreActionsHelper,
                 userCommunitiesManager = userCommunitiesManager,
                 state = lemmyAppBarController?.state,
+                lemmyTextHelper = lemmyTextHelper,
             )
 
             // Prevent flickers by setting the app bar here first

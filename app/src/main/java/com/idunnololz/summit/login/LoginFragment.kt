@@ -25,11 +25,15 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     private val viewModel: LoginViewModel by viewModels()
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     private val onBackPressedHandler = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -199,7 +203,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
                 }
             }
             signUpText.text =
-                LemmyTextHelper.getSpannable(context, getString(R.string.sign_up_title))
+                lemmyTextHelper.getSpannable(context, getString(R.string.sign_up_title))
             signUpText.setOnClickListener {
                 val direction = LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
                 findNavController().navigateSafe(direction)

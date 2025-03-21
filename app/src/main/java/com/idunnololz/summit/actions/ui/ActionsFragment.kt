@@ -8,6 +8,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.databinding.FragmentPendingActionsBinding
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -30,6 +31,9 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
     @Inject
     lateinit var animationsHelper: AnimationsHelper
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,6 +55,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
         val viewModel = parentFragment.viewModel
         val adapter = ActionsAdapter(
             context = context,
+            lemmyTextHelper = lemmyTextHelper,
             onImageClick = { postView, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,

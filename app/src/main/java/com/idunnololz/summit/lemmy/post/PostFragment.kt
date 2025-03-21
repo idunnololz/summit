@@ -45,6 +45,7 @@ import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentsSortOrder
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
@@ -147,6 +148,9 @@ class PostFragment :
 
     @Inject
     lateinit var userTagsManager: UserTagsManager
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     lateinit var preferences: Preferences
 
@@ -431,6 +435,7 @@ class PostFragment :
                     isEmbedded = false,
                     videoState = args.videoState,
                     autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
+                    lemmyTextHelper = lemmyTextHelper,
                     onRefreshClickCb = {
                         forceRefresh()
                     },

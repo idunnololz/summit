@@ -24,7 +24,6 @@ import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -40,13 +39,13 @@ import javax.inject.Inject
 class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
 
     @Inject
-    lateinit var offlineManager: OfflineManager
-
-    @Inject
     lateinit var animationsHelper: AnimationsHelper
 
     @Inject
     lateinit var avatarHelper: AvatarHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -105,7 +104,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         val adapter = PersonInfoAdapter(
             context = context,
             instance = parentFragment.viewModel.instance,
-            offlineManager = offlineManager,
+            lemmyTextHelper = lemmyTextHelper,
             avatarHelper = avatarHelper,
             onImageClick = { url ->
                 getMainActivity()?.openImage(
@@ -143,7 +142,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
     private class PersonInfoAdapter(
         private val context: Context,
         private val instance: String,
-        private val offlineManager: OfflineManager,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val avatarHelper: AvatarHelper,
         private val onImageClick: (url: String) -> Unit,
         private val onVideoClick: (url: String) -> Unit,
@@ -181,7 +180,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             addItemType(Item.InfoItem::class, PersonInfoItemBinding::inflate) { item, b, h ->
                 val personView = item.personView
 
-                LemmyTextHelper.bindText(
+                lemmyTextHelper.bindText(
                     b.bio,
                     personView.person.bio
                         ?: buildString {

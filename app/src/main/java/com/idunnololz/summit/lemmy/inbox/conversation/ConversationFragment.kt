@@ -36,7 +36,6 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.coil.AsyncDrawableSpan
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.setup
@@ -48,6 +47,7 @@ import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
+import io.noties.markwon.image.AsyncDrawableSpan
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -60,6 +60,9 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,6 +142,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             val adapter = MessagesAdapter(
                 context = context,
                 instance = args.instance,
+                lemmyTextHelper = lemmyTextHelper,
                 onImageClick = { url ->
                     getMainActivity()?.openImage(null, binding.appBar, null, url, null)
                 },
@@ -307,6 +311,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
     private class MessagesAdapter(
         private val context: Context,
         private val instance: String,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val onImageClick: (String) -> Unit,
         private val onVideoClick: (
             url: String,
@@ -369,7 +374,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 //                    showMediaAsLinks = commentsShowInlineMediaAsLinks,
 //                )
 
-                val spannable = LemmyTextHelper.bindText(
+                val spannable = lemmyTextHelper.bindText(
                     textView = b.text,
                     text = item.messageItem.content,
                     instance = instance,

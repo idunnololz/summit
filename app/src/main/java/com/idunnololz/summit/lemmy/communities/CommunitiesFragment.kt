@@ -60,6 +60,9 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
     @Inject
     lateinit var avatarHelper: AvatarHelper
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -114,6 +117,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                 instance = viewModel.apiInstance,
                 params = params,
                 avatarHelper = avatarHelper,
+                lemmyTextHelper = lemmyTextHelper,
                 onPageClick = {
                     getMainActivity()?.launchPage(it)
                 },
@@ -213,6 +217,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
         private val offlineManager: OfflineManager,
         private val instance: String,
         private val params: TextMeasurementUtils.TextMeasurementParams,
+        private val lemmyTextHelper: LemmyTextHelper,
         private val avatarHelper: AvatarHelper,
         private val onPageClick: (PageRef) -> Unit,
         private val onLoadPageClick: (Int) -> Unit,
@@ -272,7 +277,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                     b.description.visibility = View.VISIBLE
 
                     val lineCount = TextMeasurementUtils.getTextLines(
-                        LemmyTextHelper.getSpannable(context, community.community.description),
+                        lemmyTextHelper.getSpannable(context, community.community.description),
                         params,
                     ).size
 
@@ -282,7 +287,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
                         b.descriptionFade.visibility = View.GONE
                     }
 
-                    LemmyTextHelper.bindText(
+                    lemmyTextHelper.bindText(
                         textView = b.description,
                         text = community.community.description,
                         instance = instance,

@@ -22,7 +22,7 @@ class SimpleDiskCache(
     dir: File,
     private val appVersion: Int,
     maxSize: Long,
-)  {
+) {
 
     companion object {
 
@@ -82,7 +82,6 @@ class SimpleDiskCache(
         snapshot.close()
         return true
     }
-
 
     fun hasFreshCache(key: String, freshTimeMs: Long): Boolean {
         return System.currentTimeMillis() - getCachedDate(key) < freshTimeMs

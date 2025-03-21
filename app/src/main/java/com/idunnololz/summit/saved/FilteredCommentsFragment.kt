@@ -17,6 +17,7 @@ import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedCommentsBinding
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
@@ -65,6 +66,9 @@ class FilteredCommentsFragment :
     @Inject
     lateinit var preferences: Preferences
 
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -73,6 +77,7 @@ class FilteredCommentsFragment :
         adapter = CommentListAdapter(
             context = requireContext(),
             postAndCommentViewBuilder = postAndCommentViewBuilder,
+            lemmyTextHelper = lemmyTextHelper,
             onSignInRequired = {
                 PreAuthDialogFragment.newInstance()
                     .show(childFragmentManager, "asdf")

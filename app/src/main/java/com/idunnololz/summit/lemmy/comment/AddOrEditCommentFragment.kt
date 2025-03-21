@@ -44,6 +44,7 @@ import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragme
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
@@ -165,6 +166,9 @@ class AddOrEditCommentFragment :
 
     @Inject
     lateinit var animationsHelper: AnimationsHelper
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     private var textFormatterToolbar: TextFormatToolbarViewHolder? = null
 
@@ -441,7 +445,7 @@ class AddOrEditCommentFragment :
 
             toolbar.setNavigationIcon(R.drawable.baseline_close_24)
             toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
             toolbar.setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
@@ -932,6 +936,7 @@ class AddOrEditCommentFragment :
                 isEmbedded = true,
                 videoState = null,
                 autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
+                lemmyTextHelper = lemmyTextHelper,
                 onRefreshClickCb = {
                     showFullContext(force = true)
                 },

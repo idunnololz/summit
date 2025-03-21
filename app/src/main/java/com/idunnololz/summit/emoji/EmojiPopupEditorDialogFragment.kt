@@ -113,7 +113,7 @@ class EmojiPopupEditorDialogFragment :
                     dismiss()
                 }
                 setNavigationIconTint(
-                    context.getColorFromAttribute(io.noties.markwon.R.attr.colorControlNormal),
+                    context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
                 )
 
                 inflateMenu(R.menu.menu_emoji_popup_editor)

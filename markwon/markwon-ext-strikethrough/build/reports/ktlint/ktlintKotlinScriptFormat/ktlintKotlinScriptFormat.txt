@@ -1,0 +1,4 @@
+[90mC:\Users\idunnololz\Documents\Projects\summit\markwon\markwon-ext-strikethrough\[0mbuild.gradle.kts[90m:[0m1[90m:1:[0m File must end with a newline (\n) [90m(standard:final-newline)[0m
+
+Summary error count (descending) by rule:
+  standard:final-newline: 1

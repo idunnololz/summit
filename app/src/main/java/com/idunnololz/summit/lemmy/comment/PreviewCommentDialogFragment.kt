@@ -10,10 +10,16 @@ import com.idunnololz.summit.databinding.DialogFragmentPreviewCommentBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCommentBinding>() {
 
     private val args by navArgs<PreviewCommentDialogFragmentArgs>()
+
+    @Inject
+    lateinit var lemmyTextHelper: LemmyTextHelper
 
     override fun onStart() {
         super.onStart()
@@ -40,7 +46,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
             binding.previewContent.setTextIsSelectable(true)
             binding.previewContent.typeface = Typeface.MONOSPACE
         } else {
-            LemmyTextHelper.bindText(
+            lemmyTextHelper.bindText(
                 textView = binding.previewContent,
                 text = args.content,
                 instance = args.instance,
