@@ -20,9 +20,6 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
 import coil3.transition.CrossfadeTransition
-import com.google.firebase.FirebaseApp
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
 import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -35,7 +32,14 @@ import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
 import com.idunnololz.summit.util.isFirebaseInitialized
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.Hint
+import io.sentry.SentryEvent
+import io.sentry.SentryLevel
+import io.sentry.SentryOptions
+import io.sentry.android.core.SentryAndroid
+import io.sentry.android.core.SentryAndroidOptions
 import javax.inject.Inject
+
 
 @HiltAndroidApp
 class MainApplication : Application(), androidx.work.Configuration.Provider {
@@ -153,8 +157,23 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         hiltEntryPoint.conversationsManager().init()
 
         if (preferences.useFirebase) {
-            FirebaseApp.initializeApp(this)
-            Firebase.crashlytics.isCrashlyticsCollectionEnabled = true
+            SentryAndroid.init(this) { options ->
+                options.dsn = "https://decaf7c0aa19b1c009de539fb95ad4a4@o4509018554630144.ingest.us.sentry.io/4509018556465152"
+                // Add a callback that will be used before the event is sent to Sentry.
+                // With this callback, you can modify the event or, when returning null, also discard the event.
+                options.beforeSend =
+                    SentryOptions.BeforeSendCallback { event: SentryEvent, hint: Hint ->
+                        if (SentryLevel.DEBUG == event.level) {
+                            null
+                        } else {
+                            event
+                        }
+                    }
+                options.isAttachScreenshot = false
+                options.isAttachViewHierarchy = false
+                options.isEnableUserInteractionTracing = false
+                options.isEnableUserInteractionBreadcrumbs = false
+            }
 
             isFirebaseInitialized = true
         }

@@ -6,6 +6,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("com.google.devtools.ksp")
+    id("io.sentry.android.gradle") version "5.3.0"
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.plugin.serialization)
 }
@@ -108,10 +109,6 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.coil.video)
     implementation(libs.coil.okhttp)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.crashlytics)
-//    implementation(libs.firebase.analytics)
 
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp.okhttp)

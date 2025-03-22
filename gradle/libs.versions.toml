@@ -54,10 +54,6 @@ media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = 
 media3-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
 
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "33.11.0" }
-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
-
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version = "4.10.0" }
 okhttp-okhttp = { module = "com.squareup.okhttp3:okhttp" }
 okhttp-logging-intercepter = { module = "com.squareup.okhttp3:logging-interceptor" }

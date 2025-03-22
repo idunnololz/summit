@@ -30,14 +30,6 @@
         android:localeConfig="@xml/locales_config"
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="@bool/enableOnBackInvokedCallback">
-        <meta-data
-            android:name="firebase_crashlytics_collection_enabled"
-            android:value="false" />
-        <provider
-            android:name="com.google.firebase.provider.FirebaseInitProvider"
-            android:authorities="${applicationId}.firebaseinitprovider"
-            tools:node="remove"
-            />
 
         <activity
             android:configChanges="layoutDirection"
