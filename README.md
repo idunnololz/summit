@@ -19,6 +19,8 @@ If you have any technical questions you can ask on https://lemmy.world/c/summit.
 
 This is the repository that contains the source code of Summit for Lemmy.
 
+**Below is where I keep notes to myself so if it seems like non-sense that's why.**
+
 ## Release process
 
 1. Create a new release post on https://lemmy.world/c/summit. Feature post.
