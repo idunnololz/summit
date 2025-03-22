@@ -1,4 +1,0 @@
-[90mC:\Users\idunnololz\Documents\Projects\summit\markwon\markwon-core\src\main\java\io\noties\markwon\image\[0mAsyncDrawableSpan.kt[90m:[0m141[90m:1:[0m Exceeded max line length (100) [90m(standard:max-line-length)[0m
-
-Summary error count (descending) by rule:
-  standard:max-line-length: 1
