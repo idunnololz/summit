@@ -1,7 +1,5 @@
 package com.idunnololz.summit.util.shimmer
 
-import android.animation.ValueAnimator
-import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.LinearGradient
@@ -12,30 +10,28 @@ import android.graphics.RadialGradient
 import android.graphics.Rect
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
-import android.view.animation.LinearInterpolator
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.tan
 
-private val mainThreadHandler = Handler(Looper.getMainLooper())
+private const val ANIMATION_DURATION_MS = 1000
 
-class ShimmerDrawable : Drawable() {
-    private val updateListener = AnimatorUpdateListener { invalidateSelf() }
+class ShimmerDrawable : Drawable(), Animatable2Compat {
     private val shimmerPaint = Paint().apply {
         isAntiAlias = true
     }
     private val drawRect = Rect()
     private val shaderMatrix = Matrix()
-    private var valueAnimator: ValueAnimator? = null
+    private val callbacks = mutableListOf<Animatable2Compat.AnimationCallback>()
+    private var startTimeMillis = 0L
+    private var isRunning = false
 
     var shimmer: Shimmer? = null
         set(value) {
             field = value
 
             updateShader()
-            updateValueAnimator()
             invalidateSelf()
         }
 
@@ -43,13 +39,11 @@ class ShimmerDrawable : Drawable() {
         super.onBoundsChange(bounds)
         drawRect.set(bounds)
         updateShader()
-        maybeStartShimmer()
     }
 
     override fun draw(canvas: Canvas) {
         val shimmer = shimmer
             ?: return
-        val valueAnimator = valueAnimator
 
         if (shimmerPaint.shader == null) {
             return
@@ -61,11 +55,9 @@ class ShimmerDrawable : Drawable() {
         val translateWidth = drawRect.width() + tiltTan * drawRect.height()
         val dx: Float
         val dy: Float
-        val animatedValue: Float = if (valueAnimator != null) {
-            valueAnimator.animatedValue as Float
-        } else {
-            0f
-        }
+        val animatedValue: Float =
+            ((System.currentTimeMillis() - startTimeMillis) % ANIMATION_DURATION_MS) /
+                ANIMATION_DURATION_MS.toFloat()
 
         when (shimmer.direction) {
             Shimmer.Direction.LEFT_TO_RIGHT -> {
@@ -100,6 +92,10 @@ class ShimmerDrawable : Drawable() {
         shimmerPaint.shader.setLocalMatrix(shaderMatrix)
 
         canvas.drawRect(drawRect, shimmerPaint)
+
+        if (isRunning) {
+            invalidateSelf()
+        }
     }
 
     override fun setAlpha(alpha: Int) {
@@ -136,50 +132,6 @@ class ShimmerDrawable : Drawable() {
 
     private fun offset(start: Float, end: Float, percent: Float): Float {
         return start + (end - start) * percent
-    }
-
-    private fun updateValueAnimator() {
-        val shimmer = shimmer ?: return
-        val wasAnimatorStarted = valueAnimator?.isStarted == true
-
-        valueAnimator?.let {
-            it.cancel()
-            it.removeAllUpdateListeners()
-        }
-
-        valueAnimator = ValueAnimator.ofFloat(
-            0f,
-            1f + (shimmer.repeatDelay / shimmer.animationDuration).toFloat(),
-        ).apply {
-            interpolator = LinearInterpolator()
-            repeatMode = shimmer.repeatMode
-            startDelay = shimmer.startDelay
-            repeatCount = shimmer.repeatCount
-            duration = shimmer.animationDuration + shimmer.repeatDelay
-            addUpdateListener(updateListener)
-
-            if (wasAnimatorStarted) {
-                mainThreadHandler.apply {
-                    start()
-                }
-            }
-        }
-    }
-
-    private fun maybeStartShimmer() {
-        val valueAnimator = valueAnimator
-        val shimmer = shimmer
-
-        if (valueAnimator != null &&
-            !valueAnimator.isStarted &&
-            shimmer != null &&
-            shimmer.autoStart &&
-            callback != null
-        ) {
-            mainThreadHandler.apply {
-                valueAnimator.start()
-            }
-        }
     }
 
     private fun updateShader() {
@@ -249,5 +201,36 @@ class ShimmerDrawable : Drawable() {
             }
         }
         shimmerPaint.setShader(shader)
+    }
+
+    override fun start() {
+        isRunning = true
+
+        for (index in callbacks.indices.reversed()) {
+            callbacks[index].onAnimationStart(this)
+        }
+        invalidateSelf()
+    }
+
+    override fun stop() {
+        isRunning = false
+
+        for (index in callbacks.indices.reversed()) {
+            callbacks[index].onAnimationEnd(this)
+        }
+    }
+
+    override fun isRunning(): Boolean =
+        isRunning
+
+    override fun registerAnimationCallback(callback: Animatable2Compat.AnimationCallback) {
+        callbacks.add(callback)
+    }
+
+    override fun unregisterAnimationCallback(callback: Animatable2Compat.AnimationCallback): Boolean =
+        callbacks.remove(callback)
+
+    override fun clearAnimationCallbacks() {
+        callbacks.clear()
     }
 }

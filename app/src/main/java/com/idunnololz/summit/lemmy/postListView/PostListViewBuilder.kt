@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import coil3.dispose
+import coil3.load
 import com.google.android.material.button.MaterialButton
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -867,7 +868,7 @@ class PostListViewBuilder @Inject constructor(
                     iconImage?.visibility = View.GONE
 
                     imageView.dispose()
-                    imageView.setImageDrawable(newShimmerDrawable16to9(context))
+                    imageView.load(newShimmerDrawable16to9(context))
 
                     fun loadImage(useBackupUrl: Boolean = false) {
                         val urlToLoad = if (useBackupUrl) {

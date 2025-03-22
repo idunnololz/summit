@@ -261,7 +261,10 @@ class AsyncDrawable(
         if (waitingForDimensions) {
             initBounds()
         }
-        onDimensionsKnownListeners.forEach { it.onDimensionsKnown(this) }
+
+        for (i in onDimensionsKnownListeners.indices.reversed()) {
+            onDimensionsKnownListeners[i].onDimensionsKnown(this)
+        }
     }
 
     override fun draw(canvas: Canvas) {
