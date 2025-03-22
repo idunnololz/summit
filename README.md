@@ -1,5 +1,9 @@
 # Summit
 
+If you are looking for the app installer (APK) it is over at https://github.com/idunnololz/summit-for-lemmy.
+
+This is the repository that contains the source code of Summit for Lemmy.
+
 ## Release process
 
 1. Create a new release post on https://lemmy.world/c/summit. Feature post.
