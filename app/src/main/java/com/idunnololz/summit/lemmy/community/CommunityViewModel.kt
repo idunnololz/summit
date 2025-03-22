@@ -49,7 +49,6 @@ import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
-import com.idunnololz.summit.util.crashlytics
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -579,15 +578,6 @@ class CommunityViewModel @Inject constructor(
         }
 
         initialPageFetched.value = false
-
-        crashlytics?.apply {
-            setCustomKey("community", communityRef.toString())
-            setCustomKey("view_type", preferences.getPostsLayout().name)
-            setCustomKey(
-                "prefer_full_size_images",
-                preferences.getPostInListUiConfig().preferFullSizeImages,
-            )
-        }
 
         currentCommunityRef.value = communityRefSafe
         postsRepository.setCommunity(communityRef)

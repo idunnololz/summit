@@ -266,7 +266,7 @@
     <string name="error_web_settings_unsaved_changes_desc">Sono presenti modifiche non salvate. Le impostazioni web devono essere salvate sul server per essere effettive.</string>
     <string name="relay_style_navigation_desc">Aggiunge un bottone nelle schermate di post e commenti che per navigare al post precedente o al successivo.</string>
     <string name="retain_last_post_desc">Ripristina lo stato di un post quando viene aperto una seconda volta. Se abilitata, potrebbe avere un impatto negativo sulle prestazioni.</string>
-    <string name="use_firebase_desc">Se disabilitata, i crash che avvengono nell\'app non saranno loggati. Se disabiliti quest\'opzione, sei invitato a segnalare i crash su c/summit.</string>
+    <string name="use_crash_logger_desc">Se disabilitata, i crash che avvengono nell\'app non saranno loggati. Se disabiliti quest\'opzione, sei invitato a segnalare i crash su c/summit.</string>
     <string name="use_bottom_nav_bar_desc">Se abilitata, una barra di navigazione verrà visualizzata nella parte inferiore per accedere alle schermate di primo livello. Se disabilitata, le opzioni di navigazione verranno mostrate all\'interno del menù a scomparsa.</string>
     <string name="peachie">Pesca</string>
     <string name="show_up_and_down_votes_desc">Se abilitata, i numeri di voti positivi e negativi verranno mostrati separatamente. Se disabilitata, verrà visualizzato il punteggio complessivo.</string>
@@ -333,7 +333,7 @@
     <string name="dont_preview_links">Non mostrare anteprima link</string>
     <string name="logging">Log</string>
     <string name="logging_desc">Configura i log dell\'app</string>
-    <string name="use_firebase">Invia log relativi ai crash su Google Firebase</string>
+    <string name="use_crash_logger">Invia log relativi ai crash su Google Firebase</string>
     <string name="app_restart_required_by_setting">Richiede riavvio dell\'app</string>
     <string name="app_restart_required_by_setting_desc">Modificare questa impostazione richiede il riavvio dell\'app.</string>
     <string name="restart_app">Riavvia Summit</string>

@@ -406,7 +406,7 @@
     <string name="post_title_and_image_only">Pouze nadpis a obrázek příspěvku</string>
     <string name="view_image_on_single_tap_desc">Pokud je povoleno, klepnutím na miniaturu se obrázek otevře v prohlížeči obrázků. Pokud je zakázáno, dlouhým stisknutím obrázku se místo toho otevře obrázek v prohlížeči obrázků.</string>
     <string name="lock_bottom_bar_desc">Zabrání tomu, aby se spodní navigační panel skryl při posouvání.</string>
-    <string name="use_firebase">Zaznamenávat chyby aplikace do Google Firebase</string>
+    <string name="use_crash_logger">Zaznamenávat chyby aplikace do Google Firebase</string>
     <string name="a_week">Týden</string>
     <string name="tap_comment_to_collapse">Kliknutí skryje komentář</string>
     <string name="reset_download_location">Resetovat lokaci stažených souborů</string>
@@ -451,7 +451,7 @@
     <string name="mark_posts_as_read_on_scroll_desc">Pokud je tato možnost povolena, příspěvky, za kterými projdete, budou automaticky označeny jako přečtené</string>
     <string name="gestures">Gesta</string>
     <string name="gestures_desc">Změňte, která gesta chcete používat</string>
-    <string name="use_firebase_desc">Pokud je zakázáno, selhání, se kterými se v aplikaci setkáte, nebudou protokolována. Pokud toto nastavení zakážete, zvažte prosím hlášení selhání do c/summit.</string>
+    <string name="use_crash_logger_desc">Pokud je zakázáno, selhání, se kterými se v aplikaci setkáte, nebudou protokolována. Pokud toto nastavení zakážete, zvažte prosím hlášení selhání do c/summit.</string>
     <string name="less_dark_background_theme">Méně tmavá barva pozadí</string>
     <string name="save_drafts_automatically">Ukládat koncepty automaticky</string>
     <string name="save_drafts_automatically_desc">Pokud je tato možnost povolena, automaticky se ukládají koncepty příspěvků/komentářů, pokud opustíte obrazovku vytvoření/úpravy příspěvku/komentáře bez stisknutí tlačítka Odeslat.</string>

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.serialization.json.Json
 
 @Entity(tableName = "inbox_entries")
@@ -45,7 +45,7 @@ class InboxEntryConverters(private val json: Json) {
         json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        crashlytics?.recordException(e)
+        crashLogger?.recordException(e)
         null
     }
 }

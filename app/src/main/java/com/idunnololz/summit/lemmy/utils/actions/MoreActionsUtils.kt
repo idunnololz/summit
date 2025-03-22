@@ -14,7 +14,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import com.idunnololz.summit.util.getParcelableCompat
 import java.io.IOException
 import kotlinx.coroutines.flow.collect
@@ -327,7 +327,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
                                 }
                                 .show()
                         } else {
-                            crashlytics?.recordException(it)
+                            crashLogger?.recordException(it)
                             Snackbar
                                 .make(
                                     snackbarContainer,

@@ -14,7 +14,7 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
@@ -95,7 +95,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
                         }
                         .show()
                 } else {
-                    crashlytics?.recordException(it.error)
+                    crashLogger?.recordException(it.error)
                     Snackbar
                         .make(
                             parent.getSnackbarContainer(),

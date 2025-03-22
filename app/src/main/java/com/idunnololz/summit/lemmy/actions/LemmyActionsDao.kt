@@ -19,7 +19,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
@@ -77,7 +77,7 @@ class LemmyActionConverters(private val json: Json) {
         json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        crashlytics?.recordException(e)
+        crashLogger?.recordException(e)
         null
     }
 
@@ -91,7 +91,7 @@ class LemmyActionConverters(private val json: Json) {
         json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        crashlytics?.recordException(e)
+        crashLogger?.recordException(e)
         null
     }
 }

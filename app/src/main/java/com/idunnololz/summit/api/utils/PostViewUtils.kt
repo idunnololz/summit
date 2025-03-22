@@ -5,7 +5,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.PreviewInfo
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import com.idunnololz.summit.video.VideoSizeHint
 
 enum class PostType {
@@ -102,7 +102,7 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
     } catch (e: Exception) {
         // best effort!
 
-        crashlytics?.recordException(e)
+        crashLogger?.recordException(e)
     }
 
     return VideoSizeHint(

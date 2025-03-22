@@ -317,8 +317,8 @@
     <string name="preview_text_links">预览文本链接</string>
     <string name="dont_preview_links">不预览链接</string>
     <string name="preview_all_links">预览所有链接</string>
-    <string name="use_firebase">将崩溃记录到 Google Firebase</string>
-    <string name="use_firebase_desc">如果禁用，您在应用中遇到的崩溃将不会被记录。如果您禁用此设置，请考虑向 c/summit 报告崩溃。</string>
+    <string name="use_crash_logger">将崩溃记录到 Google Firebase</string>
+    <string name="use_crash_logger_desc">如果禁用，您在应用中遇到的崩溃将不会被记录。如果您禁用此设置，请考虑向 c/summit 报告崩溃。</string>
     <string name="app_restart_required_by_setting">需要重启应用</string>
     <string name="app_restart_required_by_setting_desc">更改此设置需要重新启动应用程序。</string>
     <string name="restart_app">重启峰会</string>

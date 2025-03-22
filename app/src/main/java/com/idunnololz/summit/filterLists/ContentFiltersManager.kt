@@ -5,7 +5,7 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,7 +41,7 @@ class ContentFiltersManager @Inject constructor(
                     val e = TooManyFiltersException(filterCount)
 
                     Log.e(TAG, "", e)
-                    crashlytics?.recordException(e)
+                    crashLogger?.recordException(e)
                 }
             }
         }

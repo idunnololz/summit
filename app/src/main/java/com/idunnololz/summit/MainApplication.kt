@@ -29,7 +29,7 @@ import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.BetterDebugLogger
 import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
-import com.idunnololz.summit.util.isFirebaseInitialized
+import com.idunnololz.summit.util.crashLogger.isCrashLoggerInitialized
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import io.sentry.Hint
@@ -37,9 +37,7 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
-import io.sentry.android.core.SentryAndroidOptions
 import javax.inject.Inject
-
 
 @HiltAndroidApp
 class MainApplication : Application(), androidx.work.Configuration.Provider {
@@ -175,7 +173,7 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
                 options.isEnableUserInteractionBreadcrumbs = false
             }
 
-            isFirebaseInitialized = true
+            isCrashLoggerInitialized = true
         }
     }
 

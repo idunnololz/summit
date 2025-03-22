@@ -20,6 +20,7 @@ import com.idunnololz.summit.api.ServerTimeoutException
 import com.idunnololz.summit.api.SocketTimeoutException
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.NoModeratedCommunitiesException
+import com.idunnololz.summit.util.crashLogger.crashLogger
 
 private const val TAG = "ErrorUtils"
 
@@ -62,7 +63,7 @@ fun Throwable.toErrorMessage(context: Context): String {
                             if (t.errorCode == 404) {
                                 context.getString(R.string.error_page_not_found)
                             } else {
-                                crashlytics?.recordException(t)
+                                crashLogger?.recordException(t)
                                 context.getString(R.string.error_unknown)
                             }
                         }

@@ -54,7 +54,7 @@ import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.util.imgur.ImgurPageParser
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -360,7 +360,8 @@ class ImageViewerActivity :
                                             supportFragmentManager,
                                             Intent(Intent.ACTION_VIEW).apply {
                                                 flags =
-                                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
                                                 setDataAndType(uri, mimeType)
                                             },
                                         )
@@ -386,7 +387,7 @@ class ImageViewerActivity :
                                     .setAnchorView(binding.bottomBar)
                                     .show()
                             } else {
-                                crashlytics?.recordException(it)
+                                crashLogger?.recordException(it)
                                 Snackbar
                                     .make(
                                         getSnackbarContainer(),

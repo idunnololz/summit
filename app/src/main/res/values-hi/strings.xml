@@ -286,13 +286,13 @@
     <string name="open_links_in_external_browser_desc">लिंक ऐप के बजाय ब्राउज़र में खुलेंगे।</string>
     <string name="unblock_this_instance_format">इस इंस्टैंस को अनवरुद्ध करें (%1$s)</string>
     <string name="preview_links_desc">किसी लिंक पर टैप करने से लिंक के खुलने से पहले ही पूर्वावलोकन खुल जाता है।</string>
-    <string name="use_firebase">Google Firebase पर क्रैश लॉग करें</string>
+    <string name="use_crash_logger">Google Firebase पर क्रैश लॉग करें</string>
     <string name="view_hidden_posts">छुपी हुई पोस्ट देखें</string>
     <string name="show_post_upvote_percentage">पोस्ट अपवोट प्रतिशत दिखाएं</string>
     <string name="lock_bottom_bar_desc">नीचे की नेविगेशन पट्टी को स्क्रॉल पर छिपने से रोकता है।</string>
     <string name="relay_style_navigation_desc">पोस्ट/टिप्पणियों स्क्रीन पर एक बटन जोड़ता है जो आपको अगली या पिछली पोस्ट पर जाने की अनुमति देता है।</string>
     <string name="retain_last_post">अंतिम पोस्ट बरकरार रखें</string>
-    <string name="use_firebase_desc">यदि अक्षम है तो,ऐप में आपके सामने आने वाले क्रैश लॉग नहीं किए जाएंगे। यदि आप इस सेटिंग को अक्षम करते हैं तो कृपया c/summit में क्रैश की रिपोर्ट करने पर विचार करें।</string>
+    <string name="use_crash_logger_desc">यदि अक्षम है तो,ऐप में आपके सामने आने वाले क्रैश लॉग नहीं किए जाएंगे। यदि आप इस सेटिंग को अक्षम करते हैं तो कृपया c/summit में क्रैश की रिपोर्ट करने पर विचार करें।</string>
     <string name="collapse_child_comments_desc">तयशुदा रूप से पोस्ट के लिए केवल शीर्ष स्तरीय टिप्पणियां दिखाएं</string>
     <string name="retain_last_post_desc">किसी पोस्ट पर वापस लौटते समय पोस्ट की स्थिति पुनर्स्थापित करें। इसे सक्षम करने से प्रदर्शन कम हो सकता है।</string>
     <string name="there_doesnt_seem_to_be_anything_here">यहां कुछ भी नहीं लगता</string>

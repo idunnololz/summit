@@ -339,8 +339,8 @@
     <string name="preview_all_links">Tüm bağlantıları önizleyin</string>
     <string name="logging">Günlük kaydı</string>
     <string name="logging_desc">Uygulamanın neleri günlüğe kaydedeceğini yapılandırın</string>
-    <string name="use_firebase">Çökmeleri Google Firebase\'a kaydedin</string>
-    <string name="use_firebase_desc">Devre dışı bırakılırsa, uygulamada karşılaştığınız çökmeler kaydedilmeyecektir. Bu ayarı devre dışı bırakırsanız lütfen çökmeleri c/summit\'e bildirmeyi düşünün.</string>
+    <string name="use_crash_logger">Çökmeleri Google Firebase\'a kaydedin</string>
+    <string name="use_crash_logger_desc">Devre dışı bırakılırsa, uygulamada karşılaştığınız çökmeler kaydedilmeyecektir. Bu ayarı devre dışı bırakırsanız lütfen çökmeleri c/summit\'e bildirmeyi düşünün.</string>
     <string name="app_restart_required_by_setting">Uygulamanın yeniden başlatılması gerekiyor</string>
     <string name="app_restart_required_by_setting_desc">Bu ayarı değiştirmek için uygulamanın yeniden başlatılması gerekir.</string>
     <string name="restart_app">Zirveyi Yeniden Başlat</string>

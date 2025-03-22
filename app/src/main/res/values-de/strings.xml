@@ -381,8 +381,8 @@
     <string name="preview_all_links">Vorschau aller Links</string>
     <string name="logging">Protokollierung</string>
     <string name="logging_desc">Konfigurieren Sie, was die App protokolliert</string>
-    <string name="use_firebase">Abstürze in Google Firebase protokollieren</string>
-    <string name="use_firebase_desc">Wenn diese Option deaktiviert ist, werden Abstürze, die in der App auftreten, nicht protokolliert. Wenn Sie diese Einstellung deaktivieren, sollten Sie Abstürze an c/summit melden.</string>
+    <string name="use_crash_logger">Abstürze in Google Firebase protokollieren</string>
+    <string name="use_crash_logger_desc">Wenn diese Option deaktiviert ist, werden Abstürze, die in der App auftreten, nicht protokolliert. Wenn Sie diese Einstellung deaktivieren, sollten Sie Abstürze an c/summit melden.</string>
     <string name="app_restart_required_by_setting">App-Neustart erforderlich</string>
     <string name="app_restart_required_by_setting_desc">Das Ändern dieser Einstellung erfordert einen Neustart der App.</string>
     <string name="restart_app">Gipfel neu starten</string>

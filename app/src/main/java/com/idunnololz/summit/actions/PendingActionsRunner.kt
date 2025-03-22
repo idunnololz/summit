@@ -16,7 +16,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -195,7 +195,7 @@ class PendingActionsRunner @AssistedInject constructor(
                 }
             }
         } catch (e: Exception) {
-            crashlytics?.recordException(e)
+            crashLogger?.recordException(e)
             Log.e(TAG, "Error executing pending action.", e)
         }
     }

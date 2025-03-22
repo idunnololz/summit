@@ -641,9 +641,9 @@
     <!-- Setting body text. -->
     <string name="logging_desc">Configure what the app logs</string>
     <!-- Setting title text. -->
-    <string name="use_firebase">Log crashes to Google Firebase</string>
+    <string name="use_crash_logger">Log crashes to Sentry</string>
     <!-- Setting body text. -->
-    <string name="use_firebase_desc">If disabled, crashes you encounter in the app will not be logged. Please consider reporting crashes to c/summit if you disable this setting.</string>
+    <string name="use_crash_logger_desc">If disabled, crashes you encounter in the app will not be logged. Please consider reporting crashes to c/summit if you disable this setting.</string>
     <!-- Setting title text. -->
     <string name="app_restart_required_by_setting">App restart required</string>
     <!-- Setting body text. -->

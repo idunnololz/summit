@@ -2150,8 +2150,8 @@ class LoggingSettings @Inject constructor(
 
     val useFirebase = OnOffSettingItem(
         null,
-        context.getString(R.string.use_firebase),
-        context.getString(R.string.use_firebase_desc),
+        context.getString(R.string.use_crash_logger),
+        context.getString(R.string.use_crash_logger_desc),
         relatedKeys = listOf(KEY_USE_FIREBASE),
     )
 

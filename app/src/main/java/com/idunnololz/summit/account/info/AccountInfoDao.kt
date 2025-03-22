@@ -19,7 +19,7 @@ import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.util.crashlytics
+import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -122,7 +122,7 @@ class AccountInfoConverters(private val json: Json) {
         json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        crashlytics?.recordException(e)
+        crashLogger?.recordException(e)
         null
     }
 
@@ -136,7 +136,7 @@ class AccountInfoConverters(private val json: Json) {
         json.decodeFromString(value)
     } catch (e: Exception) {
         Log.e(TAG, "", e)
-        crashlytics?.recordException(e)
+        crashLogger?.recordException(e)
         null
     }
 }

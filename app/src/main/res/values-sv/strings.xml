@@ -636,8 +636,8 @@
     <string name="dont_preview_links">Förhandsgranska inte länkar</string>
     <string name="preview_all_links">Förhandsgranska alla länkar</string>
     <string name="logging">Skogsavverkning</string>
-    <string name="use_firebase">Loggen kraschar till Google Firebase</string>
-    <string name="use_firebase_desc">Om det är inaktiverat kommer krascher du stöter på i appen inte att loggas. Överväg att rapportera krascher till c/summit om du inaktiverar den här inställningen.</string>
+    <string name="use_crash_logger">Loggen kraschar till Google Firebase</string>
+    <string name="use_crash_logger_desc">Om det är inaktiverat kommer krascher du stöter på i appen inte att loggas. Överväg att rapportera krascher till c/summit om du inaktiverar den här inställningen.</string>
     <string name="app_restart_required_by_setting">Omstart av appen krävs</string>
     <string name="app_restart_required_by_setting_desc">För att ändra den här inställningen krävs en omstart av appen.</string>
     <string name="restart_app">Starta om Summit</string>
