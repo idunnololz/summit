@@ -305,26 +305,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
     private fun onPersonChanged() {
         val personRef = personRef
-        if (personRef == null) {
-            // this can happen if the user tapped on the profile page and is not signed in.
-            binding.loadingView.showErrorText(
-                getString(R.string.error_not_signed_in),
-            )
-            binding.profileIcon.visibility = View.GONE
-            binding.collapsingToolbarContent.visibility = View.GONE
-            binding.viewPager.visibility = View.GONE
-            binding.tabLayoutContainer.visibility = View.GONE
-            binding.fab.hide()
 
-            viewModel.clearPersonData()
-        } else {
-            binding.loadingView.hideAll()
-            binding.profileIcon.visibility = View.VISIBLE
-            binding.collapsingToolbarContent.visibility = View.VISIBLE
-            binding.viewPager.visibility = View.VISIBLE
-            binding.tabLayoutContainer.visibility = View.VISIBLE
-            binding.fab.show()
-
+        if (personRef != null) {
             viewModel.fetchPersonIfNotDone(personRef)
         }
 
@@ -422,7 +404,36 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     private fun setup(personRef: PersonRef?) {
         if (!isBindingAvailable()) return
 
-        val data = viewModel.personData.valueOrNull ?: return
+        if (personRef == null) {
+            // this can happen if the user tapped on the profile page and is not signed in.
+            binding.loadingView.showErrorText(
+                getString(R.string.error_not_signed_in),
+            )
+            binding.profileIcon.visibility = View.GONE
+            binding.collapsingToolbarContent.visibility = View.GONE
+            binding.viewPager.visibility = View.GONE
+            binding.tabLayoutContainer.visibility = View.GONE
+            binding.fab.hide()
+
+            viewModel.clearPersonData()
+            return
+        }
+
+        val data = viewModel.personData.valueOrNull
+
+        if (viewModel.personData.isLoading) {
+            binding.loadingView.showProgressBar()
+        }
+
+        if (data == null) {
+            binding.profileIcon.visibility = View.GONE
+            binding.collapsingToolbarContent.visibility = View.GONE
+            binding.viewPager.visibility = View.GONE
+            binding.tabLayoutContainer.visibility = View.GONE
+            binding.fab.hide()
+            return
+        }
+
         val person = data.personView.person
         val context = requireContext()
 
@@ -432,6 +443,12 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 
         with(binding) {
+            profileIcon.visibility = View.VISIBLE
+            collapsingToolbarContent.visibility = View.VISIBLE
+            viewPager.visibility = View.VISIBLE
+            tabLayoutContainer.visibility = View.VISIBLE
+            fab.show()
+
             val displayName = person.display_name
                 ?: person.name
 

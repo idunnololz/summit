@@ -11,7 +11,7 @@ fun newShimmerDrawable16to9(context: Context): Drawable = newShimmerDrawable(con
 fun newShimmerDrawableSquare(context: Context): Drawable = newShimmerDrawable(context, 1f)
 
 fun newShimmerDrawable(context: Context, ratio: Float): Drawable {
-    val size = Utils.convertDpToPixel(1f)
+    val size = Utils.convertDpToPixel(24f)
     val shimmer = Shimmer.ColorHighlightBuilder()
         .setBaseColor(0)
         .setHighlightColor(context.getColorCompat(R.color.colorText))

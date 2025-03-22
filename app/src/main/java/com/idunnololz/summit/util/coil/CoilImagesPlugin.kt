@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.text.Spanned
+import android.util.Log
 import android.widget.TextView
 import coil3.ImageLoader
 import coil3.asDrawable
@@ -14,6 +15,7 @@ import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.size.Dimension
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory
@@ -21,6 +23,7 @@ import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableLoader
 import io.noties.markwon.image.DrawableUtils
 import io.noties.markwon.image.ImageSpanFactory
+import io.noties.markwon.image.OnDimensionsKnownListener
 import java.util.concurrent.atomic.AtomicBoolean
 import org.commonmark.node.Image
 
@@ -61,12 +64,25 @@ class CoilImagesPlugin(
     ) : AsyncDrawableLoader() {
 
         private val cache: MutableMap<AsyncDrawable, Disposable?> = HashMap(2)
-        private val handler = Handler(Looper.getMainLooper())
+        private val mainThreadHandler = Handler(Looper.getMainLooper())
+
+        private val onDimensionsKnownListener = object : OnDimensionsKnownListener {
+            override fun onDimensionsKnown(drawable: AsyncDrawable) {
+                drawable.unregisterOnDimensionsKnownListener(this)
+                load(drawable)
+            }
+        }
 
         override fun load(drawable: AsyncDrawable) {
             if (!drawable.hasKnownDimensions()) {
-                handler.post {
-                    load(drawable)
+                if (Looper.myLooper() != Looper.getMainLooper()) {
+                    mainThreadHandler.post {
+                        drawable.registerOnDimensionsKnownListener(onDimensionsKnownListener)
+                        drawable.invalidateSelf()
+                    }
+                } else {
+                    drawable.registerOnDimensionsKnownListener(onDimensionsKnownListener)
+                    drawable.invalidateSelf()
                 }
                 return
             }

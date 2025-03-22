@@ -41,7 +41,7 @@ public class ImageSizeResolverDefTest {
         final Rect rect = mock(Rect.class);
         when(result.getBounds()).thenReturn(rect);
 
-        when(drawable.getImageSize()).thenReturn(imageSize);
+        when(drawable.imageSize).thenReturn(imageSize);
         when(drawable.getResult()).thenReturn(result);
         when(drawable.getLastKnownCanvasWidth()).thenReturn(111);
         when(drawable.getLastKnowTextSize()).thenReturn(24.0F);

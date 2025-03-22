@@ -621,7 +621,6 @@ class LemmyApiClient @Inject constructor(
         page: Int = 1,
         limit: Int = 50,
     ): Result<List<CommunityView>> {
-        Log.d("HAHA", "fetchCommunities", RuntimeException())
         val form = ListCommunities(
             type_ = listingType,
             sort = sortType,
