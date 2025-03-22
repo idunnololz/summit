@@ -1,14 +1,14 @@
 # This is probably not the page/README you are looking for
 
-## Are you an end user who wants to know about Summit? 
+## Are you interested in finding out more about Summit? 
 
 https://summit.idunnololz.com
 
-## Are you already a user who wants to report a bug/suggest a feature? Or maybe just want to see Summit updates?
+## Are you an existing user who wants to report a bug/suggest a feature? Or just get updates about the app?
 
 https://lemmy.world/c/summit
 
-## Are you a developer whose here to check things out?
+## Are you a developer who is here to check things out?
 
 Please note that I am currently not accepting PRs. This repo is still mostly meant for me so 
 documentation might be rough around the edges.
