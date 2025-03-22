@@ -26,6 +26,10 @@ jobs:
         run: chmod +x gradlew
       - name: Build APK
         run: ./gradlew assembleRelease --stacktrace
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       - name: Sign APK
         # ID used to access action output
         id: sign_apk

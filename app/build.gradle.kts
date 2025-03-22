@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.firebase.crashlytics")
     id("androidx.navigation.safeargs.kotlin")
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("com.google.devtools.ksp")
@@ -18,8 +17,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 242
-        versionName = "1.58.5"
+        versionCode = 243
+        versionName = "1.58.6"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -52,6 +51,10 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+}
+
+configurations.configureEach {
+    exclude(group = "io.sentry", module = "sentry-android-ndk")
 }
 
 dependencies {
