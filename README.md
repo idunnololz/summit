@@ -1,6 +1,21 @@
-# Summit
+# This is probably not the page/README you are looking for
 
-If you are looking for the app installer (APK) it is over at https://github.com/idunnololz/summit-for-lemmy.
+## Are you an end user who wants to know about Summit? 
+
+https://summit.idunnololz.com
+
+## Are you already a user who wants to report a bug/suggest a feature? Or maybe just want to see Summit updates?
+
+https://lemmy.world/c/summit
+
+## Are you a developer whose here to check things out?
+
+Please note that I am currently not accepting PRs. This repo is still mostly meant for me so 
+documentation might be rough around the edges.
+
+If you have any technical questions you can ask on https://lemmy.world/c/summit.
+
+# Summit
 
 This is the repository that contains the source code of Summit for Lemmy.
 
