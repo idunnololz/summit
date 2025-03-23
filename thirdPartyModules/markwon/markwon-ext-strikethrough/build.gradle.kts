@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.noties.markwon.simple.ext"
+    namespace = "io.noties.markwon.ext.strikethrough"
     compileSdk = 35
 
     defaultConfig {
@@ -20,7 +20,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":markwon:markwon-core"))
+    implementation(project(":thirdPartyModules:markwon:markwon-core"))
+    implementation(libs.annotation)
     implementation(libs.commonmark)
+    implementation(libs.commonmark.strikethrough)
     implementation(libs.core)
 }

@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":markwon:markwon-core"))
+    implementation(project(":thirdPartyModules:markwon:markwon-core"))
     implementation(libs.commonmark)
     implementation(libs.core)
 }

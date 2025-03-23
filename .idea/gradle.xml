@@ -11,16 +11,17 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/calligraphy" />
-            <option value="$PROJECT_DIR$/imagepicker" />
-            <option value="$PROJECT_DIR$/markwon" />
-            <option value="$PROJECT_DIR$/markwon/markwon-core" />
-            <option value="$PROJECT_DIR$/markwon/markwon-ext-strikethrough" />
-            <option value="$PROJECT_DIR$/markwon/markwon-ext-tables" />
-            <option value="$PROJECT_DIR$/markwon/markwon-html" />
-            <option value="$PROJECT_DIR$/markwon/markwon-linkify" />
-            <option value="$PROJECT_DIR$/markwon/markwon-simple-ext" />
-            <option value="$PROJECT_DIR$/overlappingPane" />
+            <option value="$PROJECT_DIR$/thirdPartyModules" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/calligraphy" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/imagepicker" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-core" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-ext-strikethrough" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-ext-tables" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-html" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-linkify" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-simple-ext" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/overlappingPane" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

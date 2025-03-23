@@ -58,15 +58,15 @@ configurations.configureEach {
 }
 
 dependencies {
-    implementation(project(":calligraphy"))
-    implementation(project(":imagepicker"))
-    implementation(project(":overlappingPane"))
-    implementation(project(":markwon:markwon-core"))
-    implementation(project(":markwon:markwon-ext-strikethrough"))
-    implementation(project(":markwon:markwon-ext-tables"))
-    implementation(project(":markwon:markwon-html"))
-    implementation(project(":markwon:markwon-linkify"))
-    implementation(project(":markwon:markwon-simple-ext"))
+    implementation(project(":thirdPartyModules:calligraphy"))
+    implementation(project(":thirdPartyModules:imagepicker"))
+    implementation(project(":thirdPartyModules:overlappingPane"))
+    implementation(project(":thirdPartyModules:markwon:markwon-core"))
+    implementation(project(":thirdPartyModules:markwon:markwon-ext-strikethrough"))
+    implementation(project(":thirdPartyModules:markwon:markwon-ext-tables"))
+    implementation(project(":thirdPartyModules:markwon:markwon-html"))
+    implementation(project(":thirdPartyModules:markwon:markwon-linkify"))
+    implementation(project(":thirdPartyModules:markwon:markwon-simple-ext"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)

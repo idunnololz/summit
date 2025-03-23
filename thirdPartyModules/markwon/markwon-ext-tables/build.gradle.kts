@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.noties.markwon.html"
+    namespace = "io.noties.markwon.ext.tables"
     compileSdk = 35
 
     defaultConfig {
@@ -20,8 +20,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":markwon:markwon-core"))
-    implementation(libs.commonmark)
-    implementation(libs.commonmark.strikethrough)
-    implementation(libs.core)
+    implementation(project(":thirdPartyModules:markwon:markwon-core"))
+    implementation(libs.annotation)
+    implementation(libs.commonmark.table)
 }
