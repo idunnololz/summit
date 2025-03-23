@@ -11,7 +11,7 @@
         android:id="@+id/card_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Widget.Material3.CardView.Filled"
+        style="?materialCardViewFilledStyle"
         app:cardBackgroundColor="?colorSurfaceContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

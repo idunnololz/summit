@@ -24,7 +24,7 @@
         android:layout_marginTop="@dimen/padding"
         android:layout_marginBottom="@dimen/padding_half"
         android:layout_marginHorizontal="@dimen/dialog_padding"
-        style="@style/Widget.Material3.CardView.Filled"
+        style="?materialCardViewFilledStyle"
         app:cardBackgroundColor="?colorSurfaceContainerHigh"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

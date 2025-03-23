@@ -145,7 +145,8 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/title_suggestion_card"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="wrap_content"
+                                style="?materialCardViewFilledStyle">
 
                                 <TextView
                                     android:id="@+id/title_suggestion"
