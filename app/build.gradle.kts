@@ -17,8 +17,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 245
-        versionName = "1.58.8"
+        versionCode = 246
+        versionName = "1.58.9"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -51,6 +51,10 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+}
+
+sentry {
+    autoUploadProguardMapping.set(false)
 }
 
 configurations.configureEach {
