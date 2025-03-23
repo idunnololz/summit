@@ -1,0 +1,22 @@
+Summit is an app for Lemmy that enables you to explore hundreds of communities with ease.
+
+Summit is optimized for Android and offers a smooth browsing experience.
+
+Features
+* An edge-to-edge browsing experience
+* Upvote, comment and create content
+* Easy to learn gesture navigation
+* Seamless multi-account support
+* Browse history
+* Light/Dark and Material You themes
+* Customize how posts look with dozens of unique configurations
+* User inboxes
+* View user profiles
+* Customize web settings
+* Swipe gesture actions
+* Keyword and advanced filters
+* View community and instance stats and descriptions
+* Save posts & comments
+* Multi-communities (grouping multiple communities together into one feed)
+* Moderation & admin actions
+* And much more to come!

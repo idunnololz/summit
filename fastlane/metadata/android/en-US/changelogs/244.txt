@@ -1,0 +1,6 @@
+Full changelog: https://lemmy.world/post/26604491
+- Add a setting to choose the direction of swipe gestures. By default this is left-to-right.
+- Add a setting to change the default volume of the inline video player
+- Add an option to share a community/instance in the community/instance screen.
+- Add a setting to choose default app to open URLs with. By default Summit will open URLs within the app however setting a default browser will override this behavior.
+- And more...
