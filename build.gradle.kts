@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.ktlint)
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.kotlin.android.extensions) apply false
@@ -10,10 +9,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.plugin.serialization) apply false
     alias(libs.plugins.versions)
-}
-
-subprojects {
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
 
 allprojects {

@@ -23,8 +23,6 @@ jobs:
           java-version: 17
           distribution: zulu
           cache: gradle
-      - name: chmod gradlew
-        run: chmod +x gradlew
       - name: Build APK
         run: ./gradlew assembleRelease --stacktrace
         env:

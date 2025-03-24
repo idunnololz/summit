@@ -8,6 +8,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("io.sentry.android.gradle") version "5.3.0"
     alias(libs.plugins.hilt)
+    alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
@@ -161,4 +162,8 @@ dependencies {
     implementation(libs.commonmark)
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+}
+
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
