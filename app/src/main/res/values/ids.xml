@@ -105,8 +105,8 @@
     <item name="mod" type="id" />
     <item name="undo_remove_comment" type="id" />
     <item name="remove_comment" type="id" />
-    <item name="feature_comment" type="id" />
-    <item name="remove_feature_comment" type="id" />
+    <item name="distinguish" type="id" />
+    <item name="remove_distinguish" type="id" />
     <item name="create_multi_community" type="id" />
     <item name="cross_post" type="id" />
     <item name="report_post" type="id" />
@@ -264,4 +264,8 @@
     <item name="import_table_strategy_overwrite" type="id" />
     <item name="import_table_strategy_ignore" type="id" />
     <item name="none" type="id" />
+    <item name="tablet_preview_fragment_container" type="id" />
+    <item name="tablet_binding" type="id" />
+    <item name="phone_binding" type="id" />
+    <item name="admin" type="id" />
 </resources>

@@ -1,11 +1,9 @@
 package com.idunnololz.summit.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.utils.StableAccountId
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,10 +12,10 @@ import kotlinx.serialization.json.Json
 @Singleton
 class PreferenceManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val baseSharedPreferences: SharedPreferences,
-    val basePreferences: Preferences,
+    private val basePreferences: Preferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val json: Json,
+    private val sharedPreferencesManager: SharedPreferencesManager,
 ) {
 
     private var currentAccount: Account? = null
@@ -26,26 +24,33 @@ class PreferenceManager @Inject constructor(
     val currentPreferences: Preferences
         get() = _currentPreferences ?: basePreferences
 
-    fun getComposedPreferencesForAccount(guestOrUserAccount: GuestOrUserAccount?): Preferences {
+    fun updateCurrentPreferences(
+        guestOrUserAccount: GuestOrUserAccount?,
+        force: Boolean = false,
+    ): Preferences {
         val account = guestOrUserAccount as? Account
 
-        if (currentAccount == account) {
+        if (currentAccount == account && !force) {
             return _currentPreferences!!
         }
 
         val prefs = if (account != null) {
             listOf(
-                getSharedPreferencesForAccount(account),
-                baseSharedPreferences,
+                sharedPreferencesManager.getSharedPreferencesForAccount(account),
+                sharedPreferencesManager.currentSharedPreferences,
             )
         } else {
-            listOf(baseSharedPreferences)
+            listOf(sharedPreferencesManager.currentSharedPreferences)
         }
 
         currentAccount = account
         _currentPreferences = Preferences(
             context = context,
-            prefs = ComposedPreferences(prefs),
+            sharedPreferencesManager = sharedPreferencesManager,
+            sharedPreferences = ComposedPreferences(
+                preferences = prefs,
+                base = sharedPreferencesManager.currentSharedPreferences,
+            ),
             coroutineScopeFactory = coroutineScopeFactory,
             json = json,
         )
@@ -56,30 +61,10 @@ class PreferenceManager @Inject constructor(
     fun getOnlyPreferencesForAccount(account: Account): Preferences {
         return Preferences(
             context = context,
-            prefs = getSharedPreferencesForAccount(account),
+            sharedPreferencesManager = sharedPreferencesManager,
+            sharedPreferences = sharedPreferencesManager.getSharedPreferencesForAccount(account),
             coroutineScopeFactory = coroutineScopeFactory,
             json = json,
         )
-    }
-
-    fun getSharedPreferencesForAccount(account: Account): SharedPreferences {
-        val key = "account@${account.instance}@${account.id}"
-        return context.getSharedPreferences(key, Context.MODE_PRIVATE)
-    }
-
-    fun getAccountIdSharedPreferences(): SharedPreferences {
-        return context.getSharedPreferences("account_ids@", Context.MODE_PRIVATE)
-    }
-
-    fun getNotificationsSharedPreferences(): SharedPreferences {
-        return context.getSharedPreferences("notifications@", Context.MODE_PRIVATE)
-    }
-
-    fun getGlobalStateSharedPreferences(): SharedPreferences {
-        return context.getSharedPreferences("global_state@", Context.MODE_PRIVATE)
-    }
-
-    fun getAccountStateSharedPreferences(stableAccountId: StableAccountId): SharedPreferences {
-        return context.getSharedPreferences("state_$stableAccountId@", Context.MODE_PRIVATE)
     }
 }

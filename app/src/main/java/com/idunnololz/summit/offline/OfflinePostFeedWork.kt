@@ -98,7 +98,7 @@ class OfflinePostFeedWork @AssistedInject constructor(
             inputData.getParcelable<BoxedCommunityRef>(ARG_COMMUNITY_REF)?.communityRef
 
         val fullAccount = accountInfoManager.currentFullAccount.value
-        val preferences = preferenceManager.getComposedPreferencesForAccount(
+        val preferences = preferenceManager.updateCurrentPreferences(
             fullAccount?.account,
         )
 

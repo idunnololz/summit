@@ -30,7 +30,7 @@ class ImgurApiClient @Inject constructor(
             } else if (response.code() == 413) {
                 Result.failure(FileTooLargeError())
             } else {
-                Result.failure(ClientApiException(response.message(), response.code()))
+                Result.failure(ClientApiException(response.errorBody()?.string(), response.code()))
             }
         } catch (e: Exception) {
             Result.failure(e)

@@ -1,7 +1,6 @@
 package com.idunnololz.summit
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -10,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.hilt.work.HiltWorkerFactory
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
@@ -25,7 +23,6 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
-import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.BetterDebugLogger
 import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
@@ -57,11 +54,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         private val TAG = MainApplication::class.java.simpleName
     }
 
-    override fun attachBaseContext(base: Context) {
-        PreferenceUtils.initialize(base)
-        super.attachBaseContext(base)
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
@@ -70,19 +62,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
     }
 
     override fun onCreate() {
-        val context = applicationContext
-
-        PreferenceUtils.initialize(context)
-
-        val sharedPreferences = PreferenceUtils.preferences
-
-        AppCompatDelegate.setDefaultNightMode(
-            sharedPreferences.getInt(
-                PreferenceUtils.KEY_THEME,
-                AppCompatDelegate.MODE_NIGHT_YES,
-            ),
-        )
-
         super.onCreate()
 
 //        if (BuildConfig.DEBUG) {
@@ -102,10 +81,10 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 //                    .build())
 //        }
 
+        val context = applicationContext
         val hiltEntryPoint =
-            EntryPointAccessors.fromApplication(this, AppEntryPoint::class.java)
+            EntryPointAccessors.fromApplication(context, AppEntryPoint::class.java)
         val preferences = hiltEntryPoint.preferences()
-
         hiltEntryPoint.themeManager().onPreferencesChanged()
         Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
         Utils.defaultWebApp = preferences.defaultWebApp

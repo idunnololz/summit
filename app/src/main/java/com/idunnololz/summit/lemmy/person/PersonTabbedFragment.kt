@@ -27,7 +27,7 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonBinding
@@ -137,9 +137,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
-        val mainActivity = requireMainActivity()
+        val mainActivity = requireSummitActivity()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupToolbar(
                 binding.toolbar,
                 "",
@@ -218,15 +218,17 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
                         if (!consumedArgs && savedInstanceState == null) {
                             consumedArgs = true
 
-                            when (args.screen as Screen) {
-                                Screen.Posts -> {
-                                    viewPager.currentItem = 0
-                                }
-                                Screen.Comments -> {
-                                    viewPager.currentItem = 1
-                                }
-                                Screen.About -> {
-                                    viewPager.currentItem = 2
+                            viewPager.post {
+                                when (args.screen as Screen) {
+                                    Screen.Posts -> {
+                                        viewPager.currentItem = 0
+                                    }
+                                    Screen.Comments -> {
+                                        viewPager.currentItem = 1
+                                    }
+                                    Screen.About -> {
+                                        viewPager.currentItem = 2
+                                    }
                                 }
                             }
                         }
@@ -388,7 +390,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             }
         }
 
-        requireMainActivity().showBottomMenu(bottomMenu)
+        requireSummitActivity().showBottomMenu(bottomMenu)
     }
 
     override fun onResume() {
@@ -479,9 +481,9 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             avatarHelper.loadAvatar(profileIcon, person)
             if (person.avatar.isNullOrBlank()) {
                 profileIcon.setOnClickListener {
-                    OldAlertDialogFragment.Builder()
-                        .setMessage(R.string.error_user_has_no_profile_image)
-                        .createAndShow(childFragmentManager, "error_user_has_no_profile_image")
+                    launchAlertDialog("error_user_has_no_profile_image") {
+                        messageResId = R.string.error_user_has_no_profile_image
+                    }
                 }
             } else {
                 ViewCompat.setTransitionName(profileIcon, "profileIcon")

@@ -47,7 +47,9 @@ class UserCommunitiesManager @Inject constructor(
     init {
         coroutineScope.launch {
             val communities = userCommunitiesDao.getAllCommunities()
-            val userCommunities = listOf(makeHomeTab()) + communities.mapNotNull { it.toItem() }
+
+            // Important to add the home tab last in case there is an ID conflict
+            val userCommunities = communities.mapNotNull { it.toItem() } + listOf(makeHomeTab())
 
             withContext(dbContext) {
                 addCommunityOrUpdateInternal(makeHomeTab())

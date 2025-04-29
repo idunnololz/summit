@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.lemmy.utils.stateStorage.StateStorageManager
-import com.idunnololz.summit.util.PreferenceUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,35 +33,34 @@ class PreferencesModule {
     @Singleton
     fun providePreferences(
         @ApplicationContext context: Context,
-        sharedPreferences: SharedPreferences,
+        sharedPreferencesManager: SharedPreferencesManager,
         coroutineScopeFactory: CoroutineScopeFactory,
         json: Json,
     ): Preferences = Preferences(
         context = context,
-        prefs = sharedPreferences,
+        sharedPreferencesManager = sharedPreferencesManager,
+        sharedPreferences = sharedPreferencesManager.defaultSharedPreferences,
         coroutineScopeFactory = coroutineScopeFactory,
         json = json,
     )
 
-    @Provides
-    @Singleton
-    fun provideSharedPreferences(): SharedPreferences = PreferenceUtils.preferences
-
     @AccountIdsSharedPreference
     @Provides
-    fun provideAccountIdsSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
-        preferenceManager.getAccountIdSharedPreferences()
+    fun provideAccountIdsSharedPreference(
+        preferenceManager: SharedPreferencesManager,
+    ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
 
     @NotificationsSharedPreference
     @Provides
     fun provideNotificationsSharedPreference(
-        preferenceManager: PreferenceManager,
+        preferenceManager: SharedPreferencesManager,
     ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
 
     @StateSharedPreference
     @Provides
-    fun provideStateSharedPreference(preferenceManager: PreferenceManager): SharedPreferences =
-        preferenceManager.getGlobalStateSharedPreferences()
+    fun provideStateSharedPreference(
+        preferenceManager: SharedPreferencesManager,
+    ): SharedPreferences = preferenceManager.getGlobalStateSharedPreferences()
 
     @Provides
     @Singleton

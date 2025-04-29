@@ -175,7 +175,7 @@ class SearchHomeFragment :
             )
         }
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewStartAndEndByPadding(viewLifecycleOwner, binding.contentContainer)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.searchContainer)
@@ -341,7 +341,7 @@ class SearchHomeFragment :
                     }
                 },
                 onCommunityClick = { view, community ->
-                    requireMainActivity().launchPage(
+                    requireSummitActivity().launchPage(
                         page = community,
                         preferMainFragment = true,
                     )
@@ -441,7 +441,7 @@ class SearchHomeFragment :
     }
 
     private fun hideSearch(animate: Boolean = true) {
-        Utils.hideKeyboard(requireMainActivity())
+        Utils.hideKeyboard(requireSummitActivity())
 
         if (animate) {
             binding.searchContainer.animate()

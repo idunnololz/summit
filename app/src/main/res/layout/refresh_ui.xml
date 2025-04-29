@@ -30,32 +30,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
+        tools:visibility="visible"
         tools:text="Network error. Please check your internet connection and try again." />
-
-    <Button
-        android:id="@+id/_negative_button"
-        style="?attr/materialButtonOutlinedStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/padding_half"
-        android:visibility="gone"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintTop_toTopOf="@+id/_positive_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/_positive_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="Cancel" />
 
     <Button
         android:id="@+id/_positive_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_marginBottom="@dimen/padding_half"
-        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintTop_toBottomOf="@+id/_error"
+        app:layout_constraintBottom_toTopOf="@+id/_negative_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible"
+        tools:text="Retry" />
+
+    <Button
+        android:id="@+id/_negative_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/_positive_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/_negative_button"
-        tools:text="Retry" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Cancel"
+        tools:visibility="visible"
+        style="@style/Widget.Material3.Button.TextButton" />
 </merge>

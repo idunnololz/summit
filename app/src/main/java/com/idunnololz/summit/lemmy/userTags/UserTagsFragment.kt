@@ -49,10 +49,10 @@ class UserTagsFragment :
         val context = requireContext()
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-                requireMainActivity().apply {
+                requireSummitActivity().apply {
                     insetViewAutomaticallyByPaddingAndNavUi(
                         viewLifecycleOwner,
                         root,

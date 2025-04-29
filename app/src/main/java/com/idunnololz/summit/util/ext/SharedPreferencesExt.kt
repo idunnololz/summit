@@ -2,7 +2,14 @@ package com.idunnololz.summit.util.ext
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
+import com.idunnololz.summit.BuildConfig
+import com.idunnololz.summit.preferences.ComposedPreferences
+import com.idunnololz.summit.util.PreferenceUtils
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
+
+private const val TAG = "SharedPreferencesExt"
 
 inline fun <reified T> SharedPreferences.getJsonValue(json: Json, key: String): T? {
     return try {
@@ -14,15 +21,13 @@ inline fun <reified T> SharedPreferences.getJsonValue(json: Json, key: String): 
 }
 
 inline fun <reified T> SharedPreferences.putJsonValue(json: Json, key: String, value: T) {
-    this.edit()
-        .apply {
-            if (value == null) {
-                remove(key)
-            } else {
-                putString(key, json.encodeToString(value))
-            }
+    this.edit {
+        if (value == null) {
+            remove(key)
+        } else {
+            putString(key, json.encodeToString(value))
         }
-        .apply()
+    }
 }
 
 fun SharedPreferences.getIntOrNull(key: String) = if (this.contains(key)) {
@@ -81,4 +86,28 @@ fun SharedPreferences.getFloatSafe(key: String, defValue: Float): Float {
             return defValue
         }
     }
+}
+
+val SharedPreferences.base
+    get() = when (this) {
+        is ComposedPreferences -> base
+        else -> this
+    }
+
+fun SharedPreferences.asJson(): JSONObject {
+    val json = JSONObject()
+
+    for ((key, value) in this.all.entries) {
+        when (value) {
+            is String -> json.put(key, value)
+            is Boolean -> json.put(key, value)
+            is Number -> json.put(key, value)
+            null -> json.put(key, null)
+            else -> Log.d(TAG, "Unsupported type ${value::class}. Key was $key.")
+        }
+    }
+
+    json.put(PreferenceUtils.PREFERENCE_VERSION_CODE, BuildConfig.VERSION_CODE)
+
+    return json
 }

@@ -48,6 +48,7 @@ class SlidingPaneController(
     val lockPanes: Boolean = false,
     private val retainClosedPosts: Boolean = false,
     private val useSwipeBetweenPosts: Boolean = false,
+    private val isPreview: Boolean = false,
 ) {
 
     interface PostViewPagerViewModel {
@@ -88,7 +89,7 @@ class SlidingPaneController(
             override fun onPanelOpened(panel: View) {
                 Log.d(TAG, "onPanelOpened()")
 
-                fragment.requireMainActivity().apply {
+                fragment.requireSummitActivity().apply {
                     lockUiOpenness = false
                 }
                 onPageSelectedListener(true)
@@ -205,6 +206,7 @@ class SlidingPaneController(
                 id = id,
                 reveal = reveal,
                 post = post,
+                isPreview = isPreview,
                 jumpToComments = jumpToComments,
                 currentCommunity = currentCommunity,
                 videoState = videoState,
@@ -221,6 +223,7 @@ class SlidingPaneController(
             PostFragmentArgs(
                 instance = instance,
                 id = 0,
+                isPreview = isPreview,
                 commentId = commentId,
                 currentCommunity = null,
                 isSinglePage = false,

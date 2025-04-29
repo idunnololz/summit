@@ -9,7 +9,6 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.links.LinkResolver
-import com.idunnololz.summit.main.MainActivity
 
 object LinkUtils {
 
@@ -84,7 +83,7 @@ sealed interface AdvancedLink {
     ) : AdvancedLink
 }
 
-fun MainActivity.showMoreLinkOptions(url: String, text: String?) {
+fun SummitActivity.showMoreLinkOptions(url: String, text: String?) {
     showAdvancedLinkOptions(
         url,
         moreActionsHelper,

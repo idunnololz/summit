@@ -12,7 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.DialogFragmentReceiveFileBinding
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
@@ -95,9 +95,9 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
                 val account = accountManager.currentAccount.asAccount
 
                 if (account == null) {
-                    OldAlertDialogFragment.Builder()
-                        .setMessage(R.string.error_you_must_sign_in_to_create_a_post)
-                        .createAndShow(childFragmentManager, "asdf")
+                    launchAlertDialog("not_signed_in") {
+                        messageResId = R.string.error_you_must_sign_in_to_create_a_post
+                    }
                     return@setOnClickListener
                 }
 

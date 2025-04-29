@@ -340,7 +340,7 @@ class OfflineManager @Inject constructor(
 
                 Result.success(Unit)
             } else if (response.code >= 500) {
-                Result.failure(ServerApiException(response.code))
+                Result.failure(ServerApiException(null, response.code))
             } else {
                 Result.failure(
                     ClientApiException(

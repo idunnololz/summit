@@ -31,6 +31,10 @@
             android:name="tab"
             app:argType="com.idunnololz.summit.tabs.TabsManager$Tab"
             app:nullable="true" />
+        <argument
+            android:name="is_preview"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_mainFragment_to_postFragment"
             app:destination="@id/postFragment"
@@ -66,6 +70,10 @@
             android:name="commentId"
             android:defaultValue="0"
             app:argType="integer"/>
+        <argument
+            android:name="is_preview"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <argument
             android:name="currentCommunity"
             app:argType="com.idunnololz.summit.lemmy.CommunityRef"

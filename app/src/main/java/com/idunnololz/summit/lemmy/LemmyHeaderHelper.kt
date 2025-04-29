@@ -36,6 +36,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.spToPx
 import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.assisted.Assisted
@@ -98,6 +99,9 @@ class LemmyHeaderHelper @AssistedInject constructor(
         val context = headerContainer.context
         var sb = SpannableStringBuilder()
 
+        fun iconSize() = // Use SP since the icons are inline with text.
+            context.spToPx(headerContainer.textSize * 1.33f).toInt()
+
         if (isCurrentUser) {
             val s = sb.length
             sb.append(context.getString(R.string.you))
@@ -130,7 +134,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
                 res = R.drawable.baseline_bookmark_24,
                 color = context.getColorCompat(R.color.style_blue),
             )
-            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            val size: Int = iconSize()
             d.setBounds(0, 0, size, size)
             val s = sb.length
             sb.append("  ")
@@ -150,7 +154,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
                 res = R.drawable.baseline_delete_24,
                 color = context.getColorCompat(R.color.style_red),
             )
-            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            val size: Int = iconSize()
             d.setBounds(0, 0, size, size)
             val s = sb.length
             sb.append("  ")
@@ -170,7 +174,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
                 res = R.drawable.baseline_push_pin_24,
                 color = context.getColorCompat(R.color.style_green),
             )
-            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            val size: Int = iconSize()
             d.setBounds(0, 0, size, size)
             val s = sb.length
             sb.append("  ")
@@ -189,7 +193,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
                 res = R.drawable.outline_lock_24,
                 color = context.getColorCompat(R.color.style_amber),
             )
-            val size: Int = Utils.convertDpToPixel(16f).toInt()
+            val size: Int = iconSize()
             d.setBounds(0, 0, size, size)
             val s = sb.length
             sb.append("  ")

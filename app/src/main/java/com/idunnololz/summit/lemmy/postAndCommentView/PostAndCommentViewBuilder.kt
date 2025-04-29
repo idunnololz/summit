@@ -207,7 +207,7 @@ class PostAndCommentViewBuilder @Inject constructor(
                 val account = it as? Account
                 currentUser = account
 
-                preferences = preferenceManager.getComposedPreferencesForAccount(account)
+                preferences = preferenceManager.updateCurrentPreferences(account)
 
                 onPreferencesChanged()
             }
@@ -783,7 +783,7 @@ class PostAndCommentViewBuilder @Inject constructor(
 
         if (commentView.comment.distinguished) {
             overlay.visibility = View.VISIBLE
-            overlay.setBackgroundResource(R.drawable.locked_overlay)
+            overlay.setBackgroundResource(R.drawable.mod_emphasis_overlay)
         } else {
             overlay.visibility = View.GONE
         }

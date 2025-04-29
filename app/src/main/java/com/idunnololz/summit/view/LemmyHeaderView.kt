@@ -19,9 +19,10 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.AbsoluteCornerSize
 import com.idunnololz.summit.R as R2
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.convertSpToPixel
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getTextSizeFromTextAppearance
+import com.idunnololz.summit.util.ext.spToPx
 import kotlin.math.max
 
 class LemmyHeaderView : FrameLayout {
@@ -87,7 +88,7 @@ class LemmyHeaderView : FrameLayout {
         textView2.text = text
     }
 
-    var textSize: Float = 0f
+    var textSize: Float = context.getTextSizeFromTextAppearance(R.attr.textAppearanceBodySmall)
         set(value) {
             field = value
 
@@ -96,7 +97,7 @@ class LemmyHeaderView : FrameLayout {
             textView3.textSize = value
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val lineHeight = (convertSpToPixel(value) * 1.33f).toInt()
+                val lineHeight = (context.spToPx(value) * 1.33f).toInt()
                 textView1.lineHeight = lineHeight
                 textView2.lineHeight = lineHeight
                 textView3.lineHeight = lineHeight

@@ -64,7 +64,7 @@ class ActionsTabbedFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<ActionsTabbedFragment>()
 
             setupToolbar(binding.toolbar, getString(R.string.user_actions))

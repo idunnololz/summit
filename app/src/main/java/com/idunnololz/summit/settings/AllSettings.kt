@@ -325,7 +325,6 @@ class MainSettings @Inject constructor(
         SubgroupItem(
             context.getString(R.string.look_and_feel),
             listOf(
-//                settingPresets,
                 settingTheme,
                 settingPostsFeed,
                 settingPostAndComments,
@@ -357,6 +356,10 @@ class MainSettings @Inject constructor(
                 backupAndRestoreSettings,
             ),
         ),
+//        SubgroupItem(
+//            context.getString(R.string.experimental),
+//            listOf(settingPresets),
+//        ),
         SubgroupItem(
             context.getString(R.string.about),
             listOf(

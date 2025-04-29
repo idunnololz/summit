@@ -180,7 +180,7 @@
                                 android:layout_height="wrap_content"
                                 android:autofillHints="no"
                                 android:background="@null"
-                                android:hint="@string/compose_post"
+                                android:hint="@string/body"
                                 android:padding="@dimen/padding"
                                 android:gravity="start|top"
                                 android:inputType="textMultiLine|textCapSentences"

@@ -53,7 +53,7 @@ class SettingsAccountsFragment : BaseFragment<FragmentSettingsAccountsBinding>()
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 

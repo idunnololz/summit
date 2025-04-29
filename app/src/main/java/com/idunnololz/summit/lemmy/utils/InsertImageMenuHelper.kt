@@ -92,5 +92,5 @@ fun BaseFragment<*>.showInsertImageMenu(
         }
     }
 
-    requireMainActivity().showBottomMenu(bottomMenu)
+    requireSummitActivity().showBottomMenu(bottomMenu)
 }

@@ -85,7 +85,7 @@ class ActionDetailsFragment :
         super.onViewCreated(view, savedInstanceState)
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             }
             toolbar.apply {

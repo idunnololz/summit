@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import coil3.asImage
 import coil3.load
 import coil3.request.error
 import com.idunnololz.summit.R
@@ -17,6 +18,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -85,6 +87,8 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
                 context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
             )
 
+            image.load(newShimmerDrawable16to9(context))
+
             url.text = args.url
 
             viewModel.linkMetadata.observe(viewLifecycleOwner) {
@@ -119,6 +123,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
 
         imageError.visibility = View.GONE
         image.load(data.imageUrl) {
+            placeholder(newShimmerDrawable16to9(context).asImage())
             this.error(R.drawable.thumbnail_placeholder_16_9)
             listener(
                 onError = { _, _ ->

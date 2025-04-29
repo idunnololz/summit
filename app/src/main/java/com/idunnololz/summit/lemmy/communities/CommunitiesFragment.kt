@@ -24,7 +24,6 @@ import com.idunnololz.summit.databinding.FragmentCommunitiesBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.search.Item
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.offline.OfflineManager
@@ -70,7 +69,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<CommunitiesFragment>()
         }
 
@@ -84,7 +83,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 

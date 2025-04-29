@@ -67,7 +67,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<ActionsTabbedFragment>()
 
             setSupportActionBar(binding.toolbar)

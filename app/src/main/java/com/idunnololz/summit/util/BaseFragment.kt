@@ -19,7 +19,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         javaClass.canonicalName ?: "UNKNOWN_CLASS"
     }
 
-    fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
+    fun requireSummitActivity(): SummitActivity = requireActivity() as SummitActivity
     fun getMainActivity(): MainActivity? = activity as? MainActivity
     fun getBaseActivity(): BaseActivity? = activity as? BaseActivity
 
@@ -33,7 +33,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     }
 
     fun runOnReady(cb: () -> Unit) {
-        requireMainActivity().runOnReady(viewLifecycleOwner) {
+        requireSummitActivity().runOnReady(viewLifecycleOwner) {
             if (isBindingAvailable()) {
                 cb()
             }

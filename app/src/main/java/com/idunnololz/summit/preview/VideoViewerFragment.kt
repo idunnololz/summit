@@ -28,7 +28,6 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.LoopsVideoUtils
-import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.video.ExoPlayerManagerManager
@@ -45,7 +44,7 @@ import okhttp3.OkHttpClient
 class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     companion object {
-        private val TAG = "VideoViewerFragment"
+        private const val TAG = "VideoViewerFragment"
 
         private const val ORIENTATION_SLOP_DEG = 15 // in degrees
 
@@ -73,6 +72,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
     @Inject
     lateinit var globalStateStorage: GlobalStateStorage
+
+    private val currentPreferences
+        get() = preferenceManager.currentPreferences
 
     private val playerListener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -126,7 +128,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         }
 
         if (orientationListener?.canDetectOrientation() == true) {
-            if (PreferenceUtils.isVideoPlayerRotationLocked()) {
+            if (currentPreferences.isVideoPlayerRotationLocked) {
                 orientationListener?.disable()
             } else {
                 orientationListener?.enable()
@@ -150,7 +152,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<VideoViewerFragment>()
         }
 
@@ -163,7 +165,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
-        val parent = requireMainActivity()
+        val parent = requireSummitActivity()
         parent.hideSystemUI()
 
         parent.insets.observe(viewLifecycleOwner) {
@@ -192,7 +194,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             visibility = View.VISIBLE
 
             fun updateUi() {
-                if (PreferenceUtils.isVideoPlayerRotationLocked()) {
+                if (currentPreferences.isVideoPlayerRotationLocked) {
                     setImageResource(R.drawable.ic_baseline_screen_rotation_24)
                 } else {
                     setImageResource(R.drawable.ic_baseline_screen_lock_rotation_24)
@@ -200,9 +202,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             }
 
             setOnClickListener {
-                val isOrientationLocked = !PreferenceUtils.isVideoPlayerRotationLocked()
-                PreferenceUtils.setVideoPlayerRotationLocked(isOrientationLocked)
-                if (PreferenceUtils.isVideoPlayerRotationLocked()) {
+                val isOrientationLocked = !currentPreferences.isVideoPlayerRotationLocked
+                currentPreferences.isVideoPlayerRotationLocked = isOrientationLocked
+                if (currentPreferences.isVideoPlayerRotationLocked) {
                     orientationListener?.disable()
                 } else {
                     orientationListener?.enable()
@@ -223,7 +225,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     }
 
     override fun onDestroyView() {
-        requireMainActivity().showSystemUI()
+        requireSummitActivity().showSystemUI()
         binding.playerView.onPause()
         binding.playerView.player?.removeListener(playerListener)
         binding.playerView.player?.release()
@@ -309,7 +311,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                             volume = globalStateStorage.videoStateVolume,
                             playing = true,
                         ),
-                        autoPlay = preferenceManager.currentPreferences.autoPlayVideos,
+                        autoPlay = currentPreferences.autoPlayVideos,
                         isInline = false,
                     )
                     .apply {

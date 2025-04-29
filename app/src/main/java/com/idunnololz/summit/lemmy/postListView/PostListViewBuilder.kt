@@ -101,7 +101,7 @@ class PostListViewBuilder @Inject constructor(
         private const val TAG = "PostListViewBuilder"
     }
 
-    private var preferences = preferenceManager.getComposedPreferencesForAccount(
+    private var preferences = preferenceManager.updateCurrentPreferences(
         accountManager.currentAccount.asAccount,
     )
 
@@ -170,7 +170,7 @@ class PostListViewBuilder @Inject constructor(
                 val account = it as? Account
                 currentUser = account
 
-                preferences = preferenceManager.getComposedPreferencesForAccount(account)
+                preferences = preferenceManager.updateCurrentPreferences(account)
 
                 onPostUiConfigUpdated()
             }

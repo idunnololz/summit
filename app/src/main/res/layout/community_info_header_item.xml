@@ -9,7 +9,7 @@
         android:id="@+id/name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceTitleLarge"
+        android:textAppearance="?textAppearanceHeadlineMedium"
         android:layout_marginTop="@dimen/padding"
         android:layout_marginHorizontal="@dimen/padding"
         android:singleLine="true"
@@ -52,12 +52,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/instance_info"
+        android:layout_marginTop="@dimen/padding"
         android:layout_marginHorizontal="@dimen/padding"
         style="?attr/materialButtonOutlinedStyle"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/subscribe"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/subscribe"/>
+        app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
 
     <Space
         android:layout_width="wrap_content"

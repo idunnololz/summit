@@ -97,7 +97,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
         viewModel.loadNextPage(force = true)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
         }
@@ -295,7 +295,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
     override fun onResume() {
         super.onResume()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             if (!navBarController.useNavigationRail) {
                 navBarController.hideNavBar(animate = true)
             }

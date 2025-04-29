@@ -18,7 +18,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 
 open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 

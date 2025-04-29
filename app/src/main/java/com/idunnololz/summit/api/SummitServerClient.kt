@@ -1,9 +1,13 @@
 package com.idunnololz.summit.api
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toFile
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.api.summit.CommunitySuggestionsDto
+import com.idunnololz.summit.api.summit.PresetDto
 import java.io.InterruptedIOException
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -11,6 +15,9 @@ import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import retrofit2.Call
 
@@ -23,6 +30,12 @@ class SummitServerClient @Inject constructor(
         private const val TAG = "SummitServerClient"
     }
 
+    fun getAuthPublicFileUrl(fileName: String) = if (BuildConfig.DEBUG) {
+        "http://10.0.2.2:8080"
+    } else {
+        "https://summitforlemmyserver.idunnololz.com"
+    } + "/v1/auth/public/$fileName"
+
     suspend fun communitySuggestions(force: Boolean): Result<CommunitySuggestionsDto> {
         return retrofitErrorHandler {
             if (force) {
@@ -34,6 +47,62 @@ class SummitServerClient @Inject constructor(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(it) },
         )
+    }
+
+    suspend fun submitPreset(
+        presetName: String,
+        presetDescription: String,
+        presetData: String,
+        phoneScreenshot: Uri?,
+        tabletScreenshot: Uri?,
+    ): Result<PresetDto> {
+        return retrofitErrorHandler {
+            val ts = System.currentTimeMillis()
+            summitServerApi.submitPreset(
+                preset = PresetDto(
+                    id = null,
+                    presetName = presetName,
+                    presetDescription = presetDescription,
+                    presetData = presetData,
+                    createTs = ts,
+                    updateTs = ts,
+                ),
+                phoneScreenshot = phoneScreenshot?.toFile()?.let {
+                    MultipartBody.Part.createFormData(
+                        "file",
+                        "phoneScreenshot",
+                        it.asRequestBody("image/jpeg".toMediaType()),
+                    )
+                },
+                tabletScreenshot = tabletScreenshot?.toFile()?.let {
+                    MultipartBody.Part.createFormData(
+                        "file",
+                        "tabletScreenshot",
+                        it.asRequestBody("image/jpeg".toMediaType()),
+                    )
+                },
+            )
+        }
+    }
+
+    suspend fun getPresets(force: Boolean): Result<List<PresetDto>> {
+        return retrofitErrorHandler {
+            if (force) {
+                summitServerApi.getPresetsNoCache()
+            } else {
+                summitServerApi.getPresets()
+            }
+        }
+    }
+
+    suspend fun getAllPresets(force: Boolean): Result<List<PresetDto>> {
+        return retrofitErrorHandler {
+            if (force) {
+                summitServerApi.getAllPresetsNoCache()
+            } else {
+                summitServerApi.getAllPresets()
+            }
+        }
     }
 
     private suspend fun <T> retrofitErrorHandler(call: () -> Call<T>): Result<T> {
@@ -54,6 +123,9 @@ class SummitServerClient @Inject constructor(
             if (e is InterruptedIOException) {
                 return Result.failure(e)
             }
+            if (e is ConnectException) {
+                return Result.failure(ConnectionException())
+            }
             Log.e(TAG, "Exception fetching url", e)
             return Result.failure(e)
         }
@@ -68,7 +140,7 @@ class SummitServerClient @Inject constructor(
                     // for some reason okhttp returns a 504 if we force cache with no internet
                     return Result.failure(NoInternetException())
                 }
-                return Result.failure(ServerApiException(errorCode))
+                return Result.failure(ServerApiException(null, errorCode))
             }
 
             if (errorCode == 401) {
@@ -99,10 +171,6 @@ class SummitServerClient @Inject constructor(
             if (errMsg == "couldnt_find_object") {
                 return Result.failure(CouldntFindObjectError())
             }
-            // TODO: Remove these checks once v0.19 is out for everyone.
-            if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
-                return Result.failure(NewApiException("v0.19"))
-            }
 
             if (BuildConfig.DEBUG) {
                 Log.e(
@@ -114,10 +182,6 @@ class SummitServerClient @Inject constructor(
 
             if (errMsg?.contains("timeout", ignoreCase = true) == true) {
                 return Result.failure(ServerTimeoutException(errorCode))
-            }
-            if (errMsg?.contains("the database system is not yet accepting connections", ignoreCase = true) == true) {
-                // this is a 4xx error but it should be a 5xx error because it's server sided and retry-able
-                return Result.failure(ServerApiException(503))
             }
 
             return Result.failure(ClientApiException(errMsg, errorCode))

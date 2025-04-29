@@ -200,6 +200,13 @@
             app:exitAnim="@animator/fade_out"
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out" />
+        <action
+            android:id="@+id/action_settingsFragment_to_presetsFragment"
+            app:destination="@id/presetsFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out"/>
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -402,7 +409,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingBackupAndRestoreFragment"
-        android:name="com.idunnololz.summit.settings.backupAndRestore.SettingsBackupAndRestoreFragment"
+        android:name="com.idunnololz.summit.settings.importAndExport.SettingsBackupAndRestoreFragment"
         android:label="SettingBackupAndRestoreFragment" >
         <action
             android:id="@+id/action_settingBackupAndRestoreFragment_to_manageInternalSettingsBackupsDialogFragment"
@@ -421,7 +428,7 @@
     </fragment>
     <fragment
         android:id="@+id/manageInternalSettingsBackupsDialogFragment"
-        android:name="com.idunnololz.summit.settings.backupAndRestore.ManageInternalSettingsBackupsFragment"
+        android:name="com.idunnololz.summit.settings.importAndExport.ManageInternalSettingsBackupsFragment"
         android:label="ManageInternalSettingsBackupsDialogFragment" />
     <fragment
         android:id="@+id/manageSettingsFragment"
@@ -466,7 +473,7 @@
         app:popExitAnim="@animator/fade_out" />
     <fragment
         android:id="@+id/viewCurrentSettingsFragment"
-        android:name="com.idunnololz.summit.settings.backupAndRestore.ViewCurrentSettingsFragment"
+        android:name="com.idunnololz.summit.settings.importAndExport.ViewCurrentSettingsFragment"
         android:label="ViewCurrentSettingsFragment" />
     <fragment
         android:id="@+id/settingsHapticsFragment"
@@ -481,4 +488,31 @@
         android:id="@+id/settingsDefaultAppsFragment"
         android:name="com.idunnololz.summit.settings.defaultApps.SettingsDefaultAppsFragment"
         android:label="SettingsDefaultAppsFragment" />
+    <fragment
+        android:id="@+id/presetsFragment"
+        android:name="com.idunnololz.summit.presets.PresetsFragment"
+        android:label="PresetsFragment" >
+        <action
+            android:id="@+id/action_presetsFragment_to_generatePresetFragment"
+            app:destination="@id/generatePresetFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
+        <action
+            android:id="@+id/action_presetsFragment_to_adminPresetsFragment"
+            app:destination="@id/adminPresetsFragment"
+            app:enterAnim="@animator/slide_in"
+            app:exitAnim="@animator/fade_out"
+            app:popEnterAnim="@animator/fade_in"
+            app:popExitAnim="@animator/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/generatePresetFragment"
+        android:name="com.idunnololz.summit.presets.CreatePresetFragment"
+        android:label="GeneratePresetFragment" />
+    <fragment
+        android:id="@+id/adminPresetsFragment"
+        android:name="com.idunnololz.summit.presets.AdminPresetsFragment"
+        android:label="AdminPresetsFragment" />
 </navigation>

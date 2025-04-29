@@ -851,7 +851,7 @@
     <!-- Keep short. Button text of edit post button. -->
     <string name="edit_post">Edit post</string>
     <!-- Hint text for a text field where you enter the content of a post. -->
-    <string name="compose_post">Compose post</string>
+    <string name="body">Body</string>
     <!-- Hint text for a text field where you enter the title of a post. -->
     <string name="title">Title</string>
     <!-- Hint text for a text field where you enter the url of a post. -->
@@ -2029,6 +2029,52 @@
     <string name="presets_desc">Customize your app experience quickly with presets</string>
     <string name="share_a_preset">Share a preset</string>
     <string name="static_presets_unavailable">Only community presets are available for now. Static presets are still being worked on.</string>
+    <string name="remove_speak_as_moderator">Remove \"Speak as moderator\"</string>
+    <string name="speak_as_moderator">Speak as moderator</string>
+    <string name="unmark_important">Unmark important</string>
+    <string name="mark_important">Mark important</string>
+    <string name="create_preset">Create preset</string>
+    <string name="submit_preset">Submit preset</string>
+    <string name="choose_preferences_to_include">Choose preferences to include</string>
+    <string name="choose_preferences_to_include_desc">Try to include key settings only to keep the preset focused.</string>
+    <string name="choose_preferences">Choose preferences</string>
+    <string name="submit_preset_confirm">Submit preset?</string>
+    <string name="submit_preset_confirm_desc">Your preset may be published online.\n\nSubmitting a preset will sent the preset for review. Once approved it will be visible to other users.</string>
+    <string name="preset_submitted">Preset submitted!</string>
+    <string name="button_back">Back</string>
+    <string name="preset_form_instructions">Please give your preset a name (required). Names should be short and describe what the preset accomplishes. Eg. \"Modern compact\" or \"Minimal clean\". You can also describe your preset (optional).</string>
+    <string name="name_required">Name (required)</string>
+    <string name="error_submit_preset">Unable to submit preset</string>
+    <string name="exit_create_preset_flow">Exit create preset flow?</string>
+    <string name="feature_under_construction">Feature under construction</string>
+    <string name="take_preview_screenshot_instructions">Please wait until the previews below load completely. Make sure the previews look ok and tap the capture button.</string>
+    <string name="take_a_preset_preview_screenshot_desc">Take a picture of what your preset looks like in the app. This will make it easier for other users to visualize your presets.</string>
+    <string name="experimental">Experimental</string>
+    <string name="take_a_picture">Take a picture</string>
+    <string name="preset_form_title"><![CDATA[Name & description]]></string>
+    <string name="warn_pii_key_person">Suspicious key-value pair found where the value might be a person\'s name. Pair: `%1$s`</string>
+    <string name="warn_pii_key_email">Suspicious key-value pair found where the value might be an email. Pair: `%1$s`</string>
+    <string name="warn_pii_key_dob">Suspicious key-value pair found where the value might be a date of birth. Pair: `%1$s`</string>
+    <string name="warn_pii_key_gender">Suspicious key-value pair found where the value might be a gender. Pair: `%1$s`</string>
+    <string name="warn_pii_key_nationality">Suspicious key-value pair found where the value might be a nationality. Pair: `%1$s`</string>
+    <string name="warn_pii_key_address">Suspicious key-value pair found where the value might be an address. Pair: `%1$s`</string>
+    <string name="warn_pii_key_username">Suspicious key-value pair found where the value might be a username. Pair: `%1$s`</string>
+    <string name="warn_pii_key_password">Suspicious key-value pair found where the value might be a password. Pair: `%1$s`</string>
+    <string name="warn_pii_key_ssn">Suspicious key-value pair found where the value might be a Social Security Number (SSN). Pair: `%1$s`</string>
+    <string name="warn_pii_key_credit_card">Suspicious key-value pair found where the value might be a credit card number. Pair: `%1$s`</string>
+    <string name="warn_pii_key_phone_number">Suspicious key-value pair found where the value might be a phone number. Pair: `%1$s`</string>
+    <string name="warn_pii_key_auth_token">Suspicious key-value pair found where the value might be an authentication token. Pair: `%1$s`</string>
+    <string name="warn_pii_value_email">Value resembles an email address. Value: `%1$s`</string>
+    <string name="warn_pii_value_date_time">Value resembles a date or time. Value: `%1$s`</string>
+    <string name="warn_pii_value_ip">Value resembles an IP address. Value: `%1$s`</string>
+    <string name="warn_pii_value_address">Value resembles an address. Value: `%1$s`</string>
+    <string name="warn_pii_value_ssn">Value resembles a Social Security Number (SSN). Value: `%1$s`</string>
+    <string name="warn_pii_value_credit_card">Value resembles a credit card number. Value: `%1$s`</string>
+    <string name="warn_pii_value_phone">Value resembles a phone number. Value: `%1$s`</string>
+    <string name="warn_pii_value_auth_token">Value resembles an authentication token. Value: `%1$s`</string>
+    <string name="warn_pii_found_in_preset">Some values in the preset resemble PII (Personal Identifiable Information). Please review the issues found carefully before proceeding to avoid submitting sensitive information.</string>
+
+    <string name="compose_post">Compose post</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

@@ -110,7 +110,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.mainContainer)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.bottomAppBar)
@@ -615,7 +615,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 viewLifecycleOwner.lifecycleScope.launch {
                     var lastScrollY = 0
                     var startMonitorTs = 0L
-                    val mainActivity = requireMainActivity()
+                    val mainActivity = requireSummitActivity()
                     while (true) {
                         delay(100)
 

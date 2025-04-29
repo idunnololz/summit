@@ -45,7 +45,7 @@ class SettingsVideoPlayerFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)

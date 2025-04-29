@@ -34,6 +34,7 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
@@ -162,7 +163,7 @@ class PostFragment :
 
     private val scrollOffsetTop
         get() = (
-            (requireMainActivity().insets.value?.topInset ?: 0) +
+            (requireSummitActivity().insets.value?.topInset ?: 0) +
                 Utils.convertDpToPixel(56f)
             ).toInt()
 
@@ -300,7 +301,7 @@ class PostFragment :
             )
             var initialTouchY = -1f
 
-            requireMainActivity().onBackPressedDispatcher
+            requireSummitActivity().onBackPressedDispatcher
                 .addCallback(
                     this,
                     object : OnBackPressedCallback(true) {
@@ -335,7 +336,7 @@ class PostFragment :
             // do things if this is a single page
         }
 
-        requireMainActivity().onBackPressedDispatcher.apply {
+        requireSummitActivity().onBackPressedDispatcher.apply {
             addCallback(
                 this@PostFragment,
                 findInPageBackPressHandler,
@@ -345,8 +346,7 @@ class PostFragment :
                 screenshotModeBackPressHandler,
             )
         }
-
-        moreActionsHelper.setPageInstance(getInstance())
+//        moreActionsHelper.setPageInstance(getInstance())
     }
 
     private fun goBack() {
@@ -386,7 +386,7 @@ class PostFragment :
         super.onViewCreated(view, savedInstanceState)
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewExceptBottomAutomaticallyByPadding(
                     viewLifecycleOwner,
                     binding.findInPageToolbar,
@@ -649,7 +649,7 @@ class PostFragment :
             }
 
             if (preferences.useVolumeButtonNavigation) {
-                requireMainActivity().keyPressRegistrationManager.register(
+                requireSummitActivity().keyPressRegistrationManager.register(
                     viewLifecycleOwner,
                     object : KeyPressRegistrationManager.OnKeyPressHandler {
                         override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -674,10 +674,9 @@ class PostFragment :
             }
             binding.accountImageView.setOnClickListener {
                 if (accountId != null) {
-                    OldAlertDialogFragment.Builder()
-                        .setTitle(R.string.account_switching_disabled)
-                        .setMessage(R.string.account_switching_disabled_desc)
-                        .createAndShow(childFragmentManager, "asfg")
+                    launchAlertDialog("account_switching_not_allowed") {
+                        messageResId = R.string.account_switching_disabled_desc
+                    }
                     return@setOnClickListener
                 }
 
@@ -717,7 +716,7 @@ class PostFragment :
             }
             viewModel.onPostOrCommentRefChange.observe(viewLifecycleOwner) {
                 adapter?.instance = getInstance()
-                moreActionsHelper.setPageInstance(getInstance())
+//                moreActionsHelper.setPageInstance(getInstance())
             }
 
             binding.searchEditText.addTextChangedListener {
@@ -937,7 +936,7 @@ class PostFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(
                 lifecycleOwner = viewLifecycleOwner,
                 rootView = binding.recyclerView,
@@ -1229,10 +1228,12 @@ class PostFragment :
     override fun onResume() {
         super.onResume()
 
-        setupForFragment<PostFragment>()
+        if (!args.isPreview) {
+            setupForFragment<PostFragment>()
+        }
 
         if (args.isSinglePage) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 navBarController.hideNavBar(true)
                 if (!navBarController.useNavigationRail) {
                     navBarController.hideNavBar(animate = true)
@@ -1255,7 +1256,7 @@ class PostFragment :
 
     override fun onPause() {
         if (args.isSinglePage) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 lockUiOpenness = false
             }
         }

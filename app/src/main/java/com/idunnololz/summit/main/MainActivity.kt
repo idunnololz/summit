@@ -12,8 +12,6 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
@@ -33,10 +31,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import androidx.window.layout.WindowMetricsCalculator
 import coil3.Image
 import coil3.asDrawable
 import coil3.target.Target
-import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainApplication
@@ -46,7 +44,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -61,7 +59,6 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
-import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -75,24 +72,19 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
 import com.idunnololz.summit.preview.ImageViewerContract
-import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragment
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragmentArgs
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.DirectoryHelper
-import com.idunnololz.summit.util.InsetsHelper
-import com.idunnololz.summit.util.InsetsProvider
-import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManagerManager
-import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import javax.inject.Inject
@@ -103,21 +95,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
-class MainActivity :
-    BaseActivity(),
-    BottomMenuContainer,
-    InsetsProvider by InsetsHelper(
-        consumeInsets = true,
-    ) {
+class MainActivity : SummitActivity() {
 
     companion object {
-        private val TAG = MainActivity::class.java.simpleName
+        private val TAG = SummitActivity::class.java.simpleName
 
         private const val ARG_ACCOUNT_FULL_NAME = "ARG_ACCOUNT_FULL_NAME"
         private const val ARG_NOTIFICATION_ID = "ARG_NOTIFICATION_ID"
 
         fun createInboxItemIntent(context: Context, account: Account, notificationId: Int): Intent {
-            return Intent(context, MainActivity::class.java).apply {
+            return Intent(context, SummitActivity::class.java).apply {
                 putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
                 putExtra(ARG_NOTIFICATION_ID, notificationId)
                 action = Intent.ACTION_VIEW
@@ -125,7 +112,7 @@ class MainActivity :
         }
 
         fun createInboxPageIntent(context: Context, account: Account): Intent {
-            return Intent(context, MainActivity::class.java).apply {
+            return Intent(context, SummitActivity::class.java).apply {
                 putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
                 action = Intent.ACTION_VIEW
             }
@@ -138,13 +125,11 @@ class MainActivity :
 
     private var communitySelectorController: CommunitySelectorController? = null
 
-    private var currentNavController: NavController? = null
+    override var currentNavController: NavController? = null
 
     private var showNotificationBarBg: Boolean = true
 
-    internal lateinit var navBarController: NavBarController
-
-    val keyPressRegistrationManager = KeyPressRegistrationManager()
+    override lateinit var navBarController: NavBarController
 
     override val context: Context
         get() = this
@@ -155,13 +140,13 @@ class MainActivity :
 
     private var currentBottomMenu: BottomMenu? = null
 
-    var lockUiOpenness = false
+    override var lockUiOpenness = false
 
     val useBottomNavBar: Boolean
         get() = navBarController.useBottomNavBar
 
     @Inject
-    lateinit var moreActionsHelper: MoreActionsHelper
+    override lateinit var moreActionsHelper: MoreActionsHelper
 
     @Inject
     lateinit var themeManager: ThemeManager
@@ -246,11 +231,16 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
 
         navBarController = NavBarController(
-            activity = this,
+            context = this,
             contentView = binding.contentView,
             lifecycleOwner = this,
             onNavBarChanged = {
                 setupNavigationBar()
+            },
+            getWindowBounds = {
+                WindowMetricsCalculator.getOrCreate()
+                    .computeCurrentWindowMetrics(activity)
+                    .bounds
             },
         )
 
@@ -478,22 +468,6 @@ class MainActivity :
         currentNavController = navHostFragment.navController
     }
 
-    fun registerOnNavigationItemReselectedListener(
-        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
-    ) {
-        navBarController.registerOnNavigationItemReselectedListener(
-            onNavigationItemReselectedListener,
-        )
-    }
-
-    fun unregisterOnNavigationItemReselectedListener(
-        onNavigationItemReselectedListener: NavigationBarView.OnItemReselectedListener,
-    ) {
-        navBarController.unregisterOnNavigationItemReselectedListener(
-            onNavigationItemReselectedListener,
-        )
-    }
-
     private fun registerInsetsHandler() {
         onInsetsChanged = {
             with(it) {
@@ -572,11 +546,6 @@ class MainActivity :
             .translationY(0f)
     }
 
-    fun setNavUiOpenPercent(progress: Float) {
-        if (lockUiOpenness) return
-        navBarController.bottomNavViewAnimationOffsetPercent.value = progress
-    }
-
     private fun handleIntent(intent: Intent?) {
         intent ?: return
 
@@ -605,9 +574,9 @@ class MainActivity :
         )
 
         if (fileUri == null) {
-            OldAlertDialogFragment.Builder()
-                .setMessage(R.string.error_unable_to_read_file)
-                .createAndShow(supportFragmentManager, "asdf")
+            launchAlertDialog("error_send_image") {
+                messageResId = R.string.error_unable_to_read_file
+            }
             return
         }
 
@@ -624,9 +593,9 @@ class MainActivity :
         val account = accountManager.currentAccount.asAccount
 
         if (account == null) {
-            OldAlertDialogFragment.Builder()
-                .setMessage(R.string.error_you_must_sign_in_to_create_a_post)
-                .createAndShow(supportFragmentManager, "asdf")
+            launchAlertDialog("error_send_text") {
+                messageResId = R.string.error_you_must_sign_in_to_create_a_post
+            }
             return
         }
 
@@ -644,7 +613,7 @@ class MainActivity :
     }
 
     private fun handleViewIntent(intent: Intent) {
-        Log.d("notification", "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
+        Log.d(TAG, "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
         if (intent.hasExtra(ARG_ACCOUNT_FULL_NAME)) {
             val direction = MainDirections.actionGlobalInboxTabbedFragment(
                 notificationId = intent.getIntExtra(ARG_NOTIFICATION_ID, 0),
@@ -673,18 +642,20 @@ class MainActivity :
         if (page == null) {
             Log.d(TAG, "Unable to handle uri $data")
 
-            OldAlertDialogFragment.Builder()
-                .setMessage(getString(R.string.error_unable_to_handle_link, data.toString()))
-                .createAndShow(supportFragmentManager, "error")
+            launchAlertDialog("error") {
+                message = getString(R.string.error_unable_to_handle_link, data.toString())
+            }
         } else {
-            launchPage(page)
+            runOnReady(this) {
+                launchPage(page)
+            }
         }
     }
 
-    fun launchPage(
+    override fun launchPage(
         page: PageRef,
-        switchToNativeInstance: Boolean = false,
-        preferMainFragment: Boolean = false,
+        switchToNativeInstance: Boolean,
+        preferMainFragment: Boolean,
     ) {
         Log.d(TAG, "launchPage(): $page")
 
@@ -846,8 +817,8 @@ class MainActivity :
                 communitySelectorController = it
             }
 
-    fun showCommunitySelector(
-        currentCommunityRef: CommunityRef? = null,
+    override fun showCommunitySelector(
+        currentCommunityRef: CommunityRef?,
     ): CommunitySelectorController {
         val communitySelectorController = createOrGetCommunitySelectorController()
 
@@ -867,45 +838,13 @@ class MainActivity :
         return communitySelectorController
     }
 
-    fun hideSystemUI() {
-        // Enables regular immersive mode.
-        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
-        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        window.decorView.systemUiVisibility = (
-            View.SYSTEM_UI_FLAG_IMMERSIVE
-                // Set the content to appear under the system bars so that the
-                // content doesn't resize when the system bars hide and show.
-                or SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                // Hide the nav bar and status bar
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-            )
-    }
-
-    // Shows the system bars by removing all the flags
-    // except for the ones that make the content appear under the system bars.
-    fun showSystemUI() {
-        window.decorView.systemUiVisibility = (
-            SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or if (resources.getBoolean(R.bool.isLightTheme)) {
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                } else {
-                    0
-                }
-            )
-    }
-
-    fun insetViewAutomaticallyByPaddingAndNavUi(
+    override fun insetViewAutomaticallyByPaddingAndNavUi(
         lifecycleOwner: LifecycleOwner,
         rootView: View,
-        applyLeftInset: Boolean = true,
-        applyTopInset: Boolean = true,
-        applyRightInset: Boolean = true,
-        applyBottomInset: Boolean = true,
+        applyLeftInset: Boolean,
+        applyTopInset: Boolean,
+        applyRightInset: Boolean,
+        applyBottomInset: Boolean,
     ) {
         insets.observe(lifecycleOwner) {
             rootView.post {
@@ -941,22 +880,13 @@ class MainActivity :
     }
 
     fun getSnackbarContainer(): View = binding.snackbarContainer
-    fun getBottomNavHeight() = navBarController.bottomNavHeight
 
-    fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
+    override fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit) {
         viewModel.isReady.observe(lifecycleOwner) {
             if (it == true) {
                 cb()
             }
         }
-    }
-
-    fun showBottomNav() {
-        navBarController.showBottomNav()
-    }
-
-    fun hideBottomNav() {
-        navBarController.hideNavBar(animate = true)
     }
 
     fun runWhenLaidOut(cb: () -> Unit) {
@@ -986,14 +916,14 @@ class MainActivity :
         currentBottomMenu = bottomMenu
     }
 
-    fun openImage(
+    override fun openImage(
         sharedElement: View?,
         appBar: View?,
         title: String?,
         url: String,
         mimeType: String?,
-        urlAlt: String? = null,
-        mimeTypeAlt: String? = null,
+        urlAlt: String?,
+        mimeTypeAlt: String?,
     ) {
         val transitionName =
             if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Extras)) {
@@ -1035,32 +965,7 @@ class MainActivity :
         }
     }
 
-    fun openVideo(url: String, videoType: VideoType, videoState: VideoState?) {
-        val direction = MainDirections.actionGlobalVideoViewerFragment(url, videoType, videoState)
-        currentNavController?.navigateSafe(direction)
-    }
-
-    fun openSettings() {
-        val direction = MainDirections.actionGlobalSettingsFragment(null)
-        currentNavController?.navigateSafe(direction)
-    }
-
-    fun openAccountSettings() {
-        val direction = MainDirections.actionGlobalSettingsFragment("web")
-        currentNavController?.navigateSafe(direction)
-    }
-
-    fun showDownloadsSettings() {
-        val direction = MainDirections.actionGlobalSettingsFragment("downloads")
-        currentNavController?.navigateSafe(direction)
-    }
-
-    fun showCommunities(instance: String) {
-        val directions = MainDirections.actionGlobalCommunitiesFragment(instance)
-        currentNavController?.navigateSafe(directions)
-    }
-
-    fun showCommunityInfo(communityRef: CommunityRef) {
+    override fun showCommunityInfo(communityRef: CommunityRef) {
         if (communityRef is CommunityRef.MultiCommunity) {
             val userCommunityItem = userCommunitiesManager.getAllUserCommunities()
                 .firstOrNull { it.communityRef == communityRef }

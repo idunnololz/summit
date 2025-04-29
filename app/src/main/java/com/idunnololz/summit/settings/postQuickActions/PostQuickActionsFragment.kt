@@ -71,7 +71,7 @@ class PostQuickActionsFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.contentContainer)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)

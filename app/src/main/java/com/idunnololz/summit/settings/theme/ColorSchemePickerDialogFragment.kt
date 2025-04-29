@@ -83,7 +83,7 @@ class ColorSchemePickerDialogFragment :
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = ColorSchemeAdapter(context) {
                 preferences.colorScheme = it
-                preferences.setUseMaterialYou(false)
+                preferences.isUseMaterialYou = false
 
                 themeManager.onPreferencesChanged()
 

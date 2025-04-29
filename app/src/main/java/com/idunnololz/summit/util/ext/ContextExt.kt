@@ -3,12 +3,15 @@ package com.idunnololz.summit.util.ext
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.util.TypedValue
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
@@ -113,4 +116,22 @@ fun Context.getLocaleListFromXml(): LocaleListCompat {
     }
 
     return LocaleListCompat.forLanguageTags(tagsList.joinToString(","))
+}
+
+fun Context.getActivity(): AppCompatActivity? {
+    if (this is AppCompatActivity) {
+        return this
+    }
+
+    if (this is ContextWrapper) {
+        val baseContext = this.baseContext
+        if (baseContext is AppCompatActivity) {
+            return baseContext
+        }
+    }
+    return null
+}
+
+fun Context.spToPx(sp: Float): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
 }

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/padding_half"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?selectableItemBackground">
 
     <com.google.android.material.imageview.ShapeableImageView
         style="@style/RoundImageView"
         android:id="@+id/icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginStart="@dimen/padding"
         android:layout_marginEnd="@dimen/padding"
-        android:layout_marginTop="@dimen/padding_half"
-        android:layout_marginBottom="@dimen/padding_half"
         android:padding="1dp"
         app:strokeColor="@color/colorOnSurface"
         app:strokeWidth="1dp"

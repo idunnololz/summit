@@ -149,7 +149,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
         viewModel.loadCommunityInfoIfNeeded(args.community?.toCommunityRef())
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<CreateOrEditCommunityFragment>()
             insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
@@ -334,7 +334,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                     }
 
                     bottomMenu.show(
-                        bottomMenuContainer = requireMainActivity(),
+                        bottomMenuContainer = requireSummitActivity(),
                         bottomSheetContainer = binding.root,
                         expandFully = true,
                         handleBackPress = false,

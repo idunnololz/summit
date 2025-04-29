@@ -121,7 +121,7 @@ class SignUpFragment :
         val shimmerDrawable = newShimmerDrawable16to9(context)
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewAutomaticallyByPadding(viewLifecycleOwner, view)
                 setupForFragment<LoginFragment>()
 
@@ -280,7 +280,7 @@ class SignUpFragment :
 
                 signUp.setOnClickListener {
                     instanceEditText.text?.toString()?.let {
-                        Utils.hideKeyboard(requireMainActivity())
+                        Utils.hideKeyboard(requireSummitActivity())
                         viewModel.submitInstance(it)
                     }
                 }
@@ -384,7 +384,7 @@ class SignUpFragment :
                         val password = passwordEditText.text?.toString()
 
                         if (username != null && email != null && password != null) {
-                            Utils.hideKeyboard(requireMainActivity())
+                            Utils.hideKeyboard(requireSummitActivity())
                             viewModel.submitCredentials(scene, username, email, password)
                         }
                     }
@@ -442,7 +442,7 @@ class SignUpFragment :
                     }
                 }
                 answerDone.setOnClickListener {
-                    Utils.hideKeyboard(requireMainActivity())
+                    Utils.hideKeyboard(requireSummitActivity())
                     viewModel.showAnswerEditor(show = false)
                 }
 
@@ -547,7 +547,7 @@ class SignUpFragment :
                 signUp.isEnabled = scene.captchaAnswer.isNotBlank()
                 signUp.setOnClickListener {
                     if (scene.captchaUuid != null) {
-                        Utils.hideKeyboard(requireMainActivity())
+                        Utils.hideKeyboard(requireSummitActivity())
                         viewModel.submitCaptchaAnswer(scene.captchaUuid, scene.captchaAnswer)
                     }
                 }

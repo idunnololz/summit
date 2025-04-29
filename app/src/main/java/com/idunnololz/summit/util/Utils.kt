@@ -453,6 +453,11 @@ fun assertMainThread() {
     }
 }
 
+@Deprecated(
+    message = "convertSpToPixel does not take into account additional modifications to the " +
+        "activity/fragment context that can change the conversion rate between sp <-> px.",
+    replaceWith = ReplaceWith("Use Context.spToPx(sp) instead."),
+)
 fun convertSpToPixel(sp: Float): Float = TypedValue.applyDimension(
     TypedValue.COMPLEX_UNIT_SP,
     sp,

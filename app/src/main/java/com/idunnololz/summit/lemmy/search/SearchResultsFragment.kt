@@ -25,7 +25,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -198,16 +198,14 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                 onInstanceMismatch = { accountInstance, apiInstance ->
                     if (!isBindingAvailable()) return@SearchResultAdapter
 
-                    OldAlertDialogFragment.Builder()
-                        .setTitle(R.string.error_account_instance_mismatch_title)
-                        .setMessage(
-                            getString(
-                                R.string.error_account_instance_mismatch,
-                                accountInstance,
-                                apiInstance,
-                            ),
+                    launchAlertDialog("incompatible_account_instance") {
+                        titleResId = R.string.error_account_instance_mismatch_title
+                        message = getString(
+                            R.string.error_account_instance_mismatch,
+                            accountInstance,
+                            apiInstance,
                         )
-                        .createAndShow(childFragmentManager, "aa")
+                    }
                 },
                 onLinkClick = { url, text, linkType ->
                     onLinkClick(url, text, linkType)

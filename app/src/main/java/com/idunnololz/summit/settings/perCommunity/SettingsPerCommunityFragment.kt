@@ -49,7 +49,7 @@ class SettingsPerCommunityFragment : BaseFragment<FragmentSettingsPerCommunityBi
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)

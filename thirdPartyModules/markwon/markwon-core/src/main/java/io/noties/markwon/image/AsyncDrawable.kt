@@ -24,7 +24,7 @@ class AsyncDrawable(
      * @since 4.0.0
      */
     @JvmField val imageSize: ImageSize?,
-    val imageText: String?
+    val imageText: String?,
 ) : Drawable() {
     // @since 4.5.0
 
@@ -98,10 +98,11 @@ class AsyncDrawable(
         //  wrap callback so invalidation happens to this AsyncDrawable instance
         //  and not for wrapped result/placeholder
 
-        this.callback = if (cb == null)
+        this.callback = if (cb == null) {
             null
-        else
+        } else {
             WrappedCallback(cb)
+        }
 
         super.setCallback(cb)
 
@@ -111,8 +112,8 @@ class AsyncDrawable(
             // has a proper callback at this point. This is not required in most cases,
             // as placeholder should be static, but if it's not -> it can operate as usual
 
-            if (result != null
-                && result!!.callback == null
+            if (result != null &&
+                result!!.callback == null
             ) {
                 result!!.callback = callback
             }
@@ -321,13 +322,13 @@ class AsyncDrawable(
 
     override fun toString(): String {
         return "AsyncDrawable{" +
-                "destination='" + destination + '\'' +
-                ", imageSize=" + imageSize +
-                ", result=" + result +
-                ", canvasWidth=" + lastKnownCanvasWidth +
-                ", textSize=" + lastKnowTextSize +
-                ", waitingForDimensions=" + waitingForDimensions +
-                '}'
+            "destination='" + destination + '\'' +
+            ", imageSize=" + imageSize +
+            ", result=" + result +
+            ", canvasWidth=" + lastKnownCanvasWidth +
+            ", textSize=" + lastKnowTextSize +
+            ", waitingForDimensions=" + waitingForDimensions +
+            '}'
     }
 
     @MainThread

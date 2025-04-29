@@ -1,6 +1,7 @@
 package com.idunnololz.summit.main
 
-import android.app.Activity
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -28,7 +29,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.ui.NavigationUI
-import androidx.window.layout.WindowMetricsCalculator
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.navigation.NavigationBarView
@@ -48,22 +48,21 @@ import kotlin.math.max
 import kotlin.math.min
 
 class NavBarController(
-    val activity: Activity,
+    val context: Context,
     val contentView: CoordinatorLayout,
     val lifecycleOwner: LifecycleOwner,
-    val onNavBarChanged: () -> Unit,
+    val onNavBarChanged: (NavigationBarView) -> Unit,
+    val getWindowBounds: () -> Rect,
 ) {
 
     companion object {
         private const val TAG = "NavBarController"
     }
 
-    private val context = activity
-
     private var _useNavigationRail: Boolean? = null
 
     val useNavigationRail: Boolean
-        get() = _useNavigationRail!!
+        get() = _useNavigationRail == true
 
     var useBottomNavBar = true
     private var navRailMode = NavigationRailModeId.Auto
@@ -93,7 +92,7 @@ class NavBarController(
             if (useBottomNavBar) {
                 if (useNavigationRail) {
                     if (navBarContainer.width == 0) {
-                        activity.getDimen(
+                        context.getDimen(
                             com.google.android.material.R.dimen.m3_navigation_rail_default_width,
                         )
                     } else {
@@ -139,17 +138,16 @@ class NavBarController(
     }
 
     private fun onWindowSizeChanged() {
-        val metrics = WindowMetricsCalculator.getOrCreate()
-            .computeCurrentWindowMetrics(activity)
+        val bounds = getWindowBounds()
 
-        val widthDp = metrics.bounds.width() / activity.resources.displayMetrics.density
+        val widthDp = bounds.width() / context.resources.displayMetrics.density
         val widthWindowSizeClass = when {
             widthDp < 600f -> WindowSizeClass.COMPACT
             widthDp < 840f -> WindowSizeClass.MEDIUM
             else -> WindowSizeClass.EXPANDED
         }
 
-        val heightDp = metrics.bounds.height() / activity.resources.displayMetrics.density
+        val heightDp = bounds.height() / context.resources.displayMetrics.density
         val heightWindowSizeClass = when {
             heightDp < 480f -> WindowSizeClass.COMPACT
             heightDp < 900f -> WindowSizeClass.MEDIUM
@@ -177,9 +175,9 @@ class NavBarController(
         }
 
         navBar = if (useNavigationRail) {
-            NavigationRailView(activity).apply {
+            NavigationRailView(context).apply {
                 setBackgroundColor(
-                    activity.getColorFromAttribute(
+                    context.getColorFromAttribute(
                         com.google.android.material.R.attr.backgroundColor,
                     ),
                 )
@@ -187,9 +185,9 @@ class NavBarController(
                 labelVisibilityMode = LABEL_VISIBILITY_LABELED
             }
         } else {
-            BottomNavigationView(activity).apply {
+            BottomNavigationView(context).apply {
                 setBackgroundColor(
-                    activity.getColorFromAttribute(
+                    context.getColorFromAttribute(
                         com.google.android.material.R.attr.colorSurface,
                     ),
                 )
@@ -237,7 +235,7 @@ class NavBarController(
         }
 
         if (navBarChanged) {
-            onNavBarChanged()
+            onNavBarChanged(navBar)
         }
     }
 
@@ -265,16 +263,6 @@ class NavBarController(
 
             newLeftInset = leftInset
             newRightInset = rightInset
-        }
-    }
-
-    fun updateOpenness(navOpenness: Float) {
-        if (!useBottomNavBar) return
-
-        if (useNavigationRail) {
-            navBarContainer.translationX = -navOpenness * navBarContainer.width
-        } else {
-            navBarContainer.translationY = navOpenness * navBarContainer.height
         }
     }
 
@@ -398,7 +386,7 @@ class NavBarController(
     fun updatePaddingForNavBar(contentContainer: View) {
         if (useNavigationRail) {
             val width = if (navBarContainer.width == 0) {
-                activity.getDimen(
+                context.getDimen(
                     com.google.android.material.R.dimen.m3_navigation_rail_default_width,
                 )
             } else {
@@ -540,8 +528,8 @@ class NavBarController(
 
             if (onNavigationItemReselectedListeners.isEmpty()) {
                 if (navController.currentDestination?.id != menuItem.itemId) {
-                    navController.popBackStack(navController.graph.id, true)
-                    navController.navigate(menuItem.itemId)
+                    navController.popBackStack(menuItem.itemId, false)
+//                    navController.navigate(menuItem.itemId)
                 }
             } else {
                 onNavigationItemReselectedListeners.forEach {
@@ -648,6 +636,17 @@ class NavBarController(
             navController,
             args,
         )
+    }
+
+    private fun updateOpenness(navOpenness: Float) {
+        if (_useNavigationRail == null) return
+        if (!useBottomNavBar) return
+
+        if (useNavigationRail) {
+            navBarContainer.translationX = -navOpenness * navBarContainer.width
+        } else {
+            navBarContainer.translationY = navOpenness * navBarContainer.height
+        }
     }
 
     /**

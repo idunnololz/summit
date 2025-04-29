@@ -191,10 +191,13 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
             Log.d(TAG, "restoring tab to ${it.communityRef}")
             tabsManager.updateCurrentTabNow(it)
         }
-        requireActivity().onBackPressedDispatcher.addCallback(
-            this,
-            onBackPressedCallback,
-        )
+
+        if (!args.isPreview) {
+            requireActivity().onBackPressedDispatcher.addCallback(
+                this,
+                onBackPressedCallback,
+            )
+        }
         childFragmentManager.setFragmentResultListener(
             CommunityPickerDialogFragment.REQUEST_KEY,
             this,
@@ -339,7 +342,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
             )
         binding.rootView.setEndPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             this.insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPanel.root)
         }
 
@@ -358,6 +361,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
                     args = CommunityFragmentArgs(
                         tab = tabsManager.currentTab.value,
                         communityRef = page,
+                        isPreview = args.isPreview,
                     ).toBundle(),
                     navOptions = NavOptions.Builder()
                         .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
@@ -430,7 +434,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     override fun onResume() {
         super.onResume()
 
-        requireMainActivity().registerOnNavigationItemReselectedListener(
+        requireSummitActivity().registerOnNavigationItemReselectedListener(
             onNavigationItemReselectedListener,
         )
 
@@ -441,7 +445,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
 
     override fun onPause() {
         panelsChildGestureRegionObserver.removeGestureRegionsUpdateListener(this)
-        requireMainActivity().unregisterOnNavigationItemReselectedListener(
+        requireSummitActivity().unregisterOnNavigationItemReselectedListener(
             onNavigationItemReselectedListener,
         )
 
@@ -451,7 +455,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     override fun onDestroyView() {
         // Fixes some weird crash?
         view?.let { view ->
-            Navigation.setViewNavController(view, findNavController())
+            try {
+                Navigation.setViewNavController(view, findNavController())
+            } catch (e: Exception) {
+                // do nothing
+            }
         }
         communitiesPaneController = null
 
@@ -468,7 +476,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
 
         Log.d(TAG, "updatePaneBackPressHandler(): selected panel: ${rootView.getSelectedPanel()}")
         if (rootView.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
-            requireMainActivity().onBackPressedDispatcher
+            requireSummitActivity().onBackPressedDispatcher
                 .addCallback(viewLifecycleOwner, paneOnBackPressHandler)
         }
     }
@@ -495,9 +503,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     private fun onPanelStateChange() {
         when (val panelState = binding.root.startPanelState) {
             PanelState.Closed -> {
-                getMainActivity()?.let {
-                    it.setNavUiOpenPercent(0f)
-                    Utils.hideKeyboard(it)
+                if (!args.isPreview) {
+                    getMainActivity()?.let {
+                        it.setNavUiOpenPercent(0f)
+                        Utils.hideKeyboard(it)
+                    }
                 }
 
                 updatePaneBackPressHandler()
@@ -562,6 +572,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
             startDestinationArgs = CommunityFragmentArgs(
                 tab = currentTab,
                 communityRef = communityRef,
+                isPreview = args.isPreview,
             ).toBundle(),
         )
 
@@ -643,6 +654,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
             CommunityFragmentArgs(
                 communityRef = tab.communityRef,
                 tab = tab,
+                isPreview = args.isPreview,
             ).toBundle(),
         )
     }

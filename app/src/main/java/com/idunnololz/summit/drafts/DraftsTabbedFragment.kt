@@ -55,7 +55,7 @@ class DraftsTabbedFragment :
         val context = requireContext()
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewAutomaticallyByPaddingAndNavUi(
                     viewLifecycleOwner,
                     coordinatorLayoutContainer,

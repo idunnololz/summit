@@ -2,8 +2,8 @@ package com.idunnololz.summit.api
 
 import kotlin.RuntimeException
 
-class ServerApiException(val errorCode: Int) : ApiException(
-    "Server error. Code: $errorCode",
+class ServerApiException(val errorMessage: String?, val errorCode: Int) : ApiException(
+    "Server error. Code: $errorCode. Message: $errorMessage.",
 )
 open class ClientApiException(val errorMessage: String?, val errorCode: Int) : ApiException(
     "Client error. Code: $errorCode. Message: $errorMessage.",

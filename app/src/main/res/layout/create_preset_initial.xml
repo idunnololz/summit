@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/positive_button">
+
+        <LinearLayout
+            android:id="@+id/initial_view_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/choose_preferences_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding"
+                android:background="?selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/choose_preferences_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceTitleMedium"
+                    android:text="@string/choose_preferences_to_include"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/choose_preferences_subtitle"/>
+
+                <TextView
+                    android:id="@+id/choose_preferences_subtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodyMedium"
+                    android:layout_marginTop="@dimen/padding_quarter"
+                    android:text="@string/choose_preferences_to_include_desc"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/icon"
+                    app:layout_constraintTop_toBottomOf="@+id/choose_preferences_title"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/icon"
+                    android:src="@drawable/baseline_chevron_right_24"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_margin="@dimen/padding_half"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="?colorControlNormal" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleMedium"
+                android:text="@string/preset_form_title"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"/>
+
+            <TextView
+                android:text="@string/preset_form_instructions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:layout_marginTop="@dimen/padding_quarter"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/name_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name_required"
+                android:layout_marginTop="@dimen/padding"
+                android:layout_marginHorizontal="@dimen/padding"
+                app:counterEnabled="true"
+                app:counterMaxLength="200"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.idunnololz.summit.view.CustomTextInputEditText
+                    android:id="@+id/name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="no"
+                    android:background="@null"
+                    android:padding="@dimen/padding"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:textAppearance="?textAppearanceBodyMedium"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/description_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/description"
+                android:layout_marginTop="@dimen/padding"
+                android:layout_marginHorizontal="@dimen/padding"
+                app:counterEnabled="true"
+                app:counterMaxLength="10000"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.idunnololz.summit.view.CustomTextInputEditText
+                    android:id="@+id/description_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="no"
+                    android:background="@null"
+                    android:padding="@dimen/padding"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:textAppearance="?textAppearanceBodyMedium"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/positive_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_continue"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

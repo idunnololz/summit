@@ -148,7 +148,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
         }
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewAutomaticallyByPaddingAndNavUi(
                 viewLifecycleOwner,
                 binding.coordinatorLayout,
@@ -173,6 +173,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             offlineManager = offlineManager,
             preferences = preferences,
             lemmyTextHelper = lemmyTextHelper,
+            avatarHelper = avatarHelper,
             onImageClick = { imageName, sharedElementView, url ->
                 getMainActivity()?.openImage(
                     sharedElement = sharedElementView,
@@ -598,7 +599,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
         }
 
-        requireMainActivity().showBottomMenu(bottomMenu)
+        requireSummitActivity().showBottomMenu(bottomMenu)
     }
 
     private fun showOverflowMenu(siteView: SiteView) {
@@ -671,7 +672,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             }
         }
 
-        requireMainActivity().showBottomMenu(bottomMenu)
+        requireSummitActivity().showBottomMenu(bottomMenu)
     }
 
     private class PageDataAdapter(
@@ -680,6 +681,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         private val offlineManager: OfflineManager,
         private val preferences: Preferences,
         private val lemmyTextHelper: LemmyTextHelper,
+        private val avatarHelper: AvatarHelper,
         private val onImageClick: (String, View?, String) -> Unit,
         private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
         private val onPageClick: (PageRef) -> Unit,
@@ -704,6 +706,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             data class MultiCommunityHeaderItem(
                 val title: String,
                 val subtitle: String,
+                val instance: String,
             ) : Item
             data class WarningItem(
                 val message: String,
@@ -778,7 +781,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 b.subtitle.text = item.subtitle
 
                 b.subscribe.visibility = View.GONE
-                b.instanceInfo.visibility = View.GONE
+                b.instanceInfo.visibility = View.VISIBLE
+
+                b.instanceInfo.setOnClickListener {
+                    onInstanceInfoClick(item.instance)
+                }
             }
             addItemType(
                 clazz = Item.InstanceHeaderItem::class,
@@ -874,7 +881,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 Item.AdminItem::class,
                 PageDataAdminItemBinding::inflate,
             ) { item, b, _ ->
-                b.icon.load(item.admin.person.avatar)
+                avatarHelper.loadAvatar(b.icon, item.admin.person)
                 b.name.text = item.admin.person.fullName
 
                 b.root.setOnClickListener {
@@ -885,7 +892,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 Item.ModItem::class,
                 PageDataModItemBinding::inflate,
             ) { item, b, _ ->
-                b.icon.load(item.mod.avatar)
+                avatarHelper.loadAvatar(b.icon, item.mod)
                 b.name.text = item.mod.fullName
 
                 b.root.setOnClickListener {
@@ -902,10 +909,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                 Item.CommunityItem::class,
                 CommunityInfoCommunityItemBinding::inflate,
             ) { item, b, h ->
-                b.icon.load(R.drawable.ic_default_community)
-                offlineManager.fetchImage(h.itemView, item.communityInfo.icon) {
-                    b.icon.load(it)
-                }
+                avatarHelper.loadCommunityIcon(
+                    imageView = b.icon,
+                    communityRef = item.communityInfo.communityRef,
+                    iconUrl = item.communityInfo.icon,
+                )
 
                 b.title.text = item.communityInfo.name
 
@@ -993,7 +1001,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
                             context.getString(R.string.all_subscribed)
                     },
                     subtitle = multiCommunityData.instance,
+                    instance = multiCommunityData.instance,
                 )
+
+                newItems += Item.TitleItem(context.getString(R.string.communities))
 
                 for (community in multiCommunityData.communitiesData) {
                     newItems.add(

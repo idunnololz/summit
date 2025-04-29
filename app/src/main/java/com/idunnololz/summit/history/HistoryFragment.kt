@@ -85,7 +85,7 @@ class HistoryFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<HistoryFragment>()
         }
 
@@ -136,7 +136,7 @@ class HistoryFragment :
                         is CommunityRef.MultiCommunity,
                         is CommunityRef.Subscribed,
                         -> {
-                            requireMainActivity().launchPage(pageRef, preferMainFragment = false)
+                            requireSummitActivity().launchPage(pageRef, preferMainFragment = false)
                         }
                     }
                 }
@@ -177,7 +177,7 @@ class HistoryFragment :
         }
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
                 insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
                 insetViewStartAndEndByPadding(viewLifecycleOwner, binding.fastScroller)

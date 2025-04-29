@@ -1006,7 +1006,7 @@ class AccountAwareLemmyClient @Inject constructor(
         if (currentAccount == null) {
             apiClient.defaultInstance()
         } else {
-            apiClient.changeInstance(currentAccount.instance)
+            apiClient.changeInstance(currentAccount.instance.lowercase())
         }
     }
 
@@ -1062,6 +1062,9 @@ class AccountAwareLemmyClient @Inject constructor(
 //            // on all account changes, clear the cache
 //            apiClient.clearCache()
 //        }
+
+
+        Log.d(TAG, "Api instance changed to ${account?.instance}")
 
         if (account == null) {
             apiClient.defaultInstance()

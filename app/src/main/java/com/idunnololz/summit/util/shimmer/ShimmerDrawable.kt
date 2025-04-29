@@ -220,15 +220,15 @@ class ShimmerDrawable : Drawable(), Animatable2Compat {
         }
     }
 
-    override fun isRunning(): Boolean =
-        isRunning
+    override fun isRunning(): Boolean = isRunning
 
     override fun registerAnimationCallback(callback: Animatable2Compat.AnimationCallback) {
         callbacks.add(callback)
     }
 
-    override fun unregisterAnimationCallback(callback: Animatable2Compat.AnimationCallback): Boolean =
-        callbacks.remove(callback)
+    override fun unregisterAnimationCallback(
+        callback: Animatable2Compat.AnimationCallback,
+    ): Boolean = callbacks.remove(callback)
 
     override fun clearAnimationCallbacks() {
         callbacks.clear()

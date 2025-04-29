@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-linkify" />
             <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-simple-ext" />
             <option value="$PROJECT_DIR$/thirdPartyModules/overlappingPane" />
+            <option value="$PROJECT_DIR$/thirdPartyModules/zoomLayout" />
           </set>
         </option>
       </GradleProjectSettings>

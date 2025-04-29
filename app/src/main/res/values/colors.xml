@@ -92,6 +92,7 @@
     <color name="gray">#808080</color>
 
     <color name="style_amber10">#1AFFC107</color>
+    <color name="style_green10">#1A4CAF50</color>
 
     <!-- Generated -->
     <color name="seed">#3a5ba9</color>

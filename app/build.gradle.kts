@@ -1,4 +1,7 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import io.sentry.android.gradle.extensions.InstrumentationFeature
 import org.jetbrains.kotlin.konan.properties.loadProperties
+import java.util.EnumSet
 
 plugins {
     id("com.android.application")
@@ -6,6 +9,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("com.google.devtools.ksp")
+    id("kotlin-kapt")
     id("io.sentry.android.gradle") version "5.3.0"
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.plugin.serialization)
@@ -19,12 +23,17 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 246
-        versionName = "1.58.9"
+        versionCode = 247
+        versionName = "1.59.0"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+        buildConfigField(
+            "String",
+            "SUMMIT_JWT",
+            "\"${gradleLocalProperties(rootDir, providers).getProperty("summit.jwt")}\"",
+        )
     }
     buildTypes {
         release {
@@ -60,6 +69,10 @@ sentry {
     if (sentryProperties["auth.token"] == null) {
         autoUploadProguardMapping.set(false)
     }
+    tracingInstrumentation {
+        enabled.set(true)
+        features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)
+    }
 }
 
 configurations.configureEach {
@@ -75,6 +88,7 @@ dependencies {
     implementation(project(":thirdPartyModules:markwon:markwon-ext-tables"))
     implementation(project(":thirdPartyModules:markwon:markwon-linkify"))
     implementation(project(":thirdPartyModules:markwon:markwon-simple-ext"))
+    implementation(project(":thirdPartyModules:zoomLayout"))
 
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib.jdk7)
@@ -145,10 +159,10 @@ dependencies {
     implementation(libs.viewpump)
 
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    ksp(libs.hilt.compiler)
+    // Tried to switch to KSP + Dagger/Hilt but the build performance was terrible. Specifically
+    // for incremental builds. Make sure to test this when switching to KSP again in the future.
+    kapt(libs.hilt.android.compiler)
 
-    implementation(libs.zoom.layout)
     implementation(libs.process.phoenix)
 
     implementation(libs.exifinterface)
@@ -159,6 +173,11 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.commonmark)
+    implementation(libs.asynclayoutinflater)
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+}
+
+kapt {
+    correctErrorTypes = true
 }

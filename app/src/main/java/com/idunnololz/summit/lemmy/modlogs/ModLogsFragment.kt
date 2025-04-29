@@ -71,7 +71,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<ModLogsFragment>()
         }
 
@@ -85,7 +85,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 

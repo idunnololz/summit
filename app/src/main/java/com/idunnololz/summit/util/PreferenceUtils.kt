@@ -1,28 +1,12 @@
 package com.idunnololz.summit.util
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.util.Log
-import com.idunnololz.summit.util.ext.getFloatSafe
-import com.idunnololz.summit.util.ext.getIntOrNull
-import com.idunnololz.summit.util.ext.getLongSafe
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
-
 private const val TAG = "PreferenceUtils"
 
 object PreferenceUtils {
 
     var usingCustomFont: Boolean = false
-    lateinit var preferences: SharedPreferences
-        private set
-
-    private const val DEFAULT_PREF = "pref"
 
     const val KEY_DEFAULT_PAGE = "KEY_DEFAULT_PAGE"
-    const val KEY_THEME = "theme"
 
     const val PREFERENCE_VERSION_CODE = "PREFERENCE_VERSION_CODE"
 
@@ -104,7 +88,7 @@ object PreferenceUtils {
     const val KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP = "KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP"
 
     private const val KEY_OFFLINE_STORAGE_CAP_BYTES = "KEY_OFFLINE_STORAGE_CAP_BYTES"
-    private const val KEY_VIDEO_PLAYER_ROTATION_LOCKED = "KEY_VIDEO_PLAYER_ROTATION_LOCKED"
+    const val KEY_VIDEO_PLAYER_ROTATION_LOCKED = "KEY_VIDEO_PLAYER_ROTATION_LOCKED"
 
     const val KEY_COMMENT_THREAD_STYLE = "KEY_COMMENT_THREAD_STYLE"
 
@@ -218,150 +202,6 @@ object PreferenceUtils {
     @Suppress("unused")
     const val DEAD_KEY_HAPTICS_ENABLED = "KEY_HAPTICS_ENABLED"
 
-    fun initialize(context: Context) {
-        if (!::preferences.isInitialized) {
-            preferences = context.getSharedPreferences(DEFAULT_PREF, Context.MODE_PRIVATE)
-        }
-    }
-
-    fun isVideoPlayerRotationLocked(): Boolean =
-        preferences.getBoolean(KEY_VIDEO_PLAYER_ROTATION_LOCKED, false)
-
-    fun setVideoPlayerRotationLocked(b: Boolean) {
-        preferences.edit()
-            .putBoolean(KEY_VIDEO_PLAYER_ROTATION_LOCKED, b)
-            .apply()
-    }
-}
-
-class StringPreferenceDelegate(
-    val prefs: SharedPreferences,
-    val key: String,
-    val defaultValue: String? = "",
-) : ReadWriteProperty<Any, String?> {
-
-    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getString(key, defaultValue)
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: String?) =
-        prefs.edit().putString(key, value).apply()
-}
-
-class FloatPreferenceDelegate(
-    val prefs: SharedPreferences,
-    val key: String,
-    val defaultValue: Float = 0f,
-) : ReadWriteProperty<Any, Float> {
-
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getFloatSafe(key, defaultValue)
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Float) =
-        prefs.edit().putFloat(key, value).apply()
-}
-
-class BooleanPreferenceDelegate(
-    val prefs: SharedPreferences,
-    val key: String,
-    val defaultValue: Boolean = false,
-) : ReadWriteProperty<Any, Boolean> {
-
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getBoolean(key, defaultValue)
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Boolean) =
-        prefs.edit().putBoolean(key, value).apply()
-}
-
-class IntPreferenceDelegate(
-    val prefs: SharedPreferences,
-    val key: String,
-    val defaultValue: Int = 0,
-) : ReadWriteProperty<Any, Int> {
-
-    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getInt(key, defaultValue)
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
-        prefs.edit().putInt(key, value).apply()
-}
-
-class NullableIntPreferenceDelegate(
-    val prefs: SharedPreferences,
-    val key: String,
-) : ReadWriteProperty<Any, Int?> {
-
-    override fun getValue(thisRef: Any, property: KProperty<*>) = prefs.getIntOrNull(key)
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Int?) {
-        if (value != null) {
-            prefs.edit().putInt(key, value).apply()
-        }
-    }
-}
-
-class LongPreferenceDelegate(
-    private val prefs: SharedPreferences,
-    val key: String,
-    val defaultValue: Long = 0,
-) : ReadWriteProperty<Any, Long> {
-
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
-        prefs.getLongSafe(key, defaultValue)
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: Long) =
-        prefs.edit().putLong(key, value).apply()
-}
-
-class JsonPreferenceDelegate<T>(
-    val prefs: SharedPreferences,
-    val json: Json,
-    val key: String,
-    val serializer: KSerializer<T>,
-    val default: () -> T,
-) : ReadWriteProperty<Any, T> {
-
-//    var isCached: Boolean = false
-//    var cache: T? = null
-
-    override fun getValue(thisRef: Any, property: KProperty<*>): T {
-//        if (isCached) {
-//            @Suppress("UNCHECKED_CAST")
-//            return cache as T
-//        }
-
-        val s = prefs.getString(key, null)
-        return try {
-            if (s != null) {
-                json.decodeFromString(serializer, s)
-                    ?: default()
-            } else {
-                default()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error reading json. Key: $key", e)
-            default()
-        }
-//            .also {
-//            cache(it)
-//        }
-    }
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
-        val s = try {
-            json.encodeToString(serializer, value)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error converting object to json. Key: $key", e)
-            null
-        }
-        prefs.edit()
-            .putString(key, s)
-            .apply()
-
-//        cache(value)
-    }
-
-//    @Suppress("NOTHING_TO_INLINE")
-//    inline fun cache(value: T?) {
-//        isCached = true
-//        cache = value
-//    }
+    @Suppress("unused")
+    const val DEAD_KEY_THEME = "theme"
 }

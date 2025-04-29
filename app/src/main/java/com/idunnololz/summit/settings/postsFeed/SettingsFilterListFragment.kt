@@ -75,7 +75,7 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
         val context = requireContext()
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 setupForFragment<SettingsFragment>(animate = false)
 
                 setSupportActionBar(toolbar)

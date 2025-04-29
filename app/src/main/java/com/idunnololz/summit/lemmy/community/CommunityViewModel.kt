@@ -24,7 +24,6 @@ import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
@@ -37,7 +36,6 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
-import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -167,7 +165,7 @@ class CommunityViewModel @Inject constructor(
 
             registerHiddenPostObserver()
 
-            preferences = preferenceManager.getComposedPreferencesForAccount(newAccount)
+            preferences = preferenceManager.updateCurrentPreferences(newAccount)
 
             withContext(Dispatchers.Main) {
                 recheckPreferences()
@@ -966,7 +964,7 @@ class CommunityViewModel @Inject constructor(
 
     private fun updateSortOrder() {
         val fullAccount = accountInfoManager.currentFullAccount.value
-        val preferences = preferenceManager.getComposedPreferencesForAccount(
+        val preferences = preferenceManager.updateCurrentPreferences(
             fullAccount?.account,
         )
 

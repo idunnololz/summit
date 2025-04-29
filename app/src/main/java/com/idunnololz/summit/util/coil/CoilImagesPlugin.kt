@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.text.Spanned
-import android.util.Log
 import android.widget.TextView
 import coil3.ImageLoader
 import coil3.asDrawable
@@ -15,7 +14,6 @@ import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.size.Dimension
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.MarkwonSpansFactory

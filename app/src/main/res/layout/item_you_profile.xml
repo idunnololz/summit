@@ -71,13 +71,20 @@
         app:layout_constraintStart_toStartOf="@+id/title"
         app:layout_constraintEnd_toEndOf="@+id/title"/>
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/top_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="profile_icon,switch_account_text"
+        app:barrierDirection="bottom"/>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/stat_card1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding"
         android:layout_marginHorizontal="@dimen/padding"
-        app:layout_constraintTop_toBottomOf="@+id/profile_icon"
+        app:layout_constraintTop_toBottomOf="@+id/top_barrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/stat_card2">
 

@@ -20,3 +20,35 @@ fun BaseFragment<*>.setupToolbar(
         findNavController().navigateUp()
     }
 }
+
+fun BaseDialogFragment<*>.setupToolbar(
+    toolbar: MaterialToolbar,
+    title: String,
+    subtitle: String? = null,
+) {
+    toolbar.title = title
+    toolbar.subtitle = subtitle
+    toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+    toolbar.setNavigationIconTint(
+        toolbar.context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+    )
+    toolbar.setNavigationOnClickListener {
+        dismiss()
+    }
+}
+
+fun SummitActivity.setupToolbarForActivity(
+    toolbar: MaterialToolbar,
+    title: String,
+    subtitle: String? = null,
+) {
+    toolbar.title = title
+    toolbar.subtitle = subtitle
+    toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+    toolbar.setNavigationIconTint(
+        toolbar.context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+    )
+    toolbar.setNavigationOnClickListener {
+        finish()
+    }
+}

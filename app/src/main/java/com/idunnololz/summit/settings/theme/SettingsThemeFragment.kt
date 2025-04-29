@@ -85,10 +85,10 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
         if (!isBindingAvailable()) return
 
         val context = requireContext()
-        val parentActivity = requireMainActivity()
+        val parentActivity = requireSummitActivity()
 
         val account = args.account
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>(animate = false)
 
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
@@ -132,19 +132,19 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
             binding.themeConfiguration.title.text = getString(R.string.theme_config)
             settings.materialYou.bindTo(
                 binding.useMaterialYou,
-                { preferences.isUseMaterialYou() },
+                { preferences.isUseMaterialYou },
                 {
                     if (DynamicColors.isDynamicColorAvailable()) {
-                        preferences.setUseMaterialYou(it)
+                        preferences.isUseMaterialYou = it
                         preferences.colorScheme = ColorSchemes.Default
                         themeManager.onPreferencesChanged()
                     } else if (it) {
                         OldAlertDialogFragment.Builder()
                             .setMessage(R.string.error_dynamic_color_not_supported)
                             .createAndShow(childFragmentManager, "Asdfff")
-                        preferences.setUseMaterialYou(false)
+                        preferences.isUseMaterialYou = false
                     } else {
-                        preferences.setUseMaterialYou(false)
+                        preferences.isUseMaterialYou = false
                     }
                 },
             )
@@ -161,9 +161,9 @@ class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
             binding.darkThemeSettings.title.text = getString(R.string.dark_theme_settings)
             settings.blackTheme.bindTo(
                 binding.useBlackTheme,
-                { preferences.isBlackTheme() },
+                { preferences.isBlackTheme },
                 {
-                    preferences.setUseBlackTheme(it)
+                    preferences.isBlackTheme = it
                     themeManager.onPreferencesChanged()
                 },
             )

@@ -83,7 +83,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             insetViewStartAndEndByPadding(viewLifecycleOwner, binding.recyclerView)
             insetViewExceptBottomAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.searchContainer)
@@ -235,6 +235,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                             mainSettings.defaultAppsSettings.id -> {
                                 val directions = SettingsFragmentDirections
                                     .actionSettingsFragmentToSettingsDefaultAppsFragment()
+                                findNavController().navigateSafe(directions)
+                                true
+                            }
+                            mainSettings.settingPresets.id -> {
+                                val directions = SettingsFragmentDirections
+                                    .actionSettingsFragmentToPresetsFragment()
                                 findNavController().navigateSafe(directions)
                                 true
                             }
@@ -495,7 +501,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     }
 
     private fun hideSearch(animate: Boolean = true) {
-        Utils.hideKeyboard(requireMainActivity())
+        Utils.hideKeyboard(requireSummitActivity())
 
         if (animate) {
             binding.searchContainer.animate()

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container">
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/take_picture_button">
+
+        <LinearLayout
+            android:id="@+id/initial_view_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="@string/take_a_preset_preview_screenshot_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:textAppearance="?textAppearanceBodyMedium"/>
+
+            <FrameLayout
+                android:id="@+id/previews_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/take_picture_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/take_a_picture"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/positive_button"/>
+
+    <Button
+        android:id="@+id/positive_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_continue"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding_half"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/negative_button"/>
+
+    <Button
+        android:id="@+id/negative_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_back"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginBottom="@dimen/padding"
+        style="?materialButtonOutlinedStyle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.idunnololz.summit.view.LoadingView
+        android:id="@+id/loading_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

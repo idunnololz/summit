@@ -31,10 +31,13 @@ class LoginViewModel @Inject constructor(
     fun login(instance: String, username: String, password: String, twoFactorCode: String?) {
         accountLiveData.setIsLoading()
 
+        val instanceFormatted = instance.trim().lowercase()
+        val usernameFormatted = username.trim()
+
         viewModelScope.launch {
             val result = apiClient.login(
-                instance.trim(),
-                username.trim(),
+                instanceFormatted,
+                usernameFormatted,
 
                 // From jerboa https://github.com/dessalines/jerboa/blob/main/app/src/main/java/com/jerboa/ui/components/login/Login.kt
                 password.take(60),
@@ -45,7 +48,7 @@ class LoginViewModel @Inject constructor(
                 true
             ) {
                 // user has 2fa enabled
-                state.postValue(State.TwoFactorAuth(instance, username, password))
+                state.postValue(State.TwoFactorAuth(instanceFormatted, usernameFormatted, password))
                 return@launch
             }
 
@@ -68,7 +71,7 @@ class LoginViewModel @Inject constructor(
                 return@launch
             }
 
-            loginHelper.loginWithJwt(instance, jwt)
+            loginHelper.loginWithJwt(instanceFormatted, jwt)
                 .onSuccess {
                     accountLiveData.postValue(it)
                 }

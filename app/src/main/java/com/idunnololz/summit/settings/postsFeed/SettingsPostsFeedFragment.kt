@@ -68,7 +68,7 @@ class SettingsPostsFeedFragment :
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
         }
 
@@ -82,7 +82,7 @@ class SettingsPostsFeedFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)

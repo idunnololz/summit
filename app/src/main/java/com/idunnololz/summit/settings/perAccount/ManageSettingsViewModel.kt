@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.settings.backupAndRestore.Diff
-import com.idunnololz.summit.settings.backupAndRestore.DiffType
+import com.idunnololz.summit.settings.importAndExport.Diff
+import com.idunnololz.summit.settings.importAndExport.DiffType
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.webkit.URLUtil
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.databinding.DialogFragmentGoToBinding
 import com.idunnololz.summit.links.LinkContext
@@ -86,10 +86,10 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
                         onLinkClick(url, null, LinkContext.Action)
                         dismiss()
                     } else {
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(R.string.error_invalid_link)
-                            .setPositiveButton(android.R.string.ok)
-                            .createAndShow(childFragmentManager, "adssad")
+                        launchAlertDialog("invalid_link") {
+                            messageResId = R.string.error_invalid_link
+                            positionButtonResId = android.R.string.ok
+                        }
                     }
                 }
             }

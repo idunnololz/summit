@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -309,4 +310,13 @@ fun Fragment.launchAlertDialog(tag: String, builder: Builder.() -> Unit) {
             requestKey = tag + "_req"
         }
         .createAndShow(childFragmentManager, tag)
+}
+
+fun AppCompatActivity.launchAlertDialog(tag: String, builder: Builder.() -> Unit) {
+    Builder()
+        .apply {
+            builder()
+            requestKey = tag + "_req"
+        }
+        .createAndShow(supportFragmentManager, tag)
 }

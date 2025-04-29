@@ -6,6 +6,7 @@ import android.graphics.Paint.FontMetricsInt
 import android.graphics.drawable.Drawable
 import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
+import androidx.core.graphics.withTranslation
 import java.lang.ref.WeakReference
 
 class CenteredImageSpan @JvmOverloads constructor(
@@ -30,10 +31,9 @@ class CenteredImageSpan @JvmOverloads constructor(
         bottom: Int,
         paint: Paint,
     ) {
-        canvas.save()
-        canvas.translate(x, 0f)
-        drawable.draw(canvas)
-        canvas.restore()
+        canvas.withTranslation(x, ((bottom - top) - drawable.bounds.height()) / 2f) {
+            drawable.draw(this)
+        }
     }
 
     // Method used to redefined the Font Metrics when an ImageSpan is added
@@ -61,7 +61,7 @@ class CenteredImageSpan @JvmOverloads constructor(
 
     // Redefined locally because it is a private member from DynamicDrawableSpan
     private val cachedDrawable: Drawable?
-        private get() {
+        get() {
             val wr = mDrawableRef
             var d: Drawable? = null
             if (wr != null) d = wr.get()

@@ -79,7 +79,7 @@ import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
-import com.idunnololz.summit.main.LemmyAppBarController
+import com.idunnololz.summit.main.CommunityAppBarController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
@@ -182,7 +182,7 @@ class CommunityFragment :
 
     private var isCustomAppBarExpandedPercent = 0f
 
-    private var lemmyAppBarController: LemmyAppBarController? = null
+    private var communityAppBarController: CommunityAppBarController? = null
 
     private var swipeActionCallback: LemmySwipeActionCallback? = null
     private var itemTouchHelper: ItemTouchHelper? = null
@@ -358,7 +358,7 @@ class CommunityFragment :
 
                     getMainActivity()?.openImage(
                         sharedElement = sharedElementView,
-                        appBar = lemmyAppBarController?.appBarRoot,
+                        appBar = communityAppBarController?.appBarRoot,
                         title = postView.post.name,
                         url = url,
                         mimeType = null,
@@ -523,8 +523,8 @@ class CommunityFragment :
 
             viewModel.updatePreferences()
 
-            lemmyAppBarController = LemmyAppBarController(
-                mainActivity = requireMainActivity(),
+            communityAppBarController = CommunityAppBarController(
+                summitActivity = requireSummitActivity(),
                 baseFragment = this@CommunityFragment,
                 parentContainer = coordinatorLayout,
                 accountInfoManager = accountInfoManager,
@@ -534,25 +534,25 @@ class CommunityFragment :
                 useHeader = preferences.usePostsFeedHeader,
                 moreActionsHelper = moreActionsHelper,
                 userCommunitiesManager = userCommunitiesManager,
-                state = lemmyAppBarController?.state,
+                state = communityAppBarController?.state,
                 lemmyTextHelper = lemmyTextHelper,
             )
 
             // Prevent flickers by setting the app bar here first
-            lemmyAppBarController?.setCommunity(args.communityRef)
+            communityAppBarController?.setCommunity(args.communityRef)
             // Prevent flickers by setting the header thing
-            lemmyAppBarController?.setUseHeader(preferences.usePostsFeedHeader)
+            communityAppBarController?.setUseHeader(preferences.usePostsFeedHeader)
 
             viewModel.defaultCommunity.observe(viewLifecycleOwner) {
                 if (it != null) {
-                    lemmyAppBarController?.setDefaultCommunity(it)
+                    communityAppBarController?.setDefaultCommunity(it)
                 }
             }
             viewModel.currentAccount.observe(viewLifecycleOwner) {
-                lemmyAppBarController?.onAccountChanged(it)
+                communityAppBarController?.onAccountChanged(it)
             }
             viewModel.sortOrder.observe(viewLifecycleOwner) {
-                lemmyAppBarController?.setSortOrder(it)
+                communityAppBarController?.setSortOrder(it)
             }
 
             installOnActionResultHandler(
@@ -573,58 +573,61 @@ class CommunityFragment :
                 },
             )
 
-            requireMainActivity().apply {
-                if (navBarController.useNavigationRail) {
-                    navBarController.updatePaddingForNavBar(coordinatorLayout)
-                }
-                lemmyAppBarController?.percentShown?.observe(viewLifecycleOwner) {
-                    if (!isBindingAvailable() || viewModel.lockBottomBar) {
-                        return@observe
+            if (!args.isPreview) {
+                requireSummitActivity().apply {
+                    if (navBarController.useNavigationRail) {
+                        navBarController.updatePaddingForNavBar(coordinatorLayout)
                     }
-
-                    if (!navBarController.useNavigationRail) {
-                        navBarController.setNavBarOpenPercent(it)
-                    }
-
-                    isCustomAppBarExpandedPercent = 1f - it
-
-                    updateFabState()
-                }
-                lemmyAppBarController?.setup(
-                    communitySelectedListener = { controller, communityRef ->
-                        val action =
-                            CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
-                                communityRef = communityRef,
-                                tab = args.tab,
-                            )
-                        findNavController().navigate(action)
-                        Utils.hideKeyboard(activity)
-                        controller.hide()
-                    },
-                    onAccountClick = {
-                        AccountsAndSettingsDialogFragment.newInstance()
-                            .showAllowingStateLoss(
-                                childFragmentManager,
-                                "AccountsDialogFragment",
-                            )
-                    },
-                    onSortOrderClick = {
-                        getMainActivity()?.showBottomMenu(getSortByMenu())
-                    },
-                    onChangeInstanceClick = {
-                        InstancePickerDialogFragment.show(childFragmentManager)
-                    },
-                    onCommunityLongClick = { communityRef, text ->
-                        val url = communityRef?.toUrl(viewModel.apiInstance)
-                        if (url != null) {
-                            showMoreLinkOptions(url, text)
-                            true
-                        } else {
-                            false
+                    communityAppBarController?.percentShown?.observe(viewLifecycleOwner) {
+                        if (!isBindingAvailable() || viewModel.lockBottomBar) {
+                            return@observe
                         }
-                    },
-                )
+
+                        if (!navBarController.useNavigationRail) {
+                            navBarController.setNavBarOpenPercent(it)
+                        }
+
+                        isCustomAppBarExpandedPercent = 1f - it
+
+                        updateFabState()
+                    }
+                }
             }
+
+            communityAppBarController?.setup(
+                communitySelectedListener = { controller, communityRef ->
+                    val action =
+                        CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
+                            communityRef = communityRef,
+                            tab = args.tab,
+                        )
+                    findNavController().navigate(action)
+                    Utils.hideKeyboard(activity)
+                    controller.hide()
+                },
+                onAccountClick = {
+                    AccountsAndSettingsDialogFragment.newInstance()
+                        .showAllowingStateLoss(
+                            childFragmentManager,
+                            "AccountsDialogFragment",
+                        )
+                },
+                onSortOrderClick = {
+                    getMainActivity()?.showBottomMenu(getSortByMenu())
+                },
+                onChangeInstanceClick = {
+                    InstancePickerDialogFragment.show(childFragmentManager)
+                },
+                onCommunityLongClick = { communityRef, text ->
+                    val url = communityRef?.toUrl(viewModel.apiInstance)
+                    if (url != null) {
+                        getMainActivity()?.showMoreLinkOptions(url, text)
+                        true
+                    } else {
+                        false
+                    }
+                },
+            )
 
             runAfterLayout {
                 if (!isBindingAvailable()) return@runAfterLayout
@@ -681,6 +684,7 @@ class CommunityFragment :
                 emptyScreenText = getString(R.string.select_a_post),
                 fragmentContainerId = R.id.post_fragment_container,
                 useSwipeBetweenPosts = preferences.swipeBetweenPosts,
+                isPreview = args.isPreview,
             ).apply {
                 onPageSelectedListener = a@{ isOpen ->
                     if (!isBindingAvailable()) {
@@ -702,12 +706,14 @@ class CommunityFragment :
                     }
 
                     if (isOpen) {
-                        requireMainActivity().apply {
-                            setupForFragment<PostFragment>()
-                            if (isSlideable) {
-                                navBarController.hideNavBar(true)
-                                setNavUiOpenPercent(1f)
-                                lockUiOpenness = true
+                        if (!args.isPreview) {
+                            requireSummitActivity().apply {
+                                setupForFragment<PostFragment>()
+                                if (isSlideable && !args.isPreview) {
+                                    navBarController.hideNavBar(true)
+                                    setNavUiOpenPercent(1f)
+                                    lockUiOpenness = true
+                                }
                             }
                         }
 
@@ -716,11 +722,13 @@ class CommunityFragment :
                             mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
                         }
                     } else {
-                        requireMainActivity().apply {
-                            setupForFragment<CommunityFragment>()
-                            lockUiOpenness = false
-                            if (isSlideable) {
-                                setNavUiOpenPercent(0f)
+                        if (!args.isPreview) {
+                            requireSummitActivity().apply {
+                                setupForFragment<CommunityFragment>()
+                                lockUiOpenness = false
+                                if (isSlideable && !args.isPreview) {
+                                    setNavUiOpenPercent(0f)
+                                }
                             }
                         }
                         if (isSlideable) {
@@ -785,39 +793,41 @@ class CommunityFragment :
 
         checkNotNull(view.findNavController()) { "NavController was null!" }
 
-        requireMainActivity().apply {
-            insetViewAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner,
-                binding.recyclerView,
-                applyTopInset = false,
-                applyLeftInset = false,
-                applyRightInset = false,
-            )
-            insetViewStartAndEndByPadding(
-                viewLifecycleOwner,
-                binding.fastScroller,
-            )
+        if (!args.isPreview) {
+            requireSummitActivity().apply {
+                insetViewAutomaticallyByPaddingAndNavUi(
+                    viewLifecycleOwner,
+                    binding.recyclerView,
+                    applyTopInset = false,
+                    applyLeftInset = false,
+                    applyRightInset = false,
+                )
+                insetViewStartAndEndByPadding(
+                    viewLifecycleOwner,
+                    binding.fastScroller,
+                )
 
-            val customFabBehavior =
-                (binding.fab.layoutParams as? CoordinatorLayout.LayoutParams)
-                    ?.behavior as? CustomFabWithBottomNavBehavior
+                val customFabBehavior =
+                    (binding.fab.layoutParams as? CoordinatorLayout.LayoutParams)
+                        ?.behavior as? CustomFabWithBottomNavBehavior
 
-            customFabBehavior?.apply {
-                updateBottomNavHeight(getBottomNavHeight().toFloat())
-                binding.fab.translationY = -getBottomNavHeight().toFloat()
-            }
+                customFabBehavior?.apply {
+                    updateBottomNavHeight(getBottomNavHeight().toFloat())
+                    binding.fab.translationY = -getBottomNavHeight().toFloat()
+                }
 
-            insets.observe(viewLifecycleOwner) {
-                binding.coordinatorLayout.post {
-                    if (!isBindingAvailable()) return@post
+                insets.observe(viewLifecycleOwner) {
+                    binding.coordinatorLayout.post {
+                        if (!isBindingAvailable()) return@post
 
-                    customFabBehavior?.updateBottomNavHeight(getBottomNavHeight().toFloat())
-                    customFabBehavior?.updateBottomInset(it.bottomInset)
-                    customFabBehavior?.onDependentViewChanged(
-                        binding.coordinatorLayout,
-                        binding.fab,
-                        binding.coordinatorLayout,
-                    )
+                        customFabBehavior?.updateBottomNavHeight(getBottomNavHeight().toFloat())
+                        customFabBehavior?.updateBottomInset(it.bottomInset)
+                        customFabBehavior?.onDependentViewChanged(
+                            binding.coordinatorLayout,
+                            binding.fab,
+                            binding.coordinatorLayout,
+                        )
+                    }
                 }
             }
         }
@@ -953,7 +963,7 @@ class CommunityFragment :
                                             )
                                     } else {
                                         recyclerView.scrollToPosition(0)
-                                        lemmyAppBarController?.setExpanded(true)
+                                        communityAppBarController?.setExpanded(true)
                                     }
                                 }
                             }
@@ -1097,14 +1107,16 @@ class CommunityFragment :
     override fun onResume() {
         super.onResume()
 
-        requireMainActivity().apply {
-            setupForFragment<CommunityFragment>()
+        requireSummitActivity().apply {
+            if (!args.isPreview) {
+                setupForFragment<CommunityFragment>()
+            }
         }
 
         viewModel.changeCommunity(args.communityRef)
 
         runOnReady {
-            val customAppBarController = lemmyAppBarController ?: return@runOnReady
+            val customAppBarController = communityAppBarController ?: return@runOnReady
 
             viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
                 customAppBarController.setCommunity(it)
@@ -1195,7 +1207,7 @@ class CommunityFragment :
         itemTouchHelper = null
 
         slidingPaneController = null
-        lemmyAppBarController = null
+        communityAppBarController = null
         swipeActionCallback = null
         binding.recyclerView.adapter = null
 
@@ -1692,10 +1704,10 @@ class CommunityFragment :
                 }
             }
             R.id.browse_communities -> {
-                lemmyAppBarController?.showCommunitySelector()
+                communityAppBarController?.showCommunitySelector()
             }
             R.id.settings -> {
-                requireMainActivity().openSettings()
+                requireSummitActivity().openSettings()
             }
             R.id.create_multi_community -> {
                 MultiCommunityEditorDialogFragment.show(

@@ -29,7 +29,7 @@ class PatreonFragment : BaseFragment<FragmentPatreonBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
         }

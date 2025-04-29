@@ -18,6 +18,9 @@ subprojects {
 
 allprojects {
     repositories {
+        maven {
+            url = uri("https://sdk.withpersona.com/android/releases")
+        }
         mavenCentral()
         google()
         maven { url = uri("https://maven.google.com") }

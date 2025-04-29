@@ -12,7 +12,6 @@ import com.idunnololz.summit.databinding.SettingSliderItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.TextOnlySettingItemBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
-import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.ColorSettingItem
 import com.idunnololz.summit.settings.OnOffSettingItem
@@ -21,6 +20,7 @@ import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import io.noties.markwon.Markwon
@@ -147,7 +147,7 @@ fun SliderSettingItem.bindTo(
 }
 
 fun <T> TextOnlySettingItem.bindTo(
-    activity: MainActivity,
+    activity: SummitActivity,
     b: TextOnlySettingItemBinding,
     choices: Map<T, String>,
     getCurrentChoice: () -> T,

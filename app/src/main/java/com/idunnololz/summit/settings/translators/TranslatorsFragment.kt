@@ -50,7 +50,7 @@ class TranslatorsFragment : BaseFragment<DialogFragmentTranslatorsBinding>() {
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<SettingsFragment>()
             insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.contentView)
             insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)

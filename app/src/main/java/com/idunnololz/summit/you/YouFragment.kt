@@ -20,7 +20,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.PersonView
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentYouBinding
@@ -76,7 +76,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
         val context = requireContext()
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewAutomaticallyByPaddingAndNavUi(
                     lifecycleOwner = viewLifecycleOwner,
                     rootView = binding.recyclerView,
@@ -109,12 +109,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                 },
                 onProfileClick = { account, profileIcon, url ->
                     if (url.isNullOrBlank()) {
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(R.string.error_user_has_no_profile_image)
-                            .createAndShow(
-                                childFragmentManager,
-                                "error_user_has_no_profile_image",
-                            )
+                        launchAlertDialog("error_user_has_no_profile_image") {
+                            messageResId = R.string.error_user_has_no_profile_image
+                        }
                     } else {
                         getMainActivity()?.openImage(
                             profileIcon,
@@ -198,7 +195,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
                         findNavController().navigateSafe(direction)
                     }
                     R.id.account_settings -> {
-                        requireMainActivity().openAccountSettings()
+                        requireSummitActivity().openAccountSettings()
                     }
                     R.id.user_tags -> {
                         val direction = YouFragmentDirections.actionYouFragmentToUserTagsFragment()

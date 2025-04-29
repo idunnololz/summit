@@ -209,13 +209,13 @@ class ModActionsDialogFragment :
                                 ),
                             )
                         }
-                        R.id.remove_feature_comment -> {
+                        R.id.remove_distinguish -> {
                             actionsViewModel.distinguishComment(
                                 commentId = args.commentId,
                                 distinguish = false,
                             )
                         }
-                        R.id.feature_comment -> {
+                        R.id.distinguish -> {
                             actionsViewModel.distinguishComment(
                                 commentId = args.commentId,
                                 distinguish = true,
@@ -505,14 +505,14 @@ class ModActionsDialogFragment :
                     if (modState.isDistinguished != null) {
                         if (modState.isDistinguished) {
                             adapter?.addItemWithIcon(
-                                id = R.id.remove_feature_comment,
-                                title = R.string.remove_feature_comment,
+                                id = R.id.remove_distinguish,
+                                title = R.string.unmark_important,
                                 icon = R.drawable.baseline_star_border_24,
                             )
                         } else {
                             adapter?.addItemWithIcon(
-                                id = R.id.feature_comment,
-                                title = R.string.feature_comment,
+                                id = R.id.distinguish,
+                                title = R.string.mark_important,
                                 icon = R.drawable.baseline_star_24,
                             )
                         }

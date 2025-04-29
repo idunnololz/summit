@@ -4,12 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.util.Base64
-import android.util.Log
+import androidx.core.content.edit
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -25,12 +24,6 @@ import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BooleanPreferenceDelegate
-import com.idunnololz.summit.util.FloatPreferenceDelegate
-import com.idunnololz.summit.util.IntPreferenceDelegate
-import com.idunnololz.summit.util.JsonPreferenceDelegate
-import com.idunnololz.summit.util.LongPreferenceDelegate
-import com.idunnololz.summit.util.NullableIntPreferenceDelegate
 import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ANIMATION_LEVEL
@@ -141,22 +134,26 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_TRANSPARENT_NOTIFICATION_B
 import com.idunnololz.summit.util.PreferenceUtils.KEY_UPLOAD_IMAGES_TO_IMGUR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USER_AGENT_CHOICE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_FIREBASE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_GESTURE_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_LESS_DARK_BACKGROUND
+import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_MATERIAL_YOU
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_MULTILINE_POST_HEADERS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.util.PreferenceUtils.KEY_VIDEO_PLAYER_ROTATION_LOCKED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
-import com.idunnololz.summit.util.StringPreferenceDelegate
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.ext.asJson
+import com.idunnololz.summit.util.ext.base
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getJsonValue
 import com.idunnololz.summit.util.ext.putJsonValue
@@ -165,7 +162,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import org.json.JSONObject
 
 private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -174,10 +170,11 @@ private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesD
 
 class Preferences(
     @ApplicationContext private val context: Context,
-    val prefs: SharedPreferences,
+    private var sharedPreferencesManager: SharedPreferencesManager,
+    override var sharedPreferences: SharedPreferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val json: Json,
-) {
+    override val json: Json,
+) : SharedPreferencesPreferences {
 
     companion object {
         private const val TAG = "Preferences"
@@ -197,18 +194,22 @@ class Preferences(
     val onPreferenceChangeFlow = MutableSharedFlow<Unit>()
 
     init {
-        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     val all: MutableMap<String, *>
-        get() = prefs.all
+        get() = sharedPreferences.all
 
     var defaultPage: CommunityRef
         by jsonPreference(KEY_DEFAULT_PAGE) { CommunityRef.All() }
 
+    fun updateWhichSharedPreference() {
+        sharedPreferences = sharedPreferencesManager.currentSharedPreferences
+    }
+
     fun getPostsLayout(): CommunityLayout = try {
         CommunityLayout.valueOf(
-            PreferenceUtils.preferences
+            sharedPreferences
                 .getString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, null) ?: "",
         )
     } catch (e: IllegalArgumentException) {
@@ -216,9 +217,9 @@ class Preferences(
     }
 
     fun setPostsLayout(layout: CommunityLayout) {
-        PreferenceUtils.preferences.edit()
-            .putString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, layout.name)
-            .apply()
+        sharedPreferences.base.edit {
+            putString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, layout.name)
+        }
     }
 
     fun getPostInListUiConfig(): PostInListUiConfig {
@@ -226,11 +227,11 @@ class Preferences(
     }
 
     fun setPostInListUiConfig(config: PostInListUiConfig) {
-        prefs.putJsonValue(json, getPostUiConfigKey(getPostsLayout()), config)
+        sharedPreferences.putJsonValue(json, getPostUiConfigKey(getPostsLayout()), config)
     }
 
     fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig {
-        return prefs.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
+        return sharedPreferences.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
             ?: layout.getDefaultPostUiConfig()
     }
 
@@ -258,21 +259,14 @@ class Preferences(
             PreferenceUtils.KEY_POST_UI_CONFIG_FULL_WITH_CARDS
     }
 
-    fun isUseMaterialYou(): Boolean {
-        return prefs.getBoolean(PreferenceUtils.KEY_USE_MATERIAL_YOU, false)
-    }
+    var isUseMaterialYou: Boolean
+        by booleanPreference(KEY_USE_MATERIAL_YOU, false)
 
-    fun setUseMaterialYou(b: Boolean) {
-        prefs.edit().putBoolean(PreferenceUtils.KEY_USE_MATERIAL_YOU, b).apply()
-    }
+    var isBlackTheme: Boolean
+        by booleanPreference(KEY_USE_BLACK_THEME, false)
 
-    fun isBlackTheme(): Boolean {
-        return prefs.getBoolean(PreferenceUtils.KEY_USE_BLACK_THEME, false)
-    }
-
-    fun setUseBlackTheme(b: Boolean) {
-        prefs.edit().putBoolean(PreferenceUtils.KEY_USE_BLACK_THEME, b).apply()
-    }
+    var isVideoPlayerRotationLocked: Boolean
+        by booleanPreference(KEY_VIDEO_PLAYER_ROTATION_LOCKED, false)
 
     var baseTheme: BaseTheme
         by jsonPreference(KEY_BASE_THEME) { BaseTheme.Dark }
@@ -391,17 +385,7 @@ class Preferences(
         by booleanPreference(KEY_HIDE_POST_SCORES, false)
 
     var hideCommentScores: Boolean
-        get() = try {
-            // Accidentally set this to an int once...
-            prefs.getBoolean(KEY_HIDE_COMMENT_SCORES, false)
-        } catch (e: Exception) {
-            false
-        }
-        set(value) {
-            prefs.edit()
-                .putBoolean(KEY_HIDE_COMMENT_SCORES, value)
-                .apply()
-        }
+        by booleanPreference(KEY_HIDE_COMMENT_SCORES, false)
 
     var globalFont: Int
         by intPreference(KEY_GLOBAL_FONT, FontIds.DEFAULT)
@@ -445,12 +429,12 @@ class Preferences(
 
     var previewLinks: Int
         get() = try {
-            prefs.getInt(KEY_PREVIEW_LINKS, PreviewTextLinks)
+            sharedPreferences.getInt(KEY_PREVIEW_LINKS, PreviewTextLinks)
         } catch (e: Exception) {
             PreviewTextLinks
         }
         set(value) {
-            prefs.edit()
+            sharedPreferences.edit()
                 .putInt(KEY_PREVIEW_LINKS, value)
                 .apply()
         }
@@ -583,21 +567,23 @@ class Preferences(
 
     var animationLevel: AnimationsHelper.AnimationLevel
         get() = AnimationsHelper.AnimationLevel.parse(
-            prefs.getInt(
+            sharedPreferences.getInt(
                 KEY_ANIMATION_LEVEL,
                 AnimationsHelper.AnimationLevel.Max.animationLevel,
             ),
         )
         set(value) {
-            prefs.edit()
+            sharedPreferences.edit()
                 .putInt(KEY_ANIMATION_LEVEL, value.animationLevel)
                 .apply()
         }
 
     var cachePolicy: CachePolicy
-        get() = CachePolicy.parse(prefs.getInt(KEY_CACHE_POLICY, CachePolicy.Moderate.value))
+        get() = CachePolicy.parse(
+            sharedPreferences.getInt(KEY_CACHE_POLICY, CachePolicy.Moderate.value),
+        )
         set(value) {
-            prefs.edit()
+            sharedPreferences.edit()
                 .putInt(KEY_CACHE_POLICY, value.value)
                 .apply()
         }
@@ -618,9 +604,9 @@ class Preferences(
         by booleanPreference(KEY_HAPTICS_ENABLED, true)
 
     var hapticsOnActions: Boolean
-        get() = hapticsEnabled && prefs.getBoolean(KEY_HAPTICS_ON_ACTIONS, true)
+        get() = hapticsEnabled && sharedPreferences.getBoolean(KEY_HAPTICS_ON_ACTIONS, true)
         set(value) {
-            prefs.edit()
+            sharedPreferences.edit()
                 .putBoolean(KEY_HAPTICS_ON_ACTIONS, value)
                 .apply()
         }
@@ -659,25 +645,11 @@ class Preferences(
             ?: 100
 
     fun reset(key: String) {
-        prefs.edit().remove(key).apply()
+        sharedPreferences.edit { remove(key) }
     }
 
     fun asJson(): JSONObject {
-        val json = JSONObject()
-
-        for ((key, value) in all.entries) {
-            when (value) {
-                is String -> json.put(key, value)
-                is Boolean -> json.put(key, value)
-                is Number -> json.put(key, value)
-                null -> json.put(key, null)
-                else -> Log.d(TAG, "Unsupported type ${value::class}. Key was $key.")
-            }
-        }
-
-        json.put(PreferenceUtils.PREFERENCE_VERSION_CODE, BuildConfig.VERSION_CODE)
-
-        return json
+        return sharedPreferences.asJson()
     }
 
     fun generateCode(): String {
@@ -686,53 +658,31 @@ class Preferences(
     }
 
     fun importSettings(settingsToImport: JSONObject, excludeKeys: Set<String>) {
+        sharedPreferences.importSettings(settingsToImport, excludeKeys)
+    }
+
+    private fun SharedPreferences.importSettings(
+        settingsToImport: JSONObject,
+        excludeKeys: Set<String>,
+    ) {
         val allKeys = settingsToImport.keys().asSequence()
-        val editor = prefs.edit()
+        this.edit {
+            for (key in allKeys) {
+                if (excludeKeys.contains(key)) continue
 
-        for (key in allKeys) {
-            if (excludeKeys.contains(key)) continue
-
-            when (val value = settingsToImport.opt(key)) {
-                is Float -> editor.putFloat(key, value)
-                is Long -> editor.putLong(key, value)
-                is String -> editor.putString(key, value)
-                is Boolean -> editor.putBoolean(key, value)
-                is Int -> editor.putInt(key, value)
-                null -> editor.remove(key)
+                when (val value = settingsToImport.opt(key)) {
+                    is Float -> putFloat(key, value)
+                    is Long -> putLong(key, value)
+                    is String -> putString(key, value)
+                    is Boolean -> putBoolean(key, value)
+                    is Int -> putInt(key, value)
+                    null -> remove(key)
+                }
             }
         }
-
-        editor.apply()
     }
 
     fun clear() {
-        prefs.edit().clear().commit()
+        sharedPreferences.edit(commit = true) { clear() }
     }
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun stringPreference(key: String, defaultValue: String? = "") =
-        StringPreferenceDelegate(prefs, key, defaultValue)
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun floatPreference(key: String, defaultValue: Float = 0.0f) =
-        FloatPreferenceDelegate(prefs, key, defaultValue)
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun booleanPreference(key: String, defaultValue: Boolean = false) =
-        BooleanPreferenceDelegate(prefs, key, defaultValue)
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun intPreference(key: String, defaultValue: Int = 0) =
-        IntPreferenceDelegate(prefs, key, defaultValue)
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun nullableIntPreference(key: String) =
-        NullableIntPreferenceDelegate(prefs, key)
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun longPreference(key: String, defaultValue: Long = 0) =
-        LongPreferenceDelegate(prefs, key, defaultValue)
-
-    private inline fun <reified T> jsonPreference(key: String, noinline defaultValue: () -> T) =
-        JsonPreferenceDelegate(prefs, json, key, serializer(), defaultValue)
 }

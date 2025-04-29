@@ -137,7 +137,7 @@ class InboxFragment :
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 setupForFragment<InboxTabbedFragment>()
             }
         }
@@ -185,7 +185,7 @@ class InboxFragment :
         val context = requireContext()
         val parentFragment = parentFragment as InboxTabbedFragment
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupToolbar(binding.toolbar, "")
 
             insetViewAutomaticallyByPaddingAndNavUi(
@@ -338,7 +338,7 @@ class InboxFragment :
         fun updatePaneBackPressHandler() {
             if (binding.paneLayout.getSelectedPanel() != OverlappingPanelsLayout.Panel.CENTER) {
                 paneOnBackPressHandler.remove()
-                requireMainActivity().onBackPressedDispatcher.addCallback(paneOnBackPressHandler)
+                requireSummitActivity().onBackPressedDispatcher.addCallback(paneOnBackPressHandler)
             } else {
                 paneOnBackPressHandler.remove()
             }

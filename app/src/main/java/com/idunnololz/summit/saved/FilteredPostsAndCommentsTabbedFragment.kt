@@ -65,7 +65,7 @@ class FilteredPostsAndCommentsTabbedFragment :
 
         val context = requireContext()
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
 
             setupToolbar(

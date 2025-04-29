@@ -202,7 +202,7 @@ safeargs.
     </fragment>
     <dialog
         android:id="@+id/importSettingItemPreviewDialogFragment"
-        android:name="com.idunnololz.summit.settings.backupAndRestore.ImportSettingItemPreviewDialogFragment"
+        android:name="com.idunnololz.summit.settings.importAndExport.ImportSettingItemPreviewDialogFragment"
         android:label="ImportSettingItemPreviewDialogFragment" >
         <argument
             android:name="settingKey"

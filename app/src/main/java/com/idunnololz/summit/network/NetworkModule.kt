@@ -1,5 +1,6 @@
 package com.idunnololz.summit.network
 
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.util.ClientFactory
 import com.idunnololz.summit.util.DirectoryHelper
 import dagger.Module
@@ -27,7 +28,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @Api
+    @LemmyApi
     fun provideApiOkHttpClient(
         clientFactory: ClientFactory,
         directoryHelper: DirectoryHelper,
@@ -36,6 +37,29 @@ class NetworkModule {
         cacheDir = directoryHelper.okHttpCacheDir,
         purpose = ClientFactory.Purpose.LemmyApiClient,
     )
+
+    @Provides
+    @Singleton
+    @SummitApi
+    fun provideSummitApiOkHttpClient(
+        clientFactory: ClientFactory,
+        directoryHelper: DirectoryHelper,
+    ): OkHttpClient = clientFactory
+        .newClient(
+            "SummitApi",
+            directoryHelper.okHttpCacheDir,
+            ClientFactory.Purpose.SummitApiClient,
+        )
+        .newBuilder()
+        .addNetworkInterceptor {
+            val requestBuilder = it.request().newBuilder()
+            requestBuilder.header(
+                "Authorization",
+                "Bearer ${BuildConfig.SUMMIT_JWT}",
+            )
+            it.proceed(requestBuilder.build())
+        }
+        .build()
 }
 
 /**
@@ -50,4 +74,11 @@ annotation class BrowserLike
  */
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Api
+annotation class LemmyApi
+
+/**
+ * Used to make API calls for the Summit server.
+ */
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SummitApi

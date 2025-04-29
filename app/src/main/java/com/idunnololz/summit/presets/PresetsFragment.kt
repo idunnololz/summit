@@ -1,23 +1,34 @@
 package com.idunnololz.summit.presets
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuItemCompat
+import androidx.core.view.MenuProvider
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
-import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.databinding.FragmentPresetsBinding
-import com.idunnololz.summit.databinding.ItemPresetsHeaderBinding
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PresetsFragment : BaseFragment<FragmentPresetsBinding>() {
+
+    private val viewModel: PresetsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,58 +48,75 @@ class PresetsFragment : BaseFragment<FragmentPresetsBinding>() {
         val context = requireContext()
 
         with(binding) {
-            requireMainActivity().apply {
+            requireSummitActivity().apply {
                 insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
             }
 
             setupToolbar(toolbar, getString(R.string.presets))
 
-            val adapter = PresetsAdapter()
+            toolbar.addMenuProvider(
+                object : MenuProvider {
+                    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                        if (BuildConfig.SUMMIT_JWT.isNotBlank()) {
+                            val color = context.getColorFromAttribute(
+                                androidx.appcompat.R.attr.colorControlNormal,
+                            )
+                            menu.add(0, R.id.admin, 0, R.string.admin)
+                                .apply {
+                                    setIcon(R.drawable.outline_shield_24)
+                                    setShowAsAction(SHOW_AS_ACTION_IF_ROOM)
+                                    MenuItemCompat.setIconTintList(
+                                        this,
+                                        ColorStateList.valueOf(color),
+                                    )
+                                }
+                        }
+                    }
+
+                    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                        when (menuItem.itemId) {
+                            R.id.admin -> {
+                                val directions = PresetsFragmentDirections
+                                    .actionPresetsFragmentToAdminPresetsFragment()
+                                findNavController().navigateSafe(directions)
+                            }
+                        }
+                        return true
+                    }
+                },
+            )
+
+            val adapter = PresetsAdapter(
+                includeHeader = true,
+                onShareAPresetClick = {
+                    val direction = PresetsFragmentDirections
+                        .actionPresetsFragmentToGeneratePresetFragment()
+                    findNavController().navigateSafe(direction)
+                },
+            )
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
 
-        }
-    }
+            viewModel.loadData()
 
-    private class PresetsAdapter : Adapter<ViewHolder>() {
-
-        private sealed interface Item {
-            data object HeaderItem : Item
-        }
-
-        private val adapterHelper = AdapterHelper<Item>({ old, new ->
-            old::class == new::class && when (old) {
-                Item.HeaderItem -> true
+            loadingView.setOnRefreshClickListener {
+                viewModel.loadData(force = true)
             }
-        }).apply {
-            addItemType(Item.HeaderItem::class, ItemPresetsHeaderBinding::inflate) { item, b, h ->
 
+            viewModel.model.observe(viewLifecycleOwner) {
+                when (it) {
+                    is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
+                    is StatefulData.Loading -> loadingView.showProgressBar()
+                    is StatefulData.NotStarted -> {}
+                    is StatefulData.Success -> {
+                        loadingView.hideAll()
+
+                        adapter.setData(it.data.presets)
+                    }
+                }
             }
         }
-
-        init {
-            refreshItems()
-        }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        private fun refreshItems() {
-            val newItems = mutableListOf<Item>()
-
-            newItems += Item.HeaderItem
-
-            adapterHelper.setItems(newItems, this)
-        }
-
     }
 }

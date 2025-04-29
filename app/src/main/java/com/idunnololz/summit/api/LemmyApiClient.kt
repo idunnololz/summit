@@ -114,7 +114,7 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
-import com.idunnololz.summit.network.Api
+import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
@@ -141,7 +141,7 @@ const val COMMENTS_DEPTH_MAX = 6
 class LemmyApiClient @Inject constructor(
     private val apiListenerManager: ApiListenerManager,
     private val preferences: Preferences,
-    @Api val okHttpClient: OkHttpClient,
+    @LemmyApi val okHttpClient: OkHttpClient,
 ) {
 
     companion object {
@@ -193,7 +193,7 @@ class LemmyApiClient @Inject constructor(
     class Factory @Inject constructor(
         private val apiListenerManager: ApiListenerManager,
         private val preferences: Preferences,
-        @Api private val okHttpClient: OkHttpClient,
+        @LemmyApi private val okHttpClient: OkHttpClient,
     ) {
         fun create() = LemmyApiClient(
             apiListenerManager = apiListenerManager,
@@ -1974,20 +1974,25 @@ class LemmyApiClient @Inject constructor(
             return Result.success(requireNotNull(res.body()))
         } else {
             val errorCode = res.code()
+            val errorBody = res.errorBody()?.string()
 
             if (errorCode >= 500) {
                 if (res.message().contains("only-if-cached", ignoreCase = true)) {
                     // for some reason okhttp returns a 504 if we force cache with no internet
                     return Result.failure(NoInternetException())
                 }
-                return Result.failure(ServerApiException(errorCode))
+                return Result.failure(
+                    ServerApiException(
+                        errorMessage = errorBody,
+                        errorCode = errorCode,
+                    ),
+                )
             }
 
             if (errorCode == 429) {
                 return Result.failure(RateLimitException(0L))
             }
 
-            val errorBody = res.errorBody()?.string()
             val errMsg = try {
                 errorBody?.let {
                     JSONObject(it).getString("error")
@@ -2041,10 +2046,10 @@ class LemmyApiClient @Inject constructor(
             }
             if (errMsg?.contains("the database system is not yet accepting connections", ignoreCase = true) == true) {
                 // this is a 4xx error but it should be a 5xx error because it's server sided and retry-able
-                return Result.failure(ServerApiException(503))
+                return Result.failure(ServerApiException(null, 503))
             }
 
-            return Result.failure(ClientApiException(errMsg, errorCode))
+            return Result.failure(ClientApiException(errorMessage = errMsg, errorCode = errorCode))
         }
     }
 
@@ -2062,7 +2067,7 @@ class LemmyApiClient @Inject constructor(
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build()
-                .create(LemmyApi::class.java),
+                .create(com.idunnololz.summit.api.LemmyApi::class.java),
             instance,
         )
     }

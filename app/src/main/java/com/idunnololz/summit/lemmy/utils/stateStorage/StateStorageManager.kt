@@ -1,19 +1,19 @@
 package com.idunnololz.summit.lemmy.utils.stateStorage
 
 import com.idunnololz.summit.lemmy.utils.StableAccountId
-import com.idunnololz.summit.preferences.PreferenceManager
+import com.idunnololz.summit.preferences.SharedPreferencesManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StateStorageManager @Inject constructor(
-    private val preferenceManager: PreferenceManager,
+    private val sharedPreferencesManager: SharedPreferencesManager,
 ) {
 
     private val accountStateStorageByAccount = mutableMapOf<StableAccountId, AccountStateStorage>()
 
     val globalStateStorage by lazy {
-        GlobalStateStorage(preferenceManager.getGlobalStateSharedPreferences())
+        GlobalStateStorage(sharedPreferencesManager.getGlobalStateSharedPreferences())
     }
 
     fun getAccountStateStorage(accountId: Long, accountInstance: String): AccountStateStorage {
@@ -31,7 +31,7 @@ class StateStorageManager @Inject constructor(
             accountStateStorageByAccount[stableAccountId] = AccountStateStorage(
                 accountId,
                 accountInstance,
-                preferenceManager.getAccountStateSharedPreferences(stableAccountId),
+                sharedPreferencesManager.getAccountStateSharedPreferences(stableAccountId),
             )
         }
 

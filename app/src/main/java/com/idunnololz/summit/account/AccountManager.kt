@@ -58,7 +58,7 @@ class AccountManager @Inject constructor(
     init {
         runBlocking {
             val curAccount = accountDao.getCurrentAccount()?.fix()
-            preferenceManager.getComposedPreferencesForAccount(curAccount)
+            preferenceManager.updateCurrentPreferences(curAccount)
             _currentAccount.emit(curAccount)
             updateNumAccounts()
         }
@@ -189,7 +189,7 @@ class AccountManager @Inject constructor(
     private suspend fun doSwitchAccountWork(newAccount: Account?) {
         // Do pre-switch work here...
 
-        preferenceManager.getComposedPreferencesForAccount(newAccount)
+        preferenceManager.updateCurrentPreferences(newAccount)
 
         val listeners = withContext(Dispatchers.Main) {
             onAccountChangeListeners.toList()

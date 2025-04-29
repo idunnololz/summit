@@ -11,7 +11,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.idunnololz.summit.R
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.util.AnimationUtils
+import com.idunnololz.summit.util.ext.getActivity
 import com.idunnololz.summit.util.toErrorMessage
 
 class LoadingView : ConstraintLayout {
@@ -213,6 +215,12 @@ class LoadingView : ConstraintLayout {
 
     fun showDefaultErrorMessageFor(t: Throwable) {
         showErrorWithRetry(t.toErrorMessage(context))
+
+        val activity = context.getActivity() ?: return
+        show(errorText = true, positiveButton = true, negativeButton = true)
+        bindNegativeButton(context.getString(R.string.error_details)) {
+            ErrorDialogFragment.show(t.toErrorMessage(context), t, activity.supportFragmentManager)
+        }
     }
 
     fun showDefaultErrorMessageFor(

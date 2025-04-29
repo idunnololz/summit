@@ -2,10 +2,11 @@ package com.idunnololz.summit.lemmy
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.preferences.SharedPreferencesManager
 import com.idunnololz.summit.preferences.StateSharedPreference
-import com.idunnololz.summit.util.PreferenceUtils
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -16,9 +17,10 @@ import kotlinx.serialization.json.Json
 
 @Singleton
 class RecentCommunityManager @Inject constructor(
-    @StateSharedPreference private val preferences: SharedPreferences,
+    @StateSharedPreference private val statePreferences: SharedPreferences,
     private val lemmyApiClientFactory: LemmyApiClient.Factory,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val sharedPreferencesManager: SharedPreferencesManager,
     private val json: Json,
 ) {
     companion object {
@@ -38,15 +40,16 @@ class RecentCommunityManager @Inject constructor(
     private var _recentCommunities: LinkedHashMap<String, CommunityHistoryEntry>? = null
 
     init {
-        if (PreferenceUtils.preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
-            val str = PreferenceUtils.preferences.getString(PREF_KEY_RECENT_COMMUNITIES, "")
+        val preferences = sharedPreferencesManager.currentSharedPreferences
+        if (preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
+            val str = preferences.getString(PREF_KEY_RECENT_COMMUNITIES, "")
 
-            preferences.edit()
-                .putString(PREF_KEY_RECENT_COMMUNITIES, str)
-                .apply()
-            PreferenceUtils.preferences.edit()
-                .remove(PREF_KEY_RECENT_COMMUNITIES)
-                .apply()
+            statePreferences.edit {
+                putString(PREF_KEY_RECENT_COMMUNITIES, str)
+            }
+            preferences.edit {
+                remove(PREF_KEY_RECENT_COMMUNITIES)
+            }
         }
     }
 
@@ -89,12 +92,12 @@ class RecentCommunityManager @Inject constructor(
 
         coroutineScope.launch(Dispatchers.Default) {
             // serialize
-            preferences.edit()
-                .putString(
+            statePreferences.edit {
+                putString(
                     PREF_KEY_RECENT_COMMUNITIES,
                     json.encodeToString(RecentCommunityData(resultsList)),
                 )
-                .apply()
+            }
         }
 
         if (communityRef is CommunityRef.CommunityRefByName && iconUrl == null) {
@@ -131,7 +134,7 @@ class RecentCommunityManager @Inject constructor(
         if (recentCommunities != null) {
             return recentCommunities
         }
-        val jsonStr = preferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
+        val jsonStr = statePreferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
         val data = try {
             if (jsonStr != null) {
                 json.decodeFromString<RecentCommunityData?>(jsonStr)

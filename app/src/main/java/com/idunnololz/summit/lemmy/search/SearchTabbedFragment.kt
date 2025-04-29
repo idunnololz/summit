@@ -160,7 +160,7 @@ class SearchTabbedFragment :
             performSearch()
         }
 
-        requireMainActivity().apply {
+        requireSummitActivity().apply {
             setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
 
             insetViewAutomaticallyByPaddingAndNavUi(
@@ -476,7 +476,7 @@ class SearchTabbedFragment :
     }
 
     private fun hideSearch(animate: Boolean = true) {
-        Utils.hideKeyboard(requireMainActivity())
+        Utils.hideKeyboard(requireSummitActivity())
 
         if (animate) {
             binding.searchContainer.animate()

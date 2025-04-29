@@ -11,6 +11,7 @@ import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.presets.PreviewPresetActivity
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.color.ColorManager
@@ -32,16 +33,18 @@ class ThemeManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferenceManager: PreferenceManager,
     private val accountManager: AccountManager,
-    private var preferences: Preferences,
     private val coroutineScopeFactory: CoroutineScopeFactory,
     private val colorManager: ColorManager,
+    private val basePreferences: Preferences,
 ) {
 
     private val coroutineScope = coroutineScopeFactory.create()
 
     private var currentThemeOverlay: ThemeOverlayConfig? = null
 
-    val useMaterialYou = MutableStateFlow<Boolean>(preferences.isUseMaterialYou())
+    private var preferences: Preferences = basePreferences
+
+    val useMaterialYou = MutableStateFlow<Boolean>(preferences.isUseMaterialYou)
     val themeOverlayChanged = MutableSharedFlow<Unit>()
     val useCustomFont = MutableStateFlow<Boolean>(preferences.globalFont != 0)
 
@@ -56,21 +59,24 @@ class ThemeManager @Inject constructor(
     init {
         coroutineScope.launch {
             accountManager.currentAccount.collect {
-                preferences = preferenceManager.getComposedPreferencesForAccount(it)
-
                 withContext(Dispatchers.Main) {
-                    onPreferencesChanged()
+                    updatePreferences()
                 }
             }
         }
     }
 
+    fun updatePreferences() {
+        preferences = preferenceManager.updateCurrentPreferences(accountManager.currentAccount.value)
+        onPreferencesChanged()
+    }
+
     fun onPreferencesChanged() {
         val currentConfig = ThemeOverlayConfig(
             baseTheme = preferences.baseTheme,
-            isBlackTheme = preferences.isBlackTheme(),
+            isBlackTheme = preferences.isBlackTheme,
             useLessDarkBackgroundTheme = preferences.useLessDarkBackgroundTheme,
-            isMaterialYou = preferences.isUseMaterialYou(),
+            isMaterialYou = preferences.isUseMaterialYou,
             colorScheme = preferences.colorScheme,
             globalFontSize = preferences.globalFontSize,
             globalFontColor = preferences.globalFontColor,
@@ -143,12 +149,19 @@ class ThemeManager @Inject constructor(
     }
 
     fun applyThemeForActivity(activity: BaseActivity) {
+        val isPreviewActivity = activity is PreviewPresetActivity
+        val preferences = if (isPreviewActivity) {
+            basePreferences
+        } else {
+            preferences
+        }
+
         if (activity.isLightTheme()) {
             // do nothing
         } else {
             if (preferences.useLessDarkBackgroundTheme) {
                 activity.theme.applyStyle(R.style.LessDarkBackground, true)
-            } else if (!preferences.isBlackTheme()) {
+            } else if (!preferences.isBlackTheme) {
                 activity.theme.applyStyle(R.style.OverlayThemeRegular, true)
             }
         }
@@ -168,7 +181,11 @@ class ThemeManager @Inject constructor(
                 activity.theme.applyStyle(R.style.TextStyle_Xxxl, true)
         }
 
-        activity.isMaterialYou = useMaterialYou.value
+        activity.isMaterialYou = if (isPreviewActivity) {
+            preferences.isUseMaterialYou
+        } else {
+            useMaterialYou.value
+        }
         if (activity.isMaterialYou) {
             DynamicColors.applyToActivityIfAvailable(activity)
         } else {
@@ -212,11 +229,13 @@ class ThemeManager @Inject constructor(
 
         colorManager.updateColors(activity)
 
-        activity.lifecycleScope.launch(Dispatchers.Default) {
-            useMaterialYou.collect {
-                withContext(Dispatchers.Main) {
-                    if (it != activity.isMaterialYou) {
-                        recreate(activity)
+        if (!isPreviewActivity) {
+            activity.lifecycleScope.launch(Dispatchers.Default) {
+                useMaterialYou.collect {
+                    withContext(Dispatchers.Main) {
+                        if (it != activity.isMaterialYou) {
+                            recreate(activity)
+                        }
                     }
                 }
             }

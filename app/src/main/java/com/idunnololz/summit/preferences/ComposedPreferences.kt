@@ -5,6 +5,7 @@ import java.lang.ClassCastException
 
 class ComposedPreferences(
     private val preferences: List<SharedPreferences>,
+    val base: SharedPreferences,
 ) : SharedPreferences {
 
     override fun getAll(): MutableMap<String, *> = preferences.first().all
@@ -58,8 +59,7 @@ class ComposedPreferences(
         it.contains(key)
     }
 
-    override fun edit(): SharedPreferences.Editor =
-        throw RuntimeException("Edit is not supported by ComposedPreferences.")
+    override fun edit(): SharedPreferences.Editor = base.edit()
 
     override fun registerOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener?,
@@ -71,7 +71,9 @@ class ComposedPreferences(
 
     override fun unregisterOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener?,
-    ) = throw RuntimeException(
-        "unregisterOnSharedPreferenceChangeListener is not supported by ComposedPreferences.",
-    )
+    ) {
+        preferences.forEach {
+            it.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
 }

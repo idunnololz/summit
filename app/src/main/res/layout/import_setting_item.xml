@@ -27,7 +27,7 @@
         android:ellipsize="end"
         android:layout_marginHorizontal="@dimen/padding"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toStartOf="@+id/remove"
+        app:layout_constraintEnd_toStartOf="@+id/end_barrier"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/setting_key"/>
 
@@ -41,7 +41,7 @@
         android:ellipsize="end"
         android:layout_marginHorizontal="@dimen/padding"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toStartOf="@+id/remove"
+        app:layout_constraintEnd_toStartOf="@+id/end_barrier"
         app:layout_constraintTop_toBottomOf="@+id/setting_title"
         app:layout_constraintBottom_toTopOf="@+id/setting_value"/>
 
@@ -57,9 +57,16 @@
         android:layout_marginTop="@dimen/padding_quarter"
         android:layout_marginHorizontal="@dimen/padding"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintEnd_toStartOf="@+id/remove"
+        app:layout_constraintEnd_toStartOf="@+id/end_barrier"
         app:layout_constraintTop_toBottomOf="@+id/setting_key"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/end_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="remove,setting_switch"
+        app:barrierDirection="start"/>
 
     <ImageView
         android:id="@+id/remove"
@@ -72,5 +79,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:tint="?colorControlNormal" />
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/setting_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

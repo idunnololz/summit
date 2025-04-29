@@ -113,7 +113,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
                     inboxViewModel.isUserOnInboxScreen.value = false
                 } else {
-                    requireMainActivity().apply {
+                    requireSummitActivity().apply {
                         setupForFragment<CommunityFragment>()
                         lockUiOpenness = false
                         if (isSlideable) {

@@ -85,8 +85,6 @@ class MoreActionsHelper @Inject constructor(
     val nsfwModeEnabledFlow
         get() = nsfwModeManager.nsfwModeEnabled
 
-    private var currentPageInstance: String? = null
-
     fun blockCommunity(communityRef: CommunityRef.CommunityRefByName, block: Boolean = true) {
         blockCommunityResult.setIsLoading()
         coroutineScope.launch {
@@ -303,10 +301,6 @@ class MoreActionsHelper @Inject constructor(
         }
     }
 
-    fun setPageInstance(instance: String) {
-        currentPageInstance = instance
-    }
-
     fun downloadVideo(url: String) {
         downloadVideoResult.setIsLoading()
 
@@ -464,10 +458,10 @@ class MoreActionsHelper @Inject constructor(
 
     private suspend fun <T> ensureRightInstance(
         apiClient: AccountAwareLemmyClient,
+        currentPageInstance: String? = null,
         onCorrectInstance: suspend () -> Result<T>,
     ): Result<T> {
         val apiInstance = apiClient.instance
-        val currentPageInstance = currentPageInstance
         return if (currentPageInstance != null && currentPageInstance != apiInstance) {
             Result.failure(
                 AccountInstanceMismatchException(

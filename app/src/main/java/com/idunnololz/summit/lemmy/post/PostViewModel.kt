@@ -533,7 +533,7 @@ class PostViewModel @Inject constructor(
             { it.instance },
             { it.instance },
         )
-        val isNativePost = instance == apiInstance
+        val isNativePost = instance.equals(apiInstance, ignoreCase = true)
 
         if (isNativePost) return Result.success(Unit)
 
@@ -833,7 +833,7 @@ class PostViewModel @Inject constructor(
             { it.instance },
             { it.instance },
         )
-        return instance == currentAccount.account.instance
+        return instance.equals(currentAccount.account.instance, ignoreCase = true)
     }
 
     fun fetchMoreComments(parentId: CommentId?, depth: Int? = null, force: Boolean = false) {
