@@ -23,8 +23,8 @@ android {
         applicationId = "com.idunnololz.summit"
         minSdk = 21
         targetSdk = 35
-        versionCode = 247
-        versionName = "1.59.0"
+        versionCode = 248
+        versionName = "1.59.1"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -65,8 +65,12 @@ android {
 }
 
 sentry {
-    val sentryProperties = loadProperties(File(rootDir, "sentry.properties").path)
-    if (sentryProperties["auth.token"] == null) {
+    try {
+        val sentryProperties = loadProperties(File(rootDir, "sentry.properties").path)
+        if (sentryProperties["auth.token"] == null) {
+            autoUploadProguardMapping.set(false)
+        }
+    } catch (e: Exception) {
         autoUploadProguardMapping.set(false)
     }
     tracingInstrumentation {
