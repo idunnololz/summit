@@ -26,207 +26,207 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RichTextValueDialogFragment :
-    BaseDialogFragment<DialogFragmentRichTextValueBinding>() {
+  BaseDialogFragment<DialogFragmentRichTextValueBinding>() {
 
-    companion object {
-        private const val ARG_TITLE = "ARG_TITLE"
-        private const val ARG_KEY_ID = "ARG_KEY_ID"
-        private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
+  companion object {
+    private const val ARG_TITLE = "ARG_TITLE"
+    private const val ARG_KEY_ID = "ARG_KEY_ID"
+    private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
 
-        fun newInstance(title: String, key: Int, currentValue: String?) =
-            RichTextValueDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_TITLE, title)
-                    putInt(ARG_KEY_ID, key)
-                    putString(ARG_CURRENT_VALUE, currentValue)
-                }
-            }
-    }
-
-    private val viewModel: RichTextValueViewModel by viewModels()
-
-    @Inject
-    lateinit var textFieldToolbarManager: TextFieldToolbarManager
-
-    private val launcher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                val uri = it.data?.data
-
-                if (uri != null) {
-                    viewModel.uploadImage(uri)
-                }
-            }
+    fun newInstance(title: String, key: Int, currentValue: String?) =
+      RichTextValueDialogFragment().apply {
+        arguments = Bundle().apply {
+          putString(ARG_TITLE, title)
+          putInt(ARG_KEY_ID, key)
+          putString(ARG_CURRENT_VALUE, currentValue)
         }
+      }
+  }
 
-    @Inject
-    lateinit var preferences: Preferences
+  private val viewModel: RichTextValueViewModel by viewModels()
 
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.MATCH_PARENT
+  @Inject
+  lateinit var textFieldToolbarManager: TextFieldToolbarManager
 
-            val window = checkNotNull(dialog.window)
-            window.setLayout(width, height)
+  private val launcher =
+    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+      if (it.resultCode == Activity.RESULT_OK) {
+        val uri = it.data?.data
+
+        if (uri != null) {
+          viewModel.uploadImage(uri)
         }
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  @Inject
+  lateinit var preferences: Preferences
 
-        setBinding(DialogFragmentRichTextValueBinding.inflate(inflater, container, false))
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      val width = ViewGroup.LayoutParams.MATCH_PARENT
+      val height = ViewGroup.LayoutParams.MATCH_PARENT
 
-        return binding.root
+      val window = checkNotNull(dialog.window)
+      window.setLayout(width, height)
     }
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        val context = requireContext()
+    setBinding(DialogFragmentRichTextValueBinding.inflate(inflater, container, false))
 
-        with(binding) {
-            textEditor.hint = requireArguments().getString(ARG_TITLE)
-            textEditor.setText(requireArguments().getString(ARG_CURRENT_VALUE))
+    return binding.root
+  }
 
-            val textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
-                context,
-                postBodyToolbar,
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    with(binding) {
+      textEditor.hint = requireArguments().getString(ARG_TITLE)
+      textEditor.setText(requireArguments().getString(ARG_CURRENT_VALUE))
+
+      val textFormatToolbar = textFieldToolbarManager.createTextFormatterToolbar(
+        context,
+        postBodyToolbar,
+      )
+
+      textFormatToolbar.setupTextFormatterToolbar(
+        editText = textEditor,
+        referenceTextView = null,
+        lifecycleOwner = viewLifecycleOwner,
+        fragmentManager = childFragmentManager,
+        onChooseImageClick = {
+          val bottomMenu = BottomMenu(context).apply {
+            setTitle(R.string.insert_image)
+            addItemWithIcon(
+              R.id.from_camera,
+              R.string.take_a_photo,
+              R.drawable.baseline_photo_camera_24,
+            )
+            addItemWithIcon(
+              R.id.from_gallery,
+              R.string.choose_from_gallery,
+              R.drawable.baseline_image_24,
+            )
+            addItemWithIcon(
+              R.id.from_camera_with_editor,
+              R.string.take_a_photo_with_editor,
+              R.drawable.baseline_photo_camera_24,
+            )
+            addItemWithIcon(
+              R.id.from_gallery_with_editor,
+              R.string.choose_from_gallery_with_editor,
+              R.drawable.baseline_image_24,
             )
 
-            textFormatToolbar.setupTextFormatterToolbar(
-                editText = textEditor,
-                referenceTextView = null,
-                lifecycleOwner = viewLifecycleOwner,
-                fragmentManager = childFragmentManager,
-                onChooseImageClick = {
-                    val bottomMenu = BottomMenu(context).apply {
-                        setTitle(R.string.insert_image)
-                        addItemWithIcon(
-                            R.id.from_camera,
-                            R.string.take_a_photo,
-                            R.drawable.baseline_photo_camera_24,
-                        )
-                        addItemWithIcon(
-                            R.id.from_gallery,
-                            R.string.choose_from_gallery,
-                            R.drawable.baseline_image_24,
-                        )
-                        addItemWithIcon(
-                            R.id.from_camera_with_editor,
-                            R.string.take_a_photo_with_editor,
-                            R.drawable.baseline_photo_camera_24,
-                        )
-                        addItemWithIcon(
-                            R.id.from_gallery_with_editor,
-                            R.string.choose_from_gallery_with_editor,
-                            R.drawable.baseline_image_24,
-                        )
-
-                        setOnMenuItemClickListener {
-                            when (it.id) {
-                                R.id.from_camera -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .cameraOnly()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.from_gallery -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .galleryOnly()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.from_camera_with_editor -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .cameraOnly()
-                                        .crop()
-                                        .cropFreeStyle()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                                R.id.from_gallery_with_editor -> {
-                                    val intent = ImagePicker.with(requireActivity())
-                                        .galleryOnly()
-                                        .crop()
-                                        .cropFreeStyle()
-                                        .createIntent()
-                                    launcher.launch(intent)
-                                }
-                            }
-                        }
-                    }
-
-                    bottomMenu.show(
-                        bottomMenuContainer = requireMainActivity(),
-                        bottomSheetContainer = binding.root,
-                        expandFully = true,
-                        handleBackPress = true,
-                        handleInsets = false,
-                        onBackPressedDispatcher = onBackPressedDispatcher,
-                    )
-                },
-                onPreviewClick = {
-                    PreviewCommentDialogFragment()
-                        .apply {
-                            arguments = PreviewCommentDialogFragmentArgs(
-                                viewModel.instance,
-                                textEditor.text.toString(),
-                            ).toBundle()
-                        }
-                        .showAllowingStateLoss(childFragmentManager, "AA")
-                },
-                onAddLinkClick = {
-                    AddLinkDialogFragment.show(
-                        binding.textEditor.getSelectedText(),
-                        childFragmentManager,
-                    )
-                },
-            )
-
-            viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        loadingView.hideAll()
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(
-                                getString(
-                                    R.string.error_unable_to_send_post,
-                                    it.error::class.qualifiedName,
-                                    it.error.message,
-                                ),
-                            )
-                            .createAndShow(childFragmentManager, "ASDS")
-                    }
-                    is StatefulData.Loading -> {
-                        loadingView.showProgressBar()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        loadingView.hideAll()
-                        viewModel.uploadImageEvent.clear()
-
-                        textFormatToolbar.onImageUploaded(it.data.url)
-                    }
+            setOnMenuItemClickListener {
+              when (it.id) {
+                R.id.from_camera -> {
+                  val intent = ImagePicker.with(requireActivity())
+                    .cameraOnly()
+                    .createIntent()
+                  launcher.launch(intent)
                 }
+                R.id.from_gallery -> {
+                  val intent = ImagePicker.with(requireActivity())
+                    .galleryOnly()
+                    .createIntent()
+                  launcher.launch(intent)
+                }
+                R.id.from_camera_with_editor -> {
+                  val intent = ImagePicker.with(requireActivity())
+                    .cameraOnly()
+                    .crop()
+                    .cropFreeStyle()
+                    .createIntent()
+                  launcher.launch(intent)
+                }
+                R.id.from_gallery_with_editor -> {
+                  val intent = ImagePicker.with(requireActivity())
+                    .galleryOnly()
+                    .crop()
+                    .cropFreeStyle()
+                    .createIntent()
+                  launcher.launch(intent)
+                }
+              }
             }
+          }
 
-            positiveButton.setOnClickListener {
-                dismiss()
-                (parentFragment as SettingValueUpdateCallback).updateValue(
-                    requireArguments().getInt(ARG_KEY_ID),
-                    textEditor.text?.toString(),
-                )
+          bottomMenu.show(
+            bottomMenuContainer = requireMainActivity(),
+            bottomSheetContainer = binding.root,
+            expandFully = true,
+            handleBackPress = true,
+            handleInsets = false,
+            onBackPressedDispatcher = onBackPressedDispatcher,
+          )
+        },
+        onPreviewClick = {
+          PreviewCommentDialogFragment()
+            .apply {
+              arguments = PreviewCommentDialogFragmentArgs(
+                viewModel.instance,
+                textEditor.text.toString(),
+              ).toBundle()
             }
-            negativeButton.setOnClickListener {
-                dismiss()
-            }
+            .showAllowingStateLoss(childFragmentManager, "AA")
+        },
+        onAddLinkClick = {
+          AddLinkDialogFragment.show(
+            binding.textEditor.getSelectedText(),
+            childFragmentManager,
+          )
+        },
+      )
+
+      viewModel.uploadImageEvent.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            loadingView.hideAll()
+            OldAlertDialogFragment.Builder()
+              .setMessage(
+                getString(
+                  R.string.error_unable_to_send_post,
+                  it.error::class.qualifiedName,
+                  it.error.message,
+                ),
+              )
+              .createAndShow(childFragmentManager, "ASDS")
+          }
+          is StatefulData.Loading -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            loadingView.hideAll()
+            viewModel.uploadImageEvent.clear()
+
+            textFormatToolbar.onImageUploaded(it.data.url)
+          }
         }
+      }
+
+      positiveButton.setOnClickListener {
+        dismiss()
+        (parentFragment as SettingValueUpdateCallback).updateValue(
+          requireArguments().getInt(ARG_KEY_ID),
+          textEditor.text?.toString(),
+        )
+      }
+      negativeButton.setOnClickListener {
+        dismiss()
+      }
     }
+  }
 }

@@ -11,60 +11,60 @@ import android.graphics.drawable.Drawable
 import com.idunnololz.summit.util.Utils
 
 class SeekBarBackgroundDrawable(private val drawable: Drawable) : Drawable() {
-    private val height: Float = Utils.convertDpToPixel(16f)
-    private val horizontalMargin = Utils.convertDpToPixel(8f)
-    private val paint: Paint = Paint()
-    private var path: Path = Path()
-    private var bitmap: Bitmap? = null
+  private val height: Float = Utils.convertDpToPixel(16f)
+  private val horizontalMargin = Utils.convertDpToPixel(8f)
+  private val paint: Paint = Paint()
+  private var path: Path = Path()
+  private var bitmap: Bitmap? = null
 
-    override fun draw(canvas: Canvas) {
-        canvas.save()
-        canvas.clipPath(path)
+  override fun draw(canvas: Canvas) {
+    canvas.save()
+    canvas.clipPath(path)
 
-        val bitmap = bitmap
-        if (bitmap != null) {
-            canvas.drawBitmap(bitmap, horizontalMargin, 0f, paint)
-        }
-
-        canvas.restore()
+    val bitmap = bitmap
+    if (bitmap != null) {
+      canvas.drawBitmap(bitmap, horizontalMargin, 0f, paint)
     }
 
-    override fun setAlpha(alpha: Int) {
-        paint.alpha = alpha
-    }
+    canvas.restore()
+  }
 
-    override fun setColorFilter(colorFilter: ColorFilter?) {
-    }
+  override fun setAlpha(alpha: Int) {
+    paint.alpha = alpha
+  }
 
-    override fun getOpacity(): Int {
-        return PixelFormat.TRANSPARENT
-    }
+  override fun setColorFilter(colorFilter: ColorFilter?) {
+  }
 
-    override fun onBoundsChange(bounds: Rect) {
-        super.onBoundsChange(bounds)
+  override fun getOpacity(): Int {
+    return PixelFormat.TRANSPARENT
+  }
 
-        val cornerRadius = Utils.convertDpToPixel(bounds.height().toFloat())
+  override fun onBoundsChange(bounds: Rect) {
+    super.onBoundsChange(bounds)
 
-        path.reset()
-        path.addRoundRect(
-            bounds.left.toFloat() + horizontalMargin,
-            (bounds.centerY() - height / 2),
-            bounds.right.toFloat() - horizontalMargin,
-            (bounds.centerY() + height / 2),
-            cornerRadius,
-            cornerRadius,
-            Path.Direction.CW,
-        )
-        path.close()
+    val cornerRadius = Utils.convertDpToPixel(bounds.height().toFloat())
 
-        val bitmap = Bitmap.createBitmap(
-            (bounds.width() - horizontalMargin * 2).toInt(),
-            bounds.height(),
-            Bitmap.Config.RGB_565,
-        )
-        drawable.setBounds(0, 0, bounds.width(), bounds.height())
-        drawable.draw(Canvas(bitmap))
+    path.reset()
+    path.addRoundRect(
+      bounds.left.toFloat() + horizontalMargin,
+      (bounds.centerY() - height / 2),
+      bounds.right.toFloat() - horizontalMargin,
+      (bounds.centerY() + height / 2),
+      cornerRadius,
+      cornerRadius,
+      Path.Direction.CW,
+    )
+    path.close()
 
-        this.bitmap = bitmap
-    }
+    val bitmap = Bitmap.createBitmap(
+      (bounds.width() - horizontalMargin * 2).toInt(),
+      bounds.height(),
+      Bitmap.Config.RGB_565,
+    )
+    drawable.setBounds(0, 0, bounds.width(), bounds.height())
+    drawable.draw(Canvas(bitmap))
+
+    this.bitmap = bitmap
+  }
 }

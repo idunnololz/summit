@@ -10,35 +10,35 @@ import javax.inject.Singleton
 
 @Singleton
 class SettingsBackupManager @Inject constructor(
-    directoryHelper: DirectoryHelper,
+  directoryHelper: DirectoryHelper,
 ) {
 
-    private val settingBackupsDir: File = directoryHelper.settingBackupsDir
+  private val settingBackupsDir: File = directoryHelper.settingBackupsDir
 
-    fun saveBackup(backup: String, backupName: String = "settings_backup_%datetime%"): File {
-        val currentDateTimeString = ZonedDateTime.now(ZoneOffset.UTC)
-            .format(DateTimeFormatter.ISO_INSTANT)
-        val fileName = backupName.replace("%datetime%", currentDateTimeString)
-        val backupFile = File(settingBackupsDir, fileName)
+  fun saveBackup(backup: String, backupName: String = "settings_backup_%datetime%"): File {
+    val currentDateTimeString = ZonedDateTime.now(ZoneOffset.UTC)
+      .format(DateTimeFormatter.ISO_INSTANT)
+    val fileName = backupName.replace("%datetime%", currentDateTimeString)
+    val backupFile = File(settingBackupsDir, fileName)
 
-        settingBackupsDir.mkdirs()
+    settingBackupsDir.mkdirs()
 
-        backupFile.outputStream().use {
-            it.write(backup.encodeToByteArray())
-        }
-
-        return backupFile
+    backupFile.outputStream().use {
+      it.write(backup.encodeToByteArray())
     }
 
-    fun getBackups(): List<BackupInfo> = settingBackupsDir.listFiles()?.map {
-        BackupInfo(it)
-    } ?: listOf()
+    return backupFile
+  }
 
-    fun deleteBackup(backupInfo: BackupInfo) {
-        backupInfo.file.delete()
-    }
+  fun getBackups(): List<BackupInfo> = settingBackupsDir.listFiles()?.map {
+    BackupInfo(it)
+  } ?: listOf()
 
-    data class BackupInfo(
-        val file: File,
-    )
+  fun deleteBackup(backupInfo: BackupInfo) {
+    backupInfo.file.delete()
+  }
+
+  data class BackupInfo(
+    val file: File,
+  )
 }

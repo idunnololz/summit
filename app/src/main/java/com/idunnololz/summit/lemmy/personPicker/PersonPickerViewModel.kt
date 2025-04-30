@@ -16,47 +16,47 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PersonPickerViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
+  private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
-    data class PersonSearchResults(
-        val people: List<PersonView>,
-        val query: String,
-    )
+  data class PersonSearchResults(
+    val people: List<PersonView>,
+    val query: String,
+  )
 
-    val instance: String
-        get() = apiClient.instance
-    val searchResults = StatefulLiveData<PersonSearchResults>()
-    val personName = MutableLiveData<String>()
+  val instance: String
+    get() = apiClient.instance
+  val searchResults = StatefulLiveData<PersonSearchResults>()
+  val personName = MutableLiveData<String>()
 
-    private var searchJob: Job? = null
+  private var searchJob: Job? = null
 
-    fun doQuery(query: String) {
-        searchResults.setIsLoading()
+  fun doQuery(query: String) {
+    searchResults.setIsLoading()
 
-        if (query.isBlank()) {
-            searchResults.setValue(PersonSearchResults(listOf(), query))
-            return
+    if (query.isBlank()) {
+      searchResults.setValue(PersonSearchResults(listOf(), query))
+      return
+    }
+
+    searchJob?.cancel()
+    searchJob = viewModelScope.launch {
+      apiClient
+        .searchWithRetry(
+          sortType = SortType.Active,
+          listingType = ListingType.All,
+          searchType = SearchType.Users,
+          query = query,
+          limit = 20,
+        )
+        .onSuccess {
+          searchResults.setValue(
+            PersonSearchResults(it.users, query),
+          )
         }
-
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            apiClient
-                .searchWithRetry(
-                    sortType = SortType.Active,
-                    listingType = ListingType.All,
-                    searchType = SearchType.Users,
-                    query = query,
-                    limit = 20,
-                )
-                .onSuccess {
-                    searchResults.setValue(
-                        PersonSearchResults(it.users, query),
-                    )
-                }
-                .onFailure {
-                    searchResults.setError(it)
-                }
+        .onFailure {
+          searchResults.setError(it)
         }
     }
+  }
 }

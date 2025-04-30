@@ -27,386 +27,386 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class ConversationsManager @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val accountManager: AccountManager,
-    private val conversationEntriesDao: ConversationEntriesDao,
-    private val stateStorageManager: StateStorageManager,
-    private val draftsManager: DraftsManager,
+  private val apiClient: AccountAwareLemmyClient,
+  private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val accountManager: AccountManager,
+  private val conversationEntriesDao: ConversationEntriesDao,
+  private val stateStorageManager: StateStorageManager,
+  private val draftsManager: DraftsManager,
 ) {
 
-    companion object {
-        private const val TAG = "ConversationsManager"
+  companion object {
+    private const val TAG = "ConversationsManager"
 
-        private const val PAGE_SIZE = 50
+    private const val PAGE_SIZE = 50
 
-        /**
-         * When loading conversations, the maximum number of messages to fetch. Any messages above
-         * this limit will not be fetched.
-         */
-        const val CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT = 1000
-    }
+    /**
+     * When loading conversations, the maximum number of messages to fetch. Any messages above
+     * this limit will not be fetched.
+     */
+    const val CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT = 1000
+  }
 
-    private val coroutineScope = coroutineScopeFactory.create()
-    val conversationsFlow = MutableStateFlow(ConversationsModel(isLoaded = false))
+  private val coroutineScope = coroutineScopeFactory.create()
+  val conversationsFlow = MutableStateFlow(ConversationsModel(isLoaded = false))
 
-    private val pageSize = PAGE_SIZE
+  private val pageSize = PAGE_SIZE
 
-    private var stateStorage: AccountStateStorage? = null
-    private var conversationsByPersonId = mutableMapOf<PersonId, Conversation>()
-    private var draftsByPersonId = mapOf<PersonId, DbMessageDraft>()
-    private var currentAccount: Account? = null
-    private var conversationsLoadedFromDb: Boolean = false
-    private var conversationEarliestMessageTs: Long? = null
+  private var stateStorage: AccountStateStorage? = null
+  private var conversationsByPersonId = mutableMapOf<PersonId, Conversation>()
+  private var draftsByPersonId = mapOf<PersonId, DbMessageDraft>()
+  private var currentAccount: Account? = null
+  private var conversationsLoadedFromDb: Boolean = false
+  private var conversationEarliestMessageTs: Long? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val conversationContext = Dispatchers.Default.limitedParallelism(1)
+  @OptIn(ExperimentalCoroutinesApi::class)
+  private val conversationContext = Dispatchers.Default.limitedParallelism(1)
 
-    fun init() {
-        currentAccount = accountManager.currentAccount.asAccount
-        setupForAccount()
+  fun init() {
+    currentAccount = accountManager.currentAccount.asAccount
+    setupForAccount()
 
-        if (BuildConfig.DEBUG) {
+    if (BuildConfig.DEBUG) {
 //            runBlocking {
 //                conversationEntriesDao.deleteAll()
 //            }
 //            stateStorage?.lastConversationRefreshTs = 0
 
-            stateStorage?.conversationEarliestMessageTs = null
-        }
-
-        accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
-            override suspend fun onAccountChanged(newAccount: Account?) {
-                invalidate()
-                currentAccount = newAccount
-                setupForAccount()
-            }
-
-            override suspend fun onAccountSigningOut(account: Account) {
-                conversationEntriesDao.deleteConversationsForAccount(account.stableId)
-            }
-        })
+      stateStorage?.conversationEarliestMessageTs = null
     }
 
-    suspend fun refreshConversations(senderId: Long? = null): Result<ConversationsModel> {
-        loadConversationsFromDbIfNeeded()
+    accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
+      override suspend fun onAccountChanged(newAccount: Account?) {
+        invalidate()
+        currentAccount = newAccount
+        setupForAccount()
+      }
 
-        val refreshTime = System.currentTimeMillis()
-        val stateStorage = stateStorage
-            ?: return Result.failure(RuntimeException("stateStorage is null!"))
-        val lastConversationRefreshTs = stateStorage.lastConversationRefreshTs
-        val earliestConversationRefreshTs = stateStorage.conversationEarliestMessageTs
+      override suspend fun onAccountSigningOut(account: Account) {
+        conversationEntriesDao.deleteConversationsForAccount(account.stableId)
+      }
+    })
+  }
 
-        val allMessages = mutableListOf<InboxItem.MessageInboxItem>()
-        var oldestMessageTs = System.currentTimeMillis()
+  suspend fun refreshConversations(senderId: Long? = null): Result<ConversationsModel> {
+    loadConversationsFromDbIfNeeded()
 
-        var page = 1
-        var messagesLoaded = 0
-        var earliestMessage: InboxItem.MessageInboxItem? = null
-        var messageLimitTriggered = false
+    val refreshTime = System.currentTimeMillis()
+    val stateStorage = stateStorage
+      ?: return Result.failure(RuntimeException("stateStorage is null!"))
+    val lastConversationRefreshTs = stateStorage.lastConversationRefreshTs
+    val earliestConversationRefreshTs = stateStorage.conversationEarliestMessageTs
 
-        while (true) {
-            val result = apiClient.fetchPrivateMessages(
-                page = page,
-                limit = pageSize,
-                senderId = senderId,
-                unreadOnly = false,
-                force = true,
-            ).fold(
-                onSuccess = {
-                    Result.success(
-                        it.map { InboxItem.MessageInboxItem(it) },
-                    )
-                },
-                onFailure = {
-                    Result.failure(it)
-                },
-            )
+    val allMessages = mutableListOf<InboxItem.MessageInboxItem>()
+    var oldestMessageTs = System.currentTimeMillis()
 
-            result.exceptionOrNull()?.let {
-                return Result.failure(it)
-            }
+    var page = 1
+    var messagesLoaded = 0
+    var earliestMessage: InboxItem.MessageInboxItem? = null
+    var messageLimitTriggered = false
 
-            val messagesResult = result.getOrThrow()
-            val hasMore = messagesResult.size >= pageSize
+    while (true) {
+      val result = apiClient.fetchPrivateMessages(
+        page = page,
+        limit = pageSize,
+        senderId = senderId,
+        unreadOnly = false,
+        force = true,
+      ).fold(
+        onSuccess = {
+          Result.success(
+            it.map { InboxItem.MessageInboxItem(it) },
+          )
+        },
+        onFailure = {
+          Result.failure(it)
+        },
+      )
 
-            for (message in messagesResult) {
-                allMessages.add(message)
+      result.exceptionOrNull()?.let {
+        return Result.failure(it)
+      }
 
-                oldestMessageTs = min(message.lastUpdateTs, oldestMessageTs)
+      val messagesResult = result.getOrThrow()
+      val hasMore = messagesResult.size >= pageSize
 
-                if (earliestMessage == null) {
-                    earliestMessage = message
-                } else if (earliestMessage.lastUpdateTs > message.lastUpdateTs) {
-                    earliestMessage = message
-                }
-            }
+      for (message in messagesResult) {
+        allMessages.add(message)
 
-            messagesLoaded += messagesResult.size
+        oldestMessageTs = min(message.lastUpdateTs, oldestMessageTs)
 
-            if (oldestMessageTs <= lastConversationRefreshTs || !hasMore) {
-                break
-            }
-
-            if (messagesLoaded >= CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT) {
-                messageLimitTriggered = true
-                break
-            }
-
-            page++
+        if (earliestMessage == null) {
+          earliestMessage = message
+        } else if (earliestMessage.lastUpdateTs > message.lastUpdateTs) {
+          earliestMessage = message
         }
+      }
 
-        Log.d(
-            TAG,
-            "lastConversationRefreshTs: $lastConversationRefreshTs " +
-                "earliestMessageTs: ${earliestMessage?.lastUpdateTs} " +
-                "messagesLoaded: $messagesLoaded " +
-                "messageLimitTriggered: $messageLimitTriggered",
-        )
+      messagesLoaded += messagesResult.size
 
-        withContext(conversationContext) {
-            allMessages.forEach {
-                processMessage(it)
-            }
+      if (oldestMessageTs <= lastConversationRefreshTs || !hasMore) {
+        break
+      }
 
-            commitToDb()
-        }
+      if (messagesLoaded >= CONVERSATION_MAX_MESSAGE_REFRESH_LIMIT) {
+        messageLimitTriggered = true
+        break
+      }
 
-        stateStorage.lastConversationRefreshTs = refreshTime
-
-        if (messageLimitTriggered && earliestMessage != null) {
-            stateStorage.conversationEarliestMessageTs = earliestMessage.lastUpdateTs
-        }
-
-        if (stateStorage.conversationEarliestMessageTs == 0L) {
-            conversationEarliestMessageTs = null
-        } else {
-            conversationEarliestMessageTs = stateStorage.conversationEarliestMessageTs
-        }
-
-        loadDrafts()
-
-        publishModel()
-
-        return Result.success(conversationsFlow.value)
+      page++
     }
 
-    suspend fun updateConversation(otherPersonId: Long) {
-        refreshConversations(senderId = otherPersonId)
+    Log.d(
+      TAG,
+      "lastConversationRefreshTs: $lastConversationRefreshTs " +
+        "earliestMessageTs: ${earliestMessage?.lastUpdateTs} " +
+        "messagesLoaded: $messagesLoaded " +
+        "messageLimitTriggered: $messageLimitTriggered",
+    )
+
+    withContext(conversationContext) {
+      allMessages.forEach {
+        processMessage(it)
+      }
+
+      commitToDb()
     }
 
-    fun saveDraftAsync(otherPersonId: Long, draftContent: String?) {
-        coroutineScope.launch {
-            saveDraft(otherPersonId, draftContent)
-        }
+    stateStorage.lastConversationRefreshTs = refreshTime
+
+    if (messageLimitTriggered && earliestMessage != null) {
+      stateStorage.conversationEarliestMessageTs = earliestMessage.lastUpdateTs
     }
 
-    suspend fun saveDraft(otherPersonId: Long, draftContent: String?) {
-        loadConversationsFromDbIfNeeded()
-
-        val currentAccount = currentAccount
-            ?: return
-        val conversation = conversationsByPersonId[otherPersonId]
-            ?: return
-
-        val existingDraft = draftsByPersonId[conversation.personId]
-        var didDbChange = false
-
-        if (draftContent.isNullOrBlank()) {
-            existingDraft?.entryId?.let {
-                draftsManager.deleteDraftWithId(it)
-                didDbChange = true
-            }
-        } else {
-            val draftData = DraftData.MessageDraftData(
-                targetAccountId = conversation.personId,
-                targetInstance = conversation.personInstance,
-                content = draftContent,
-                accountId = currentAccount.id,
-                accountInstance = currentAccount.instance,
-            )
-
-            draftsManager.updateDraft(
-                entryId = existingDraft?.entryId ?: 0L,
-                draftData = draftData,
-                showToast = false,
-            )
-            didDbChange = true
-        }
-
-        if (didDbChange) {
-            loadDrafts()
-
-            publishModel()
-        }
+    if (stateStorage.conversationEarliestMessageTs == 0L) {
+      conversationEarliestMessageTs = null
+    } else {
+      conversationEarliestMessageTs = stateStorage.conversationEarliestMessageTs
     }
 
-    suspend fun getDraft(otherPersonId: Long): DraftData.MessageDraftData? {
-        loadConversationsFromDbIfNeeded()
+    loadDrafts()
 
-        val conversation = conversationsByPersonId[otherPersonId]
-            ?: return null
+    publishModel()
 
-        val existingDraft = draftsByPersonId[conversation.personId]
+    return Result.success(conversationsFlow.value)
+  }
 
-        return existingDraft?.draftData
+  suspend fun updateConversation(otherPersonId: Long) {
+    refreshConversations(senderId = otherPersonId)
+  }
+
+  fun saveDraftAsync(otherPersonId: Long, draftContent: String?) {
+    coroutineScope.launch {
+      saveDraft(otherPersonId, draftContent)
+    }
+  }
+
+  suspend fun saveDraft(otherPersonId: Long, draftContent: String?) {
+    loadConversationsFromDbIfNeeded()
+
+    val currentAccount = currentAccount
+      ?: return
+    val conversation = conversationsByPersonId[otherPersonId]
+      ?: return
+
+    val existingDraft = draftsByPersonId[conversation.personId]
+    var didDbChange = false
+
+    if (draftContent.isNullOrBlank()) {
+      existingDraft?.entryId?.let {
+        draftsManager.deleteDraftWithId(it)
+        didDbChange = true
+      }
+    } else {
+      val draftData = DraftData.MessageDraftData(
+        targetAccountId = conversation.personId,
+        targetInstance = conversation.personInstance,
+        content = draftContent,
+        accountId = currentAccount.id,
+        accountInstance = currentAccount.instance,
+      )
+
+      draftsManager.updateDraft(
+        entryId = existingDraft?.entryId ?: 0L,
+        draftData = draftData,
+        showToast = false,
+      )
+      didDbChange = true
     }
 
-    private fun publishModel() {
-        val conversationsModel = ConversationsModel(
-            conversations = conversationsByPersonId.values.toList().sortedByDescending { it.ts },
-            drafts = draftsByPersonId,
-            conversationEarliestMessageTs = conversationEarliestMessageTs,
-        )
-        conversationsFlow.value = conversationsModel
+    if (didDbChange) {
+      loadDrafts()
+
+      publishModel()
+    }
+  }
+
+  suspend fun getDraft(otherPersonId: Long): DraftData.MessageDraftData? {
+    loadConversationsFromDbIfNeeded()
+
+    val conversation = conversationsByPersonId[otherPersonId]
+      ?: return null
+
+    val existingDraft = draftsByPersonId[conversation.personId]
+
+    return existingDraft?.draftData
+  }
+
+  private fun publishModel() {
+    val conversationsModel = ConversationsModel(
+      conversations = conversationsByPersonId.values.toList().sortedByDescending { it.ts },
+      drafts = draftsByPersonId,
+      conversationEarliestMessageTs = conversationEarliestMessageTs,
+    )
+    conversationsFlow.value = conversationsModel
+  }
+
+  private fun processMessage(message: InboxItem.MessageInboxItem) {
+    val currentAccount = currentAccount ?: return
+
+    val isMessageAuthor = message.authorId == currentAccount.id
+    val otherPersonId = if (isMessageAuthor) {
+      message.targetAccountId
+    } else {
+      message.authorId
+    } ?: return
+    val otherPersonInstance = if (isMessageAuthor) {
+      message.targetInstance
+    } else {
+      message.authorInstance
+    } ?: return
+    val otherPersonName = if (isMessageAuthor) {
+      message.targetUserName
+    } else {
+      message.authorName
     }
 
-    private fun processMessage(message: InboxItem.MessageInboxItem) {
-        val currentAccount = currentAccount ?: return
+    val existingConversation = conversationsByPersonId[otherPersonId]
 
-        val isMessageAuthor = message.authorId == currentAccount.id
-        val otherPersonId = if (isMessageAuthor) {
-            message.targetAccountId
-        } else {
-            message.authorId
-        } ?: return
-        val otherPersonInstance = if (isMessageAuthor) {
-            message.targetInstance
-        } else {
-            message.authorInstance
-        } ?: return
-        val otherPersonName = if (isMessageAuthor) {
-            message.targetUserName
-        } else {
-            message.authorName
-        }
+    val iconUrl = if (isMessageAuthor) {
+      message.targetAccountAvatar
+    } else {
+      message.authorAvatar
+    }
+    val isRead = message.isRead || isMessageAuthor
+    val messageId = message.id.toLong()
 
-        val existingConversation = conversationsByPersonId[otherPersonId]
+    if (existingConversation == null) {
+      conversationsByPersonId[otherPersonId] = Conversation(
+        id = 0,
+        ts = message.lastUpdateTs,
+        content = message.content,
+        iconUrl = iconUrl,
+        accountStableId = currentAccount.stableId,
+        personId = otherPersonId,
+        personInstance = otherPersonInstance,
+        personName = otherPersonName,
+        isRead = isRead,
+        mostRecentMessageId = messageId,
+      )
+    } else if (existingConversation.mostRecentMessageId == messageId) {
+      conversationsByPersonId[existingConversation.personId] = existingConversation.copy(
+        ts = message.lastUpdateTs,
+        content = message.content,
+        iconUrl = iconUrl,
+        isRead = isRead,
+        mostRecentMessageId = messageId,
+      )
+    } else {
+      if (existingConversation.ts > message.lastUpdateTs) {
+        return
+      }
 
-        val iconUrl = if (isMessageAuthor) {
-            message.targetAccountAvatar
-        } else {
-            message.authorAvatar
-        }
-        val isRead = message.isRead || isMessageAuthor
-        val messageId = message.id.toLong()
+      conversationsByPersonId[existingConversation.personId] = existingConversation.copy(
+        ts = message.lastUpdateTs,
+        content = message.content,
+        iconUrl = iconUrl,
+        isRead = isRead,
+        mostRecentMessageId = messageId,
+      )
+    }
+  }
 
-        if (existingConversation == null) {
-            conversationsByPersonId[otherPersonId] = Conversation(
-                id = 0,
-                ts = message.lastUpdateTs,
-                content = message.content,
-                iconUrl = iconUrl,
-                accountStableId = currentAccount.stableId,
-                personId = otherPersonId,
-                personInstance = otherPersonInstance,
-                personName = otherPersonName,
-                isRead = isRead,
-                mostRecentMessageId = messageId,
-            )
-        } else if (existingConversation.mostRecentMessageId == messageId) {
-            conversationsByPersonId[existingConversation.personId] = existingConversation.copy(
-                ts = message.lastUpdateTs,
-                content = message.content,
-                iconUrl = iconUrl,
-                isRead = isRead,
-                mostRecentMessageId = messageId,
-            )
-        } else {
-            if (existingConversation.ts > message.lastUpdateTs) {
-                return
-            }
+  private fun invalidate() {
+    coroutineScope.launch(conversationContext) {
+      conversationsByPersonId = mutableMapOf()
+      draftsByPersonId = mapOf()
+      conversationsLoadedFromDb = false
+      conversationEarliestMessageTs = null
+      publishModel()
+    }
+  }
 
-            conversationsByPersonId[existingConversation.personId] = existingConversation.copy(
-                ts = message.lastUpdateTs,
-                content = message.content,
-                iconUrl = iconUrl,
-                isRead = isRead,
-                mostRecentMessageId = messageId,
-            )
-        }
+  private suspend fun loadConversationsFromDbIfNeeded() {
+    if (conversationsLoadedFromDb) {
+      return
     }
 
-    private fun invalidate() {
-        coroutineScope.launch(conversationContext) {
-            conversationsByPersonId = mutableMapOf()
-            draftsByPersonId = mapOf()
-            conversationsLoadedFromDb = false
-            conversationEarliestMessageTs = null
-            publishModel()
-        }
+    withContext(conversationContext) {
+      if (conversationsLoadedFromDb) {
+        return@withContext
+      }
+
+      val currentAccount = currentAccount ?: return@withContext
+
+      val entries = conversationEntriesDao.getAllEntriesForAccount(currentAccount.stableId)
+
+      for (entry in entries) {
+        conversationsByPersonId[entry.personId] = entry.toConversation()
+      }
+
+      loadDrafts()
+
+      conversationsLoadedFromDb = true
+    }
+  }
+
+  private suspend fun loadDrafts() {
+    val currentAccount = currentAccount ?: return
+
+    val allDrafts = draftsManager.getAllDraftsByType(
+      DraftTypes.Message,
+      currentAccount.id,
+      currentAccount.instance,
+    )
+    val sortedDrafts = allDrafts
+      .sortedBy { it.updatedTs }
+
+    val draftsByPersonId = mutableMapOf<PersonId, DbMessageDraft>()
+
+    for (draft in sortedDrafts) {
+      val messageDraftData = draft.data as? DraftData.MessageDraftData
+        ?: continue
+
+      draftsByPersonId[messageDraftData.targetAccountId] =
+        DbMessageDraft(draft.id, messageDraftData)
     }
 
-    private suspend fun loadConversationsFromDbIfNeeded() {
-        if (conversationsLoadedFromDb) {
-            return
-        }
+    this.draftsByPersonId = draftsByPersonId
+  }
 
-        withContext(conversationContext) {
-            if (conversationsLoadedFromDb) {
-                return@withContext
-            }
-
-            val currentAccount = currentAccount ?: return@withContext
-
-            val entries = conversationEntriesDao.getAllEntriesForAccount(currentAccount.stableId)
-
-            for (entry in entries) {
-                conversationsByPersonId[entry.personId] = entry.toConversation()
-            }
-
-            loadDrafts()
-
-            conversationsLoadedFromDb = true
-        }
+  private suspend fun commitToDb() {
+    if (!conversationsLoadedFromDb) {
+      return
     }
 
-    private suspend fun loadDrafts() {
-        val currentAccount = currentAccount ?: return
+    withContext(conversationContext) {
+      if (!conversationsLoadedFromDb) {
+        return@withContext
+      }
 
-        val allDrafts = draftsManager.getAllDraftsByType(
-            DraftTypes.Message,
-            currentAccount.id,
-            currentAccount.instance,
-        )
-        val sortedDrafts = allDrafts
-            .sortedBy { it.updatedTs }
-
-        val draftsByPersonId = mutableMapOf<PersonId, DbMessageDraft>()
-
-        for (draft in sortedDrafts) {
-            val messageDraftData = draft.data as? DraftData.MessageDraftData
-                ?: continue
-
-            draftsByPersonId[messageDraftData.targetAccountId] =
-                DbMessageDraft(draft.id, messageDraftData)
-        }
-
-        this.draftsByPersonId = draftsByPersonId
+      for (conversation in conversationsByPersonId.values) {
+        conversationEntriesDao.insertEntry(conversation.toEntry())
+      }
     }
+  }
 
-    private suspend fun commitToDb() {
-        if (!conversationsLoadedFromDb) {
-            return
-        }
+  private fun setupForAccount() {
+    val currentAccount = currentAccount
+      ?: return
 
-        withContext(conversationContext) {
-            if (!conversationsLoadedFromDb) {
-                return@withContext
-            }
-
-            for (conversation in conversationsByPersonId.values) {
-                conversationEntriesDao.insertEntry(conversation.toEntry())
-            }
-        }
-    }
-
-    private fun setupForAccount() {
-        val currentAccount = currentAccount
-            ?: return
-
-        stateStorage = stateStorageManager.getAccountStateStorage(
-            currentAccount.id, currentAccount.instance,
-        )
-    }
+    stateStorage = stateStorageManager.getAccountStateStorage(
+      currentAccount.id, currentAccount.instance,
+    )
+  }
 }

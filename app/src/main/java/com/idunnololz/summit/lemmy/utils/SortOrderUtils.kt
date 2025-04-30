@@ -8,31 +8,31 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 
 fun getSortOrderForCommunity(
-    communityRef: CommunityRef?,
-    preferences: Preferences,
-    perCommunityPreferences: PerCommunityPreferences,
-    fullAccount: FullAccount?,
+  communityRef: CommunityRef?,
+  preferences: Preferences,
+  perCommunityPreferences: PerCommunityPreferences,
+  fullAccount: FullAccount?,
 ): CommunitySortOrder? {
-    if (communityRef != null) {
-        val config = perCommunityPreferences.getCommunityConfig(communityRef)
-        val sortOrder = config?.sortOrder
+  if (communityRef != null) {
+    val config = perCommunityPreferences.getCommunityConfig(communityRef)
+    val sortOrder = config?.sortOrder
 
-        if (sortOrder != null) {
-            return sortOrder
-        }
+    if (sortOrder != null) {
+      return sortOrder
     }
+  }
 
-    if (preferences.defaultCommunitySortOrder != null) {
-        return preferences.defaultCommunitySortOrder
-    }
+  if (preferences.defaultCommunitySortOrder != null) {
+    return preferences.defaultCommunitySortOrder
+  }
 
-    if (fullAccount != null) {
-        return fullAccount
-            .accountInfo
-            .miscAccountInfo
-            ?.defaultCommunitySortType
-            ?.toSortOrder()
-    }
+  if (fullAccount != null) {
+    return fullAccount
+      .accountInfo
+      .miscAccountInfo
+      ?.defaultCommunitySortType
+      ?.toSortOrder()
+  }
 
-    return null
+  return null
 }

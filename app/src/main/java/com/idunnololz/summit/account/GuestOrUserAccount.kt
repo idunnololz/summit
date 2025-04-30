@@ -1,9 +1,9 @@
 package com.idunnololz.summit.account
 
 sealed interface GuestOrUserAccount {
-    val instance: String
+  val instance: String
 }
 
 data class GuestAccount(
-    override val instance: String,
+  override val instance: String,
 ) : GuestOrUserAccount

@@ -5,6 +5,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PersonView(
-    val person: Person,
-    val counts: PersonAggregates,
+  val person: Person,
+  val counts: PersonAggregates,
 ) : Parcelable

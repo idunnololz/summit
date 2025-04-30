@@ -11,25 +11,25 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ManageInternalSettingsBackupsViewModel @Inject constructor(
-    private val settingsBackupManager: SettingsBackupManager,
+  private val settingsBackupManager: SettingsBackupManager,
 ) : ViewModel() {
 
-    val backupsInfo = StatefulLiveData<List<SettingsBackupManager.BackupInfo>>()
+  val backupsInfo = StatefulLiveData<List<SettingsBackupManager.BackupInfo>>()
 
-    init {
-        viewModelScope.launch {
-            loadBackupsData()
-        }
+  init {
+    viewModelScope.launch {
+      loadBackupsData()
     }
+  }
 
-    fun deleteBackup(backupInfo: SettingsBackupManager.BackupInfo) {
-        viewModelScope.launch {
-            settingsBackupManager.deleteBackup(backupInfo)
-            loadBackupsData()
-        }
+  fun deleteBackup(backupInfo: SettingsBackupManager.BackupInfo) {
+    viewModelScope.launch {
+      settingsBackupManager.deleteBackup(backupInfo)
+      loadBackupsData()
     }
+  }
 
-    private suspend fun loadBackupsData() = withContext(Dispatchers.Default) {
-        backupsInfo.postValue(settingsBackupManager.getBackups())
-    }
+  private suspend fun loadBackupsData() = withContext(Dispatchers.Default) {
+    backupsInfo.postValue(settingsBackupManager.getBackups())
+  }
 }

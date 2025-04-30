@@ -14,39 +14,39 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsPerAccountViewModel @Inject constructor(
-    private val accountManager: AccountManager,
-    private val preferenceManager: PreferenceManager,
+  private val accountManager: AccountManager,
+  private val preferenceManager: PreferenceManager,
 ) : ViewModel() {
 
-    val preferenceData = StatefulLiveData<PreferenceData>()
+  val preferenceData = StatefulLiveData<PreferenceData>()
 
-    fun loadAccount(accountId: Long) {
-        preferenceData.setIsLoading()
+  fun loadAccount(accountId: Long) {
+    preferenceData.setIsLoading()
 
-        viewModelScope.launch {
-            val account = if (accountId == 0L) {
-                accountManager.currentAccount.asAccount
-            } else {
-                accountManager.getAccountById(accountId)
-            }
+    viewModelScope.launch {
+      val account = if (accountId == 0L) {
+        accountManager.currentAccount.asAccount
+      } else {
+        accountManager.getAccountById(accountId)
+      }
 
-            if (account != null) {
-                preferenceData.setValue(
-                    PreferenceData(
-                        account,
-                        preferenceManager.getOnlyPreferencesForAccount(account),
-                    ),
-                )
-            } else {
-                this@SettingsPerAccountViewModel.preferenceData.setError(NoAccountError())
-            }
-        }
+      if (account != null) {
+        preferenceData.setValue(
+          PreferenceData(
+            account,
+            preferenceManager.getOnlyPreferencesForAccount(account),
+          ),
+        )
+      } else {
+        this@SettingsPerAccountViewModel.preferenceData.setError(NoAccountError())
+      }
     }
+  }
 
-    class NoAccountError : Exception()
+  class NoAccountError : Exception()
 
-    class PreferenceData(
-        val account: Account,
-        val preferences: Preferences,
-    )
+  class PreferenceData(
+    val account: Account,
+    val preferences: Preferences,
+  )
 }

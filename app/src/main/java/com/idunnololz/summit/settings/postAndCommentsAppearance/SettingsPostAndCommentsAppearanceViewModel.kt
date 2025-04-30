@@ -12,50 +12,50 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsPostAndCommentsAppearanceViewModel @Inject constructor(
-    val preferences: Preferences,
+  val preferences: Preferences,
 ) : ViewModel() {
 
-    var currentPostAndCommentUiConfig: PostAndCommentsUiConfig = preferences.postAndCommentsUiConfig
-        set(value) {
-            field = value
+  var currentPostAndCommentUiConfig: PostAndCommentsUiConfig = preferences.postAndCommentsUiConfig
+    set(value) {
+      field = value
 
-            viewModelScope.launch {
-                applyConfig()
-            }
-        }
-
-    val onPostUiChanged = MutableLiveData<Unit>()
-
-    fun onLayoutChanging() {
+      viewModelScope.launch {
         applyConfig()
+      }
     }
 
-    fun onLayoutChanged() {
-        currentPostAndCommentUiConfig = preferences.postAndCommentsUiConfig
-        onPostUiChanged.value = Unit
-    }
+  val onPostUiChanged = MutableLiveData<Unit>()
 
-    fun resetPostUiConfig() {
-        currentPostAndCommentUiConfig = currentPostAndCommentUiConfig.copy(
-            postUiConfig = getDefaultPostAndCommentsUiConfig().postUiConfig,
-        )
-        onPostUiChanged.value = Unit
-    }
+  fun onLayoutChanging() {
+    applyConfig()
+  }
 
-    fun resetCommentUiConfig() {
-        currentPostAndCommentUiConfig = currentPostAndCommentUiConfig.copy(
-            commentUiConfig = getDefaultPostAndCommentsUiConfig().commentUiConfig,
-        )
-        onPostUiChanged.value = Unit
-    }
+  fun onLayoutChanged() {
+    currentPostAndCommentUiConfig = preferences.postAndCommentsUiConfig
+    onPostUiChanged.value = Unit
+  }
 
-    private fun applyConfig() {
-        preferences.postAndCommentsUiConfig = currentPostAndCommentUiConfig
-    }
+  fun resetPostUiConfig() {
+    currentPostAndCommentUiConfig = currentPostAndCommentUiConfig.copy(
+      postUiConfig = getDefaultPostAndCommentsUiConfig().postUiConfig,
+    )
+    onPostUiChanged.value = Unit
+  }
 
-    override fun onCleared() {
-        applyConfig()
+  fun resetCommentUiConfig() {
+    currentPostAndCommentUiConfig = currentPostAndCommentUiConfig.copy(
+      commentUiConfig = getDefaultPostAndCommentsUiConfig().commentUiConfig,
+    )
+    onPostUiChanged.value = Unit
+  }
 
-        super.onCleared()
-    }
+  private fun applyConfig() {
+    preferences.postAndCommentsUiConfig = currentPostAndCommentUiConfig
+  }
+
+  override fun onCleared() {
+    applyConfig()
+
+    super.onCleared()
+  }
 }

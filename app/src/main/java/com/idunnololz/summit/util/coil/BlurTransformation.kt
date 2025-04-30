@@ -14,57 +14,57 @@ import coil3.transform.Transformation
 import com.idunnololz.summit.util.safeConfig
 
 class BlurTransformation @JvmOverloads constructor(
-    private val context: Context,
-    private val radius: Float = DEFAULT_RADIUS,
-    private val sampling: Float = DEFAULT_SAMPLING,
+  private val context: Context,
+  private val radius: Float = DEFAULT_RADIUS,
+  private val sampling: Float = DEFAULT_SAMPLING,
 ) : Transformation() {
 
-    init {
-        require(radius in 0.0..25.0) { "radius must be in [0, 25]." }
-        require(sampling > 0) { "sampling must be > 0." }
+  init {
+    require(radius in 0.0..25.0) { "radius must be in [0, 25]." }
+    require(sampling > 0) { "sampling must be > 0." }
+  }
+
+  @Suppress("NullableToStringCall")
+  override val cacheKey = "${BlurTransformation::class.java.name}-$radius-$sampling"
+
+  override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+
+    val scaledWidth = (input.width / sampling).toInt()
+    val scaledHeight = (input.height / sampling).toInt()
+    val output = createBitmap(scaledWidth, scaledHeight, input.safeConfig)
+    output.applyCanvas {
+      scale(1 / sampling, 1 / sampling)
+      drawBitmap(input, 0f, 0f, paint)
     }
 
-    @Suppress("NullableToStringCall")
-    override val cacheKey = "${BlurTransformation::class.java.name}-$radius-$sampling"
-
-    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
-
-        val scaledWidth = (input.width / sampling).toInt()
-        val scaledHeight = (input.height / sampling).toInt()
-        val output = createBitmap(scaledWidth, scaledHeight, input.safeConfig)
-        output.applyCanvas {
-            scale(1 / sampling, 1 / sampling)
-            drawBitmap(input, 0f, 0f, paint)
-        }
-
-        var script: RenderScript? = null
-        var tmpInt: Allocation? = null
-        var tmpOut: Allocation? = null
-        var blur: ScriptIntrinsicBlur? = null
-        try {
-            script = RenderScript.create(context)
-            tmpInt = Allocation.createFromBitmap(script, output, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT)
-            tmpOut = Allocation.createTyped(script, tmpInt.type)
-            blur = ScriptIntrinsicBlur.create(script, Element.U8_4(script))
-            blur.setRadius(radius)
-            blur.setInput(tmpInt)
-            blur.forEach(tmpOut)
-            tmpOut.copyTo(output)
-        } finally {
-            script?.destroy()
-            tmpInt?.destroy()
-            tmpOut?.destroy()
-            blur?.destroy()
-        }
-
-        val originalSizeOutput = Bitmap.createScaledBitmap(output, input.width, input.height, true)
-
-        return originalSizeOutput
+    var script: RenderScript? = null
+    var tmpInt: Allocation? = null
+    var tmpOut: Allocation? = null
+    var blur: ScriptIntrinsicBlur? = null
+    try {
+      script = RenderScript.create(context)
+      tmpInt = Allocation.createFromBitmap(script, output, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT)
+      tmpOut = Allocation.createTyped(script, tmpInt.type)
+      blur = ScriptIntrinsicBlur.create(script, Element.U8_4(script))
+      blur.setRadius(radius)
+      blur.setInput(tmpInt)
+      blur.forEach(tmpOut)
+      tmpOut.copyTo(output)
+    } finally {
+      script?.destroy()
+      tmpInt?.destroy()
+      tmpOut?.destroy()
+      blur?.destroy()
     }
 
-    private companion object {
-        private const val DEFAULT_RADIUS = 10f
-        private const val DEFAULT_SAMPLING = 1f
-    }
+    val originalSizeOutput = Bitmap.createScaledBitmap(output, input.width, input.height, true)
+
+    return originalSizeOutput
+  }
+
+  private companion object {
+    private const val DEFAULT_RADIUS = 10f
+    private const val DEFAULT_SAMPLING = 1f
+  }
 }

@@ -35,285 +35,285 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SlidingPaneController(
-    private val fragment: BaseFragment<*>,
-    private val slidingPaneLayout: FixedSlidingPaneLayout,
-    private val childFragmentManager: FragmentManager,
-    private val viewModel: PostViewPagerViewModel,
-    private val globalLayoutMode: GlobalLayoutMode,
-    /**
-     * Used for tablets. The message is shown on the side pane when nothing is selected.
-     */
-    private val emptyScreenText: String,
-    @IdRes private val fragmentContainerId: Int,
-    val lockPanes: Boolean = false,
-    private val retainClosedPosts: Boolean = false,
-    private val useSwipeBetweenPosts: Boolean = false,
-    private val isPreview: Boolean = false,
+  private val fragment: BaseFragment<*>,
+  private val slidingPaneLayout: FixedSlidingPaneLayout,
+  private val childFragmentManager: FragmentManager,
+  private val viewModel: PostViewPagerViewModel,
+  private val globalLayoutMode: GlobalLayoutMode,
+  /**
+   * Used for tablets. The message is shown on the side pane when nothing is selected.
+   */
+  private val emptyScreenText: String,
+  @IdRes private val fragmentContainerId: Int,
+  val lockPanes: Boolean = false,
+  private val retainClosedPosts: Boolean = false,
+  private val useSwipeBetweenPosts: Boolean = false,
+  private val isPreview: Boolean = false,
 ) {
 
-    interface PostViewPagerViewModel {
-        var lastSelectedItem: Either<PostRef, CommentRef>?
-    }
+  interface PostViewPagerViewModel {
+    var lastSelectedItem: Either<PostRef, CommentRef>?
+  }
 
-    companion object {
-        private const val TAG = "SlidingPaneController"
-    }
+  companion object {
+    private const val TAG = "SlidingPaneController"
+  }
 
-    private var activeOpenPostJob: Job? = null
-    private var activeClosePostJob: Job? = null
-    private var lastPostFragment: PostFragment? = null
-    var onPageSelectedListener: (isOpen: Boolean) -> Unit = {}
-    var onPostOpen: (accountId: Long?, postView: PostView?) -> Unit = { _, _ -> }
+  private var activeOpenPostJob: Job? = null
+  private var activeClosePostJob: Job? = null
+  private var lastPostFragment: PostFragment? = null
+  var onPageSelectedListener: (isOpen: Boolean) -> Unit = {}
+  var onPostOpen: (accountId: Long?, postView: PostView?) -> Unit = { _, _ -> }
 
-    val isSlideable: Boolean
-        get() = slidingPaneLayout.isSlideable
+  val isSlideable: Boolean
+    get() = slidingPaneLayout.isSlideable
 
-    val isOpen: Boolean
-        get() = slidingPaneLayout.isOpen
+  val isOpen: Boolean
+    get() = slidingPaneLayout.isOpen
 
-    private val panelSlideListener =
-        object : PanelSlideListener {
-            override fun onPanelSlide(panel: View, slideOffset: Float) {
-                Log.d(TAG, "onPanelSlide() - $slideOffset")
+  private val panelSlideListener =
+    object : PanelSlideListener {
+      override fun onPanelSlide(panel: View, slideOffset: Float) {
+        Log.d(TAG, "onPanelSlide() - $slideOffset")
 
-                if (slidingPaneLayout.isSlideable) {
-                    fragment.getMainActivity()?.apply {
-                        lockUiOpenness = false
-                        setNavUiOpenPercent(1f - slideOffset)
-                    }
+        if (slidingPaneLayout.isSlideable) {
+          fragment.getMainActivity()?.apply {
+            lockUiOpenness = false
+            setNavUiOpenPercent(1f - slideOffset)
+          }
 
-                    slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
-                }
-            }
-
-            override fun onPanelOpened(panel: View) {
-                Log.d(TAG, "onPanelOpened()")
-
-                fragment.requireSummitActivity().apply {
-                    lockUiOpenness = false
-                }
-                onPageSelectedListener(true)
-                slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
-            }
-
-            override fun onPanelClosed(panel: View) {
-                Log.d(TAG, "onPanelClosed()")
-
-                // close post fragment
-                val postFragment = childFragmentManager
-                    .findFragmentById(R.id.post_fragment_container)
-                if (postFragment != null) {
-                    childFragmentManager.commit(allowStateLoss = true) {
-                        if (retainClosedPosts) {
-                            detach(postFragment)
-                        } else {
-                            remove(postFragment)
-                        }
-                    }
-
-                    if (retainClosedPosts) {
-                        lastPostFragment = postFragment as? PostFragment
-                    }
-                }
-                if (slidingPaneLayout.isSlideable) {
-                    fragment.getMainActivity()?.setNavUiOpenPercent(0f)
-                }
-                onPageSelectedListener(false)
-                slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
-            }
+          slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
         }
+      }
 
-    fun init() {
-        slidingPaneLayout.addPanelSlideListener(panelSlideListener)
-        slidingPaneLayout.post {
-            if (!slidingPaneLayout.isSlideable) {
-                val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
-                firstChild.findViewById<View>(R.id.pane_divider)?.visibility = View.VISIBLE
+      override fun onPanelOpened(panel: View) {
+        Log.d(TAG, "onPanelOpened()")
 
-                val currentFragment = childFragmentManager.findFragmentById(fragmentContainerId)
-                if (currentFragment == null) {
-                    childFragmentManager.commit(allowStateLoss = true) {
-                        setReorderingAllowed(true)
-                        replace(
-                            fragmentContainerId,
-                            EmptyScreenFragment.newInstance(emptyScreenText),
-                        )
-                    }
-                }
+        fragment.requireSummitActivity().apply {
+          lockUiOpenness = false
+        }
+        onPageSelectedListener(true)
+        slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
+      }
+
+      override fun onPanelClosed(panel: View) {
+        Log.d(TAG, "onPanelClosed()")
+
+        // close post fragment
+        val postFragment = childFragmentManager
+          .findFragmentById(R.id.post_fragment_container)
+        if (postFragment != null) {
+          childFragmentManager.commit(allowStateLoss = true) {
+            if (retainClosedPosts) {
+              detach(postFragment)
             } else {
-                val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
-                firstChild.findViewById<View>(R.id.pane_divider)?.visibility = View.GONE
-
-                if (slidingPaneLayout.isOpen) {
-                    slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
-                } else {
-                    slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
-                }
+              remove(postFragment)
             }
-        }
+          }
 
-        if (globalLayoutMode == GlobalLayoutModes.SmallScreen) {
-            slidingPaneLayout.getChildAt(0).updateLayoutParams<SlidingPaneLayout.LayoutParams> {
-                width = SlidingPaneLayout.LayoutParams.MATCH_PARENT
-            }
+          if (retainClosedPosts) {
+            lastPostFragment = postFragment as? PostFragment
+          }
         }
-
-        slidingPaneLayout.isSwipeEnabled = !useSwipeBetweenPosts
+        if (slidingPaneLayout.isSlideable) {
+          fragment.getMainActivity()?.setNavUiOpenPercent(0f)
+        }
+        onPageSelectedListener(false)
+        slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+      }
     }
 
-    fun openPost(
-        instance: String,
-        id: Int,
-        currentCommunity: CommunityRef?,
-        accountId: Long?,
-        post: PostView? = null,
-        jumpToComments: Boolean = false,
-        reveal: Boolean = false,
-        videoState: VideoState? = null,
-    ) {
-        try {
-            // Best effort restore PostFragment
+  fun init() {
+    slidingPaneLayout.addPanelSlideListener(panelSlideListener)
+    slidingPaneLayout.post {
+      if (!slidingPaneLayout.isSlideable) {
+        val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
+        firstChild.findViewById<View>(R.id.pane_divider)?.visibility = View.VISIBLE
 
-            val lastPostFragment = lastPostFragment
-
-            if (lastPostFragment != null) {
-                val args = PostFragmentArgs.fromBundle(requireNotNull(lastPostFragment.arguments))
-
-                if (id == args.post?.post?.id) {
-                    openPostInternal(
-                        args = null,
-                        itemRef = Either.Left(PostRef(instance, id)),
-                        postFragmentOverride = lastPostFragment,
-                    )
-                    onPostOpen.invoke(accountId, post)
-                    return
-                } else {
-                    this.lastPostFragment = null
-                    childFragmentManager.commit(allowStateLoss = true) {
-                        // Apparently we don't need to call attach before remove
-                        // attach(lastPostFragment)
-                        remove(lastPostFragment)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            // do nothing
+        val currentFragment = childFragmentManager.findFragmentById(fragmentContainerId)
+        if (currentFragment == null) {
+          childFragmentManager.commit(allowStateLoss = true) {
+            setReorderingAllowed(true)
+            replace(
+              fragmentContainerId,
+              EmptyScreenFragment.newInstance(emptyScreenText),
+            )
+          }
         }
+      } else {
+        val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
+        firstChild.findViewById<View>(R.id.pane_divider)?.visibility = View.GONE
 
-        openPostInternal(
-            args = PostFragmentArgs(
-                instance = instance,
-                id = id,
-                reveal = reveal,
-                post = post,
-                isPreview = isPreview,
-                jumpToComments = jumpToComments,
-                currentCommunity = currentCommunity,
-                videoState = videoState,
-                accountId = accountId ?: 0L,
-            ),
+        if (slidingPaneLayout.isOpen) {
+          slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
+        } else {
+          slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+        }
+      }
+    }
+
+    if (globalLayoutMode == GlobalLayoutModes.SmallScreen) {
+      slidingPaneLayout.getChildAt(0).updateLayoutParams<SlidingPaneLayout.LayoutParams> {
+        width = SlidingPaneLayout.LayoutParams.MATCH_PARENT
+      }
+    }
+
+    slidingPaneLayout.isSwipeEnabled = !useSwipeBetweenPosts
+  }
+
+  fun openPost(
+    instance: String,
+    id: Int,
+    currentCommunity: CommunityRef?,
+    accountId: Long?,
+    post: PostView? = null,
+    jumpToComments: Boolean = false,
+    reveal: Boolean = false,
+    videoState: VideoState? = null,
+  ) {
+    try {
+      // Best effort restore PostFragment
+
+      val lastPostFragment = lastPostFragment
+
+      if (lastPostFragment != null) {
+        val args = PostFragmentArgs.fromBundle(requireNotNull(lastPostFragment.arguments))
+
+        if (id == args.post?.post?.id) {
+          openPostInternal(
+            args = null,
             itemRef = Either.Left(PostRef(instance, id)),
-        )
-
-        onPostOpen.invoke(accountId, post)
-    }
-
-    fun openComment(instance: String, commentId: CommentId) {
-        openPostInternal(
-            PostFragmentArgs(
-                instance = instance,
-                id = 0,
-                isPreview = isPreview,
-                commentId = commentId,
-                currentCommunity = null,
-                isSinglePage = false,
-            ),
-            Either.Right(CommentRef(instance, commentId)),
-        )
-    }
-
-    private fun openPostInternal(
-        args: PostFragmentArgs?,
-        itemRef: Either<PostRef, CommentRef>? = null,
-        postFragmentOverride: PostFragment? = null,
-    ) {
-        if (activeOpenPostJob != null) {
-            Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
-            return
+            postFragmentOverride = lastPostFragment,
+          )
+          onPostOpen.invoke(accountId, post)
+          return
+        } else {
+          this.lastPostFragment = null
+          childFragmentManager.commit(allowStateLoss = true) {
+            // Apparently we don't need to call attach before remove
+            // attach(lastPostFragment)
+            remove(lastPostFragment)
+          }
         }
+      }
+    } catch (e: Exception) {
+      // do nothing
+    }
 
-        activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
-            val fragment =
-                postFragmentOverride
-                    ?: if (useSwipeBetweenPosts) {
-                        PostTabbedFragment().apply {
-                            arguments = PostTabbedFragmentArgs(
-                                id = args?.id ?: 0,
-                            ).toBundle()
-                        }
-                    } else {
-                        PostFragment().apply {
-                            arguments = args?.toBundle() ?: Bundle()
-                        }
-                    }
+    openPostInternal(
+      args = PostFragmentArgs(
+        instance = instance,
+        id = id,
+        reveal = reveal,
+        post = post,
+        isPreview = isPreview,
+        jumpToComments = jumpToComments,
+        currentCommunity = currentCommunity,
+        videoState = videoState,
+        accountId = accountId ?: 0L,
+      ),
+      itemRef = Either.Left(PostRef(instance, id)),
+    )
 
-            childFragmentManager.commit(allowStateLoss = true) {
-                setReorderingAllowed(true)
-                if (postFragmentOverride != null) {
-                    attach(fragment)
-                }
-                replace(R.id.post_fragment_container, fragment)
+    onPostOpen.invoke(accountId, post)
+  }
+
+  fun openComment(instance: String, commentId: CommentId) {
+    openPostInternal(
+      PostFragmentArgs(
+        instance = instance,
+        id = 0,
+        isPreview = isPreview,
+        commentId = commentId,
+        currentCommunity = null,
+        isSinglePage = false,
+      ),
+      Either.Right(CommentRef(instance, commentId)),
+    )
+  }
+
+  private fun openPostInternal(
+    args: PostFragmentArgs?,
+    itemRef: Either<PostRef, CommentRef>? = null,
+    postFragmentOverride: PostFragment? = null,
+  ) {
+    if (activeOpenPostJob != null) {
+      Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
+      return
+    }
+
+    activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+      val fragment =
+        postFragmentOverride
+          ?: if (useSwipeBetweenPosts) {
+            PostTabbedFragment().apply {
+              arguments = PostTabbedFragmentArgs(
+                id = args?.id ?: 0,
+              ).toBundle()
             }
-
-            if (postFragmentOverride != null) {
-                withContext(Dispatchers.IO) {
-                    // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
-                    delay(100)
-                }
+          } else {
+            PostFragment().apply {
+              arguments = args?.toBundle() ?: Bundle()
             }
+          }
 
-            viewModel.lastSelectedItem = itemRef
-
-            openPane()
-
-            withContext(Dispatchers.IO) {
-                delay(250)
-            }
-            activeOpenPostJob = null
+      childFragmentManager.commit(allowStateLoss = true) {
+        setReorderingAllowed(true)
+        if (postFragmentOverride != null) {
+          attach(fragment)
         }
+        replace(R.id.post_fragment_container, fragment)
+      }
+
+      if (postFragmentOverride != null) {
+        withContext(Dispatchers.IO) {
+          // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
+          delay(100)
+        }
+      }
+
+      viewModel.lastSelectedItem = itemRef
+
+      openPane()
+
+      withContext(Dispatchers.IO) {
+        delay(250)
+      }
+      activeOpenPostJob = null
+    }
+  }
+
+  fun closePost(fragment: Fragment) {
+    if (activeClosePostJob != null) {
+      Log.d(TAG, "Ignoring closePost() because it occurred too fast.")
+      return
     }
 
-    fun closePost(fragment: Fragment) {
-        if (activeClosePostJob != null) {
-            Log.d(TAG, "Ignoring closePost() because it occurred too fast.")
-            return
-        }
+    activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+      closePane()
 
-        activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
-            closePane()
-
-            withContext(Dispatchers.IO) {
-                delay(250)
-            }
-            activeClosePostJob = null
-        }
+      withContext(Dispatchers.IO) {
+        delay(250)
+      }
+      activeClosePostJob = null
     }
+  }
 
-    fun callPageSelected() {
-        onPageSelectedListener(slidingPaneLayout.isOpen)
-    }
+  fun callPageSelected() {
+    onPageSelectedListener(slidingPaneLayout.isOpen)
+  }
 
-    private fun openPane() {
-        slidingPaneLayout.openPane()
-        if (!slidingPaneLayout.isSlideable) {
-            panelSlideListener.onPanelOpened(slidingPaneLayout)
-        }
+  private fun openPane() {
+    slidingPaneLayout.openPane()
+    if (!slidingPaneLayout.isSlideable) {
+      panelSlideListener.onPanelOpened(slidingPaneLayout)
     }
+  }
 
-    private fun closePane() {
-        slidingPaneLayout.closePane()
-        if (!slidingPaneLayout.isSlideable) {
-            panelSlideListener.onPanelClosed(slidingPaneLayout)
-        }
+  private fun closePane() {
+    slidingPaneLayout.closePane()
+    if (!slidingPaneLayout.isSlideable) {
+      panelSlideListener.onPanelClosed(slidingPaneLayout)
     }
+  }
 }

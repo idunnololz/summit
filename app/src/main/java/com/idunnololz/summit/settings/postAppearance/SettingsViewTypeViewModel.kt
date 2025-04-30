@@ -12,41 +12,41 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsViewTypeViewModel @Inject constructor(
-    private val preferences: Preferences,
+  private val preferences: Preferences,
 ) : ViewModel() {
 
-    var currentPostUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
-        set(value) {
-            field = value
+  var currentPostUiConfig: PostInListUiConfig = preferences.getPostInListUiConfig()
+    set(value) {
+      field = value
 
-            viewModelScope.launch {
-                applyConfig()
-            }
-        }
-
-    val onPostUiChanged = MutableLiveData<Unit>()
-
-    fun onLayoutChanging() {
+      viewModelScope.launch {
         applyConfig()
+      }
     }
 
-    fun onLayoutChanged() {
-        currentPostUiConfig = preferences.getPostInListUiConfig()
-        onPostUiChanged.value = Unit
-    }
+  val onPostUiChanged = MutableLiveData<Unit>()
 
-    fun resetPostUiConfig() {
-        currentPostUiConfig = preferences.getPostsLayout().getDefaultPostUiConfig()
-        onPostUiChanged.value = Unit
-    }
+  fun onLayoutChanging() {
+    applyConfig()
+  }
 
-    private fun applyConfig() {
-        preferences.setPostInListUiConfig(currentPostUiConfig)
-    }
+  fun onLayoutChanged() {
+    currentPostUiConfig = preferences.getPostInListUiConfig()
+    onPostUiChanged.value = Unit
+  }
 
-    override fun onCleared() {
-        applyConfig()
+  fun resetPostUiConfig() {
+    currentPostUiConfig = preferences.getPostsLayout().getDefaultPostUiConfig()
+    onPostUiChanged.value = Unit
+  }
 
-        super.onCleared()
-    }
+  private fun applyConfig() {
+    preferences.setPostInListUiConfig(currentPostUiConfig)
+  }
+
+  override fun onCleared() {
+    applyConfig()
+
+    super.onCleared()
+  }
 }

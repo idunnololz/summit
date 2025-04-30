@@ -11,47 +11,47 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UploadImageViewModel @Inject constructor(
-    private val uploadHelper: UploadHelper,
-    private val preferences: Preferences,
+  private val uploadHelper: UploadHelper,
+  private val preferences: Preferences,
 ) : ViewModel() {
 
-    val uploadImageResult = StatefulLiveData<UploadImageResult>()
-    val uploadImageForUrlResult = StatefulLiveData<UploadImageResult>()
-    val uploadImageForCommunityIcon = StatefulLiveData<UploadImageResult>()
-    val uploadImageForCommunityBanner = StatefulLiveData<UploadImageResult>()
+  val uploadImageResult = StatefulLiveData<UploadImageResult>()
+  val uploadImageForUrlResult = StatefulLiveData<UploadImageResult>()
+  val uploadImageForCommunityIcon = StatefulLiveData<UploadImageResult>()
+  val uploadImageForCommunityBanner = StatefulLiveData<UploadImageResult>()
 
-    val isUploading: Boolean
-        get() = uploadHelper.isUploading
+  val isUploading: Boolean
+    get() = uploadHelper.isUploading
 
-    fun uploadImage(uri: Uri) {
-        uploadImageInternal(uri, uploadImageResult)
-    }
+  fun uploadImage(uri: Uri) {
+    uploadImageInternal(uri, uploadImageResult)
+  }
 
-    fun uploadImageForUrl(uri: Uri) {
-        uploadImageInternal(uri, uploadImageForUrlResult)
-    }
+  fun uploadImageForUrl(uri: Uri) {
+    uploadImageInternal(uri, uploadImageForUrlResult)
+  }
 
-    fun uploadImageForCommunityIcon(uri: Uri) {
-        uploadImageInternal(uri, uploadImageForCommunityIcon)
-    }
+  fun uploadImageForCommunityIcon(uri: Uri) {
+    uploadImageInternal(uri, uploadImageForCommunityIcon)
+  }
 
-    fun uploadImageForCommunityBanner(uri: Uri) {
-        uploadImageInternal(uri, uploadImageForCommunityBanner)
-    }
+  fun uploadImageForCommunityBanner(uri: Uri) {
+    uploadImageInternal(uri, uploadImageForCommunityBanner)
+  }
 
-    private fun uploadImageInternal(uri: Uri, imageLiveData: StatefulLiveData<UploadImageResult>) {
-        imageLiveData.setIsLoading()
+  private fun uploadImageInternal(uri: Uri, imageLiveData: StatefulLiveData<UploadImageResult>) {
+    imageLiveData.setIsLoading()
 
-        uploadHelper.uploadAsync(
-            coroutineScope = viewModelScope,
-            uri = uri,
-            rotateAccounts = preferences.rotateInstanceOnUploadFail,
-            onSuccess = {
-                imageLiveData.postValue(it)
-            },
-            onFailure = {
-                imageLiveData.postError(it)
-            },
-        )
-    }
+    uploadHelper.uploadAsync(
+      coroutineScope = viewModelScope,
+      uri = uri,
+      rotateAccounts = preferences.rotateInstanceOnUploadFail,
+      onSuccess = {
+        imageLiveData.postValue(it)
+      },
+      onFailure = {
+        imageLiveData.postError(it)
+      },
+    )
+  }
 }

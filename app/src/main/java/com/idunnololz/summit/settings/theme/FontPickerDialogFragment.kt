@@ -31,163 +31,163 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class FontPickerDialogFragment :
-    BaseBottomSheetDialogFragment<DialogFragmentFontPickerBinding>(),
-    FullscreenDialogFragment {
+  BaseBottomSheetDialogFragment<DialogFragmentFontPickerBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
-        fun newInstance(account: Account?) = FontPickerDialogFragment().apply {
-            arguments = FontPickerDialogFragmentArgs(account).toBundle()
-        }
+  companion object {
+    fun newInstance(account: Account?) = FontPickerDialogFragment().apply {
+      arguments = FontPickerDialogFragmentArgs(account).toBundle()
     }
+  }
 
-    private val args: FontPickerDialogFragmentArgs by navArgs()
-    private val preferencesViewModel: PreferencesViewModel by viewModels()
+  private val args: FontPickerDialogFragmentArgs by navArgs()
+  private val preferencesViewModel: PreferencesViewModel by viewModels()
 
-    lateinit var preferences: Preferences
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var themeManager: ThemeManager
+  @Inject
+  lateinit var themeManager: ThemeManager
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        preferences = preferencesViewModel.getPreferences(args.account)
-    }
+    preferences = preferencesViewModel.getPreferences(args.account)
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentFontPickerBinding.inflate(inflater, container, false))
+    setBinding(DialogFragmentFontPickerBinding.inflate(inflater, container, false))
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
+    val context = requireContext()
 
-        ViewPump.init(null)
+    ViewPump.init(null)
 
-        with(binding) {
-            recyclerView.setup(animationsHelper)
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = FontAdapter(context, preferences) {
-                preferences.globalFont = it
+    with(binding) {
+      recyclerView.setup(animationsHelper)
+      recyclerView.setHasFixedSize(true)
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.adapter = FontAdapter(context, preferences) {
+        preferences.globalFont = it
 
-                dismiss()
-                themeManager.onPreferencesChanged()
-                getMainActivity()?.recreate()
-            }
-        }
-    }
-
-    override fun onDestroyView() {
+        dismiss()
         themeManager.onPreferencesChanged()
+        getMainActivity()?.recreate()
+      }
+    }
+  }
 
-        super.onDestroyView()
+  override fun onDestroyView() {
+    themeManager.onPreferencesChanged()
+
+    super.onDestroyView()
+  }
+
+  private class FontAdapter(
+    private val context: Context,
+    private val preferences: Preferences,
+    private val onFontSelected: (FontId) -> Unit,
+  ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    sealed interface Item {
+      data class FontItem(
+        val fontId: FontId,
+        val name: String,
+      ) : Item
     }
 
-    private class FontAdapter(
-        private val context: Context,
-        private val preferences: Preferences,
-        private val onFontSelected: (FontId) -> Unit,
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val adapterHelper = AdapterHelper<Item>(
+      areItemsTheSame = { old, new ->
+        old::class == new::class && when (old) {
+          is Item.FontItem ->
+            old.fontId == (new as Item.FontItem).fontId
+        }
+      },
+    ).apply {
+      addItemType(
+        clazz = Item.FontItem::class,
+        inflateFn = FontItemBinding::inflate,
+      ) { item, b, h ->
+        b.title.text = item.name
+        b.sampleText.text = context.getString(R.string.font_sample_text)
 
-        sealed interface Item {
-            data class FontItem(
-                val fontId: FontId,
-                val name: String,
-            ) : Item
+        CalligraphyUtils.applyFontToTextView(context, b.title, item.fontId.toFontAsset())
+        CalligraphyUtils.applyFontToTextView(
+          context,
+          b.sampleText,
+          item.fontId.toFontAsset(),
+        )
+
+        if (preferences.globalFont == item.fontId) {
+          b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            0,
+            0,
+            R.drawable.baseline_check_18,
+            0,
+          )
+        } else {
+          b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            0,
+            0,
+            0,
+            0,
+          )
         }
 
-        private val adapterHelper = AdapterHelper<Item>(
-            areItemsTheSame = { old, new ->
-                old::class == new::class && when (old) {
-                    is Item.FontItem ->
-                        old.fontId == (new as Item.FontItem).fontId
-                }
-            },
-        ).apply {
-            addItemType(
-                clazz = Item.FontItem::class,
-                inflateFn = FontItemBinding::inflate,
-            ) { item, b, h ->
-                b.title.text = item.name
-                b.sampleText.text = context.getString(R.string.font_sample_text)
-
-                CalligraphyUtils.applyFontToTextView(context, b.title, item.fontId.toFontAsset())
-                CalligraphyUtils.applyFontToTextView(
-                    context,
-                    b.sampleText,
-                    item.fontId.toFontAsset(),
-                )
-
-                if (preferences.globalFont == item.fontId) {
-                    b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        0,
-                        0,
-                        R.drawable.baseline_check_18,
-                        0,
-                    )
-                } else {
-                    b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        0,
-                        0,
-                        0,
-                        0,
-                    )
-                }
-
-                b.root.setOnClickListener {
-                    onFontSelected(item.fontId)
-                }
-            }
+        b.root.setOnClickListener {
+          onFontSelected(item.fontId)
         }
-
-        init {
-            refreshItems()
-        }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        private fun refreshItems() {
-            val newItems = listOf(
-                Item.FontItem(
-                    FontIds.DEFAULT,
-                    context.getString(R.string._default),
-                ),
-                Item.FontItem(
-                    FontIds.ROBOTO,
-                    context.getString(R.string.roboto),
-                ),
-                Item.FontItem(
-                    FontIds.ROBOTO_SERIF,
-                    context.getString(R.string.roboto_serif),
-                ),
-                Item.FontItem(
-                    FontIds.OPEN_SANS,
-                    context.getString(R.string.open_sans),
-                ),
-            )
-
-            adapterHelper.setItems(newItems, this)
-        }
+      }
     }
+
+    init {
+      refreshItems()
+    }
+
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+
+    private fun refreshItems() {
+      val newItems = listOf(
+        Item.FontItem(
+          FontIds.DEFAULT,
+          context.getString(R.string._default),
+        ),
+        Item.FontItem(
+          FontIds.ROBOTO,
+          context.getString(R.string.roboto),
+        ),
+        Item.FontItem(
+          FontIds.ROBOTO_SERIF,
+          context.getString(R.string.roboto_serif),
+        ),
+        Item.FontItem(
+          FontIds.OPEN_SANS,
+          context.getString(R.string.open_sans),
+        ),
+      )
+
+      adapterHelper.setItems(newItems, this)
+    }
+  }
 }

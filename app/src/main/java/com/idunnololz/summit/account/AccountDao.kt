@@ -10,44 +10,44 @@ import androidx.room.Update
 
 @Dao
 abstract class AccountDao {
-    @Query("SELECT * FROM account")
-    abstract suspend fun getAll(): List<Account>
+  @Query("SELECT * FROM account")
+  abstract suspend fun getAll(): List<Account>
 
-    @Query("SELECT * FROM account")
-    abstract fun getAllSync(): List<Account>
+  @Query("SELECT * FROM account")
+  abstract fun getAllSync(): List<Account>
 
-    @Query("SELECT * FROM account WHERE current = 1")
-    abstract suspend fun getCurrentAccount(): Account?
+  @Query("SELECT * FROM account WHERE current = 1")
+  abstract suspend fun getCurrentAccount(): Account?
 
-    @Query("SELECT * FROM account LIMIT 1")
-    abstract suspend fun getFirstAccount(): Account?
+  @Query("SELECT * FROM account LIMIT 1")
+  abstract suspend fun getFirstAccount(): Account?
 
-    @Query("SELECT * FROM account WHERE id = :accountId")
-    abstract suspend fun getAccountById(accountId: Long): Account?
+  @Query("SELECT * FROM account WHERE id = :accountId")
+  abstract suspend fun getAccountById(accountId: Long): Account?
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE, entity = Account::class)
-    abstract suspend fun insert(account: Account)
+  @Insert(onConflict = OnConflictStrategy.IGNORE, entity = Account::class)
+  abstract suspend fun insert(account: Account)
 
-    @Update(entity = Account::class)
-    abstract suspend fun update(account: Account)
+  @Update(entity = Account::class)
+  abstract suspend fun update(account: Account)
 
-    @Query("UPDATE account set current = 0 where current = 1")
-    abstract suspend fun removeCurrent()
+  @Query("UPDATE account set current = 0 where current = 1")
+  abstract suspend fun removeCurrent()
 
-    @Query("UPDATE account set current = 1 where id = :accountId")
-    abstract suspend fun setCurrent(accountId: Long)
+  @Query("UPDATE account set current = 1 where id = :accountId")
+  abstract suspend fun setCurrent(accountId: Long)
 
-    @Delete(entity = Account::class)
-    abstract suspend fun delete(account: Account): Int
+  @Delete(entity = Account::class)
+  abstract suspend fun delete(account: Account): Int
 
-    @Query("SELECT COUNT(*) FROM account")
-    abstract suspend fun count(): Int
+  @Query("SELECT COUNT(*) FROM account")
+  abstract suspend fun count(): Int
 
-    @Transaction
-    open suspend fun clearAndSetCurrent(accountId: Long?) {
-        removeCurrent()
-        if (accountId != null) {
-            setCurrent(accountId)
-        }
+  @Transaction
+  open suspend fun clearAndSetCurrent(accountId: Long?) {
+    removeCurrent()
+    if (accountId != null) {
+      setCurrent(accountId)
     }
+  }
 }

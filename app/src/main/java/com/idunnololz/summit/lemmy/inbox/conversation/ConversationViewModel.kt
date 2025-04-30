@@ -23,264 +23,262 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ConversationViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val accountManager: AccountManager,
-    private val apiClient: AccountAwareLemmyClient,
-    private val inboxRepositoryFactory: InboxRepository.Factory,
-    private val conversationsManager: ConversationsManager,
+  @ApplicationContext private val context: Context,
+  private val accountManager: AccountManager,
+  private val apiClient: AccountAwareLemmyClient,
+  private val inboxRepositoryFactory: InboxRepository.Factory,
+  private val conversationsManager: ConversationsManager,
 ) : ViewModel() {
 
-    private var inboxRepository: InboxRepository? = null
+  private var inboxRepository: InboxRepository? = null
 
-    private var allMessagesById = mutableMapOf<Int, MessageItem>()
-    private var nextPageIndex = 0
-    private var lastPageIndex = -1
-    private var highestLoadedPageIndex = -1
-    var personId: Long? = null
-    private var draftMessage: String? = null
+  private var allMessagesById = mutableMapOf<Int, MessageItem>()
+  private var nextPageIndex = 0
+  private var lastPageIndex = -1
+  private var highestLoadedPageIndex = -1
+  var personId: Long? = null
+  private var draftMessage: String? = null
 
-    val conversationInfoModel = MutableLiveData<ConversationInfoModel>()
-    val conversationModel = MutableLiveData<ConversationModel>()
-    val draftModel = MutableLiveData<String>()
-    val loadConversationState = StatefulLiveData<Unit>()
-    val commentSentEvent = StatefulLiveData<Unit>()
+  val conversationInfoModel = MutableLiveData<ConversationInfoModel>()
+  val conversationModel = MutableLiveData<ConversationModel>()
+  val draftModel = MutableLiveData<String>()
+  val loadConversationState = StatefulLiveData<Unit>()
+  val commentSentEvent = StatefulLiveData<Unit>()
 
-    fun setup(
-        accountId: Long,
-        messageInboxItem: InboxItem.MessageInboxItem?,
-        conversation: Conversation?,
-        newConversation: NewConversation?,
-    ): Result<Unit> {
-        val currentAccount = accountManager.currentAccount.asAccount
+  fun setup(
+    accountId: Long,
+    messageInboxItem: InboxItem.MessageInboxItem?,
+    conversation: Conversation?,
+    newConversation: NewConversation?,
+  ): Result<Unit> {
+    val currentAccount = accountManager.currentAccount.asAccount
 
-        if (accountId != currentAccount?.id) {
-            return Result.failure(RuntimeException())
-        }
-
-        val otherPersonId: Long?
-        val otherPersonName: String?
-        val otherPersonInstance: String?
-        val otherPersonIcon: String?
-
-        if (messageInboxItem != null) {
-            val isAuthor = currentAccount.id == messageInboxItem.authorId
-
-            otherPersonId = if (isAuthor) {
-                messageInboxItem.targetAccountId
-            } else {
-                messageInboxItem.authorId
-            }
-            otherPersonIcon = if (isAuthor) {
-                messageInboxItem.targetAccountAvatar
-            } else {
-                messageInboxItem.authorAvatar
-            }
-            otherPersonName = if (isAuthor) {
-                messageInboxItem.targetUserName
-            } else {
-                messageInboxItem.authorName
-            }
-            otherPersonInstance = if (isAuthor) {
-                messageInboxItem.targetInstance
-            } else {
-                messageInboxItem.authorInstance
-            }
-        } else if (conversation != null) {
-            otherPersonId = conversation.personId
-            otherPersonIcon = conversation.iconUrl
-            otherPersonName = conversation.personName
-            otherPersonInstance = conversation.personInstance
-        } else if (newConversation != null) {
-            otherPersonId = newConversation.personId
-            otherPersonIcon = newConversation.personAvatar
-            otherPersonName = newConversation.personName
-            otherPersonInstance = newConversation.personInstance
-        } else {
-            return Result.failure(RuntimeException())
-        }
-
-        conversationInfoModel.postValue(
-            ConversationInfoModel(
-                otherPersonId = otherPersonId,
-                otherPersonAvatar = otherPersonIcon,
-                otherPersonName = otherPersonName,
-                otherPersonInstance = otherPersonInstance,
-            ),
-        )
-
-        personId = otherPersonId
-
-        inboxRepository = inboxRepositoryFactory.create(
-            InboxRepository.InboxMultiDataSource(
-                listOf(
-                    InboxSource(
-                        context,
-                        CommentSortType.New,
-                    ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
-                        apiClient.fetchPrivateMessages(
-                            page = page,
-                            limit = limit,
-                            senderId = otherPersonId,
-                            unreadOnly = false,
-                            force = force,
-                        ).fold(
-                            onSuccess = {
-                                Result.success(
-                                    it.map {
-                                        it.toMessageItem()
-                                    },
-                                )
-                            },
-                            onFailure = {
-                                Result.failure(it)
-                            },
-                        )
-                    },
-                ),
-            ),
-        )
-
-        viewModelScope.launch {
-            if (otherPersonId != null) {
-                val draftData = conversationsManager.getDraft(otherPersonId)
-
-                draftData?.content?.let {
-                    draftModel.postValue(it)
-                }
-            }
-        }
-
-        return Result.success(Unit)
+    if (accountId != currentAccount?.id) {
+      return Result.failure(RuntimeException())
     }
 
-    fun loadFirstPage(force: Boolean = false) {
-        loadConversationState.setIsLoading()
+    val otherPersonId: Long?
+    val otherPersonName: String?
+    val otherPersonInstance: String?
+    val otherPersonIcon: String?
 
-        viewModelScope.launch {
-            loadPage(0, force)
-                .onSuccess {
-                    conversationModel.postValue(it)
+    if (messageInboxItem != null) {
+      val isAuthor = currentAccount.id == messageInboxItem.authorId
 
-                    loadConversationState.postValue(Unit)
-                }
-                .onFailure {
-                    loadConversationState.postError(it)
-                }
-        }
+      otherPersonId = if (isAuthor) {
+        messageInboxItem.targetAccountId
+      } else {
+        messageInboxItem.authorId
+      }
+      otherPersonIcon = if (isAuthor) {
+        messageInboxItem.targetAccountAvatar
+      } else {
+        messageInboxItem.authorAvatar
+      }
+      otherPersonName = if (isAuthor) {
+        messageInboxItem.targetUserName
+      } else {
+        messageInboxItem.authorName
+      }
+      otherPersonInstance = if (isAuthor) {
+        messageInboxItem.targetInstance
+      } else {
+        messageInboxItem.authorInstance
+      }
+    } else if (conversation != null) {
+      otherPersonId = conversation.personId
+      otherPersonIcon = conversation.iconUrl
+      otherPersonName = conversation.personName
+      otherPersonInstance = conversation.personInstance
+    } else if (newConversation != null) {
+      otherPersonId = newConversation.personId
+      otherPersonIcon = newConversation.personAvatar
+      otherPersonName = newConversation.personName
+      otherPersonInstance = newConversation.personInstance
+    } else {
+      return Result.failure(RuntimeException())
     }
 
-    fun loadNextPage(force: Boolean = false) {
-        if (loadConversationState.isLoading) {
-            return
-        }
+    conversationInfoModel.postValue(
+      ConversationInfoModel(
+        otherPersonId = otherPersonId,
+        otherPersonAvatar = otherPersonIcon,
+        otherPersonName = otherPersonName,
+        otherPersonInstance = otherPersonInstance,
+      ),
+    )
 
-        loadConversationState.setIsLoading()
+    personId = otherPersonId
 
-        viewModelScope.launch {
-            loadPage(nextPageIndex, force)
-                .onSuccess {
-                    conversationModel.postValue(it)
-                    nextPageIndex++
-
-                    loadConversationState.postValue(Unit)
-                }
-                .onFailure {
-                    loadConversationState.postError(it)
-                }
-        }
-    }
-
-    private suspend fun loadPage(
-        pageIndex: Int,
-        force: Boolean = false,
-    ): Result<ConversationModel> = withContext(Dispatchers.Default) {
-        val inboxItems = inboxRepository
-            ?.getPage(pageIndex = pageIndex, pageType = PageType.Conversation, force = force)
-
-        if (inboxItems == null) {
-            return@withContext Result.failure(RuntimeException("Inbox repository is null!"))
-        }
-
-        inboxItems.fold(
-            onSuccess = {
-                it.items.filterIsInstance<MessageItem>()
-                    .forEach { messageItem ->
-                        allMessagesById[messageItem.id] = messageItem
-                    }
-
-                val allMessages = allMessagesById.values
-                    .sortedByDescending { it.lastUpdateTs }
-                val account = accountManager.currentAccount.asAccount
-
-                if (!it.hasMore) {
-                    lastPageIndex = pageIndex
-                }
-
-                highestLoadedPageIndex = max(highestLoadedPageIndex, pageIndex)
-
+    inboxRepository = inboxRepositoryFactory.create(
+      InboxRepository.InboxMultiDataSource(
+        listOf(
+          InboxSource(
+            context,
+            CommentSortType.New,
+          ) { page: Int, sortOrder: CommentSortType, limit: Int, force: Boolean ->
+            apiClient.fetchPrivateMessages(
+              page = page,
+              limit = limit,
+              senderId = otherPersonId,
+              unreadOnly = false,
+              force = force,
+            ).fold(
+              onSuccess = {
                 Result.success(
-                    ConversationModel(
-                        accountId = account?.id,
-                        allMessages = allMessages,
-                        nextPageIndex = nextPageIndex,
-                        hasMore =
-                        if (lastPageIndex < 0) {
-                            true
-                        } else {
-                            highestLoadedPageIndex < lastPageIndex
-                        },
-                    ),
+                  it.map {
+                    it.toMessageItem()
+                  },
                 )
-            },
-            onFailure = {
+              },
+              onFailure = {
                 Result.failure(it)
-            },
-        )
+              },
+            )
+          },
+        ),
+      ),
+    )
+
+    viewModelScope.launch {
+      if (otherPersonId != null) {
+        val draftData = conversationsManager.getDraft(otherPersonId)
+
+        draftData?.content?.let {
+          draftModel.postValue(it)
+        }
+      }
     }
 
-    fun markAsRead(id: Int) {
-        viewModelScope.launch {
-            apiClient.markPrivateMessageAsRead(id, true)
-            conversationsManager.refreshConversations()
-            personId?.let {
-                conversationsManager.updateConversation(it)
+    return Result.success(Unit)
+  }
+
+  fun loadFirstPage(force: Boolean = false) {
+    loadConversationState.setIsLoading()
+
+    viewModelScope.launch {
+      loadPage(0, force)
+        .onSuccess {
+          conversationModel.postValue(it)
+
+          loadConversationState.postValue(Unit)
+        }
+        .onFailure {
+          loadConversationState.postError(it)
+        }
+    }
+  }
+
+  fun loadNextPage(force: Boolean = false) {
+    if (loadConversationState.isLoading) {
+      return
+    }
+
+    loadConversationState.setIsLoading()
+
+    viewModelScope.launch {
+      loadPage(nextPageIndex, force)
+        .onSuccess {
+          conversationModel.postValue(it)
+          nextPageIndex++
+
+          loadConversationState.postValue(Unit)
+        }
+        .onFailure {
+          loadConversationState.postError(it)
+        }
+    }
+  }
+
+  private suspend fun loadPage(pageIndex: Int, force: Boolean = false): Result<ConversationModel> =
+    withContext(Dispatchers.Default) {
+      val inboxItems = inboxRepository
+        ?.getPage(pageIndex = pageIndex, pageType = PageType.Conversation, force = force)
+
+      if (inboxItems == null) {
+        return@withContext Result.failure(RuntimeException("Inbox repository is null!"))
+      }
+
+      inboxItems.fold(
+        onSuccess = {
+          it.items.filterIsInstance<MessageItem>()
+            .forEach { messageItem ->
+              allMessagesById[messageItem.id] = messageItem
             }
-        }
+
+          val allMessages = allMessagesById.values
+            .sortedByDescending { it.lastUpdateTs }
+          val account = accountManager.currentAccount.asAccount
+
+          if (!it.hasMore) {
+            lastPageIndex = pageIndex
+          }
+
+          highestLoadedPageIndex = max(highestLoadedPageIndex, pageIndex)
+
+          Result.success(
+            ConversationModel(
+              accountId = account?.id,
+              allMessages = allMessages,
+              nextPageIndex = nextPageIndex,
+              hasMore =
+              if (lastPageIndex < 0) {
+                true
+              } else {
+                highestLoadedPageIndex < lastPageIndex
+              },
+            ),
+          )
+        },
+        onFailure = {
+          Result.failure(it)
+        },
+      )
     }
 
-    fun sendComment(accountId: Long, content: String) {
-        if (content.isBlank()) {
-            return
-        }
+  fun markAsRead(id: Int) {
+    viewModelScope.launch {
+      apiClient.markPrivateMessageAsRead(id, true)
+      conversationsManager.refreshConversations()
+      personId?.let {
+        conversationsManager.updateConversation(it)
+      }
+    }
+  }
 
-        commentSentEvent.setIsLoading()
-
-        viewModelScope.launch {
-            val account = accountManager.getAccountById(accountId)
-                ?: return@launch
-            val personId = personId
-                ?: return@launch
-
-            apiClient
-                .createPrivateMessage(
-                    content = content,
-                    recipient = personId,
-                    account = account,
-                )
-                .onFailure {
-                    commentSentEvent.postError(it)
-                }
-                .onSuccess {
-                    commentSentEvent.postValue(Unit)
-                    loadFirstPage(force = true)
-                    conversationsManager.updateConversation(personId)
-                }
-        }
+  fun sendComment(accountId: Long, content: String) {
+    if (content.isBlank()) {
+      return
     }
 
-    fun saveDraft(text: String?) {
-        val personId = personId ?: return
+    commentSentEvent.setIsLoading()
 
-        conversationsManager.saveDraftAsync(personId, text)
+    viewModelScope.launch {
+      val account = accountManager.getAccountById(accountId)
+        ?: return@launch
+      val personId = personId
+        ?: return@launch
+
+      apiClient
+        .createPrivateMessage(
+          content = content,
+          recipient = personId,
+          account = account,
+        )
+        .onFailure {
+          commentSentEvent.postError(it)
+        }
+        .onSuccess {
+          commentSentEvent.postValue(Unit)
+          loadFirstPage(force = true)
+          conversationsManager.updateConversation(personId)
+        }
     }
+  }
+
+  fun saveDraft(text: String?) {
+    val personId = personId ?: return
+
+    conversationsManager.saveDraftAsync(personId, text)
+  }
 }

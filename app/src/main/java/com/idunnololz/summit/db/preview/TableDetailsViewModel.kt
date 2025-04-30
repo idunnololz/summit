@@ -15,36 +15,36 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class TableDetailsViewModel @Inject constructor() : ViewModel() {
 
-    data class Model(
-        val tableName: String,
-        val rowCount: Int,
-        val columnNames: List<String>,
-        val rows: List<TableRow>,
-    )
+  data class Model(
+    val tableName: String,
+    val rowCount: Int,
+    val columnNames: List<String>,
+    val rows: List<TableRow>,
+  )
 
-    val model = StatefulLiveData<Model>()
+  val model = StatefulLiveData<Model>()
 
-    fun loadDbDetails(dbUri: Uri, tableName: String) {
-        model.setIsLoading()
+  fun loadDbDetails(dbUri: Uri, tableName: String) {
+    model.setIsLoading()
 
-        viewModelScope.launch {
-            val dbHelper = DbHelper(
-                SQLiteDatabase.openDatabase(dbUri.toFile().path, null, 0),
-            )
+    viewModelScope.launch {
+      val dbHelper = DbHelper(
+        SQLiteDatabase.openDatabase(dbUri.toFile().path, null, 0),
+      )
 
-            val rowCount = dbHelper.getTableRowCount(tableName)
-            val fullTable = dbHelper.getTableRows(tableName)
+      val rowCount = dbHelper.getTableRowCount(tableName)
+      val fullTable = dbHelper.getTableRows(tableName)
 
-            model.postValue(
-                Model(
-                    tableName = tableName,
-                    rowCount = rowCount,
-                    columnNames = fullTable.columnNames,
-                    rows = fullTable.tableRows,
-                ),
-            )
+      model.postValue(
+        Model(
+          tableName = tableName,
+          rowCount = rowCount,
+          columnNames = fullTable.columnNames,
+          rows = fullTable.tableRows,
+        ),
+      )
 
-            dbHelper.close()
-        }
+      dbHelper.close()
     }
+  }
 }

@@ -7,10 +7,10 @@ import javax.inject.Singleton
 @Singleton
 class CachePolicyManager @Inject constructor(private val preferences: Preferences) {
 
-    var cachePolicy: CachePolicy = preferences.cachePolicy
-        private set
+  var cachePolicy: CachePolicy = preferences.cachePolicy
+    private set
 
-    fun refreshCachePolicy() {
-        cachePolicy = preferences.cachePolicy
-    }
+  fun refreshCachePolicy() {
+    cachePolicy = preferences.cachePolicy
+  }
 }

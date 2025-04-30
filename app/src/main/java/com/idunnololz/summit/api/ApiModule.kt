@@ -16,27 +16,24 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 @Module
 @InstallIn(SingletonComponent::class)
 class ApiModule {
-    @Provides
-    @Singleton
-    fun provideSummitServerApi(
-        @SummitApi okHttpClient: OkHttpClient,
-        json: Json,
-    ): SummitServerApi {
-        return Retrofit.Builder()
-            .apply {
-                if (BuildConfig.DEBUG) {
-                    baseUrl("http://10.0.2.2:8080")
-                } else {
-                    baseUrl("https://summitforlemmyserver.idunnololz.com")
-                }
-            }
-            .addConverterFactory(
-                json.asConverterFactory(
-                    "application/json; charset=UTF8".toMediaType(),
-                ),
-            )
-            .client(okHttpClient)
-            .build()
-            .create(SummitServerApi::class.java)
-    }
+  @Provides
+  @Singleton
+  fun provideSummitServerApi(@SummitApi okHttpClient: OkHttpClient, json: Json): SummitServerApi {
+    return Retrofit.Builder()
+      .apply {
+        if (BuildConfig.DEBUG) {
+          baseUrl("http://10.0.2.2:8080")
+        } else {
+          baseUrl("https://summitforlemmyserver.idunnololz.com")
+        }
+      }
+      .addConverterFactory(
+        json.asConverterFactory(
+          "application/json; charset=UTF8".toMediaType(),
+        ),
+      )
+      .client(okHttpClient)
+      .build()
+      .create(SummitServerApi::class.java)
+  }
 }

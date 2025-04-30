@@ -12,10 +12,10 @@ include(":thirdPartyModules:zoomLayout")
 rootProject.name = "summit"
 
 pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
+  repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+  }
 }
 include(":tools")

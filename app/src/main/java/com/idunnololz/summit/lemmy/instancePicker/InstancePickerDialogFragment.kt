@@ -31,151 +31,151 @@ import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class InstancePickerDialogFragment :
-    BaseDialogFragment<DialogFragmentInstancePickerBinding>(),
-    FullscreenDialogFragment {
+  BaseDialogFragment<DialogFragmentInstancePickerBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
-        const val REQUEST_KEY = "InstancePickerDialogFragment_req_key"
-        const val REQUEST_KEY_RESULT = "result"
+  companion object {
+    const val REQUEST_KEY = "InstancePickerDialogFragment_req_key"
+    const val REQUEST_KEY_RESULT = "result"
 
-        fun show(fragmentManager: FragmentManager) {
-            InstancePickerDialogFragment()
-                .showAllowingStateLoss(fragmentManager, "InstancePickerDialogFragment")
+    fun show(fragmentManager: FragmentManager) {
+      InstancePickerDialogFragment()
+        .showAllowingStateLoss(fragmentManager, "InstancePickerDialogFragment")
+    }
+  }
+
+  private var adapter: InstanceAdapter? = null
+
+  private val viewModel: InstancePickerViewModel by viewModels()
+
+  @Inject
+  lateinit var offlineManager: OfflineManager
+
+  @Inject
+  lateinit var userCommunitiesManager: UserCommunitiesManager
+
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
+
+  private val searchEditTextPressedHandler = object : OnBackPressedCallback(false) {
+    override fun handleOnBackPressed() {
+      binding.searchEditText.setText("")
+    }
+  }
+
+  @Parcelize
+  data class Result(
+    val instance: String,
+  ) : Parcelable
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentInstancePickerBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    requireMainActivity().apply {
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+    }
+
+    val context = requireContext()
+
+    with(binding) {
+      searchEditText.addTextChangedListener {
+        val query = it?.toString() ?: ""
+        adapter?.setQuery(query) {
+          resultsRecyclerView.scrollToPosition(0)
         }
-    }
+        viewModel.doQuery(query)
 
-    private var adapter: InstanceAdapter? = null
+        searchEditTextPressedHandler.isEnabled = query.isNotEmpty()
+      }
+      searchBar.hint = viewModel.instance
+      searchEditText.hint = viewModel.instance
 
-    private val viewModel: InstancePickerViewModel by viewModels()
-
-    @Inject
-    lateinit var offlineManager: OfflineManager
-
-    @Inject
-    lateinit var userCommunitiesManager: UserCommunitiesManager
-
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
-
-    private val searchEditTextPressedHandler = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            binding.searchEditText.setText("")
-        }
-    }
-
-    @Parcelize
-    data class Result(
-        val instance: String,
-    ) : Parcelable
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                WindowCompat.setDecorFitsSystemWindows(window, false)
+      searchEditText.setOnKeyListener(
+        object : View.OnKeyListener {
+          override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+            if (event?.action == KeyEvent.ACTION_DOWN &&
+              keyCode == KeyEvent.KEYCODE_ENTER
+            ) {
+              setFragmentResult(
+                REQUEST_KEY,
+                bundleOf(
+                  REQUEST_KEY_RESULT to Result(searchEditText.text.toString()),
+                ),
+              )
+              dismiss()
+              return true
             }
+            return false
+          }
+        },
+      )
+
+      adapter = InstanceAdapter(
+        context = context,
+        offlineManager = offlineManager,
+        canSelectMultipleCommunities = false,
+        onSingleInstanceSelected = { instance ->
+          setFragmentResult(
+            REQUEST_KEY,
+            bundleOf(
+              REQUEST_KEY_RESULT to Result(instance),
+            ),
+          )
+          dismiss()
+        },
+      )
+      resultsRecyclerView.setup(animationsHelper)
+      resultsRecyclerView.adapter = adapter
+      resultsRecyclerView.setHasFixedSize(true)
+      resultsRecyclerView.layoutManager = LinearLayoutManager(context)
+
+      viewModel.searchResults.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            adapter?.setQueryServerResults(InstancePickerViewModel.SearchResults())
+          }
+          is StatefulData.Loading -> {
+            adapter?.setQueryServerResultsInProgress()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            adapter?.setQueryServerResults(it.data)
+          }
         }
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        setBinding(DialogFragmentInstancePickerBinding.inflate(inflater, container, false))
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        requireMainActivity().apply {
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-        }
-
-        val context = requireContext()
-
-        with(binding) {
-            searchEditText.addTextChangedListener {
-                val query = it?.toString() ?: ""
-                adapter?.setQuery(query) {
-                    resultsRecyclerView.scrollToPosition(0)
-                }
-                viewModel.doQuery(query)
-
-                searchEditTextPressedHandler.isEnabled = query.isNotEmpty()
-            }
-            searchBar.hint = viewModel.instance
-            searchEditText.hint = viewModel.instance
-
-            searchEditText.setOnKeyListener(
-                object : View.OnKeyListener {
-                    override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-                        if (event?.action == KeyEvent.ACTION_DOWN &&
-                            keyCode == KeyEvent.KEYCODE_ENTER
-                        ) {
-                            setFragmentResult(
-                                REQUEST_KEY,
-                                bundleOf(
-                                    REQUEST_KEY_RESULT to Result(searchEditText.text.toString()),
-                                ),
-                            )
-                            dismiss()
-                            return true
-                        }
-                        return false
-                    }
-                },
-            )
-
-            adapter = InstanceAdapter(
-                context = context,
-                offlineManager = offlineManager,
-                canSelectMultipleCommunities = false,
-                onSingleInstanceSelected = { instance ->
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        bundleOf(
-                            REQUEST_KEY_RESULT to Result(instance),
-                        ),
-                    )
-                    dismiss()
-                },
-            )
-            resultsRecyclerView.setup(animationsHelper)
-            resultsRecyclerView.adapter = adapter
-            resultsRecyclerView.setHasFixedSize(true)
-            resultsRecyclerView.layoutManager = LinearLayoutManager(context)
-
-            viewModel.searchResults.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        adapter?.setQueryServerResults(InstancePickerViewModel.SearchResults())
-                    }
-                    is StatefulData.Loading -> {
-                        adapter?.setQueryServerResultsInProgress()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        adapter?.setQueryServerResults(it.data)
-                    }
-                }
-            }
-        }
-
-        onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            searchEditTextPressedHandler,
-        )
-    }
+    onBackPressedDispatcher.addCallback(
+      viewLifecycleOwner,
+      searchEditTextPressedHandler,
+    )
+  }
 }

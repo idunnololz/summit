@@ -20,135 +20,135 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class UploadHelper @Inject constructor(
-    private val context: Application,
-    private val accountManager: AccountManager,
-    private val preferences: Preferences,
-    private val directoryHelper: DirectoryHelper,
-    private val imgurApiClient: ImgurApiClient,
-    private val lemmyApiClientFactory: LemmyApiClient.Factory,
+  private val context: Application,
+  private val accountManager: AccountManager,
+  private val preferences: Preferences,
+  private val directoryHelper: DirectoryHelper,
+  private val imgurApiClient: ImgurApiClient,
+  private val lemmyApiClientFactory: LemmyApiClient.Factory,
 ) {
 
-    companion object {
-        const val TAG = "UploadHelper"
+  companion object {
+    const val TAG = "UploadHelper"
 
-        private var nextId = 0
+    private var nextId = 0
+  }
+
+  private val id = nextId++
+
+  private val uploaderApiClient = lemmyApiClientFactory.create()
+
+  private var uploadJob: Job? = null
+
+  val isUploading: Boolean
+    get() {
+      val uploadJob = uploadJob
+
+      return uploadJob != null && uploadJob.isActive
     }
 
-    private val id = nextId++
+  fun uploadAsync(
+    coroutineScope: CoroutineScope,
+    uri: Uri,
+    rotateAccounts: Boolean,
+    onSuccess: (UploadImageResult) -> Unit,
+    onFailure: (Throwable) -> Unit,
+  ) {
+    val file = File(directoryHelper.miscCacheDir, "upload_file_$id")
+    file.parentFile?.mkdirs()
 
-    private val uploaderApiClient = lemmyApiClientFactory.create()
+    val inputStream = context.contentResolver.openInputStream(uri)
 
-    private var uploadJob: Job? = null
-
-    val isUploading: Boolean
-        get() {
-            val uploadJob = uploadJob
-
-            return uploadJob != null && uploadJob.isActive
-        }
-
-    fun uploadAsync(
-        coroutineScope: CoroutineScope,
-        uri: Uri,
-        rotateAccounts: Boolean,
-        onSuccess: (UploadImageResult) -> Unit,
-        onFailure: (Throwable) -> Unit,
-    ) {
-        val file = File(directoryHelper.miscCacheDir, "upload_file_$id")
-        file.parentFile?.mkdirs()
-
-        val inputStream = context.contentResolver.openInputStream(uri)
-
-        uploadJob = coroutineScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    inputStream.use { input ->
-                        file.outputStream().use { output ->
-                            input?.copyTo(output)
-                        }
-                    }
-                }
-
-                uploadFile(file, rotateAccounts)
-                    .onSuccess {
-                        onSuccess(it)
-                    }
-                    .onFailure {
-                        onFailure(it)
-                    }
-            } finally {
-                file.delete()
+    uploadJob = coroutineScope.launch {
+      try {
+        withContext(Dispatchers.IO) {
+          inputStream.use { input ->
+            file.outputStream().use { output ->
+              input?.copyTo(output)
             }
+          }
         }
+
+        uploadFile(file, rotateAccounts)
+          .onSuccess {
+            onSuccess(it)
+          }
+          .onFailure {
+            onFailure(it)
+          }
+      } finally {
+        file.delete()
+      }
     }
+  }
 
-    suspend fun uploadFile(file: File, rotateAccounts: Boolean): Result<UploadImageResult> {
-        try {
-            val currentAccount = accountManager.currentAccount.asAccount
+  suspend fun uploadFile(file: File, rotateAccounts: Boolean): Result<UploadImageResult> {
+    try {
+      val currentAccount = accountManager.currentAccount.asAccount
 
-            val allAccounts = mutableListOf<Account>()
-            if (currentAccount != null) {
-                allAccounts.add(currentAccount)
-            }
-            if (rotateAccounts) {
-                allAccounts.addAll(accountManager.getAccounts())
-            }
+      val allAccounts = mutableListOf<Account>()
+      if (currentAccount != null) {
+        allAccounts.add(currentAccount)
+      }
+      if (rotateAccounts) {
+        allAccounts.addAll(accountManager.getAccounts())
+      }
 
-            val attemptedInstances = mutableSetOf<String>()
+      val attemptedInstances = mutableSetOf<String>()
 
-            var uploadResult: Result<UploadImageResult>? = null
+      var uploadResult: Result<UploadImageResult>? = null
 
-            if (!file.exists()) {
-                return Result.failure(RuntimeException("file_not_found"))
-            }
+      if (!file.exists()) {
+        return Result.failure(RuntimeException("file_not_found"))
+      }
 
-            if (preferences.uploadImagesToImgur) {
-                return imgurApiClient.uploadFile(file)
-                    .fold(
-                        {
-                            if (it.link != null) {
-                                Result.success(UploadImageResult(it.link))
-                            } else {
-                                Result.failure(
-                                    RuntimeException("Upload success but no link returned."),
-                                )
-                            }
-                        },
-                        {
-                            Result.failure(it)
-                        },
-                    )
-            }
+      if (preferences.uploadImagesToImgur) {
+        return imgurApiClient.uploadFile(file)
+          .fold(
+            {
+              if (it.link != null) {
+                Result.success(UploadImageResult(it.link))
+              } else {
+                Result.failure(
+                  RuntimeException("Upload success but no link returned."),
+                )
+              }
+            },
+            {
+              Result.failure(it)
+            },
+          )
+      }
 
-            for (account in allAccounts) {
-                val uploadInstance = account.instance
+      for (account in allAccounts) {
+        val uploadInstance = account.instance
 
-                if (attemptedInstances.contains(uploadInstance)) {
-                    continue
-                }
-                attemptedInstances.add(uploadInstance)
-
-                Log.d(TAG, "Uploading onto instance $uploadInstance.")
-                uploaderApiClient.changeInstance(uploadInstance)
-
-                val thisUploadResult = file.inputStream().use { inputStream ->
-                    uploaderApiClient.uploadImage(account, "image", inputStream)
-                }
-
-                if (uploadResult == null) {
-                    uploadResult = thisUploadResult
-                }
-
-                if (thisUploadResult.isSuccess) {
-                    uploadResult = thisUploadResult
-                    break
-                }
-            }
-
-            return uploadResult!!
-        } catch (e: SecurityException) {
-            Log.e(TAG, "Upload failed with an exception.", e)
-            return Result.failure(e)
+        if (attemptedInstances.contains(uploadInstance)) {
+          continue
         }
+        attemptedInstances.add(uploadInstance)
+
+        Log.d(TAG, "Uploading onto instance $uploadInstance.")
+        uploaderApiClient.changeInstance(uploadInstance)
+
+        val thisUploadResult = file.inputStream().use { inputStream ->
+          uploaderApiClient.uploadImage(account, "image", inputStream)
+        }
+
+        if (uploadResult == null) {
+          uploadResult = thisUploadResult
+        }
+
+        if (thisUploadResult.isSuccess) {
+          uploadResult = thisUploadResult
+          break
+        }
+      }
+
+      return uploadResult!!
+    } catch (e: SecurityException) {
+      Log.e(TAG, "Upload failed with an exception.", e)
+      return Result.failure(e)
     }
+  }
 }

@@ -5,14 +5,14 @@ import com.idunnololz.summit.api.summit.CommunitySuggestionsDto
 import com.idunnololz.summit.lemmy.CommunityRef
 
 data class SearchHomeModel(
-    val suggestions: List<String>,
-    val myCommunities: List<MyCommunity>,
-    val communitySuggestionsDto: CommunitySuggestionsDto?,
-    val isCommunitySuggestionsLoading: Boolean,
-    val errors: List<Throwable>,
+  val suggestions: List<String>,
+  val myCommunities: List<MyCommunity>,
+  val communitySuggestionsDto: CommunitySuggestionsDto?,
+  val isCommunitySuggestionsLoading: Boolean,
+  val errors: List<Throwable>,
 )
 
 data class MyCommunity(
-    val communityRef: CommunityRef,
-    val sub: AccountSubscription,
+  val communityRef: CommunityRef,
+  val sub: AccountSubscription,
 )

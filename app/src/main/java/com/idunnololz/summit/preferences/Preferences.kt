@@ -166,526 +166,526 @@ import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
 private val Context.offlineModeDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "offlineModePreferences",
+  name = "offlineModePreferences",
 )
 
 class Preferences(
-    @ApplicationContext private val context: Context,
-    private var sharedPreferencesManager: SharedPreferencesManager,
-    override var sharedPreferences: SharedPreferences,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
-    override val json: Json,
+  @ApplicationContext private val context: Context,
+  private var sharedPreferencesManager: SharedPreferencesManager,
+  override var sharedPreferences: SharedPreferences,
+  private val coroutineScopeFactory: CoroutineScopeFactory,
+  override val json: Json,
 ) : SharedPreferencesPreferences {
 
-    companion object {
-        private const val TAG = "Preferences"
+  companion object {
+    private const val TAG = "Preferences"
+  }
+
+  private val coroutineScope = coroutineScopeFactory.create()
+
+  @Suppress("ObjectLiteralToLambda")
+  private val preferenceChangeListener = object : OnSharedPreferenceChangeListener {
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
+      coroutineScope.launch {
+        onPreferenceChangeFlow.emit(Unit)
+      }
+    }
+  }
+
+  val onPreferenceChangeFlow = MutableSharedFlow<Unit>()
+
+  init {
+    sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+  }
+
+  val all: MutableMap<String, *>
+    get() = sharedPreferences.all
+
+  var defaultPage: CommunityRef
+    by jsonPreference(KEY_DEFAULT_PAGE) { CommunityRef.All() }
+
+  fun updateWhichSharedPreference() {
+    sharedPreferences = sharedPreferencesManager.currentSharedPreferences
+  }
+
+  fun getPostsLayout(): CommunityLayout = try {
+    CommunityLayout.valueOf(
+      sharedPreferences
+        .getString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, null) ?: "",
+    )
+  } catch (e: IllegalArgumentException) {
+    CommunityLayout.List
+  }
+
+  fun setPostsLayout(layout: CommunityLayout) {
+    sharedPreferences.base.edit {
+      putString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, layout.name)
+    }
+  }
+
+  fun getPostInListUiConfig(): PostInListUiConfig {
+    return getPostInListUiConfig(getPostsLayout())
+  }
+
+  fun setPostInListUiConfig(config: PostInListUiConfig) {
+    sharedPreferences.putJsonValue(json, getPostUiConfigKey(getPostsLayout()), config)
+  }
+
+  fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig {
+    return sharedPreferences.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
+      ?: layout.getDefaultPostUiConfig()
+  }
+
+  var postAndCommentsUiConfig: PostAndCommentsUiConfig
+    by jsonPreference(KEY_POST_AND_COMMENTS_UI_CONFIG) { getDefaultPostAndCommentsUiConfig() }
+
+  private fun getPostUiConfigKey(layout: CommunityLayout) = when (layout) {
+    CommunityLayout.Compact ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_COMPACT
+    CommunityLayout.List ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_LIST
+    CommunityLayout.LargeList ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_LARGE_LIST
+    CommunityLayout.Card ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_CARD
+    CommunityLayout.Card2 ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_CARD2
+    CommunityLayout.Card3 ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_CARD3
+    CommunityLayout.Full ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_FULL
+    CommunityLayout.ListWithCards ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
+    CommunityLayout.FullWithCards ->
+      PreferenceUtils.KEY_POST_UI_CONFIG_FULL_WITH_CARDS
+  }
+
+  var isUseMaterialYou: Boolean
+    by booleanPreference(KEY_USE_MATERIAL_YOU, false)
+
+  var isBlackTheme: Boolean
+    by booleanPreference(KEY_USE_BLACK_THEME, false)
+
+  var isVideoPlayerRotationLocked: Boolean
+    by booleanPreference(KEY_VIDEO_PLAYER_ROTATION_LOCKED, false)
+
+  var baseTheme: BaseTheme
+    by jsonPreference(KEY_BASE_THEME) { BaseTheme.Dark }
+
+  var useLessDarkBackgroundTheme: Boolean
+    by booleanPreference(KEY_USE_LESS_DARK_BACKGROUND, false)
+
+  var markPostsAsReadOnScroll: Boolean
+    by booleanPreference(KEY_MARK_POSTS_AS_READ_ON_SCROLL, false)
+
+  var useGestureActions: Boolean
+    by booleanPreference(KEY_USE_GESTURE_ACTIONS, true)
+
+  var hideCommentActions: Boolean
+    by booleanPreference(KEY_HIDE_COMMENT_ACTIONS, true)
+
+  var tapCommentToCollapse: Boolean
+    by booleanPreference(KEY_TAP_COMMENT_TO_COLLAPSE, false)
+
+  var infinity: Boolean
+    by booleanPreference(KEY_INFINITY, true)
+
+  var postGestureAction1: Int
+    by intPreference(KEY_POST_GESTURE_ACTION_1, PostGestureAction.Upvote)
+
+  var postGestureAction2: Int
+    by intPreference(KEY_POST_GESTURE_ACTION_2, PostGestureAction.Reply)
+
+  var postGestureAction3: Int
+    by intPreference(KEY_POST_GESTURE_ACTION_3, PostGestureAction.MarkAsRead)
+
+  var postGestureActionColor1: Int?
+    by nullableIntPreference(KEY_POST_GESTURE_ACTION_COLOR_1)
+
+  var postGestureActionColor2: Int?
+    by nullableIntPreference(KEY_POST_GESTURE_ACTION_COLOR_2)
+
+  var postGestureActionColor3: Int?
+    by nullableIntPreference(KEY_POST_GESTURE_ACTION_COLOR_3)
+
+  var postGestureSize: Float
+    by floatPreference(KEY_POST_GESTURE_SIZE, 0.5f)
+
+  var commentGestureAction1: Int
+    by intPreference(KEY_COMMENT_GESTURE_ACTION_1, CommentGestureAction.Upvote)
+
+  var commentGestureAction2: Int
+    by intPreference(KEY_COMMENT_GESTURE_ACTION_2, CommentGestureAction.Downvote)
+
+  var commentGestureAction3: Int
+    by intPreference(KEY_COMMENT_GESTURE_ACTION_3, CommentGestureAction.Reply)
+
+  var commentGestureActionColor1: Int?
+    by nullableIntPreference(KEY_COMMENT_GESTURE_ACTION_COLOR_1)
+
+  var commentGestureActionColor2: Int?
+    by nullableIntPreference(KEY_COMMENT_GESTURE_ACTION_COLOR_2)
+
+  var commentGestureActionColor3: Int?
+    by nullableIntPreference(KEY_COMMENT_GESTURE_ACTION_COLOR_3)
+
+  var commentGestureSize: Float
+    by floatPreference(KEY_COMMENT_GESTURE_SIZE, 0.5f)
+
+  var commentThreadStyle: CommentThreadStyleId
+    by intPreference(KEY_COMMENT_THREAD_STYLE, CommentsThreadStyle.MODERN)
+
+  var blurNsfwPosts: Boolean
+    by booleanPreference(KEY_BLUR_NSFW_POSTS, true)
+
+  var showLinkPosts: Boolean
+    by booleanPreference(KEY_SHOW_LINK_POSTS, true)
+  var showImagePosts: Boolean
+    by booleanPreference(KEY_SHOW_IMAGE_POSTS, true)
+  var showVideoPosts: Boolean
+    by booleanPreference(KEY_SHOW_VIDEO_POSTS, true)
+  var showTextPosts: Boolean
+    by booleanPreference(KEY_SHOW_TEXT_POSTS, true)
+  var showNsfwPosts: Boolean
+    by booleanPreference(KEY_SHOW_NSFW_POSTS, true)
+
+  var globalFontSize: Int
+    by intPreference(KEY_GLOBAL_FONT_SIZE, GlobalFontSizeId.Normal)
+
+  var globalFontColor: Int
+    by intPreference(KEY_GLOBAL_FONT_COLOR, GlobalFontColorId.Calm)
+
+  var defaultCommunitySortOrder: CommunitySortOrder?
+    by jsonPreference(KEY_DEFAULT_COMMUNITY_SORT_ORDER) { null }
+  var defaultCommentsSortOrder: CommentsSortOrder?
+    by jsonPreference(KEY_DEFAULT_COMMENTS_SORT_ORDER) { null }
+
+  var alwaysShowLinkButtonBelowPost: Boolean
+    by booleanPreference(KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST, false)
+
+  var postListViewImageOnSingleTap: Boolean
+    by booleanPreference(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP, false)
+
+  var colorScheme: ColorSchemeId
+    by intPreference(KEY_COLOR_SCHEME, ColorSchemes.Default)
+
+  var commentsNavigationFab: Boolean
+    by booleanPreference(KEY_COMMENTS_NAVIGATION_FAB, false)
+  var useVolumeButtonNavigation: Boolean
+    by booleanPreference(KEY_USE_VOLUME_BUTTON_NAVIGATION, false)
+  var collapseChildCommentsByDefault: Boolean
+    by booleanPreference(KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT, false)
+
+  var commentsNavigationFabOffX: Int
+    by intPreference(KEY_COMMENTS_NAVIGATION_FAB_OFF_X, 0)
+
+  var commentsNavigationFabOffY: Int
+    by intPreference(KEY_COMMENTS_NAVIGATION_FAB_OFF_Y, -Utils.convertDpToPixel(24f).toInt())
+
+  var hidePostScores: Boolean
+    by booleanPreference(KEY_HIDE_POST_SCORES, false)
+
+  var hideCommentScores: Boolean
+    by booleanPreference(KEY_HIDE_COMMENT_SCORES, false)
+
+  var globalFont: Int
+    by intPreference(KEY_GLOBAL_FONT, FontIds.DEFAULT)
+
+  var upvoteColor: Int
+    by intPreference(KEY_UPVOTE_COLOR, context.getColorCompat(R.color.upvoteColor))
+  var downvoteColor: Int
+    by intPreference(KEY_DOWNVOTE_COLOR, context.getColorCompat(R.color.downvoteColor))
+
+  var openLinksInExternalApp: Boolean
+    by booleanPreference(KEY_OPEN_LINKS_IN_APP, false)
+  var autoLinkPhoneNumbers: Boolean
+    by booleanPreference(KEY_AUTO_LINK_PHONE_NUMBERS, false)
+  var autoLinkIpAddresses: Boolean
+    by booleanPreference(KEY_AUTO_LINK_IP_ADDRESSES, true)
+  var postShowUpAndDownVotes: Boolean
+    by booleanPreference(KEY_POST_SHOW_UP_AND_DOWN_VOTES, false)
+  var commentShowUpAndDownVotes: Boolean
+    by booleanPreference(KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES, false)
+
+  var displayInstanceStyle: Int
+    by intPreference(
+      KEY_DISPLAY_INSTANCE_STYLE,
+      DisplayInstanceOptions.OnlyDisplayNonLocalInstances,
+    )
+
+  var retainLastPost: Boolean
+    by booleanPreference(KEY_RETAIN_LAST_POST, true)
+
+  var leftHandMode: Boolean
+    by booleanPreference(KEY_LEFT_HAND_MODE, false)
+
+  var transparentNotificationBar: Boolean
+    by booleanPreference(KEY_TRANSPARENT_NOTIFICATION_BAR, false)
+
+  var lockBottomBar: Boolean
+    by booleanPreference(KEY_LOCK_BOTTOM_BAR, false)
+
+  var appVersionLastLaunch: Int
+    by intPreference(KEY_PREF_VERSION, 0)
+
+  var previewLinks: Int
+    get() = try {
+      sharedPreferences.getInt(KEY_PREVIEW_LINKS, PreviewTextLinks)
+    } catch (e: Exception) {
+      PreviewTextLinks
+    }
+    set(value) {
+      sharedPreferences.edit()
+        .putInt(KEY_PREVIEW_LINKS, value)
+        .apply()
     }
 
-    private val coroutineScope = coroutineScopeFactory.create()
+  var screenshotWidthDp: Int
+    by intPreference(KEY_SCREENSHOT_WIDTH_DP, 360)
 
-    @Suppress("ObjectLiteralToLambda")
-    private val preferenceChangeListener = object : OnSharedPreferenceChangeListener {
-        override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
-            coroutineScope.launch {
-                onPreferenceChangeFlow.emit(Unit)
-            }
+  var dateScreenshots: Boolean
+    by booleanPreference(KEY_DATE_SCREENSHOTS, true)
+
+  var screenshotWatermark: Int
+    by intPreference(KEY_SCREENSHOT_WATERMARK, ScreenshotWatermarkId.LEMMY)
+
+  var useFirebase: Boolean
+    by booleanPreference(KEY_USE_FIREBASE, true)
+
+  var autoCollapseCommentThreshold: Float
+    by floatPreference(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD, 0.3f)
+
+  var trackBrowsingHistory: Boolean
+    by booleanPreference(KEY_TRACK_BROWSING_HISTORY, true)
+
+  var useCustomNavBar: Boolean
+    by booleanPreference(KEY_USE_CUSTOM_NAV_BAR, false)
+
+  var navBarConfig: NavBarConfig
+    by jsonPreference(KEY_NAV_BAR_ITEMS) { NavBarConfig() }
+
+  var useBottomNavBar: Boolean
+    by booleanPreference(KEY_USE_BOTTOM_NAV_BAR, true)
+
+  var isHiddenPostsEnabled: Boolean
+    by booleanPreference(KEY_ENABLE_HIDDEN_POSTS, true)
+
+  var usePredictiveBack: Boolean
+    by booleanPreference(KEY_USE_PREDICTIVE_BACK, false)
+
+  var autoLoadMorePosts: Boolean
+    by booleanPreference(KEY_AUTO_LOAD_MORE_POSTS, true)
+
+  var infinityPageIndicator: Boolean
+    by booleanPreference(KEY_INFINITY_PAGE_INDICATOR, false)
+
+  var warnReplyToOldContent: Boolean
+    by booleanPreference(KEY_WARN_REPLY_TO_OLD_CONTENT, true)
+
+  var warnReplyToOldContentThresholdMs: Long
+    by longPreference(
+      KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS,
+      1000 * 60 * 60 * 24 * 2,
+    )
+
+  var showPostUpvotePercentage: Boolean
+    by booleanPreference(KEY_SHOW_POST_UPVOTE_PERCENTAGE, false)
+
+  var showCommentUpvotePercentage: Boolean
+    by booleanPreference(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE, false)
+
+  var useMultilinePostHeaders: Boolean
+    by booleanPreference(KEY_USE_MULTILINE_POST_HEADERS, true)
+
+  var indicatePostsAndCommentsCreatedByCurrentUser: Boolean
+    by booleanPreference(KEY_INDICATE_CONTENT_FROM_CURRENT_USER, true)
+
+  var saveDraftsAutomatically: Boolean
+    by booleanPreference(KEY_SAVE_DRAFTS_AUTOMATICALLY, true)
+
+  var showProfileIcons: Boolean
+    by booleanPreference(KEY_SHOW_PROFILE_ICONS, true)
+
+  var commentHeaderLayout: Int
+    by intPreference(KEY_COMMENT_HEADER_LAYOUT, CommentHeaderLayoutId.SingleLine)
+
+  var navigationRailMode: Int
+    by intPreference(KEY_NAVIGATION_RAIL_MODE, NavigationRailModeId.ManualOff)
+
+  var downloadDirectory: String?
+    by stringPreference(KEY_DOWNLOAD_DIRECTORY, null)
+
+  var usePerCommunitySettings: Boolean
+    by booleanPreference(KEY_USE_PER_COMMUNITY_SETTINGS, true)
+
+  var guestAccountSettings: GuestAccountSettings?
+    by jsonPreference(KEY_GUEST_ACCOUNT_SETTINGS) { null }
+  var textFieldToolbarSettings: TextFieldToolbarSettings?
+    by jsonPreference(KEY_TEXT_FIELD_TOOLBAR_SETTINGS) { null }
+  var postQuickActions: PostQuickActionsSettings?
+    by jsonPreference(KEY_POST_QUICK_ACTIONS) { null }
+  var commentQuickActions: CommentQuickActionsSettings?
+    by jsonPreference(KEY_COMMENT_QUICK_ACTIONS) { null }
+  var postsInFeedQuickActions: PostsInFeedQuickActionsSettings?
+    by jsonPreference(KEY_POSTS_IN_FEED_QUICK_ACTIONS) { null }
+
+  var globalLayoutMode: GlobalLayoutMode
+    by intPreference(KEY_GLOBAL_LAYOUT_MODE, GlobalLayoutModes.Auto)
+
+  var rotateInstanceOnUploadFail: Boolean
+    by booleanPreference(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL, false)
+
+  var showFilteredPosts: Boolean
+    by booleanPreference(KEY_SHOW_FILTERED_POSTS, false)
+
+  var commentsShowInlineMediaAsLinks: Boolean
+    by booleanPreference(KEY_COMMENTS_SHOW_INLINE_MEDIA_AS_LINKS, false)
+
+  var isNotificationsOn: Boolean
+    by booleanPreference(KEY_IS_NOTIFICATIONS_ON, false)
+
+  var lastAccountNotificationId: Int
+    by intPreference(KEY_LAST_ACCOUNT_NOTIFICATION_ID, 0)
+
+  var notificationsCheckIntervalMs: Long
+    by longPreference(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, 1000L * 60L * 15L)
+
+  var homeFabQuickAction: Int
+    by intPreference(KEY_HOME_FAB_QUICK_ACTION, HomeFabQuickActionIds.None)
+
+  var showEditedDate: Boolean
+    by booleanPreference(KEY_SHOW_EDITED_DATE, true)
+
+  var imagePreviewHideUiByDefault: Boolean
+    by booleanPreference(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT, false)
+
+  var prefetchPosts: Boolean
+    by booleanPreference(KEY_PREFETCH_POSTS, true)
+
+  var autoPlayVideos: Boolean
+    by booleanPreference(KEY_AUTO_PLAY_VIDEOS, true)
+
+  var uploadImagesToImgur: Boolean
+    by booleanPreference(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
+
+  var animationLevel: AnimationsHelper.AnimationLevel
+    get() = AnimationsHelper.AnimationLevel.parse(
+      sharedPreferences.getInt(
+        KEY_ANIMATION_LEVEL,
+        AnimationsHelper.AnimationLevel.Max.animationLevel,
+      ),
+    )
+    set(value) {
+      sharedPreferences.edit()
+        .putInt(KEY_ANIMATION_LEVEL, value.animationLevel)
+        .apply()
+    }
+
+  var cachePolicy: CachePolicy
+    get() = CachePolicy.parse(
+      sharedPreferences.getInt(KEY_CACHE_POLICY, CachePolicy.Moderate.value),
+    )
+    set(value) {
+      sharedPreferences.edit()
+        .putInt(KEY_CACHE_POLICY, value.value)
+        .apply()
+    }
+
+  var useCondensedTypefaceForCommentHeaders: Boolean
+    by booleanPreference(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, true)
+
+  var parseMarkdownInPostTitles: Boolean
+    by booleanPreference(KEY_PARSE_MARKDOWN_IN_POST_TITLES, true)
+
+  var searchHomeConfig: SearchHomeConfig
+    by jsonPreference(KEY_SEARCH_HOME_CONFIG) { SearchHomeConfig() }
+
+  var postFeedShowScrollBar: Boolean
+    by booleanPreference(KEY_POST_FEED_SHOW_SCROLL_BAR, true)
+
+  var hapticsEnabled: Boolean
+    by booleanPreference(KEY_HAPTICS_ENABLED, true)
+
+  var hapticsOnActions: Boolean
+    get() = hapticsEnabled && sharedPreferences.getBoolean(KEY_HAPTICS_ON_ACTIONS, true)
+    set(value) {
+      sharedPreferences.edit()
+        .putBoolean(KEY_HAPTICS_ON_ACTIONS, value)
+        .apply()
+    }
+
+  var hideDuplicatePostsOnRead: Boolean
+    by booleanPreference(KEY_HIDE_DUPLICATE_POSTS_ON_READ, false)
+  var usePostsFeedHeader: Boolean
+    by booleanPreference(KEY_USE_POSTS_FEED_HEADER, false)
+  var inlineVideoDefaultVolume: Float
+    by floatPreference(KEY_INLINE_VIDEO_DEFAULT_VOLUME, 0f)
+  var swipeBetweenPosts: Boolean
+    by booleanPreference(KEY_SWIPE_BETWEEN_POSTS, false)
+  var postFabQuickAction: Int
+    by intPreference(KEY_POST_FAB_QUICK_ACTION, PostFabQuickActions.NONE)
+  var shakeToSendFeedback: Boolean
+    by booleanPreference(KEY_SHAKE_TO_SEND_FEEDBACK, true)
+  var showLabelsInNavBar: Boolean
+    by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
+  var warnNewPerson: Boolean
+    by booleanPreference(KEY_WARN_NEW_PERSON, true)
+  var gestureSwipeDirection: Int
+    by intPreference(KEY_GESTURE_SWIPE_DIRECTION, GestureSwipeDirectionIds.LEFT)
+  var defaultWebApp: DefaultAppPreference?
+    by jsonPreference(KEY_DEFAULT_APP_WEB_BROWSER) { null }
+  var preferredLocale: String?
+    by stringPreference(KEY_PREFERRED_LOCALE)
+  var communitySelectorShowCommunitySuggestions: Boolean
+    by booleanPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, true)
+  var postFullBleedImage: Boolean
+    by booleanPreference(KEY_POST_FULL_BLEED_IMAGE, true)
+  var userAgentChoice: Int
+    by intPreference(KEY_USER_AGENT_CHOICE, UserAgentChoiceIds.UNSET)
+
+  suspend fun getOfflinePostCount(): Int =
+    context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
+      ?: 100
+
+  fun reset(key: String) {
+    sharedPreferences.edit { remove(key) }
+  }
+
+  fun asJson(): JSONObject {
+    return sharedPreferences.asJson()
+  }
+
+  fun generateCode(): String {
+    val json = this.asJson()
+    return Utils.compress(json.toString(), Base64.NO_WRAP)
+  }
+
+  fun importSettings(settingsToImport: JSONObject, excludeKeys: Set<String>) {
+    sharedPreferences.importSettings(settingsToImport, excludeKeys)
+  }
+
+  private fun SharedPreferences.importSettings(
+    settingsToImport: JSONObject,
+    excludeKeys: Set<String>,
+  ) {
+    val allKeys = settingsToImport.keys().asSequence()
+    this.edit {
+      for (key in allKeys) {
+        if (excludeKeys.contains(key)) continue
+
+        when (val value = settingsToImport.opt(key)) {
+          is Float -> putFloat(key, value)
+          is Long -> putLong(key, value)
+          is String -> putString(key, value)
+          is Boolean -> putBoolean(key, value)
+          is Int -> putInt(key, value)
+          null -> remove(key)
         }
+      }
     }
-
-    val onPreferenceChangeFlow = MutableSharedFlow<Unit>()
-
-    init {
-        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-    }
-
-    val all: MutableMap<String, *>
-        get() = sharedPreferences.all
-
-    var defaultPage: CommunityRef
-        by jsonPreference(KEY_DEFAULT_PAGE) { CommunityRef.All() }
-
-    fun updateWhichSharedPreference() {
-        sharedPreferences = sharedPreferencesManager.currentSharedPreferences
-    }
-
-    fun getPostsLayout(): CommunityLayout = try {
-        CommunityLayout.valueOf(
-            sharedPreferences
-                .getString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, null) ?: "",
-        )
-    } catch (e: IllegalArgumentException) {
-        CommunityLayout.List
-    }
-
-    fun setPostsLayout(layout: CommunityLayout) {
-        sharedPreferences.base.edit {
-            putString(PreferenceUtils.KEY_COMMUNITY_LAYOUT, layout.name)
-        }
-    }
-
-    fun getPostInListUiConfig(): PostInListUiConfig {
-        return getPostInListUiConfig(getPostsLayout())
-    }
-
-    fun setPostInListUiConfig(config: PostInListUiConfig) {
-        sharedPreferences.putJsonValue(json, getPostUiConfigKey(getPostsLayout()), config)
-    }
-
-    fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig {
-        return sharedPreferences.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
-            ?: layout.getDefaultPostUiConfig()
-    }
-
-    var postAndCommentsUiConfig: PostAndCommentsUiConfig
-        by jsonPreference(KEY_POST_AND_COMMENTS_UI_CONFIG) { getDefaultPostAndCommentsUiConfig() }
-
-    private fun getPostUiConfigKey(layout: CommunityLayout) = when (layout) {
-        CommunityLayout.Compact ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_COMPACT
-        CommunityLayout.List ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_LIST
-        CommunityLayout.LargeList ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_LARGE_LIST
-        CommunityLayout.Card ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_CARD
-        CommunityLayout.Card2 ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_CARD2
-        CommunityLayout.Card3 ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_CARD3
-        CommunityLayout.Full ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_FULL
-        CommunityLayout.ListWithCards ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
-        CommunityLayout.FullWithCards ->
-            PreferenceUtils.KEY_POST_UI_CONFIG_FULL_WITH_CARDS
-    }
-
-    var isUseMaterialYou: Boolean
-        by booleanPreference(KEY_USE_MATERIAL_YOU, false)
-
-    var isBlackTheme: Boolean
-        by booleanPreference(KEY_USE_BLACK_THEME, false)
-
-    var isVideoPlayerRotationLocked: Boolean
-        by booleanPreference(KEY_VIDEO_PLAYER_ROTATION_LOCKED, false)
-
-    var baseTheme: BaseTheme
-        by jsonPreference(KEY_BASE_THEME) { BaseTheme.Dark }
-
-    var useLessDarkBackgroundTheme: Boolean
-        by booleanPreference(KEY_USE_LESS_DARK_BACKGROUND, false)
-
-    var markPostsAsReadOnScroll: Boolean
-        by booleanPreference(KEY_MARK_POSTS_AS_READ_ON_SCROLL, false)
-
-    var useGestureActions: Boolean
-        by booleanPreference(KEY_USE_GESTURE_ACTIONS, true)
-
-    var hideCommentActions: Boolean
-        by booleanPreference(KEY_HIDE_COMMENT_ACTIONS, true)
-
-    var tapCommentToCollapse: Boolean
-        by booleanPreference(KEY_TAP_COMMENT_TO_COLLAPSE, false)
-
-    var infinity: Boolean
-        by booleanPreference(KEY_INFINITY, true)
-
-    var postGestureAction1: Int
-        by intPreference(KEY_POST_GESTURE_ACTION_1, PostGestureAction.Upvote)
-
-    var postGestureAction2: Int
-        by intPreference(KEY_POST_GESTURE_ACTION_2, PostGestureAction.Reply)
-
-    var postGestureAction3: Int
-        by intPreference(KEY_POST_GESTURE_ACTION_3, PostGestureAction.MarkAsRead)
-
-    var postGestureActionColor1: Int?
-        by nullableIntPreference(KEY_POST_GESTURE_ACTION_COLOR_1)
-
-    var postGestureActionColor2: Int?
-        by nullableIntPreference(KEY_POST_GESTURE_ACTION_COLOR_2)
-
-    var postGestureActionColor3: Int?
-        by nullableIntPreference(KEY_POST_GESTURE_ACTION_COLOR_3)
-
-    var postGestureSize: Float
-        by floatPreference(KEY_POST_GESTURE_SIZE, 0.5f)
-
-    var commentGestureAction1: Int
-        by intPreference(KEY_COMMENT_GESTURE_ACTION_1, CommentGestureAction.Upvote)
-
-    var commentGestureAction2: Int
-        by intPreference(KEY_COMMENT_GESTURE_ACTION_2, CommentGestureAction.Downvote)
-
-    var commentGestureAction3: Int
-        by intPreference(KEY_COMMENT_GESTURE_ACTION_3, CommentGestureAction.Reply)
-
-    var commentGestureActionColor1: Int?
-        by nullableIntPreference(KEY_COMMENT_GESTURE_ACTION_COLOR_1)
-
-    var commentGestureActionColor2: Int?
-        by nullableIntPreference(KEY_COMMENT_GESTURE_ACTION_COLOR_2)
-
-    var commentGestureActionColor3: Int?
-        by nullableIntPreference(KEY_COMMENT_GESTURE_ACTION_COLOR_3)
-
-    var commentGestureSize: Float
-        by floatPreference(KEY_COMMENT_GESTURE_SIZE, 0.5f)
-
-    var commentThreadStyle: CommentThreadStyleId
-        by intPreference(KEY_COMMENT_THREAD_STYLE, CommentsThreadStyle.MODERN)
-
-    var blurNsfwPosts: Boolean
-        by booleanPreference(KEY_BLUR_NSFW_POSTS, true)
-
-    var showLinkPosts: Boolean
-        by booleanPreference(KEY_SHOW_LINK_POSTS, true)
-    var showImagePosts: Boolean
-        by booleanPreference(KEY_SHOW_IMAGE_POSTS, true)
-    var showVideoPosts: Boolean
-        by booleanPreference(KEY_SHOW_VIDEO_POSTS, true)
-    var showTextPosts: Boolean
-        by booleanPreference(KEY_SHOW_TEXT_POSTS, true)
-    var showNsfwPosts: Boolean
-        by booleanPreference(KEY_SHOW_NSFW_POSTS, true)
-
-    var globalFontSize: Int
-        by intPreference(KEY_GLOBAL_FONT_SIZE, GlobalFontSizeId.Normal)
-
-    var globalFontColor: Int
-        by intPreference(KEY_GLOBAL_FONT_COLOR, GlobalFontColorId.Calm)
-
-    var defaultCommunitySortOrder: CommunitySortOrder?
-        by jsonPreference(KEY_DEFAULT_COMMUNITY_SORT_ORDER) { null }
-    var defaultCommentsSortOrder: CommentsSortOrder?
-        by jsonPreference(KEY_DEFAULT_COMMENTS_SORT_ORDER) { null }
-
-    var alwaysShowLinkButtonBelowPost: Boolean
-        by booleanPreference(KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST, false)
-
-    var postListViewImageOnSingleTap: Boolean
-        by booleanPreference(KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP, false)
-
-    var colorScheme: ColorSchemeId
-        by intPreference(KEY_COLOR_SCHEME, ColorSchemes.Default)
-
-    var commentsNavigationFab: Boolean
-        by booleanPreference(KEY_COMMENTS_NAVIGATION_FAB, false)
-    var useVolumeButtonNavigation: Boolean
-        by booleanPreference(KEY_USE_VOLUME_BUTTON_NAVIGATION, false)
-    var collapseChildCommentsByDefault: Boolean
-        by booleanPreference(KEY_COLLAPSE_CHILD_COMMENTS_BY_DEFAULT, false)
-
-    var commentsNavigationFabOffX: Int
-        by intPreference(KEY_COMMENTS_NAVIGATION_FAB_OFF_X, 0)
-
-    var commentsNavigationFabOffY: Int
-        by intPreference(KEY_COMMENTS_NAVIGATION_FAB_OFF_Y, -Utils.convertDpToPixel(24f).toInt())
-
-    var hidePostScores: Boolean
-        by booleanPreference(KEY_HIDE_POST_SCORES, false)
-
-    var hideCommentScores: Boolean
-        by booleanPreference(KEY_HIDE_COMMENT_SCORES, false)
-
-    var globalFont: Int
-        by intPreference(KEY_GLOBAL_FONT, FontIds.DEFAULT)
-
-    var upvoteColor: Int
-        by intPreference(KEY_UPVOTE_COLOR, context.getColorCompat(R.color.upvoteColor))
-    var downvoteColor: Int
-        by intPreference(KEY_DOWNVOTE_COLOR, context.getColorCompat(R.color.downvoteColor))
-
-    var openLinksInExternalApp: Boolean
-        by booleanPreference(KEY_OPEN_LINKS_IN_APP, false)
-    var autoLinkPhoneNumbers: Boolean
-        by booleanPreference(KEY_AUTO_LINK_PHONE_NUMBERS, false)
-    var autoLinkIpAddresses: Boolean
-        by booleanPreference(KEY_AUTO_LINK_IP_ADDRESSES, true)
-    var postShowUpAndDownVotes: Boolean
-        by booleanPreference(KEY_POST_SHOW_UP_AND_DOWN_VOTES, false)
-    var commentShowUpAndDownVotes: Boolean
-        by booleanPreference(KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES, false)
-
-    var displayInstanceStyle: Int
-        by intPreference(
-            KEY_DISPLAY_INSTANCE_STYLE,
-            DisplayInstanceOptions.OnlyDisplayNonLocalInstances,
-        )
-
-    var retainLastPost: Boolean
-        by booleanPreference(KEY_RETAIN_LAST_POST, true)
-
-    var leftHandMode: Boolean
-        by booleanPreference(KEY_LEFT_HAND_MODE, false)
-
-    var transparentNotificationBar: Boolean
-        by booleanPreference(KEY_TRANSPARENT_NOTIFICATION_BAR, false)
-
-    var lockBottomBar: Boolean
-        by booleanPreference(KEY_LOCK_BOTTOM_BAR, false)
-
-    var appVersionLastLaunch: Int
-        by intPreference(KEY_PREF_VERSION, 0)
-
-    var previewLinks: Int
-        get() = try {
-            sharedPreferences.getInt(KEY_PREVIEW_LINKS, PreviewTextLinks)
-        } catch (e: Exception) {
-            PreviewTextLinks
-        }
-        set(value) {
-            sharedPreferences.edit()
-                .putInt(KEY_PREVIEW_LINKS, value)
-                .apply()
-        }
-
-    var screenshotWidthDp: Int
-        by intPreference(KEY_SCREENSHOT_WIDTH_DP, 360)
-
-    var dateScreenshots: Boolean
-        by booleanPreference(KEY_DATE_SCREENSHOTS, true)
-
-    var screenshotWatermark: Int
-        by intPreference(KEY_SCREENSHOT_WATERMARK, ScreenshotWatermarkId.LEMMY)
-
-    var useFirebase: Boolean
-        by booleanPreference(KEY_USE_FIREBASE, true)
-
-    var autoCollapseCommentThreshold: Float
-        by floatPreference(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD, 0.3f)
-
-    var trackBrowsingHistory: Boolean
-        by booleanPreference(KEY_TRACK_BROWSING_HISTORY, true)
-
-    var useCustomNavBar: Boolean
-        by booleanPreference(KEY_USE_CUSTOM_NAV_BAR, false)
-
-    var navBarConfig: NavBarConfig
-        by jsonPreference(KEY_NAV_BAR_ITEMS) { NavBarConfig() }
-
-    var useBottomNavBar: Boolean
-        by booleanPreference(KEY_USE_BOTTOM_NAV_BAR, true)
-
-    var isHiddenPostsEnabled: Boolean
-        by booleanPreference(KEY_ENABLE_HIDDEN_POSTS, true)
-
-    var usePredictiveBack: Boolean
-        by booleanPreference(KEY_USE_PREDICTIVE_BACK, false)
-
-    var autoLoadMorePosts: Boolean
-        by booleanPreference(KEY_AUTO_LOAD_MORE_POSTS, true)
-
-    var infinityPageIndicator: Boolean
-        by booleanPreference(KEY_INFINITY_PAGE_INDICATOR, false)
-
-    var warnReplyToOldContent: Boolean
-        by booleanPreference(KEY_WARN_REPLY_TO_OLD_CONTENT, true)
-
-    var warnReplyToOldContentThresholdMs: Long
-        by longPreference(
-            KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS,
-            1000 * 60 * 60 * 24 * 2,
-        )
-
-    var showPostUpvotePercentage: Boolean
-        by booleanPreference(KEY_SHOW_POST_UPVOTE_PERCENTAGE, false)
-
-    var showCommentUpvotePercentage: Boolean
-        by booleanPreference(KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE, false)
-
-    var useMultilinePostHeaders: Boolean
-        by booleanPreference(KEY_USE_MULTILINE_POST_HEADERS, true)
-
-    var indicatePostsAndCommentsCreatedByCurrentUser: Boolean
-        by booleanPreference(KEY_INDICATE_CONTENT_FROM_CURRENT_USER, true)
-
-    var saveDraftsAutomatically: Boolean
-        by booleanPreference(KEY_SAVE_DRAFTS_AUTOMATICALLY, true)
-
-    var showProfileIcons: Boolean
-        by booleanPreference(KEY_SHOW_PROFILE_ICONS, true)
-
-    var commentHeaderLayout: Int
-        by intPreference(KEY_COMMENT_HEADER_LAYOUT, CommentHeaderLayoutId.SingleLine)
-
-    var navigationRailMode: Int
-        by intPreference(KEY_NAVIGATION_RAIL_MODE, NavigationRailModeId.ManualOff)
-
-    var downloadDirectory: String?
-        by stringPreference(KEY_DOWNLOAD_DIRECTORY, null)
-
-    var usePerCommunitySettings: Boolean
-        by booleanPreference(KEY_USE_PER_COMMUNITY_SETTINGS, true)
-
-    var guestAccountSettings: GuestAccountSettings?
-        by jsonPreference(KEY_GUEST_ACCOUNT_SETTINGS) { null }
-    var textFieldToolbarSettings: TextFieldToolbarSettings?
-        by jsonPreference(KEY_TEXT_FIELD_TOOLBAR_SETTINGS) { null }
-    var postQuickActions: PostQuickActionsSettings?
-        by jsonPreference(KEY_POST_QUICK_ACTIONS) { null }
-    var commentQuickActions: CommentQuickActionsSettings?
-        by jsonPreference(KEY_COMMENT_QUICK_ACTIONS) { null }
-    var postsInFeedQuickActions: PostsInFeedQuickActionsSettings?
-        by jsonPreference(KEY_POSTS_IN_FEED_QUICK_ACTIONS) { null }
-
-    var globalLayoutMode: GlobalLayoutMode
-        by intPreference(KEY_GLOBAL_LAYOUT_MODE, GlobalLayoutModes.Auto)
-
-    var rotateInstanceOnUploadFail: Boolean
-        by booleanPreference(KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL, false)
-
-    var showFilteredPosts: Boolean
-        by booleanPreference(KEY_SHOW_FILTERED_POSTS, false)
-
-    var commentsShowInlineMediaAsLinks: Boolean
-        by booleanPreference(KEY_COMMENTS_SHOW_INLINE_MEDIA_AS_LINKS, false)
-
-    var isNotificationsOn: Boolean
-        by booleanPreference(KEY_IS_NOTIFICATIONS_ON, false)
-
-    var lastAccountNotificationId: Int
-        by intPreference(KEY_LAST_ACCOUNT_NOTIFICATION_ID, 0)
-
-    var notificationsCheckIntervalMs: Long
-        by longPreference(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, 1000L * 60L * 15L)
-
-    var homeFabQuickAction: Int
-        by intPreference(KEY_HOME_FAB_QUICK_ACTION, HomeFabQuickActionIds.None)
-
-    var showEditedDate: Boolean
-        by booleanPreference(KEY_SHOW_EDITED_DATE, true)
-
-    var imagePreviewHideUiByDefault: Boolean
-        by booleanPreference(KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT, false)
-
-    var prefetchPosts: Boolean
-        by booleanPreference(KEY_PREFETCH_POSTS, true)
-
-    var autoPlayVideos: Boolean
-        by booleanPreference(KEY_AUTO_PLAY_VIDEOS, true)
-
-    var uploadImagesToImgur: Boolean
-        by booleanPreference(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
-
-    var animationLevel: AnimationsHelper.AnimationLevel
-        get() = AnimationsHelper.AnimationLevel.parse(
-            sharedPreferences.getInt(
-                KEY_ANIMATION_LEVEL,
-                AnimationsHelper.AnimationLevel.Max.animationLevel,
-            ),
-        )
-        set(value) {
-            sharedPreferences.edit()
-                .putInt(KEY_ANIMATION_LEVEL, value.animationLevel)
-                .apply()
-        }
-
-    var cachePolicy: CachePolicy
-        get() = CachePolicy.parse(
-            sharedPreferences.getInt(KEY_CACHE_POLICY, CachePolicy.Moderate.value),
-        )
-        set(value) {
-            sharedPreferences.edit()
-                .putInt(KEY_CACHE_POLICY, value.value)
-                .apply()
-        }
-
-    var useCondensedTypefaceForCommentHeaders: Boolean
-        by booleanPreference(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS, true)
-
-    var parseMarkdownInPostTitles: Boolean
-        by booleanPreference(KEY_PARSE_MARKDOWN_IN_POST_TITLES, true)
-
-    var searchHomeConfig: SearchHomeConfig
-        by jsonPreference(KEY_SEARCH_HOME_CONFIG) { SearchHomeConfig() }
-
-    var postFeedShowScrollBar: Boolean
-        by booleanPreference(KEY_POST_FEED_SHOW_SCROLL_BAR, true)
-
-    var hapticsEnabled: Boolean
-        by booleanPreference(KEY_HAPTICS_ENABLED, true)
-
-    var hapticsOnActions: Boolean
-        get() = hapticsEnabled && sharedPreferences.getBoolean(KEY_HAPTICS_ON_ACTIONS, true)
-        set(value) {
-            sharedPreferences.edit()
-                .putBoolean(KEY_HAPTICS_ON_ACTIONS, value)
-                .apply()
-        }
-
-    var hideDuplicatePostsOnRead: Boolean
-        by booleanPreference(KEY_HIDE_DUPLICATE_POSTS_ON_READ, false)
-    var usePostsFeedHeader: Boolean
-        by booleanPreference(KEY_USE_POSTS_FEED_HEADER, false)
-    var inlineVideoDefaultVolume: Float
-        by floatPreference(KEY_INLINE_VIDEO_DEFAULT_VOLUME, 0f)
-    var swipeBetweenPosts: Boolean
-        by booleanPreference(KEY_SWIPE_BETWEEN_POSTS, false)
-    var postFabQuickAction: Int
-        by intPreference(KEY_POST_FAB_QUICK_ACTION, PostFabQuickActions.NONE)
-    var shakeToSendFeedback: Boolean
-        by booleanPreference(KEY_SHAKE_TO_SEND_FEEDBACK, true)
-    var showLabelsInNavBar: Boolean
-        by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
-    var warnNewPerson: Boolean
-        by booleanPreference(KEY_WARN_NEW_PERSON, true)
-    var gestureSwipeDirection: Int
-        by intPreference(KEY_GESTURE_SWIPE_DIRECTION, GestureSwipeDirectionIds.LEFT)
-    var defaultWebApp: DefaultAppPreference?
-        by jsonPreference(KEY_DEFAULT_APP_WEB_BROWSER) { null }
-    var preferredLocale: String?
-        by stringPreference(KEY_PREFERRED_LOCALE)
-    var communitySelectorShowCommunitySuggestions: Boolean
-        by booleanPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, true)
-    var postFullBleedImage: Boolean
-        by booleanPreference(KEY_POST_FULL_BLEED_IMAGE, true)
-    var userAgentChoice: Int
-        by intPreference(KEY_USER_AGENT_CHOICE, UserAgentChoiceIds.UNSET)
-
-    suspend fun getOfflinePostCount(): Int =
-        context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
-            ?: 100
-
-    fun reset(key: String) {
-        sharedPreferences.edit { remove(key) }
-    }
-
-    fun asJson(): JSONObject {
-        return sharedPreferences.asJson()
-    }
-
-    fun generateCode(): String {
-        val json = this.asJson()
-        return Utils.compress(json.toString(), Base64.NO_WRAP)
-    }
-
-    fun importSettings(settingsToImport: JSONObject, excludeKeys: Set<String>) {
-        sharedPreferences.importSettings(settingsToImport, excludeKeys)
-    }
-
-    private fun SharedPreferences.importSettings(
-        settingsToImport: JSONObject,
-        excludeKeys: Set<String>,
-    ) {
-        val allKeys = settingsToImport.keys().asSequence()
-        this.edit {
-            for (key in allKeys) {
-                if (excludeKeys.contains(key)) continue
-
-                when (val value = settingsToImport.opt(key)) {
-                    is Float -> putFloat(key, value)
-                    is Long -> putLong(key, value)
-                    is String -> putString(key, value)
-                    is Boolean -> putBoolean(key, value)
-                    is Int -> putInt(key, value)
-                    null -> remove(key)
-                }
-            }
-        }
-    }
-
-    fun clear() {
-        sharedPreferences.edit(commit = true) { clear() }
-    }
+  }
+
+  fun clear() {
+    sharedPreferences.edit(commit = true) { clear() }
+  }
 }

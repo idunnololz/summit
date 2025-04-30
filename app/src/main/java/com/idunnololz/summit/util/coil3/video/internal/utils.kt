@@ -8,45 +8,45 @@ import androidx.annotation.RequiresApi
 
 /** [MediaMetadataRetriever] doesn't implement [AutoCloseable] until API 29. */
 internal inline fun <T> MediaMetadataRetriever.use(block: (MediaMetadataRetriever) -> T): T {
-    try {
-        return block(this)
-    } finally {
-        // We must call 'close' on API 29+ to avoid a strict mode warning.
-        if (SDK_INT >= 29) {
-            close()
-        } else {
-            release()
-        }
+  try {
+    return block(this)
+  } finally {
+    // We must call 'close' on API 29+ to avoid a strict mode warning.
+    if (SDK_INT >= 29) {
+      close()
+    } else {
+      release()
     }
+  }
 }
 
 internal fun MediaMetadataRetriever.getFrameAtTime(
-    timeUs: Long,
-    option: Int,
-    config: Bitmap.Config,
+  timeUs: Long,
+  option: Int,
+  config: Bitmap.Config,
 ): Bitmap? = if (SDK_INT >= 30) {
-    val params = BitmapParams().apply { preferredConfig = config }
-    getFrameAtTime(timeUs, option, params)
+  val params = BitmapParams().apply { preferredConfig = config }
+  getFrameAtTime(timeUs, option, params)
 } else {
-    getFrameAtTime(timeUs, option)
+  getFrameAtTime(timeUs, option)
 }
 
 @RequiresApi(27)
 internal fun MediaMetadataRetriever.getScaledFrameAtTime(
-    timeUs: Long,
-    option: Int,
-    dstWidth: Int,
-    dstHeight: Int,
-    config: Bitmap.Config,
+  timeUs: Long,
+  option: Int,
+  dstWidth: Int,
+  dstHeight: Int,
+  config: Bitmap.Config,
 ): Bitmap? = if (SDK_INT >= 30) {
-    val params = BitmapParams().apply { preferredConfig = config }
-    getScaledFrameAtTime(timeUs, option, dstWidth, dstHeight, params)
+  val params = BitmapParams().apply { preferredConfig = config }
+  getScaledFrameAtTime(timeUs, option, dstWidth, dstHeight, params)
 } else {
-    getScaledFrameAtTime(timeUs, option, dstWidth, dstHeight)
+  getScaledFrameAtTime(timeUs, option, dstWidth, dstHeight)
 }
 
 @RequiresApi(28)
 internal fun MediaMetadataRetriever.getFrameAtIndex(
-    frameIndex: Int,
-    config: Bitmap.Config,
+  frameIndex: Int,
+  config: Bitmap.Config,
 ): Bitmap? = getFrameAtIndex(frameIndex, BitmapParams().apply { preferredConfig = config })

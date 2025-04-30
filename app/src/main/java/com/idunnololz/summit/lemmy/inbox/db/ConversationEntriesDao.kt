@@ -9,18 +9,18 @@ import androidx.room.Query
 @Dao
 interface ConversationEntriesDao {
 
-    @Query("SELECT * FROM conversation_entries WHERE account_full_name = :accountFullName")
-    suspend fun getAllEntriesForAccount(accountFullName: String): List<ConversationEntry>
+  @Query("SELECT * FROM conversation_entries WHERE account_full_name = :accountFullName")
+  suspend fun getAllEntriesForAccount(accountFullName: String): List<ConversationEntry>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertEntry(entry: ConversationEntry): Long
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertEntry(entry: ConversationEntry): Long
 
-    @Delete
-    suspend fun delete(entry: ConversationEntry)
+  @Delete
+  suspend fun delete(entry: ConversationEntry)
 
-    @Query("DELETE FROM conversation_entries")
-    suspend fun deleteAll()
+  @Query("DELETE FROM conversation_entries")
+  suspend fun deleteAll()
 
-    @Query("DELETE FROM conversation_entries WHERE account_full_name = :accountFullName")
-    suspend fun deleteConversationsForAccount(accountFullName: String)
+  @Query("DELETE FROM conversation_entries WHERE account_full_name = :accountFullName")
+  suspend fun deleteConversationsForAccount(accountFullName: String)
 }

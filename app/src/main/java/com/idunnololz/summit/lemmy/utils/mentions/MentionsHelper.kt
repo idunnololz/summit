@@ -7,14 +7,14 @@ import javax.inject.Singleton
 
 @Singleton
 class MentionsHelper @Inject constructor(
-    private val mentionsControllerFactory: MentionsController.Factory,
+  private val mentionsControllerFactory: MentionsController.Factory,
 ) {
 
-    fun installMentionsSupportOn(
-        lifecycleOwner: LifecycleOwner,
-        customTextInputEditText: CustomTextInputEditText,
-    ) {
-        val controller = mentionsControllerFactory.create(lifecycleOwner, customTextInputEditText)
-        controller.setup()
-    }
+  fun installMentionsSupportOn(
+    lifecycleOwner: LifecycleOwner,
+    customTextInputEditText: CustomTextInputEditText,
+  ) {
+    val controller = mentionsControllerFactory.create(lifecycleOwner, customTextInputEditText)
+    controller.setup()
+  }
 }

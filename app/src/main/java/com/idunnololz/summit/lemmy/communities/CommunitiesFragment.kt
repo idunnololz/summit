@@ -46,317 +46,317 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
-    private val args by navArgs<CommunitiesFragmentArgs>()
+  private val args by navArgs<CommunitiesFragmentArgs>()
 
-    private val viewModel: CommunitiesViewModel by viewModels()
+  private val viewModel: CommunitiesViewModel by viewModels()
 
-    @Inject
-    lateinit var offlineManager: OfflineManager
+  @Inject
+  lateinit var offlineManager: OfflineManager
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
 
-    @Inject
-    lateinit var avatarHelper: AvatarHelper
+  @Inject
+  lateinit var avatarHelper: AvatarHelper
 
-    @Inject
-    lateinit var lemmyTextHelper: LemmyTextHelper
+  @Inject
+  lateinit var lemmyTextHelper: LemmyTextHelper
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        requireSummitActivity().apply {
-            setupForFragment<CommunitiesFragment>()
-        }
-
-        setBinding(FragmentCommunitiesBinding.inflate(inflater, container, false))
-
-        return binding.root
+    requireSummitActivity().apply {
+      setupForFragment<CommunitiesFragment>()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    setBinding(FragmentCommunitiesBinding.inflate(inflater, container, false))
 
-        val context = requireContext()
+    return binding.root
+  }
 
-        requireSummitActivity().apply {
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-            setupToolbar(binding.toolbar, getString(R.string.communities))
+    val context = requireContext()
 
-            navBarController.updatePaddingForNavBar(binding.contentContainer)
-        }
+    requireSummitActivity().apply {
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-        viewModel.setCommunitiesInstance(args.instance)
-        if (viewModel.communitiesData.isNotStarted) {
-            viewModel.fetchCommunities(0)
-        }
+      setupToolbar(binding.toolbar, getString(R.string.communities))
 
-        runAfterLayout {
-            setupView()
-        }
+      navBarController.updatePaddingForNavBar(binding.contentContainer)
     }
 
-    private fun setupView() {
-        val context = context ?: return
+    viewModel.setCommunitiesInstance(args.instance)
+    if (viewModel.communitiesData.isNotStarted) {
+      viewModel.fetchCommunities(0)
+    }
 
-        with(binding) {
-            val params = TextMeasurementUtils.TextMeasurementParams.Builder
-                .from(descriptionMeasurementObject).build()
+    runAfterLayout {
+      setupView()
+    }
+  }
 
-            val adapter = CommunitiesEngineAdapter(
-                context = context,
-                rootView = root,
-                offlineManager = offlineManager,
-                instance = viewModel.apiInstance,
-                params = params,
-                avatarHelper = avatarHelper,
-                lemmyTextHelper = lemmyTextHelper,
-                onPageClick = {
-                    getMainActivity()?.launchPage(it)
-                },
-                onLoadPageClick = {
-                    viewModel.fetchCommunities(it)
-                },
-                showMoreOptionsMenu = { communityView ->
-                    val bottomMenu = BottomMenu(requireContext()).apply {
-                        setTitle(R.string.community_actions)
+  private fun setupView() {
+    val context = context ?: return
 
-                        addItemWithIcon(
-                            id = R.id.community_info,
-                            title = R.string.community_info,
-                            icon = R.drawable.ic_community_24,
-                        )
+    with(binding) {
+      val params = TextMeasurementUtils.TextMeasurementParams.Builder
+        .from(descriptionMeasurementObject).build()
 
-                        setOnMenuItemClickListener {
-                            when (it.id) {
-                                R.id.community_info -> {
-                                    val direction = CommunitiesFragmentDirections
-                                        .actionCommunitiesFragmentToCommunityInfoFragment(
-                                            communityView.community.toCommunityRef(),
-                                        )
-                                    findNavController().navigateSafe(direction)
-                                }
-                            }
-                        }
-                    }
+      val adapter = CommunitiesEngineAdapter(
+        context = context,
+        rootView = root,
+        offlineManager = offlineManager,
+        instance = viewModel.apiInstance,
+        params = params,
+        avatarHelper = avatarHelper,
+        lemmyTextHelper = lemmyTextHelper,
+        onPageClick = {
+          getMainActivity()?.launchPage(it)
+        },
+        onLoadPageClick = {
+          viewModel.fetchCommunities(it)
+        },
+        showMoreOptionsMenu = { communityView ->
+          val bottomMenu = BottomMenu(requireContext()).apply {
+            setTitle(R.string.community_actions)
 
-                    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
-                },
-            )
-            val layoutManager = LinearLayoutManager(context)
-
-            fun fetchPageIfLoadItem(position: Int) {
-                (adapter.items.getOrNull(position) as? ListEngine.Item.LoadItem)
-                    ?.pageIndex
-                    ?.let {
-                        viewModel.fetchCommunities(it)
-                    }
-            }
-
-            fun checkIfFetchNeeded() {
-                val firstPos = layoutManager.findFirstVisibleItemPosition()
-                val lastPos = layoutManager.findLastVisibleItemPosition()
-
-                fetchPageIfLoadItem(firstPos)
-                fetchPageIfLoadItem(firstPos - 1)
-                fetchPageIfLoadItem(lastPos)
-                fetchPageIfLoadItem(lastPos + 1)
-            }
-
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = layoutManager
-            recyclerView.adapter = adapter
-            recyclerView.setup(animationsHelper)
-            recyclerView.addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-
-                        checkIfFetchNeeded()
-                    }
-                },
+            addItemWithIcon(
+              id = R.id.community_info,
+              title = R.string.community_info,
+              icon = R.drawable.ic_community_24,
             )
 
-            swipeRefreshLayout.setOnRefreshListener {
-                viewModel.reset()
-            }
-
-            fastScroller.setRecyclerView(recyclerView)
-
-            viewModel.communitiesData.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        swipeRefreshLayout.isRefreshing = false
-                        loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                    is StatefulData.Loading -> {
-                        loadingView.showProgressBar()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        swipeRefreshLayout.isRefreshing = false
-                        loadingView.hideAll()
-
-                        adapter.items = it.data.data
-                    }
+            setOnMenuItemClickListener {
+              when (it.id) {
+                R.id.community_info -> {
+                  val direction = CommunitiesFragmentDirections
+                    .actionCommunitiesFragmentToCommunityInfoFragment(
+                      communityView.community.toCommunityRef(),
+                    )
+                  findNavController().navigateSafe(direction)
                 }
+              }
             }
+          }
+
+          getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
+        },
+      )
+      val layoutManager = LinearLayoutManager(context)
+
+      fun fetchPageIfLoadItem(position: Int) {
+        (adapter.items.getOrNull(position) as? ListEngine.Item.LoadItem)
+          ?.pageIndex
+          ?.let {
+            viewModel.fetchCommunities(it)
+          }
+      }
+
+      fun checkIfFetchNeeded() {
+        val firstPos = layoutManager.findFirstVisibleItemPosition()
+        val lastPos = layoutManager.findLastVisibleItemPosition()
+
+        fetchPageIfLoadItem(firstPos)
+        fetchPageIfLoadItem(firstPos - 1)
+        fetchPageIfLoadItem(lastPos)
+        fetchPageIfLoadItem(lastPos + 1)
+      }
+
+      recyclerView.setHasFixedSize(true)
+      recyclerView.layoutManager = layoutManager
+      recyclerView.adapter = adapter
+      recyclerView.setup(animationsHelper)
+      recyclerView.addOnScrollListener(
+        object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            checkIfFetchNeeded()
+          }
+        },
+      )
+
+      swipeRefreshLayout.setOnRefreshListener {
+        viewModel.reset()
+      }
+
+      fastScroller.setRecyclerView(recyclerView)
+
+      viewModel.communitiesData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            swipeRefreshLayout.isRefreshing = false
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            swipeRefreshLayout.isRefreshing = false
+            loadingView.hideAll()
+
+            adapter.items = it.data.data
+          }
         }
+      }
     }
+  }
 
-    private class CommunitiesEngineAdapter(
-        private val context: Context,
-        private val rootView: View,
-        private val offlineManager: OfflineManager,
-        private val instance: String,
-        private val params: TextMeasurementUtils.TextMeasurementParams,
-        private val lemmyTextHelper: LemmyTextHelper,
-        private val avatarHelper: AvatarHelper,
-        private val onPageClick: (PageRef) -> Unit,
-        private val onLoadPageClick: (Int) -> Unit,
-        private val showMoreOptionsMenu: (CommunityView) -> Unit,
-    ) : Adapter<ViewHolder>() {
+  private class CommunitiesEngineAdapter(
+    private val context: Context,
+    private val rootView: View,
+    private val offlineManager: OfflineManager,
+    private val instance: String,
+    private val params: TextMeasurementUtils.TextMeasurementParams,
+    private val lemmyTextHelper: LemmyTextHelper,
+    private val avatarHelper: AvatarHelper,
+    private val onPageClick: (PageRef) -> Unit,
+    private val onLoadPageClick: (Int) -> Unit,
+    private val showMoreOptionsMenu: (CommunityView) -> Unit,
+  ) : Adapter<ViewHolder>() {
 
-        var items: List<ListEngine.Item<CommunityView>> = listOf()
-            set(value) {
-                field = value
+    var items: List<ListEngine.Item<CommunityView>> = listOf()
+      set(value) {
+        field = value
 
-                updateItems()
-            }
+        updateItems()
+      }
 
-        private val adapterHelper = AdapterHelper<ListEngine.Item<CommunityView>>(
-            areItemsTheSame = { old, new ->
-                old::class == new::class && when (old) {
-                    is ListEngine.Item.DataItem -> {
-                        old.data.community.id ==
-                            (new as ListEngine.Item.DataItem).data.community.id
-                    }
-                    is ListEngine.Item.ErrorItem ->
-                        old.pageIndex == (new as ListEngine.Item.ErrorItem).pageIndex
-                    is ListEngine.Item.LoadItem ->
-                        old.pageIndex == (new as ListEngine.Item.LoadItem).pageIndex
-                    is ListEngine.Item.EmptyItem -> true
-                }
+    private val adapterHelper = AdapterHelper<ListEngine.Item<CommunityView>>(
+      areItemsTheSame = { old, new ->
+        old::class == new::class && when (old) {
+          is ListEngine.Item.DataItem -> {
+            old.data.community.id ==
+              (new as ListEngine.Item.DataItem).data.community.id
+          }
+          is ListEngine.Item.ErrorItem ->
+            old.pageIndex == (new as ListEngine.Item.ErrorItem).pageIndex
+          is ListEngine.Item.LoadItem ->
+            old.pageIndex == (new as ListEngine.Item.LoadItem).pageIndex
+          is ListEngine.Item.EmptyItem -> true
+        }
+      },
+    ).apply {
+      addItemType(
+        clazz = ListEngine.Item.EmptyItem<CommunityView>()::class,
+        inflateFn = EmptyItemBinding::inflate,
+      ) { item, b, h ->
+      }
+      addItemType(
+        clazz = ListEngine.Item.DataItem<CommunityView>(null)::class,
+        inflateFn = CommunityDetailsItemBinding::inflate,
+      ) { item, b, h ->
+        val community = item.data
+
+        b.overtext.text = "c/${community.community.name}@${community.community.instance}"
+        b.title.text = community.community.title
+
+        val mauString =
+          LemmyUtils.abbrevNumber(community.counts.users_active_month.toLong())
+        val subsString =
+          LemmyUtils.abbrevNumber(community.counts.subscribers.toLong())
+
+        @Suppress("SetTextI18n")
+        b.stats.text =
+          "${context.getString(R.string.subscribers_format, subsString)}" +
+          " ${context.getString(R.string.mau_format, mauString)}"
+
+        if (community.community.description == null) {
+          b.description.visibility = View.GONE
+          b.descriptionFade.visibility = View.GONE
+        } else {
+          b.description.visibility = View.VISIBLE
+
+          val lineCount = TextMeasurementUtils.getTextLines(
+            lemmyTextHelper.getSpannable(context, community.community.description),
+            params,
+          ).size
+
+          if (lineCount > 4) {
+            b.descriptionFade.visibility = View.VISIBLE
+          } else {
+            b.descriptionFade.visibility = View.GONE
+          }
+
+          lemmyTextHelper.bindText(
+            textView = b.description,
+            text = community.community.description,
+            instance = instance,
+            highlight = null,
+            onImageClick = {},
+            onVideoClick = {},
+            onPageClick = {},
+            onLinkClick = { _, _, _ -> },
+            onLinkLongClick = { _, _ -> },
+          )
+        }
+
+        if (community.community.banner.isNullOrBlank()) {
+          b.banner.load("file:///android_asset/banner_placeholder.svg")
+        } else {
+          b.banner.load(newShimmerDrawable16to9(context))
+          offlineManager.fetchImageWithError(
+            rootView,
+            community.community.banner,
+            {
+              b.banner.load(it)
             },
-        ).apply {
-            addItemType(
-                clazz = ListEngine.Item.EmptyItem<CommunityView>()::class,
-                inflateFn = EmptyItemBinding::inflate,
-            ) { item, b, h ->
-            }
-            addItemType(
-                clazz = ListEngine.Item.DataItem<CommunityView>(null)::class,
-                inflateFn = CommunityDetailsItemBinding::inflate,
-            ) { item, b, h ->
-                val community = item.data
-
-                b.overtext.text = "c/${community.community.name}@${community.community.instance}"
-                b.title.text = community.community.title
-
-                val mauString =
-                    LemmyUtils.abbrevNumber(community.counts.users_active_month.toLong())
-                val subsString =
-                    LemmyUtils.abbrevNumber(community.counts.subscribers.toLong())
-
-                @Suppress("SetTextI18n")
-                b.stats.text =
-                    "${context.getString(R.string.subscribers_format, subsString)}" +
-                    " ${context.getString(R.string.mau_format, mauString)}"
-
-                if (community.community.description == null) {
-                    b.description.visibility = View.GONE
-                    b.descriptionFade.visibility = View.GONE
-                } else {
-                    b.description.visibility = View.VISIBLE
-
-                    val lineCount = TextMeasurementUtils.getTextLines(
-                        lemmyTextHelper.getSpannable(context, community.community.description),
-                        params,
-                    ).size
-
-                    if (lineCount > 4) {
-                        b.descriptionFade.visibility = View.VISIBLE
-                    } else {
-                        b.descriptionFade.visibility = View.GONE
-                    }
-
-                    lemmyTextHelper.bindText(
-                        textView = b.description,
-                        text = community.community.description,
-                        instance = instance,
-                        highlight = null,
-                        onImageClick = {},
-                        onVideoClick = {},
-                        onPageClick = {},
-                        onLinkClick = { _, _, _ -> },
-                        onLinkLongClick = { _, _ -> },
-                    )
-                }
-
-                if (community.community.banner.isNullOrBlank()) {
-                    b.banner.load("file:///android_asset/banner_placeholder.svg")
-                } else {
-                    b.banner.load(newShimmerDrawable16to9(context))
-                    offlineManager.fetchImageWithError(
-                        rootView,
-                        community.community.banner,
-                        {
-                            b.banner.load(it)
-                        },
-                        {
-                            b.banner.visibility = View.GONE
-                        },
-                    )
-                }
-
-                avatarHelper.loadCommunityIcon(b.icon, community.community)
-
-                h.itemView.setOnClickListener {
-                    onPageClick(community.community.toCommunityRef())
-                }
-                h.itemView.setOnLongClickListener {
-                    showMoreOptionsMenu(item.data)
-                    true
-                }
-                b.moreButton.setOnClickListener {
-                    showMoreOptionsMenu(item.data)
-                }
-            }
-            addItemType(
-                clazz = ListEngine.Item.LoadItem<CommunityView>()::class,
-                inflateFn = CommunitiesLoadItemBinding::inflate,
-            ) { item, b, h ->
-                b.loadingView.showProgressBar()
-            }
-            addItemType(
-                clazz = ListEngine.Item.ErrorItem<CommunityView>()::class,
-                inflateFn = CommunitiesLoadItemBinding::inflate,
-            ) { item, b, h ->
-                b.loadingView.showDefaultErrorMessageFor(item.error)
-                b.loadingView.setOnRefreshClickListener {
-                    onLoadPageClick(item.pageIndex)
-                }
-            }
+            {
+              b.banner.visibility = View.GONE
+            },
+          )
         }
 
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+        avatarHelper.loadCommunityIcon(b.icon, community.community)
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        fun updateItems() {
-            adapterHelper.setItems(items, this)
+        h.itemView.setOnClickListener {
+          onPageClick(community.community.toCommunityRef())
         }
+        h.itemView.setOnLongClickListener {
+          showMoreOptionsMenu(item.data)
+          true
+        }
+        b.moreButton.setOnClickListener {
+          showMoreOptionsMenu(item.data)
+        }
+      }
+      addItemType(
+        clazz = ListEngine.Item.LoadItem<CommunityView>()::class,
+        inflateFn = CommunitiesLoadItemBinding::inflate,
+      ) { item, b, h ->
+        b.loadingView.showProgressBar()
+      }
+      addItemType(
+        clazz = ListEngine.Item.ErrorItem<CommunityView>()::class,
+        inflateFn = CommunitiesLoadItemBinding::inflate,
+      ) { item, b, h ->
+        b.loadingView.showDefaultErrorMessageFor(item.error)
+        b.loadingView.setOnRefreshClickListener {
+          onLoadPageClick(item.pageIndex)
+        }
+      }
     }
+
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+
+    fun updateItems() {
+      adapterHelper.setItems(items, this)
+    }
+  }
 }

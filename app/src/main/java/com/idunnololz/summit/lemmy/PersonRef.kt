@@ -12,36 +12,36 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @JsonClassDiscriminator("t")
 sealed interface PersonRef : Parcelable, PageRef {
 
-    val instance: String
+  val instance: String
 
-    @Serializable
-    @SerialName("1")
-    @Parcelize
-    data class PersonRefByName(
-        val name: String,
-        /**
-         * This should be the instance of the actual person.
-         */
-        override val instance: String,
-    ) : PersonRef
+  @Serializable
+  @SerialName("1")
+  @Parcelize
+  data class PersonRefByName(
+    val name: String,
+    /**
+     * This should be the instance of the actual person.
+     */
+    override val instance: String,
+  ) : PersonRef
 
-    @Serializable
-    @SerialName("2")
-    @Parcelize
-    data class PersonRefById(
-        val id: Long,
-        /**
-         * This should be the instance of the actual person.
-         */
-        override val instance: String,
-    ) : PersonRef
+  @Serializable
+  @SerialName("2")
+  @Parcelize
+  data class PersonRefById(
+    val id: Long,
+    /**
+     * This should be the instance of the actual person.
+     */
+    override val instance: String,
+  ) : PersonRef
 
-    val fullName: String
-        get() =
-            when (this) {
-                is PersonRefByName -> "$name@$instance"
-                is PersonRefById -> "id:$id@$instance"
-            }
+  val fullName: String
+    get() =
+      when (this) {
+        is PersonRefByName -> "$name@$instance"
+        is PersonRefById -> "id:$id@$instance"
+      }
 }
 
 fun Person.toPersonRef() = PersonRef.PersonRefByName(name, instance)

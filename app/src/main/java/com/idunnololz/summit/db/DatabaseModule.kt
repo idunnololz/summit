@@ -27,56 +27,56 @@ import kotlinx.serialization.json.Json
 @InstallIn(SingletonComponent::class)
 @Module
 class DatabaseModule {
-    @Provides
-    fun provideAccountDao(db: MainDatabase): AccountDao = db.accountDao()
+  @Provides
+  fun provideAccountDao(db: MainDatabase): AccountDao = db.accountDao()
 
-    @Provides
-    fun provideUserCommunitiesDao(db: MainDatabase): UserCommunitiesDao = db.userCommunitiesDao()
+  @Provides
+  fun provideUserCommunitiesDao(db: MainDatabase): UserCommunitiesDao = db.userCommunitiesDao()
 
-    @Provides
-    fun provideLemmyActionsDao(db: MainDatabase): LemmyActionsDao = db.lemmyActionsDao()
+  @Provides
+  fun provideLemmyActionsDao(db: MainDatabase): LemmyActionsDao = db.lemmyActionsDao()
 
-    @Provides
-    fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
-        db.lemmyFailedActionsDao()
+  @Provides
+  fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
+    db.lemmyFailedActionsDao()
 
-    @Provides
-    fun provideLemmyCompletedActionsDao(db: MainDatabase): LemmyCompletedActionsDao =
-        db.lemmyCompletedActionsDao()
+  @Provides
+  fun provideLemmyCompletedActionsDao(db: MainDatabase): LemmyCompletedActionsDao =
+    db.lemmyCompletedActionsDao()
 
-    @Provides
-    fun provideHistoryDao(db: MainDatabase): HistoryDao = db.historyDao()
+  @Provides
+  fun provideHistoryDao(db: MainDatabase): HistoryDao = db.historyDao()
 
-    @Provides
-    fun provideAccountInfoDao(db: MainDatabase): AccountInfoDao = db.accountInfoDao()
+  @Provides
+  fun provideAccountInfoDao(db: MainDatabase): AccountInfoDao = db.accountInfoDao()
 
-    @Provides
-    fun provideHiddenPostsDao(db: MainDatabase): HiddenPostsDao = db.hiddenPostsDao()
+  @Provides
+  fun provideHiddenPostsDao(db: MainDatabase): HiddenPostsDao = db.hiddenPostsDao()
 
-    @Provides
-    fun provideContentFiltersDao(db: MainDatabase): ContentFiltersDao = db.contentFiltersDao()
+  @Provides
+  fun provideContentFiltersDao(db: MainDatabase): ContentFiltersDao = db.contentFiltersDao()
 
-    @Provides
-    fun provideDraftsDao(db: MainDatabase): DraftsDao = db.draftsDao()
+  @Provides
+  fun provideDraftsDao(db: MainDatabase): DraftsDao = db.draftsDao()
 
-    @Provides
-    fun provideInboxEntriesDao(db: MainDatabase): InboxEntriesDao = db.inboxEntriesDao()
+  @Provides
+  fun provideInboxEntriesDao(db: MainDatabase): InboxEntriesDao = db.inboxEntriesDao()
 
-    @Provides
-    fun provideConversationEntriesDao(db: MainDatabase): ConversationEntriesDao =
-        db.conversationEntriesDao()
+  @Provides
+  fun provideConversationEntriesDao(db: MainDatabase): ConversationEntriesDao =
+    db.conversationEntriesDao()
 
-    @Provides
-    fun providePostReadDao(db: MainDatabase): PostReadDao = db.postReadDao()
+  @Provides
+  fun providePostReadDao(db: MainDatabase): PostReadDao = db.postReadDao()
 
-    @Provides
-    fun provideTextEmojiDao(db: MainDatabase): TextEmojiDao = db.textEmojiDao()
+  @Provides
+  fun provideTextEmojiDao(db: MainDatabase): TextEmojiDao = db.textEmojiDao()
 
-    @Provides
-    fun provideUserTagsDao(db: MainDatabase): UserTagsDao = db.userTagsDao()
+  @Provides
+  fun provideUserTagsDao(db: MainDatabase): UserTagsDao = db.userTagsDao()
 
-    @Provides
-    @Singleton
-    fun provideMainDatabase(@ApplicationContext context: Context, json: Json): MainDatabase =
-        MainDatabase.getInstance(context, json)
+  @Provides
+  @Singleton
+  fun provideMainDatabase(@ApplicationContext context: Context, json: Json): MainDatabase =
+    MainDatabase.getInstance(context, json)
 }

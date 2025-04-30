@@ -8,30 +8,30 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsNavigationViewModel @Inject constructor(
-    private val preferences: Preferences,
+  private val preferences: Preferences,
 ) : ViewModel() {
-    val navBarOptions = MutableLiveData<List<NavBarDestId>?>()
+  val navBarOptions = MutableLiveData<List<NavBarDestId>?>()
 
-    fun loadNavBarOptions() {
-        val options = MutableList(5) { NavBarDestinations.None }
-        preferences.navBarConfig.navBarDestinations.take(5).withIndex().forEach { (index, value) ->
-            options[index] = value
-        }
-
-        navBarOptions.value = options
+  fun loadNavBarOptions() {
+    val options = MutableList(5) { NavBarDestinations.None }
+    preferences.navBarConfig.navBarDestinations.take(5).withIndex().forEach { (index, value) ->
+      options[index] = value
     }
 
-    fun applyChanges() {
-        val navBarOptions = navBarOptions.value ?: return
-        preferences.navBarConfig = preferences.navBarConfig.copy(
-            navBarDestinations = navBarOptions.distinct(),
-        )
-    }
+    navBarOptions.value = options
+  }
 
-    fun updateDestination(position: Int, destId: NavBarDestId) {
-        val navBarOptions = navBarOptions.value ?: return
-        this.navBarOptions.value = navBarOptions.toMutableList().apply {
-            this[position] = destId
-        }
+  fun applyChanges() {
+    val navBarOptions = navBarOptions.value ?: return
+    preferences.navBarConfig = preferences.navBarConfig.copy(
+      navBarDestinations = navBarOptions.distinct(),
+    )
+  }
+
+  fun updateDestination(position: Int, destId: NavBarDestId) {
+    val navBarOptions = navBarOptions.value ?: return
+    this.navBarOptions.value = navBarOptions.toMutableList().apply {
+      this[position] = destId
     }
+  }
 }

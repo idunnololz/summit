@@ -32,207 +32,207 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ManageSettingsFragment :
-    BaseFragment<FragmentManageSettingsBinding>(),
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentManageSettingsBinding>(),
+  OldAlertDialogFragment.AlertDialogFragmentListener {
 
-    private val args: ManageSettingsFragmentArgs by navArgs()
-    private val viewModel: ManageSettingsViewModel by viewModels()
+  private val args: ManageSettingsFragmentArgs by navArgs()
+  private val viewModel: ManageSettingsViewModel by viewModels()
 
-    @Inject
-    lateinit var allSettings: AllSettings
+  @Inject
+  lateinit var allSettings: AllSettings
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentManageSettingsBinding.inflate(inflater, container, false))
+    setBinding(FragmentManageSettingsBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = context.getString(R.string.manage_settings)
+      supportActionBar?.subtitle = args.account?.fullName
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    viewModel.loadManageSettingsData(args.account)
 
-        val context = requireContext()
+    with(binding) {
+      val adapter = ManageSettingsDataAdapter(
+        context = context,
+        keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems(),
+        onClearSettingClick = { settingKey ->
+          if (args.account != null) {
+            OldAlertDialogFragment.Builder()
+              .setMessage(
+                getString(
+                  R.string.delete_setting_override_for_setting_format,
+                  settingKey,
+                ),
+              )
+              .setNegativeButton(R.string.cancel)
+              .setPositiveButton(R.string.delete)
+              .setExtra("setting_key", settingKey)
+              .createAndShow(childFragmentManager, "delete_confirm")
+          }
+        },
+      )
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+      viewModel.manageSettingsData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            loadingView.hideAll()
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.manage_settings)
-            supportActionBar?.subtitle = args.account?.fullName
+            adapter.manageSettingsData = it.data
+          }
         }
+      }
 
-        viewModel.loadManageSettingsData(args.account)
+      recyclerView.setup(animationsHelper)
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.adapter = adapter
+      recyclerView.setHasFixedSize(true)
+    }
+  }
 
-        with(binding) {
-            val adapter = ManageSettingsDataAdapter(
-                context = context,
-                keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems(),
-                onClearSettingClick = { settingKey ->
-                    if (args.account != null) {
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(
-                                getString(
-                                    R.string.delete_setting_override_for_setting_format,
-                                    settingKey,
-                                ),
-                            )
-                            .setNegativeButton(R.string.cancel)
-                            .setPositiveButton(R.string.delete)
-                            .setExtra("setting_key", settingKey)
-                            .createAndShow(childFragmentManager, "delete_confirm")
-                    }
-                },
-            )
+  private class ManageSettingsDataAdapter(
+    private val context: Context,
+    private val keyToSettingItems: MutableMap<String, MutableList<SettingItem>>,
+    private val onClearSettingClick: (key: String) -> Unit,
+  ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-            viewModel.manageSettingsData.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                    is StatefulData.Loading -> {
-                        loadingView.showProgressBar()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        loadingView.hideAll()
+    private sealed interface Item {
 
-                        adapter.manageSettingsData = it.data
-                    }
-                }
-            }
+      data object InstructionItem : Item
+      data object EmptyItem : Item
 
-            recyclerView.setup(animationsHelper)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = adapter
-            recyclerView.setHasFixedSize(true)
-        }
+      /**
+       * A single setting within the imported setting data.
+       */
+      data class SettingListItem(
+        val settingKey: String,
+        val value: Any,
+        val relatedSettings: List<SettingItem>,
+      ) : Item
     }
 
-    private class ManageSettingsDataAdapter(
-        private val context: Context,
-        private val keyToSettingItems: MutableMap<String, MutableList<SettingItem>>,
-        private val onClearSettingClick: (key: String) -> Unit,
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    var manageSettingsData: ManageSettingsViewModel.ManageSettingsData? = null
+      set(value) {
+        field = value
 
-        private sealed interface Item {
+        updateItems()
+      }
 
-            data object InstructionItem : Item
-            data object EmptyItem : Item
+    private val adapterHelper = AdapterHelper<Item>(
+      areItemsTheSame = { oldItem, newItem ->
+        oldItem::class == newItem::class && when (oldItem) {
+          is Item.SettingListItem ->
+            oldItem.settingKey == (newItem as Item.SettingListItem).settingKey
 
-            /**
-             * A single setting within the imported setting data.
-             */
-            data class SettingListItem(
-                val settingKey: String,
-                val value: Any,
-                val relatedSettings: List<SettingItem>,
-            ) : Item
+          Item.EmptyItem,
+          Item.InstructionItem,
+          -> true
         }
+      },
+    ).apply {
+      addItemType(
+        clazz = Item.SettingListItem::class,
+        inflateFn = ImportSettingItemBinding::inflate,
+      ) { item, b, h ->
+        b.settingTitle.text = item.relatedSettings.firstOrNull()?.title
+          ?: context.getString(R.string.unknown_special)
+        b.settingKey.text = item.settingKey.lowercase()
+        b.settingValue.text = item.value.toString()
 
-        var manageSettingsData: ManageSettingsViewModel.ManageSettingsData? = null
-            set(value) {
-                field = value
-
-                updateItems()
-            }
-
-        private val adapterHelper = AdapterHelper<Item>(
-            areItemsTheSame = { oldItem, newItem ->
-                oldItem::class == newItem::class && when (oldItem) {
-                    is Item.SettingListItem ->
-                        oldItem.settingKey == (newItem as Item.SettingListItem).settingKey
-
-                    Item.EmptyItem,
-                    Item.InstructionItem,
-                    -> true
-                }
-            },
-        ).apply {
-            addItemType(
-                clazz = Item.SettingListItem::class,
-                inflateFn = ImportSettingItemBinding::inflate,
-            ) { item, b, h ->
-                b.settingTitle.text = item.relatedSettings.firstOrNull()?.title
-                    ?: context.getString(R.string.unknown_special)
-                b.settingKey.text = item.settingKey.lowercase()
-                b.settingValue.text = item.value.toString()
-
-                b.remove.setImageResource(R.drawable.baseline_close_24)
-                b.remove.setOnClickListener {
-                    onClearSettingClick(item.settingKey)
-                }
-            }
-            addItemType(
-                clazz = Item.InstructionItem::class,
-                inflateFn = ManageSettingsInstructionItemBinding::inflate,
-            ) { item, b, h ->
-                b.desc.text = context.getString(R.string.manage_settings_desc)
-            }
-            addItemType(
-                clazz = Item.EmptyItem::class,
-                inflateFn = EmptyItemBinding::inflate,
-            ) { _, _, _ -> }
+        b.remove.setImageResource(R.drawable.baseline_close_24)
+        b.remove.setOnClickListener {
+          onClearSettingClick(item.settingKey)
         }
-
-        init {
-            updateItems()
-        }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        private fun updateItems() {
-            val newItems = mutableListOf<Item>()
-            val newData = manageSettingsData
-
-            newItems.add(Item.InstructionItem)
-
-            if (newData == null) {
-                // do nothing
-            } else if (newData.settingsPreview.isEmpty()) {
-                newItems.add(Item.EmptyItem)
-            } else {
-                newData.settingsPreview.mapTo(newItems) {
-                    Item.SettingListItem(
-                        settingKey = it.key,
-                        value = it.value,
-                        keyToSettingItems[it.key] ?: listOf(),
-                    )
-                }
-            }
-
-            adapterHelper.setItems(newItems, this)
-        }
+      }
+      addItemType(
+        clazz = Item.InstructionItem::class,
+        inflateFn = ManageSettingsInstructionItemBinding::inflate,
+      ) { item, b, h ->
+        b.desc.text = context.getString(R.string.manage_settings_desc)
+      }
+      addItemType(
+        clazz = Item.EmptyItem::class,
+        inflateFn = EmptyItemBinding::inflate,
+      ) { _, _, _ -> }
     }
 
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "delete_confirm" -> {
-                viewModel.deleteSetting(args.account, dialog.getExtra("setting_key"))
-            }
-        }
+    init {
+      updateItems()
     }
 
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    private fun updateItems() {
+      val newItems = mutableListOf<Item>()
+      val newData = manageSettingsData
+
+      newItems.add(Item.InstructionItem)
+
+      if (newData == null) {
+        // do nothing
+      } else if (newData.settingsPreview.isEmpty()) {
+        newItems.add(Item.EmptyItem)
+      } else {
+        newData.settingsPreview.mapTo(newItems) {
+          Item.SettingListItem(
+            settingKey = it.key,
+            value = it.value,
+            keyToSettingItems[it.key] ?: listOf(),
+          )
+        }
+      }
+
+      adapterHelper.setItems(newItems, this)
     }
+  }
+
+  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+    when (tag) {
+      "delete_confirm" -> {
+        viewModel.deleteSetting(args.account, dialog.getExtra("setting_key"))
+      }
+    }
+  }
+
+  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+  }
 }

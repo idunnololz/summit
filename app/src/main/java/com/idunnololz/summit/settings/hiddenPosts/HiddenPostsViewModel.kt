@@ -10,30 +10,30 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HiddenPostsViewModel @Inject constructor(
-    private val hiddenPostsManager: HiddenPostsManager,
+  private val hiddenPostsManager: HiddenPostsManager,
 ) : ViewModel() {
 
-    val hiddenPosts = StatefulLiveData<List<HiddenPostsManager.HiddenPost>>()
+  val hiddenPosts = StatefulLiveData<List<HiddenPostsManager.HiddenPost>>()
 
-    init {
-        loadHiddenPosts()
+  init {
+    loadHiddenPosts()
+  }
+
+  fun loadHiddenPosts() {
+    hiddenPosts.setIsLoading()
+
+    viewModelScope.launch {
+      val posts = hiddenPostsManager.getAllHiddenPostEntries().sortedByDescending { it.ts }
+
+      hiddenPosts.postValue(posts)
     }
+  }
 
-    fun loadHiddenPosts() {
-        hiddenPosts.setIsLoading()
+  fun removeHiddenPost(entryId: Long) {
+    viewModelScope.launch {
+      hiddenPostsManager.removeEntry(entryId)
 
-        viewModelScope.launch {
-            val posts = hiddenPostsManager.getAllHiddenPostEntries().sortedByDescending { it.ts }
-
-            hiddenPosts.postValue(posts)
-        }
+      loadHiddenPosts()
     }
-
-    fun removeHiddenPost(entryId: Long) {
-        viewModelScope.launch {
-            hiddenPostsManager.removeEntry(entryId)
-
-            loadHiddenPosts()
-        }
-    }
+  }
 }

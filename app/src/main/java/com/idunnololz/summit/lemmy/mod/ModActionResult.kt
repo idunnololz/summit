@@ -8,28 +8,28 @@ import kotlinx.parcelize.Parcelize
 
 object ModActionResult {
 
-    const val REQUEST_KEY = "ModActionsDialogFragment_req"
-    const val RESULT_UPDATED_OBJ = "RESULT_UPDATED_OBJ"
+  const val REQUEST_KEY = "ModActionsDialogFragment_req"
+  const val RESULT_UPDATED_OBJ = "RESULT_UPDATED_OBJ"
 
-    fun Fragment.setModActionResult(updatedObject: UpdatedObject?) {
-        setFragmentResult(
-            REQUEST_KEY,
-            bundleOf(
-                RESULT_UPDATED_OBJ to updatedObject,
-            ),
-        )
-    }
+  fun Fragment.setModActionResult(updatedObject: UpdatedObject?) {
+    setFragmentResult(
+      REQUEST_KEY,
+      bundleOf(
+        RESULT_UPDATED_OBJ to updatedObject,
+      ),
+    )
+  }
 
-    sealed interface UpdatedObject : Parcelable {
-        @Parcelize
-        data class PostObject(
-            val postId: Int,
-            val accountId: Long?,
-        ) : UpdatedObject
+  sealed interface UpdatedObject : Parcelable {
+    @Parcelize
+    data class PostObject(
+      val postId: Int,
+      val accountId: Long?,
+    ) : UpdatedObject
 
-        @Parcelize
-        data class CommentObject(
-            val commentId: Int,
-        ) : UpdatedObject
-    }
+    @Parcelize
+    data class CommentObject(
+      val commentId: Int,
+    ) : UpdatedObject
+  }
 }

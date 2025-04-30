@@ -22,203 +22,203 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class AccountManager @Inject constructor(
-    private val accountDao: AccountDao,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
-    private val preferenceManager: PreferenceManager,
-    @AccountIdsSharedPreference private val accountIdsSharedPreference: SharedPreferences,
+  private val accountDao: AccountDao,
+  private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val preferenceManager: PreferenceManager,
+  @AccountIdsSharedPreference private val accountIdsSharedPreference: SharedPreferences,
 
 ) {
 
-    companion object {
-        private const val KEY_ACCOUNT_ID_COUNTER = "#counter"
-        private const val ACCOUNT_ID_MAX_VALUE = 10000
+  companion object {
+    private const val KEY_ACCOUNT_ID_COUNTER = "#counter"
+    private const val ACCOUNT_ID_MAX_VALUE = 10000
+  }
+
+  interface OnAccountChangedListener {
+    suspend fun onAccountSigningOut(account: Account) {}
+    suspend fun onAccountChanged(newAccount: Account?)
+  }
+
+  private val coroutineScope = coroutineScopeFactory.create()
+
+  private val onAccountChangeListeners = mutableListOf<OnAccountChangedListener>()
+
+  private val _currentAccount = MutableStateFlow<GuestOrUserAccount?>(null)
+  private val _numAccounts = MutableStateFlow<Int>(0)
+
+  private val accountByIdCache = mutableMapOf<Long, Account?>()
+
+  val currentAccount: StateFlow<GuestOrUserAccount?> = _currentAccount
+  val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
+
+  val numAccounts: StateFlow<Int> = _numAccounts
+
+  val mutex = Mutex()
+
+  init {
+    runBlocking {
+      val curAccount = accountDao.getCurrentAccount()?.fix()
+      preferenceManager.updateCurrentPreferences(curAccount)
+      _currentAccount.emit(curAccount)
+      updateNumAccounts()
+    }
+    coroutineScope.launch {
+      Log.d("dbdb", "accountDao: ${_numAccounts.value}")
+    }
+  }
+
+  fun addAccountAndSetCurrent(account: Account) {
+    coroutineScope.launch {
+      accountDao.insert(account)
+      accountDao.clearAndSetCurrent(account.id)
+      doSwitchAccountWork(account)
+
+      _currentAccount.emit(account)
+      updateNumAccounts()
+    }
+  }
+
+  suspend fun getAccounts(): List<Account> = withContext(Dispatchers.IO) {
+    val deferred = coroutineScope.async {
+      accountDao.getAll()
     }
 
-    interface OnAccountChangedListener {
-        suspend fun onAccountSigningOut(account: Account) {}
-        suspend fun onAccountChanged(newAccount: Account?)
-    }
+    deferred.await()
+      .map { it.fix() }
+  }
 
-    private val coroutineScope = coroutineScopeFactory.create()
+  suspend fun signOut(account: Account) = withContext(Dispatchers.IO) {
+    val deferred = coroutineScope.async {
+      doSignOutWork(account)
 
-    private val onAccountChangeListeners = mutableListOf<OnAccountChangedListener>()
+      accountDao.delete(account)
+      if (accountDao.getCurrentAccount() == null) {
+        val firstAccount = accountDao.getFirstAccount()
 
-    private val _currentAccount = MutableStateFlow<GuestOrUserAccount?>(null)
-    private val _numAccounts = MutableStateFlow<Int>(0)
-
-    private val accountByIdCache = mutableMapOf<Long, Account?>()
-
-    val currentAccount: StateFlow<GuestOrUserAccount?> = _currentAccount
-    val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
-
-    val numAccounts: StateFlow<Int> = _numAccounts
-
-    val mutex = Mutex()
-
-    init {
-        runBlocking {
-            val curAccount = accountDao.getCurrentAccount()?.fix()
-            preferenceManager.updateCurrentPreferences(curAccount)
-            _currentAccount.emit(curAccount)
-            updateNumAccounts()
+        if (firstAccount != null) {
+          accountDao.clearAndSetCurrent(firstAccount.id)
         }
-        coroutineScope.launch {
-            Log.d("dbdb", "accountDao: ${_numAccounts.value}")
-        }
+      }
+      accountIdsSharedPreference.edit()
+        .remove(account.fullName)
+        .apply()
+
+      updateCurrentAccount()
+      updateNumAccounts()
     }
 
-    fun addAccountAndSetCurrent(account: Account) {
-        coroutineScope.launch {
-            accountDao.insert(account)
-            accountDao.clearAndSetCurrent(account.id)
-            doSwitchAccountWork(account)
+    deferred.await()
+  }
 
-            _currentAccount.emit(account)
-            updateNumAccounts()
-        }
+  suspend fun setCurrentAccount(guestOrUserAccount: GuestOrUserAccount?) = withContext(
+    Dispatchers.IO,
+  ) {
+    val deferred = coroutineScope.async {
+      val account = guestOrUserAccount as? Account
+      accountDao.clearAndSetCurrent(account?.id)
+
+      doSwitchAccountWork(account)
+
+      _currentAccount.emit(guestOrUserAccount)
     }
 
-    suspend fun getAccounts(): List<Account> = withContext(Dispatchers.IO) {
-        val deferred = coroutineScope.async {
-            accountDao.getAll()
-        }
+    deferred.await()
+  }
 
-        deferred.await()
-            .map { it.fix() }
+  private suspend fun updateCurrentAccount() {
+    val currentAccount = accountDao.getCurrentAccount()
+    if (this._currentAccount.value != currentAccount) {
+      doSwitchAccountWork(currentAccount)
+    }
+    this._currentAccount.emit(currentAccount)
+  }
+
+  suspend fun getAccountById(id: Long): Account? {
+    return accountDao.getAccountById(id)
+  }
+
+  suspend fun getAccountByIdOrDefault(accountId: Long?): Account? = if (accountId == null) {
+    currentAccount.asAccount
+  } else {
+    getAccountById(accountId)
+  }
+
+  fun getAccountByIdBlocking(id: Long): Account? {
+    val cachedAccount = accountByIdCache[id]
+    if (cachedAccount != null) {
+      return cachedAccount
     }
 
-    suspend fun signOut(account: Account) = withContext(Dispatchers.IO) {
-        val deferred = coroutineScope.async {
-            doSignOutWork(account)
+    return runBlocking {
+      val account = getAccountById(id)
+      accountByIdCache[id] = account
 
-            accountDao.delete(account)
-            if (accountDao.getCurrentAccount() == null) {
-                val firstAccount = accountDao.getFirstAccount()
-
-                if (firstAccount != null) {
-                    accountDao.clearAndSetCurrent(firstAccount.id)
-                }
-            }
-            accountIdsSharedPreference.edit()
-                .remove(account.fullName)
-                .apply()
-
-            updateCurrentAccount()
-            updateNumAccounts()
-        }
-
-        deferred.await()
+      account
     }
+  }
 
-    suspend fun setCurrentAccount(guestOrUserAccount: GuestOrUserAccount?) = withContext(
-        Dispatchers.IO,
-    ) {
-        val deferred = coroutineScope.async {
-            val account = guestOrUserAccount as? Account
-            accountDao.clearAndSetCurrent(account?.id)
+  fun addOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
+    onAccountChangeListeners.add(onAccountChangeListener)
+  }
 
-            doSwitchAccountWork(account)
+  fun removeOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
+    onAccountChangeListeners.add(onAccountChangeListener)
+  }
 
-            _currentAccount.emit(guestOrUserAccount)
-        }
-
-        deferred.await()
-    }
-
-    private suspend fun updateCurrentAccount() {
-        val currentAccount = accountDao.getCurrentAccount()
-        if (this._currentAccount.value != currentAccount) {
-            doSwitchAccountWork(currentAccount)
-        }
-        this._currentAccount.emit(currentAccount)
-    }
-
-    suspend fun getAccountById(id: Long): Account? {
-        return accountDao.getAccountById(id)
-    }
-
-    suspend fun getAccountByIdOrDefault(accountId: Long?): Account? = if (accountId == null) {
-        currentAccount.asAccount
+  fun getLocalAccountId(account: Account): Int {
+    val accountKey = account.fullName
+    if (accountIdsSharedPreference.contains(accountKey)) {
+      return accountIdsSharedPreference.getInt(accountKey, 0)
     } else {
-        getAccountById(accountId)
+      val nextAccountId = accountIdsSharedPreference.getInt(KEY_ACCOUNT_ID_COUNTER, 0)
+      val newNextAccountId = if (nextAccountId + 1 == ACCOUNT_ID_MAX_VALUE) {
+        0
+      } else {
+        nextAccountId + 1
+      }
+
+      accountIdsSharedPreference.edit()
+        .putInt(KEY_ACCOUNT_ID_COUNTER, newNextAccountId)
+        .putInt(accountKey, nextAccountId)
+        .apply()
+
+      return nextAccountId
     }
+  }
 
-    fun getAccountByIdBlocking(id: Long): Account? {
-        val cachedAccount = accountByIdCache[id]
-        if (cachedAccount != null) {
-            return cachedAccount
-        }
+  private suspend fun doSwitchAccountWork(newAccount: Account?) {
+    // Do pre-switch work here...
 
-        return runBlocking {
-            val account = getAccountById(id)
-            accountByIdCache[id] = account
+    preferenceManager.updateCurrentPreferences(newAccount)
 
-            account
-        }
+    val listeners = withContext(Dispatchers.Main) {
+      onAccountChangeListeners.toList()
     }
-
-    fun addOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
-        onAccountChangeListeners.add(onAccountChangeListener)
+    listeners.forEach {
+      it.onAccountChanged(newAccount)
     }
+  }
 
-    fun removeOnAccountChangedListener(onAccountChangeListener: OnAccountChangedListener) {
-        onAccountChangeListeners.add(onAccountChangeListener)
+  private suspend fun doSignOutWork(account: Account) {
+    val listeners: List<OnAccountChangedListener>
+
+    withContext(Dispatchers.Main) {
+      accountByIdCache.remove(account.id)
+
+      listeners = onAccountChangeListeners.toList()
     }
-
-    fun getLocalAccountId(account: Account): Int {
-        val accountKey = account.fullName
-        if (accountIdsSharedPreference.contains(accountKey)) {
-            return accountIdsSharedPreference.getInt(accountKey, 0)
-        } else {
-            val nextAccountId = accountIdsSharedPreference.getInt(KEY_ACCOUNT_ID_COUNTER, 0)
-            val newNextAccountId = if (nextAccountId + 1 == ACCOUNT_ID_MAX_VALUE) {
-                0
-            } else {
-                nextAccountId + 1
-            }
-
-            accountIdsSharedPreference.edit()
-                .putInt(KEY_ACCOUNT_ID_COUNTER, newNextAccountId)
-                .putInt(accountKey, nextAccountId)
-                .apply()
-
-            return nextAccountId
-        }
+    listeners.forEach {
+      it.onAccountSigningOut(account)
     }
+  }
 
-    private suspend fun doSwitchAccountWork(newAccount: Account?) {
-        // Do pre-switch work here...
-
-        preferenceManager.updateCurrentPreferences(newAccount)
-
-        val listeners = withContext(Dispatchers.Main) {
-            onAccountChangeListeners.toList()
-        }
-        listeners.forEach {
-            it.onAccountChanged(newAccount)
-        }
-    }
-
-    private suspend fun doSignOutWork(account: Account) {
-        val listeners: List<OnAccountChangedListener>
-
-        withContext(Dispatchers.Main) {
-            accountByIdCache.remove(account.id)
-
-            listeners = onAccountChangeListeners.toList()
-        }
-        listeners.forEach {
-            it.onAccountSigningOut(account)
-        }
-    }
-
-    private suspend fun updateNumAccounts() {
-        _numAccounts.value = accountDao.count()
-    }
+  private suspend fun updateNumAccounts() {
+    _numAccounts.value = accountDao.count()
+  }
 }
 
 val StateFlow<GuestOrUserAccount?>.asAccount
-    get() = value as? Account
+  get() = value as? Account
 
 fun StateFlow<GuestOrUserAccount?>.asAccountLiveData() = this.asLiveData().map { it as? Account }
 

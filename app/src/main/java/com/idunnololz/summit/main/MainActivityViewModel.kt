@@ -36,219 +36,219 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
-    private val accountManager: AccountManager,
-    private val directoryHelper: DirectoryHelper,
-    private val accountInfoManager: AccountInfoManager,
-    private val userTagsManager: UserTagsManager,
-    private val pendingActionsManager: PendingActionsManager,
-    val communitySelectorControllerFactory: CommunitySelectorController.Factory,
-    val userCommunitiesManager: UserCommunitiesManager,
-    val postReadManager: PostReadManager,
+  private val apiClient: AccountAwareLemmyClient,
+  private val accountManager: AccountManager,
+  private val directoryHelper: DirectoryHelper,
+  private val accountInfoManager: AccountInfoManager,
+  private val userTagsManager: UserTagsManager,
+  private val pendingActionsManager: PendingActionsManager,
+  val communitySelectorControllerFactory: CommunitySelectorController.Factory,
+  val userCommunitiesManager: UserCommunitiesManager,
+  val postReadManager: PostReadManager,
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "MainActivityViewModel"
+  companion object {
+    private const val TAG = "MainActivityViewModel"
+  }
+  private val readyCount = MutableStateFlow<Int>(0)
+
+  val communities = StatefulLiveData<List<CommunityView>>()
+  val currentAccount = MutableLiveData<AccountView?>(null)
+  val unreadCount = accountInfoManager.unreadCount.asLiveData()
+  val newActionErrorsCount = pendingActionsManager.numNewFailedActionsFlow.asLiveData()
+
+  private var communityRef: CommunityRef? = null
+
+  val siteOrCommunity = StatefulLiveData<Either<GetSiteResponse, CommunityView>>()
+  private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
+
+  val isReady = MutableLiveData<Boolean>(false)
+
+  val currentInstance: String
+    get() = apiClient.instance
+
+  init {
+    viewModelScope.launch(Dispatchers.Default) {
+      launch {
+        readyCount
+          .completeWhenDone()
+          .collect {}
+
+        Log.d(TAG, "All ready!")
+        isReady.postValue(true)
+      }
+
+      launch {
+        accountManager.currentAccount.collect {
+          withContext(Dispatchers.Main) {
+            loadCommunities()
+          }
+
+          val account = it as? Account
+          val accountView = if (account != null) {
+            accountInfoManager.getAccountViewForAccount(account)
+          } else {
+            null
+          }
+
+          currentAccount.postValue(accountView)
+
+          withContext(Dispatchers.Main) {
+            Log.d(TAG, "'accountManager' ready!")
+            readyCount.emit(readyCount.value + 1)
+          }
+        }
+      }
+
+      launch {
+        while (true) {
+          Log.d(TAG, "Waiting for 'userCommunitiesManager'")
+          val mainTab = userCommunitiesManager.waitForTab(
+            UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID,
+          )
+
+          if (mainTab != null) {
+            break
+          }
+        }
+
+        withContext(Dispatchers.Main) {
+          Log.d(TAG, "'userCommunitiesManager' ready!")
+          readyCount.emit(readyCount.value + 1)
+        }
+      }
+
+      launch {
+        postReadManager.init()
+
+        withContext(Dispatchers.Main) {
+          Log.d(TAG, "'PostReadyManager' ready!")
+          readyCount.emit(readyCount.value + 1)
+        }
+      }
+
+      launch {
+        userTagsManager.init()
+
+        withContext(Dispatchers.Main) {
+          Log.d(TAG, "'UserTagsManager' ready!")
+          readyCount.emit(readyCount.value + 1)
+        }
+      }
+
+      launch {
+        withContext(Dispatchers.IO) {
+          directoryHelper.cleanup()
+        }
+      }
     }
-    private val readyCount = MutableStateFlow<Int>(0)
+  }
 
-    val communities = StatefulLiveData<List<CommunityView>>()
-    val currentAccount = MutableLiveData<AccountView?>(null)
-    val unreadCount = accountInfoManager.unreadCount.asLiveData()
-    val newActionErrorsCount = pendingActionsManager.numNewFailedActionsFlow.asLiveData()
+  fun loadCommunities() {
+    communities.setIsLoading()
+    viewModelScope.launch(Dispatchers.Default) {
+      apiClient.fetchCommunitiesWithRetry(
+        sortType = SortType.TopAll,
+        listingType = ListingType.All,
+      ).onSuccess {
+        communities.postValue(it)
+      }.onFailure {
+        communities.postError(it)
+      }
+    }
+  }
 
-    private var communityRef: CommunityRef? = null
+  fun updateUnreadCount() {
+    accountInfoManager.updateUnreadCount()
+  }
 
-    val siteOrCommunity = StatefulLiveData<Either<GetSiteResponse, CommunityView>>()
-    private val subscribeEvent = MutableLiveData<Event<Result<CommunityView>>>()
+  private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
+    siteOrCommunity.setIsLoading()
+    viewModelScope.launch(Dispatchers.Default) {
+      val result = when (communityRef) {
+        is CommunityRef.All -> {
+          Either.Left(apiClient.fetchSiteWithRetry(force))
+        }
+        is CommunityRef.CommunityRefByName -> {
+          Either.Right(
+            apiClient.fetchCommunityWithRetry(
+              Either.Right(communityRef.getServerId(currentInstance)),
+              force,
+            ),
+          )
+        }
+        is CommunityRef.Local -> {
+          Either.Left(apiClient.fetchSiteWithRetry(force))
+        }
+        is CommunityRef.Subscribed -> {
+          Either.Left(apiClient.fetchSiteWithRetry(force))
+        }
+        is CommunityRef.MultiCommunity ->
+          Either.Left(Result.failure(RuntimeException()))
+        is CommunityRef.AllSubscribed ->
+          Either.Left(Result.failure(RuntimeException()))
+        is CommunityRef.ModeratedCommunities ->
+          Either.Left(Result.failure(RuntimeException()))
+      }
 
-    val isReady = MutableLiveData<Boolean>(false)
-
-    val currentInstance: String
-        get() = apiClient.instance
-
-    init {
-        viewModelScope.launch(Dispatchers.Default) {
-            launch {
-                readyCount
-                    .completeWhenDone()
-                    .collect {}
-
-                Log.d(TAG, "All ready!")
-                isReady.postValue(true)
+      result
+        .onLeft {
+          it
+            .onSuccess {
+              siteOrCommunity.postValue(Either.Left(it))
             }
-
-            launch {
-                accountManager.currentAccount.collect {
-                    withContext(Dispatchers.Main) {
-                        loadCommunities()
-                    }
-
-                    val account = it as? Account
-                    val accountView = if (account != null) {
-                        accountInfoManager.getAccountViewForAccount(account)
-                    } else {
-                        null
-                    }
-
-                    currentAccount.postValue(accountView)
-
-                    withContext(Dispatchers.Main) {
-                        Log.d(TAG, "'accountManager' ready!")
-                        readyCount.emit(readyCount.value + 1)
-                    }
-                }
+            .onFailure {
+              siteOrCommunity.postError(it)
             }
-
-            launch {
-                while (true) {
-                    Log.d(TAG, "Waiting for 'userCommunitiesManager'")
-                    val mainTab = userCommunitiesManager.waitForTab(
-                        UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID,
-                    )
-
-                    if (mainTab != null) {
-                        break
-                    }
-                }
-
-                withContext(Dispatchers.Main) {
-                    Log.d(TAG, "'userCommunitiesManager' ready!")
-                    readyCount.emit(readyCount.value + 1)
-                }
+        }
+        .onRight {
+          it
+            .onSuccess {
+              siteOrCommunity.postValue(Either.Right(it.community_view))
             }
-
-            launch {
-                postReadManager.init()
-
-                withContext(Dispatchers.Main) {
-                    Log.d(TAG, "'PostReadyManager' ready!")
-                    readyCount.emit(readyCount.value + 1)
-                }
-            }
-
-            launch {
-                userTagsManager.init()
-
-                withContext(Dispatchers.Main) {
-                    Log.d(TAG, "'UserTagsManager' ready!")
-                    readyCount.emit(readyCount.value + 1)
-                }
-            }
-
-            launch {
-                withContext(Dispatchers.IO) {
-                    directoryHelper.cleanup()
-                }
+            .onFailure {
+              siteOrCommunity.postError(it)
             }
         }
     }
+  }
 
-    fun loadCommunities() {
-        communities.setIsLoading()
-        viewModelScope.launch(Dispatchers.Default) {
-            apiClient.fetchCommunitiesWithRetry(
-                sortType = SortType.TopAll,
-                listingType = ListingType.All,
-            ).onSuccess {
-                communities.postValue(it)
-            }.onFailure {
-                communities.postError(it)
-            }
+  fun updateSubscriptionStatus(communityId: Int, subscribe: Boolean) {
+    viewModelScope.launch(Dispatchers.Default) {
+      val result = apiClient.followCommunityWithRetry(communityId, subscribe)
+
+      subscribeEvent.postValue(Event(result))
+      result
+        .onSuccess {
+          if (communityRef == it.community.toCommunityRef()) {
+            siteOrCommunity.postValue(Either.Right(it))
+          }
+
+          delay(1000)
+
+          withContext(Dispatchers.Main) {
+            refetchCommunityOrSite(force = true)
+          }
+
+          Log.d(TAG, "subscription status: " + it.subscribed)
         }
     }
+  }
 
-    fun updateUnreadCount() {
-        accountInfoManager.updateUnreadCount()
-    }
+  fun onCommunityChanged(communityRef: CommunityRef) {
+    this.communityRef = communityRef
 
-    private fun fetchCommunityOrSiteInfo(communityRef: CommunityRef, force: Boolean = false) {
-        siteOrCommunity.setIsLoading()
-        viewModelScope.launch(Dispatchers.Default) {
-            val result = when (communityRef) {
-                is CommunityRef.All -> {
-                    Either.Left(apiClient.fetchSiteWithRetry(force))
-                }
-                is CommunityRef.CommunityRefByName -> {
-                    Either.Right(
-                        apiClient.fetchCommunityWithRetry(
-                            Either.Right(communityRef.getServerId(currentInstance)),
-                            force,
-                        ),
-                    )
-                }
-                is CommunityRef.Local -> {
-                    Either.Left(apiClient.fetchSiteWithRetry(force))
-                }
-                is CommunityRef.Subscribed -> {
-                    Either.Left(apiClient.fetchSiteWithRetry(force))
-                }
-                is CommunityRef.MultiCommunity ->
-                    Either.Left(Result.failure(RuntimeException()))
-                is CommunityRef.AllSubscribed ->
-                    Either.Left(Result.failure(RuntimeException()))
-                is CommunityRef.ModeratedCommunities ->
-                    Either.Left(Result.failure(RuntimeException()))
-            }
+    fetchCommunityOrSiteInfo(communityRef)
+  }
 
-            result
-                .onLeft {
-                    it
-                        .onSuccess {
-                            siteOrCommunity.postValue(Either.Left(it))
-                        }
-                        .onFailure {
-                            siteOrCommunity.postError(it)
-                        }
-                }
-                .onRight {
-                    it
-                        .onSuccess {
-                            siteOrCommunity.postValue(Either.Right(it.community_view))
-                        }
-                        .onFailure {
-                            siteOrCommunity.postError(it)
-                        }
-                }
-        }
-    }
+  fun refetchCommunityOrSite(force: Boolean) {
+    val communityRef = communityRef ?: return
+    fetchCommunityOrSiteInfo(communityRef, force)
+  }
 
-    fun updateSubscriptionStatus(communityId: Int, subscribe: Boolean) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val result = apiClient.followCommunityWithRetry(communityId, subscribe)
+  private fun Flow<Int>.completeWhenDone(): Flow<Int> = transformWhile { readyCount ->
+    emit(readyCount) // always emit progress
 
-            subscribeEvent.postValue(Event(result))
-            result
-                .onSuccess {
-                    if (communityRef == it.community.toCommunityRef()) {
-                        siteOrCommunity.postValue(Either.Right(it))
-                    }
-
-                    delay(1000)
-
-                    withContext(Dispatchers.Main) {
-                        refetchCommunityOrSite(force = true)
-                    }
-
-                    Log.d(TAG, "subscription status: " + it.subscribed)
-                }
-        }
-    }
-
-    fun onCommunityChanged(communityRef: CommunityRef) {
-        this.communityRef = communityRef
-
-        fetchCommunityOrSiteInfo(communityRef)
-    }
-
-    fun refetchCommunityOrSite(force: Boolean) {
-        val communityRef = communityRef ?: return
-        fetchCommunityOrSiteInfo(communityRef, force)
-    }
-
-    private fun Flow<Int>.completeWhenDone(): Flow<Int> = transformWhile { readyCount ->
-        emit(readyCount) // always emit progress
-
-        readyCount < 4
-    }
+    readyCount < 4
+  }
 }

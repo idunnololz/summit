@@ -9,9 +9,9 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "read_posts")
 @Parcelize
 class ReadPostEntry(
-    @PrimaryKey
-    @ColumnInfo(name = "post_key")
-    val postKey: String,
-    @ColumnInfo(name = "read")
-    val read: Boolean,
+  @PrimaryKey
+  @ColumnInfo(name = "post_key")
+  val postKey: String,
+  @ColumnInfo(name = "read")
+  val read: Boolean,
 ) : Parcelable

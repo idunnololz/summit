@@ -16,143 +16,143 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
 class CommunitySearchResultsAdapter(
-    private val context: Context,
-    private val offlineManager: OfflineManager,
-    private val avatarHelper: AvatarHelper,
-    private val onCommunitySelected: (CommunityView) -> Unit,
+  private val context: Context,
+  private val offlineManager: OfflineManager,
+  private val avatarHelper: AvatarHelper,
+  private val onCommunitySelected: (CommunityView) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private sealed interface Item {
+  private sealed interface Item {
 
-        data class GroupHeaderItem(
-            val text: String,
-            val stillLoading: Boolean = false,
-        ) : Item
+    data class GroupHeaderItem(
+      val text: String,
+      val stillLoading: Boolean = false,
+    ) : Item
 
-        data class NoResultsItem(
-            val text: String,
-        ) : Item
+    data class NoResultsItem(
+      val text: String,
+    ) : Item
 
-        data class SearchResultCommunityItem(
-            val text: String,
-            val communityView: CommunityView,
-            val monthlyActiveUsers: Int,
-        ) : Item
-    }
+    data class SearchResultCommunityItem(
+      val text: String,
+      val communityView: CommunityView,
+      val monthlyActiveUsers: Int,
+    ) : Item
+  }
 
-    private var serverResultsInProgress = false
-    private var serverQueryResults: List<CommunityView> = listOf()
+  private var serverResultsInProgress = false
+  private var serverQueryResults: List<CommunityView> = listOf()
 
-    private var query: String? = null
+  private var query: String? = null
 
-    private val adapterHelper = AdapterHelper<Item>(
-        areItemsTheSame = { old, new ->
-            old::class == new::class && when (old) {
-                is Item.GroupHeaderItem -> {
-                    old.text == (new as Item.GroupHeaderItem).text
-                }
-                is Item.NoResultsItem -> true
-                is Item.SearchResultCommunityItem -> {
-                    old.communityView.community.id ==
-                        (new as Item.SearchResultCommunityItem).communityView.community.id
-                }
-            }
-        },
-    ).apply {
-        addItemType(
-            clazz = Item.GroupHeaderItem::class,
-            inflateFn = ItemCommunitySearchHeaderBinding::inflate,
-        ) { item, b, _ ->
-            b.titleTextView.text = item.text
-
-            if (item.stillLoading) {
-                b.progressBar.visibility = View.VISIBLE
-            } else {
-                b.progressBar.visibility = View.GONE
-            }
+  private val adapterHelper = AdapterHelper<Item>(
+    areItemsTheSame = { old, new ->
+      old::class == new::class && when (old) {
+        is Item.GroupHeaderItem -> {
+          old.text == (new as Item.GroupHeaderItem).text
         }
-        addItemType(
-            clazz = Item.SearchResultCommunityItem::class,
-            inflateFn = CommunitySearchResultCommunityItemBinding::inflate,
-        ) { item, b, h ->
-            avatarHelper.loadCommunityIcon(b.icon, item.communityView.community)
-
-            b.title.text = item.text
-            val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
-
-            @Suppress("SetTextI18n")
-            b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
-                "(${item.communityView.community.instance})"
-
-            h.itemView.setOnClickListener {
-                onCommunitySelected(item.communityView)
-            }
+        is Item.NoResultsItem -> true
+        is Item.SearchResultCommunityItem -> {
+          old.communityView.community.id ==
+            (new as Item.SearchResultCommunityItem).communityView.community.id
         }
-        addItemType(
-            clazz = Item.NoResultsItem::class,
-            inflateFn = ItemCommunitySearchNoResultsBinding::inflate,
-        ) { item, b, _ ->
-            b.text.text = item.text
-        }
+      }
+    },
+  ).apply {
+    addItemType(
+      clazz = Item.GroupHeaderItem::class,
+      inflateFn = ItemCommunitySearchHeaderBinding::inflate,
+    ) { item, b, _ ->
+      b.titleTextView.text = item.text
+
+      if (item.stillLoading) {
+        b.progressBar.visibility = View.VISIBLE
+      } else {
+        b.progressBar.visibility = View.GONE
+      }
     }
+    addItemType(
+      clazz = Item.SearchResultCommunityItem::class,
+      inflateFn = CommunitySearchResultCommunityItemBinding::inflate,
+    ) { item, b, h ->
+      avatarHelper.loadCommunityIcon(b.icon, item.communityView.community)
 
-    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+      b.title.text = item.text
+      val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        adapterHelper.onCreateViewHolder(parent, viewType)
+      @Suppress("SetTextI18n")
+      b.monthlyActives.text = "(${context.getString(R.string.mau_format, mauString)}) " +
+        "(${item.communityView.community.instance})"
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        adapterHelper.onBindViewHolder(holder, position)
+      h.itemView.setOnClickListener {
+        onCommunitySelected(item.communityView)
+      }
     }
-
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        super.onViewRecycled(holder)
-        offlineManager.cancelFetch(holder.itemView)
+    addItemType(
+      clazz = Item.NoResultsItem::class,
+      inflateFn = ItemCommunitySearchNoResultsBinding::inflate,
+    ) { item, b, _ ->
+      b.text.text = item.text
     }
+  }
 
-    override fun getItemCount(): Int = adapterHelper.itemCount
+  override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    private fun refreshItems(cb: () -> Unit) {
-        val newItems = mutableListOf<Item>()
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+    adapterHelper.onCreateViewHolder(parent, viewType)
 
-        newItems.add(
-            Item.GroupHeaderItem(
-                context.getString(R.string.server_results),
-                serverResultsInProgress,
-            ),
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    adapterHelper.onBindViewHolder(holder, position)
+  }
+
+  override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+    super.onViewRecycled(holder)
+    offlineManager.cancelFetch(holder.itemView)
+  }
+
+  override fun getItemCount(): Int = adapterHelper.itemCount
+
+  private fun refreshItems(cb: () -> Unit) {
+    val newItems = mutableListOf<Item>()
+
+    newItems.add(
+      Item.GroupHeaderItem(
+        context.getString(R.string.server_results),
+        serverResultsInProgress,
+      ),
+    )
+    if (serverQueryResults.isEmpty() && !serverResultsInProgress) {
+      newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+    } else {
+      serverQueryResults.forEach {
+        newItems += Item.SearchResultCommunityItem(
+          it.community.name,
+          it,
+          it.counts.users_active_month,
         )
-        if (serverQueryResults.isEmpty() && !serverResultsInProgress) {
-            newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
-        } else {
-            serverQueryResults.forEach {
-                newItems += Item.SearchResultCommunityItem(
-                    it.community.name,
-                    it,
-                    it.counts.users_active_month,
-                )
-            }
-        }
-
-        adapterHelper.setItems(newItems, this, cb)
+      }
     }
 
-    fun setQuery(query: String?, cb: () -> Unit) {
-        this.query = query
+    adapterHelper.setItems(newItems, this, cb)
+  }
 
-        refreshItems(cb)
-    }
+  fun setQuery(query: String?, cb: () -> Unit) {
+    this.query = query
 
-    fun setQueryServerResults(serverQueryResults: List<CommunityView>) {
-        this.serverQueryResults = serverQueryResults
-        serverResultsInProgress = false
+    refreshItems(cb)
+  }
 
-        refreshItems {}
-    }
+  fun setQueryServerResults(serverQueryResults: List<CommunityView>) {
+    this.serverQueryResults = serverQueryResults
+    serverResultsInProgress = false
 
-    fun setQueryServerResultsInProgress() {
-        serverQueryResults = listOf()
-        serverResultsInProgress = true
+    refreshItems {}
+  }
 
-        refreshItems {}
-    }
+  fun setQueryServerResultsInProgress() {
+    serverQueryResults = listOf()
+    serverResultsInProgress = true
+
+    refreshItems {}
+  }
 }

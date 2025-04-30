@@ -15,42 +15,42 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class DbDetailsViewModel @Inject constructor() : ViewModel() {
 
-    data class Model(
-        val databaseName: String?,
-        val tablesInfo: List<TableInfo>,
-    )
+  data class Model(
+    val databaseName: String?,
+    val tablesInfo: List<TableInfo>,
+  )
 
-    val model = StatefulLiveData<Model>()
+  val model = StatefulLiveData<Model>()
 
-    fun loadDbDetails(dbUri: Uri, tablesToShow: Set<String>?) {
-        model.setIsLoading()
+  fun loadDbDetails(dbUri: Uri, tablesToShow: Set<String>?) {
+    model.setIsLoading()
 
-        viewModelScope.launch {
-            val dbHelper = DbHelper(
-                SQLiteDatabase.openDatabase(dbUri.toFile().path, null, 0),
-            )
+    viewModelScope.launch {
+      val dbHelper = DbHelper(
+        SQLiteDatabase.openDatabase(dbUri.toFile().path, null, 0),
+      )
 
-            val dbName = dbHelper.getDbName()
-            val tablesInfo = dbHelper.getTableNames()
-                .let {
-                    if (tablesToShow != null) {
-                        it.filter { tablesToShow.contains(it) }
-                    } else {
-                        it
-                    }
-                }
-                .map {
-                    dbHelper.getTableInfo(it)
-                }
-
-            model.postValue(
-                Model(
-                    databaseName = dbName,
-                    tablesInfo = tablesInfo,
-                ),
-            )
-
-            dbHelper.close()
+      val dbName = dbHelper.getDbName()
+      val tablesInfo = dbHelper.getTableNames()
+        .let {
+          if (tablesToShow != null) {
+            it.filter { tablesToShow.contains(it) }
+          } else {
+            it
+          }
         }
+        .map {
+          dbHelper.getTableInfo(it)
+        }
+
+      model.postValue(
+        Model(
+          databaseName = dbName,
+          tablesInfo = tablesInfo,
+        ),
+      )
+
+      dbHelper.close()
     }
+  }
 }

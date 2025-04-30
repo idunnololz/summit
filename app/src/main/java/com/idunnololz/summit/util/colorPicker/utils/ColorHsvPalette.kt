@@ -33,61 +33,61 @@ import kotlin.math.min
  * for alternating representations of the RGB color model.
  */
 class ColorHsvPalette(resources: Resources?, bitmap: Bitmap?) :
-    BitmapDrawable(resources, bitmap) {
-    private val huePaint =
-        Paint(Paint.ANTI_ALIAS_FLAG)
-    private val saturationPaint =
-        Paint(Paint.ANTI_ALIAS_FLAG)
+  BitmapDrawable(resources, bitmap) {
+  private val huePaint =
+    Paint(Paint.ANTI_ALIAS_FLAG)
+  private val saturationPaint =
+    Paint(Paint.ANTI_ALIAS_FLAG)
 
-    override fun draw(canvas: Canvas) {
-        val width = bounds.width()
-        val height = bounds.height()
-        val centerX = width * 0.5f
-        val centerY = height * 0.5f
-        val radius = (min(width.toDouble(), height.toDouble()) * 0.5f).toFloat()
+  override fun draw(canvas: Canvas) {
+    val width = bounds.width()
+    val height = bounds.height()
+    val centerX = width * 0.5f
+    val centerY = height * 0.5f
+    val radius = (min(width.toDouble(), height.toDouble()) * 0.5f).toFloat()
 
-        val sweepShader: Shader =
-            SweepGradient(
-                centerX,
-                centerY,
-                intArrayOf(
-                    Color.RED,
-                    Color.MAGENTA,
-                    Color.BLUE,
-                    Color.CYAN,
-                    Color.GREEN,
-                    Color.YELLOW,
-                    Color.RED,
-                ),
-                floatArrayOf(0.000f, 0.166f, 0.333f, 0.499f, 0.666f, 0.833f, 0.999f),
-            )
+    val sweepShader: Shader =
+      SweepGradient(
+        centerX,
+        centerY,
+        intArrayOf(
+          Color.RED,
+          Color.MAGENTA,
+          Color.BLUE,
+          Color.CYAN,
+          Color.GREEN,
+          Color.YELLOW,
+          Color.RED,
+        ),
+        floatArrayOf(0.000f, 0.166f, 0.333f, 0.499f, 0.666f, 0.833f, 0.999f),
+      )
 
-        huePaint.setShader(sweepShader)
+    huePaint.setShader(sweepShader)
 
-        val saturationShader: Shader =
-            RadialGradient(
-                centerX,
-                centerY,
-                radius,
-                Color.WHITE,
-                0x00FFFFFF,
-                Shader.TileMode.CLAMP,
-            )
-        saturationPaint.setShader(saturationShader)
+    val saturationShader: Shader =
+      RadialGradient(
+        centerX,
+        centerY,
+        radius,
+        Color.WHITE,
+        0x00FFFFFF,
+        Shader.TileMode.CLAMP,
+      )
+    saturationPaint.setShader(saturationShader)
 
-        canvas.drawCircle(centerX, centerY, radius, huePaint)
-        canvas.drawCircle(centerX, centerY, radius, saturationPaint)
-    }
+    canvas.drawCircle(centerX, centerY, radius, huePaint)
+    canvas.drawCircle(centerX, centerY, radius, saturationPaint)
+  }
 
-    override fun setAlpha(alpha: Int) {
-        huePaint.alpha = alpha
-    }
+  override fun setAlpha(alpha: Int) {
+    huePaint.alpha = alpha
+  }
 
-    override fun setColorFilter(colorFilter: ColorFilter?) {
-        huePaint.setColorFilter(colorFilter)
-    }
+  override fun setColorFilter(colorFilter: ColorFilter?) {
+    huePaint.setColorFilter(colorFilter)
+  }
 
-    override fun getOpacity(): Int {
-        return PixelFormat.OPAQUE
-    }
+  override fun getOpacity(): Int {
+    return PixelFormat.OPAQUE
+  }
 }

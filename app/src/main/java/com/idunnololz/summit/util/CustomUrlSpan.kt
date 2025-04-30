@@ -5,12 +5,12 @@ import android.text.TextPaint
 import android.text.style.URLSpan
 
 class CustomUrlSpan : URLSpan {
-    constructor(url: String?) : super(url)
-    constructor(src: Parcel) : super(src)
+  constructor(url: String?) : super(url)
+  constructor(src: Parcel) : super(src)
 
-    override fun updateDrawState(ds: TextPaint) {
-        super.updateDrawState(ds)
+  override fun updateDrawState(ds: TextPaint) {
+    super.updateDrawState(ds)
 
-        ds.isUnderlineText = false
-    }
+    ds.isUnderlineText = false
+  }
 }

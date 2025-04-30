@@ -48,259 +48,259 @@ import kotlinx.parcelize.Parcelize
 
 @HiltWorker
 class OfflinePostFeedWork @AssistedInject constructor(
-    @Assisted private val context: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val postsRepositoryFactory: PostsRepository.Factory,
-    private val postFeedPrefetcher: PostFeedPrefetcher,
-    private val postPrefetcher: PostPrefetcher,
-    private val accountInfoManager: AccountInfoManager,
-    private val preferenceManager: PreferenceManager,
-    private val perCommunityPreferences: PerCommunityPreferences,
-    private val offlineManager: OfflineManager,
+  @Assisted private val context: Context,
+  @Assisted workerParams: WorkerParameters,
+  private val postsRepositoryFactory: PostsRepository.Factory,
+  private val postFeedPrefetcher: PostFeedPrefetcher,
+  private val postPrefetcher: PostPrefetcher,
+  private val accountInfoManager: AccountInfoManager,
+  private val preferenceManager: PreferenceManager,
+  private val perCommunityPreferences: PerCommunityPreferences,
+  private val offlineManager: OfflineManager,
 ) : CoroutineWorker(context, workerParams) {
 
-    companion object {
-        private const val TAG = "OfflinePostFeedWork"
+  companion object {
+    private const val TAG = "OfflinePostFeedWork"
 
-        private const val NOTIFICATION_CHANNEL_ID = "offline_post_feed"
-        private const val NOTIFICATION_CHANNEL_NAME = "Offline post feed"
-        private const val NOTIFICATION_ID = 1337
+    private const val NOTIFICATION_CHANNEL_ID = "offline_post_feed"
+    private const val NOTIFICATION_CHANNEL_NAME = "Offline post feed"
+    private const val NOTIFICATION_ID = 1337
 
-        private const val ARG_COMMUNITY_REF = "ARG_COMMUNITY_REF"
+    private const val ARG_COMMUNITY_REF = "ARG_COMMUNITY_REF"
 
-        fun makeInputData(communityRef: CommunityRef): Data =
-            workDataOf(ARG_COMMUNITY_REF to BoxedCommunityRef(communityRef).toByteArray())
+    fun makeInputData(communityRef: CommunityRef): Data =
+      workDataOf(ARG_COMMUNITY_REF to BoxedCommunityRef(communityRef).toByteArray())
+  }
+
+  @Parcelize
+  enum class ProgressPhase(val index: Int) : Parcelable {
+    Start(0),
+    FetchingPostFeed(1),
+    FetchingPosts(2),
+    FetchingExtras(3),
+    Complete(4),
+  }
+
+  @Parcelize
+  private class BoxedCommunityRef(
+    val communityRef: CommunityRef,
+  ) : Parcelable
+
+  private val postsRepository = postsRepositoryFactory.create(SavedStateHandle())
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  override suspend fun doWork(): Result {
+    val progressTracker = ProgressTracker()
+
+    setProgress(progressTracker.getProgressData())
+
+    val communityRef =
+      inputData.getParcelable<BoxedCommunityRef>(ARG_COMMUNITY_REF)?.communityRef
+
+    val fullAccount = accountInfoManager.currentFullAccount.value
+    val preferences = preferenceManager.updateCurrentPreferences(
+      fullAccount?.account,
+    )
+
+    val sortOrder = getSortOrderForCommunity(
+      communityRef,
+      preferences,
+      perCommunityPreferences,
+      fullAccount,
+    ) ?: DefaultSortOrder
+
+    postsRepository.setCommunity(communityRef)
+    postsRepository.setSortOrder(sortOrder)
+
+    val allPosts = mutableListOf<LocalPostView>()
+    val offlinePostCount = preferenceManager.currentPreferences.getOfflinePostCount()
+    var postsLoaded = 0
+    var index = 0
+
+    setProgress(
+      progressTracker.apply {
+        currentPhase = ProgressPhase.FetchingPostFeed
+        subMax = offlinePostCount.toDouble()
+      }.getProgressData(),
+    )
+
+    while (true) {
+      val result = postFeedPrefetcher.suspendPrefetchPage(index, postsRepository)
+
+      val posts = result.getOrNull()?.posts
+      val postCount = posts?.size ?: 0
+
+      if (posts != null) {
+        allPosts += posts
+      }
+
+      if (postCount == 0) {
+        break
+      }
+
+      postsLoaded += postCount
+
+      setProgress(
+        progressTracker.apply {
+          subCount = postsLoaded.toDouble()
+        }.getProgressData(),
+      )
+
+      if (postsLoaded >= offlinePostCount) {
+        break
+      }
+
+      index++
     }
 
-    @Parcelize
-    enum class ProgressPhase(val index: Int) : Parcelable {
-        Start(0),
-        FetchingPostFeed(1),
-        FetchingPosts(2),
-        FetchingExtras(3),
-        Complete(4),
-    }
+    setProgress(
+      progressTracker.apply {
+        currentPhase = ProgressPhase.FetchingPosts
+        subMax = allPosts.size.toDouble()
+      }.getProgressData(),
+    )
 
-    @Parcelize
-    private class BoxedCommunityRef(
-        val communityRef: CommunityRef,
-    ) : Parcelable
-
-    private val postsRepository = postsRepositoryFactory.create(SavedStateHandle())
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun doWork(): Result {
-        val progressTracker = ProgressTracker()
-
-        setProgress(progressTracker.getProgressData())
-
-        val communityRef =
-            inputData.getParcelable<BoxedCommunityRef>(ARG_COMMUNITY_REF)?.communityRef
-
-        val fullAccount = accountInfoManager.currentFullAccount.value
-        val preferences = preferenceManager.updateCurrentPreferences(
-            fullAccount?.account,
+    postPrefetcher.prefetchPosts(
+      postOrCommentRefs = allPosts.map { post ->
+        Either.Left(
+          PostRef(
+            post.fetchedPost.source.instance
+              ?: post.fetchedPost.postView.instance,
+            post.fetchedPost.postView.post.id,
+          ),
         )
-
-        val sortOrder = getSortOrderForCommunity(
-            communityRef,
-            preferences,
-            perCommunityPreferences,
-            fullAccount,
-        ) ?: DefaultSortOrder
-
-        postsRepository.setCommunity(communityRef)
-        postsRepository.setSortOrder(sortOrder)
-
-        val allPosts = mutableListOf<LocalPostView>()
-        val offlinePostCount = preferenceManager.currentPreferences.getOfflinePostCount()
-        var postsLoaded = 0
-        var index = 0
-
+      },
+      sortOrder = (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
+      maxDepth = if (preferences.collapseChildCommentsByDefault) {
+        1
+      } else {
+        null
+      },
+      account = fullAccount?.account,
+      onProgress = { count: Int, maxCount: Int ->
         setProgress(
-            progressTracker.apply {
-                currentPhase = ProgressPhase.FetchingPostFeed
-                subMax = offlinePostCount.toDouble()
-            }.getProgressData(),
+          progressTracker.apply {
+            subCount = count.toDouble()
+          }.getProgressData(),
         )
+      },
+    )
 
-        while (true) {
-            val result = postFeedPrefetcher.suspendPrefetchPage(index, postsRepository)
+    setProgress(
+      progressTracker.apply {
+        currentPhase = ProgressPhase.FetchingExtras
+        subMax = allPosts.size.toDouble()
+      }.getProgressData(),
+    )
+    coroutineScope {
+      var doneCount = 0
+      val fetchImageJobs = mutableListOf<Job>()
 
-            val posts = result.getOrNull()?.posts
-            val postCount = posts?.size ?: 0
-
-            if (posts != null) {
-                allPosts += posts
-            }
-
-            if (postCount == 0) {
-                break
-            }
-
-            postsLoaded += postCount
-
-            setProgress(
-                progressTracker.apply {
-                    subCount = postsLoaded.toDouble()
-                }.getProgressData(),
-            )
-
-            if (postsLoaded >= offlinePostCount) {
-                break
-            }
-
-            index++
-        }
-
-        setProgress(
-            progressTracker.apply {
-                currentPhase = ProgressPhase.FetchingPosts
-                subMax = allPosts.size.toDouble()
-            }.getProgressData(),
-        )
-
-        postPrefetcher.prefetchPosts(
-            postOrCommentRefs = allPosts.map { post ->
-                Either.Left(
-                    PostRef(
-                        post.fetchedPost.source.instance
-                            ?: post.fetchedPost.postView.instance,
-                        post.fetchedPost.postView.post.id,
-                    ),
+      for (post in allPosts) {
+        fetchImageJobs += launch {
+          val postView = post.fetchedPost.postView
+          val imageUrl = postView.getImageUrl(false)
+          if (imageUrl != null) {
+            withContext(Dispatchers.Main) {
+              suspendCancellableCoroutine<Unit> { cont ->
+                val registration = offlineManager.fetchImage(
+                  imageUrl,
+                  {
+                    cont.resume(Unit) {}
+                  },
+                  {
+                    Log.d(TAG, "Error downloading image for post $post. Url: $imageUrl", it)
+                    cont.resume(Unit) {}
+                  },
                 )
-            },
-            sortOrder = (preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top).toApiSortOrder(),
-            maxDepth = if (preferences.collapseChildCommentsByDefault) {
-                1
-            } else {
-                null
-            },
-            account = fullAccount?.account,
-            onProgress = { count: Int, maxCount: Int ->
-                setProgress(
-                    progressTracker.apply {
-                        subCount = count.toDouble()
-                    }.getProgressData(),
-                )
-            },
-        )
 
-        setProgress(
-            progressTracker.apply {
-                currentPhase = ProgressPhase.FetchingExtras
-                subMax = allPosts.size.toDouble()
-            }.getProgressData(),
-        )
-        coroutineScope {
-            var doneCount = 0
-            val fetchImageJobs = mutableListOf<Job>()
-
-            for (post in allPosts) {
-                fetchImageJobs += launch {
-                    val postView = post.fetchedPost.postView
-                    val imageUrl = postView.getImageUrl(false)
-                    if (imageUrl != null) {
-                        withContext(Dispatchers.Main) {
-                            suspendCancellableCoroutine<Unit> { cont ->
-                                val registration = offlineManager.fetchImage(
-                                    imageUrl,
-                                    {
-                                        cont.resume(Unit) {}
-                                    },
-                                    {
-                                        Log.d(TAG, "Error downloading image for post $post. Url: $imageUrl", it)
-                                        cont.resume(Unit) {}
-                                    },
-                                )
-
-                                cont.invokeOnCancellation {
-                                    registration.cancel(offlineManager)
-                                }
-                            }
-                        }
-                    }
-
-                    doneCount++
-                    setProgress(
-                        progressTracker.apply {
-                            subCount = doneCount.toDouble()
-                        }.getProgressData(),
-                    )
+                cont.invokeOnCancellation {
+                  registration.cancel(offlineManager)
                 }
+              }
             }
+          }
 
-            setProgress(
-                progressTracker.apply {
-                    currentPhase = ProgressPhase.Complete
-                }.getProgressData(),
-            )
-
-            fetchImageJobs.joinAll()
+          doneCount++
+          setProgress(
+            progressTracker.apply {
+              subCount = doneCount.toDouble()
+            }.getProgressData(),
+          )
         }
+      }
 
-        return Result.success()
+      setProgress(
+        progressTracker.apply {
+          currentPhase = ProgressPhase.Complete
+        }.getProgressData(),
+      )
+
+      fetchImageJobs.joinAll()
     }
 
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    return Result.success()
+  }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH,
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
+  override suspend fun getForegroundInfo(): ForegroundInfo {
+    val notificationManager =
+      context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.baseline_download_for_offline_24)
-            .setOngoing(true)
-            .setAutoCancel(true)
-            .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
-            .setContentTitle(context.getString(R.string.app_name))
-            .setLocalOnly(true)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
-            .setContentText("Updating widget")
-            .build()
-        return ForegroundInfo(NOTIFICATION_ID, notification)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      val channel = NotificationChannel(
+        NOTIFICATION_CHANNEL_ID,
+        NOTIFICATION_CHANNEL_NAME,
+        NotificationManager.IMPORTANCE_HIGH,
+      )
+      notificationManager.createNotificationChannel(channel)
     }
 
-    class ProgressTracker {
+    val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+      .setSmallIcon(R.drawable.baseline_download_for_offline_24)
+      .setOngoing(true)
+      .setAutoCancel(true)
+      .setOnlyAlertOnce(true)
+      .setPriority(NotificationCompat.PRIORITY_MIN)
+      .setContentTitle(context.getString(R.string.app_name))
+      .setLocalOnly(true)
+      .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+      .setContentText("Updating widget")
+      .build()
+    return ForegroundInfo(NOTIFICATION_ID, notification)
+  }
 
-        companion object {
-            private const val PROGRESS_PHASE = "PROGRESS_1"
-            private const val PROGRESS_SUB_COUNT = "PROGRESS_2"
-            private const val PROGRESS_SUB_MAX = "PROGRESS_3"
+  class ProgressTracker {
 
-            fun fromData(data: Data) = ProgressTracker().apply {
-                currentPhase = ProgressPhase.entries[data.getInt(PROGRESS_PHASE, 0)]
-                subCount = data.getDouble(PROGRESS_SUB_COUNT, 0.0)
-                subMax = data.getDouble(PROGRESS_SUB_MAX, 0.0)
-            }
-        }
+    companion object {
+      private const val PROGRESS_PHASE = "PROGRESS_1"
+      private const val PROGRESS_SUB_COUNT = "PROGRESS_2"
+      private const val PROGRESS_SUB_MAX = "PROGRESS_3"
 
-        var currentPhase: ProgressPhase = ProgressPhase.Start
-            set(value) {
-                field = value
-                subCount = 0.0
-                subMax = 1.0
-            }
-        var subCount: Double = 0.0
-        var subMax: Double = 0.0
-
-        val progressPercent
-            get() = (currentPhase.index / ((ProgressPhase.entries.size - 1).toDouble()))
-        val subProgressPercent
-            get() = subCount / subMax
-
-        fun getProgressData() = workDataOf(
-            PROGRESS_PHASE to currentPhase.ordinal,
-            PROGRESS_SUB_COUNT to subCount,
-            PROGRESS_SUB_MAX to subMax,
-        )
+      fun fromData(data: Data) = ProgressTracker().apply {
+        currentPhase = ProgressPhase.entries[data.getInt(PROGRESS_PHASE, 0)]
+        subCount = data.getDouble(PROGRESS_SUB_COUNT, 0.0)
+        subMax = data.getDouble(PROGRESS_SUB_MAX, 0.0)
+      }
     }
+
+    var currentPhase: ProgressPhase = ProgressPhase.Start
+      set(value) {
+        field = value
+        subCount = 0.0
+        subMax = 1.0
+      }
+    var subCount: Double = 0.0
+    var subMax: Double = 0.0
+
+    val progressPercent
+      get() = (currentPhase.index / ((ProgressPhase.entries.size - 1).toDouble()))
+    val subProgressPercent
+      get() = subCount / subMax
+
+    fun getProgressData() = workDataOf(
+      PROGRESS_PHASE to currentPhase.ordinal,
+      PROGRESS_SUB_COUNT to subCount,
+      PROGRESS_SUB_MAX to subMax,
+    )
+  }
 }

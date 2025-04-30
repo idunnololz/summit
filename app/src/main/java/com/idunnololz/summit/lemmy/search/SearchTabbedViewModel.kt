@@ -24,138 +24,138 @@ import kotlinx.parcelize.Parcelize
 
 @HiltViewModel
 class SearchTabbedViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val apiClient: AccountAwareLemmyClient,
+  private val coroutineScopeFactory: CoroutineScopeFactory,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
-    companion object {
-        private const val MAX_QUERY_PAGE_LIMIT = 20
+  companion object {
+    private const val MAX_QUERY_PAGE_LIMIT = 20
+  }
+
+  val showSearch = MutableLiveData<Boolean>(true)
+  val instance: String
+    get() = apiClient.instance
+  override var lastSelectedItem: Either<PostRef, CommentRef>? = null
+
+  val queryEnginesByType = mutableMapOf<SearchType, QueryEngine>()
+
+  private var currentType: SearchType = SearchType.All
+
+  val currentQueryFlow = MutableStateFlow<String>("")
+  val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
+  val currentPersonFilter = MutableStateFlow<PersonFilter?>(null)
+  val currentCommunityFilter = MutableStateFlow<CommunityFilter?>(null)
+  val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
+  val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
+
+  val currentQueryLiveData = currentQueryFlow.asLiveData()
+  val currentPersonFilterLiveData = currentPersonFilter.asLiveData()
+  val currentCommunityFilterLiveData = currentCommunityFilter.asLiveData()
+
+  init {
+    queryEnginesByType[SearchType.All] = QueryEngine(
+      coroutineScopeFactory,
+      apiClient,
+      SearchType.All,
+    )
+    queryEnginesByType[SearchType.Url] = QueryEngine(
+      coroutineScopeFactory,
+      apiClient,
+      SearchType.Url,
+    )
+    queryEnginesByType[SearchType.Posts] = QueryEngine(
+      coroutineScopeFactory,
+      apiClient,
+      SearchType.Posts,
+    )
+    queryEnginesByType[SearchType.Comments] = QueryEngine(
+      coroutineScopeFactory,
+      apiClient,
+      SearchType.Comments,
+    )
+    queryEnginesByType[SearchType.Communities] = QueryEngine(
+      coroutineScopeFactory,
+      apiClient,
+      SearchType.Communities,
+    )
+    queryEnginesByType[SearchType.Users] = QueryEngine(
+      coroutineScopeFactory,
+      apiClient,
+      SearchType.Users,
+    )
+
+    viewModelScope.launch {
+      currentQueryFlow.collect {
+        queryEnginesByType[currentType]?.setQuery(it)
+      }
     }
-
-    val showSearch = MutableLiveData<Boolean>(true)
-    val instance: String
-        get() = apiClient.instance
-    override var lastSelectedItem: Either<PostRef, CommentRef>? = null
-
-    val queryEnginesByType = mutableMapOf<SearchType, QueryEngine>()
-
-    private var currentType: SearchType = SearchType.All
-
-    val currentQueryFlow = MutableStateFlow<String>("")
-    val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
-    val currentPersonFilter = MutableStateFlow<PersonFilter?>(null)
-    val currentCommunityFilter = MutableStateFlow<CommunityFilter?>(null)
-    val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
-    val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
-
-    val currentQueryLiveData = currentQueryFlow.asLiveData()
-    val currentPersonFilterLiveData = currentPersonFilter.asLiveData()
-    val currentCommunityFilterLiveData = currentCommunityFilter.asLiveData()
-
-    init {
-        queryEnginesByType[SearchType.All] = QueryEngine(
-            coroutineScopeFactory,
-            apiClient,
-            SearchType.All,
-        )
-        queryEnginesByType[SearchType.Url] = QueryEngine(
-            coroutineScopeFactory,
-            apiClient,
-            SearchType.Url,
-        )
-        queryEnginesByType[SearchType.Posts] = QueryEngine(
-            coroutineScopeFactory,
-            apiClient,
-            SearchType.Posts,
-        )
-        queryEnginesByType[SearchType.Comments] = QueryEngine(
-            coroutineScopeFactory,
-            apiClient,
-            SearchType.Comments,
-        )
-        queryEnginesByType[SearchType.Communities] = QueryEngine(
-            coroutineScopeFactory,
-            apiClient,
-            SearchType.Communities,
-        )
-        queryEnginesByType[SearchType.Users] = QueryEngine(
-            coroutineScopeFactory,
-            apiClient,
-            SearchType.Users,
-        )
-
-        viewModelScope.launch {
-            currentQueryFlow.collect {
-                queryEnginesByType[currentType]?.setQuery(it)
-            }
-        }
-        viewModelScope.launch {
-            currentSortTypeFlow.collect {
-                queryEnginesByType[currentType]?.setSortType(it)
-            }
-        }
-        viewModelScope.launch {
-            currentPersonFilter.collect {
-                queryEnginesByType[currentType]?.setPersonFilter(it?.personId)
-            }
-        }
-        viewModelScope.launch {
-            currentCommunityFilter.collect {
-                queryEnginesByType[currentType]?.setCommunityFilter(it?.communityId)
-            }
-        }
+    viewModelScope.launch {
+      currentSortTypeFlow.collect {
+        queryEnginesByType[currentType]?.setSortType(it)
+      }
     }
-
-    fun setCurrentPersonFilter(personFilter: PersonFilter?) {
-        viewModelScope.launch {
-            currentPersonFilter.value = personFilter
-        }
+    viewModelScope.launch {
+      currentPersonFilter.collect {
+        queryEnginesByType[currentType]?.setPersonFilter(it?.personId)
+      }
     }
-
-    fun setCurrentCommunityFilter(communityFilter: CommunityFilter?) {
-        viewModelScope.launch {
-            currentCommunityFilter.value = communityFilter
-        }
+    viewModelScope.launch {
+      currentCommunityFilter.collect {
+        queryEnginesByType[currentType]?.setCommunityFilter(it?.communityId)
+      }
     }
+  }
 
-    fun updateCurrentQuery(query: String) {
-        viewModelScope.launch {
-            currentQueryFlow.value = query
-        }
+  fun setCurrentPersonFilter(personFilter: PersonFilter?) {
+    viewModelScope.launch {
+      currentPersonFilter.value = personFilter
     }
+  }
 
-    fun setActiveType(type: SearchType) {
-        currentType = type
-
-        queryEnginesByType[currentType]?.apply {
-            setSortType(currentSortTypeFlow.value)
-            setPersonFilter(currentPersonFilter.value?.personId)
-            setCommunityFilter(currentCommunityFilter.value?.communityId)
-
-            // Set query must be last to avoid race conditions
-            setQuery(currentQueryFlow.value)
-        }
+  fun setCurrentCommunityFilter(communityFilter: CommunityFilter?) {
+    viewModelScope.launch {
+      currentCommunityFilter.value = communityFilter
     }
+  }
 
-    fun setSortType(type: SortType) {
-        viewModelScope.launch {
-            currentSortTypeFlow.value = type
-        }
+  fun updateCurrentQuery(query: String) {
+    viewModelScope.launch {
+      currentQueryFlow.value = query
     }
+  }
 
-    fun loadPage(pageIndex: Int, force: Boolean = false) {
-        queryEnginesByType[currentType]?.performQuery(pageIndex, force)
+  fun setActiveType(type: SearchType) {
+    currentType = type
+
+    queryEnginesByType[currentType]?.apply {
+      setSortType(currentSortTypeFlow.value)
+      setPersonFilter(currentPersonFilter.value?.personId)
+      setCommunityFilter(currentCommunityFilter.value?.communityId)
+
+      // Set query must be last to avoid race conditions
+      setQuery(currentQueryFlow.value)
     }
+  }
 
-    @Parcelize
-    data class PersonFilter(
-        val personId: PersonId,
-        val personRef: PersonRef.PersonRefByName,
-    ) : Parcelable
+  fun setSortType(type: SortType) {
+    viewModelScope.launch {
+      currentSortTypeFlow.value = type
+    }
+  }
 
-    @Parcelize
-    data class CommunityFilter(
-        val communityId: Int,
-        val communityRef: CommunityRef.CommunityRefByName,
-    ) : Parcelable
+  fun loadPage(pageIndex: Int, force: Boolean = false) {
+    queryEnginesByType[currentType]?.performQuery(pageIndex, force)
+  }
+
+  @Parcelize
+  data class PersonFilter(
+    val personId: PersonId,
+    val personRef: PersonRef.PersonRefByName,
+  ) : Parcelable
+
+  @Parcelize
+  data class CommunityFilter(
+    val communityId: Int,
+    val communityRef: CommunityRef.CommunityRefByName,
+  ) : Parcelable
 }

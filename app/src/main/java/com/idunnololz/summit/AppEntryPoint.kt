@@ -15,13 +15,13 @@ import okhttp3.OkHttpClient
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface AppEntryPoint {
-    fun themeManager(): ThemeManager
-    fun preferences(): Preferences
-    fun notificationsManager(): NotificationsManager
-    fun notificationsUpdaterFactory(): NotificationsUpdater.Factory
-    fun conversationsManager(): ConversationsManager
-    fun accountInfoManager(): AccountInfoManager
+  fun themeManager(): ThemeManager
+  fun preferences(): Preferences
+  fun notificationsManager(): NotificationsManager
+  fun notificationsUpdaterFactory(): NotificationsUpdater.Factory
+  fun conversationsManager(): ConversationsManager
+  fun accountInfoManager(): AccountInfoManager
 
-    @BrowserLike
-    fun browserLikeOkHttpClient(): OkHttpClient
+  @BrowserLike
+  fun browserLikeOkHttpClient(): OkHttpClient
 }

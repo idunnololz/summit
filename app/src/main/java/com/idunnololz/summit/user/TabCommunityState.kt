@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TabCommunityState(
-    val tabId: Long?,
-    val viewState: CommunityViewState?,
+  val tabId: Long?,
+  val viewState: CommunityViewState?,
 )

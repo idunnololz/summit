@@ -6,25 +6,25 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.doOnLayout
 
 fun View.excludeRegionFromSystemGestures() {
-    val that = this
-    doOnLayout {
-        ViewCompat.setSystemGestureExclusionRects(
-            that,
-            listOf(
-                Rect().apply {
-                    that.getDrawingRect(this)
-                },
-            ),
-        )
-    }
+  val that = this
+  doOnLayout {
+    ViewCompat.setSystemGestureExclusionRects(
+      that,
+      listOf(
+        Rect().apply {
+          that.getDrawingRect(this)
+        },
+      ),
+    )
+  }
 }
 
 fun View.clearExcludeRegionFromSystemGestures() {
-    val that = this
-    doOnLayout {
-        ViewCompat.setSystemGestureExclusionRects(
-            that,
-            listOf(),
-        )
-    }
+  val that = this
+  doOnLayout {
+    ViewCompat.setSystemGestureExclusionRects(
+      that,
+      listOf(),
+    )
+  }
 }

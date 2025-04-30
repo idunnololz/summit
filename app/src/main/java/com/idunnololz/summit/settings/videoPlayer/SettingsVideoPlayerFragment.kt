@@ -20,54 +20,54 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsVideoPlayerFragment :
-    BaseFragment<FragmentSettingsVideoPlayerBinding>() {
+  BaseFragment<FragmentSettingsVideoPlayerBinding>() {
 
-    @Inject
-    lateinit var settings: VideoPlayerSettings
+  @Inject
+  lateinit var settings: VideoPlayerSettings
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        setBinding(
-            FragmentSettingsVideoPlayerBinding.inflate(inflater, container, false),
-        )
-        return binding.root
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+    setBinding(
+      FragmentSettingsVideoPlayerBinding.inflate(inflater, container, false),
+    )
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setupToolbar(binding.toolbar, settings.getPageName(context))
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    updateRendering()
+  }
 
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setupToolbar(binding.toolbar, settings.getPageName(context))
-        }
-
-        updateRendering()
-    }
-
-    private fun updateRendering() {
-        settings.autoPlayVideos.bindTo(
-            binding.autoPlayVideos,
-            { preferences.autoPlayVideos },
-            {
-                preferences.autoPlayVideos = it
-            },
-        )
-        settings.inlineVideoVolume.bindTo(
-            binding.inlineVideoVolume,
-            { preferences.inlineVideoDefaultVolume },
-            { preferences.inlineVideoDefaultVolume = it },
-        )
-    }
+  private fun updateRendering() {
+    settings.autoPlayVideos.bindTo(
+      binding.autoPlayVideos,
+      { preferences.autoPlayVideos },
+      {
+        preferences.autoPlayVideos = it
+      },
+    )
+    settings.inlineVideoVolume.bindTo(
+      binding.inlineVideoVolume,
+      { preferences.inlineVideoDefaultVolume },
+      { preferences.inlineVideoDefaultVolume = it },
+    )
+  }
 }

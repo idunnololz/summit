@@ -15,131 +15,131 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class AddOrEditUserTagViewModel @Inject constructor(
-    private val userTagsManager: UserTagsManager,
-    private val state: SavedStateHandle,
+  private val userTagsManager: UserTagsManager,
+  private val state: SavedStateHandle,
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "AddOrEditUserTagViewModel"
+  companion object {
+    private const val TAG = "AddOrEditUserTagViewModel"
+  }
+
+  data class Model(
+    val personName: String,
+    @StringRes val personNameError: Int?,
+    val tag: String,
+    @StringRes val tagError: Int?,
+    val fillColor: Int,
+    val strokeColor: Int,
+    val isSubmitted: Boolean,
+    val showDeleteButton: Boolean,
+  )
+
+  var personName: String = ""
+    set(value) {
+      if (field == value) {
+        return
+      }
+
+      field = value
+
+      generateModel()
+      loadUserTag(field)
+    }
+  var tag: String = ""
+    set(value) {
+      field = value
+
+      generateModel()
+    }
+  var fillColor: Int = 0
+    set(value) {
+      field = value
+
+      generateModel()
+    }
+  var strokeColor: Int = 0
+    set(value) {
+      field = value
+
+      generateModel()
+    }
+  var showDeleteButton: Boolean = false
+    set(value) {
+      field = value
+
+      generateModel()
     }
 
-    data class Model(
-        val personName: String,
-        @StringRes val personNameError: Int?,
-        val tag: String,
-        @StringRes val tagError: Int?,
-        val fillColor: Int,
-        val strokeColor: Int,
-        val isSubmitted: Boolean,
-        val showDeleteButton: Boolean,
+  val isSubmitted = state.getLiveData<Boolean>("is_submitted")
+
+  val model = MutableLiveData<Model>()
+
+  fun loadUserTag(personName: String) {
+    viewModelScope.launch {
+      val userTag = userTagsManager.getUserTag(personName) ?: return@launch
+
+      withContext(Dispatchers.Main) {
+        this@AddOrEditUserTagViewModel.personName = personName
+        tag = userTag.tagName
+        fillColor = userTag.fillColor
+        strokeColor = userTag.borderColor
+        showDeleteButton = true
+      }
+    }
+  }
+
+  fun generateModel(validate: Boolean = false) {
+    Log.d(TAG, "generateModel()")
+    val last = model.value
+    val newModel = Model(
+      personName = personName,
+      personNameError = if (validate) {
+        if (personName.isBlank()) {
+          R.string.error_cannot_be_blank
+        } else {
+          null
+        }
+      } else {
+        last?.personNameError
+      },
+      tag = tag,
+      tagError = if (validate) {
+        if (tag.isBlank()) {
+          R.string.error_cannot_be_blank
+        } else {
+          null
+        }
+      } else {
+        last?.tagError
+      },
+      fillColor = fillColor,
+      strokeColor = strokeColor,
+      isSubmitted = isSubmitted.value ?: false,
+      showDeleteButton = showDeleteButton,
     )
 
-    var personName: String = ""
-        set(value) {
-            if (field == value) {
-                return
-            }
-
-            field = value
-
-            generateModel()
-            loadUserTag(field)
-        }
-    var tag: String = ""
-        set(value) {
-            field = value
-
-            generateModel()
-        }
-    var fillColor: Int = 0
-        set(value) {
-            field = value
-
-            generateModel()
-        }
-    var strokeColor: Int = 0
-        set(value) {
-            field = value
-
-            generateModel()
-        }
-    var showDeleteButton: Boolean = false
-        set(value) {
-            field = value
-
-            generateModel()
-        }
-
-    val isSubmitted = state.getLiveData<Boolean>("is_submitted")
-
-    val model = MutableLiveData<Model>()
-
-    fun loadUserTag(personName: String) {
-        viewModelScope.launch {
-            val userTag = userTagsManager.getUserTag(personName) ?: return@launch
-
-            withContext(Dispatchers.Main) {
-                this@AddOrEditUserTagViewModel.personName = personName
-                tag = userTag.tagName
-                fillColor = userTag.fillColor
-                strokeColor = userTag.borderColor
-                showDeleteButton = true
-            }
-        }
+    if (last == newModel) {
+      return
     }
 
-    fun generateModel(validate: Boolean = false) {
-        Log.d(TAG, "generateModel()")
-        val last = model.value
-        val newModel = Model(
-            personName = personName,
-            personNameError = if (validate) {
-                if (personName.isBlank()) {
-                    R.string.error_cannot_be_blank
-                } else {
-                    null
-                }
-            } else {
-                last?.personNameError
-            },
-            tag = tag,
-            tagError = if (validate) {
-                if (tag.isBlank()) {
-                    R.string.error_cannot_be_blank
-                } else {
-                    null
-                }
-            } else {
-                last?.tagError
-            },
-            fillColor = fillColor,
-            strokeColor = strokeColor,
-            isSubmitted = isSubmitted.value ?: false,
-            showDeleteButton = showDeleteButton,
-        )
+    model.value = newModel
+  }
 
-        if (last == newModel) {
-            return
-        }
+  fun addTag() {
+    generateModel(validate = true)
 
-        model.value = newModel
+    val model = model.value ?: return
+
+    if (model.tagError != null || model.personNameError != null) {
+      return
     }
 
-    fun addTag() {
-        generateModel(validate = true)
+    userTagsManager.addOrUpdateTag(model.personName, tag, fillColor, strokeColor)
+    isSubmitted.value = true
+    generateModel()
+  }
 
-        val model = model.value ?: return
-
-        if (model.tagError != null || model.personNameError != null) {
-            return
-        }
-
-        userTagsManager.addOrUpdateTag(model.personName, tag, fillColor, strokeColor)
-        isSubmitted.value = true
-        generateModel()
-    }
-
-    fun deleteUserTag() {
-        userTagsManager.deleteTag(personName)
-    }
+  fun deleteUserTag() {
+    userTagsManager.deleteTag(personName)
+  }
 }

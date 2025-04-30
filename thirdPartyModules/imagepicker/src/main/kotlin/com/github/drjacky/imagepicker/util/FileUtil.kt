@@ -20,117 +20,117 @@ import java.util.*
  */
 object FileUtil {
 
-    /**
-     * Get Image File
-     *
-     * Default it will take Camera folder as it's directory
-     *
-     * @param dir File Folder in which file needs tobe created.
-     * @param extension String Image file extension.
-     * @return Return Empty file to store camera image.
-     * @throws IOException if permission denied of failed to create new file.
-     */
-    fun getImageFile(context: Context, dir: File? = null, extension: String? = null): File? {
-        try {
-            // Create an image file name
-            val ext = extension ?: ".jpg"
-            val imageFileName = "IMG_${getTimestamp()}$ext"
+  /**
+   * Get Image File
+   *
+   * Default it will take Camera folder as it's directory
+   *
+   * @param dir File Folder in which file needs tobe created.
+   * @param extension String Image file extension.
+   * @return Return Empty file to store camera image.
+   * @throws IOException if permission denied of failed to create new file.
+   */
+  fun getImageFile(context: Context, dir: File? = null, extension: String? = null): File? {
+    try {
+      // Create an image file name
+      val ext = extension ?: ".jpg"
+      val imageFileName = "IMG_${getTimestamp()}$ext"
 
-            // Create File Directory Object
-            val storageDir = dir ?: getCameraDirectory(context)
+      // Create File Directory Object
+      val storageDir = dir ?: getCameraDirectory(context)
 
-            // Create Directory If not exist
-            if (!storageDir.exists()) storageDir.mkdirs()
+      // Create Directory If not exist
+      if (!storageDir.exists()) storageDir.mkdirs()
 
-            // Create File Object
-            val file = File(storageDir, imageFileName)
+      // Create File Object
+      val file = File(storageDir, imageFileName)
 
-            // Create empty file
-            file.createNewFile()
+      // Create empty file
+      file.createNewFile()
 
-            return file
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            return null
-        }
+      return file
+    } catch (ex: IOException) {
+      ex.printStackTrace()
+      return null
     }
+  }
 
-    fun getImageUri(context: Context, dir: File? = null, extension: String? = null): Uri? {
-        try {
-            // Create an image file name
-            val ext = extension ?: ".jpg"
-            val imageFileName = "IMG_${getTimestamp()}$ext"
+  fun getImageUri(context: Context, dir: File? = null, extension: String? = null): Uri? {
+    try {
+      // Create an image file name
+      val ext = extension ?: ".jpg"
+      val imageFileName = "IMG_${getTimestamp()}$ext"
 
-            // Create File Directory Object
-            val storageDir = dir ?: getCameraDirectory(context)
+      // Create File Directory Object
+      val storageDir = dir ?: getCameraDirectory(context)
 
-            // Create Directory If not exist
-            if (!storageDir.exists()) storageDir.mkdirs()
+      // Create Directory If not exist
+      if (!storageDir.exists()) storageDir.mkdirs()
 
-            // Create File Object
-            val file = File(storageDir, imageFileName)
+      // Create File Object
+      val file = File(storageDir, imageFileName)
 
-            // Create empty file
-            file.createNewFile()
+      // Create empty file
+      file.createNewFile()
 
-            val authority =
-                context.packageName +
-                    context.getString(R.string.image_picker_provider_authority_suffix)
-            val uriForFile = FileProvider.getUriForFile(
-                context,
-                authority,
-                file,
-            )
-            return uriForFile
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            return null
-        }
+      val authority =
+        context.packageName +
+          context.getString(R.string.image_picker_provider_authority_suffix)
+      val uriForFile = FileProvider.getUriForFile(
+        context,
+        authority,
+        file,
+      )
+      return uriForFile
+    } catch (ex: IOException) {
+      ex.printStackTrace()
+      return null
     }
+  }
 
-    /**
-     * Get Camera Image Directory
-     *
-     * @return File Camera Image Directory
-     */
-    private fun getCameraDirectory(context: Context): File {
-        val dir =
-            context.getExternalFilesDir(
-                Environment.DIRECTORY_DCIM,
-            ) // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-        return File(dir, "Camera")
-    }
+  /**
+   * Get Camera Image Directory
+   *
+   * @return File Camera Image Directory
+   */
+  private fun getCameraDirectory(context: Context): File {
+    val dir =
+      context.getExternalFilesDir(
+        Environment.DIRECTORY_DCIM,
+      ) // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+    return File(dir, "Camera")
+  }
 
-    /**
-     * Get Current Time in yyyyMMdd HHmmssSSS format
-     *
-     * 2019/01/30 10:30:20 000
-     * E.g. 20190130_103020000
-     */
-    private fun getTimestamp(): String {
-        val timeFormat = "yyyyMMdd_HHmmssSSS"
-        return SimpleDateFormat(timeFormat, Locale.getDefault()).format(Date())
-    }
+  /**
+   * Get Current Time in yyyyMMdd HHmmssSSS format
+   *
+   * 2019/01/30 10:30:20 000
+   * E.g. 20190130_103020000
+   */
+  private fun getTimestamp(): String {
+    val timeFormat = "yyyyMMdd_HHmmssSSS"
+    return SimpleDateFormat(timeFormat, Locale.getDefault()).format(Date())
+  }
 
-    /**
-     * Get Bitmap Compress Format
-     *
-     * @param extension Image File Extension
-     * @return Bitmap CompressFormat
-     */
-    fun getCompressFormat(extension: String): Bitmap.CompressFormat {
-        val withoutDotExtension = extension.replace(".", "")
-        return safeValueOf<Bitmap.CompressFormat>(
-            name = withoutDotExtension.uppercase(),
-            defaultValue = Bitmap.CompressFormat.JPEG,
-        )
-    }
+  /**
+   * Get Bitmap Compress Format
+   *
+   * @param extension Image File Extension
+   * @return Bitmap CompressFormat
+   */
+  fun getCompressFormat(extension: String): Bitmap.CompressFormat {
+    val withoutDotExtension = extension.replace(".", "")
+    return safeValueOf<Bitmap.CompressFormat>(
+      name = withoutDotExtension.uppercase(),
+      defaultValue = Bitmap.CompressFormat.JPEG,
+    )
+  }
 
-    private inline fun <reified T : Enum<T>> safeValueOf(name: String, defaultValue: T): T {
-        return try {
-            java.lang.Enum.valueOf(T::class.java, name) ?: defaultValue
-        } catch (e: IllegalArgumentException) {
-            defaultValue
-        }
+  private inline fun <reified T : Enum<T>> safeValueOf(name: String, defaultValue: T): T {
+    return try {
+      java.lang.Enum.valueOf(T::class.java, name) ?: defaultValue
+    } catch (e: IllegalArgumentException) {
+      defaultValue
     }
+  }
 }

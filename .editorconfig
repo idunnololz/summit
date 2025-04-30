@@ -2,5 +2,5 @@
 ktlint_code_style = android_studio
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
-indent_size = 4
+indent_size = 2
 indent_style = space

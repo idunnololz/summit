@@ -9,36 +9,36 @@ import com.idunnololz.summit.util.BaseFragment
 
 class EmptyScreenFragment : BaseFragment<FragmentEmptyScreenBinding>() {
 
-    companion object {
+  companion object {
 
-        private const val ARG_TEXT = "ARG_TEXT"
+    private const val ARG_TEXT = "ARG_TEXT"
 
-        fun newInstance(text: String) = EmptyScreenFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_TEXT, text)
-            }
-        }
+    fun newInstance(text: String) = EmptyScreenFragment().apply {
+      arguments = Bundle().apply {
+        putString(ARG_TEXT, text)
+      }
     }
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentEmptyScreenBinding.inflate(inflater, container, false))
+    setBinding(FragmentEmptyScreenBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val text = requireArguments().getString(ARG_TEXT)
+
+    with(binding) {
+      textView.text = text
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val text = requireArguments().getString(ARG_TEXT)
-
-        with(binding) {
-            textView.text = text
-        }
-    }
+  }
 }

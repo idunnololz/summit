@@ -12,36 +12,36 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class InstancePickerViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
+  private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
-    private val trigram = NGram(3)
+  private val trigram = NGram(3)
 
-    val searchResults = StatefulLiveData<SearchResults>()
+  val searchResults = StatefulLiveData<SearchResults>()
 
-    val instance
-        get() = apiClient.instance
+  val instance
+    get() = apiClient.instance
 
-    init {
-        doQuery("")
+  init {
+    doQuery("")
+  }
+
+  fun doQuery(query: String) {
+    searchResults.setIsLoading()
+
+    viewModelScope.launch {
+      val results = DEFAULT_LEMMY_INSTANCES.filter { it.contains(query, ignoreCase = true) }
+      val sortedResults = results.sortedBy {
+        trigram.distance(
+          it,
+          query,
+        )
+      }
+
+      searchResults.postValue(SearchResults(sortedResults))
     }
+  }
 
-    fun doQuery(query: String) {
-        searchResults.setIsLoading()
-
-        viewModelScope.launch {
-            val results = DEFAULT_LEMMY_INSTANCES.filter { it.contains(query, ignoreCase = true) }
-            val sortedResults = results.sortedBy {
-                trigram.distance(
-                    it,
-                    query,
-                )
-            }
-
-            searchResults.postValue(SearchResults(sortedResults))
-        }
-    }
-
-    data class SearchResults(
-        val results: List<String> = listOf(),
-    )
+  data class SearchResults(
+    val results: List<String> = listOf(),
+  )
 }

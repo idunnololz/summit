@@ -29,135 +29,135 @@ import org.json.JSONObject
 
 @HiltViewModel
 class ExportSettingsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val preferences: Preferences,
-    private val settingsBackupManager: SettingsBackupManager,
-    private val json: Json,
+  @ApplicationContext private val context: Context,
+  private val preferences: Preferences,
+  private val settingsBackupManager: SettingsBackupManager,
+  private val json: Json,
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "BackupSettingsViewModel"
-    }
+  companion object {
+    private const val TAG = "BackupSettingsViewModel"
+  }
 
-    val backupFile = StatefulLiveData<BackupResult>()
+  val backupFile = StatefulLiveData<BackupResult>()
 
-    fun createBackupAndSave(backupConfig: BackupConfig) {
-        Log.d(TAG, "createBackupAndSave()")
+  fun createBackupAndSave(backupConfig: BackupConfig) {
+    Log.d(TAG, "createBackupAndSave()")
 
-        backupFile.setIsLoading()
+    backupFile.setIsLoading()
 
-        viewModelScope.launch(Dispatchers.Default) {
-            try {
-                val encodedString = generateCode(backupConfig)
-                Log.d(TAG, encodedString)
+    viewModelScope.launch(Dispatchers.Default) {
+      try {
+        val encodedString = generateCode(backupConfig)
+        Log.d(TAG, encodedString)
 
-                val uri = if (backupConfig.dest == null) {
-                    FileProviderHelper(context)
-                        .openTempFile(getBackupFileName()) {
-                            it.write(encodedString.encodeToByteArray())
-                        }
-                } else {
-                    context.contentResolver.openOutputStream(backupConfig.dest).use {
-                        it?.write(encodedString.encodeToByteArray())
-                    }
-
-                    backupConfig.dest
-                }
-
-                backupFile.postValue(
-                    BackupResult(
-                        uri = uri,
-                        config = backupConfig,
-                    ),
-                )
-            } catch (e: Exception) {
-                backupFile.postError(e)
+        val uri = if (backupConfig.dest == null) {
+          FileProviderHelper(context)
+            .openTempFile(getBackupFileName()) {
+              it.write(encodedString.encodeToByteArray())
             }
-        }
-    }
+        } else {
+          context.contentResolver.openOutputStream(backupConfig.dest).use {
+            it?.write(encodedString.encodeToByteArray())
+          }
 
-    fun getBackupFileName(): String {
-        val dateFormatter = SimpleDateFormat("dd-MM-yyyy_HH-mm", Locale.US)
-
-        return "backup-${dateFormatter.format(Calendar.getInstance().time)}.summitbackup"
-    }
-
-    fun saveToInternalBackups(
-        backupConfig: BackupConfig,
-        backupName: String = "settings_backup_%datetime%",
-    ) {
-        viewModelScope.launch {
-            val file = settingsBackupManager.saveBackup(generateCode(backupConfig), backupName)
-
-            backupFile.postValue(
-                BackupResult(
-                    file.toUri(),
-                    BackupConfig(
-                        BackupOption.SaveInternal,
-                    ),
-                ),
-            )
-        }
-    }
-
-    fun resetSettings() {
-        preferences.clear()
-    }
-
-    private suspend fun generateCode(backupConfig: BackupConfig): String {
-        val prefJson = preferences.asJson()
-
-        if (backupConfig.includeDatabase) {
-            val file = context.getDatabasePath(MainDatabase.DATABASE_NAME)
-            val tempDb = context.getDatabasePath("_temp_main_db")
-
-            tempDb.delete()
-
-            file.copyTo(tempDb)
-
-            val tablesToKeep = defaultTablesToExport
-
-            val mainDatabase = MainDatabase.buildDatabase(context, tempDb.name, json)
-            DbHelper(mainDatabase.openHelper.writableDatabase, true).use { dbHelper ->
-                dbHelper.keepTables(tablesToKeep)
-            }
-            mainDatabase.close()
-
-            val byteArr = ByteArrayOutputStream().use { outputStream ->
-                tempDb.inputStream().use { inputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-                outputStream.toByteArray()
-            }
-
-            prefJson.put(
-                KEY_DATABASE_MAIN,
-                JSONObject().apply {
-                    put("db_1", Utils.compress(byteArr, Base64.NO_WRAP))
-                },
-            )
-
-            tempDb.delete()
+          backupConfig.dest
         }
 
-        return Utils.compress(prefJson.toString(), Base64.NO_WRAP)
+        backupFile.postValue(
+          BackupResult(
+            uri = uri,
+            config = backupConfig,
+          ),
+        )
+      } catch (e: Exception) {
+        backupFile.postError(e)
+      }
+    }
+  }
+
+  fun getBackupFileName(): String {
+    val dateFormatter = SimpleDateFormat("dd-MM-yyyy_HH-mm", Locale.US)
+
+    return "backup-${dateFormatter.format(Calendar.getInstance().time)}.summitbackup"
+  }
+
+  fun saveToInternalBackups(
+    backupConfig: BackupConfig,
+    backupName: String = "settings_backup_%datetime%",
+  ) {
+    viewModelScope.launch {
+      val file = settingsBackupManager.saveBackup(generateCode(backupConfig), backupName)
+
+      backupFile.postValue(
+        BackupResult(
+          file.toUri(),
+          BackupConfig(
+            BackupOption.SaveInternal,
+          ),
+        ),
+      )
+    }
+  }
+
+  fun resetSettings() {
+    preferences.clear()
+  }
+
+  private suspend fun generateCode(backupConfig: BackupConfig): String {
+    val prefJson = preferences.asJson()
+
+    if (backupConfig.includeDatabase) {
+      val file = context.getDatabasePath(MainDatabase.DATABASE_NAME)
+      val tempDb = context.getDatabasePath("_temp_main_db")
+
+      tempDb.delete()
+
+      file.copyTo(tempDb)
+
+      val tablesToKeep = defaultTablesToExport
+
+      val mainDatabase = MainDatabase.buildDatabase(context, tempDb.name, json)
+      DbHelper(mainDatabase.openHelper.writableDatabase, true).use { dbHelper ->
+        dbHelper.keepTables(tablesToKeep)
+      }
+      mainDatabase.close()
+
+      val byteArr = ByteArrayOutputStream().use { outputStream ->
+        tempDb.inputStream().use { inputStream ->
+          inputStream.copyTo(outputStream)
+        }
+        outputStream.toByteArray()
+      }
+
+      prefJson.put(
+        KEY_DATABASE_MAIN,
+        JSONObject().apply {
+          put("db_1", Utils.compress(byteArr, Base64.NO_WRAP))
+        },
+      )
+
+      tempDb.delete()
     }
 
-    data class BackupConfig(
-        val backupOption: BackupOption,
-        val includeDatabase: Boolean = true,
-        val dest: Uri? = null,
-    )
+    return Utils.compress(prefJson.toString(), Base64.NO_WRAP)
+  }
 
-    enum class BackupOption {
-        Share,
-        Save,
-        Copy,
-        SaveInternal,
-    }
+  data class BackupConfig(
+    val backupOption: BackupOption,
+    val includeDatabase: Boolean = true,
+    val dest: Uri? = null,
+  )
 
-    data class BackupResult(
-        val uri: Uri,
-        val config: BackupConfig,
-    )
+  enum class BackupOption {
+    Share,
+    Save,
+    Copy,
+    SaveInternal,
+  }
+
+  data class BackupResult(
+    val uri: Uri,
+    val config: BackupConfig,
+  )
 }

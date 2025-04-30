@@ -9,21 +9,21 @@ import androidx.room.Query
 @Dao
 interface ContentFiltersDao {
 
-    @Query("SELECT * FROM content_filters")
-    suspend fun getAllFilters(): List<FilterEntry>
+  @Query("SELECT * FROM content_filters")
+  suspend fun getAllFilters(): List<FilterEntry>
 
-    @Query("SELECT * FROM content_filters WHERE contentType = :contentTypeId")
-    suspend fun getFiltersForContentType(contentTypeId: ContentTypeId): List<FilterEntry>
+  @Query("SELECT * FROM content_filters WHERE contentType = :contentTypeId")
+  suspend fun getFiltersForContentType(contentTypeId: ContentTypeId): List<FilterEntry>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFilter(entry: FilterEntry): Long
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertFilter(entry: FilterEntry): Long
 
-    @Query("SELECT count(*) FROM content_filters")
-    suspend fun count(): Long
+  @Query("SELECT count(*) FROM content_filters")
+  suspend fun count(): Long
 
-    @Delete
-    suspend fun delete(entry: FilterEntry)
+  @Delete
+  suspend fun delete(entry: FilterEntry)
 
-    @Query("DELETE FROM content_filters")
-    suspend fun clear()
+  @Query("DELETE FROM content_filters")
+  suspend fun clear()
 }

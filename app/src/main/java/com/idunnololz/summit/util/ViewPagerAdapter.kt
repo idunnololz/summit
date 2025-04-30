@@ -16,55 +16,55 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat
 
 data class PageItem(
-    val id: Long,
-    val clazz: Class<*>,
-    val args: Bundle?,
-    val title: String,
-    @DrawableRes val drawable: Int? = null,
+  val id: Long,
+  val clazz: Class<*>,
+  val args: Bundle?,
+  val title: String,
+  @DrawableRes val drawable: Int? = null,
 )
 
 class ViewPagerAdapter(
-    private val context: Context,
-    fragmentManager: FragmentManager,
-    lifecycle: Lifecycle,
+  private val context: Context,
+  fragmentManager: FragmentManager,
+  lifecycle: Lifecycle,
 ) : FragmentStateAdapter(fragmentManager, lifecycle), TabLayoutMediator.TabConfigurationStrategy {
 
-    private val fragmentFactory: FragmentFactory = fragmentManager.fragmentFactory
-    private val items = ArrayList<PageItem>()
+  private val fragmentFactory: FragmentFactory = fragmentManager.fragmentFactory
+  private val items = ArrayList<PageItem>()
 
-    override fun createFragment(position: Int): Fragment {
-        val fragment = fragmentFactory.instantiate(
-            context::class.java.classLoader!!,
-            items[position].clazz.name,
-        )
-        fragment.arguments = items[position].args
+  override fun createFragment(position: Int): Fragment {
+    val fragment = fragmentFactory.instantiate(
+      context::class.java.classLoader!!,
+      items[position].clazz.name,
+    )
+    fragment.arguments = items[position].args
 
-        // DO NOT DO THIS. New ViewPager2 made this method terribly inconsistent
-        // createdFragments.put(position, fragment)
+    // DO NOT DO THIS. New ViewPager2 made this method terribly inconsistent
+    // createdFragments.put(position, fragment)
 
-        return fragment
+    return fragment
+  }
+
+  override fun getItemCount(): Int = items.size
+
+  fun addFrag(
+    clazz: Class<*>,
+    title: String,
+    args: Bundle? = null,
+    @DrawableRes drawableRes: Int? = null,
+  ) {
+    items.add(PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes))
+  }
+
+  fun getTitleForPosition(position: Int): CharSequence = items[position].title
+
+  override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
+    val item = items[position]
+    tab.text = item.title
+    if (item.drawable != null) {
+      tab.icon = context.getDrawableCompat(item.drawable)?.apply {
+        setTint(context.getColorCompat(R.color.colorTextTitle))
+      }
     }
-
-    override fun getItemCount(): Int = items.size
-
-    fun addFrag(
-        clazz: Class<*>,
-        title: String,
-        args: Bundle? = null,
-        @DrawableRes drawableRes: Int? = null,
-    ) {
-        items.add(PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes))
-    }
-
-    fun getTitleForPosition(position: Int): CharSequence = items[position].title
-
-    override fun onConfigureTab(tab: TabLayout.Tab, position: Int) {
-        val item = items[position]
-        tab.text = item.title
-        if (item.drawable != null) {
-            tab.icon = context.getDrawableCompat(item.drawable)?.apply {
-                setTint(context.getColorCompat(R.color.colorTextTitle))
-            }
-        }
-    }
+  }
 }

@@ -4,7 +4,7 @@ import android.net.Uri
 import com.idunnololz.summit.api.dto.Community
 
 val Community.instance: String
-    get() = Uri.parse(this.actor_id).host ?: this.actor_id
+  get() = Uri.parse(this.actor_id).host ?: this.actor_id
 
 val Community.fullName: String
-    get() = "$name@$instance"
+  get() = "$name@$instance"

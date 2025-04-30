@@ -9,25 +9,25 @@ import com.idunnololz.summit.databinding.FragmentPostListLoadingPageBinding
 import com.idunnololz.summit.util.BaseFragment
 
 class PostListLoadingPageFragment : BaseFragment<FragmentPostListLoadingPageBinding>() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentPostListLoadingPageBinding.inflate(inflater, container, false))
+    setBinding(FragmentPostListLoadingPageBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    binding.loadingView.apply {
+      showProgressBarWithMessage(
+        context.getString(R.string.loading_more_posts),
+      )
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.loadingView.apply {
-            showProgressBarWithMessage(
-                context.getString(R.string.loading_more_posts),
-            )
-        }
-    }
+  }
 }

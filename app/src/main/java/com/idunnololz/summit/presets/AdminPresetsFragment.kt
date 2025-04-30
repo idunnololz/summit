@@ -19,69 +19,69 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AdminPresetsFragment : BaseFragment<FragmentAdminPresetsBinding>() {
 
-    private val viewModel: AdminViewModel by viewModels()
+  private val viewModel: AdminViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentAdminPresetsBinding.inflate(inflater, container, false))
+    setBinding(FragmentAdminPresetsBinding.inflate(inflater, container, false))
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        with(binding) {
-            requireSummitActivity().apply {
-                insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-            }
+    with(binding) {
+      requireSummitActivity().apply {
+        insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+      }
 
-            setupToolbar(toolbar, getString(R.string.admin))
+      setupToolbar(toolbar, getString(R.string.admin))
 
-            val adapter = PresetsAdapter(
-                includeHeader = false,
-                onShareAPresetClick = {
-                    val direction = PresetsFragmentDirections
-                        .actionPresetsFragmentToGeneratePresetFragment()
-                    findNavController().navigateSafe(direction)
-                },
-            )
+      val adapter = PresetsAdapter(
+        includeHeader = false,
+        onShareAPresetClick = {
+          val direction = PresetsFragmentDirections
+            .actionPresetsFragmentToGeneratePresetFragment()
+          findNavController().navigateSafe(direction)
+        },
+      )
 
-            swipeRefreshLayout.setOnRefreshListener {
-                viewModel.loadData(force = true)
-            }
+      swipeRefreshLayout.setOnRefreshListener {
+        viewModel.loadData(force = true)
+      }
 
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.setHasFixedSize(true)
-            recyclerView.adapter = adapter
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setHasFixedSize(true)
+      recyclerView.adapter = adapter
 
-            viewModel.loadData()
+      viewModel.loadData()
 
-            loadingView.setOnRefreshClickListener {
-                viewModel.loadData(force = true)
-            }
+      loadingView.setOnRefreshClickListener {
+        viewModel.loadData(force = true)
+      }
 
-            viewModel.model.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        swipeRefreshLayout.isRefreshing = false
-                        loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                    is StatefulData.Loading -> loadingView.showProgressBar()
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        swipeRefreshLayout.isRefreshing = false
-                        loadingView.hideAll()
+      viewModel.model.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            swipeRefreshLayout.isRefreshing = false
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading -> loadingView.showProgressBar()
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            swipeRefreshLayout.isRefreshing = false
+            loadingView.hideAll()
 
-                        adapter.setData(it.data.presets)
-                    }
-                }
-            }
+            adapter.setData(it.data.presets)
+          }
         }
+      }
     }
+  }
 }

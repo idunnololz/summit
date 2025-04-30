@@ -13,49 +13,49 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsFilterListViewModel @Inject constructor(
-    private val contentFiltersManager: ContentFiltersManager,
+  private val contentFiltersManager: ContentFiltersManager,
 ) : ViewModel() {
 
-    val filters = StatefulLiveData<List<FilterEntry>>()
+  val filters = StatefulLiveData<List<FilterEntry>>()
 
-    private var contentTypeId: ContentTypeId? = null
-    private var filterTypeId: FilterTypeId? = null
+  private var contentTypeId: ContentTypeId? = null
+  private var filterTypeId: FilterTypeId? = null
 
-    fun getFilters(contentTypeId: ContentTypeId, filterTypeId: FilterTypeId) {
-        this.contentTypeId = contentTypeId
-        this.filterTypeId = filterTypeId
+  fun getFilters(contentTypeId: ContentTypeId, filterTypeId: FilterTypeId) {
+    this.contentTypeId = contentTypeId
+    this.filterTypeId = filterTypeId
 
-        refreshFilters()
+    refreshFilters()
+  }
+
+  fun addFilter(result: FilterEntry) {
+    filters.setIsLoading()
+
+    viewModelScope.launch {
+      contentFiltersManager.addFilter(result)
+
+      refreshFilters()
     }
+  }
 
-    fun addFilter(result: FilterEntry) {
-        filters.setIsLoading()
+  fun deleteFilter(filter: FilterEntry) {
+    viewModelScope.launch {
+      contentFiltersManager.deleteFilter(filter)
 
-        viewModelScope.launch {
-            contentFiltersManager.addFilter(result)
-
-            refreshFilters()
-        }
+      refreshFilters()
     }
+  }
 
-    fun deleteFilter(filter: FilterEntry) {
-        viewModelScope.launch {
-            contentFiltersManager.deleteFilter(filter)
+  private fun refreshFilters() {
+    val contentTypeId = contentTypeId ?: return
+    val filterTypeId = filterTypeId ?: return
 
-            refreshFilters()
-        }
+    filters.setIsLoading()
+
+    viewModelScope.launch {
+      val filters = contentFiltersManager.getFilters(contentTypeId, filterTypeId)
+
+      this@SettingsFilterListViewModel.filters.postValue(filters)
     }
-
-    private fun refreshFilters() {
-        val contentTypeId = contentTypeId ?: return
-        val filterTypeId = filterTypeId ?: return
-
-        filters.setIsLoading()
-
-        viewModelScope.launch {
-            val filters = contentFiltersManager.getFilters(contentTypeId, filterTypeId)
-
-            this@SettingsFilterListViewModel.filters.postValue(filters)
-        }
-    }
+  }
 }

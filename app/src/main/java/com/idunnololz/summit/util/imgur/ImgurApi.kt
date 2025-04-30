@@ -13,22 +13,22 @@ import retrofit2.http.Part
  * There are many other endpoints available here: https://apidocs.imgur.com/
  */
 interface ImgurApi {
-    /**
-     * An anonymous image upload endpoint:
-     * https://apidocs.imgur.com/?version=latest#c85c9dfc-7487-4de2-9ecd-66f727cf3139
-     */
-    @Multipart
-    @POST("/3/image")
-    suspend fun uploadFile(
-        @Header("Authorization") authorization: String,
-        @Part image: MultipartBody.Part?,
-        @Part("title") title: RequestBody? = null,
-    ): Response<UploadResponse>
+  /**
+   * An anonymous image upload endpoint:
+   * https://apidocs.imgur.com/?version=latest#c85c9dfc-7487-4de2-9ecd-66f727cf3139
+   */
+  @Multipart
+  @POST("/3/image")
+  suspend fun uploadFile(
+    @Header("Authorization") authorization: String,
+    @Part image: MultipartBody.Part?,
+    @Part("title") title: RequestBody? = null,
+  ): Response<UploadResponse>
 }
 
 object ApiKeys {
-    /**
-     * Fill in your imgur client id below. Don't have a client id? Get one here: https://api.imgur.com/oauth2/addclient
-     */
-    const val CLIENT_ID = "aba29536f38627d"
+  /**
+   * Fill in your imgur client id below. Don't have a client id? Get one here: https://api.imgur.com/oauth2/addclient
+   */
+  const val CLIENT_ID = "aba29536f38627d"
 }

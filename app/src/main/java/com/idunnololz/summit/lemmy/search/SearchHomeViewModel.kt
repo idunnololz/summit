@@ -35,285 +35,285 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class SearchHomeViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val accountInfoManager: AccountInfoManager,
-    private val summitServerClient: SummitServerClient,
-    private val apiClient: AccountAwareLemmyClient,
+  @ApplicationContext private val context: Context,
+  private val accountInfoManager: AccountInfoManager,
+  private val summitServerClient: SummitServerClient,
+  private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
-    companion object {
-        private const val QUERY_LIMIT = 40
-        private const val TAG = "SearchHomeViewModel"
+  companion object {
+    private const val QUERY_LIMIT = 40
+    private const val TAG = "SearchHomeViewModel"
+  }
+
+  val apiInstance: String
+    get() = apiClient.instance
+  val currentAccountView = MutableLiveData<AccountView?>()
+
+  val showSearch = MutableLiveData<Boolean>(false)
+
+  val currentQueryFlow = MutableStateFlow<String>("")
+  val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
+  val currentQueryLiveData = currentQueryFlow.asLiveData()
+  val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
+  val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
+
+  var subscriptionCommunities: List<AccountSubscription> = listOf()
+
+  val model = StatefulLiveData<SearchHomeModel>()
+
+  private var componentName: ComponentName? = null
+
+  init {
+    viewModelScope.launch {
+      accountInfoManager.currentFullAccount.collect {
+        withContext(Dispatchers.Main) {
+          if (it != null) {
+            currentAccountView.value =
+              accountInfoManager.getAccountViewForAccount(it.account)
+          } else {
+            currentAccountView.value = null
+          }
+        }
+      }
+    }
+    viewModelScope.launch(Dispatchers.Default) {
+      accountInfoManager.subscribedCommunities.collect {
+        subscriptionCommunities = it
+
+        withContext(Dispatchers.Main) {
+          generateModel()
+        }
+      }
+    }
+  }
+
+  fun updateCurrentQuery(query: String) {
+    viewModelScope.launch {
+      currentQueryFlow.value = query
+    }
+  }
+
+  fun generateModel(componentName: ComponentName? = null, force: Boolean = false) {
+    if (componentName != null) {
+      this.componentName = componentName
     }
 
-    val apiInstance: String
-        get() = apiClient.instance
-    val currentAccountView = MutableLiveData<AccountView?>()
+    val componentName = this.componentName ?: return
 
-    val showSearch = MutableLiveData<Boolean>(false)
+    val currentModel = model.valueOrNull
+    if (currentModel != null &&
+      !currentModel.isCommunitySuggestionsLoading &&
+      currentModel.errors.isEmpty() &&
+      !force
+    ) {
+      viewModelScope.launch {
+        val seen = mutableSetOf<String>()
+        val searchSuggestions = ArrayList<String>()
+        val errors = mutableListOf<Throwable>()
 
-    val currentQueryFlow = MutableStateFlow<String>("")
-    val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
-    val currentQueryLiveData = currentQueryFlow.asLiveData()
-    val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
-    val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
+        val searchManager = context.getSystemService(
+          Context.SEARCH_SERVICE,
+        ) as SearchManager
+        val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
+          componentName,
+        )
 
-    var subscriptionCommunities: List<AccountSubscription> = listOf()
+        var text1Col: Int = -1
 
-    val model = StatefulLiveData<SearchHomeModel>()
+        runInterruptible(Dispatchers.IO) {
+          // Query 2x the limit because there might be case sensitive duplicates...
+          getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
+            if (c != null) {
+              try {
+                text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
+              } catch (e: Exception) {
+                Log.e(TAG, "error changing cursor and caching columns", e)
+              }
 
-    private var componentName: ComponentName? = null
-
-    init {
-        viewModelScope.launch {
-            accountInfoManager.currentFullAccount.collect {
-                withContext(Dispatchers.Main) {
-                    if (it != null) {
-                        currentAccountView.value =
-                            accountInfoManager.getAccountViewForAccount(it.account)
-                    } else {
-                        currentAccountView.value = null
-                    }
+              while (c.moveToNext()) {
+                c.getStringOrNull(text1Col)?.let {
+                  if (seen.add(it.lowercase(Locale.US))) {
+                    searchSuggestions.add(it)
+                    Log.d(TAG, "Got suggestion $it")
+                  }
                 }
+              }
             }
-        }
-        viewModelScope.launch(Dispatchers.Default) {
-            accountInfoManager.subscribedCommunities.collect {
-                subscriptionCommunities = it
-
-                withContext(Dispatchers.Main) {
-                    generateModel()
-                }
-            }
-        }
-    }
-
-    fun updateCurrentQuery(query: String) {
-        viewModelScope.launch {
-            currentQueryFlow.value = query
-        }
-    }
-
-    fun generateModel(componentName: ComponentName? = null, force: Boolean = false) {
-        if (componentName != null) {
-            this.componentName = componentName
+          }
         }
 
-        val componentName = this.componentName ?: return
-
-        val currentModel = model.valueOrNull
-        if (currentModel != null &&
-            !currentModel.isCommunitySuggestionsLoading &&
-            currentModel.errors.isEmpty() &&
-            !force
-        ) {
-            viewModelScope.launch {
-                val seen = mutableSetOf<String>()
-                val searchSuggestions = ArrayList<String>()
-                val errors = mutableListOf<Throwable>()
-
-                val searchManager = context.getSystemService(
-                    Context.SEARCH_SERVICE,
-                ) as SearchManager
-                val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
-                    componentName,
+        withContext(Dispatchers.Main) {
+          model.setValue(
+            currentModel.copy(
+              suggestions = searchSuggestions.take(4),
+              myCommunities = subscriptionCommunities.map {
+                MyCommunity(
+                  it.toCommunityRef(),
+                  it,
                 )
-
-                var text1Col: Int = -1
-
-                runInterruptible(Dispatchers.IO) {
-                    // Query 2x the limit because there might be case sensitive duplicates...
-                    getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
-                        if (c != null) {
-                            try {
-                                text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "error changing cursor and caching columns", e)
-                            }
-
-                            while (c.moveToNext()) {
-                                c.getStringOrNull(text1Col)?.let {
-                                    if (seen.add(it.lowercase(Locale.US))) {
-                                        searchSuggestions.add(it)
-                                        Log.d(TAG, "Got suggestion $it")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                withContext(Dispatchers.Main) {
-                    model.setValue(
-                        currentModel.copy(
-                            suggestions = searchSuggestions.take(4),
-                            myCommunities = subscriptionCommunities.map {
-                                MyCommunity(
-                                    it.toCommunityRef(),
-                                    it,
-                                )
-                            },
-                        ),
-                    )
-                }
-            }
-
-            return
+              },
+            ),
+          )
         }
+      }
 
-        model.setIsLoading()
-
-        viewModelScope.launch {
-            val seen = mutableSetOf<String>()
-            val searchSuggestions = ArrayList<String>()
-            val errors = mutableListOf<Throwable>()
-
-            val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-            val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
-                componentName,
-            )
-
-            var text1Col: Int = -1
-
-            runInterruptible(Dispatchers.IO) {
-                // Query 2x the limit because there might be case sensitive duplicates...
-                getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
-                    if (c != null) {
-                        try {
-                            text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
-                        } catch (e: Exception) {
-                            Log.e(TAG, "error changing cursor and caching columns", e)
-                        }
-
-                        while (c.moveToNext()) {
-                            c.getStringOrNull(text1Col)?.let {
-                                if (seen.add(it.lowercase(Locale.US))) {
-                                    searchSuggestions.add(it)
-                                    Log.d(TAG, "Got suggestion $it")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            withContext(Dispatchers.Main) {
-                model.setValue(
-                    SearchHomeModel(
-                        suggestions = searchSuggestions.take(4),
-                        myCommunities = subscriptionCommunities.map {
-                            MyCommunity(
-                                it.toCommunityRef(),
-                                it,
-                            )
-                        },
-                        communitySuggestionsDto = null,
-                        isCommunitySuggestionsLoading = true,
-                        errors = errors,
-                    ),
-                )
-            }
-
-            val communitySessions = summitServerClient.communitySuggestions(force)
-
-            communitySessions
-                .onFailure {
-                    errors.add(it)
-                }
-
-            withContext(Dispatchers.Main) {
-                model.setValue(
-                    SearchHomeModel(
-                        suggestions = searchSuggestions.take(4),
-                        myCommunities = subscriptionCommunities.map {
-                            MyCommunity(
-                                it.toCommunityRef(),
-                                it,
-                            )
-                        },
-                        communitySuggestionsDto = communitySessions.getOrNull(),
-                        isCommunitySuggestionsLoading = false,
-                        errors = errors,
-                    ),
-                )
-            }
-        }
+      return
     }
 
-    private fun getSearchManagerSuggestions(
-        searchable: SearchableInfo?,
-        query: String?,
-        limit: Int,
-    ): Cursor? {
-        if (searchable == null) {
-            return null
-        }
-        if (query == null) {
-            return null
-        }
+    model.setIsLoading()
 
-        val authority = searchable.suggestAuthority ?: return null
+    viewModelScope.launch {
+      val seen = mutableSetOf<String>()
+      val searchSuggestions = ArrayList<String>()
+      val errors = mutableListOf<Throwable>()
 
-        val uriBuilder = Uri.Builder()
-            .scheme(ContentResolver.SCHEME_CONTENT)
-            .authority(authority)
-            .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-            .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+      val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as SearchManager
+      val searchableInfo: SearchableInfo? = searchManager.getSearchableInfo(
+        componentName,
+      )
 
-        // if content path provided, insert it now
-        val contentPath = searchable.suggestPath
-        if (contentPath != null) {
-            uriBuilder.appendEncodedPath(contentPath)
-        }
+      var text1Col: Int = -1
 
-        // append standard suggestion query path
-        uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY)
-
-        // get the query selection, may be null
-        val selection = searchable.suggestSelection
-        // inject query, either as selection args or inline
-        var selArgs: Array<String>? = null
-        if (selection != null) { // use selection if provided
-            selArgs = arrayOf(query)
-        } else { // no selection, use REST pattern
-            uriBuilder.appendPath(query)
-        }
-
-        if (limit > 0) {
-            uriBuilder.appendQueryParameter("limit", limit.toString())
-        }
-
-        val uri = uriBuilder.build()
-
-        // finally, make the query
-        return context.contentResolver.query(uri, null, selection, selArgs, null)
-    }
-
-    fun deleteSuggestion(componentName: ComponentName?, suggestion: String) {
-        viewModelScope.launch {
-            val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-            val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(componentName)
-            val searchable = searchableInfo ?: return@launch
-            val authority = searchable.suggestAuthority ?: return@launch
-
-            val uriBuilder = Uri.Builder()
-                .scheme(ContentResolver.SCHEME_CONTENT)
-                .authority(authority)
-                .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-                .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-                .appendEncodedPath("suggestions")
-
-            val uri = uriBuilder.build()
-
-            runInterruptible {
-                context.contentResolver.delete(
-                    uri,
-                    "query = ?",
-                    arrayOf(suggestion),
-                )
+      runInterruptible(Dispatchers.IO) {
+        // Query 2x the limit because there might be case sensitive duplicates...
+        getSearchManagerSuggestions(searchableInfo, "", QUERY_LIMIT).use { c ->
+          if (c != null) {
+            try {
+              text1Col = c.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1)
+            } catch (e: Exception) {
+              Log.e(TAG, "error changing cursor and caching columns", e)
             }
 
-            generateModel(componentName)
+            while (c.moveToNext()) {
+              c.getStringOrNull(text1Col)?.let {
+                if (seen.add(it.lowercase(Locale.US))) {
+                  searchSuggestions.add(it)
+                  Log.d(TAG, "Got suggestion $it")
+                }
+              }
+            }
+          }
         }
+      }
+
+      withContext(Dispatchers.Main) {
+        model.setValue(
+          SearchHomeModel(
+            suggestions = searchSuggestions.take(4),
+            myCommunities = subscriptionCommunities.map {
+              MyCommunity(
+                it.toCommunityRef(),
+                it,
+              )
+            },
+            communitySuggestionsDto = null,
+            isCommunitySuggestionsLoading = true,
+            errors = errors,
+          ),
+        )
+      }
+
+      val communitySessions = summitServerClient.communitySuggestions(force)
+
+      communitySessions
+        .onFailure {
+          errors.add(it)
+        }
+
+      withContext(Dispatchers.Main) {
+        model.setValue(
+          SearchHomeModel(
+            suggestions = searchSuggestions.take(4),
+            myCommunities = subscriptionCommunities.map {
+              MyCommunity(
+                it.toCommunityRef(),
+                it,
+              )
+            },
+            communitySuggestionsDto = communitySessions.getOrNull(),
+            isCommunitySuggestionsLoading = false,
+            errors = errors,
+          ),
+        )
+      }
     }
+  }
+
+  private fun getSearchManagerSuggestions(
+    searchable: SearchableInfo?,
+    query: String?,
+    limit: Int,
+  ): Cursor? {
+    if (searchable == null) {
+      return null
+    }
+    if (query == null) {
+      return null
+    }
+
+    val authority = searchable.suggestAuthority ?: return null
+
+    val uriBuilder = Uri.Builder()
+      .scheme(ContentResolver.SCHEME_CONTENT)
+      .authority(authority)
+      .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+      .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+
+    // if content path provided, insert it now
+    val contentPath = searchable.suggestPath
+    if (contentPath != null) {
+      uriBuilder.appendEncodedPath(contentPath)
+    }
+
+    // append standard suggestion query path
+    uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY)
+
+    // get the query selection, may be null
+    val selection = searchable.suggestSelection
+    // inject query, either as selection args or inline
+    var selArgs: Array<String>? = null
+    if (selection != null) { // use selection if provided
+      selArgs = arrayOf(query)
+    } else { // no selection, use REST pattern
+      uriBuilder.appendPath(query)
+    }
+
+    if (limit > 0) {
+      uriBuilder.appendQueryParameter("limit", limit.toString())
+    }
+
+    val uri = uriBuilder.build()
+
+    // finally, make the query
+    return context.contentResolver.query(uri, null, selection, selArgs, null)
+  }
+
+  fun deleteSuggestion(componentName: ComponentName?, suggestion: String) {
+    viewModelScope.launch {
+      val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
+      val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(componentName)
+      val searchable = searchableInfo ?: return@launch
+      val authority = searchable.suggestAuthority ?: return@launch
+
+      val uriBuilder = Uri.Builder()
+        .scheme(ContentResolver.SCHEME_CONTENT)
+        .authority(authority)
+        .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+        .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+        .appendEncodedPath("suggestions")
+
+      val uri = uriBuilder.build()
+
+      runInterruptible {
+        context.contentResolver.delete(
+          uri,
+          "query = ?",
+          arrayOf(suggestion),
+        )
+      }
+
+      generateModel(componentName)
+    }
+  }
 }

@@ -7,34 +7,34 @@ import javax.inject.Singleton
 
 @Singleton
 class StateStorageManager @Inject constructor(
-    private val sharedPreferencesManager: SharedPreferencesManager,
+  private val sharedPreferencesManager: SharedPreferencesManager,
 ) {
 
-    private val accountStateStorageByAccount = mutableMapOf<StableAccountId, AccountStateStorage>()
+  private val accountStateStorageByAccount = mutableMapOf<StableAccountId, AccountStateStorage>()
 
-    val globalStateStorage by lazy {
-        GlobalStateStorage(sharedPreferencesManager.getGlobalStateSharedPreferences())
+  val globalStateStorage by lazy {
+    GlobalStateStorage(sharedPreferencesManager.getGlobalStateSharedPreferences())
+  }
+
+  fun getAccountStateStorage(accountId: Long, accountInstance: String): AccountStateStorage {
+    val stableAccountId = StableAccountId(accountId, accountInstance)
+
+    accountStateStorageByAccount[stableAccountId]?.let {
+      return it
     }
 
-    fun getAccountStateStorage(accountId: Long, accountInstance: String): AccountStateStorage {
-        val stableAccountId = StableAccountId(accountId, accountInstance)
+    synchronized(this) {
+      accountStateStorageByAccount[stableAccountId]?.let {
+        return it
+      }
 
-        accountStateStorageByAccount[stableAccountId]?.let {
-            return it
-        }
-
-        synchronized(this) {
-            accountStateStorageByAccount[stableAccountId]?.let {
-                return it
-            }
-
-            accountStateStorageByAccount[stableAccountId] = AccountStateStorage(
-                accountId,
-                accountInstance,
-                sharedPreferencesManager.getAccountStateSharedPreferences(stableAccountId),
-            )
-        }
-
-        return requireNotNull(accountStateStorageByAccount[stableAccountId])
+      accountStateStorageByAccount[stableAccountId] = AccountStateStorage(
+        accountId,
+        accountInstance,
+        sharedPreferencesManager.getAccountStateSharedPreferences(stableAccountId),
+      )
     }
+
+    return requireNotNull(accountStateStorageByAccount[stableAccountId])
+  }
 }

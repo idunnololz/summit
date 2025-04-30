@@ -9,13 +9,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PreferencesViewModel @Inject constructor(
-    private val preferenceManager: PreferenceManager,
-    private val preferences: Preferences,
+  private val preferenceManager: PreferenceManager,
+  private val preferences: Preferences,
 ) : ViewModel() {
 
-    fun getPreferences(account: Account?) = if (account == null) {
-        preferences
-    } else {
-        preferenceManager.getOnlyPreferencesForAccount(account)
-    }
+  fun getPreferences(account: Account?) = if (account == null) {
+    preferences
+  } else {
+    preferenceManager.getOnlyPreferencesForAccount(account)
+  }
 }

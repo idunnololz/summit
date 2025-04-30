@@ -6,5 +6,5 @@ import coil3.video.VideoFrameDecoder
 
 @OptIn(InternalCoilApi::class)
 internal class VideoFrameDecoderServiceLoaderTarget : DecoderServiceLoaderTarget {
-    override fun factory() = VideoFrameDecoder.Factory()
+  override fun factory() = VideoFrameDecoder.Factory()
 }

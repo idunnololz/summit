@@ -5,10 +5,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class PreviewInfo(
-    private val url: String,
-    val width: Int,
-    val height: Int,
+  private val url: String,
+  val width: Int,
+  val height: Int,
 ) : Parcelable {
 
-    fun getUrl(): String = Utils.fromHtml(url).toString()
+  fun getUrl(): String = Utils.fromHtml(url).toString()
 }

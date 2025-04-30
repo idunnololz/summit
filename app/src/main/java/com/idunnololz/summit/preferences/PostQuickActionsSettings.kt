@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class PostQuickActionsSettings(
-    val actions: List<PostQuickActionId> =
-        listOf(
-            PostQuickActionIds.Voting,
-            PostQuickActionIds.Reply,
-            PostQuickActionIds.Save,
-        ),
+  val actions: List<PostQuickActionId> =
+    listOf(
+      PostQuickActionIds.Voting,
+      PostQuickActionIds.Reply,
+      PostQuickActionIds.Save,
+    ),
 )

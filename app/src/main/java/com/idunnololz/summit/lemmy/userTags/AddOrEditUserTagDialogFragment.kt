@@ -29,212 +29,212 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEditUserTagBinding>() {
 
-    companion object {
-        fun show(
-            fragmentManager: FragmentManager,
-            person: Person? = null,
-            userTag: UserTag? = null,
-            personRef: PersonRef? = null,
-        ) {
-            AddOrEditUserTagDialogFragment()
-                .apply {
-                    arguments = AddOrEditUserTagDialogFragmentArgs(
-                        person = person,
-                        userTag = userTag,
-                        personRef = personRef,
-                    ).toBundle()
-                }
-                .show(fragmentManager, "AddOrEditUserTagDialogFragment")
+  companion object {
+    fun show(
+      fragmentManager: FragmentManager,
+      person: Person? = null,
+      userTag: UserTag? = null,
+      personRef: PersonRef? = null,
+    ) {
+      AddOrEditUserTagDialogFragment()
+        .apply {
+          arguments = AddOrEditUserTagDialogFragmentArgs(
+            person = person,
+            userTag = userTag,
+            personRef = personRef,
+          ).toBundle()
         }
+        .show(fragmentManager, "AddOrEditUserTagDialogFragment")
+    }
+  }
+
+  private val args: AddOrEditUserTagDialogFragmentArgs by navArgs()
+
+  private val viewModel: AddOrEditUserTagViewModel by viewModels()
+
+  @Inject
+  lateinit var globalStateStorage: GlobalStateStorage
+
+  override fun onStart() {
+    super.onStart()
+
+    setSizeDynamically(
+      width = ViewGroup.LayoutParams.MATCH_PARENT,
+      height = ViewGroup.LayoutParams.WRAP_CONTENT,
+    )
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentAddOrEditUserTagBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    if (savedInstanceState == null) {
+      val person = args.person
+      val userTag = args.userTag
+      val personRef = args.personRef
+      if (person != null) {
+        viewModel.personName = person.fullName
+      }
+      if (userTag != null) {
+        viewModel.personName = userTag.personName
+      }
+      if (personRef != null) {
+        viewModel.personName = personRef.fullName
+      }
+
+      viewModel.fillColor =
+        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+      viewModel.strokeColor =
+        context.getColorFromAttribute(com.google.android.material.R.attr.colorOnPrimary)
     }
 
-    private val args: AddOrEditUserTagDialogFragmentArgs by navArgs()
-
-    private val viewModel: AddOrEditUserTagViewModel by viewModels()
-
-    @Inject
-    lateinit var globalStateStorage: GlobalStateStorage
-
-    override fun onStart() {
-        super.onStart()
-
-        setSizeDynamically(
-            width = ViewGroup.LayoutParams.MATCH_PARENT,
-            height = ViewGroup.LayoutParams.WRAP_CONTENT,
-        )
+    childFragmentManager.setFragmentResultListener(
+      PersonPickerDialogFragment.REQUEST_KEY,
+      this,
+    ) { key, bundle ->
+      val result = bundle.getParcelableCompat<PersonPickerDialogFragment.Result>(
+        PersonPickerDialogFragment.REQUEST_KEY_RESULT,
+      )
+      if (result != null) {
+        viewModel.personName = result.personRef.fullName
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    with(binding) {
+      toolbar.setTitle(R.string.add_user_tag)
+      toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+      toolbar.setNavigationIconTint(
+        context.getColorFromAttribute(android.R.attr.colorControlNormal),
+      )
+      toolbar.setNavigationOnClickListener {
+        dismiss()
+      }
 
-        setBinding(DialogFragmentAddOrEditUserTagBinding.inflate(inflater, container, false))
+      personEditText.setOnFocusChangeListener { view, b ->
+        showPersonPicker()
+      }
+      tagEditText.addTextChangedListener(
+        onTextChanged = { text, start, before, count ->
+          viewModel.tag = text?.toString() ?: ""
+        },
+      )
 
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        if (savedInstanceState == null) {
-            val person = args.person
-            val userTag = args.userTag
-            val personRef = args.personRef
-            if (person != null) {
-                viewModel.personName = person.fullName
-            }
-            if (userTag != null) {
-                viewModel.personName = userTag.personName
-            }
-            if (personRef != null) {
-                viewModel.personName = personRef.fullName
-            }
-
-            viewModel.fillColor =
-                context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
-            viewModel.strokeColor =
-                context.getColorFromAttribute(com.google.android.material.R.attr.colorOnPrimary)
+      changeFillColorButton.setOnClickListener {
+        showColorPicker(viewModel.fillColor) {
+          viewModel.fillColor = it
         }
-
-        childFragmentManager.setFragmentResultListener(
-            PersonPickerDialogFragment.REQUEST_KEY,
-            this,
-        ) { key, bundle ->
-            val result = bundle.getParcelableCompat<PersonPickerDialogFragment.Result>(
-                PersonPickerDialogFragment.REQUEST_KEY_RESULT,
-            )
-            if (result != null) {
-                viewModel.personName = result.personRef.fullName
-            }
+      }
+      changeStrokeColorButton.setOnClickListener {
+        showColorPicker(viewModel.strokeColor) {
+          viewModel.strokeColor = it
         }
+      }
 
-        with(binding) {
-            toolbar.setTitle(R.string.add_user_tag)
-            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-            toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(android.R.attr.colorControlNormal),
-            )
-            toolbar.setNavigationOnClickListener {
-                dismiss()
-            }
+      positiveButton.setOnClickListener {
+        // Remember the values before we set them as setting them will revert their values
+        val personName = requireNotNull(binding.personEditText.text?.toString())
+        val tag = requireNotNull(binding.tagEditText.text?.toString())
 
-            personEditText.setOnFocusChangeListener { view, b ->
-                showPersonPicker()
-            }
-            tagEditText.addTextChangedListener(
-                onTextChanged = { text, start, before, count ->
-                    viewModel.tag = text?.toString() ?: ""
-                },
-            )
+        viewModel.personName = personName
+        viewModel.tag = tag
 
-            changeFillColorButton.setOnClickListener {
-                showColorPicker(viewModel.fillColor) {
-                    viewModel.fillColor = it
-                }
-            }
-            changeStrokeColorButton.setOnClickListener {
-                showColorPicker(viewModel.strokeColor) {
-                    viewModel.strokeColor = it
-                }
-            }
+        viewModel.addTag()
+      }
+      negativeButton.setOnClickListener {
+        dismiss()
+      }
+      neutralButton.setOnClickListener {
+        viewModel.deleteUserTag()
+        dismiss()
+      }
 
-            positiveButton.setOnClickListener {
-                // Remember the values before we set them as setting them will revert their values
-                val personName = requireNotNull(binding.personEditText.text?.toString())
-                val tag = requireNotNull(binding.tagEditText.text?.toString())
+      viewModel.model.observe(viewLifecycleOwner) {
+        updateRender()
+      }
+    }
+  }
 
-                viewModel.personName = personName
-                viewModel.tag = tag
+  override fun onPause() {
+    viewModel.personName = requireNotNull(binding.personEditText.text?.toString())
+    viewModel.tag = requireNotNull(binding.tagEditText.text?.toString())
 
-                viewModel.addTag()
-            }
-            negativeButton.setOnClickListener {
-                dismiss()
-            }
-            neutralButton.setOnClickListener {
-                viewModel.deleteUserTag()
-                dismiss()
-            }
+    super.onPause()
+  }
 
-            viewModel.model.observe(viewLifecycleOwner) {
-                updateRender()
-            }
-        }
+  private fun showPersonPicker() {
+    val personEditText = binding.personEditText
+
+    if (personEditText.hasFocus()) {
+      val prefill = personEditText.text?.split("@")?.firstOrNull().toString()
+
+      personEditText.clearFocus()
+      PersonPickerDialogFragment.show(childFragmentManager, prefill)
+    }
+  }
+
+  private fun updateRender() {
+    val model = viewModel.model.value ?: return
+
+    if (model.isSubmitted) {
+      dismiss()
+      return
     }
 
-    override fun onPause() {
-        viewModel.personName = requireNotNull(binding.personEditText.text?.toString())
-        viewModel.tag = requireNotNull(binding.tagEditText.text?.toString())
+    with(binding) {
+      personEditText.setText(model.personName)
+      if (model.personNameError != null) {
+        personInputLayout.error = getString(model.personNameError)
+      } else {
+        personInputLayout.isErrorEnabled = false
+      }
 
-        super.onPause()
+      if (!tagEditText.isFocused) {
+        tagEditText.setText(model.tag)
+      }
+      if (model.tagError != null) {
+        tagInputLayout.error = getString(model.tagError)
+      } else {
+        tagInputLayout.isErrorEnabled = false
+      }
+
+      tagFillColorInner.background = ColorDrawable(model.fillColor)
+      tagStrokeColorInner.background = ColorDrawable(model.strokeColor)
+      neutralButton.visibility = if (model.showDeleteButton) {
+        View.VISIBLE
+      } else {
+        View.GONE
+      }
     }
+  }
 
-    private fun showPersonPicker() {
-        val personEditText = binding.personEditText
+  private fun showColorPicker(initialColor: Int, onColorPicked: (Int) -> Unit) {
+    val context = requireContext()
 
-        if (personEditText.hasFocus()) {
-            val prefill = personEditText.text?.split("@")?.firstOrNull().toString()
-
-            personEditText.clearFocus()
-            PersonPickerDialogFragment.show(childFragmentManager, prefill)
+    ColorPickerDialog(
+      context = context,
+      title = context.getString(R.string.tag_fill_color),
+      color = initialColor,
+      globalStateStorage = globalStateStorage,
+    )
+      .withAlphaEnabled(true)
+      .withListener(object : OnColorPickedListener {
+        override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
+          onColorPicked(color)
         }
-    }
-
-    private fun updateRender() {
-        val model = viewModel.model.value ?: return
-
-        if (model.isSubmitted) {
-            dismiss()
-            return
-        }
-
-        with(binding) {
-            personEditText.setText(model.personName)
-            if (model.personNameError != null) {
-                personInputLayout.error = getString(model.personNameError)
-            } else {
-                personInputLayout.isErrorEnabled = false
-            }
-
-            if (!tagEditText.isFocused) {
-                tagEditText.setText(model.tag)
-            }
-            if (model.tagError != null) {
-                tagInputLayout.error = getString(model.tagError)
-            } else {
-                tagInputLayout.isErrorEnabled = false
-            }
-
-            tagFillColorInner.background = ColorDrawable(model.fillColor)
-            tagStrokeColorInner.background = ColorDrawable(model.strokeColor)
-            neutralButton.visibility = if (model.showDeleteButton) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-        }
-    }
-
-    private fun showColorPicker(initialColor: Int, onColorPicked: (Int) -> Unit) {
-        val context = requireContext()
-
-        ColorPickerDialog(
-            context = context,
-            title = context.getString(R.string.tag_fill_color),
-            color = initialColor,
-            globalStateStorage = globalStateStorage,
-        )
-            .withAlphaEnabled(true)
-            .withListener(object : OnColorPickedListener {
-                override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
-                    onColorPicked(color)
-                }
-            })
-            .show()
-    }
+      })
+      .show()
+  }
 }

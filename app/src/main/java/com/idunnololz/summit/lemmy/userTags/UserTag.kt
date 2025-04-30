@@ -5,6 +5,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class UserTag(
-    val personName: String,
-    val config: UserTagConfig,
+  val personName: String,
+  val config: UserTagConfig,
 ) : Parcelable

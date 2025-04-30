@@ -8,33 +8,33 @@ import android.content.SharedPreferences
  * for instance.
  */
 class AccountStateStorage(
-    private val accountId: Long,
-    private val accountInstance: String,
-    private val prefs: SharedPreferences,
+  private val accountId: Long,
+  private val accountInstance: String,
+  private val prefs: SharedPreferences,
 ) {
 
-    companion object {
-        private const val KEY_LAST_CONVERSATION_REFRESH_TS = "KEY_LAST_CONVERSATION_REFRESH_TS"
-        private const val KEY_CONVERSATION_EARLIEST_MESSAGE_TS =
-            "KEY_CONVERSATION_EARLIEST_MESSAGE_TS"
+  companion object {
+    private const val KEY_LAST_CONVERSATION_REFRESH_TS = "KEY_LAST_CONVERSATION_REFRESH_TS"
+    private const val KEY_CONVERSATION_EARLIEST_MESSAGE_TS =
+      "KEY_CONVERSATION_EARLIEST_MESSAGE_TS"
+  }
+
+  var lastConversationRefreshTs: Long
+    get() = prefs.getLong(KEY_LAST_CONVERSATION_REFRESH_TS, 0)
+    set(value) {
+      prefs.edit().putLong(KEY_LAST_CONVERSATION_REFRESH_TS, value).apply()
     }
 
-    var lastConversationRefreshTs: Long
-        get() = prefs.getLong(KEY_LAST_CONVERSATION_REFRESH_TS, 0)
-        set(value) {
-            prefs.edit().putLong(KEY_LAST_CONVERSATION_REFRESH_TS, value).apply()
-        }
-
-    var conversationEarliestMessageTs: Long?
-        get() = prefs.getLong(KEY_CONVERSATION_EARLIEST_MESSAGE_TS, 0)
-        set(value) {
-            prefs.edit()
-                .apply {
-                    if (value == null) {
-                        remove(KEY_CONVERSATION_EARLIEST_MESSAGE_TS)
-                    } else {
-                        putLong(KEY_CONVERSATION_EARLIEST_MESSAGE_TS, value)
-                    }
-                }.apply()
-        }
+  var conversationEarliestMessageTs: Long?
+    get() = prefs.getLong(KEY_CONVERSATION_EARLIEST_MESSAGE_TS, 0)
+    set(value) {
+      prefs.edit()
+        .apply {
+          if (value == null) {
+            remove(KEY_CONVERSATION_EARLIEST_MESSAGE_TS)
+          } else {
+            putLong(KEY_CONVERSATION_EARLIEST_MESSAGE_TS, value)
+          }
+        }.apply()
+    }
 }

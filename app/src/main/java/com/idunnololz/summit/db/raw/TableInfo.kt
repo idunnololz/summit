@@ -5,6 +5,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TableInfo(
-    val tableName: String,
-    val rowCount: Int,
+  val tableName: String,
+  val rowCount: Int,
 ) : Parcelable

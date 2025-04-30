@@ -35,139 +35,139 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class FilteredPostsAndCommentsTabbedFragment :
-    BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
+  BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
 
-    private val args: FilteredPostsAndCommentsTabbedFragmentArgs by navArgs()
+  private val args: FilteredPostsAndCommentsTabbedFragmentArgs by navArgs()
 
-    val viewModel: FilteredPostAndCommentsViewModel by viewModels()
-    var slidingPaneController: SlidingPaneController? = null
+  val viewModel: FilteredPostAndCommentsViewModel by viewModels()
+  var slidingPaneController: SlidingPaneController? = null
 
-    @Inject
-    lateinit var moreActionsHelper: MoreActionsHelper
+  @Inject
+  lateinit var moreActionsHelper: MoreActionsHelper
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(TabbedFragmentSavedBinding.inflate(inflater, container, false))
+    setBinding(TabbedFragmentSavedBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
+
+      setupToolbar(
+        toolbar = binding.toolbar,
+        title = when (args.type) {
+          FilteredPostAndCommentsType.Saved -> getString(R.string.saved)
+          FilteredPostAndCommentsType.Upvoted -> getString(R.string.upvoted)
+          FilteredPostAndCommentsType.Downvoted -> getString(R.string.downvoted)
+        },
+      )
+
+      insetViewAutomaticallyByPaddingAndNavUi(
+        viewLifecycleOwner,
+        binding.coordinatorLayoutContainer,
+      )
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    with(binding) {
+      fab.visibility = View.GONE
+      binding.fab.setup(preferences)
 
-        val context = requireContext()
+      viewModel.currentAccountView.observe(viewLifecycleOwner) {
+        it.loadProfileImageOrDefault(binding.accountImageView)
+      }
+      accountImageView.setOnClickListener {
+        AccountsAndSettingsDialogFragment.newInstance()
+          .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+      }
 
-        requireSummitActivity().apply {
-            setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
+      if (viewPager.adapter == null) {
+        viewPager.offscreenPageLimit = 5
+        val adapter =
+          ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
+        adapter.addFrag(FilteredPostsFragment::class.java, getString(R.string.posts))
+        adapter.addFrag(FilteredCommentsFragment::class.java, getString(R.string.comments))
+        viewPager.adapter = adapter
+      }
 
-            setupToolbar(
-                toolbar = binding.toolbar,
-                title = when (args.type) {
-                    FilteredPostAndCommentsType.Saved -> getString(R.string.saved)
-                    FilteredPostAndCommentsType.Upvoted -> getString(R.string.upvoted)
-                    FilteredPostAndCommentsType.Downvoted -> getString(R.string.downvoted)
-                },
-            )
+      TabLayoutMediator(
+        tabLayout,
+        binding.viewPager,
+        binding.viewPager.adapter as ViewPagerAdapter,
+      ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
 
-            insetViewAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner,
-                binding.coordinatorLayoutContainer,
-            )
-        }
+      slidingPaneController = SlidingPaneController(
+        fragment = this@FilteredPostsAndCommentsTabbedFragment,
+        slidingPaneLayout = slidingPaneLayout,
+        childFragmentManager = childFragmentManager,
+        viewModel = viewModel,
+        globalLayoutMode = preferences.globalLayoutMode,
+        lockPanes = true,
+        retainClosedPosts = preferences.retainLastPost,
+        emptyScreenText = getString(R.string.select_a_post_or_comment),
+        fragmentContainerId = R.id.post_fragment_container,
+      ).apply {
+        onPageSelectedListener = a@{ isOpen ->
+          if (!isBindingAvailable()) {
+            return@a
+          }
 
-        with(binding) {
-            fab.visibility = View.GONE
-            binding.fab.setup(preferences)
-
-            viewModel.currentAccountView.observe(viewLifecycleOwner) {
-                it.loadProfileImageOrDefault(binding.accountImageView)
-            }
-            accountImageView.setOnClickListener {
-                AccountsAndSettingsDialogFragment.newInstance()
-                    .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
-            }
-
-            if (viewPager.adapter == null) {
-                viewPager.offscreenPageLimit = 5
-                val adapter =
-                    ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
-                adapter.addFrag(FilteredPostsFragment::class.java, getString(R.string.posts))
-                adapter.addFrag(FilteredCommentsFragment::class.java, getString(R.string.comments))
-                viewPager.adapter = adapter
-            }
-
-            TabLayoutMediator(
-                tabLayout,
-                binding.viewPager,
-                binding.viewPager.adapter as ViewPagerAdapter,
-            ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
-
-            slidingPaneController = SlidingPaneController(
-                fragment = this@FilteredPostsAndCommentsTabbedFragment,
-                slidingPaneLayout = slidingPaneLayout,
-                childFragmentManager = childFragmentManager,
-                viewModel = viewModel,
-                globalLayoutMode = preferences.globalLayoutMode,
-                lockPanes = true,
-                retainClosedPosts = preferences.retainLastPost,
-                emptyScreenText = getString(R.string.select_a_post_or_comment),
-                fragmentContainerId = R.id.post_fragment_container,
-            ).apply {
-                onPageSelectedListener = a@{ isOpen ->
-                    if (!isBindingAvailable()) {
-                        return@a
-                    }
-
-                    if (!isOpen) {
-                        val lastSelectedPost = viewModel.lastSelectedItem
-                        if (lastSelectedPost != null) {
-                            // We came from a post...
+          if (!isOpen) {
+            val lastSelectedPost = viewModel.lastSelectedItem
+            if (lastSelectedPost != null) {
+              // We came from a post...
 //                        adapter?.highlightPost(lastSelectedPost)
-                            viewModel.lastSelectedItem = null
-                        }
-                    } else {
-                        val lastSelectedPost = viewModel.lastSelectedItem
-                        if (lastSelectedPost != null) {
-//                        adapter?.highlightPostForever(lastSelectedPost)
-                        }
-                    }
-                }
-                init()
+              viewModel.lastSelectedItem = null
             }
-
-            installOnActionResultHandler(
-                context = context,
-                moreActionsHelper = moreActionsHelper,
-                snackbarContainer = binding.coordinatorLayout,
-                onSavePostChanged = {
-                    viewModel.onSavePostChanged(it)
-                },
-                onSaveCommentChanged = {
-                    viewModel.onSaveCommentChanged(it)
-                },
-            )
+          } else {
+            val lastSelectedPost = viewModel.lastSelectedItem
+            if (lastSelectedPost != null) {
+//                        adapter?.highlightPostForever(lastSelectedPost)
+            }
+          }
         }
+        init()
+      }
 
-        viewModel.initializeIfNeeded(args.type)
+      installOnActionResultHandler(
+        context = context,
+        moreActionsHelper = moreActionsHelper,
+        snackbarContainer = binding.coordinatorLayout,
+        onSavePostChanged = {
+          viewModel.onSavePostChanged(it)
+        },
+        onSaveCommentChanged = {
+          viewModel.onSaveCommentChanged(it)
+        },
+      )
     }
 
-    override fun navigateToSignInScreen() {
-        val direction = PostFragmentDirections.actionGlobalLogin()
-        findNavController().navigateSafe(direction)
-    }
+    viewModel.initializeIfNeeded(args.type)
+  }
 
-    override fun proceedAnyways(tag: Int) {
-    }
+  override fun navigateToSignInScreen() {
+    val direction = PostFragmentDirections.actionGlobalLogin()
+    findNavController().navigateSafe(direction)
+  }
 
-    fun closePost(postFragment: PostFragment) {
-        slidingPaneController?.closePost(postFragment)
-    }
+  override fun proceedAnyways(tag: Int) {
+  }
+
+  fun closePost(postFragment: PostFragment) {
+    slidingPaneController?.closePost(postFragment)
+  }
 }

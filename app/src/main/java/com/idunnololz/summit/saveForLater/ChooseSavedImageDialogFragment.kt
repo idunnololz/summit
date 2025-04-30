@@ -35,131 +35,131 @@ import kotlinx.parcelize.Parcelize
 @AndroidEntryPoint
 class ChooseSavedImageDialogFragment : BaseDialogFragment<DialogFragmentChooseSavedImageBinding>() {
 
-    companion object {
+  companion object {
 
-        private const val TAG = "ChooseSavedImageDialogFragment"
+    private const val TAG = "ChooseSavedImageDialogFragment"
 
-        const val REQUEST_KEY = "ChooseSavedImageDialogFragment_req"
-        const val REQUEST_RESULT = "REQUEST_RESULT"
+    const val REQUEST_KEY = "ChooseSavedImageDialogFragment_req"
+    const val REQUEST_RESULT = "REQUEST_RESULT"
+  }
+
+  @Parcelize
+  data class Result(
+    val fileUri: Uri,
+  ) : Parcelable
+
+  private val args by navArgs<ChooseSavedImageDialogFragmentArgs>()
+
+  @Inject
+  lateinit var saveForLaterManager: SaveForLaterManager
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        window.setBackgroundDrawable(null)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.setWindowAnimations(R.style.BottomSheetAnimations)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentChooseSavedImageBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      delay(100)
+
+      setupBottomSheetAndShow(
+        bottomSheet = binding.bottomSheet,
+        bottomSheetContainerInner = binding.bottomSheetContainerInner,
+        overlay = binding.overlay,
+        onClose = {
+          dismiss()
+        },
+        expandFully = true,
+      )
     }
 
-    @Parcelize
-    data class Result(
-        val fileUri: Uri,
-    ) : Parcelable
-
-    private val args by navArgs<ChooseSavedImageDialogFragmentArgs>()
-
-    @Inject
-    lateinit var saveForLaterManager: SaveForLaterManager
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                window.setBackgroundDrawable(null)
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-                window.setWindowAnimations(R.style.BottomSheetAnimations)
-            }
+    requireMainActivity().apply {
+      insets.observe(viewLifecycleOwner) { insets ->
+        binding.bottomSheet.updatePadding(bottom = insets.bottomInset)
+        binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+          topMargin = insets.topInset
         }
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    loadSaveSlots()
+  }
 
-        setBinding(DialogFragmentChooseSavedImageBinding.inflate(inflater, container, false))
+  private fun loadSaveSlots() {
+    val context = requireContext()
+    val inflater = LayoutInflater.from(context)
 
-        return binding.root
-    }
+    with(binding) {
+      slotsContainer.removeAllViews()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+      saveForLaterManager.getSlotFiles().withIndex().forEach { (index, file) ->
+        val b = SaveSlotBinding.inflate(inflater, slotsContainer, false)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            delay(100)
+        if (file.exists()) {
+          b.preview.load(file) {
+            placeholder(newShimmerDrawable16to9(context).asImage())
+          }
+        } else {
+          b.preview.dispose()
+          b.preview.setImageDrawable(null)
+        }
 
-            setupBottomSheetAndShow(
-                bottomSheet = binding.bottomSheet,
-                bottomSheetContainerInner = binding.bottomSheetContainerInner,
-                overlay = binding.overlay,
-                onClose = {
-                    dismiss()
-                },
-                expandFully = true,
+        b.text.text = getString(R.string.slot_format, (index + 1).toString())
+
+        if (file.exists()) {
+          lifecycle.coroutineScope.launch {
+            val hex = file.readBytes().take(
+              10,
+            ).joinToString(separator = " ") { eachByte -> "%02x".format(eachByte) }
+            Log.d(TAG, "File ${index + 1}. File name: ${file.absolutePath}. Hex: $hex")
+          }
+          b.subtitle.text = "${humanReadableByteCountSi(file.length())} - " +
+            "${tsToShortDate(file.lastModified())}"
+        } else {
+          b.subtitle.text = getString(R.string.empty)
+        }
+
+        slotsContainer.addView(b.root)
+
+        b.root.setOnClickListener {
+          if (file.exists()) {
+            setFragmentResult(
+              args.requestKey ?: REQUEST_KEY,
+              Bundle().apply {
+                putParcelable(REQUEST_RESULT, Result(file.toUri()))
+              },
             )
+            dismiss()
+          }
         }
-
-        requireMainActivity().apply {
-            insets.observe(viewLifecycleOwner) { insets ->
-                binding.bottomSheet.updatePadding(bottom = insets.bottomInset)
-                binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    topMargin = insets.topInset
-                }
-            }
-        }
-
-        loadSaveSlots()
+      }
     }
-
-    private fun loadSaveSlots() {
-        val context = requireContext()
-        val inflater = LayoutInflater.from(context)
-
-        with(binding) {
-            slotsContainer.removeAllViews()
-
-            saveForLaterManager.getSlotFiles().withIndex().forEach { (index, file) ->
-                val b = SaveSlotBinding.inflate(inflater, slotsContainer, false)
-
-                if (file.exists()) {
-                    b.preview.load(file) {
-                        placeholder(newShimmerDrawable16to9(context).asImage())
-                    }
-                } else {
-                    b.preview.dispose()
-                    b.preview.setImageDrawable(null)
-                }
-
-                b.text.text = getString(R.string.slot_format, (index + 1).toString())
-
-                if (file.exists()) {
-                    lifecycle.coroutineScope.launch {
-                        val hex = file.readBytes().take(
-                            10,
-                        ).joinToString(separator = " ") { eachByte -> "%02x".format(eachByte) }
-                        Log.d(TAG, "File ${index + 1}. File name: ${file.absolutePath}. Hex: $hex")
-                    }
-                    b.subtitle.text = "${humanReadableByteCountSi(file.length())} - " +
-                        "${tsToShortDate(file.lastModified())}"
-                } else {
-                    b.subtitle.text = getString(R.string.empty)
-                }
-
-                slotsContainer.addView(b.root)
-
-                b.root.setOnClickListener {
-                    if (file.exists()) {
-                        setFragmentResult(
-                            args.requestKey ?: REQUEST_KEY,
-                            Bundle().apply {
-                                putParcelable(REQUEST_RESULT, Result(file.toUri()))
-                            },
-                        )
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
+  }
 }

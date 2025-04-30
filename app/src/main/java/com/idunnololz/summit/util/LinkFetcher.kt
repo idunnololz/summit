@@ -13,31 +13,31 @@ import okhttp3.Response
 
 @Singleton
 class LinkFetcher @Inject constructor(
-    @BrowserLike private val okHttpClient: OkHttpClient,
+  @BrowserLike private val okHttpClient: OkHttpClient,
 ) {
 
-    suspend fun downloadSite(url: String, cache: Boolean = false): String =
-        runInterruptible(Dispatchers.IO) {
-            val response = doRequest(url, cache)
-            val responseCode = response.code
-            if (response.isSuccessful) {
-                return@runInterruptible response.body?.string() ?: ""
-            } else {
-                response.body?.close()
-                throw GetNetworkException(
-                    "Response was not 200. Response code: $responseCode. Url: $url",
-                )
-            }
-        }
-
-    private fun doRequest(url: String, cache: Boolean): Response {
-        val builder = Request.Builder()
-            .url(url)
-        if (!cache) {
-            builder.cacheControl(CacheControl.FORCE_NETWORK)
-                .header("Cache-Control", "no-cache, no-store")
-        }
-        val request = builder.build()
-        return okHttpClient.newCall(request).execute()
+  suspend fun downloadSite(url: String, cache: Boolean = false): String =
+    runInterruptible(Dispatchers.IO) {
+      val response = doRequest(url, cache)
+      val responseCode = response.code
+      if (response.isSuccessful) {
+        return@runInterruptible response.body?.string() ?: ""
+      } else {
+        response.body?.close()
+        throw GetNetworkException(
+          "Response was not 200. Response code: $responseCode. Url: $url",
+        )
+      }
     }
+
+  private fun doRequest(url: String, cache: Boolean): Response {
+    val builder = Request.Builder()
+      .url(url)
+    if (!cache) {
+      builder.cacheControl(CacheControl.FORCE_NETWORK)
+        .header("Cache-Control", "no-cache, no-store")
+    }
+    val request = builder.build()
+    return okHttpClient.newCall(request).execute()
+  }
 }

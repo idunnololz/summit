@@ -17,94 +17,94 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ActionDetailsViewModel @Inject constructor(
-    private val apiClient: LemmyApiClient,
-    private val accountManager: AccountManager,
-    private val actionsRunnerHelper: ActionsRunnerHelper,
-    private val pendingActionsManager: PendingActionsManager,
+  private val apiClient: LemmyApiClient,
+  private val accountManager: AccountManager,
+  private val actionsRunnerHelper: ActionsRunnerHelper,
+  private val pendingActionsManager: PendingActionsManager,
 ) : ViewModel() {
 
-    val retryActionResult = StatefulLiveData<Unit>()
-    val deleteActionResult = StatefulLiveData<Unit>()
+  val retryActionResult = StatefulLiveData<Unit>()
+  val deleteActionResult = StatefulLiveData<Unit>()
 
-    fun markActionAsSeen(action: Action) {
-        if (!action.seen) {
-            pendingActionsManager.markActionAsSeen(action.toLemmyAction())
-        }
+  fun markActionAsSeen(action: Action) {
+    if (!action.seen) {
+      pendingActionsManager.markActionAsSeen(action.toLemmyAction())
     }
+  }
 
-    fun retryAction(action: Action) {
-        retryActionResult.setIsLoading()
+  fun retryAction(action: Action) {
+    retryActionResult.setIsLoading()
 
-        viewModelScope.launch {
-            val actionInfo = action.info
+    viewModelScope.launch {
+      val actionInfo = action.info
 
-            if (actionInfo == null) {
-                retryActionResult.setError(RuntimeException("Action info is null"))
-                return@launch
-            }
+      if (actionInfo == null) {
+        retryActionResult.setError(RuntimeException("Action info is null"))
+        return@launch
+      }
 
-            val result = actionsRunnerHelper
-                .executeAction(
-                    actionInfo = actionInfo,
-                    retries = 0,
-                )
+      val result = actionsRunnerHelper
+        .executeAction(
+          actionInfo = actionInfo,
+          retries = 0,
+        )
 
-            when (result) {
-                is PendingActionsManager.ActionExecutionResult.Success -> {
-                    retryActionResult.setValue(Unit)
+      when (result) {
+        is PendingActionsManager.ActionExecutionResult.Success -> {
+          retryActionResult.setValue(Unit)
 
-                    pendingActionsManager.completeActionSuccess(
-                        action = LemmyPendingAction(
-                            action.id,
-                            action.ts,
-                            action.creationTs,
-                            actionInfo,
-                        ),
-                        result = result.result,
-                    )
-                    if (action.details is ActionDetails.FailureDetails) {
-                        pendingActionsManager.deleteFailedAction(
-                            action = action.toLemmyAction() as LemmyFailedAction,
-                        )
-                    }
-                }
-                is PendingActionsManager.ActionExecutionResult.Failure -> {
-                    retryActionResult.setError(LemmyActionFailureException(result.failureReason))
-                }
-            }
+          pendingActionsManager.completeActionSuccess(
+            action = LemmyPendingAction(
+              action.id,
+              action.ts,
+              action.creationTs,
+              actionInfo,
+            ),
+            result = result.result,
+          )
+          if (action.details is ActionDetails.FailureDetails) {
+            pendingActionsManager.deleteFailedAction(
+              action = action.toLemmyAction() as LemmyFailedAction,
+            )
+          }
         }
-    }
-
-    fun deleteAction(action: Action) {
-        deleteActionResult.setIsLoading()
-
-        viewModelScope.launch {
-            val actionInfo = action.info
-
-            if (actionInfo == null) {
-                retryActionResult.setError(RuntimeException("Action info is null"))
-                return@launch
-            }
-
-            when (val lemmyAction = action.toLemmyAction()) {
-                is LemmyCompletedAction -> {
-                    pendingActionsManager.deleteCompletedAction(
-                        action = lemmyAction,
-                    )
-                }
-                is LemmyFailedAction -> {
-                    pendingActionsManager.deleteFailedAction(
-                        action = lemmyAction,
-                    )
-                }
-                is LemmyPendingAction -> {
-                    pendingActionsManager.deletePendingAction(
-                        action = lemmyAction,
-                    )
-                }
-            }
-
-            deleteActionResult.postValue(Unit)
+        is PendingActionsManager.ActionExecutionResult.Failure -> {
+          retryActionResult.setError(LemmyActionFailureException(result.failureReason))
         }
+      }
     }
+  }
+
+  fun deleteAction(action: Action) {
+    deleteActionResult.setIsLoading()
+
+    viewModelScope.launch {
+      val actionInfo = action.info
+
+      if (actionInfo == null) {
+        retryActionResult.setError(RuntimeException("Action info is null"))
+        return@launch
+      }
+
+      when (val lemmyAction = action.toLemmyAction()) {
+        is LemmyCompletedAction -> {
+          pendingActionsManager.deleteCompletedAction(
+            action = lemmyAction,
+          )
+        }
+        is LemmyFailedAction -> {
+          pendingActionsManager.deleteFailedAction(
+            action = lemmyAction,
+          )
+        }
+        is LemmyPendingAction -> {
+          pendingActionsManager.deletePendingAction(
+            action = lemmyAction,
+          )
+        }
+      }
+
+      deleteActionResult.postValue(Unit)
+    }
+  }
 }

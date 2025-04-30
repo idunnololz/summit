@@ -26,62 +26,62 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsAboutFragment : BaseFragment<FragmentSettingsAboutBinding>() {
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var aboutSettings: AboutSettings
+  @Inject
+  lateinit var aboutSettings: AboutSettings
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsAboutBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsAboutBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setupToolbar(binding.toolbar, aboutSettings.getPageName(context))
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    updateRendering()
+  }
 
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setupToolbar(binding.toolbar, aboutSettings.getPageName(context))
-        }
-
-        updateRendering()
+  private fun updateRendering() {
+    aboutSettings.version.bindTo(binding.version) {
+      launchChangelog()
     }
 
-    private fun updateRendering() {
-        aboutSettings.version.bindTo(binding.version) {
-            launchChangelog()
-        }
-
-        aboutSettings.googlePlayLink.bindTo(binding.playStoreListing) {
-            openAppOnPlayStore()
-        }
-
-        aboutSettings.giveFeedback.bindTo(binding.giveFeedback) {
-            showHelpAndFeedbackOptions()
-        }
-
-        aboutSettings.patreonSettings.bindTo(binding.patreon) {
-            val directions = SettingsAboutFragmentDirections
-                .actionSettingAboutFragmentToPatreonFragment()
-            findNavController().navigateSafe(directions)
-        }
-        aboutSettings.translatorsSettings.bindTo(binding.translators) {
-            val directions = SettingsAboutFragmentDirections
-                .actionSettingAboutFragmentToTranslatorsFragment()
-            findNavController().navigateSafe(directions)
-        }
+    aboutSettings.googlePlayLink.bindTo(binding.playStoreListing) {
+      openAppOnPlayStore()
     }
+
+    aboutSettings.giveFeedback.bindTo(binding.giveFeedback) {
+      showHelpAndFeedbackOptions()
+    }
+
+    aboutSettings.patreonSettings.bindTo(binding.patreon) {
+      val directions = SettingsAboutFragmentDirections
+        .actionSettingAboutFragmentToPatreonFragment()
+      findNavController().navigateSafe(directions)
+    }
+    aboutSettings.translatorsSettings.bindTo(binding.translators) {
+      val directions = SettingsAboutFragmentDirections
+        .actionSettingAboutFragmentToTranslatorsFragment()
+      findNavController().navigateSafe(directions)
+    }
+  }
 }

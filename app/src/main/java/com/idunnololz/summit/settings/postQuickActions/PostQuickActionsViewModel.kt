@@ -12,24 +12,24 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PostQuickActionsViewModel @Inject constructor(
-    val preferences: Preferences,
+  val preferences: Preferences,
 ) : ViewModel() {
 
-    val settingsChangedLiveData = MutableLiveData<Unit>()
+  val settingsChangedLiveData = MutableLiveData<Unit>()
 
-    fun updatePostQuickActions(quickActions: List<PostQuickActionId>) {
-        viewModelScope.launch {
-            preferences.postQuickActions = PostQuickActionsSettings(
-                quickActions,
-            )
-        }
+  fun updatePostQuickActions(quickActions: List<PostQuickActionId>) {
+    viewModelScope.launch {
+      preferences.postQuickActions = PostQuickActionsSettings(
+        quickActions,
+      )
     }
+  }
 
-    fun resetSettings() {
-        viewModelScope.launch {
-            preferences.postQuickActions = null
+  fun resetSettings() {
+    viewModelScope.launch {
+      preferences.postQuickActions = null
 
-            settingsChangedLiveData.postValue(Unit)
-        }
+      settingsChangedLiveData.postValue(Unit)
     }
+  }
 }

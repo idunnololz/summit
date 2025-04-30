@@ -16,38 +16,38 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CommunityPickerViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
+  private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
-    val searchResults = StatefulLiveData<List<CommunityView>>()
-    val communityName = MutableLiveData<String>()
+  val searchResults = StatefulLiveData<List<CommunityView>>()
+  val communityName = MutableLiveData<String>()
 
-    private var searchJob: Job? = null
+  private var searchJob: Job? = null
 
-    fun doQuery(query: String) {
-        searchResults.setIsLoading()
+  fun doQuery(query: String) {
+    searchResults.setIsLoading()
 
-        if (query.isBlank()) {
-            searchResults.setValue(listOf())
-            return
+    if (query.isBlank()) {
+      searchResults.setValue(listOf())
+      return
+    }
+
+    searchJob?.cancel()
+    searchJob = viewModelScope.launch {
+      apiClient
+        .searchWithRetry(
+          sortType = SortType.TopAll,
+          listingType = ListingType.All,
+          searchType = SearchType.Communities,
+          query = query,
+          limit = 20,
+        )
+        .onSuccess {
+          searchResults.setValue(it.communities)
         }
-
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            apiClient
-                .searchWithRetry(
-                    sortType = SortType.TopAll,
-                    listingType = ListingType.All,
-                    searchType = SearchType.Communities,
-                    query = query,
-                    limit = 20,
-                )
-                .onSuccess {
-                    searchResults.setValue(it.communities)
-                }
-                .onFailure {
-                    searchResults.setError(it)
-                }
+        .onFailure {
+          searchResults.setError(it)
         }
     }
+  }
 }

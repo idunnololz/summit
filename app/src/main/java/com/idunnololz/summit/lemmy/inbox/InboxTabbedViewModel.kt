@@ -25,73 +25,73 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class InboxTabbedViewModel @Inject constructor(
-    private val context: Application,
-    private val accountManager: AccountManager,
-    private val accountInfoManager: AccountInfoManager,
-    private val notificationsManager: NotificationsManager,
+  private val context: Application,
+  private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
+  private val notificationsManager: NotificationsManager,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
-    class InboxItemWithInstance(
-        val inboxItem: InboxItem,
-        val instance: String,
-        val accountId: Long,
+  class InboxItemWithInstance(
+    val inboxItem: InboxItem,
+    val instance: String,
+    val accountId: Long,
+  )
+
+  var pageItems = MutableLiveData<List<PageItem>>()
+
+  val notificationInboxItem = MutableLiveData<InboxItemWithInstance>()
+
+  override var lastSelectedItem: Either<PostRef, CommentRef>? = null
+
+  init {
+    addFrag(
+      InboxFragment::class.java,
+      PageType.All.getName(context),
+      InboxFragmentArgs(PageType.All).toBundle(),
     )
+  }
 
-    var pageItems = MutableLiveData<List<PageItem>>()
+  fun updateUnreadCount() {
+    accountInfoManager.updateUnreadCount()
+  }
 
-    val notificationInboxItem = MutableLiveData<InboxItemWithInstance>()
+  fun removeAllButFirst() {
+    pageItems.value = pageItems.value?.take(1) ?: listOf()
+  }
 
-    override var lastSelectedItem: Either<PostRef, CommentRef>? = null
+  private fun addFrag(
+    clazz: Class<*>,
+    title: String,
+    args: Bundle? = null,
+    @DrawableRes drawableRes: Int? = null,
+  ) {
+    val currentItems = pageItems.value ?: listOf()
+    pageItems.value =
+      currentItems + PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes)
+  }
 
-    init {
-        addFrag(
-            InboxFragment::class.java,
-            PageType.All.getName(context),
-            InboxFragmentArgs(PageType.All).toBundle(),
-        )
-    }
+  fun findInboxItemFromNotificationId(notificationId: Int) {
+    viewModelScope.launch {
+      val inboxEntry = notificationsManager.findInboxItem(notificationId)
+      val inboxItem = inboxEntry?.inboxItem
 
-    fun updateUnreadCount() {
-        accountInfoManager.updateUnreadCount()
-    }
-
-    fun removeAllButFirst() {
-        pageItems.value = pageItems.value?.take(1) ?: listOf()
-    }
-
-    private fun addFrag(
-        clazz: Class<*>,
-        title: String,
-        args: Bundle? = null,
-        @DrawableRes drawableRes: Int? = null,
-    ) {
-        val currentItems = pageItems.value ?: listOf()
-        pageItems.value =
-            currentItems + PageItem(View.generateViewId().toLong(), clazz, args, title, drawableRes)
-    }
-
-    fun findInboxItemFromNotificationId(notificationId: Int) {
-        viewModelScope.launch {
-            val inboxEntry = notificationsManager.findInboxItem(notificationId)
-            val inboxItem = inboxEntry?.inboxItem
-
-            if (inboxEntry != null && inboxItem != null) {
-                val inboxItemAccount = accountManager.getAccounts().firstOrNull {
-                    it.fullName == inboxEntry.accountFullName
-                }
-
-                if (inboxItemAccount != null) {
-                    accountManager.setCurrentAccount(inboxItemAccount)
-
-                    notificationInboxItem.postValue(
-                        InboxItemWithInstance(
-                            inboxItem,
-                            inboxItemAccount.instance,
-                            inboxItemAccount.id,
-                        ),
-                    )
-                }
-            }
+      if (inboxEntry != null && inboxItem != null) {
+        val inboxItemAccount = accountManager.getAccounts().firstOrNull {
+          it.fullName == inboxEntry.accountFullName
         }
+
+        if (inboxItemAccount != null) {
+          accountManager.setCurrentAccount(inboxItemAccount)
+
+          notificationInboxItem.postValue(
+            InboxItemWithInstance(
+              inboxItem,
+              inboxItemAccount.instance,
+              inboxItemAccount.id,
+            ),
+          )
+        }
+      }
     }
+  }
 }

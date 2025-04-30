@@ -7,17 +7,17 @@ import androidx.work.WorkerParameters
 import com.idunnololz.summit.MainApplication
 
 class NotificationsWorker(context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+  Worker(context, workerParams) {
 
-    companion object {
-        private const val TAG = "NotificationsWorker"
-    }
+  companion object {
+    private const val TAG = "NotificationsWorker"
+  }
 
-    override fun doWork(): Result {
-        Log.d(TAG, "doWork()")
+  override fun doWork(): Result {
+    Log.d(TAG, "doWork()")
 
-        (applicationContext as? MainApplication)?.runNotificationsUpdate()
+    (applicationContext as? MainApplication)?.runNotificationsUpdate()
 
-        return Result.success()
-    }
+    return Result.success()
+  }
 }

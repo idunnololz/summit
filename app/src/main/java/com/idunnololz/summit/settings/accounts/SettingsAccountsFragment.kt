@@ -28,85 +28,85 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsAccountsFragment : BaseFragment<FragmentSettingsAccountsBinding>() {
 
-    private val viewModel: SettingsAccountsViewModel by viewModels()
+  private val viewModel: SettingsAccountsViewModel by viewModels()
 
-    @Inject
-    lateinit var guestAccountManager: GuestAccountManager
+  @Inject
+  lateinit var guestAccountManager: GuestAccountManager
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsAccountsBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsAccountsBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setupToolbar(binding.toolbar, context.getString(R.string.choose_an_account))
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setupToolbar(binding.toolbar, context.getString(R.string.choose_an_account))
+    val adapter = AccountAdapter(
+      context = context,
+      isSimple = true,
+      showGuestAccount = false,
+      guestAccountManager = guestAccountManager,
+      signOut = {},
+      onAccountClick = {
+        if (it is Account) {
+          onAccountClick(it.id)
         }
+      },
+      onAddAccountClick = {},
+      onSettingClick = {},
+      onPersonClick = {
+        onAccountClick(it.account.id)
+      },
+    )
 
-        val adapter = AccountAdapter(
-            context = context,
-            isSimple = true,
-            showGuestAccount = false,
-            guestAccountManager = guestAccountManager,
-            signOut = {},
-            onAccountClick = {
-                if (it is Account) {
-                    onAccountClick(it.id)
-                }
-            },
-            onAddAccountClick = {},
-            onSettingClick = {},
-            onPersonClick = {
-                onAccountClick(it.account.id)
-            },
-        )
-
-        with(binding) {
-            viewModel.accounts.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                    is StatefulData.Loading -> {
-                        loadingView.showProgressBar()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        loadingView.hideAll()
-                        adapter.setAccounts(it.data) {}
-                    }
-                }
-            }
-
-            recyclerView.setup(animationsHelper)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.setHasFixedSize(true)
-            recyclerView.adapter = adapter
+    with(binding) {
+      viewModel.accounts.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            loadingView.hideAll()
+            adapter.setAccounts(it.data) {}
+          }
         }
-    }
+      }
 
-    private fun onAccountClick(accountId: PersonId) {
-        val direction = SettingsAccountsFragmentDirections
-            .actionSettingAccountsFragmentToSettingPerAccountFragment(
-                accountId,
-            )
-        findNavController().navigateSafe(direction)
+      recyclerView.setup(animationsHelper)
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setHasFixedSize(true)
+      recyclerView.adapter = adapter
     }
+  }
+
+  private fun onAccountClick(accountId: PersonId) {
+    val direction = SettingsAccountsFragmentDirections
+      .actionSettingAccountsFragmentToSettingPerAccountFragment(
+        accountId,
+      )
+    findNavController().navigateSafe(direction)
+  }
 }

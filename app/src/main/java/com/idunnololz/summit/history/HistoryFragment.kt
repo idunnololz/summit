@@ -48,385 +48,384 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HistoryFragment :
-    BaseFragment<FragmentHistoryBinding>(),
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentHistoryBinding>(),
+  OldAlertDialogFragment.AlertDialogFragmentListener {
 
-    companion object {
-        private const val TAG = "HistoryFragment"
+  companion object {
+    private const val TAG = "HistoryFragment"
+  }
+
+  private val viewModel: HistoryViewModel by viewModels()
+
+  private lateinit var adapter: HistoryEntryAdapter
+
+  @Inject
+  lateinit var historyManager: HistoryManager
+
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
+
+  @Inject
+  lateinit var preferences: Preferences
+
+  private var slidingPaneController: SlidingPaneController? = null
+
+  private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
+    override fun onHistoryChanged() {
+      lifecycleScope.launch(Dispatchers.Main) {
+        viewModel.loadHistory(force = true)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    requireSummitActivity().apply {
+      setupForFragment<HistoryFragment>()
     }
 
-    private val viewModel: HistoryViewModel by viewModels()
+    setBinding(FragmentHistoryBinding.inflate(inflater, container, false))
 
-    private lateinit var adapter: HistoryEntryAdapter
+    return binding.root
+  }
 
-    @Inject
-    lateinit var historyManager: HistoryManager
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    Log.d(TAG, "onViewCreated()")
+    super.onViewCreated(view, savedInstanceState)
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+    val context = requireContext()
 
-    @Inject
-    lateinit var preferences: Preferences
-
-    private var slidingPaneController: SlidingPaneController? = null
-
-    private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
-        override fun onHistoryChanged() {
-            lifecycleScope.launch(Dispatchers.Main) {
-                viewModel.loadHistory(force = true)
+    adapter = HistoryEntryAdapter(
+      removeEntry = {
+        viewModel.removeEntry(it)
+      },
+      onEntryClick = {
+        val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance, mustHandle = true)
+        if (pageRef == null) {
+          OldAlertDialogFragment.Builder()
+            .setMessage(R.string.error_history_entry_corrupt)
+            .createAndShow(this@HistoryFragment, "asdf")
+        } else {
+          when (pageRef) {
+            is CommentRef -> {
+              slidingPaneController?.openComment(
+                instance = pageRef.instance,
+                commentId = pageRef.id,
+              )
             }
+            is PostRef -> {
+              slidingPaneController?.openPost(
+                instance = pageRef.instance,
+                id = pageRef.id,
+                currentCommunity = null,
+                accountId = null,
+              )
+            }
+            is PersonRef.PersonRefByName,
+            is PersonRef.PersonRefById,
+            is CommunityRef.All,
+            is CommunityRef.AllSubscribed,
+            is CommunityRef.CommunityRefByName,
+            is CommunityRef.Local,
+            is CommunityRef.ModeratedCommunities,
+            is CommunityRef.MultiCommunity,
+            is CommunityRef.Subscribed,
+            -> {
+              requireSummitActivity().launchPage(pageRef, preferMainFragment = false)
+            }
+          }
         }
+      },
+    )
+
+    historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
+
+    viewModel.loadHistory()
+    viewModel.historyData.observe(viewLifecycleOwner) {
+      when (it) {
+        is StatefulData.Error -> {
+          binding.loadingView.showDefaultErrorMessageFor(it.error)
+        }
+
+        is StatefulData.Loading -> {
+          binding.loadingView.showProgressBar()
+        }
+
+        is StatefulData.NotStarted -> {}
+        is StatefulData.Success -> {
+          binding.loadingView.hideAll()
+          binding.swipeRefreshLayout.isRefreshing = false
+
+          adapter.setItems(it.data)
+        }
+      }
+    }
+    viewModel.historyQueryData.observe(viewLifecycleOwner) {
+      when (it) {
+        is StatefulData.Error -> {}
+        is StatefulData.Loading -> {}
+        is StatefulData.NotStarted -> {}
+        is StatefulData.Success -> {
+          adapter.queryResults = it.data
+        }
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    with(binding) {
+      requireSummitActivity().apply {
+        insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+        insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+        insetViewStartAndEndByPadding(viewLifecycleOwner, binding.fastScroller)
 
-        requireSummitActivity().apply {
-            setupForFragment<HistoryFragment>()
+        if (navBarController.useNavigationRail) {
+          navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
         }
 
-        setBinding(FragmentHistoryBinding.inflate(inflater, container, false))
+        setupToolbar(toolbar, getString(R.string.history))
+        toolbar.addMenuProvider(
+          object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+              menuInflater.inflate(R.menu.menu_fragment_history, menu)
 
-        return binding.root
-    }
+              val searchView: SearchView = menu.findItem(
+                R.id.search,
+              ).actionView as SearchView
+              searchView.setOnQueryTextListener(
+                object : SearchView.OnQueryTextListener {
+                  override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(TAG, "onViewCreated()")
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        adapter = HistoryEntryAdapter(
-            removeEntry = {
-                viewModel.removeEntry(it)
-            },
-            onEntryClick = {
-                val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance, mustHandle = true)
-                if (pageRef == null) {
-                    OldAlertDialogFragment.Builder()
-                        .setMessage(R.string.error_history_entry_corrupt)
-                        .createAndShow(this@HistoryFragment, "asdf")
-                } else {
-                    when (pageRef) {
-                        is CommentRef -> {
-                            slidingPaneController?.openComment(
-                                instance = pageRef.instance,
-                                commentId = pageRef.id,
-                            )
-                        }
-                        is PostRef -> {
-                            slidingPaneController?.openPost(
-                                instance = pageRef.instance,
-                                id = pageRef.id,
-                                currentCommunity = null,
-                                accountId = null,
-                            )
-                        }
-                        is PersonRef.PersonRefByName,
-                        is PersonRef.PersonRefById,
-                        is CommunityRef.All,
-                        is CommunityRef.AllSubscribed,
-                        is CommunityRef.CommunityRefByName,
-                        is CommunityRef.Local,
-                        is CommunityRef.ModeratedCommunities,
-                        is CommunityRef.MultiCommunity,
-                        is CommunityRef.Subscribed,
-                        -> {
-                            requireSummitActivity().launchPage(pageRef, preferMainFragment = false)
-                        }
+                  override fun onQueryTextChange(newText: String?): Boolean {
+                    if (newText != null) {
+                      adapter.setQuery(newText)
+                      viewModel.query(newText)
                     }
-                }
-            },
+
+                    return true
+                  }
+                },
+              )
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+              R.id.search -> {
+                true
+              }
+              R.id.clear_history -> {
+                viewModel.clearHistory()
+                true
+              }
+              else ->
+                false
+            }
+          },
         )
+      }
 
-        historyManager.registerOnHistoryChangedListener(onHistoryChangedListener)
+      recyclerView.setHasFixedSize(true)
+      recyclerView.adapter = adapter
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setup(animationsHelper)
 
-        viewModel.loadHistory()
-        viewModel.historyData.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    binding.loadingView.showDefaultErrorMessageFor(it.error)
-                }
+      fastScroller.setRecyclerView(recyclerView)
 
-                is StatefulData.Loading -> {
-                    binding.loadingView.showProgressBar()
-                }
+      swipeRefreshLayout.setOnRefreshListener {
+        viewModel.loadHistory(force = true)
+      }
 
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    binding.loadingView.hideAll()
-                    binding.swipeRefreshLayout.isRefreshing = false
+      slidingPaneController = SlidingPaneController(
+        fragment = this@HistoryFragment,
+        slidingPaneLayout = slidingPaneLayout,
+        childFragmentManager = childFragmentManager,
+        viewModel = viewModel,
+        globalLayoutMode = preferences.globalLayoutMode,
+        lockPanes = true,
+        retainClosedPosts = preferences.retainLastPost,
+        emptyScreenText = getString(R.string.select_a_post_or_comment),
+        fragmentContainerId = R.id.post_fragment_container,
+      ).apply {
+        onPageSelectedListener = a@{ isOpen ->
+          if (!isBindingAvailable()) {
+            return@a
+          }
 
-                    adapter.setItems(it.data)
-                }
-            }
-        }
-        viewModel.historyQueryData.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {}
-                is StatefulData.Loading -> {}
-                is StatefulData.NotStarted -> {}
-                is StatefulData.Success -> {
-                    adapter.queryResults = it.data
-                }
-            }
-        }
-
-        with(binding) {
-            requireSummitActivity().apply {
-                insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
-                insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-                insetViewStartAndEndByPadding(viewLifecycleOwner, binding.fastScroller)
-
-                if (navBarController.useNavigationRail) {
-                    navBarController.updatePaddingForNavBar(binding.coordinatorLayout)
-                }
-
-                setupToolbar(toolbar, getString(R.string.history))
-                toolbar.addMenuProvider(
-                    object : MenuProvider {
-                        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                            menuInflater.inflate(R.menu.menu_fragment_history, menu)
-
-                            val searchView: SearchView = menu.findItem(
-                                R.id.search,
-                            ).actionView as SearchView
-                            searchView.setOnQueryTextListener(
-                                object : SearchView.OnQueryTextListener {
-                                    override fun onQueryTextSubmit(query: String?): Boolean {
-                                        return true
-                                    }
-
-                                    override fun onQueryTextChange(newText: String?): Boolean {
-                                        if (newText != null) {
-                                            adapter.setQuery(newText)
-                                            viewModel.query(newText)
-                                        }
-
-                                        return true
-                                    }
-                                },
-                            )
-                        }
-
-                        override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-                            when (menuItem.itemId) {
-                                R.id.search -> {
-                                    true
-                                }
-                                R.id.clear_history -> {
-                                    viewModel.clearHistory()
-                                    true
-                                }
-                                else ->
-                                    false
-                            }
-                    },
-                )
-            }
-
-            recyclerView.setHasFixedSize(true)
-            recyclerView.adapter = adapter
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.setup(animationsHelper)
-
-            fastScroller.setRecyclerView(recyclerView)
-
-            swipeRefreshLayout.setOnRefreshListener {
-                viewModel.loadHistory(force = true)
-            }
-
-            slidingPaneController = SlidingPaneController(
-                fragment = this@HistoryFragment,
-                slidingPaneLayout = slidingPaneLayout,
-                childFragmentManager = childFragmentManager,
-                viewModel = viewModel,
-                globalLayoutMode = preferences.globalLayoutMode,
-                lockPanes = true,
-                retainClosedPosts = preferences.retainLastPost,
-                emptyScreenText = getString(R.string.select_a_post_or_comment),
-                fragmentContainerId = R.id.post_fragment_container,
-            ).apply {
-                onPageSelectedListener = a@{ isOpen ->
-                    if (!isBindingAvailable()) {
-                        return@a
-                    }
-
-                    if (!isOpen) {
-                        val lastSelectedPost = viewModel.lastSelectedItem
-                        if (lastSelectedPost != null) {
-                            // We came from a post...
+          if (!isOpen) {
+            val lastSelectedPost = viewModel.lastSelectedItem
+            if (lastSelectedPost != null) {
+              // We came from a post...
 //                        adapter?.highlightPost(lastSelectedPost)
-                            viewModel.lastSelectedItem = null
-                        }
-                    } else {
-                        val lastSelectedPost = viewModel.lastSelectedItem
-                        if (lastSelectedPost != null) {
+              viewModel.lastSelectedItem = null
+            }
+          } else {
+            val lastSelectedPost = viewModel.lastSelectedItem
+            if (lastSelectedPost != null) {
 //                        adapter?.highlightPostForever(lastSelectedPost)
-                        }
-                    }
-                }
-                init()
             }
+          }
         }
+        init()
+      }
+    }
+  }
+
+  override fun onDestroyView() {
+    historyManager.unregisterOnHistoryChangedListener(onHistoryChangedListener)
+    super.onDestroyView()
+  }
+
+  fun closePost(postFragment: PostFragment) {
+    slidingPaneController?.closePost(postFragment)
+  }
+
+  private class HistoryEntryAdapter(
+    private val removeEntry: (Long) -> Unit,
+    private val onEntryClick: (LiteHistoryEntry) -> Unit,
+  ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private sealed interface Item {
+      val headerId: Int
+
+      data class HistoryItem(
+        val sharableUrl: String,
+        val data: LiteHistoryEntry,
+        override val headerId: Int,
+      ) : Item
+
+      data class HeaderItem(
+        override val headerId: Int,
+        val date: Date,
+      ) : Item
     }
 
-    override fun onDestroyView() {
-        historyManager.unregisterOnHistoryChangedListener(onHistoryChangedListener)
-        super.onDestroyView()
-    }
+    private var data: HistoryViewModel.HistoryEntryData? = null
 
-    fun closePost(postFragment: PostFragment) {
-        slidingPaneController?.closePost(postFragment)
-    }
+    private var query: String = ""
 
-    private class HistoryEntryAdapter(
-        private val removeEntry: (Long) -> Unit,
-        private val onEntryClick: (LiteHistoryEntry) -> Unit,
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val dateFormatter = SimpleDateFormat.getDateInstance()
 
-        private sealed interface Item {
-            val headerId: Int
+    var queryResults: HistoryViewModel.HistoryQueryResult? = null
+      set(value) {
+        field = value
 
-            data class HistoryItem(
-                val sharableUrl: String,
-                val data: LiteHistoryEntry,
-                override val headerId: Int,
-            ) : Item
+        refreshItems()
+      }
 
-            data class HeaderItem(
-                override val headerId: Int,
-                val date: Date,
-            ) : Item
+    private val adapterHelper = AdapterHelper<Item>(
+      areItemsTheSame = { old, new ->
+        if (old::class != new::class) {
+          return@AdapterHelper false
         }
 
-        private var data: HistoryViewModel.HistoryEntryData? = null
+        when (old) {
+          is Item.HistoryItem -> {
+            old.data.id == (new as Item.HistoryItem).data.id
+          }
+          is Item.HeaderItem -> {
+            old.date == (new as Item.HeaderItem).date
+          }
+        }
+      },
+    ).apply {
+      addItemType(Item.HeaderItem::class, HistoryHeaderItemBinding::inflate) { item, b, _ ->
+        b.title.text = dateFormatter.format(item.date)
+      }
+      addItemType(Item.HistoryItem::class, HistoryEntryItemBinding::inflate) { item, b, h ->
+        b.title.text = item.data.shortDesc
+        b.body.text = item.sharableUrl
 
-        private var query: String = ""
-
-        private val dateFormatter = SimpleDateFormat.getDateInstance()
-
-        var queryResults: HistoryViewModel.HistoryQueryResult? = null
-            set(value) {
-                field = value
-
-                refreshItems()
-            }
-
-        private val adapterHelper = AdapterHelper<Item>(
-            areItemsTheSame = { old, new ->
-                if (old::class != new::class) {
-                    return@AdapterHelper false
-                }
-
-                when (old) {
-                    is Item.HistoryItem -> {
-                        old.data.id == (new as Item.HistoryItem).data.id
-                    }
-                    is Item.HeaderItem -> {
-                        old.date == (new as Item.HeaderItem).date
-                    }
-                }
-            },
-        ).apply {
-            addItemType(Item.HeaderItem::class, HistoryHeaderItemBinding::inflate) { item, b, _ ->
-                b.title.text = dateFormatter.format(item.date)
-            }
-            addItemType(Item.HistoryItem::class, HistoryEntryItemBinding::inflate) { item, b, h ->
-                b.title.text = item.data.shortDesc
-                b.body.text = item.sharableUrl
-
-                b.removeButton.setOnClickListener {
-                    removeEntry(item.data.id)
-                }
-
-                h.itemView.setOnClickListener {
-                    onEntryClick(item.data)
-                }
-            }
+        b.removeButton.setOnClickListener {
+          removeEntry(item.data.id)
         }
 
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        fun setItems(newData: HistoryViewModel.HistoryEntryData) {
-            data = newData
-
-            refreshItems()
+        h.itemView.setOnClickListener {
+          onEntryClick(item.data)
         }
-
-        fun setQuery(newText: String) {
-            query = newText
-
-            refreshItems()
-        }
-
-        private fun refreshItems() {
-            val data = data ?: return
-            val newItems = mutableListOf<Item>()
-            val lastDate: Calendar = Calendar.getInstance()
-            val query = query
-            val queryResults = queryResults
-
-            lastDate.timeInMillis = 0
-            var headerId = 0
-
-            val calendar = Calendar.getInstance()
-
-            fun add(it: LiteHistoryEntry) {
-                calendar.timeInMillis = it.ts
-                if (calendar.get(Calendar.YEAR) != lastDate.get(Calendar.YEAR) ||
-                    calendar.get(Calendar.DAY_OF_YEAR) != lastDate.get(Calendar.DAY_OF_YEAR)
-                ) {
-                    lastDate.set(Calendar.YEAR, calendar.get(Calendar.YEAR))
-                    lastDate.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR))
-
-                    val headerItem = Item.HeaderItem(++headerId, lastDate.time)
-
-                    newItems.add(headerItem)
-                }
-                newItems.add(
-                    Item.HistoryItem(
-                        sharableUrl = LemmyUtils.cleanUrl(
-                            it.url,
-                            desiredFormat = "",
-                        ),
-                        data = it,
-                        headerId = headerId,
-                    ),
-                )
-            }
-
-            if (query.isNotBlank()) {
-                if (query == queryResults?.query) {
-                    queryResults.sortedEntries.forEach {
-                        add(it)
-                    }
-                }
-            } else {
-                data.sortedEntries.forEach {
-                    add(it)
-                }
-            }
-
-            adapterHelper.setItems(newItems, this)
-        }
+      }
     }
 
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    fun setItems(newData: HistoryViewModel.HistoryEntryData) {
+      data = newData
+
+      refreshItems()
     }
 
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+    fun setQuery(newText: String) {
+      query = newText
+
+      refreshItems()
     }
+
+    private fun refreshItems() {
+      val data = data ?: return
+      val newItems = mutableListOf<Item>()
+      val lastDate: Calendar = Calendar.getInstance()
+      val query = query
+      val queryResults = queryResults
+
+      lastDate.timeInMillis = 0
+      var headerId = 0
+
+      val calendar = Calendar.getInstance()
+
+      fun add(it: LiteHistoryEntry) {
+        calendar.timeInMillis = it.ts
+        if (calendar.get(Calendar.YEAR) != lastDate.get(Calendar.YEAR) ||
+          calendar.get(Calendar.DAY_OF_YEAR) != lastDate.get(Calendar.DAY_OF_YEAR)
+        ) {
+          lastDate.set(Calendar.YEAR, calendar.get(Calendar.YEAR))
+          lastDate.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR))
+
+          val headerItem = Item.HeaderItem(++headerId, lastDate.time)
+
+          newItems.add(headerItem)
+        }
+        newItems.add(
+          Item.HistoryItem(
+            sharableUrl = LemmyUtils.cleanUrl(
+              it.url,
+              desiredFormat = "",
+            ),
+            data = it,
+            headerId = headerId,
+          ),
+        )
+      }
+
+      if (query.isNotBlank()) {
+        if (query == queryResults?.query) {
+          queryResults.sortedEntries.forEach {
+            add(it)
+          }
+        }
+      } else {
+        data.sortedEntries.forEach {
+          add(it)
+        }
+      }
+
+      adapterHelper.setItems(newItems, this)
+    }
+  }
+
+  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+  }
+
+  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+  }
 }

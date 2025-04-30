@@ -19,87 +19,87 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsPerCommunityViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val preferences: Preferences,
-    private val perCommunityPreferences: PerCommunityPreferences,
+  @ApplicationContext private val context: Context,
+  private val preferences: Preferences,
+  private val perCommunityPreferences: PerCommunityPreferences,
 ) : ViewModel() {
 
-    private val communityConfigs = MutableStateFlow<List<PerCommunityPreferences.CommunityConfig>>(
-        listOf(),
-    )
+  private val communityConfigs = MutableStateFlow<List<PerCommunityPreferences.CommunityConfig>>(
+    listOf(),
+  )
 
-    val data = StatefulLiveData<SettingData>()
+  val data = StatefulLiveData<SettingData>()
 
-    fun loadData(settings: PerCommunitySettings) {
-        data.setIsLoading()
+  fun loadData(settings: PerCommunitySettings) {
+    data.setIsLoading()
 
-        viewModelScope.launch {
-            val allCommunityConfigs = perCommunityPreferences.getAllCommunityConfigs()
+    viewModelScope.launch {
+      val allCommunityConfigs = perCommunityPreferences.getAllCommunityConfigs()
 
-            if (communityConfigs.value == allCommunityConfigs) {
-                updateSettingItems(settings)
-            } else {
-                communityConfigs.value = allCommunityConfigs
-                updateSettingItems(settings)
-            }
-        }
+      if (communityConfigs.value == allCommunityConfigs) {
+        updateSettingItems(settings)
+      } else {
+        communityConfigs.value = allCommunityConfigs
+        updateSettingItems(settings)
+      }
     }
+  }
 
-    private fun updateSettingItems(settings: PerCommunitySettings) {
-        val communityConfigs: List<PerCommunityPreferences.CommunityConfig> = communityConfigs.value
-        data.setIsLoading()
+  private fun updateSettingItems(settings: PerCommunitySettings) {
+    val communityConfigs: List<PerCommunityPreferences.CommunityConfig> = communityConfigs.value
+    data.setIsLoading()
 
-        val allSettings = mutableListOf<SettingItem>()
-        allSettings.addAll(makeBaseSettings(settings))
+    val allSettings = mutableListOf<SettingItem>()
+    allSettings.addAll(makeBaseSettings(settings))
 
-        if (communityConfigs.isNotEmpty()) {
-            allSettings.add(
-                SubgroupItem(
-                    context.getString(R.string.per_community_overrides),
-                    listOf(),
-                ),
-            )
-            communityConfigs.mapTo(allSettings) {
-                BasicSettingItem(
-                    null,
-                    it.communityRef.getLocalizedFullName(context),
-                    context.getString(R.string.view_type_format, it.layout),
-                )
-            }
-        }
-
-        data.postValue(
-            SettingData(
-                allSettings,
-                getSettingValues(settings),
-            ),
+    if (communityConfigs.isNotEmpty()) {
+      allSettings.add(
+        SubgroupItem(
+          context.getString(R.string.per_community_overrides),
+          listOf(),
+        ),
+      )
+      communityConfigs.mapTo(allSettings) {
+        BasicSettingItem(
+          null,
+          it.communityRef.getLocalizedFullName(context),
+          context.getString(R.string.view_type_format, it.layout),
         )
+      }
     }
 
-    private fun makeBaseSettings(settings: PerCommunitySettings) = listOf(
-        settings.usePerCommunitySettings,
-        settings.clearPerCommunitySettings,
+    data.postValue(
+      SettingData(
+        allSettings,
+        getSettingValues(settings),
+      ),
     )
+  }
 
-    fun onSettingClick(settings: PerCommunitySettings, settingClicked: SettingItem) {
-        when (settingClicked.id) {
-            settings.usePerCommunitySettings.id -> {
-                preferences.usePerCommunitySettings = !preferences.usePerCommunitySettings
-                updateSettingItems(settings)
-            }
-            settings.clearPerCommunitySettings.id -> {
-                perCommunityPreferences.clear()
-                loadData(settings)
-            }
-        }
+  private fun makeBaseSettings(settings: PerCommunitySettings) = listOf(
+    settings.usePerCommunitySettings,
+    settings.clearPerCommunitySettings,
+  )
+
+  fun onSettingClick(settings: PerCommunitySettings, settingClicked: SettingItem) {
+    when (settingClicked.id) {
+      settings.usePerCommunitySettings.id -> {
+        preferences.usePerCommunitySettings = !preferences.usePerCommunitySettings
+        updateSettingItems(settings)
+      }
+      settings.clearPerCommunitySettings.id -> {
+        perCommunityPreferences.clear()
+        loadData(settings)
+      }
     }
+  }
 
-    private fun getSettingValues(settings: PerCommunitySettings) = mapOf(
-        settings.usePerCommunitySettings.id to preferences.usePerCommunitySettings,
-    )
+  private fun getSettingValues(settings: PerCommunitySettings) = mapOf(
+    settings.usePerCommunitySettings.id to preferences.usePerCommunitySettings,
+  )
 
-    data class SettingData(
-        val settingItems: List<SettingItem>,
-        val settingValues: Map<Int, Any?>,
-    )
+  data class SettingData(
+    val settingItems: List<SettingItem>,
+    val settingValues: Map<Int, Any?>,
+  )
 }

@@ -15,23 +15,23 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MainFragmentViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
-    private val userCommunitiesManager: UserCommunitiesManager,
+  private val savedStateHandle: SavedStateHandle,
+  private val userCommunitiesManager: UserCommunitiesManager,
 ) : ViewModel() {
 
-    val userCommunitiesChangedEvents = MutableLiveData<Event<Unit>>()
-    val userCommunitiesUpdated = MutableLiveData<Event<UserCommunityItem>>()
+  val userCommunitiesChangedEvents = MutableLiveData<Event<Unit>>()
+  val userCommunitiesUpdated = MutableLiveData<Event<UserCommunityItem>>()
 
-    init {
-        viewModelScope.launch(Dispatchers.Default) {
-            userCommunitiesManager.userCommunitiesChangedFlow.collect {
-                userCommunitiesChangedEvents.postValue(Event(Unit))
-            }
-        }
-        viewModelScope.launch(Dispatchers.Default) {
-            userCommunitiesManager.userCommunitiesUpdatedFlow.collect {
-                userCommunitiesUpdated.postValue(Event(it))
-            }
-        }
+  init {
+    viewModelScope.launch(Dispatchers.Default) {
+      userCommunitiesManager.userCommunitiesChangedFlow.collect {
+        userCommunitiesChangedEvents.postValue(Event(Unit))
+      }
     }
+    viewModelScope.launch(Dispatchers.Default) {
+      userCommunitiesManager.userCommunitiesUpdatedFlow.collect {
+        userCommunitiesUpdated.postValue(Event(it))
+      }
+    }
+  }
 }

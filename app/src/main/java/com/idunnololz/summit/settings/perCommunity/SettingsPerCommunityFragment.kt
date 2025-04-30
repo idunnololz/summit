@@ -24,73 +24,73 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsPerCommunityFragment : BaseFragment<FragmentSettingsPerCommunityBinding>() {
 
-    private val viewModel: SettingsPerCommunityViewModel by viewModels()
+  private val viewModel: SettingsPerCommunityViewModel by viewModels()
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
 
-    @Inject
-    lateinit var settings: PerCommunitySettings
+  @Inject
+  lateinit var settings: PerCommunitySettings
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsPerCommunityBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsPerCommunityBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = context.getString(R.string.per_community_settings)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    with(binding) {
+      val adapter = SettingItemsAdapter(
+        context = context,
+        onSettingClick = {
+          viewModel.onSettingClick(settings, it)
+          true
+        },
+        fragmentManager = childFragmentManager,
+      )
 
-        val context = requireContext()
+      viewModel.data.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
+          is StatefulData.Loading -> loadingView.showProgressBar()
+          is StatefulData.NotStarted -> loadingView.hideAll()
+          is StatefulData.Success -> {
+            loadingView.hideAll()
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.per_community_settings)
+            adapter.setData(it.data.settingItems)
+            adapter.defaultSettingValues = it.data.settingValues
+          }
         }
+      }
 
-        with(binding) {
-            val adapter = SettingItemsAdapter(
-                context = context,
-                onSettingClick = {
-                    viewModel.onSettingClick(settings, it)
-                    true
-                },
-                fragmentManager = childFragmentManager,
-            )
-
-            viewModel.data.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
-                    is StatefulData.Loading -> loadingView.showProgressBar()
-                    is StatefulData.NotStarted -> loadingView.hideAll()
-                    is StatefulData.Success -> {
-                        loadingView.hideAll()
-
-                        adapter.setData(it.data.settingItems)
-                        adapter.defaultSettingValues = it.data.settingValues
-                    }
-                }
-            }
-
-            recyclerView.setup(animationsHelper)
-            recyclerView.adapter = adapter
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-        }
-
-        viewModel.loadData(settings)
+      recyclerView.setup(animationsHelper)
+      recyclerView.adapter = adapter
+      recyclerView.setHasFixedSize(true)
+      recyclerView.layoutManager = LinearLayoutManager(context)
     }
+
+    viewModel.loadData(settings)
+  }
 }

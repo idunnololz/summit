@@ -26,90 +26,90 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsDefaultAppsFragment :
-    BaseFragment<FragmentSettingsDefaultAppsBinding>() {
+  BaseFragment<FragmentSettingsDefaultAppsBinding>() {
 
-    @Inject
-    lateinit var settings: DefaultAppsSettings
+  @Inject
+  lateinit var settings: DefaultAppsSettings
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        setBinding(
-            FragmentSettingsDefaultAppsBinding.inflate(inflater, container, false),
-        )
-        return binding.root
-    }
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+    setBinding(
+      FragmentSettingsDefaultAppsBinding.inflate(inflater, container, false),
+    )
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
+    val context = requireContext()
 
-        childFragmentManager.setFragmentResultListener(
-            ChooseDefaultAppBottomSheetFragment.REQUEST_KEY,
-            viewLifecycleOwner,
-        ) { _, result ->
-            val result = result.getParcelableCompat<ChooseDefaultAppBottomSheetFragment.Result>(
-                ChooseDefaultAppBottomSheetFragment.RESULT_KEY,
-            )
+    childFragmentManager.setFragmentResultListener(
+      ChooseDefaultAppBottomSheetFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, result ->
+      val result = result.getParcelableCompat<ChooseDefaultAppBottomSheetFragment.Result>(
+        ChooseDefaultAppBottomSheetFragment.RESULT_KEY,
+      )
 
-            if (result != null) {
-                if (result.selectedApp != null) {
-                    preferences.defaultWebApp = DefaultAppPreference(
-                        appName = result.selectedApp.name,
-                        packageName = result.selectedApp.packageName,
-                        componentName = result.componentName,
-                    )
-                    Utils.defaultWebApp = preferences.defaultWebApp
-                    updateRendering()
-                } else if (result.clear) {
-                    preferences.defaultWebApp = null
-                    Utils.defaultWebApp = null
-                    updateRendering()
-                }
-            }
+      if (result != null) {
+        if (result.selectedApp != null) {
+          preferences.defaultWebApp = DefaultAppPreference(
+            appName = result.selectedApp.name,
+            packageName = result.selectedApp.packageName,
+            componentName = result.componentName,
+          )
+          Utils.defaultWebApp = preferences.defaultWebApp
+          updateRendering()
+        } else if (result.clear) {
+          preferences.defaultWebApp = null
+          Utils.defaultWebApp = null
+          updateRendering()
         }
+      }
+    }
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-            setupToolbar(binding.toolbar, settings.getPageName(context))
+      setupToolbar(binding.toolbar, settings.getPageName(context))
+    }
+
+    updateRendering()
+  }
+
+  private fun updateRendering() {
+    val context = requireContext()
+    val pm = context.packageManager
+
+    settings.defaultWebApp.bindTo(
+      binding.browserDefaultApp,
+      {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+          data = Uri.parse("https://google.com")
         }
-
-        updateRendering()
-    }
-
-    private fun updateRendering() {
-        val context = requireContext()
-        val pm = context.packageManager
-
-        settings.defaultWebApp.bindTo(
-            binding.browserDefaultApp,
-            {
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = Uri.parse("https://google.com")
-                }
-                ChooseDefaultAppBottomSheetFragment.show(childFragmentManager, intent)
-            },
-        )
-        binding.browserDefaultApp.desc.visibility = View.VISIBLE
-        binding.browserDefaultApp.desc.text =
-            preferences.defaultWebApp?.let {
-                try {
-                    pm.getApplicationInfo(it.packageName, 0).let {
-                        pm.getApplicationLabel(it)
-                    }
-                } catch (e: Exception) {
-                    null
-                } ?: it.appName ?: "Unnamed app"
-            } ?: getString(R.string.none_set)
-    }
+        ChooseDefaultAppBottomSheetFragment.show(childFragmentManager, intent)
+      },
+    )
+    binding.browserDefaultApp.desc.visibility = View.VISIBLE
+    binding.browserDefaultApp.desc.text =
+      preferences.defaultWebApp?.let {
+        try {
+          pm.getApplicationInfo(it.packageName, 0).let {
+            pm.getApplicationLabel(it)
+          }
+        } catch (e: Exception) {
+          null
+        } ?: it.appName ?: "Unnamed app"
+      } ?: getString(R.string.none_set)
+  }
 }

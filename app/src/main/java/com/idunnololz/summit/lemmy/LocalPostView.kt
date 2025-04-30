@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class LocalPostView(
-    val fetchedPost: FetchedPost,
-    val filterReason: FilterReason?,
-    val isDuplicatePost: Boolean,
+  val fetchedPost: FetchedPost,
+  val filterReason: FilterReason?,
+  val isDuplicatePost: Boolean,
 ) : Parcelable

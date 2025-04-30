@@ -18,79 +18,79 @@ import com.idunnololz.summit.util.setupForFragment
 
 class SettingsAccountBlockListFragment : BaseFragment<FragmentSettingsAccountBlockListBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsAccountBlockListBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsAccountBlockListBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = context.getString(R.string.account_block_settings)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    with(binding) {
+      BasicSettingItem(
+        R.drawable.baseline_person_24,
+        getString(R.string.blocked_users),
+        null,
+      ).bindTo(
+        blockedUsers,
+        onValueChanged = {
+          val directions = SettingsAccountBlockListFragmentDirections
+            .actionSettingsAccountBlockListFragmentToSettingsUserBlockListFragment()
+          findNavController().navigateSafe(directions)
+        },
+      )
 
-        val context = requireContext()
+      BasicSettingItem(
+        R.drawable.ic_default_community,
+        getString(R.string.blocked_communities),
+        null,
+      ).bindTo(
+        blockedCommunities,
+        onValueChanged = {
+          val directions = SettingsAccountBlockListFragmentDirections
+            .actionSettingsAccountBlockListFragmentToSettingsCommunityBlockListFragment()
+          findNavController().navigateSafe(directions)
+        },
+      )
 
-        requireSummitActivity().apply {
-            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.account_block_settings)
-        }
-
-        with(binding) {
-            BasicSettingItem(
-                R.drawable.baseline_person_24,
-                getString(R.string.blocked_users),
-                null,
-            ).bindTo(
-                blockedUsers,
-                onValueChanged = {
-                    val directions = SettingsAccountBlockListFragmentDirections
-                        .actionSettingsAccountBlockListFragmentToSettingsUserBlockListFragment()
-                    findNavController().navigateSafe(directions)
-                },
-            )
-
-            BasicSettingItem(
-                R.drawable.ic_default_community,
-                getString(R.string.blocked_communities),
-                null,
-            ).bindTo(
-                blockedCommunities,
-                onValueChanged = {
-                    val directions = SettingsAccountBlockListFragmentDirections
-                        .actionSettingsAccountBlockListFragmentToSettingsCommunityBlockListFragment()
-                    findNavController().navigateSafe(directions)
-                },
-            )
-
-            BasicSettingItem(
-                R.drawable.ic_lemmy_24,
-                getString(R.string.blocked_instances),
-                null,
-            ).bindTo(
-                blockedInstances,
-                onValueChanged = {
-                    val directions = SettingsAccountBlockListFragmentDirections
-                        .actionSettingsAccountBlockListFragmentToSettingsInstanceBlockListFragment()
-                    findNavController().navigateSafe(directions)
-                },
-            )
-        }
+      BasicSettingItem(
+        R.drawable.ic_lemmy_24,
+        getString(R.string.blocked_instances),
+        null,
+      ).bindTo(
+        blockedInstances,
+        onValueChanged = {
+          val directions = SettingsAccountBlockListFragmentDirections
+            .actionSettingsAccountBlockListFragmentToSettingsInstanceBlockListFragment()
+          findNavController().navigateSafe(directions)
+        },
+      )
     }
+  }
 
-    override fun onResume() {
-        super.onResume()
+  override fun onResume() {
+    super.onResume()
 
-        setupForFragment<SettingsFragment>()
-    }
+    setupForFragment<SettingsFragment>()
+  }
 }

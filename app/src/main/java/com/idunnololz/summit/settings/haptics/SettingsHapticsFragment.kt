@@ -24,92 +24,92 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsHapticsFragment :
-    BaseFragment<FragmentSettingsHapticsBinding>(),
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentSettingsHapticsBinding>(),
+  OldAlertDialogFragment.AlertDialogFragmentListener {
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var settings: HapticSettings
+  @Inject
+  lateinit var settings: HapticSettings
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsHapticsBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsHapticsBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = settings.getPageName(context)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    updateRendering()
+  }
 
-        val context = requireContext()
+  private fun updateRendering() {
+    if (!isBindingAvailable()) {
+      return
+    }
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+    val context = requireContext()
 
-            setSupportActionBar(binding.toolbar)
+    settings.haptics.bindTo(
+      binding.haptics,
+      { preferences.hapticsEnabled },
+      {
+        preferences.hapticsEnabled = it
 
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
+        if (it) {
+          val hapticsEnabled =
+            Settings.System.getInt(context.contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) == 1
+
+          if (!hapticsEnabled) {
+            OldAlertDialogFragment.Builder()
+              .setMessage(R.string.warn_system_haptic_feedback_disabled)
+              .setPositiveButton(R.string.settings)
+              .setNegativeButton(R.string.cancel)
+              .createAndShow(childFragmentManager, "warn_haptics_disabled")
+          }
         }
 
         updateRendering()
-    }
+      },
+    )
+    settings.moreHaptics.bindTo(
+      binding.moreHaptics,
+      { preferences.hapticsOnActions },
+      {
+        preferences.hapticsOnActions = it
+      },
+    )
 
-    private fun updateRendering() {
-        if (!isBindingAvailable()) {
-            return
-        }
+    binding.moreHaptics.isEnabled = preferences.hapticsEnabled
+  }
 
-        val context = requireContext()
+  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+    val intent = Intent(Settings.ACTION_SOUND_SETTINGS)
+    startActivity(intent)
+  }
 
-        settings.haptics.bindTo(
-            binding.haptics,
-            { preferences.hapticsEnabled },
-            {
-                preferences.hapticsEnabled = it
-
-                if (it) {
-                    val hapticsEnabled =
-                        Settings.System.getInt(context.contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) == 1
-
-                    if (!hapticsEnabled) {
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(R.string.warn_system_haptic_feedback_disabled)
-                            .setPositiveButton(R.string.settings)
-                            .setNegativeButton(R.string.cancel)
-                            .createAndShow(childFragmentManager, "warn_haptics_disabled")
-                    }
-                }
-
-                updateRendering()
-            },
-        )
-        settings.moreHaptics.bindTo(
-            binding.moreHaptics,
-            { preferences.hapticsOnActions },
-            {
-                preferences.hapticsOnActions = it
-            },
-        )
-
-        binding.moreHaptics.isEnabled = preferences.hapticsEnabled
-    }
-
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        val intent = Intent(Settings.ACTION_SOUND_SETTINGS)
-        startActivity(intent)
-    }
-
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-    }
+  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+  }
 }

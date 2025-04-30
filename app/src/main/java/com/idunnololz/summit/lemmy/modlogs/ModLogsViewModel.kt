@@ -21,141 +21,141 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ModLogsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val apiClient: AccountAwareLemmyClient,
-    private val noAuthApiClient: LemmyApiClient,
-    private val accountManager: AccountManager,
+  @ApplicationContext private val context: Context,
+  private val apiClient: AccountAwareLemmyClient,
+  private val noAuthApiClient: LemmyApiClient,
+  private val accountManager: AccountManager,
 ) : ViewModel() {
 
-    companion object {
+  companion object {
 
-        private const val TAG = "ModLogsViewModel"
+    private const val TAG = "ModLogsViewModel"
 
-        private const val PAGE_ENTRIES_LIMIT = 50
+    private const val PAGE_ENTRIES_LIMIT = 50
+  }
+
+  private var communityRef: CommunityRef? = null
+  private var communityView: CommunityView? = null
+
+  val apiInstance: String
+    get() = apiClient.instance
+  private val modLogEngine = ListEngine<ModEvent>()
+
+  val modLogData = StatefulLiveData<ModLogData>()
+
+  private var modSource: MultiModEventDataSource? = null
+
+  var resetScrollPosition: Boolean = false
+
+  init {
+    viewModelScope.launch {
+      modLogEngine.items.collect {
+        modLogData.postValue(ModLogData(it, resetScrollPosition = resetScrollPosition))
+      }
     }
+  }
 
-    private var communityRef: CommunityRef? = null
-    private var communityView: CommunityView? = null
+  fun fetchModLogs(pageIndex: Int, force: Boolean = false, resetScrollPosition: Boolean = false) {
+    Log.d(TAG, "fetchModLogs(): $pageIndex, $force")
+    modLogData.setIsLoading()
 
-    val apiInstance: String
-        get() = apiClient.instance
-    private val modLogEngine = ListEngine<ModEvent>()
+    val communityRef = communityRef
+    val communityView = communityView
+    val account = accountManager.currentAccount.asAccount
 
-    val modLogData = StatefulLiveData<ModLogData>()
+    this.resetScrollPosition = resetScrollPosition
 
-    private var modSource: MultiModEventDataSource? = null
+    viewModelScope.launch {
+      val communityIdOrNull: Result<CommunityId?> =
+        if (communityRef is CommunityRef.CommunityRefByName) {
+          if (communityView != null && communityView.community.name == communityRef.name) {
+            Result.success(communityView.community.id)
+          } else {
+            noAuthApiClient.getCommunity(
+              account = if (account?.instance == apiInstance) {
+                account
+              } else {
+                null
+              },
+              idOrName = Either.Right(communityRef.getServerId(apiClient.instance)),
+              force = force,
+            ).fold(
+              {
+                this@ModLogsViewModel.communityView = it.community_view
 
-    var resetScrollPosition: Boolean = false
-
-    init {
-        viewModelScope.launch {
-            modLogEngine.items.collect {
-                modLogData.postValue(ModLogData(it, resetScrollPosition = resetScrollPosition))
-            }
-        }
-    }
-
-    fun fetchModLogs(pageIndex: Int, force: Boolean = false, resetScrollPosition: Boolean = false) {
-        Log.d(TAG, "fetchModLogs(): $pageIndex, $force")
-        modLogData.setIsLoading()
-
-        val communityRef = communityRef
-        val communityView = communityView
-        val account = accountManager.currentAccount.asAccount
-
-        this.resetScrollPosition = resetScrollPosition
-
-        viewModelScope.launch {
-            val communityIdOrNull: Result<CommunityId?> =
-                if (communityRef is CommunityRef.CommunityRefByName) {
-                    if (communityView != null && communityView.community.name == communityRef.name) {
-                        Result.success(communityView.community.id)
-                    } else {
-                        noAuthApiClient.getCommunity(
-                            account = if (account?.instance == apiInstance) {
-                                account
-                            } else {
-                                null
-                            },
-                            idOrName = Either.Right(communityRef.getServerId(apiClient.instance)),
-                            force = force,
-                        ).fold(
-                            {
-                                this@ModLogsViewModel.communityView = it.community_view
-
-                                Result.success(it.community_view.community.id)
-                            },
-                            {
-                                Result.failure(it)
-                            },
-                        )
-                    }
-                } else {
-                    Result.success(null)
-                }
-
-            if (communityIdOrNull.isFailure) {
-                modLogData.postError(communityIdOrNull.exceptionOrNull()!!)
-                return@launch
-            }
-
-            val modSource = modSource ?: MultiModEventDataSource.create(
-                context,
-                noAuthApiClient,
-                communityIdOrNull.getOrThrow(),
-                noAuthApiClient.instance,
-                PAGE_ENTRIES_LIMIT,
-            ).also {
-                modSource = it
-            }
-
-            val result = modSource.fetchModEvents(pageIndex, force)
-
-            val modEvents = result.fold(
-                onSuccess = {
-                    it.sortedByDescending { it.ts }
-                },
-                onFailure = {
-                    null
-                },
+                Result.success(it.community_view.community.id)
+              },
+              {
+                Result.failure(it)
+              },
             )
-
-            modLogEngine.addPage(
-                page = pageIndex,
-                communities = result.fold(
-                    onSuccess = {
-                        Result.success(modEvents!!)
-                    },
-                    onFailure = {
-                        Result.failure(it)
-                    },
-                ),
-                hasMore = result.fold(
-                    onSuccess = {
-                        it.isNotEmpty()
-                    },
-                    onFailure = {
-                        true
-                    },
-                ),
-            )
+          }
+        } else {
+          Result.success(null)
         }
-    }
 
-    fun setArguments(instance: String, communityRef: CommunityRef?) {
-        noAuthApiClient.changeInstance(instance)
-        this.communityRef = communityRef
-    }
+      if (communityIdOrNull.isFailure) {
+        modLogData.postError(communityIdOrNull.exceptionOrNull()!!)
+        return@launch
+      }
 
-    fun reset() {
-        viewModelScope.launch {
-            modLogData.clear()
-            fetchModLogs(0, force = true, resetScrollPosition = true)
-        }
-    }
+      val modSource = modSource ?: MultiModEventDataSource.create(
+        context,
+        noAuthApiClient,
+        communityIdOrNull.getOrThrow(),
+        noAuthApiClient.instance,
+        PAGE_ENTRIES_LIMIT,
+      ).also {
+        modSource = it
+      }
 
-    data class ModLogData(
-        val data: List<ListEngine.Item<ModEvent>>,
-        val resetScrollPosition: Boolean,
-    )
+      val result = modSource.fetchModEvents(pageIndex, force)
+
+      val modEvents = result.fold(
+        onSuccess = {
+          it.sortedByDescending { it.ts }
+        },
+        onFailure = {
+          null
+        },
+      )
+
+      modLogEngine.addPage(
+        page = pageIndex,
+        communities = result.fold(
+          onSuccess = {
+            Result.success(modEvents!!)
+          },
+          onFailure = {
+            Result.failure(it)
+          },
+        ),
+        hasMore = result.fold(
+          onSuccess = {
+            it.isNotEmpty()
+          },
+          onFailure = {
+            true
+          },
+        ),
+      )
+    }
+  }
+
+  fun setArguments(instance: String, communityRef: CommunityRef?) {
+    noAuthApiClient.changeInstance(instance)
+    this.communityRef = communityRef
+  }
+
+  fun reset() {
+    viewModelScope.launch {
+      modLogData.clear()
+      fetchModLogs(0, force = true, resetScrollPosition = true)
+    }
+  }
+
+  data class ModLogData(
+    val data: List<ListEngine.Item<ModEvent>>,
+    val resetScrollPosition: Boolean,
+  )
 }

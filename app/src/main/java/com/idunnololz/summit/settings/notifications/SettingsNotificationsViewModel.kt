@@ -12,25 +12,25 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsNotificationsViewModel @Inject constructor(
-    private val accountManager: AccountManager,
-    val notificationsManager: NotificationsManager,
+  private val accountManager: AccountManager,
+  val notificationsManager: NotificationsManager,
 ) : ViewModel() {
 
-    val accounts = MutableLiveData<List<Account>>()
+  val accounts = MutableLiveData<List<Account>>()
 
-    init {
-        viewModelScope.launch {
-            accountManager.currentAccount.collect {
-                accounts.postValue(accountManager.getAccounts())
-            }
-        }
+  init {
+    viewModelScope.launch {
+      accountManager.currentAccount.collect {
+        accounts.postValue(accountManager.getAccounts())
+      }
     }
+  }
 
-    fun onNotificationSettingsChanged() {
-        notificationsManager.onPreferencesChanged()
-    }
+  fun onNotificationSettingsChanged() {
+    notificationsManager.onPreferencesChanged()
+  }
 
-    fun onNotificationCheckIntervalChanged() {
-        notificationsManager.reenqueue()
-    }
+  fun onNotificationCheckIntervalChanged() {
+    notificationsManager.reenqueue()
+  }
 }

@@ -24,119 +24,119 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsBackupAndRestoreFragment :
-    BaseFragment<FragmentSettingsBackupAndRestoreBinding>(),
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentSettingsBackupAndRestoreBinding>(),
+  OldAlertDialogFragment.AlertDialogFragmentListener {
 
-    @Inject
-    lateinit var settings: ImportAndExportSettings
+  @Inject
+  lateinit var settings: ImportAndExportSettings
 
-    private val exportSettingsViewModel: ExportSettingsViewModel by viewModels()
+  private val exportSettingsViewModel: ExportSettingsViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsBackupAndRestoreBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsBackupAndRestoreBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = settings.getPageName(context)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    updateRendering()
+  }
 
-        val context = requireContext()
+  private fun updateRendering() {
+    with(binding) {
+      settings.exportSettings.bindTo(
+        backupSettings,
+      ) {
+        ExportSettingsDialogFragment.show(childFragmentManager)
+      }
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+      settings.importSettings.bindTo(
+        restoreSettings,
+      ) {
+        ImportSettingsDialogFragment.show(childFragmentManager)
+      }
 
-            setSupportActionBar(binding.toolbar)
+      settings.resetSettingsWithBackup.bindTo(
+        resetSettingsWithBackup,
+      ) {
+        OldAlertDialogFragment.Builder()
+          .setTitle(R.string.reset_settings_prompt)
+          .setMessage(R.string.backup_and_reset_settings_desc)
+          .setPositiveButton(R.string.reset_settings)
+          .setNegativeButton(R.string.cancel)
+          .createAndShow(childFragmentManager, "reset_settings")
+      }
 
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
-        }
+      settings.manageInternalSettingsBackups.bindTo(
+        manageInternalSettingsBackups,
+      ) {
+        val direction = SettingsBackupAndRestoreFragmentDirections
+          .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()
+        findNavController().navigateSafe(direction)
+      }
 
-        updateRendering()
+      settings.viewCurrentSettings.bindTo(
+        viewCurrentSettings,
+      ) {
+        val direction = SettingsBackupAndRestoreFragmentDirections
+          .actionSettingBackupAndRestoreFragmentToViewCurrentSettingsFragment()
+        findNavController().navigateSafe(direction)
+      }
     }
+  }
 
-    private fun updateRendering() {
-        with(binding) {
-            settings.exportSettings.bindTo(
-                backupSettings,
-            ) {
-                ExportSettingsDialogFragment.show(childFragmentManager)
-            }
+  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+    when (tag) {
+      "reset_settings" -> {
+        exportSettingsViewModel.saveToInternalBackups(
+          backupName = "reset_settings_backup_%datetime%",
+          backupConfig = ExportSettingsViewModel.BackupConfig(
+            backupOption = ExportSettingsViewModel.BackupOption.SaveInternal,
+            includeDatabase = true,
+          ),
+        )
+        exportSettingsViewModel.resetSettings()
 
-            settings.importSettings.bindTo(
-                restoreSettings,
-            ) {
-                ImportSettingsDialogFragment.show(childFragmentManager)
-            }
-
-            settings.resetSettingsWithBackup.bindTo(
-                resetSettingsWithBackup,
-            ) {
-                OldAlertDialogFragment.Builder()
-                    .setTitle(R.string.reset_settings_prompt)
-                    .setMessage(R.string.backup_and_reset_settings_desc)
-                    .setPositiveButton(R.string.reset_settings)
-                    .setNegativeButton(R.string.cancel)
-                    .createAndShow(childFragmentManager, "reset_settings")
-            }
-
-            settings.manageInternalSettingsBackups.bindTo(
-                manageInternalSettingsBackups,
-            ) {
-                val direction = SettingsBackupAndRestoreFragmentDirections
-                    .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()
-                findNavController().navigateSafe(direction)
-            }
-
-            settings.viewCurrentSettings.bindTo(
-                viewCurrentSettings,
-            ) {
-                val direction = SettingsBackupAndRestoreFragmentDirections
-                    .actionSettingBackupAndRestoreFragmentToViewCurrentSettingsFragment()
-                findNavController().navigateSafe(direction)
-            }
-        }
+        OldAlertDialogFragment.Builder()
+          .setTitle(R.string.app_restart_required)
+          .setMessage(R.string.app_restart_required_after_pref_cleared_desc)
+          .setPositiveButton(R.string.restart_app)
+          .setNegativeButton(R.string.restart_later)
+          .createAndShow(childFragmentManager, "restart_required")
+      }
+      "restart_required" -> {
+        ProcessPhoenix.triggerRebirth(requireContext())
+      }
     }
+  }
 
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "reset_settings" -> {
-                exportSettingsViewModel.saveToInternalBackups(
-                    backupName = "reset_settings_backup_%datetime%",
-                    backupConfig = ExportSettingsViewModel.BackupConfig(
-                        backupOption = ExportSettingsViewModel.BackupOption.SaveInternal,
-                        includeDatabase = true,
-                    ),
-                )
-                exportSettingsViewModel.resetSettings()
-
-                OldAlertDialogFragment.Builder()
-                    .setTitle(R.string.app_restart_required)
-                    .setMessage(R.string.app_restart_required_after_pref_cleared_desc)
-                    .setPositiveButton(R.string.restart_app)
-                    .setNegativeButton(R.string.restart_later)
-                    .createAndShow(childFragmentManager, "restart_required")
-            }
-            "restart_required" -> {
-                ProcessPhoenix.triggerRebirth(requireContext())
-            }
-        }
+  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+    when (tag) {
+      "restart_required" -> {
+        // do nothing
+      }
     }
-
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "restart_required" -> {
-                // do nothing
-            }
-        }
-    }
+  }
 }

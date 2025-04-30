@@ -13,89 +13,89 @@ import kotlin.math.max
 
 class FixedSlidingPaneLayout : SlidingPaneLayout {
 
-    companion object {
-        private val sEdgeSizeUsingSystemGestureInsets = Build.VERSION.SDK_INT >= 29
+  companion object {
+    private val sEdgeSizeUsingSystemGestureInsets = Build.VERSION.SDK_INT >= 29
+  }
+
+  var isSwipeEnabled: Boolean = true
+
+  // We only construct a drag helper to get the width of the drag region.
+  private val dragHelper = ViewDragHelper.create(
+    this,
+    0.5f,
+    object : ViewDragHelper.Callback() {
+      override fun tryCaptureView(child: View, pointerId: Int): Boolean {
+        return false
+      }
+    },
+  )
+
+  constructor(context: Context) : super(context)
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+  constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
+    context,
+    attrs,
+    defStyle,
+  )
+
+  override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+    if (!isSwipeEnabled) return false
+
+    val intercept = super.onInterceptTouchEvent(ev)
+
+    if (ev == null) {
+      return intercept
     }
 
-    var isSwipeEnabled: Boolean = true
-
-    // We only construct a drag helper to get the width of the drag region.
-    private val dragHelper = ViewDragHelper.create(
-        this,
-        0.5f,
-        object : ViewDragHelper.Callback() {
-            override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-                return false
-            }
-        },
-    )
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle,
-    )
-
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        if (!isSwipeEnabled) return false
-
-        val intercept = super.onInterceptTouchEvent(ev)
-
-        if (ev == null) {
-            return intercept
-        }
-
-        if (!intercept) {
-            return false
-        }
-
-        if (!isOpen || !isSlideable) {
-            return true
-        }
-
-        val gestureInsets = getSystemGestureInsets()
-            ?: return true
-
-        val edgeSize = max(dragHelper.defaultEdgeSize, gestureInsets.left)
-
-        val isLayoutRtl = isLayoutRtlSupport()
-
-        if (isLayoutRtl) {
-            if (ev.x > edgeSize) {
-                return false
-            }
-        } else {
-            if (ev.x < edgeSize) {
-                return false
-            }
-        }
-
-        return true
+    if (!intercept) {
+      return false
     }
 
-    override fun onTouchEvent(ev: MotionEvent?): Boolean {
-        if (!isSwipeEnabled) {
-            // Careful here, view might be null
-            getChildAt(1).dispatchTouchEvent(ev)
-            return true
-        }
-        return super.onTouchEvent(ev)
+    if (!isOpen || !isSlideable) {
+      return true
     }
 
-    private fun getSystemGestureInsets(): Insets? {
-        var gestureInsets: Insets? = null
-        if (sEdgeSizeUsingSystemGestureInsets) {
-            val rootInsetsCompat = ViewCompat.getRootWindowInsets(this)
-            if (rootInsetsCompat != null) {
-                gestureInsets = rootInsetsCompat.systemGestureInsets
-            }
-        }
-        return gestureInsets
+    val gestureInsets = getSystemGestureInsets()
+      ?: return true
+
+    val edgeSize = max(dragHelper.defaultEdgeSize, gestureInsets.left)
+
+    val isLayoutRtl = isLayoutRtlSupport()
+
+    if (isLayoutRtl) {
+      if (ev.x > edgeSize) {
+        return false
+      }
+    } else {
+      if (ev.x < edgeSize) {
+        return false
+      }
     }
 
-    private fun isLayoutRtlSupport(): Boolean {
-        return this.layoutDirection == View.LAYOUT_DIRECTION_RTL
+    return true
+  }
+
+  override fun onTouchEvent(ev: MotionEvent?): Boolean {
+    if (!isSwipeEnabled) {
+      // Careful here, view might be null
+      getChildAt(1).dispatchTouchEvent(ev)
+      return true
     }
+    return super.onTouchEvent(ev)
+  }
+
+  private fun getSystemGestureInsets(): Insets? {
+    var gestureInsets: Insets? = null
+    if (sEdgeSizeUsingSystemGestureInsets) {
+      val rootInsetsCompat = ViewCompat.getRootWindowInsets(this)
+      if (rootInsetsCompat != null) {
+        gestureInsets = rootInsetsCompat.systemGestureInsets
+      }
+    }
+    return gestureInsets
+  }
+
+  private fun isLayoutRtlSupport(): Boolean {
+    return this.layoutDirection == View.LAYOUT_DIRECTION_RTL
+  }
 }

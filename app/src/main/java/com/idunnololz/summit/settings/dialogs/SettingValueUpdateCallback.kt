@@ -1,5 +1,5 @@
 package com.idunnololz.summit.settings.dialogs
 
 interface SettingValueUpdateCallback {
-    fun updateValue(key: Int, value: Any?)
+  fun updateValue(key: Int, value: Any?)
 }

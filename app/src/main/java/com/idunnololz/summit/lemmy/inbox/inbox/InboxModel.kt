@@ -5,23 +5,23 @@ import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.conversation.Conversation
 
 class InboxModel(
-    val items: List<InboxListItem> = listOf(),
-    val earliestMessageTs: Long? = null,
-    val hasMore: Boolean = false,
+  val items: List<InboxListItem> = listOf(),
+  val earliestMessageTs: Long? = null,
+  val hasMore: Boolean = false,
 )
 
 sealed interface InboxListItem {
 
-    val page: Int
+  val page: Int
 
-    data class RegularInboxItem(
-        override val page: Int,
-        val item: InboxItem,
-    ) : InboxListItem
+  data class RegularInboxItem(
+    override val page: Int,
+    val item: InboxItem,
+  ) : InboxListItem
 
-    data class ConversationItem(
-        override val page: Int,
-        val conversation: Conversation,
-        val draftMessage: DraftData.MessageDraftData?,
-    ) : InboxListItem
+  data class ConversationItem(
+    override val page: Int,
+    val conversation: Conversation,
+    val draftMessage: DraftData.MessageDraftData?,
+  ) : InboxListItem
 }

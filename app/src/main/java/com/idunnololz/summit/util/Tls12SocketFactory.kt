@@ -24,64 +24,64 @@ import okhttp3.TlsVersion
  */
 class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFactory() {
 
-    /**
-     * Forcefully adds [TlsVersion.TLS_1_2] as an enabled protocol if called on an [SSLSocket]
-     *
-     * @return the (potentially modified) [Socket]
-     */
-    private fun Socket.patchForTls12(): Socket {
-        return (this as? SSLSocket)?.apply {
-            enabledProtocols += TlsVersion.TLS_1_2.javaName
-        } ?: this
-    }
+  /**
+   * Forcefully adds [TlsVersion.TLS_1_2] as an enabled protocol if called on an [SSLSocket]
+   *
+   * @return the (potentially modified) [Socket]
+   */
+  private fun Socket.patchForTls12(): Socket {
+    return (this as? SSLSocket)?.apply {
+      enabledProtocols += TlsVersion.TLS_1_2.javaName
+    } ?: this
+  }
 
-    override fun getDefaultCipherSuites(): Array<String> {
-        return delegate.defaultCipherSuites
-    }
+  override fun getDefaultCipherSuites(): Array<String> {
+    return delegate.defaultCipherSuites
+  }
 
-    override fun getSupportedCipherSuites(): Array<String> {
-        return delegate.supportedCipherSuites
-    }
+  override fun getSupportedCipherSuites(): Array<String> {
+    return delegate.supportedCipherSuites
+  }
 
-    @Throws(IOException::class)
-    override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket? {
-        return delegate.createSocket(s, host, port, autoClose)
-            .patchForTls12()
-    }
+  @Throws(IOException::class)
+  override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket? {
+    return delegate.createSocket(s, host, port, autoClose)
+      .patchForTls12()
+  }
 
-    @Throws(IOException::class, UnknownHostException::class)
-    override fun createSocket(host: String, port: Int): Socket? {
-        return delegate.createSocket(host, port)
-            .patchForTls12()
-    }
+  @Throws(IOException::class, UnknownHostException::class)
+  override fun createSocket(host: String, port: Int): Socket? {
+    return delegate.createSocket(host, port)
+      .patchForTls12()
+  }
 
-    @Throws(IOException::class, UnknownHostException::class)
-    override fun createSocket(
-        host: String,
-        port: Int,
-        localHost: InetAddress,
-        localPort: Int,
-    ): Socket? {
-        return delegate.createSocket(host, port, localHost, localPort)
-            .patchForTls12()
-    }
+  @Throws(IOException::class, UnknownHostException::class)
+  override fun createSocket(
+    host: String,
+    port: Int,
+    localHost: InetAddress,
+    localPort: Int,
+  ): Socket? {
+    return delegate.createSocket(host, port, localHost, localPort)
+      .patchForTls12()
+  }
 
-    @Throws(IOException::class)
-    override fun createSocket(host: InetAddress, port: Int): Socket? {
-        return delegate.createSocket(host, port)
-            .patchForTls12()
-    }
+  @Throws(IOException::class)
+  override fun createSocket(host: InetAddress, port: Int): Socket? {
+    return delegate.createSocket(host, port)
+      .patchForTls12()
+  }
 
-    @Throws(IOException::class)
-    override fun createSocket(
-        address: InetAddress,
-        port: Int,
-        localAddress: InetAddress,
-        localPort: Int,
-    ): Socket? {
-        return delegate.createSocket(address, port, localAddress, localPort)
-            .patchForTls12()
-    }
+  @Throws(IOException::class)
+  override fun createSocket(
+    address: InetAddress,
+    port: Int,
+    localAddress: InetAddress,
+    localPort: Int,
+  ): Socket? {
+    return delegate.createSocket(address, port, localAddress, localPort)
+      .patchForTls12()
+  }
 }
 
 /**
@@ -91,11 +91,11 @@ class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFact
  * should never happen because PKIX is the only supported algorithm
  */
 val trustManager by lazy {
-    val trustManagerFactory =
-        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-    trustManagerFactory.init(null as KeyStore?)
-    trustManagerFactory.trustManagers
-        .first { it is X509TrustManager } as X509TrustManager
+  val trustManagerFactory =
+    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+  trustManagerFactory.init(null as KeyStore?)
+  trustManagerFactory.trustManagers
+    .first { it is X509TrustManager } as X509TrustManager
 }
 
 /**
@@ -111,17 +111,17 @@ val trustManager by lazy {
  * @return the (potentially modified) [OkHttpClient.Builder]
  */
 fun OkHttpClient.Builder.enableTls12(): OkHttpClient.Builder = apply {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
-        try {
-            val sslContext = SSLContext.getInstance(TlsVersion.TLS_1_2.javaName)
-            sslContext.init(null, arrayOf(trustManager), null)
+  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
+    try {
+      val sslContext = SSLContext.getInstance(TlsVersion.TLS_1_2.javaName)
+      sslContext.init(null, arrayOf(trustManager), null)
 
-            sslSocketFactory(
-                Tls12SocketFactory(sslContext.socketFactory),
-                trustManager,
-            )
-        } catch (e: Exception) {
-            Log.e("Tls12SocketFactory", "Error while setting TLS 1.2 compatibility", e)
-        }
+      sslSocketFactory(
+        Tls12SocketFactory(sslContext.socketFactory),
+        trustManager,
+      )
+    } catch (e: Exception) {
+      Log.e("Tls12SocketFactory", "Error while setting TLS 1.2 compatibility", e)
     }
+  }
 }

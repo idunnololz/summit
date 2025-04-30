@@ -29,124 +29,124 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsCommunityBlockListFragment :
-    BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
+  BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
 
-    private val viewModel: SettingsAccountBlockListViewModel by viewModels()
+  private val viewModel: SettingsAccountBlockListViewModel by viewModels()
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(
-            FragmentSettingsCommunityBlockListBinding
-                .inflate(inflater, container, false),
-        )
+    setBinding(
+      FragmentSettingsCommunityBlockListBinding
+        .inflate(inflater, container, false),
+    )
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = context.getString(R.string.blocked_communities)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    with(binding) {
+      val adapter = CommunityBlockListAdapter(
+        onRemoveCommunity = {
+          viewModel.unblockCommunity(it)
+        },
+      )
+      binding.recyclerView.setup(animationsHelper)
+      binding.recyclerView.setHasFixedSize(true)
+      binding.recyclerView.adapter = adapter
+      binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val context = requireContext()
+      viewModel.communityBlockList.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
+          is StatefulData.Loading -> loadingView.showProgressBar()
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            loadingView.hideAll()
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+            adapter.data = it.data
 
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.blocked_communities)
-        }
-
-        with(binding) {
-            val adapter = CommunityBlockListAdapter(
-                onRemoveCommunity = {
-                    viewModel.unblockCommunity(it)
-                },
-            )
-            binding.recyclerView.setup(animationsHelper)
-            binding.recyclerView.setHasFixedSize(true)
-            binding.recyclerView.adapter = adapter
-            binding.recyclerView.layoutManager = LinearLayoutManager(context)
-
-            viewModel.communityBlockList.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
-                    is StatefulData.Loading -> loadingView.showProgressBar()
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        loadingView.hideAll()
-
-                        adapter.data = it.data
-
-                        if (it.data.isEmpty()) {
-                            loadingView.showErrorText(
-                                R.string.there_doesnt_seem_to_be_anything_here,
-                            )
-                        }
-                    }
-                }
+            if (it.data.isEmpty()) {
+              loadingView.showErrorText(
+                R.string.there_doesnt_seem_to_be_anything_here,
+              )
             }
+          }
         }
+      }
+    }
+  }
+
+  private class CommunityBlockListAdapter(
+    val onRemoveCommunity: (CommunityId) -> Unit,
+  ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    var data: List<BlockedCommunityItem> = listOf()
+      set(value) {
+        field = value
+
+        refreshItems()
+      }
+
+    private val adapterHelper = AdapterHelper<BlockedCommunityItem>(
+      areItemsTheSame = { old, new ->
+        old.blockedCommunity.community.id == new.blockedCommunity.community.id
+      },
+    ).apply {
+      addItemType(
+        BlockedCommunityItem::class,
+        BlockListCommunityItemBinding::inflate,
+      ) { item, b, h ->
+        b.icon.load(item.blockedCommunity.community.icon)
+        b.title.text = item.blockedCommunity.community.fullName
+
+        if (item.isRemoving) {
+          b.delete.visibility = View.GONE
+          b.progressBar.visibility = View.VISIBLE
+        } else {
+          b.delete.visibility = View.VISIBLE
+          b.progressBar.visibility = View.GONE
+        }
+
+        b.delete.setOnClickListener {
+          onRemoveCommunity(item.blockedCommunity.community.id)
+        }
+      }
     }
 
-    private class CommunityBlockListAdapter(
-        val onRemoveCommunity: (CommunityId) -> Unit,
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
 
-        var data: List<BlockedCommunityItem> = listOf()
-            set(value) {
-                field = value
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
-                refreshItems()
-            }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
 
-        private val adapterHelper = AdapterHelper<BlockedCommunityItem>(
-            areItemsTheSame = { old, new ->
-                old.blockedCommunity.community.id == new.blockedCommunity.community.id
-            },
-        ).apply {
-            addItemType(
-                BlockedCommunityItem::class,
-                BlockListCommunityItemBinding::inflate,
-            ) { item, b, h ->
-                b.icon.load(item.blockedCommunity.community.icon)
-                b.title.text = item.blockedCommunity.community.fullName
-
-                if (item.isRemoving) {
-                    b.delete.visibility = View.GONE
-                    b.progressBar.visibility = View.VISIBLE
-                } else {
-                    b.delete.visibility = View.VISIBLE
-                    b.progressBar.visibility = View.GONE
-                }
-
-                b.delete.setOnClickListener {
-                    onRemoveCommunity(item.blockedCommunity.community.id)
-                }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
-
-        private fun refreshItems() {
-            adapterHelper.setItems(data, this)
-        }
+    private fun refreshItems() {
+      adapterHelper.setItems(data, this)
     }
+  }
 }

@@ -21,104 +21,104 @@ import com.idunnololz.summit.you.YouFragment
 import kotlin.reflect.KClass
 
 inline fun <reified T> BaseFragment<*>.setupForFragment(animate: Boolean = true) {
-    setupForFragment(T::class, animate)
+  setupForFragment(T::class, animate)
 }
 
 fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
-    getMainActivity()?.apply {
-        Log.d("MainActivity", "setupForFragment(): $t")
+  getMainActivity()?.apply {
+    Log.d("MainActivity", "setupForFragment(): $t")
 
-        runWhenLaidOut {
-            when (t) {
-                CommunityFragment::class -> {
-                    navBarController.enableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                PostFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    showNotificationBarBg()
-                }
-                VideoViewerFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.hideNavBar(animate)
-                    hideNotificationBarBg()
-                }
-                ImageViewerActivity::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.hideNavBar(animate)
-                    hideNotificationBarBg()
-                }
-                SettingsCacheFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                HistoryFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                LoginFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.hideNavBar(animate)
-                    hideNotificationBarBg()
-                }
-                SettingsFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.hideNavBar(animate)
-                    hideNotificationBarBg()
-                }
-                PersonTabbedFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    hideNotificationBarBg()
-                }
-                CommunityInfoFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    hideNotificationBarBg()
-                }
-                FilteredPostsAndCommentsTabbedFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                InboxTabbedFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav(supportOpenness = true)
-                    showNotificationBarBg()
-                }
-                ActionsTabbedFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.hideNavBar(animate)
-                    hideNotificationBarBg()
-                }
-                CommunitiesFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                ModLogsFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                CreateOrEditCommunityFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.hideNavBar(animate)
-                    hideNotificationBarBg()
-                }
-                YouFragment::class -> {
-                    navBarController.disableBottomNavViewScrolling()
-                    navBarController.showBottomNav()
-                    showNotificationBarBg()
-                }
-                else ->
-                    throw RuntimeException(
-                        "No setup instructions for type: ${t.java.canonicalName}",
-                    )
-            }
+    runWhenLaidOut {
+      when (t) {
+        CommunityFragment::class -> {
+          navBarController.enableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
         }
+        PostFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          showNotificationBarBg()
+        }
+        VideoViewerFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.hideNavBar(animate)
+          hideNotificationBarBg()
+        }
+        ImageViewerActivity::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.hideNavBar(animate)
+          hideNotificationBarBg()
+        }
+        SettingsCacheFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
+        HistoryFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
+        LoginFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.hideNavBar(animate)
+          hideNotificationBarBg()
+        }
+        SettingsFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.hideNavBar(animate)
+          hideNotificationBarBg()
+        }
+        PersonTabbedFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          hideNotificationBarBg()
+        }
+        CommunityInfoFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          hideNotificationBarBg()
+        }
+        FilteredPostsAndCommentsTabbedFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
+        InboxTabbedFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav(supportOpenness = true)
+          showNotificationBarBg()
+        }
+        ActionsTabbedFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.hideNavBar(animate)
+          hideNotificationBarBg()
+        }
+        CommunitiesFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
+        ModLogsFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
+        CreateOrEditCommunityFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.hideNavBar(animate)
+          hideNotificationBarBg()
+        }
+        YouFragment::class -> {
+          navBarController.disableBottomNavViewScrolling()
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
+        else ->
+          throw RuntimeException(
+            "No setup instructions for type: ${t.java.canonicalName}",
+          )
+      }
     }
+  }
 }

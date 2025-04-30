@@ -19,157 +19,151 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ActionsViewModel @Inject constructor(
-    private val pendingActionsManager: PendingActionsManager,
-    private val accountManager: AccountManager,
+  private val pendingActionsManager: PendingActionsManager,
+  private val accountManager: AccountManager,
 ) : ViewModel() {
 
-    val actionsDataLiveData = StatefulLiveData<ActionsData>()
-    private val actionsListener =
-        object : PendingActionsManager.OnActionChangedListener {
-            override fun onActionAdded(action: LemmyPendingAction) {
-                loadActions()
-            }
-
-            override fun onActionFailed(
-                action: LemmyPendingAction,
-                reason: LemmyActionFailureReason,
-            ) {
-                loadActions()
-            }
-
-            override fun onActionComplete(
-                action: LemmyPendingAction,
-                result: LemmyActionResult<*, *>,
-            ) {
-                loadActions()
-            }
-
-            override fun onActionDeleted(action: LemmyAction) {
-                loadActions()
-            }
-        }
-
-    init {
+  val actionsDataLiveData = StatefulLiveData<ActionsData>()
+  private val actionsListener =
+    object : PendingActionsManager.OnActionChangedListener {
+      override fun onActionAdded(action: LemmyPendingAction) {
         loadActions()
+      }
 
-        pendingActionsManager.addActionCompleteListener(actionsListener)
+      override fun onActionFailed(action: LemmyPendingAction, reason: LemmyActionFailureReason) {
+        loadActions()
+      }
+
+      override fun onActionComplete(action: LemmyPendingAction, result: LemmyActionResult<*, *>) {
+        loadActions()
+      }
+
+      override fun onActionDeleted(action: LemmyAction) {
+        loadActions()
+      }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        pendingActionsManager.removeActionCompleteListener(actionsListener)
+  init {
+    loadActions()
+
+    pendingActionsManager.addActionCompleteListener(actionsListener)
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    pendingActionsManager.removeActionCompleteListener(actionsListener)
+  }
+
+  fun loadActions() {
+    actionsDataLiveData.setIsLoading()
+
+    viewModelScope.launch(Dispatchers.Default) {
+      val pendingActions = pendingActionsManager.getAllPendingActions()
+        .sortedByDescending { it.ts }
+      val completedActions = pendingActionsManager.getAllCompletedActions()
+        .sortedByDescending { it.ts }
+      val failedAccountInfo = pendingActionsManager.getAllFailedActions()
+        .sortedByDescending { it.ts }
+
+      val accountIds = mutableSetOf<Long>()
+
+      pendingActions.mapNotNullTo(accountIds) { it.info?.accountId }
+      completedActions.mapNotNullTo(accountIds) { it.info?.accountId }
+      failedAccountInfo.mapNotNullTo(accountIds) { it.info?.accountId }
+
+      val accountDictionary = accountIds.associateWith { accountManager.getAccountById(it) }
+
+      val actionsData = ActionsData(
+        pendingActions = pendingActions.pendingToActions(),
+        completedActions = completedActions.completedToActions(),
+        failedActions = failedAccountInfo.failedToActions(),
+        accountDictionary = accountDictionary,
+      )
+
+      actionsDataLiveData.postValue(actionsData)
+    }
+  }
+
+  fun markActionAsSeen(action: Action) {
+    val value = actionsDataLiveData.valueOrNull
+      ?: return
+
+    if (action.seen) {
+      return
     }
 
-    fun loadActions() {
-        actionsDataLiveData.setIsLoading()
-
-        viewModelScope.launch(Dispatchers.Default) {
-            val pendingActions = pendingActionsManager.getAllPendingActions()
-                .sortedByDescending { it.ts }
-            val completedActions = pendingActionsManager.getAllCompletedActions()
-                .sortedByDescending { it.ts }
-            val failedAccountInfo = pendingActionsManager.getAllFailedActions()
-                .sortedByDescending { it.ts }
-
-            val accountIds = mutableSetOf<Long>()
-
-            pendingActions.mapNotNullTo(accountIds) { it.info?.accountId }
-            completedActions.mapNotNullTo(accountIds) { it.info?.accountId }
-            failedAccountInfo.mapNotNullTo(accountIds) { it.info?.accountId }
-
-            val accountDictionary = accountIds.associateWith { accountManager.getAccountById(it) }
-
-            val actionsData = ActionsData(
-                pendingActions = pendingActions.pendingToActions(),
-                completedActions = completedActions.completedToActions(),
-                failedActions = failedAccountInfo.failedToActions(),
-                accountDictionary = accountDictionary,
-            )
-
-            actionsDataLiveData.postValue(actionsData)
+    val newValue = value.copy(
+      failedActions = value.failedActions.map {
+        if (it.id == action.id) {
+          it.copy(seen = true)
+        } else {
+          it
         }
-    }
-
-    fun markActionAsSeen(action: Action) {
-        val value = actionsDataLiveData.valueOrNull
-            ?: return
-
-        if (action.seen) {
-            return
-        }
-
-        val newValue = value.copy(
-            failedActions = value.failedActions.map {
-                if (it.id == action.id) {
-                    it.copy(seen = true)
-                } else {
-                    it
-                }
-            },
-        )
-        actionsDataLiveData.setValue(newValue)
-    }
-
-    private fun List<LemmyPendingAction>.pendingToActions(): List<Action> = this.map {
-        Action(
-            id = it.id,
-            info = it.info,
-            ts = it.ts,
-            creationTs = it.creationTs,
-            details = ActionDetails.PendingDetails,
-            seen = true,
-        )
-    }
-
-    private fun List<LemmyCompletedAction>.completedToActions(): List<Action> = this.map {
-        Action(
-            id = it.id,
-            info = it.info,
-            ts = it.ts,
-            creationTs = it.creationTs,
-            details = ActionDetails.SuccessDetails,
-            seen = true,
-        )
-    }
-
-    private fun List<LemmyFailedAction>.failedToActions(): List<Action> = this.map {
-        Action(
-            id = it.id,
-            info = it.info,
-            ts = it.ts,
-            creationTs = it.creationTs,
-            details = ActionDetails.FailureDetails(
-                it.error,
-            ),
-            seen = it.seen ?: false,
-        )
-    }
-
-    fun deleteCompletedActions() {
-        viewModelScope.launch {
-            pendingActionsManager.deleteCompletedActions()
-            loadActions()
-        }
-    }
-
-    fun deleteFailedActions() {
-        viewModelScope.launch {
-            pendingActionsManager.deleteFailedActions()
-            loadActions()
-        }
-    }
-
-    fun deletePendingActions() {
-        viewModelScope.launch {
-            pendingActionsManager.deleteAllPendingActions()
-            loadActions()
-        }
-    }
-
-    data class ActionsData(
-        val pendingActions: List<Action>,
-        val completedActions: List<Action>,
-        val failedActions: List<Action>,
-        val accountDictionary: Map<Long, Account?>,
+      },
     )
+    actionsDataLiveData.setValue(newValue)
+  }
+
+  private fun List<LemmyPendingAction>.pendingToActions(): List<Action> = this.map {
+    Action(
+      id = it.id,
+      info = it.info,
+      ts = it.ts,
+      creationTs = it.creationTs,
+      details = ActionDetails.PendingDetails,
+      seen = true,
+    )
+  }
+
+  private fun List<LemmyCompletedAction>.completedToActions(): List<Action> = this.map {
+    Action(
+      id = it.id,
+      info = it.info,
+      ts = it.ts,
+      creationTs = it.creationTs,
+      details = ActionDetails.SuccessDetails,
+      seen = true,
+    )
+  }
+
+  private fun List<LemmyFailedAction>.failedToActions(): List<Action> = this.map {
+    Action(
+      id = it.id,
+      info = it.info,
+      ts = it.ts,
+      creationTs = it.creationTs,
+      details = ActionDetails.FailureDetails(
+        it.error,
+      ),
+      seen = it.seen ?: false,
+    )
+  }
+
+  fun deleteCompletedActions() {
+    viewModelScope.launch {
+      pendingActionsManager.deleteCompletedActions()
+      loadActions()
+    }
+  }
+
+  fun deleteFailedActions() {
+    viewModelScope.launch {
+      pendingActionsManager.deleteFailedActions()
+      loadActions()
+    }
+  }
+
+  fun deletePendingActions() {
+    viewModelScope.launch {
+      pendingActionsManager.deleteAllPendingActions()
+      loadActions()
+    }
+  }
+
+  data class ActionsData(
+    val pendingActions: List<Action>,
+    val completedActions: List<Action>,
+    val failedActions: List<Action>,
+    val accountDictionary: Map<Long, Account?>,
+  )
 }

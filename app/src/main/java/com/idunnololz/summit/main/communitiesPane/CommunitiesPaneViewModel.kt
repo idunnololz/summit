@@ -22,104 +22,104 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CommunitiesPaneViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val communitiesPaneControllerFactory: CommunitiesPaneController.Factory,
-    private val accountInfoManager: AccountInfoManager,
-    private val userCommunitiesManager: UserCommunitiesManager,
-    private val tabsManager: TabsManager,
+  @ApplicationContext private val context: Context,
+  private val communitiesPaneControllerFactory: CommunitiesPaneController.Factory,
+  private val accountInfoManager: AccountInfoManager,
+  private val userCommunitiesManager: UserCommunitiesManager,
+  private val tabsManager: TabsManager,
 ) : ViewModel() {
 
-    private var subscriptionCommunities: List<AccountSubscription> = listOf()
-    private var userCommunities: List<UserCommunityItem> = listOf()
-    private var tabsState: Map<TabsManager.Tab, TabsManager.TabState> = mapOf()
-    private var accountInfoUpdateState: StatefulData<Account?> = StatefulData.NotStarted()
+  private var subscriptionCommunities: List<AccountSubscription> = listOf()
+  private var userCommunities: List<UserCommunityItem> = listOf()
+  private var tabsState: Map<TabsManager.Tab, TabsManager.TabState> = mapOf()
+  private var accountInfoUpdateState: StatefulData<Account?> = StatefulData.NotStarted()
 
-    val communities = MutableLiveData<CommunityData?>(null)
+  val communities = MutableLiveData<CommunityData?>(null)
 
-    init {
-        viewModelScope.launch(Dispatchers.Default) {
-            accountInfoManager.subscribedCommunities.collect {
-                subscriptionCommunities = it.sortedBy {
-                    it.toCommunityRef().getLocalizedFullName(context)
-                }
-
-                updateCommunities()
-            }
+  init {
+    viewModelScope.launch(Dispatchers.Default) {
+      accountInfoManager.subscribedCommunities.collect {
+        subscriptionCommunities = it.sortedBy {
+          it.toCommunityRef().getLocalizedFullName(context)
         }
 
-        viewModelScope.launch(Dispatchers.Default) {
-            userCommunitiesManager.userCommunitiesChangedFlow.collect {
-                userCommunities = userCommunitiesManager.getAllUserCommunities()
-
-                updateCommunities()
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
-            accountInfoManager.accountInfoUpdateState.collect {
-                accountInfoUpdateState = it
-
-                updateCommunities()
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.Default) {
-            tabsManager.tabStateChangedFlow.collect {
-                updateTabsState()
-            }
-        }
-
-        updateTabsState()
+        updateCommunities()
+      }
     }
 
-    fun createController(
-        binding: CommunitiesPaneBinding,
-        viewLifecycleOwner: LifecycleOwner,
-        onCommunitySelected: OnCommunitySelected,
-        onEditMultiCommunity: (UserCommunityItem) -> Unit,
-        onAddBookmarkClick: () -> Unit,
-    ) = communitiesPaneControllerFactory.create(
-        this,
-        binding,
-        viewLifecycleOwner,
-        onCommunitySelected,
-        onEditMultiCommunity,
-        onAddBookmarkClick,
-    )
-
-    fun loadCommunities(force: Boolean) {
+    viewModelScope.launch(Dispatchers.Default) {
+      userCommunitiesManager.userCommunitiesChangedFlow.collect {
         userCommunities = userCommunitiesManager.getAllUserCommunities()
-        accountInfoManager.refreshAccountInfo(force)
-        updateCommunities()
-    }
-
-    fun deleteUserCommunity(id: Long) {
-        viewModelScope.launch {
-            userCommunitiesManager.deleteUserCommunity(id)
-        }
-    }
-
-    private fun updateTabsState() {
-        tabsState = tabsManager.getTabState()
 
         updateCommunities()
+      }
     }
 
-    private fun updateCommunities() {
-        communities.postValue(
-            CommunityData(
-                userCommunities = userCommunities,
-                subscriptionCommunities = subscriptionCommunities,
-                accountInfoUpdateState = accountInfoUpdateState,
-                tabsState = tabsState,
-            ),
-        )
+    viewModelScope.launch(Dispatchers.Default) {
+      accountInfoManager.accountInfoUpdateState.collect {
+        accountInfoUpdateState = it
+
+        updateCommunities()
+      }
     }
 
-    class CommunityData(
-        val subscriptionCommunities: List<AccountSubscription>,
-        val userCommunities: List<UserCommunityItem>,
-        val accountInfoUpdateState: StatefulData<Account?>,
-        val tabsState: Map<TabsManager.Tab, TabsManager.TabState>,
+    viewModelScope.launch(Dispatchers.Default) {
+      tabsManager.tabStateChangedFlow.collect {
+        updateTabsState()
+      }
+    }
+
+    updateTabsState()
+  }
+
+  fun createController(
+    binding: CommunitiesPaneBinding,
+    viewLifecycleOwner: LifecycleOwner,
+    onCommunitySelected: OnCommunitySelected,
+    onEditMultiCommunity: (UserCommunityItem) -> Unit,
+    onAddBookmarkClick: () -> Unit,
+  ) = communitiesPaneControllerFactory.create(
+    this,
+    binding,
+    viewLifecycleOwner,
+    onCommunitySelected,
+    onEditMultiCommunity,
+    onAddBookmarkClick,
+  )
+
+  fun loadCommunities(force: Boolean) {
+    userCommunities = userCommunitiesManager.getAllUserCommunities()
+    accountInfoManager.refreshAccountInfo(force)
+    updateCommunities()
+  }
+
+  fun deleteUserCommunity(id: Long) {
+    viewModelScope.launch {
+      userCommunitiesManager.deleteUserCommunity(id)
+    }
+  }
+
+  private fun updateTabsState() {
+    tabsState = tabsManager.getTabState()
+
+    updateCommunities()
+  }
+
+  private fun updateCommunities() {
+    communities.postValue(
+      CommunityData(
+        userCommunities = userCommunities,
+        subscriptionCommunities = subscriptionCommunities,
+        accountInfoUpdateState = accountInfoUpdateState,
+        tabsState = tabsState,
+      ),
     )
+  }
+
+  class CommunityData(
+    val subscriptionCommunities: List<AccountSubscription>,
+    val userCommunities: List<UserCommunityItem>,
+    val accountInfoUpdateState: StatefulData<Account?>,
+    val tabsState: Map<TabsManager.Tab, TabsManager.TabState>,
+  )
 }

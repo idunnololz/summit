@@ -26,310 +26,310 @@ import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import io.noties.markwon.Markwon
 
 fun BasicSettingItem.bindTo(b: BasicSettingItemBinding, onValueChanged: () -> Unit) {
-    if (this.icon == null) {
-        b.icon.visibility = View.GONE
-    } else {
-        b.icon.setImageResource(this.icon)
-        b.icon.visibility = View.VISIBLE
-    }
+  if (this.icon == null) {
+    b.icon.visibility = View.GONE
+  } else {
+    b.icon.setImageResource(this.icon)
+    b.icon.visibility = View.VISIBLE
+  }
 
-    b.title.text = this.title
+  b.title.text = this.title
 
-    if (this.description == null) {
-        b.desc.visibility = View.GONE
-    } else {
-        b.desc.text = description
-        b.desc.visibility = View.VISIBLE
-    }
+  if (this.description == null) {
+    b.desc.visibility = View.GONE
+  } else {
+    b.desc.text = description
+    b.desc.visibility = View.VISIBLE
+  }
 
-    b.root.setOnClickListener {
-        onValueChanged()
-    }
+  b.root.setOnClickListener {
+    onValueChanged()
+  }
 }
 
 fun OnOffSettingItem.bindTo(
-    b: SettingItemOnOffBinding,
-    getCurrentValue: () -> Boolean,
-    onValueChanged: (Boolean) -> Unit,
+  b: SettingItemOnOffBinding,
+  getCurrentValue: () -> Boolean,
+  onValueChanged: (Boolean) -> Unit,
 ) {
-    if (this.icon == null) {
-        b.icon.visibility = View.GONE
-    } else {
-        b.icon.setImageResource(this.icon)
-        b.icon.visibility = View.VISIBLE
-    }
+  if (this.icon == null) {
+    b.icon.visibility = View.GONE
+  } else {
+    b.icon.setImageResource(this.icon)
+    b.icon.visibility = View.VISIBLE
+  }
 
-    b.title.text = this.title
-    if (this.description != null) {
-        b.desc.visibility = View.VISIBLE
+  b.title.text = this.title
+  if (this.description != null) {
+    b.desc.visibility = View.VISIBLE
 
-        Markwon.create(b.root.context).setMarkdown(b.desc, description)
-    } else {
-        b.desc.visibility = View.GONE
-    }
+    Markwon.create(b.root.context).setMarkdown(b.desc, description)
+  } else {
+    b.desc.visibility = View.GONE
+  }
 
-    // Unbind previous binding
-    b.switchView.setOnCheckedChangeListener(null)
+  // Unbind previous binding
+  b.switchView.setOnCheckedChangeListener(null)
+  b.switchView.isChecked = getCurrentValue()
+  b.switchView.jumpDrawablesToCurrentState()
+  b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
+    onValueChanged(newValue)
+
     b.switchView.isChecked = getCurrentValue()
-    b.switchView.jumpDrawablesToCurrentState()
-    b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
-        onValueChanged(newValue)
+  }
 
-        b.switchView.isChecked = getCurrentValue()
-    }
-
-    // Prevent auto state restoration since multiple checkboxes can have the same id
-    b.switchView.isSaveEnabled = false
+  // Prevent auto state restoration since multiple checkboxes can have the same id
+  b.switchView.isSaveEnabled = false
 }
 
 fun OnOffSettingItem.bindTo(
-    b: SettingItemOnOffMasterBinding,
-    getCurrentValue: () -> Boolean,
-    onValueChanged: (Boolean) -> Unit,
+  b: SettingItemOnOffMasterBinding,
+  getCurrentValue: () -> Boolean,
+  onValueChanged: (Boolean) -> Unit,
 ) {
-    b.title.text = this.title
-    if (this.description != null) {
-        b.desc.visibility = View.VISIBLE
+  b.title.text = this.title
+  if (this.description != null) {
+    b.desc.visibility = View.VISIBLE
 
-        Markwon.create(b.root.context).setMarkdown(b.desc, description)
-    } else {
-        b.desc.visibility = View.GONE
-    }
+    Markwon.create(b.root.context).setMarkdown(b.desc, description)
+  } else {
+    b.desc.visibility = View.GONE
+  }
 
-    // Unbind previous binding
-    b.switchView.setOnCheckedChangeListener(null)
+  // Unbind previous binding
+  b.switchView.setOnCheckedChangeListener(null)
+  b.switchView.isChecked = getCurrentValue()
+  b.switchView.jumpDrawablesToCurrentState()
+  b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
+    onValueChanged(newValue)
+
     b.switchView.isChecked = getCurrentValue()
-    b.switchView.jumpDrawablesToCurrentState()
-    b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
-        onValueChanged(newValue)
+  }
+  b.card.setOnClickListener {
+    b.switchView.performClick()
+  }
 
-        b.switchView.isChecked = getCurrentValue()
-    }
-    b.card.setOnClickListener {
-        b.switchView.performClick()
-    }
-
-    // Prevent auto state restoration since multiple checkboxes can have the same id
-    b.switchView.isSaveEnabled = false
+  // Prevent auto state restoration since multiple checkboxes can have the same id
+  b.switchView.isSaveEnabled = false
 }
 
 fun SliderSettingItem.bindTo(
-    b: SettingSliderItemBinding,
-    getCurrentValue: () -> Float,
-    onValueChanged: (Float) -> Unit,
+  b: SettingSliderItemBinding,
+  getCurrentValue: () -> Float,
+  onValueChanged: (Float) -> Unit,
 ) {
-    b.title.text = this.title
-    b.slider.valueFrom = this.minValue
-    b.slider.valueTo = this.maxValue
+  b.title.text = this.title
+  b.slider.valueFrom = this.minValue
+  b.slider.valueTo = this.maxValue
 
-    val stepSize = stepSize
-    if (stepSize != null) {
-        b.slider.stepSize = stepSize
-        b.slider.value =
-            ((getCurrentValue() / stepSize).toInt() * b.slider.stepSize)
-                .coerceIn(minValue, maxValue)
-    } else {
-        b.slider.value = getCurrentValue().coerceIn(minValue, maxValue)
-    }
+  val stepSize = stepSize
+  if (stepSize != null) {
+    b.slider.stepSize = stepSize
+    b.slider.value =
+      ((getCurrentValue() / stepSize).toInt() * b.slider.stepSize)
+        .coerceIn(minValue, maxValue)
+  } else {
+    b.slider.value = getCurrentValue().coerceIn(minValue, maxValue)
+  }
 
-    b.slider.addOnSliderTouchListener(
-        object : Slider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: Slider) {}
+  b.slider.addOnSliderTouchListener(
+    object : Slider.OnSliderTouchListener {
+      override fun onStartTrackingTouch(slider: Slider) {}
 
-            override fun onStopTrackingTouch(slider: Slider) {
-                onValueChanged(slider.value)
-            }
-        },
-    )
+      override fun onStopTrackingTouch(slider: Slider) {
+        onValueChanged(slider.value)
+      }
+    },
+  )
 
-    // Prevent auto state restoration since multiple checkboxes can have the same id
-    b.slider.isSaveEnabled = false
+  // Prevent auto state restoration since multiple checkboxes can have the same id
+  b.slider.isSaveEnabled = false
 }
 
 fun <T> TextOnlySettingItem.bindTo(
-    activity: SummitActivity,
-    b: TextOnlySettingItemBinding,
-    choices: Map<T, String>,
-    getCurrentChoice: () -> T,
-    onChoiceSelected: (T) -> Unit,
+  activity: SummitActivity,
+  b: TextOnlySettingItemBinding,
+  choices: Map<T, String>,
+  getCurrentChoice: () -> T,
+  onChoiceSelected: (T) -> Unit,
 ) {
-    b.title.text = this.title
-    b.desc.text = choices[getCurrentChoice()]
+  b.title.text = this.title
+  b.desc.text = choices[getCurrentChoice()]
 
-    b.root.setOnClickListener {
-        val curChoice = getCurrentChoice()
-        val bottomMenu = BottomMenu(b.root.context)
-            .apply {
-                val idToChoice = mutableMapOf<Int, T>()
-                choices.entries.withIndex().forEach { (index, entry) ->
-                    idToChoice[index] = entry.key
-                    addItem(index, entry.value)
+  b.root.setOnClickListener {
+    val curChoice = getCurrentChoice()
+    val bottomMenu = BottomMenu(b.root.context)
+      .apply {
+        val idToChoice = mutableMapOf<Int, T>()
+        choices.entries.withIndex().forEach { (index, entry) ->
+          idToChoice[index] = entry.key
+          addItem(index, entry.value)
 
-                    if (getCurrentChoice() == entry.key) {
-                        setChecked(index)
-                    }
-                }
+          if (getCurrentChoice() == entry.key) {
+            setChecked(index)
+          }
+        }
 
-                setTitle(title)
+        setTitle(title)
 
-                setOnMenuItemClickListener {
-                    onChoiceSelected(requireNotNull(idToChoice[it.id]))
-                    b.desc.text = choices[getCurrentChoice()]
-                }
-            }
-        activity.showBottomMenu(bottomMenu)
-    }
+        setOnMenuItemClickListener {
+          onChoiceSelected(requireNotNull(idToChoice[it.id]))
+          b.desc.text = choices[getCurrentChoice()]
+        }
+      }
+    activity.showBottomMenu(bottomMenu)
+  }
 }
 
 fun RadioGroupSettingItem.bindTo(
-    b: SettingTextValueBinding,
-    getCurrentValue: () -> Int,
-    onSettingClick: (setting: RadioGroupSettingItem, currentValue: Int) -> Unit,
+  b: SettingTextValueBinding,
+  getCurrentValue: () -> Int,
+  onSettingClick: (setting: RadioGroupSettingItem, currentValue: Int) -> Unit,
 ) {
-    b.title.text = this.title
+  b.title.text = this.title
 
-    if (this.description == null) {
-        b.desc.visibility = View.GONE
-    } else {
-        b.desc.text = this.description
-        b.desc.visibility = View.VISIBLE
-    }
+  if (this.description == null) {
+    b.desc.visibility = View.GONE
+  } else {
+    b.desc.text = this.description
+    b.desc.visibility = View.VISIBLE
+  }
 
-    b.value.text = this.options.firstOrNull { it.id == getCurrentValue() }?.title
+  b.value.text = this.options.firstOrNull { it.id == getCurrentValue() }?.title
 
-    b.root.tag = this
-    b.root.setOnClickListener {
-        onSettingClick(this, getCurrentValue())
-    }
+  b.root.tag = this
+  b.root.setOnClickListener {
+    onSettingClick(this, getCurrentValue())
+  }
 }
 
 fun RadioGroupSettingItem.bindToMultiView(
-    b: RadioGroupTitleSettingItemBinding,
-    optionsB: List<RadioGroupOptionSettingItemBinding>,
-    getCurrentValue: () -> Int,
-    onValueChanged: (Int) -> Unit,
+  b: RadioGroupTitleSettingItemBinding,
+  optionsB: List<RadioGroupOptionSettingItemBinding>,
+  getCurrentValue: () -> Int,
+  onValueChanged: (Int) -> Unit,
 ) {
-    require(optionsB.size == this.options.size)
+  require(optionsB.size == this.options.size)
 
-    b.title.text = this.title
+  b.title.text = this.title
 
-    val zipped = this.options.zip(optionsB)
+  val zipped = this.options.zip(optionsB)
 
-    fun updateChecked() {
-        val currentValue = getCurrentValue()
-        zipped.forEach { (option, b) ->
-            b.radioButton.isChecked = option.id == currentValue
-        }
-    }
-    updateChecked()
-
+  fun updateChecked() {
+    val currentValue = getCurrentValue()
     zipped.forEach { (option, b) ->
-        b.title.text = option.title
-        if (option.icon != null) {
-            b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(option.icon, 0, 0, 0)
-        } else {
-            b.title.setCompoundDrawables(null, null, null, null)
-        }
-
-        if (option.description != null) {
-            b.desc.visibility = View.VISIBLE
-            b.desc.text = option.description
-        } else {
-            b.desc.visibility = View.GONE
-        }
-
-        b.radioButton.setOnCheckedChangeListener { _, value ->
-            if (value && getCurrentValue() != option.id) {
-                onValueChanged(option.id)
-            }
-            updateChecked()
-        }
+      b.radioButton.isChecked = option.id == currentValue
     }
+  }
+  updateChecked()
+
+  zipped.forEach { (option, b) ->
+    b.title.text = option.title
+    if (option.icon != null) {
+      b.title.setCompoundDrawablesRelativeWithIntrinsicBounds(option.icon, 0, 0, 0)
+    } else {
+      b.title.setCompoundDrawables(null, null, null, null)
+    }
+
+    if (option.description != null) {
+      b.desc.visibility = View.VISIBLE
+      b.desc.text = option.description
+    } else {
+      b.desc.visibility = View.GONE
+    }
+
+    b.radioButton.setOnCheckedChangeListener { _, value ->
+      if (value && getCurrentValue() != option.id) {
+        onValueChanged(option.id)
+      }
+      updateChecked()
+    }
+  }
 }
 
 fun ColorSettingItem.bindTo(
-    b: SettingColorItemBinding,
-    globalStateStorage: GlobalStateStorage,
-    getCurrentValue: () -> Int?,
-    onValueChanged: (Int) -> Unit,
-    defaultValue: (() -> Int),
+  b: SettingColorItemBinding,
+  globalStateStorage: GlobalStateStorage,
+  getCurrentValue: () -> Int?,
+  onValueChanged: (Int) -> Unit,
+  defaultValue: (() -> Int),
 ) {
-    val context = b.title.context
+  val context = b.title.context
 
-    if (this.icon == null) {
-        b.icon.visibility = View.GONE
-    } else {
-        b.icon.setImageResource(this.icon)
-        b.icon.visibility = View.VISIBLE
-    }
+  if (this.icon == null) {
+    b.icon.visibility = View.GONE
+  } else {
+    b.icon.setImageResource(this.icon)
+    b.icon.visibility = View.VISIBLE
+  }
 
-    b.title.text = this.title
+  b.title.text = this.title
 
-    if (this.description == null) {
-        b.desc.visibility = View.GONE
-    } else {
-        b.desc.text = description
-        b.desc.visibility = View.VISIBLE
-    }
+  if (this.description == null) {
+    b.desc.visibility = View.GONE
+  } else {
+    b.desc.text = description
+    b.desc.visibility = View.VISIBLE
+  }
 
-    b.colorInner.setBackgroundColor(
-        getCurrentValue() ?: defaultValue(),
+  b.colorInner.setBackgroundColor(
+    getCurrentValue() ?: defaultValue(),
+  )
+
+  b.root.setOnClickListener {
+    com.idunnololz.summit.util.colorPicker.ColorPickerDialog(
+      context = context,
+      title = title,
+      color = getCurrentValue() ?: defaultValue(),
+      defaultColor = defaultValue(),
+      globalStateStorage = globalStateStorage,
     )
-
-    b.root.setOnClickListener {
-        com.idunnololz.summit.util.colorPicker.ColorPickerDialog(
-            context = context,
-            title = title,
-            color = getCurrentValue() ?: defaultValue(),
-            defaultColor = defaultValue(),
-            globalStateStorage = globalStateStorage,
-        )
-            .withAlphaEnabled(true)
-            .withListener(object : OnColorPickedListener {
-                override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
-                    onValueChanged(color)
-                    b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
-                }
-            })
-            .show()
-    }
+      .withAlphaEnabled(true)
+      .withListener(object : OnColorPickedListener {
+        override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
+          onValueChanged(color)
+          b.colorInner.setBackgroundColor(getCurrentValue() ?: defaultValue())
+        }
+      })
+      .show()
+  }
 }
 
 var SettingTextValueBinding.isEnabled: Boolean
-    get() = root.isEnabled
-    set(value) {
-        root.isEnabled = value
-        this.title.isEnabled = value
-        this.value.isEnabled = value
-    }
+  get() = root.isEnabled
+  set(value) {
+    root.isEnabled = value
+    this.title.isEnabled = value
+    this.value.isEnabled = value
+  }
 
 var SettingItemOnOffBinding.isEnabled: Boolean
-    get() = root.isEnabled
-    set(value) {
-        root.isEnabled = value
-        this.title.isEnabled = value
-        this.desc.isEnabled = value
-        this.switchView.isEnabled = value
-    }
+  get() = root.isEnabled
+  set(value) {
+    root.isEnabled = value
+    this.title.isEnabled = value
+    this.desc.isEnabled = value
+    this.switchView.isEnabled = value
+  }
 
 fun TextValueSettingItem.bindTo(
-    b: SettingTextValueBinding,
-    getCurrentValue: () -> String,
-    onSettingClick: (setting: TextValueSettingItem, currentValue: String) -> Unit,
+  b: SettingTextValueBinding,
+  getCurrentValue: () -> String,
+  onSettingClick: (setting: TextValueSettingItem, currentValue: String) -> Unit,
 ) {
-    b.title.text = this.title
+  b.title.text = this.title
 
-    if (this.description == null) {
-        b.desc.visibility = View.GONE
-    } else {
-        b.desc.text = this.description
-        b.desc.visibility = View.VISIBLE
-    }
+  if (this.description == null) {
+    b.desc.visibility = View.GONE
+  } else {
+    b.desc.text = this.description
+    b.desc.visibility = View.VISIBLE
+  }
 
-    b.value.text = getCurrentValue()
+  b.value.text = getCurrentValue()
 
-    b.root.tag = this
-    b.root.setOnClickListener {
-        onSettingClick(this, getCurrentValue())
-    }
+  b.root.tag = this
+  b.root.setOnClickListener {
+    onSettingClick(this, getCurrentValue())
+  }
 }

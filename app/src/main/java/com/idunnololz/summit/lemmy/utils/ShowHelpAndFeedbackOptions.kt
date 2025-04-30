@@ -6,10 +6,10 @@ import com.idunnololz.summit.util.DirectoryHelper
 import java.io.File
 
 fun BaseFragment<*>.showHelpAndFeedbackOptions() {
-    if (!isBindingAvailable()) return
-    HelpAndFeedbackDialogFragment.show(childFragmentManager)
+  if (!isBindingAvailable()) return
+  HelpAndFeedbackDialogFragment.show(childFragmentManager)
 }
 
 fun DirectoryHelper.getFeedbackScreenshotFile(): File {
-    return File(saveForLaterDir, "slot_feedback_screenshot.jpg")
+  return File(saveForLaterDir, "slot_feedback_screenshot.jpg")
 }

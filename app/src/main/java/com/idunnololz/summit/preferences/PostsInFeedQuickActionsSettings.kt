@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PostsInFeedQuickActionsSettings(
-    val enabled: Boolean = false,
-    val actions: List<PostQuickActionId> = listOf(),
+  val enabled: Boolean = false,
+  val actions: List<PostQuickActionId> = listOf(),
 )

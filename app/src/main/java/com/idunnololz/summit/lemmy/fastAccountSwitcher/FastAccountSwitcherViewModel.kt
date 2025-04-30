@@ -12,21 +12,21 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FastAccountSwitcherViewModel @Inject constructor(
-    private val accountManager: AccountManager,
-    private val accountInfoManager: AccountInfoManager,
+  private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
-    val accounts = StatefulLiveData<List<AccountView>>()
+  val accounts = StatefulLiveData<List<AccountView>>()
 
-    fun refreshAccounts() {
-        accounts.setIsLoading()
+  fun refreshAccounts() {
+    accounts.setIsLoading()
 
-        viewModelScope.launch {
-            val accountViews = accountManager.getAccounts().map {
-                accountInfoManager.getAccountViewForAccount(it)
-            }
+    viewModelScope.launch {
+      val accountViews = accountManager.getAccounts().map {
+        accountInfoManager.getAccountViewForAccount(it)
+      }
 
-            accounts.postValue(accountViews)
-        }
+      accounts.postValue(accountViews)
     }
+  }
 }

@@ -29,41 +29,41 @@ annotation class StateSharedPreference
 @InstallIn(SingletonComponent::class)
 @Module
 class PreferencesModule {
-    @Provides
-    @Singleton
-    fun providePreferences(
-        @ApplicationContext context: Context,
-        sharedPreferencesManager: SharedPreferencesManager,
-        coroutineScopeFactory: CoroutineScopeFactory,
-        json: Json,
-    ): Preferences = Preferences(
-        context = context,
-        sharedPreferencesManager = sharedPreferencesManager,
-        sharedPreferences = sharedPreferencesManager.defaultSharedPreferences,
-        coroutineScopeFactory = coroutineScopeFactory,
-        json = json,
-    )
+  @Provides
+  @Singleton
+  fun providePreferences(
+    @ApplicationContext context: Context,
+    sharedPreferencesManager: SharedPreferencesManager,
+    coroutineScopeFactory: CoroutineScopeFactory,
+    json: Json,
+  ): Preferences = Preferences(
+    context = context,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sharedPreferences = sharedPreferencesManager.defaultSharedPreferences,
+    coroutineScopeFactory = coroutineScopeFactory,
+    json = json,
+  )
 
-    @AccountIdsSharedPreference
-    @Provides
-    fun provideAccountIdsSharedPreference(
-        preferenceManager: SharedPreferencesManager,
-    ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
+  @AccountIdsSharedPreference
+  @Provides
+  fun provideAccountIdsSharedPreference(
+    preferenceManager: SharedPreferencesManager,
+  ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
 
-    @NotificationsSharedPreference
-    @Provides
-    fun provideNotificationsSharedPreference(
-        preferenceManager: SharedPreferencesManager,
-    ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
+  @NotificationsSharedPreference
+  @Provides
+  fun provideNotificationsSharedPreference(
+    preferenceManager: SharedPreferencesManager,
+  ): SharedPreferences = preferenceManager.getAccountIdSharedPreferences()
 
-    @StateSharedPreference
-    @Provides
-    fun provideStateSharedPreference(
-        preferenceManager: SharedPreferencesManager,
-    ): SharedPreferences = preferenceManager.getGlobalStateSharedPreferences()
+  @StateSharedPreference
+  @Provides
+  fun provideStateSharedPreference(
+    preferenceManager: SharedPreferencesManager,
+  ): SharedPreferences = preferenceManager.getGlobalStateSharedPreferences()
 
-    @Provides
-    @Singleton
-    fun provideGlobalStateStorage(stateStorageManager: StateStorageManager): GlobalStateStorage =
-        stateStorageManager.globalStateStorage
+  @Provides
+  @Singleton
+  fun provideGlobalStateStorage(stateStorageManager: StateStorageManager): GlobalStateStorage =
+    stateStorageManager.globalStateStorage
 }

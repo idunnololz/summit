@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class BaseTheme {
-    @SerialName("use_system")
-    UseSystem,
+  @SerialName("use_system")
+  UseSystem,
 
-    @SerialName("light")
-    Light,
+  @SerialName("light")
+  Light,
 
-    @SerialName("dark")
-    Dark,
+  @SerialName("dark")
+  Dark,
 }

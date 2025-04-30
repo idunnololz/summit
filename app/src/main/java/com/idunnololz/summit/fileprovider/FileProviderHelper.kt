@@ -7,46 +7,46 @@ import java.io.File
 import java.io.OutputStream
 
 class FileProviderHelper(
-    private val context: Context,
+  private val context: Context,
 ) {
-    val fileProviderDir = File(context.cacheDir, "fileprovider")
+  val fileProviderDir = File(context.cacheDir, "fileprovider")
 
-    suspend fun openTempFile(fileName: String, writeFn: suspend (OutputStream) -> Unit): Uri {
-        val file = File(fileProviderDir, fileName)
+  suspend fun openTempFile(fileName: String, writeFn: suspend (OutputStream) -> Unit): Uri {
+    val file = File(fileProviderDir, fileName)
 
-        if (file.isDirectory) {
-            file.delete()
-        }
-
-        file.parentFile?.mkdirs()
-
-        file.outputStream().use {
-            writeFn(it)
-        }
-
-        return FileProvider.getUriForFile(
-            context,
-            context.applicationContext.packageName + ".fileprovider",
-            file,
-        )
+    if (file.isDirectory) {
+      file.delete()
     }
 
-    fun getTempFile(fileName: String): FileWithUri {
-        val file = File(fileProviderDir, fileName)
+    file.parentFile?.mkdirs()
 
-        if (file.isDirectory) {
-            file.delete()
-        }
-
-        file.parentFile?.mkdirs()
-
-        return FileWithUri(
-            file = file,
-            uri = FileProvider.getUriForFile(
-                context,
-                context.applicationContext.packageName + ".fileprovider",
-                file,
-            ),
-        )
+    file.outputStream().use {
+      writeFn(it)
     }
+
+    return FileProvider.getUriForFile(
+      context,
+      context.applicationContext.packageName + ".fileprovider",
+      file,
+    )
+  }
+
+  fun getTempFile(fileName: String): FileWithUri {
+    val file = File(fileProviderDir, fileName)
+
+    if (file.isDirectory) {
+      file.delete()
+    }
+
+    file.parentFile?.mkdirs()
+
+    return FileWithUri(
+      file = file,
+      uri = FileProvider.getUriForFile(
+        context,
+        context.applicationContext.packageName + ".fileprovider",
+        file,
+      ),
+    )
+  }
 }

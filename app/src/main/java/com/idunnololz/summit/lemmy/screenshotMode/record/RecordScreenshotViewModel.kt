@@ -6,5 +6,5 @@ import com.idunnololz.summit.util.viewRecorder.RecordScreenshotConfig
 
 class RecordScreenshotViewModel : ViewModel() {
 
-    val recordScreenshotConfig = MutableLiveData(RecordScreenshotConfig())
+  val recordScreenshotConfig = MutableLiveData(RecordScreenshotConfig())
 }

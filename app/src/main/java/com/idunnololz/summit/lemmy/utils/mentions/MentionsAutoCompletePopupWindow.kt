@@ -14,49 +14,49 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.setup
 
 class MentionsAutoCompletePopupWindow(
-    context: Context,
-    adapterFactory: MentionsResultAdapter.Factory,
-    animationsHelper: AnimationsHelper,
-    val onItemSelected: (String) -> Unit,
+  context: Context,
+  adapterFactory: MentionsResultAdapter.Factory,
+  animationsHelper: AnimationsHelper,
+  val onItemSelected: (String) -> Unit,
 ) : PopupWindow(context) {
 
-    val adapter = adapterFactory.create()
-    val binding = MentionsPopupBinding.inflate(LayoutInflater.from(context))
+  val adapter = adapterFactory.create()
+  val binding = MentionsPopupBinding.inflate(LayoutInflater.from(context))
 
-    init {
-        contentView = binding.apply {
-            recyclerView.setup(animationsHelper)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.setHasFixedSize(false)
-            recyclerView.adapter = adapter
-        }.root
+  init {
+    contentView = binding.apply {
+      recyclerView.setup(animationsHelper)
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setHasFixedSize(false)
+      recyclerView.adapter = adapter
+    }.root
 
-        height = ViewGroup.LayoutParams.WRAP_CONTENT
-        width = ViewGroup.LayoutParams.MATCH_PARENT
-        isOutsideTouchable = true
-        inputMethodMode = INPUT_METHOD_NEEDED
+    height = ViewGroup.LayoutParams.WRAP_CONTENT
+    width = ViewGroup.LayoutParams.MATCH_PARENT
+    isOutsideTouchable = true
+    inputMethodMode = INPUT_METHOD_NEEDED
 
-        adapter.onResultSelected = {
-            when (it) {
-                is CommunityResultItem -> {
-                    val link = LinkUtils.getLinkForCommunity(it.communityView.community.toCommunityRef())
-                    val text = "${it.mentionPrefix}${it.communityView.community.fullName}"
+    adapter.onResultSelected = {
+      when (it) {
+        is CommunityResultItem -> {
+          val link = LinkUtils.getLinkForCommunity(it.communityView.community.toCommunityRef())
+          val text = "${it.mentionPrefix}${it.communityView.community.fullName}"
 
-                    onItemSelected("[$text]($link)")
-                }
-                is PersonResultItem -> {
-                    val link = LinkUtils.getLinkForPerson(it.personView.person.toPersonRef())
-                    val text = "${it.mentionPrefix}${it.personView.person.fullName}"
-
-                    onItemSelected("[$text]($link)")
-                }
-            }
+          onItemSelected("[$text]($link)")
         }
+        is PersonResultItem -> {
+          val link = LinkUtils.getLinkForPerson(it.personView.person.toPersonRef())
+          val text = "${it.mentionPrefix}${it.personView.person.fullName}"
 
-        setBackgroundDrawable(null)
-
-        binding.root.setOnClickListener {
-            dismiss()
+          onItemSelected("[$text]($link)")
         }
+      }
     }
+
+    setBackgroundDrawable(null)
+
+    binding.root.setOnClickListener {
+      dismiss()
+    }
+  }
 }

@@ -12,31 +12,31 @@ import kotlinx.coroutines.launch
 
 @Singleton
 class PostFeedPrefetcher @Inject constructor(
-    coroutineScopeFactory: CoroutineScopeFactory,
+  coroutineScopeFactory: CoroutineScopeFactory,
 ) {
-    companion object {
-        private const val TAG = "PostFeedPrefetcher"
+  companion object {
+    private const val TAG = "PostFeedPrefetcher"
+  }
+
+  private val coroutineScope = coroutineScopeFactory.create()
+  private var prefetchingJob: Job? = null
+
+  fun prefetchPage(
+    pageIndex: Int,
+    postsRepository: PostsRepository,
+    coroutineScope: CoroutineScope = this.coroutineScope,
+  ) {
+    Log.d(TAG, "Prefetching page $pageIndex")
+
+    prefetchingJob = coroutineScope.launch(Dispatchers.IO) {
+      suspendPrefetchPage(pageIndex = pageIndex, postsRepository = postsRepository)
     }
+  }
 
-    private val coroutineScope = coroutineScopeFactory.create()
-    private var prefetchingJob: Job? = null
-
-    fun prefetchPage(
-        pageIndex: Int,
-        postsRepository: PostsRepository,
-        coroutineScope: CoroutineScope = this.coroutineScope,
-    ) {
-        Log.d(TAG, "Prefetching page $pageIndex")
-
-        prefetchingJob = coroutineScope.launch(Dispatchers.IO) {
-            suspendPrefetchPage(pageIndex = pageIndex, postsRepository = postsRepository)
-        }
-    }
-
-    suspend fun suspendPrefetchPage(
-        pageIndex: Int,
-        postsRepository: PostsRepository,
-    ): Result<PostsRepository.PageResult> {
-        return postsRepository.getPage(pageIndex, dispatcher = Dispatchers.IO)
-    }
+  suspend fun suspendPrefetchPage(
+    pageIndex: Int,
+    postsRepository: PostsRepository,
+  ): Result<PostsRepository.PageResult> {
+    return postsRepository.getPage(pageIndex, dispatcher = Dispatchers.IO)
+  }
 }

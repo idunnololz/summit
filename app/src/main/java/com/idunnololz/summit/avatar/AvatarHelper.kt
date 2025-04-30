@@ -34,132 +34,132 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class AvatarHelper @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val accountImageGenerator: AccountImageGenerator,
-    coroutineScopeFactory: CoroutineScopeFactory,
+  @ApplicationContext private val context: Context,
+  private val accountImageGenerator: AccountImageGenerator,
+  coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
-    private val coroutineScope = coroutineScopeFactory.create()
+  private val coroutineScope = coroutineScopeFactory.create()
 
-    fun loadAvatar(imageView: ImageView, person: Person) {
-        loadAvatar(
-            imageView = imageView,
-            imageUrl = person.avatar,
-            personName = person.name,
-            personId = person.id,
-            personInstance = person.instance,
+  fun loadAvatar(imageView: ImageView, person: Person) {
+    loadAvatar(
+      imageView = imageView,
+      imageUrl = person.avatar,
+      personName = person.name,
+      personId = person.id,
+      personInstance = person.instance,
+    )
+  }
+
+  fun generateDrawableAndSet(
+    view: View,
+    personName: String,
+    personId: PersonId,
+    personInstance: String,
+    setDrawable: (Drawable) -> Unit,
+  ) {
+    (view.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
+    val job = coroutineScope.launch {
+      val d = accountImageGenerator.generateDrawableForPerson(
+        personName,
+        personId,
+        personInstance,
+      )
+
+      withContext(Dispatchers.Main) {
+        setDrawable(d)
+      }
+    }
+    view.setTag(R.id.generate_profile_icon_job, job)
+  }
+
+  fun loadAvatar(
+    imageView: ImageView,
+    imageUrl: String?,
+    personName: String,
+    personId: PersonId,
+    personInstance: String,
+  ) {
+    (imageView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
+
+    if (imageUrl.isNullOrBlank()) {
+      val job = coroutineScope.launch {
+        val d = accountImageGenerator.generateDrawableForPerson(
+          personName,
+          personId,
+          personInstance,
         )
-    }
 
-    fun generateDrawableAndSet(
-        view: View,
-        personName: String,
-        personId: PersonId,
-        personInstance: String,
-        setDrawable: (Drawable) -> Unit,
-    ) {
-        (view.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
-        val job = coroutineScope.launch {
-            val d = accountImageGenerator.generateDrawableForPerson(
-                personName,
-                personId,
-                personInstance,
-            )
-
-            withContext(Dispatchers.Main) {
-                setDrawable(d)
-            }
+        withContext(Dispatchers.Main) {
+          imageView.dispose()
+          imageView.setImageDrawable(d)
         }
-        view.setTag(R.id.generate_profile_icon_job, job)
+      }
+      imageView.setTag(R.id.generate_profile_icon_job, job)
+    } else {
+      imageView.load(imageUrl) {
+        placeholder(newShimmerDrawableSquare(context).asImage())
+        allowHardware(false)
+      }
     }
+  }
 
-    fun loadAvatar(
-        imageView: ImageView,
-        imageUrl: String?,
-        personName: String,
-        personId: PersonId,
-        personInstance: String,
-    ) {
-        (imageView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
+  fun loadAvatar(
+    target: coil3.target.Target,
+    imageUrl: String?,
+    personName: String,
+    personId: PersonId,
+    personInstance: String,
+  ): Job {
+    return if (imageUrl.isNullOrBlank()) {
+      coroutineScope.launch {
+        val d = accountImageGenerator.generateDrawableForPerson(
+          personName = personName,
+          personId = personId,
+          personInstance = personInstance,
+          circleClip = true,
+        )
 
-        if (imageUrl.isNullOrBlank()) {
-            val job = coroutineScope.launch {
-                val d = accountImageGenerator.generateDrawableForPerson(
-                    personName,
-                    personId,
-                    personInstance,
-                )
-
-                withContext(Dispatchers.Main) {
-                    imageView.dispose()
-                    imageView.setImageDrawable(d)
-                }
-            }
-            imageView.setTag(R.id.generate_profile_icon_job, job)
-        } else {
-            imageView.load(imageUrl) {
-                placeholder(newShimmerDrawableSquare(context).asImage())
-                allowHardware(false)
-            }
+        withContext(Dispatchers.Main) {
+          target.onSuccess(d.asImage())
         }
+      }
+    } else {
+      coroutineScope.launch {
+        context.imageLoader.execute(
+          ImageRequest.Builder(context)
+            .data(imageUrl)
+            .transformations(CircleCropTransformation())
+            .target(target)
+            .placeholder(newShimmerDrawableSquare(context).asImage())
+            .allowHardware(false)
+            .build(),
+        )
+      }
     }
+  }
 
-    fun loadAvatar(
-        target: coil3.target.Target,
-        imageUrl: String?,
-        personName: String,
-        personId: PersonId,
-        personInstance: String,
-    ): Job {
-        return if (imageUrl.isNullOrBlank()) {
-            coroutineScope.launch {
-                val d = accountImageGenerator.generateDrawableForPerson(
-                    personName = personName,
-                    personId = personId,
-                    personInstance = personInstance,
-                    circleClip = true,
-                )
+  fun loadCommunityIcon(imageView: ImageView, community: Community) {
+    loadCommunityIcon(imageView, community.toCommunityRef(), community.icon)
+  }
 
-                withContext(Dispatchers.Main) {
-                    target.onSuccess(d.asImage())
-                }
-            }
-        } else {
-            coroutineScope.launch {
-                context.imageLoader.execute(
-                    ImageRequest.Builder(context)
-                        .data(imageUrl)
-                        .transformations(CircleCropTransformation())
-                        .target(target)
-                        .placeholder(newShimmerDrawableSquare(context).asImage())
-                        .allowHardware(false)
-                        .build(),
-                )
-            }
+  fun loadCommunityIcon(imageView: ImageView, communityRef: CommunityRef, iconUrl: String?) {
+    (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
+
+    if (iconUrl.isNullOrBlank()) {
+      val job = coroutineScope.launch {
+        val d = accountImageGenerator.generateDrawableForGeneric(
+          communityRef.getKey(),
+          context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
+        )
+
+        withContext(Dispatchers.Main) {
+          imageView.dispose()
+          imageView.setImageDrawable(d)
         }
-    }
-
-    fun loadCommunityIcon(imageView: ImageView, community: Community) {
-        loadCommunityIcon(imageView, community.toCommunityRef(), community.icon)
-    }
-
-    fun loadCommunityIcon(imageView: ImageView, communityRef: CommunityRef, iconUrl: String?) {
-        (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
-
-        if (iconUrl.isNullOrBlank()) {
-            val job = coroutineScope.launch {
-                val d = accountImageGenerator.generateDrawableForGeneric(
-                    communityRef.getKey(),
-                    context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
-                )
-
-                withContext(Dispatchers.Main) {
-                    imageView.dispose()
-                    imageView.setImageDrawable(d)
-                }
-            }
-            imageView.setTag(R.id.generate_profile_icon_job, job)
-        } else {
+      }
+      imageView.setTag(R.id.generate_profile_icon_job, job)
+    } else {
             /*
 
                     offlineManager.fetchImageWithError(
@@ -173,49 +173,49 @@ class AvatarHelper @Inject constructor(
                         },
                     )
              */
-            imageView.load(iconUrl) {
-                allowHardware(false)
-                placeholder(newShimmerDrawableSquare(context).asImage())
-                listener(
-                    onError = { _, _ ->
-                        loadCommunityIcon(imageView, communityRef, null)
-                    },
-                )
-            }
+      imageView.load(iconUrl) {
+        allowHardware(false)
+        placeholder(newShimmerDrawableSquare(context).asImage())
+        listener(
+          onError = { _, _ ->
+            loadCommunityIcon(imageView, communityRef, null)
+          },
+        )
+      }
+    }
+  }
+
+  fun loadInstanceIcon(imageView: ImageView, siteView: SiteView?) {
+    loadInstanceIcon(imageView, siteView, siteView?.site?.icon)
+  }
+
+  fun loadInstanceIcon(imageView: ImageView, siteView: SiteView?, iconUrl: String?) {
+    (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
+    if (iconUrl.isNullOrBlank()) {
+      val job = coroutineScope.launch {
+        val d = accountImageGenerator.generateDrawableForGeneric(
+          key = siteView?.site?.public_key ?: "",
+          drawable = context.getDrawableCompat(
+            R.drawable.ic_lemmy_outline_community_icon_24,
+          ),
+        )
+
+        withContext(Dispatchers.Main) {
+          imageView.dispose()
+          imageView.setImageDrawable(d)
         }
+      }
+      imageView.setTag(R.id.generate_profile_icon_job, job)
+    } else {
+      imageView.load(iconUrl) {
+        allowHardware(false)
+        placeholder(newShimmerDrawableSquare(context).asImage())
+        listener(
+          onError = { _, _ ->
+            loadInstanceIcon(imageView, siteView, null)
+          },
+        )
+      }
     }
-
-    fun loadInstanceIcon(imageView: ImageView, siteView: SiteView?) {
-        loadInstanceIcon(imageView, siteView, siteView?.site?.icon)
-    }
-
-    fun loadInstanceIcon(imageView: ImageView, siteView: SiteView?, iconUrl: String?) {
-        (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
-        if (iconUrl.isNullOrBlank()) {
-            val job = coroutineScope.launch {
-                val d = accountImageGenerator.generateDrawableForGeneric(
-                    key = siteView?.site?.public_key ?: "",
-                    drawable = context.getDrawableCompat(
-                        R.drawable.ic_lemmy_outline_community_icon_24,
-                    ),
-                )
-
-                withContext(Dispatchers.Main) {
-                    imageView.dispose()
-                    imageView.setImageDrawable(d)
-                }
-            }
-            imageView.setTag(R.id.generate_profile_icon_job, job)
-        } else {
-            imageView.load(iconUrl) {
-                allowHardware(false)
-                placeholder(newShimmerDrawableSquare(context).asImage())
-                listener(
-                    onError = { _, _ ->
-                        loadInstanceIcon(imageView, siteView, null)
-                    },
-                )
-            }
-        }
-    }
+  }
 }

@@ -6,5 +6,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor() : ViewModel() {
-    var url: String? = null
+  var url: String? = null
 }

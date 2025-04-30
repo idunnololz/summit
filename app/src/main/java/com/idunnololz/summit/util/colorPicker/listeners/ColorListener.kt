@@ -18,5 +18,5 @@ package com.idunnololz.summit.util.colorPicker.listeners
 import androidx.annotation.ColorInt
 
 interface ColorListener : ColorPickerViewListener {
-    fun onColorSelected(@ColorInt color: Int, fromUser: Boolean)
+  fun onColorSelected(@ColorInt color: Int, fromUser: Boolean)
 }

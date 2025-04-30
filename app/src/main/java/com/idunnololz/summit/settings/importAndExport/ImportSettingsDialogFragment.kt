@@ -37,301 +37,301 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ImportSettingsDialogFragment :
-    BaseDialogFragment<DialogFragmentImportSettingsBinding>(),
-    FullscreenDialogFragment {
+  BaseDialogFragment<DialogFragmentImportSettingsBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
+  companion object {
 
-        fun show(fragmentManager: FragmentManager) {
-            ImportSettingsDialogFragment()
-                .showAllowingStateLoss(fragmentManager, "ImportSettingsDialogFragment")
-        }
+    fun show(fragmentManager: FragmentManager) {
+      ImportSettingsDialogFragment()
+        .showAllowingStateLoss(fragmentManager, "ImportSettingsDialogFragment")
+    }
+  }
+
+  private val viewModel: ImportSettingsViewModel by viewModels()
+
+  @Inject
+  lateinit var settingsBackupManager: SettingsBackupManager
+
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
+
+  private val chooseFileLauncher =
+    registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+      if (uri != null) {
+        viewModel.generatePreviewFromFile(uri)
+      }
     }
 
-    private val viewModel: ImportSettingsViewModel by viewModels()
+  private val restartAppDialogLauncher = newAlertDialogLauncher("restart_required") {
+    if (it.isOk) {
+      ProcessPhoenix.triggerRebirth(requireContext())
+    } else {
+      dismiss()
+    }
+  }
 
-    @Inject
-    lateinit var settingsBackupManager: SettingsBackupManager
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
 
-    private val chooseFileLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                viewModel.generatePreviewFromFile(uri)
-            }
-        }
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
+    }
+  }
 
-    private val restartAppDialogLauncher = newAlertDialogLauncher("restart_required") {
-        if (it.isOk) {
-            ProcessPhoenix.triggerRebirth(requireContext())
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentImportSettingsBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireMainActivity().apply {
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+    }
+
+    with(binding) {
+      toolbar.title = getString(R.string.import_settings)
+      toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+      toolbar.setNavigationIconTint(
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+      )
+      toolbar.setNavigationOnClickListener {
+        onBackPressedDispatcher.onBackPressed()
+      }
+
+      importFromCode.setOnClickListener {
+        val text = importSettingsEditText.text
+        if (text.isNullOrBlank()) {
+          importSettingsTextInput.error = getString(R.string.settings_code_missing)
         } else {
-            dismiss()
+          importSettingsTextInput.error = null
+          viewModel.importSettings(text.toString())
         }
-    }
+      }
+      importFromFile.setOnClickListener {
+        chooseFileLauncher.launch("*/*")
+      }
+      importSettingsTextInput.setEndIconOnClickListener {
+        importSettingsEditText.setText(Utils.getFromClipboard(context))
+      }
+      importFromInternalBackup.setOnClickListener {
+        onImportFromInternalBackup()
+      }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+      viewModel.state.observe(viewLifecycleOwner) {
+        loadingView.hideAll()
 
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
+        when (it) {
+          is ImportSettingsViewModel.State.ConfirmImportSettings -> {
+            showRecyclerViewWithData(it.preview)
+          }
+          is ImportSettingsViewModel.State.Error -> {
+            val errorMessage: String = when (it.error) {
+              ImportSettingsViewModel.ErrorType.UnableToDecipherInput -> {
+                getString(R.string.error_unable_to_decipher_input)
+              }
 
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                WindowCompat.setDecorFitsSystemWindows(window, false)
+              ImportSettingsViewModel.ErrorType.InvalidSettingsJson -> {
+                getString(R.string.error_input_is_not_settings_json)
+              }
+
+              ImportSettingsViewModel.ErrorType.InvalidJson -> {
+                getString(R.string.error_input_is_not_json)
+              }
             }
+
+            launchAlertDialog("error_dialog") {
+              message = errorMessage
+            }
+
+            viewModel.state.postValue(ImportSettingsViewModel.State.NotStarted)
+          }
+          is ImportSettingsViewModel.State.DecodeInputString,
+          is ImportSettingsViewModel.State.GeneratePreviewFromSettingsJson,
+          is ImportSettingsViewModel.State.PerformImportSettings,
+          -> {
+            loadingView.showProgressBar()
+          }
+          ImportSettingsViewModel.State.NotStarted -> {}
+          ImportSettingsViewModel.State.ImportSettingsCompleted -> {
+            restartAppDialogLauncher.launchDialog {
+              titleResId = R.string.app_restart_required
+              messageResId = R.string.app_restart_required_desc
+              positionButtonResId = R.string.restart_app
+              negativeButtonResId = R.string.restart_later
+            }
+          }
         }
+      }
+    }
+  }
+
+  private fun onImportFromInternalBackup() {
+    val context = requireContext()
+
+    val backups = settingsBackupManager.getBackups()
+    val b = ImportSettingsFromBackupsBinding.inflate(LayoutInflater.from(context))
+    val dialog = Dialog(context, R.style.Theme_App_Dialog)
+
+    with(b) {
+      recyclerView.apply {
+        setup(animationsHelper)
+        adapter = BackupsAdapter(
+          backups,
+          onBackupClick = {
+            viewModel.generatePreviewFromFile(it.file.toUri())
+            dialog.dismiss()
+          },
+        )
+        setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(context)
+      }
+
+      if (backups.isEmpty()) {
+        loadingView.showErrorText(R.string.no_backups)
+      } else {
+        loadingView.hideAll()
+      }
+
+      toolbar.title = getString(R.string.choose_a_backup)
+      toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+      toolbar.setNavigationIconTint(
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+      )
+      toolbar.setNavigationOnClickListener {
+        dialog.dismiss()
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    dialog.apply {
+      setContentView(b.root)
+      show()
 
-        setBinding(DialogFragmentImportSettingsBinding.inflate(inflater, container, false))
+      val width = ViewGroup.LayoutParams.MATCH_PARENT
+      val height = ViewGroup.LayoutParams.WRAP_CONTENT
 
-        return binding.root
+      val window = checkNotNull(window)
+      window.setLayout(width, height)
     }
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  private fun showRecyclerViewWithData(data: SettingsDataPreview) {
+    with(binding) {
+      TransitionManager.beginDelayedTransition(root)
 
-        val context = requireContext()
+      importSettingsView.visibility = View.GONE
+      confirmImportView.visibility = View.VISIBLE
 
-        requireMainActivity().apply {
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-        }
-
-        with(binding) {
-            toolbar.title = getString(R.string.import_settings)
-            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-            toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-            )
-            toolbar.setNavigationOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
-            }
-
-            importFromCode.setOnClickListener {
-                val text = importSettingsEditText.text
-                if (text.isNullOrBlank()) {
-                    importSettingsTextInput.error = getString(R.string.settings_code_missing)
-                } else {
-                    importSettingsTextInput.error = null
-                    viewModel.importSettings(text.toString())
-                }
-            }
-            importFromFile.setOnClickListener {
-                chooseFileLauncher.launch("*/*")
-            }
-            importSettingsTextInput.setEndIconOnClickListener {
-                importSettingsEditText.setText(Utils.getFromClipboard(context))
-            }
-            importFromInternalBackup.setOnClickListener {
-                onImportFromInternalBackup()
-            }
-
-            viewModel.state.observe(viewLifecycleOwner) {
-                loadingView.hideAll()
-
-                when (it) {
-                    is ImportSettingsViewModel.State.ConfirmImportSettings -> {
-                        showRecyclerViewWithData(it.preview)
-                    }
-                    is ImportSettingsViewModel.State.Error -> {
-                        val errorMessage: String = when (it.error) {
-                            ImportSettingsViewModel.ErrorType.UnableToDecipherInput -> {
-                                getString(R.string.error_unable_to_decipher_input)
-                            }
-
-                            ImportSettingsViewModel.ErrorType.InvalidSettingsJson -> {
-                                getString(R.string.error_input_is_not_settings_json)
-                            }
-
-                            ImportSettingsViewModel.ErrorType.InvalidJson -> {
-                                getString(R.string.error_input_is_not_json)
-                            }
-                        }
-
-                        launchAlertDialog("error_dialog") {
-                            message = errorMessage
-                        }
-
-                        viewModel.state.postValue(ImportSettingsViewModel.State.NotStarted)
-                    }
-                    is ImportSettingsViewModel.State.DecodeInputString,
-                    is ImportSettingsViewModel.State.GeneratePreviewFromSettingsJson,
-                    is ImportSettingsViewModel.State.PerformImportSettings,
-                    -> {
-                        loadingView.showProgressBar()
-                    }
-                    ImportSettingsViewModel.State.NotStarted -> {}
-                    ImportSettingsViewModel.State.ImportSettingsCompleted -> {
-                        restartAppDialogLauncher.launchDialog {
-                            titleResId = R.string.app_restart_required
-                            messageResId = R.string.app_restart_required_desc
-                            positionButtonResId = R.string.restart_app
-                            negativeButtonResId = R.string.restart_later
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun onImportFromInternalBackup() {
-        val context = requireContext()
-
-        val backups = settingsBackupManager.getBackups()
-        val b = ImportSettingsFromBackupsBinding.inflate(LayoutInflater.from(context))
-        val dialog = Dialog(context, R.style.Theme_App_Dialog)
-
-        with(b) {
-            recyclerView.apply {
-                setup(animationsHelper)
-                adapter = BackupsAdapter(
-                    backups,
-                    onBackupClick = {
-                        viewModel.generatePreviewFromFile(it.file.toUri())
-                        dialog.dismiss()
-                    },
-                )
-                setHasFixedSize(true)
-                layoutManager = LinearLayoutManager(context)
-            }
-
-            if (backups.isEmpty()) {
-                loadingView.showErrorText(R.string.no_backups)
+      val excludedKeys = mutableSetOf<String>()
+      val adapter = SettingDataAdapter(
+        context = binding.root.context,
+        isImporting = true,
+        onSettingPreviewClick = { settingKey, settingsDataPreview ->
+          ImportSettingItemPreviewDialogFragment.show(
+            childFragmentManager,
+            settingKey,
+            settingsDataPreview.settingsPreview[settingKey] ?: "",
+            settingsDataPreview.keyToType[settingKey] ?: "?",
+          )
+        },
+        onTableClick = {
+          TableDetailsDialogFragment.show(
+            childFragmentManager,
+            requireContext().getDatabasePath(DATABASE_NAME).toUri(),
+            it,
+          )
+        },
+        style = SettingDataAdapter.Style.Switch(
+          onSwitchClick = { key, isChecked ->
+            if (!isChecked) {
+              excludedKeys.add(key)
             } else {
-                loadingView.hideAll()
+              excludedKeys.remove(key)
             }
+          },
+          isChecked = { key ->
+            !excludedKeys.contains(key)
+          },
+        ),
+      ).apply {
+        setData(data)
+      }
 
-            toolbar.title = getString(R.string.choose_a_backup)
-            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-            toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-            )
-            toolbar.setNavigationOnClickListener {
-                dialog.dismiss()
-            }
-        }
+      recyclerView.setHasFixedSize(true)
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.adapter = adapter
 
-        dialog.apply {
-            setContentView(b.root)
-            show()
+      confirmImport.setOnClickListener {
+        viewModel.confirmImport(excludedKeys, adapter.tableResolutions)
+      }
+    }
+  }
 
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
+  private class BackupsAdapter(
+    private val backupData: List<SettingsBackupManager.BackupInfo>,
+    private val onBackupClick: (SettingsBackupManager.BackupInfo) -> Unit,
+  ) : Adapter<ViewHolder>() {
 
-            val window = checkNotNull(window)
-            window.setLayout(width, height)
-        }
+    private sealed interface Item {
+      data class BackupItem(
+        val backupInfo: SettingsBackupManager.BackupInfo,
+      ) : Item
     }
 
-    private fun showRecyclerViewWithData(data: SettingsDataPreview) {
-        with(binding) {
-            TransitionManager.beginDelayedTransition(root)
-
-            importSettingsView.visibility = View.GONE
-            confirmImportView.visibility = View.VISIBLE
-
-            val excludedKeys = mutableSetOf<String>()
-            val adapter = SettingDataAdapter(
-                context = binding.root.context,
-                isImporting = true,
-                onSettingPreviewClick = { settingKey, settingsDataPreview ->
-                    ImportSettingItemPreviewDialogFragment.show(
-                        childFragmentManager,
-                        settingKey,
-                        settingsDataPreview.settingsPreview[settingKey] ?: "",
-                        settingsDataPreview.keyToType[settingKey] ?: "?",
-                    )
-                },
-                onTableClick = {
-                    TableDetailsDialogFragment.show(
-                        childFragmentManager,
-                        requireContext().getDatabasePath(DATABASE_NAME).toUri(),
-                        it,
-                    )
-                },
-                style = SettingDataAdapter.Style.Switch(
-                    onSwitchClick = { key, isChecked ->
-                        if (!isChecked) {
-                            excludedKeys.add(key)
-                        } else {
-                            excludedKeys.remove(key)
-                        }
-                    },
-                    isChecked = { key ->
-                        !excludedKeys.contains(key)
-                    },
-                ),
-            ).apply {
-                setData(data)
-            }
-
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = adapter
-
-            confirmImport.setOnClickListener {
-                viewModel.confirmImport(excludedKeys, adapter.tableResolutions)
-            }
+    private val adapterHelper = AdapterHelper<Item>(
+      areItemsTheSame = { oldItem, newItem ->
+        oldItem::class == newItem::class && when (oldItem) {
+          is Item.BackupItem ->
+            oldItem.backupInfo.file.path ==
+              (newItem as Item.BackupItem).backupInfo.file.path
         }
+      },
+    ).apply {
+      addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
+        b.text.text = item.backupInfo.file.name
+        b.root.setOnClickListener {
+          onBackupClick(item.backupInfo)
+        }
+      }
     }
 
-    private class BackupsAdapter(
-        private val backupData: List<SettingsBackupManager.BackupInfo>,
-        private val onBackupClick: (SettingsBackupManager.BackupInfo) -> Unit,
-    ) : Adapter<ViewHolder>() {
-
-        private sealed interface Item {
-            data class BackupItem(
-                val backupInfo: SettingsBackupManager.BackupInfo,
-            ) : Item
-        }
-
-        private val adapterHelper = AdapterHelper<Item>(
-            areItemsTheSame = { oldItem, newItem ->
-                oldItem::class == newItem::class && when (oldItem) {
-                    is Item.BackupItem ->
-                        oldItem.backupInfo.file.path ==
-                            (newItem as Item.BackupItem).backupInfo.file.path
-                }
-            },
-        ).apply {
-            addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
-                b.text.text = item.backupInfo.file.name
-                b.root.setOnClickListener {
-                    onBackupClick(item.backupInfo)
-                }
-            }
-        }
-
-        init {
-            updateItems()
-        }
-
-        private fun updateItems() {
-            val newItems = backupData.map { Item.BackupItem(it) }
-
-            adapterHelper.setItems(newItems, this)
-        }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
+    init {
+      updateItems()
     }
+
+    private fun updateItems() {
+      val newItems = backupData.map { Item.BackupItem(it) }
+
+      adapterHelper.setItems(newItems, this)
+    }
+
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+  }
 }

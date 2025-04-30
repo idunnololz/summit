@@ -18,43 +18,43 @@ import com.github.drjacky.imagepicker.listener.ResultListener
  */
 internal object DialogHelper {
 
-    /**
-     * Show Image Provide Picker Dialog. This will streamline the code to pick/capture image
-     *
-     */
-    fun showChooseAppDialog(
-        context: Context,
-        listener: ResultListener<ImageProvider>,
-        dismissListener: DismissListener?,
-    ) {
-        val layoutInflater = LayoutInflater.from(context)
-        val binding = DialogChooseAppBinding.inflate(layoutInflater)
+  /**
+   * Show Image Provide Picker Dialog. This will streamline the code to pick/capture image
+   *
+   */
+  fun showChooseAppDialog(
+    context: Context,
+    listener: ResultListener<ImageProvider>,
+    dismissListener: DismissListener?,
+  ) {
+    val layoutInflater = LayoutInflater.from(context)
+    val binding = DialogChooseAppBinding.inflate(layoutInflater)
 
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(R.string.title_choose_image_provider)
-            .setView(binding.root)
-            .setOnCancelListener {
-                listener.onResult(null)
-            }
-            .setOnDismissListener {
-                dismissListener?.onDismiss()
-                listener.onResult(null)
-            }
-            .setNegativeButton(R.string.action_cancel) { _, _ ->
-                listener.onResult(null)
-            }
-            .show()
+    val dialog = AlertDialog.Builder(context)
+      .setTitle(R.string.title_choose_image_provider)
+      .setView(binding.root)
+      .setOnCancelListener {
+        listener.onResult(null)
+      }
+      .setOnDismissListener {
+        dismissListener?.onDismiss()
+        listener.onResult(null)
+      }
+      .setNegativeButton(R.string.action_cancel) { _, _ ->
+        listener.onResult(null)
+      }
+      .show()
 
-        // Handle Camera option click
-        binding.lytCameraPick.setOnClickListener {
-            listener.onResult(ImageProvider.CAMERA)
-            dialog.dismiss()
-        }
-
-        // Handle Gallery option click
-        binding.lytGalleryPick.setOnClickListener {
-            listener.onResult(ImageProvider.GALLERY)
-            dialog.dismiss()
-        }
+    // Handle Camera option click
+    binding.lytCameraPick.setOnClickListener {
+      listener.onResult(ImageProvider.CAMERA)
+      dialog.dismiss()
     }
+
+    // Handle Gallery option click
+    binding.lytGalleryPick.setOnClickListener {
+      listener.onResult(ImageProvider.GALLERY)
+      dialog.dismiss()
+    }
+  }
 }

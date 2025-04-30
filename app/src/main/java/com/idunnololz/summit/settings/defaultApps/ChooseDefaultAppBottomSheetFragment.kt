@@ -26,141 +26,141 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import kotlinx.parcelize.Parcelize
 
 class ChooseDefaultAppBottomSheetFragment :
-    BaseBottomSheetDialogFragment<FragmentChooseDefaultAppBinding>(),
-    FullscreenDialogFragment {
+  BaseBottomSheetDialogFragment<FragmentChooseDefaultAppBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
+  companion object {
 
-        const val RESULT_KEY = "ChooseDefaultAppBottomSheetFragment.result"
-        const val REQUEST_KEY = "ChooseDefaultAppBottomSheetFragment.request"
+    const val RESULT_KEY = "ChooseDefaultAppBottomSheetFragment.result"
+    const val REQUEST_KEY = "ChooseDefaultAppBottomSheetFragment.request"
 
-        fun show(fragmentManager: FragmentManager, intent: Intent) =
-            ChooseDefaultAppBottomSheetFragment()
-                .apply {
-                    arguments = ChooseDefaultAppBottomSheetFragmentArgs(
-                        intent,
-                    ).toBundle()
-                }
-                .show(fragmentManager, "ChooseDefaultAppBottomSheetFragment")
-    }
-
-    @Parcelize
-    class Result(
-        val selectedApp: ApplicationInfo?,
-        val componentName: String?,
-        val clear: Boolean,
-    ) : Parcelable
-
-    private val args: ChooseDefaultAppBottomSheetFragmentArgs by navArgs()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        setBinding(FragmentChooseDefaultAppBinding.inflate(inflater, container, false))
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-        val intent = args.intent
-        val pm = context.packageManager
-        val options: List<ResolveInfo> =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-            } else {
-                pm.queryIntentActivities(intent, 0)
-            }.mapNotNull { it }
-
-        with(binding) {
-            recyclerView.adapter = ResolveInfoAdapter(
-                pm,
-                options,
-                { appInfo, componentName ->
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        Bundle().apply {
-                            putParcelable(
-                                RESULT_KEY,
-                                Result(
-                                    selectedApp = appInfo,
-                                    componentName = componentName,
-                                    clear = appInfo == null,
-                                ),
-                            )
-                        },
-                    )
-                    dismiss()
-                },
-            )
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.setHasFixedSize(false)
+    fun show(fragmentManager: FragmentManager, intent: Intent) =
+      ChooseDefaultAppBottomSheetFragment()
+        .apply {
+          arguments = ChooseDefaultAppBottomSheetFragmentArgs(
+            intent,
+          ).toBundle()
         }
-    }
+        .show(fragmentManager, "ChooseDefaultAppBottomSheetFragment")
+  }
 
-    private class ResolveInfoAdapter(
-        private val packageManager: PackageManager,
-        private val options: List<ResolveInfo>,
-        private val onIntentClick: (ApplicationInfo?, String?) -> Unit,
-    ) : Adapter<ViewHolder>() {
+  @Parcelize
+  class Result(
+    val selectedApp: ApplicationInfo?,
+    val componentName: String?,
+    val clear: Boolean,
+  ) : Parcelable
 
-        sealed interface Item {
-            data class OptionItem(
-                val resolveInfo: ResolveInfo,
-            ) : Item
+  private val args: ChooseDefaultAppBottomSheetFragmentArgs by navArgs()
 
-            data object ClearItem : Item
-        }
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        private val adapterHelper = AdapterHelper<Item>(
-            { old, new ->
-                old::class == new::class && when (old) {
-                    Item.ClearItem -> true
-                    is Item.OptionItem ->
-                        old.resolveInfo.resolvePackageName ==
-                            (new as Item.OptionItem).resolveInfo.resolvePackageName
-                }
+    setBinding(FragmentChooseDefaultAppBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+    val intent = args.intent
+    val pm = context.packageManager
+    val options: List<ResolveInfo> =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+      } else {
+        pm.queryIntentActivities(intent, 0)
+      }.mapNotNull { it }
+
+    with(binding) {
+      recyclerView.adapter = ResolveInfoAdapter(
+        pm,
+        options,
+        { appInfo, componentName ->
+          setFragmentResult(
+            REQUEST_KEY,
+            Bundle().apply {
+              putParcelable(
+                RESULT_KEY,
+                Result(
+                  selectedApp = appInfo,
+                  componentName = componentName,
+                  clear = appInfo == null,
+                ),
+              )
             },
-        ).apply {
-            addItemType(Item.OptionItem::class, ItemAppChoiceBinding::inflate) { item, b, h ->
-                val appInfo = item.resolveInfo.activityInfo.applicationInfo
-                b.icon.load(packageManager.getApplicationIcon(appInfo))
-                b.title.text = packageManager.getApplicationLabel(appInfo)
-
-                b.root.setOnClickListener {
-                    onIntentClick(appInfo, item.resolveInfo.activityInfo.name)
-                }
-            }
-            addItemType(Item.ClearItem::class, ItemAppChoiceClearBinding::inflate) { item, b, h ->
-                b.root.setOnClickListener {
-                    onIntentClick(null, null)
-                }
-            }
-        }
-
-        init {
-            val newItems = mutableListOf<Item>()
-            options.mapTo(newItems) {
-                Item.OptionItem(it)
-            }
-            newItems += Item.ClearItem
-            adapterHelper.setItems(newItems, this)
-        }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
+          )
+          dismiss()
+        },
+      )
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setHasFixedSize(false)
     }
+  }
+
+  private class ResolveInfoAdapter(
+    private val packageManager: PackageManager,
+    private val options: List<ResolveInfo>,
+    private val onIntentClick: (ApplicationInfo?, String?) -> Unit,
+  ) : Adapter<ViewHolder>() {
+
+    sealed interface Item {
+      data class OptionItem(
+        val resolveInfo: ResolveInfo,
+      ) : Item
+
+      data object ClearItem : Item
+    }
+
+    private val adapterHelper = AdapterHelper<Item>(
+      { old, new ->
+        old::class == new::class && when (old) {
+          Item.ClearItem -> true
+          is Item.OptionItem ->
+            old.resolveInfo.resolvePackageName ==
+              (new as Item.OptionItem).resolveInfo.resolvePackageName
+        }
+      },
+    ).apply {
+      addItemType(Item.OptionItem::class, ItemAppChoiceBinding::inflate) { item, b, h ->
+        val appInfo = item.resolveInfo.activityInfo.applicationInfo
+        b.icon.load(packageManager.getApplicationIcon(appInfo))
+        b.title.text = packageManager.getApplicationLabel(appInfo)
+
+        b.root.setOnClickListener {
+          onIntentClick(appInfo, item.resolveInfo.activityInfo.name)
+        }
+      }
+      addItemType(Item.ClearItem::class, ItemAppChoiceClearBinding::inflate) { item, b, h ->
+        b.root.setOnClickListener {
+          onIntentClick(null, null)
+        }
+      }
+    }
+
+    init {
+      val newItems = mutableListOf<Item>()
+      options.mapTo(newItems) {
+        Item.OptionItem(it)
+      }
+      newItems += Item.ClearItem
+      adapterHelper.setItems(newItems, this)
+    }
+
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+  }
 }

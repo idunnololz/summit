@@ -17,40 +17,40 @@ import kotlinx.coroutines.launch
 
 class PatreonFragment : BaseFragment<FragmentPatreonBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentPatreonBinding.inflate(inflater, container, false))
+    setBinding(FragmentPatreonBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-        }
-
-        with(binding) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                names.text = context.resources.openRawResource(R.raw.patreon)
-                    .bufferedReader().use { it.readText() }
-            }
-            link.setOnClickListener {
-                onLinkClick(
-                    url = "https://www.patreon.com/SummitforLemmy",
-                    text = null,
-                    linkContext = LinkContext.Action
-                )
-            }
-        }
+    with(binding) {
+      viewLifecycleOwner.lifecycleScope.launch {
+        names.text = context.resources.openRawResource(R.raw.patreon)
+          .bufferedReader().use { it.readText() }
+      }
+      link.setOnClickListener {
+        onLinkClick(
+          url = "https://www.patreon.com/SummitforLemmy",
+          text = null,
+          linkContext = LinkContext.Action,
+        )
+      }
     }
+  }
 }

@@ -12,13 +12,13 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(
-    private val userCommunitiesManager: UserCommunitiesManager,
+  private val userCommunitiesManager: UserCommunitiesManager,
 ) : ViewModel() {
-    fun addTab(userCommunityItem: UserCommunityItem) {
-        viewModelScope.launch {
-            userCommunitiesManager.addUserCommunityItem(userCommunityItem)
-        }
+  fun addTab(userCommunityItem: UserCommunityItem) {
+    viewModelScope.launch {
+      userCommunitiesManager.addUserCommunityItem(userCommunityItem)
     }
+  }
 
-    val currentNavController = MutableLiveData<NavController>()
+  val currentNavController = MutableLiveData<NavController>()
 }

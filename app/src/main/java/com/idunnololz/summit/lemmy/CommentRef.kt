@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class CommentRef(
-    val instance: String,
-    val id: Int,
+  val instance: String,
+  val id: Int,
 ) : PageRef, Parcelable

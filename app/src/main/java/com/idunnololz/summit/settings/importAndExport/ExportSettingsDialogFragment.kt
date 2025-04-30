@@ -35,197 +35,197 @@ import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ExportSettingsDialogFragment :
-    BaseDialogFragment<DialogFragmentBackupSettingsBinding>(),
-    FullscreenDialogFragment {
+  BaseDialogFragment<DialogFragmentBackupSettingsBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
+  companion object {
 
-        fun show(fragmentManager: FragmentManager) {
-            ExportSettingsDialogFragment()
-                .showAllowingStateLoss(fragmentManager, "ExportSettingsDialogFragment")
+    fun show(fragmentManager: FragmentManager) {
+      ExportSettingsDialogFragment()
+        .showAllowingStateLoss(fragmentManager, "ExportSettingsDialogFragment")
+    }
+  }
+
+  private val viewModel: ExportSettingsViewModel by viewModels()
+
+  private val chooseSaveLocationLauncher =
+    registerForActivityResult(
+      object : ActivityResultContracts.CreateDocument("application/lol-catalyst-backup") {
+        override fun createIntent(context: Context, input: String): Intent {
+          return super.createIntent(context, input).apply {
+            type = "application/lol-catalyst-backup"
+          }
         }
+      },
+    ) { uri ->
+      if (uri != null) {
+        viewModel.createBackupAndSave(
+          getBackupConfig(
+            backupOption = ExportSettingsViewModel.BackupOption.Save,
+            dest = uri,
+          ),
+        )
+      }
     }
 
-    private val viewModel: ExportSettingsViewModel by viewModels()
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-    private val chooseSaveLocationLauncher =
-        registerForActivityResult(
-            object : ActivityResultContracts.CreateDocument("application/lol-catalyst-backup") {
-                override fun createIntent(context: Context, input: String): Intent {
-                    return super.createIntent(context, input).apply {
-                        type = "application/lol-catalyst-backup"
-                    }
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentBackupSettingsBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireMainActivity().apply {
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+    }
+
+    with(binding) {
+      viewModel.backupFile.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            progressBar.visibility = View.GONE
+            launchAlertDialog("error_generating_backup") {
+              messageResId = R.string.error_generating_backup
+            }
+          }
+          is StatefulData.Loading -> {
+            progressBar.visibility = View.VISIBLE
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            progressBar.visibility = View.GONE
+
+            when (it.data.config.backupOption) {
+              ExportSettingsViewModel.BackupOption.Share -> {
+                if (!isAdded) return@observe
+
+                val sendIntent = Intent().apply {
+                  putExtra(
+                    Intent.EXTRA_STREAM,
+                    it.data.uri,
+                  )
+                  action = Intent.ACTION_SEND
+                  type = "application/lol-catalyst-backup"
                 }
-            },
-        ) { uri ->
-            if (uri != null) {
-                viewModel.createBackupAndSave(
-                    getBackupConfig(
-                        backupOption = ExportSettingsViewModel.BackupOption.Save,
-                        dest = uri,
-                    ),
+
+                startActivity(
+                  Intent.createChooser(
+                    sendIntent,
+                    getString(R.string.share_backup),
+                  ),
                 )
-            }
-        }
+              }
+              ExportSettingsViewModel.BackupOption.Save -> {
+                dismiss()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+                Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
+                  .show()
+              }
 
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-            }
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        setBinding(DialogFragmentBackupSettingsBinding.inflate(inflater, container, false))
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        requireMainActivity().apply {
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-        }
-
-        with(binding) {
-            viewModel.backupFile.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        progressBar.visibility = View.GONE
-                        launchAlertDialog("error_generating_backup") {
-                            messageResId = R.string.error_generating_backup
-                        }
+              ExportSettingsViewModel.BackupOption.Copy -> {
+                lifecycleScope.launch {
+                  val text = context.contentResolver.openInputStream(it.data.uri)
+                    ?.use {
+                      it.bufferedReader().readText()
                     }
-                    is StatefulData.Loading -> {
-                        progressBar.visibility = View.VISIBLE
+
+                  if (text != null) {
+                    withContext(Dispatchers.Main) {
+                      Utils.copyToClipboard(context, text)
                     }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        progressBar.visibility = View.GONE
-
-                        when (it.data.config.backupOption) {
-                            ExportSettingsViewModel.BackupOption.Share -> {
-                                if (!isAdded) return@observe
-
-                                val sendIntent = Intent().apply {
-                                    putExtra(
-                                        Intent.EXTRA_STREAM,
-                                        it.data.uri,
-                                    )
-                                    action = Intent.ACTION_SEND
-                                    type = "application/lol-catalyst-backup"
-                                }
-
-                                startActivity(
-                                    Intent.createChooser(
-                                        sendIntent,
-                                        getString(R.string.share_backup),
-                                    ),
-                                )
-                            }
-                            ExportSettingsViewModel.BackupOption.Save -> {
-                                dismiss()
-
-                                Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
-                                    .show()
-                            }
-
-                            ExportSettingsViewModel.BackupOption.Copy -> {
-                                lifecycleScope.launch {
-                                    val text = context.contentResolver.openInputStream(it.data.uri)
-                                        ?.use {
-                                            it.bufferedReader().readText()
-                                        }
-
-                                    if (text != null) {
-                                        withContext(Dispatchers.Main) {
-                                            Utils.copyToClipboard(context, text)
-                                        }
-                                    } else {
-                                        withContext(Dispatchers.Main) {
-                                            launchAlertDialog("error_generating_backup") {
-                                                messageResId = R.string.error_generating_backup
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            SaveInternal -> {
-                                dismiss()
-
-                                Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
-                                    .show()
-                            }
-                        }
+                  } else {
+                    withContext(Dispatchers.Main) {
+                      launchAlertDialog("error_generating_backup") {
+                        messageResId = R.string.error_generating_backup
+                      }
                     }
+                  }
                 }
-            }
+              }
 
-            toolbar.title = getString(R.string.backup_settings)
-            toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-            toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-            )
-            toolbar.setNavigationOnClickListener {
-                onBackPressedDispatcher.onBackPressed()
-            }
+              SaveInternal -> {
+                dismiss()
 
-            share.setOnClickListener {
-                viewModel.createBackupAndSave(
-                    getBackupConfig(
-                        ExportSettingsViewModel.BackupOption.Share,
-                    ),
-                )
+                Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
+                  .show()
+              }
             }
-            more.setOnClickListener {
-                DbDetailsDialogFragment.show(
-                    fragmentManager = childFragmentManager,
-                    dbUri = context.getDatabasePath(MainDatabase.DATABASE_NAME).toUri(),
-                    title = context.getString(R.string.tables_to_be_exported),
-                    tableNames = defaultTablesToExport.toList(),
-                )
-            }
-            save.setOnClickListener {
-                chooseSaveLocationLauncher.launch(viewModel.getBackupFileName())
-            }
-            copyToClipboard.setOnClickListener {
-                viewModel.createBackupAndSave(
-                    getBackupConfig(
-                        ExportSettingsViewModel.BackupOption.Copy,
-                    ),
-                )
-            }
-            saveToInternalBackups.setOnClickListener {
-                viewModel.saveToInternalBackups(getBackupConfig(SaveInternal))
-            }
+          }
         }
-    }
+      }
 
-    private fun getBackupConfig(
-        backupOption: ExportSettingsViewModel.BackupOption,
-        dest: Uri? = null,
-    ) = ExportSettingsViewModel.BackupConfig(
-        backupOption = backupOption,
-        includeDatabase = binding.cbIncludeDatabase.isChecked,
-        dest = dest,
-    )
+      toolbar.title = getString(R.string.backup_settings)
+      toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+      toolbar.setNavigationIconTint(
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+      )
+      toolbar.setNavigationOnClickListener {
+        onBackPressedDispatcher.onBackPressed()
+      }
+
+      share.setOnClickListener {
+        viewModel.createBackupAndSave(
+          getBackupConfig(
+            ExportSettingsViewModel.BackupOption.Share,
+          ),
+        )
+      }
+      more.setOnClickListener {
+        DbDetailsDialogFragment.show(
+          fragmentManager = childFragmentManager,
+          dbUri = context.getDatabasePath(MainDatabase.DATABASE_NAME).toUri(),
+          title = context.getString(R.string.tables_to_be_exported),
+          tableNames = defaultTablesToExport.toList(),
+        )
+      }
+      save.setOnClickListener {
+        chooseSaveLocationLauncher.launch(viewModel.getBackupFileName())
+      }
+      copyToClipboard.setOnClickListener {
+        viewModel.createBackupAndSave(
+          getBackupConfig(
+            ExportSettingsViewModel.BackupOption.Copy,
+          ),
+        )
+      }
+      saveToInternalBackups.setOnClickListener {
+        viewModel.saveToInternalBackups(getBackupConfig(SaveInternal))
+      }
+    }
+  }
+
+  private fun getBackupConfig(
+    backupOption: ExportSettingsViewModel.BackupOption,
+    dest: Uri? = null,
+  ) = ExportSettingsViewModel.BackupConfig(
+    backupOption = backupOption,
+    includeDatabase = binding.cbIncludeDatabase.isChecked,
+    dest = dest,
+  )
 }

@@ -46,111 +46,111 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CreatePresetFragment : BaseFragment<FragmentCreatePresetBinding>() {
 
-    val viewModel: CreatePresetViewModel by viewModels()
+  val viewModel: CreatePresetViewModel by viewModels()
 
-    @Inject
-    lateinit var sharedPreferencesManager: SharedPreferencesManager
+  @Inject
+  lateinit var sharedPreferencesManager: SharedPreferencesManager
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var preferenceManager: PreferenceManager
+  @Inject
+  lateinit var preferenceManager: PreferenceManager
 
-    @Inject
-    lateinit var accountManager: AccountManager
+  @Inject
+  lateinit var accountManager: AccountManager
 
-    @Inject
-    lateinit var themeManager: ThemeManager
+  @Inject
+  lateinit var themeManager: ThemeManager
 
-    @Inject
-    lateinit var lemmyTextHelper: LemmyTextHelper
+  @Inject
+  lateinit var lemmyTextHelper: LemmyTextHelper
 
-    private var currentBinding: ViewBinding? = null
-    private var currentState: CreatePresetViewModel.State? = null
+  private var currentBinding: ViewBinding? = null
+  private var currentState: CreatePresetViewModel.State? = null
 
-    private val cancelLauncher = newAlertDialogLauncher("cancel") {
-        if (it.isOk) {
-            findNavController().popBackStack()
+  private val cancelLauncher = newAlertDialogLauncher("cancel") {
+    if (it.isOk) {
+      findNavController().popBackStack()
+    }
+  }
+  private val submittedLauncher = newAlertDialogLauncher("submitted") {
+    findNavController().popBackStack()
+  }
+
+  private val takePreviewScreenshotLauncher =
+    registerForActivityResult(TakePreviewScreenshotContract()) {
+      if (it != null) {
+        viewModel.updateScreenshots(
+          it.phonePreviewSs,
+          it.tabletPreviewSs,
+        )
+      }
+    }
+
+  private val onBackPressedHandler = object : OnBackPressedCallback(false) {
+    override fun handleOnBackPressed() {
+      viewModel.goBack()
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(FragmentCreatePresetBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    with(binding) {
+      requireSummitActivity().apply {
+        insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+      }
+      requireActivity().onBackPressedDispatcher
+        .addCallback(viewLifecycleOwner, onBackPressedHandler)
+
+      setupToolbar(toolbar, getString(R.string.create_preset))
+      toolbar.setNavigationOnClickListener {
+        cancelLauncher.launchDialog {
+          messageResId = R.string.exit_create_preset_flow
         }
-    }
-    private val submittedLauncher = newAlertDialogLauncher("submitted") {
-        findNavController().popBackStack()
-    }
+      }
 
-    private val takePreviewScreenshotLauncher =
-        registerForActivityResult(TakePreviewScreenshotContract()) {
-            if (it != null) {
-                viewModel.updateScreenshots(
-                    it.phonePreviewSs,
-                    it.tabletPreviewSs,
-                )
+      viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.state.collect {
+          val currentState = currentState
+
+          if (currentState == it) {
+            return@collect
+          }
+
+          if (it is CreatePresetViewModel.State.Complete) {
+            submittedLauncher.launchDialog {
+              messageResId = R.string.preset_submitted
             }
-        }
+            return@collect
+          }
 
-    private val onBackPressedHandler = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            viewModel.goBack()
-        }
-    }
+          if (currentState == null || currentState::class != it::class) {
+            currentBinding = layoutState(it, animate = true)
+          }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+          bindState(it)
 
-        setBinding(FragmentCreatePresetBinding.inflate(inflater, container, false))
+          this@CreatePresetFragment.currentState = it
 
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        with(binding) {
-            requireSummitActivity().apply {
-                insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-            }
-            requireActivity().onBackPressedDispatcher
-                .addCallback(viewLifecycleOwner, onBackPressedHandler)
-
-            setupToolbar(toolbar, getString(R.string.create_preset))
-            toolbar.setNavigationOnClickListener {
-                cancelLauncher.launchDialog {
-                    messageResId = R.string.exit_create_preset_flow
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.state.collect {
-                    val currentState = currentState
-
-                    if (currentState == it) {
-                        return@collect
-                    }
-
-                    if (it is CreatePresetViewModel.State.Complete) {
-                        submittedLauncher.launchDialog {
-                            messageResId = R.string.preset_submitted
-                        }
-                        return@collect
-                    }
-
-                    if (currentState == null || currentState::class != it::class) {
-                        currentBinding = layoutState(it, animate = true)
-                    }
-
-                    bindState(it)
-
-                    this@CreatePresetFragment.currentState = it
-
-                    if (it is CreatePresetViewModel.State.Initial) {
-                        onBackPressedHandler.isEnabled = false
-                    } else {
-                        onBackPressedHandler.isEnabled = true
-                    }
+          if (it is CreatePresetViewModel.State.Initial) {
+            onBackPressedHandler.isEnabled = false
+          } else {
+            onBackPressedHandler.isEnabled = true
+          }
 
 //                when (it) {
 //                    CreatePresetViewModel.State.Initial -> TODO()
@@ -170,437 +170,437 @@ class CreatePresetFragment : BaseFragment<FragmentCreatePresetBinding>() {
 //                    }
 //                    is CreatePresetViewModel.State.ResolveSettingIssues -> TODO()
 //                }
-                }
-            }
         }
+      }
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    sharedPreferencesManager.useTempPreferences = true
+    preferences.updateWhichSharedPreference()
+    preferenceManager
+      .updateCurrentPreferences(accountManager.currentAccount.value, force = true)
+
+    viewModel.refreshDraftPreferences()
+  }
+
+  override fun onPause() {
+    if (isRemoving) {
+      sharedPreferencesManager.useTempPreferences = false
+      preferences.updateWhichSharedPreference()
+      preferenceManager
+        .updateCurrentPreferences(accountManager.currentAccount.value, force = true)
     }
 
-    override fun onResume() {
-        super.onResume()
-        sharedPreferencesManager.useTempPreferences = true
-        preferences.updateWhichSharedPreference()
-        preferenceManager
-            .updateCurrentPreferences(accountManager.currentAccount.value, force = true)
+    super.onPause()
+  }
 
-        viewModel.refreshDraftPreferences()
-    }
+  private fun bindState(state: CreatePresetViewModel.State) {
+    val context = requireContext()
 
-    override fun onPause() {
-        if (isRemoving) {
-            sharedPreferencesManager.useTempPreferences = false
-            preferences.updateWhichSharedPreference()
-            preferenceManager
-                .updateCurrentPreferences(accountManager.currentAccount.value, force = true)
-        }
+    when (state) {
+      is CreatePresetViewModel.State.Initial -> {}
+      is CreatePresetViewModel.State.ConfirmSubmit ->
+        with(currentBinding as CreatePresetConfirmBinding) {
+          if (state.isSubmitting) {
+            loadingView.showProgressBar()
 
-        super.onPause()
-    }
+            positiveButton.isEnabled = false
+            negativeButton.isEnabled = false
+          } else {
+            loadingView.hideAll()
 
-    private fun bindState(state: CreatePresetViewModel.State) {
-        val context = requireContext()
+            positiveButton.isEnabled = true
+            negativeButton.isEnabled = true
+          }
 
-        when (state) {
-            is CreatePresetViewModel.State.Initial -> {}
-            is CreatePresetViewModel.State.ConfirmSubmit ->
-                with(currentBinding as CreatePresetConfirmBinding) {
-                    if (state.isSubmitting) {
-                        loadingView.showProgressBar()
-
-                        positiveButton.isEnabled = false
-                        negativeButton.isEnabled = false
-                    } else {
-                        loadingView.hideAll()
-
-                        positiveButton.isEnabled = true
-                        negativeButton.isEnabled = true
-                    }
-
-                    if (state.submitError != null) {
-                        ErrorDialogFragment.show(
-                            message = getString(R.string.error_submit_preset),
-                            error = state.submitError,
-                            fm = childFragmentManager,
-                        )
-                    }
-                }
-            is CreatePresetViewModel.State.ResolveSettingIssues -> {
-                with(currentBinding as CreatePresetResolveSettingIssuesBinding) {
-                    val piiFoundWarningMd = buildString {
-                        append(getString(R.string.warn_pii_found_in_preset))
-                        appendLine()
-                        appendLine()
-
-                        state.settingIssues.forEach {
-                            if (it.keyError != null) {
-                                appendLine()
-                                append("- ")
-                            }
-
-                            when (it.keyError) {
-                                PiiDetector.ColumnNamePiiIssue.Person ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_person,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Email ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_email,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Dob ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_dob,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Gender ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_gender,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Nationality ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_nationality,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Address ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_address,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.UserName ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_username,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Password ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_password,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Ssn ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_ssn,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.CreditCard ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_credit_card,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.Phone ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_phone_number,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ColumnNamePiiIssue.AuthToken ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_key_auth_token,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                null -> {}
-                            }
-
-                            if (it.valueError != null) {
-                                appendLine()
-                                append("- ")
-                            }
-
-                            when (it.valueError) {
-                                PiiDetector.ValuePiiIssue.DateTime ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_date_time,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.Email ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_email,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.Ip ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_ip,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.Address ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_address,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.Ssn ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_ssn,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.CreditCard ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_credit_card,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.Phone ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_phone,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                PiiDetector.ValuePiiIssue.AuthToken ->
-                                    append(
-                                        getString(
-                                            R.string.warn_pii_value_auth_token,
-                                            "${it.key}, ${it.value}",
-                                        ),
-                                    )
-
-                                null -> {}
-                            }
-                        }
-                    }
-
-                    this.body.text = lemmyTextHelper.getSpannable(context, piiFoundWarningMd)
-                }
-            }
-            CreatePresetViewModel.State.Complete -> {}
-            is CreatePresetViewModel.State.TakePreviewScreenshot ->
-                with(currentBinding as CreatePresetTakePreviewScreenshotBinding) {
-                    val tabletPreviewBinding: PresetPreviewScreenshotContainerBinding =
-                        root.getTag(R.id.tablet_binding) as PresetPreviewScreenshotContainerBinding
-                    val phonePreviewBinding: PresetPreviewScreenshotContainerBinding =
-                        root.getTag(R.id.phone_binding) as PresetPreviewScreenshotContainerBinding
-
-                    tabletPreviewBinding.screenshot.load(state.tabletPreviewSs)
-                    phonePreviewBinding.screenshot.load(state.phonePreviewSs)
-                }
-        }
-    }
-
-    private fun newDevicePreview(
-        previewsContainer: ViewGroup,
-        dimensionRatio: String,
-    ): PresetPreviewScreenshotContainerBinding {
-        val context = requireContext()
-
-        return PresetPreviewScreenshotContainerBinding.inflate(
-            LayoutInflater.from(context),
-            previewsContainer,
-            false,
-        ).apply {
-            screenshot.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                this.dimensionRatio = dimensionRatio
-            }
-        }
-    }
-
-    private fun layoutState(state: CreatePresetViewModel.State, animate: Boolean): ViewBinding {
-        val context = requireContext()
-
-        if (animate) {
-            TransitionManager.beginDelayedTransition(
-                binding.root,
-                AutoTransition()
-                    .apply {
-                        setDuration(220)
-                        excludeChildren(R.id.previews_container, true)
-                    },
+          if (state.submitError != null) {
+            ErrorDialogFragment.show(
+              message = getString(R.string.error_submit_preset),
+              error = state.submitError,
+              fm = childFragmentManager,
             )
+          }
         }
+      is CreatePresetViewModel.State.ResolveSettingIssues -> {
+        with(currentBinding as CreatePresetResolveSettingIssuesBinding) {
+          val piiFoundWarningMd = buildString {
+            append(getString(R.string.warn_pii_found_in_preset))
+            appendLine()
+            appendLine()
 
-        binding.content.removeAllViews()
+            state.settingIssues.forEach {
+              if (it.keyError != null) {
+                appendLine()
+                append("- ")
+              }
 
-        val layoutInflater = LayoutInflater.from(context)
+              when (it.keyError) {
+                PiiDetector.ColumnNamePiiIssue.Person ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_person,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-        return when (state) {
-            is CreatePresetViewModel.State.Initial ->
-                CreatePresetInitialBinding.inflate(
-                    layoutInflater,
-                    binding.content,
-                    true,
-                ).apply {
-                    choosePreferencesContainer.setOnClickListener {
-                        PresetChangePreferencesDialogFragment.show(childFragmentManager)
-                    }
-                    fun updateCreds() {
-                        val name = nameEditText.text?.toString()
-                        val description = descriptionEditText.text?.toString()
+                PiiDetector.ColumnNamePiiIssue.Email ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_email,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                        if (name != null && description != null) {
-                            viewModel.updatePresetForm(name = name, description = description)
-                        }
-                    }
+                PiiDetector.ColumnNamePiiIssue.Dob ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_dob,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                    nameEditText.setText(viewModel.presetForm.value.name)
-                    descriptionEditText.setText(viewModel.presetForm.value.description)
+                PiiDetector.ColumnNamePiiIssue.Gender ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_gender,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                    nameEditText.doOnTextChanged { text, start, before, count ->
-                        updateCreds()
-                    }
-                    descriptionEditText.doOnTextChanged { text, start, before, count ->
-                        updateCreds()
-                    }
+                PiiDetector.ColumnNamePiiIssue.Nationality ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_nationality,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                    positiveButton.setOnClickListener {
-                        val name = nameEditText.text?.toString()
-                        val description = descriptionEditText.text?.toString()
+                PiiDetector.ColumnNamePiiIssue.Address ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_address,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                        if (name.isNullOrBlank()) {
-                            nameInput.error = getString(R.string.required)
-                            return@setOnClickListener
-                        }
-                        if (name.length > nameInput.counterMaxLength) {
-                            return@setOnClickListener
-                        }
-                        if ((description?.length ?: 0) > descriptionInput.counterMaxLength) {
-                            return@setOnClickListener
-                        }
+                PiiDetector.ColumnNamePiiIssue.UserName ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_username,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                        nameInput.isErrorEnabled = false
+                PiiDetector.ColumnNamePiiIssue.Password ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_password,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                        viewModel.prepareSubmitPreset(
-                            name = name,
-                            description = description,
-                        )
-                    }
-                }
-            CreatePresetViewModel.State.Complete -> TODO()
-            is CreatePresetViewModel.State.ConfirmSubmit ->
-                CreatePresetConfirmBinding.inflate(
-                    layoutInflater,
-                    binding.content,
-                    true,
-                ).apply {
-                    positiveButton.setOnClickListener {
-                        viewModel.submitPreset()
-                    }
-                    negativeButton.setOnClickListener {
-                        viewModel.goBack()
-                    }
-                }
-            is CreatePresetViewModel.State.ResolveSettingIssues ->
-                CreatePresetResolveSettingIssuesBinding.inflate(
-                    layoutInflater,
-                    binding.content,
-                    true,
-                ).apply {
-                    positiveButton.setOnClickListener {
-                        viewModel.resolveSettingIssues()
-                    }
-                    negativeButton.setOnClickListener {
-                        viewModel.goBack()
-                    }
-                }
-            is CreatePresetViewModel.State.TakePreviewScreenshot ->
-                CreatePresetTakePreviewScreenshotBinding.inflate(
-                    layoutInflater,
-                    binding.content,
-                    true,
-                ).apply {
-                    val screenBounds = WindowMetricsCalculator.getOrCreate()
-                        .computeCurrentWindowMetrics(requireActivity())
-                        .bounds
+                PiiDetector.ColumnNamePiiIssue.Ssn ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_ssn,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                    val tabletPreviewBinding = newDevicePreview(
-                        previewsContainer = previewsContainer,
-                        dimensionRatio = "1:1",
-                    ).apply {
-                        root.layoutParams = FrameLayout.LayoutParams(
-                            FrameLayout.LayoutParams.MATCH_PARENT,
-                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                        ).apply {
-                            marginEnd = Utils.convertDpToPixel(64f).toInt()
-                        }
-                    }
-                    val phonePreviewBinding = newDevicePreview(
-                        previewsContainer = previewsContainer,
-                        dimensionRatio = "6:13",
-                    ).apply {
-                        root.layoutParams = FrameLayout.LayoutParams(
-                            (screenBounds.width() * 0.45f).toInt(),
-                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                        ).apply {
-                            topMargin = Utils.convertDpToPixel(64f).toInt()
+                PiiDetector.ColumnNamePiiIssue.CreditCard ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_credit_card,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                            gravity = Gravity.END or Gravity.BOTTOM
-                        }
-                    }
+                PiiDetector.ColumnNamePiiIssue.Phone ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_phone_number,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                    previewsContainer.addView(tabletPreviewBinding.root)
-                    previewsContainer.addView(phonePreviewBinding.root)
+                PiiDetector.ColumnNamePiiIssue.AuthToken ->
+                  append(
+                    getString(
+                      R.string.warn_pii_key_auth_token,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
 
-                    root.setTag(R.id.tablet_binding, tabletPreviewBinding)
-                    root.setTag(R.id.phone_binding, phonePreviewBinding)
+                null -> {}
+              }
 
-                    takePictureButton.setOnClickListener {
-                        takePreviewScreenshotLauncher.launch(Unit)
-                    }
-                    previewsContainer.setOnClickListener {
-                        takePreviewScreenshotLauncher.launch(Unit)
-                    }
+              if (it.valueError != null) {
+                appendLine()
+                append("- ")
+              }
 
-                    positiveButton.setOnClickListener {
-                        viewModel.submitPreviewScreenshots()
-                    }
-                    negativeButton.setOnClickListener {
-                        viewModel.goBack()
-                    }
-                }
+              when (it.valueError) {
+                PiiDetector.ValuePiiIssue.DateTime ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_date_time,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.Email ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_email,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.Ip ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_ip,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.Address ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_address,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.Ssn ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_ssn,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.CreditCard ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_credit_card,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.Phone ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_phone,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                PiiDetector.ValuePiiIssue.AuthToken ->
+                  append(
+                    getString(
+                      R.string.warn_pii_value_auth_token,
+                      "${it.key}, ${it.value}",
+                    ),
+                  )
+
+                null -> {}
+              }
+            }
+          }
+
+          this.body.text = lemmyTextHelper.getSpannable(context, piiFoundWarningMd)
+        }
+      }
+      CreatePresetViewModel.State.Complete -> {}
+      is CreatePresetViewModel.State.TakePreviewScreenshot ->
+        with(currentBinding as CreatePresetTakePreviewScreenshotBinding) {
+          val tabletPreviewBinding: PresetPreviewScreenshotContainerBinding =
+            root.getTag(R.id.tablet_binding) as PresetPreviewScreenshotContainerBinding
+          val phonePreviewBinding: PresetPreviewScreenshotContainerBinding =
+            root.getTag(R.id.phone_binding) as PresetPreviewScreenshotContainerBinding
+
+          tabletPreviewBinding.screenshot.load(state.tabletPreviewSs)
+          phonePreviewBinding.screenshot.load(state.phonePreviewSs)
         }
     }
+  }
 
-    fun onPresetChangePreferencesDismiss() {
-        viewModel.refreshDraftPreferences()
+  private fun newDevicePreview(
+    previewsContainer: ViewGroup,
+    dimensionRatio: String,
+  ): PresetPreviewScreenshotContainerBinding {
+    val context = requireContext()
+
+    return PresetPreviewScreenshotContainerBinding.inflate(
+      LayoutInflater.from(context),
+      previewsContainer,
+      false,
+    ).apply {
+      screenshot.updateLayoutParams<ConstraintLayout.LayoutParams> {
+        this.dimensionRatio = dimensionRatio
+      }
     }
+  }
+
+  private fun layoutState(state: CreatePresetViewModel.State, animate: Boolean): ViewBinding {
+    val context = requireContext()
+
+    if (animate) {
+      TransitionManager.beginDelayedTransition(
+        binding.root,
+        AutoTransition()
+          .apply {
+            setDuration(220)
+            excludeChildren(R.id.previews_container, true)
+          },
+      )
+    }
+
+    binding.content.removeAllViews()
+
+    val layoutInflater = LayoutInflater.from(context)
+
+    return when (state) {
+      is CreatePresetViewModel.State.Initial ->
+        CreatePresetInitialBinding.inflate(
+          layoutInflater,
+          binding.content,
+          true,
+        ).apply {
+          choosePreferencesContainer.setOnClickListener {
+            PresetChangePreferencesDialogFragment.show(childFragmentManager)
+          }
+          fun updateCreds() {
+            val name = nameEditText.text?.toString()
+            val description = descriptionEditText.text?.toString()
+
+            if (name != null && description != null) {
+              viewModel.updatePresetForm(name = name, description = description)
+            }
+          }
+
+          nameEditText.setText(viewModel.presetForm.value.name)
+          descriptionEditText.setText(viewModel.presetForm.value.description)
+
+          nameEditText.doOnTextChanged { text, start, before, count ->
+            updateCreds()
+          }
+          descriptionEditText.doOnTextChanged { text, start, before, count ->
+            updateCreds()
+          }
+
+          positiveButton.setOnClickListener {
+            val name = nameEditText.text?.toString()
+            val description = descriptionEditText.text?.toString()
+
+            if (name.isNullOrBlank()) {
+              nameInput.error = getString(R.string.required)
+              return@setOnClickListener
+            }
+            if (name.length > nameInput.counterMaxLength) {
+              return@setOnClickListener
+            }
+            if ((description?.length ?: 0) > descriptionInput.counterMaxLength) {
+              return@setOnClickListener
+            }
+
+            nameInput.isErrorEnabled = false
+
+            viewModel.prepareSubmitPreset(
+              name = name,
+              description = description,
+            )
+          }
+        }
+      CreatePresetViewModel.State.Complete -> TODO()
+      is CreatePresetViewModel.State.ConfirmSubmit ->
+        CreatePresetConfirmBinding.inflate(
+          layoutInflater,
+          binding.content,
+          true,
+        ).apply {
+          positiveButton.setOnClickListener {
+            viewModel.submitPreset()
+          }
+          negativeButton.setOnClickListener {
+            viewModel.goBack()
+          }
+        }
+      is CreatePresetViewModel.State.ResolveSettingIssues ->
+        CreatePresetResolveSettingIssuesBinding.inflate(
+          layoutInflater,
+          binding.content,
+          true,
+        ).apply {
+          positiveButton.setOnClickListener {
+            viewModel.resolveSettingIssues()
+          }
+          negativeButton.setOnClickListener {
+            viewModel.goBack()
+          }
+        }
+      is CreatePresetViewModel.State.TakePreviewScreenshot ->
+        CreatePresetTakePreviewScreenshotBinding.inflate(
+          layoutInflater,
+          binding.content,
+          true,
+        ).apply {
+          val screenBounds = WindowMetricsCalculator.getOrCreate()
+            .computeCurrentWindowMetrics(requireActivity())
+            .bounds
+
+          val tabletPreviewBinding = newDevicePreview(
+            previewsContainer = previewsContainer,
+            dimensionRatio = "1:1",
+          ).apply {
+            root.layoutParams = FrameLayout.LayoutParams(
+              FrameLayout.LayoutParams.MATCH_PARENT,
+              FrameLayout.LayoutParams.WRAP_CONTENT,
+            ).apply {
+              marginEnd = Utils.convertDpToPixel(64f).toInt()
+            }
+          }
+          val phonePreviewBinding = newDevicePreview(
+            previewsContainer = previewsContainer,
+            dimensionRatio = "6:13",
+          ).apply {
+            root.layoutParams = FrameLayout.LayoutParams(
+              (screenBounds.width() * 0.45f).toInt(),
+              FrameLayout.LayoutParams.WRAP_CONTENT,
+            ).apply {
+              topMargin = Utils.convertDpToPixel(64f).toInt()
+
+              gravity = Gravity.END or Gravity.BOTTOM
+            }
+          }
+
+          previewsContainer.addView(tabletPreviewBinding.root)
+          previewsContainer.addView(phonePreviewBinding.root)
+
+          root.setTag(R.id.tablet_binding, tabletPreviewBinding)
+          root.setTag(R.id.phone_binding, phonePreviewBinding)
+
+          takePictureButton.setOnClickListener {
+            takePreviewScreenshotLauncher.launch(Unit)
+          }
+          previewsContainer.setOnClickListener {
+            takePreviewScreenshotLauncher.launch(Unit)
+          }
+
+          positiveButton.setOnClickListener {
+            viewModel.submitPreviewScreenshots()
+          }
+          negativeButton.setOnClickListener {
+            viewModel.goBack()
+          }
+        }
+    }
+  }
+
+  fun onPresetChangePreferencesDismiss() {
+    viewModel.refreshDraftPreferences()
+  }
 }

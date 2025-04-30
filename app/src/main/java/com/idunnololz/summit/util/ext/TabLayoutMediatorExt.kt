@@ -6,18 +6,18 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.tabs.TabLayoutMediator
 
 fun TabLayoutMediator.attachWithAutoDetachUsingLifecycle(
-    lifecycleOwner: LifecycleOwner,
+  lifecycleOwner: LifecycleOwner,
 ): TabLayoutMediator {
-    lifecycleOwner.lifecycle.addObserver(
-        object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    detach()
-                    source.lifecycle.removeObserver(this)
-                }
-            }
-        },
-    )
-    attach()
-    return this
+  lifecycleOwner.lifecycle.addObserver(
+    object : LifecycleEventObserver {
+      override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        if (event == Lifecycle.Event.ON_DESTROY) {
+          detach()
+          source.lifecycle.removeObserver(this)
+        }
+      }
+    },
+  )
+  attach()
+  return this
 }

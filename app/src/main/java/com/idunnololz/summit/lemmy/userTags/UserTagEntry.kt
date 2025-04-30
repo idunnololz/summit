@@ -17,45 +17,45 @@ import kotlinx.serialization.json.Json
 @Parcelize
 @TypeConverters(UserTagConverters::class)
 data class UserTagEntry(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    val id: Long,
-    @ColumnInfo(name = "actor_id")
-    val actorId: String,
-    @ColumnInfo(name = "tag")
-    val tag: UserTagConfig,
-    @ColumnInfo(name = "create_ts")
-    val createTs: Long,
-    @ColumnInfo(name = "update_ts")
-    val updateTs: Long,
+  @PrimaryKey(autoGenerate = true)
+  @ColumnInfo(name = "id")
+  val id: Long,
+  @ColumnInfo(name = "actor_id")
+  val actorId: String,
+  @ColumnInfo(name = "tag")
+  val tag: UserTagConfig,
+  @ColumnInfo(name = "create_ts")
+  val createTs: Long,
+  @ColumnInfo(name = "update_ts")
+  val updateTs: Long,
 ) : Parcelable
 
 @Parcelize
 @Serializable
 data class UserTagConfig(
-    val tagName: String,
-    val fillColor: Int,
-    val borderColor: Int,
+  val tagName: String,
+  val fillColor: Int,
+  val borderColor: Int,
 ) : Parcelable
 
 @ProvidedTypeConverter
 class UserTagConverters(private val json: Json) {
 
-    companion object {
-        private const val TAG = "UserTagConverters"
-    }
+  companion object {
+    private const val TAG = "UserTagConverters"
+  }
 
-    @TypeConverter
-    fun userTagConfigToString(value: UserTagConfig): String {
-        return json.encodeToString(value)
-    }
+  @TypeConverter
+  fun userTagConfigToString(value: UserTagConfig): String {
+    return json.encodeToString(value)
+  }
 
-    @TypeConverter
-    fun stringToUserTagConfig(value: String): UserTagConfig? = try {
-        json.decodeFromString(value)
-    } catch (e: Exception) {
-        Log.e(TAG, "", e)
-        crashLogger?.recordException(e)
-        null
-    }
+  @TypeConverter
+  fun stringToUserTagConfig(value: String): UserTagConfig? = try {
+    json.decodeFromString(value)
+  } catch (e: Exception) {
+    Log.e(TAG, "", e)
+    crashLogger?.recordException(e)
+    null
+  }
 }

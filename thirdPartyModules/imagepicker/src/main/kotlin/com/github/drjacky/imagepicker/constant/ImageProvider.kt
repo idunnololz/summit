@@ -8,8 +8,8 @@ package com.github.drjacky.imagepicker.constant
  * @since 04 January 2019
  */
 enum class ImageProvider {
-    GALLERY,
-    CAMERA,
-    FRONT_CAMERA,
-    BOTH,
+  GALLERY,
+  CAMERA,
+  FRONT_CAMERA,
+  BOTH,
 }

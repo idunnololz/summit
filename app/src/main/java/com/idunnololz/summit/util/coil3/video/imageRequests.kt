@@ -21,22 +21,22 @@ import coil3.request.Options
  */
 @RequiresApi(28)
 fun ImageRequest.Builder.videoFrameIndex(frameIndex: Int) = apply {
-    require(frameIndex >= 0) { "frameIndex must be >= 0." }
-    memoryCacheKeyExtra("coil#videoFrameIndex", frameIndex.toString())
-    extras[videoFrameIndexKey] = frameIndex
+  require(frameIndex >= 0) { "frameIndex must be >= 0." }
+  memoryCacheKeyExtra("coil#videoFrameIndex", frameIndex.toString())
+  extras[videoFrameIndexKey] = frameIndex
 }
 
 val ImageRequest.videoFrameIndex: Int
-    @RequiresApi(28)
-    get() = getExtra(videoFrameIndexKey)
+  @RequiresApi(28)
+  get() = getExtra(videoFrameIndexKey)
 
 val Options.videoFrameIndex: Int
-    @RequiresApi(28)
-    get() = getExtra(videoFrameIndexKey)
+  @RequiresApi(28)
+  get() = getExtra(videoFrameIndexKey)
 
 val Extras.Key.Companion.videoFrameIndex: Extras.Key<Int>
-    @RequiresApi(28)
-    get() = videoFrameIndexKey
+  @RequiresApi(28)
+  get() = videoFrameIndexKey
 
 private val videoFrameIndexKey = Extras.Key(default = -1)
 
@@ -58,19 +58,19 @@ fun ImageRequest.Builder.videoFrameMillis(frameMillis: Long) = videoFrameMicros(
  * [videoFrameMicros] (or [videoFrameMillis]) will take precedence.
  */
 fun ImageRequest.Builder.videoFrameMicros(frameMicros: Long) = apply {
-    require(frameMicros >= 0) { "frameMicros must be >= 0." }
-    memoryCacheKeyExtra("coil#videoFrameMicros", frameMicros.toString())
-    extras[videoFrameMicrosKey] = frameMicros
+  require(frameMicros >= 0) { "frameMicros must be >= 0." }
+  memoryCacheKeyExtra("coil#videoFrameMicros", frameMicros.toString())
+  extras[videoFrameMicrosKey] = frameMicros
 }
 
 val ImageRequest.videoFrameMicros: Long
-    get() = getExtra(videoFrameMicrosKey)
+  get() = getExtra(videoFrameMicrosKey)
 
 val Options.videoFrameMicros: Long
-    get() = getExtra(videoFrameMicrosKey)
+  get() = getExtra(videoFrameMicrosKey)
 
 val Extras.Key.Companion.videoFrameMicros: Extras.Key<Long>
-    get() = videoFrameMicrosKey
+  get() = videoFrameMicrosKey
 
 private val videoFrameMicrosKey = Extras.Key(default = -1L)
 
@@ -84,19 +84,19 @@ private val videoFrameMicrosKey = Extras.Key(default = -1L)
  * [videoFrameMicros] (or [videoFrameMillis]) will take precedence.
  */
 fun ImageRequest.Builder.videoFramePercent(framePercent: Double) = apply {
-    require(framePercent in 0.0..1.0) { "framePercent must be in the range [0.0, 1.0]." }
-    memoryCacheKeyExtra("coil#videoFramePercent", framePercent.toString())
-    extras[videoFramePercentKey] = framePercent
+  require(framePercent in 0.0..1.0) { "framePercent must be in the range [0.0, 1.0]." }
+  memoryCacheKeyExtra("coil#videoFramePercent", framePercent.toString())
+  extras[videoFramePercentKey] = framePercent
 }
 
 val ImageRequest.videoFramePercent: Double
-    get() = getExtra(videoFramePercentKey)
+  get() = getExtra(videoFramePercentKey)
 
 val Options.videoFramePercent: Double
-    get() = getExtra(videoFramePercentKey)
+  get() = getExtra(videoFramePercentKey)
 
 val Extras.Key.Companion.videoFramePercent: Extras.Key<Double>
-    get() = videoFramePercentKey
+  get() = videoFramePercentKey
 
 private val videoFramePercentKey = Extras.Key(default = -1.0)
 
@@ -111,24 +111,24 @@ private val videoFramePercentKey = Extras.Key(default = -1.0)
  * @see MediaMetadataRetriever
  */
 fun ImageRequest.Builder.videoFrameOption(option: Int) = apply {
-    require(
-        option == OPTION_PREVIOUS_SYNC ||
-            option == OPTION_NEXT_SYNC ||
-            option == OPTION_CLOSEST_SYNC ||
-            option == OPTION_CLOSEST,
-    ) { "Invalid video frame option: $option." }
-    memoryCacheKeyExtra("coil#videoFrameOption", option.toString())
-    extras[videoFrameOptionKey] = option
+  require(
+    option == OPTION_PREVIOUS_SYNC ||
+      option == OPTION_NEXT_SYNC ||
+      option == OPTION_CLOSEST_SYNC ||
+      option == OPTION_CLOSEST,
+  ) { "Invalid video frame option: $option." }
+  memoryCacheKeyExtra("coil#videoFrameOption", option.toString())
+  extras[videoFrameOptionKey] = option
 }
 
 val ImageRequest.videoFrameOption: Int
-    get() = getExtra(videoFrameOptionKey)
+  get() = getExtra(videoFrameOptionKey)
 
 val Options.videoFrameOption: Int
-    get() = getExtra(videoFrameOptionKey)
+  get() = getExtra(videoFrameOptionKey)
 
 val Extras.Key.Companion.videoFrameOption: Extras.Key<Int>
-    get() = videoFrameOptionKey
+  get() = videoFrameOptionKey
 
 private val videoFrameOptionKey = Extras.Key(default = OPTION_CLOSEST_SYNC)
 

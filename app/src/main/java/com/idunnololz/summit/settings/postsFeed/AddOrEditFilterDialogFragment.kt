@@ -15,88 +15,88 @@ import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 
 class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilterBinding>() {
-    private val args by navArgs<AddOrEditFilterDialogFragmentArgs>()
+  private val args by navArgs<AddOrEditFilterDialogFragmentArgs>()
 
-    companion object {
-        const val REQUEST_KEY = "AddFilterDialogFragment_req_key"
-        const val REQUEST_KEY_RESULT = "result"
+  companion object {
+    const val REQUEST_KEY = "AddFilterDialogFragment_req_key"
+    const val REQUEST_KEY_RESULT = "result"
 
-        private const val SIS_CURRENT_FILTER = "SIS_CURRENT_FILTER"
+    private const val SIS_CURRENT_FILTER = "SIS_CURRENT_FILTER"
 
-        fun newInstance(initialEntry: FilterEntry): AddOrEditFilterDialogFragment =
-            AddOrEditFilterDialogFragment().apply {
-                arguments = AddOrEditFilterDialogFragmentArgs(initialEntry).toBundle()
-            }
-    }
+    fun newInstance(initialEntry: FilterEntry): AddOrEditFilterDialogFragment =
+      AddOrEditFilterDialogFragment().apply {
+        arguments = AddOrEditFilterDialogFragmentArgs(initialEntry).toBundle()
+      }
+  }
 
-    private var currentFilter: FilterEntry? = null
+  private var currentFilter: FilterEntry? = null
 
-    override fun onStart() {
-        super.onStart()
+  override fun onStart() {
+    super.onStart()
 
-        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    }
+    setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentAddFilterBinding.inflate(inflater, container, false))
+    setBinding(DialogFragmentAddFilterBinding.inflate(inflater, container, false))
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        with(binding) {
-            title.text = getString(R.string.add_filter)
+    with(binding) {
+      title.text = getString(R.string.add_filter)
 
-            currentFilter = currentFilter
-                ?: savedInstanceState?.getParcelableCompat(SIS_CURRENT_FILTER)
-                ?: args.filterToEdit
+      currentFilter = currentFilter
+        ?: savedInstanceState?.getParcelableCompat(SIS_CURRENT_FILTER)
+        ?: args.filterToEdit
 
-            filterField.editText?.setText(currentFilter?.filter)
-            regexSwitch.isChecked = currentFilter?.isRegex == true
+      filterField.editText?.setText(currentFilter?.filter)
+      regexSwitch.isChecked = currentFilter?.isRegex == true
 
-            cancel.setOnClickListener {
-                dismiss()
-            }
-            add.setOnClickListener {
-                commitAndDismiss()
-            }
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putParcelable(SIS_CURRENT_FILTER, currentFilter)
-    }
-
-    private fun commitAndDismiss() {
-        if (!isBindingAvailable()) return
-
-        val filterText = binding.filterField.editText?.text?.toString()
-        val isRegex = binding.regexSwitch.isChecked
-
-        if (filterText.isNullOrBlank()) {
-            binding.filterField.error = getString(R.string.error_filter_cannot_be_blank)
-            return
-        }
-
-        val filter = args.filterToEdit.copy(
-            filter = filterText,
-            isRegex = isRegex,
-        )
-        setFragmentResult(
-            REQUEST_KEY,
-            bundleOf(REQUEST_KEY_RESULT to filter),
-        )
-
+      cancel.setOnClickListener {
         dismiss()
+      }
+      add.setOnClickListener {
+        commitAndDismiss()
+      }
     }
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+
+    outState.putParcelable(SIS_CURRENT_FILTER, currentFilter)
+  }
+
+  private fun commitAndDismiss() {
+    if (!isBindingAvailable()) return
+
+    val filterText = binding.filterField.editText?.text?.toString()
+    val isRegex = binding.regexSwitch.isChecked
+
+    if (filterText.isNullOrBlank()) {
+      binding.filterField.error = getString(R.string.error_filter_cannot_be_blank)
+      return
+    }
+
+    val filter = args.filterToEdit.copy(
+      filter = filterText,
+      isRegex = isRegex,
+    )
+    setFragmentResult(
+      REQUEST_KEY,
+      bundleOf(REQUEST_KEY_RESULT to filter),
+    )
+
+    dismiss()
+  }
 }

@@ -33,192 +33,192 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class) // Flow.debounce()
 @HiltViewModel
 class CreateOrEditPostViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
-    private val accountManager: AccountManager,
-    private val state: SavedStateHandle,
-    private val linkMetadataHelper: LinkMetadataHelper,
-    val draftsManager: DraftsManager,
+  private val apiClient: AccountAwareLemmyClient,
+  private val accountManager: AccountManager,
+  private val state: SavedStateHandle,
+  private val linkMetadataHelper: LinkMetadataHelper,
+  val draftsManager: DraftsManager,
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "CreateOrEditPostViewModel"
-    }
+  companion object {
+    private const val TAG = "CreateOrEditPostViewModel"
+  }
 
-    var postPrefilled: Boolean = false
-    val createOrEditPostResult = StatefulLiveData<PostView>()
-    val searchResults = StatefulLiveData<List<CommunityView>>()
-    val showSearch = MutableStateFlow<Boolean>(false)
-    val showSearchLiveData = showSearch.asLiveData()
-    val query = MutableStateFlow("")
-    val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()
+  var postPrefilled: Boolean = false
+  val createOrEditPostResult = StatefulLiveData<PostView>()
+  val searchResults = StatefulLiveData<List<CommunityView>>()
+  val showSearch = MutableStateFlow<Boolean>(false)
+  val showSearchLiveData = showSearch.asLiveData()
+  val query = MutableStateFlow("")
+  val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()
 
-    val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
-    val currentDraftId = state.getLiveData<Long>("current_draft_id")
+  val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
+  val currentDraftId = state.getLiveData<Long>("current_draft_id")
 
-    val currentAccount: Account?
-        get() = accountManager.currentAccount.asAccount
+  val currentAccount: Account?
+    get() = accountManager.currentAccount.asAccount
 
-    private var searchJob: Job? = null
+  private var searchJob: Job? = null
 
-    private var urlFlow = MutableSharedFlow<String>()
+  private var urlFlow = MutableSharedFlow<String>()
 
-    init {
-        viewModelScope.launch {
-            query
-                .debounce(300)
-                .collect {
-                    doQuery(it)
-                }
-        }
-        viewModelScope.launch {
-            urlFlow
-                .debounce(500)
-                .collect {
-                    if (URLUtil.isValidUrl(it)) {
-                        loadLinkMetadata(it)
-                    }
-                }
+  init {
+    viewModelScope.launch {
+      query
+        .debounce(300)
+        .collect {
+          doQuery(it)
         }
     }
-
-    fun createPost(
-        communityFullName: String,
-        name: String,
-        body: String,
-        url: String,
-        isNsfw: Boolean,
-    ) {
-        createOrEditPostResult.setIsLoading()
-        viewModelScope.launch {
-            val communityIdResult =
-                apiClient.fetchCommunityWithRetry(
-                    Either.Right(communityFullName),
-                    force = false,
-                )
-                    .fold(
-                        {
-                            Result.success(it.community_view.community.id)
-                        },
-                        {
-                            Result.failure(it)
-                        },
-                    )
-
-            if (communityIdResult.isFailure) {
-                createOrEditPostResult.postError(
-                    requireNotNull(communityIdResult.exceptionOrNull()),
-                )
-                return@launch
-            }
-
-            if (name.isBlank()) {
-                createOrEditPostResult.postError(NoTitleError())
-                return@launch
-            }
-
-            val result = apiClient.createPost(
-                name = name,
-                body = body.ifBlank { null },
-                url = url.ifBlank { null },
-                isNsfw = isNsfw,
-                communityId = communityIdResult.getOrThrow(),
-            )
-
-            result
-                .onSuccess {
-                    createOrEditPostResult.postValue(it)
-                }
-                .onFailure {
-                    createOrEditPostResult.postError(it)
-                }
+    viewModelScope.launch {
+      urlFlow
+        .debounce(500)
+        .collect {
+          if (URLUtil.isValidUrl(it)) {
+            loadLinkMetadata(it)
+          }
         }
     }
+  }
 
-    fun updatePost(
-        instance: String,
-        name: String,
-        body: String,
-        url: String,
-        isNsfw: Boolean,
-        postId: PostId,
-    ) {
-        createOrEditPostResult.setIsLoading()
-        viewModelScope.launch {
-            val account = accountManager.currentAccount.asAccount
+  fun createPost(
+    communityFullName: String,
+    name: String,
+    body: String,
+    url: String,
+    isNsfw: Boolean,
+  ) {
+    createOrEditPostResult.setIsLoading()
+    viewModelScope.launch {
+      val communityIdResult =
+        apiClient.fetchCommunityWithRetry(
+          Either.Right(communityFullName),
+          force = false,
+        )
+          .fold(
+            {
+              Result.success(it.community_view.community.id)
+            },
+            {
+              Result.failure(it)
+            },
+          )
 
-            if (account == null) {
-                createOrEditPostResult.postError(NotAuthenticatedException())
-                return@launch
-            }
+      if (communityIdResult.isFailure) {
+        createOrEditPostResult.postError(
+          requireNotNull(communityIdResult.exceptionOrNull()),
+        )
+        return@launch
+      }
 
-            if (name.isBlank()) {
-                createOrEditPostResult.postError(NoTitleError())
-                return@launch
-            }
+      if (name.isBlank()) {
+        createOrEditPostResult.postError(NoTitleError())
+        return@launch
+      }
 
-            val result = apiClient.editPost(
-                postId = postId,
-                name = name,
-                body = body.ifBlank { null },
-                url = url.ifBlank { null },
-                isNsfw = isNsfw,
-                account = account,
-            )
+      val result = apiClient.createPost(
+        name = name,
+        body = body.ifBlank { null },
+        url = url.ifBlank { null },
+        isNsfw = isNsfw,
+        communityId = communityIdResult.getOrThrow(),
+      )
 
-            result
-                .onSuccess {
-                    createOrEditPostResult.postValue(it)
-                }
-                .onFailure {
-                    createOrEditPostResult.postError(it)
-                }
+      result
+        .onSuccess {
+          createOrEditPostResult.postValue(it)
+        }
+        .onFailure {
+          createOrEditPostResult.postError(it)
         }
     }
+  }
 
-    fun loadLinkMetadata(url: String) {
-        linkMetadata.setIsLoading()
+  fun updatePost(
+    instance: String,
+    name: String,
+    body: String,
+    url: String,
+    isNsfw: Boolean,
+    postId: PostId,
+  ) {
+    createOrEditPostResult.setIsLoading()
+    viewModelScope.launch {
+      val account = accountManager.currentAccount.asAccount
 
-        viewModelScope.launch {
-            try {
-                linkMetadata.setValue(linkMetadataHelper.loadLinkMetadata(url))
-            } catch (e: Exception) {
-                linkMetadata.setError(e)
-            }
+      if (account == null) {
+        createOrEditPostResult.postError(NotAuthenticatedException())
+        return@launch
+      }
+
+      if (name.isBlank()) {
+        createOrEditPostResult.postError(NoTitleError())
+        return@launch
+      }
+
+      val result = apiClient.editPost(
+        postId = postId,
+        name = name,
+        body = body.ifBlank { null },
+        url = url.ifBlank { null },
+        isNsfw = isNsfw,
+        account = account,
+      )
+
+      result
+        .onSuccess {
+          createOrEditPostResult.postValue(it)
+        }
+        .onFailure {
+          createOrEditPostResult.postError(it)
         }
     }
+  }
 
-    fun setUrl(url: String) {
-        viewModelScope.launch {
-            urlFlow.emit(url)
-        }
+  fun loadLinkMetadata(url: String) {
+    linkMetadata.setIsLoading()
+
+    viewModelScope.launch {
+      try {
+        linkMetadata.setValue(linkMetadataHelper.loadLinkMetadata(url))
+      } catch (e: Exception) {
+        linkMetadata.setError(e)
+      }
+    }
+  }
+
+  fun setUrl(url: String) {
+    viewModelScope.launch {
+      urlFlow.emit(url)
+    }
+  }
+
+  private fun doQuery(query: String) {
+    searchResults.setIsLoading()
+
+    if (query.isBlank()) {
+      searchResults.setValue(listOf())
+      return
     }
 
-    private fun doQuery(query: String) {
-        searchResults.setIsLoading()
-
-        if (query.isBlank()) {
-            searchResults.setValue(listOf())
-            return
+    searchJob?.cancel()
+    searchJob = viewModelScope.launch {
+      apiClient
+        .searchWithRetry(
+          sortType = SortType.TopMonth,
+          listingType = ListingType.All,
+          searchType = SearchType.Communities,
+          query = query.toString(),
+          limit = 20,
+        )
+        .onSuccess {
+          searchResults.setValue(it.communities)
         }
-
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            apiClient
-                .searchWithRetry(
-                    sortType = SortType.TopMonth,
-                    listingType = ListingType.All,
-                    searchType = SearchType.Communities,
-                    query = query.toString(),
-                    limit = 20,
-                )
-                .onSuccess {
-                    searchResults.setValue(it.communities)
-                }
-                .onFailure {
-                    searchResults.setError(it)
-                }
+        .onFailure {
+          searchResults.setError(it)
         }
     }
+  }
 
-    class NoTitleError : RuntimeException()
+  class NoTitleError : RuntimeException()
 }

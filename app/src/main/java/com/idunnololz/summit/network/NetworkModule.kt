@@ -14,52 +14,52 @@ import okhttp3.OkHttpClient
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-    @Provides
-    @Singleton
-    @BrowserLike
-    fun provideBrowserLikeOkHttpClient(
-        clientFactory: ClientFactory,
-        directoryHelper: DirectoryHelper,
-    ): OkHttpClient = clientFactory.newClient(
-        debugName = "BrowserLike",
-        cacheDir = directoryHelper.okHttpCacheDir,
-        purpose = ClientFactory.Purpose.BrowserLike,
-    )
+  @Provides
+  @Singleton
+  @BrowserLike
+  fun provideBrowserLikeOkHttpClient(
+    clientFactory: ClientFactory,
+    directoryHelper: DirectoryHelper,
+  ): OkHttpClient = clientFactory.newClient(
+    debugName = "BrowserLike",
+    cacheDir = directoryHelper.okHttpCacheDir,
+    purpose = ClientFactory.Purpose.BrowserLike,
+  )
 
-    @Provides
-    @Singleton
-    @LemmyApi
-    fun provideApiOkHttpClient(
-        clientFactory: ClientFactory,
-        directoryHelper: DirectoryHelper,
-    ): OkHttpClient = clientFactory.newClient(
-        debugName = "Api",
-        cacheDir = directoryHelper.okHttpCacheDir,
-        purpose = ClientFactory.Purpose.LemmyApiClient,
-    )
+  @Provides
+  @Singleton
+  @LemmyApi
+  fun provideApiOkHttpClient(
+    clientFactory: ClientFactory,
+    directoryHelper: DirectoryHelper,
+  ): OkHttpClient = clientFactory.newClient(
+    debugName = "Api",
+    cacheDir = directoryHelper.okHttpCacheDir,
+    purpose = ClientFactory.Purpose.LemmyApiClient,
+  )
 
-    @Provides
-    @Singleton
-    @SummitApi
-    fun provideSummitApiOkHttpClient(
-        clientFactory: ClientFactory,
-        directoryHelper: DirectoryHelper,
-    ): OkHttpClient = clientFactory
-        .newClient(
-            "SummitApi",
-            directoryHelper.okHttpCacheDir,
-            ClientFactory.Purpose.SummitApiClient,
-        )
-        .newBuilder()
-        .addNetworkInterceptor {
-            val requestBuilder = it.request().newBuilder()
-            requestBuilder.header(
-                "Authorization",
-                "Bearer ${BuildConfig.SUMMIT_JWT}",
-            )
-            it.proceed(requestBuilder.build())
-        }
-        .build()
+  @Provides
+  @Singleton
+  @SummitApi
+  fun provideSummitApiOkHttpClient(
+    clientFactory: ClientFactory,
+    directoryHelper: DirectoryHelper,
+  ): OkHttpClient = clientFactory
+    .newClient(
+      "SummitApi",
+      directoryHelper.okHttpCacheDir,
+      ClientFactory.Purpose.SummitApiClient,
+    )
+    .newBuilder()
+    .addNetworkInterceptor {
+      val requestBuilder = it.request().newBuilder()
+      requestBuilder.header(
+        "Authorization",
+        "Bearer ${BuildConfig.SUMMIT_JWT}",
+      )
+      it.proceed(requestBuilder.build())
+    }
+    .build()
 }
 
 /**

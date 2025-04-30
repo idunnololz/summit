@@ -7,25 +7,25 @@ import coil3.size.ScaleDrawable
 import com.idunnololz.summit.util.Size
 
 fun Drawable.tint(color: Int): Drawable {
-    val wrappedDrawable: Drawable = DrawableCompat.wrap(this)
-    DrawableCompat.setTint(wrappedDrawable, color)
-    return wrappedDrawable
+  val wrappedDrawable: Drawable = DrawableCompat.wrap(this)
+  DrawableCompat.setTint(wrappedDrawable, color)
+  return wrappedDrawable
 }
 
 fun Drawable.getSize(outSize: Size) {
-    when (this) {
-        is BitmapDrawable -> {
-            outSize.width = this.bitmap.width
-            outSize.height = this.bitmap.height
-        }
-
-        is ScaleDrawable -> {
-            this.child.getSize(outSize)
-        }
-
-        else -> {
-            outSize.width = intrinsicWidth
-            outSize.height = intrinsicHeight
-        }
+  when (this) {
+    is BitmapDrawable -> {
+      outSize.width = this.bitmap.width
+      outSize.height = this.bitmap.height
     }
+
+    is ScaleDrawable -> {
+      this.child.getSize(outSize)
+    }
+
+    else -> {
+      outSize.width = intrinsicWidth
+      outSize.height = intrinsicHeight
+    }
+  }
 }

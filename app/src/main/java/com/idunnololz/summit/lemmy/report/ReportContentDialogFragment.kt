@@ -22,124 +22,124 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ReportContentDialogFragment :
-    BaseDialogFragment<DialogFragmentReportContentBinding>() {
+  BaseDialogFragment<DialogFragmentReportContentBinding>() {
 
-    companion object {
-        fun show(fragmentManager: FragmentManager, postRef: PostRef?, commentRef: CommentRef?) {
-            ReportContentDialogFragment()
-                .apply {
-                    arguments = ReportContentDialogFragmentArgs(postRef, commentRef).toBundle()
-                }
-                .showAllowingStateLoss(fragmentManager, "ReportContentDialogFragment")
+  companion object {
+    fun show(fragmentManager: FragmentManager, postRef: PostRef?, commentRef: CommentRef?) {
+      ReportContentDialogFragment()
+        .apply {
+          arguments = ReportContentDialogFragmentArgs(postRef, commentRef).toBundle()
         }
+        .showAllowingStateLoss(fragmentManager, "ReportContentDialogFragment")
+    }
+  }
+
+  private val args by navArgs<ReportContentDialogFragmentArgs>()
+
+  private val viewModel: ReportContentViewModel by viewModels()
+
+  private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
+    override fun handleOnBackPressed() {
+      viewModel.cancelSendReport()
+    }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentReportContentBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val commentRef = args.commentRef
+    val postRef = args.postRef
+
+    if (commentRef == null && postRef == null) {
+      dismiss()
+      return
+    }
+    val target = if (postRef != null) {
+      Either.Left(postRef)
+    } else {
+      Either.Right(requireNotNull(commentRef))
     }
 
-    private val args by navArgs<ReportContentDialogFragmentArgs>()
-
-    private val viewModel: ReportContentViewModel by viewModels()
-
-    private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            viewModel.cancelSendReport()
-        }
+    binding.report.setOnClickListener {
+      viewModel.sendReport(
+        target,
+        binding.reasonEditText.text.toString(),
+      )
+    }
+    binding.cancel.setOnClickListener {
+      if (viewModel.reportState.isLoading) {
+        viewModel.cancelSendReport()
+      } else {
+        dismiss()
+      }
     }
 
-    override fun onStart() {
-        super.onStart()
-        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    viewModel.reportState.observe(viewLifecycleOwner) {
+      when (it) {
+        is StatefulData.Error -> {
+          onSendReportStateChange(isSending = false)
+          ErrorDialogFragment.show(
+            getString(R.string.error_unable_to_send_report),
+            it.error,
+            childFragmentManager,
+          )
+
+          unsavedChangesBackPressedHandler.isEnabled = false
+        }
+        is StatefulData.Loading -> {
+          onSendReportStateChange(isSending = true)
+
+          unsavedChangesBackPressedHandler.isEnabled = true
+        }
+        is StatefulData.NotStarted -> {
+          onSendReportStateChange(isSending = false)
+
+          unsavedChangesBackPressedHandler.isEnabled = false
+        }
+        is StatefulData.Success -> {
+          unsavedChangesBackPressedHandler.isEnabled = false
+
+          onSendReportStateChange(isSending = false)
+          dismiss()
+        }
+      }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    onBackPressedDispatcher.addCallback(
+      viewLifecycleOwner,
+      unsavedChangesBackPressedHandler,
+    )
+  }
 
-        setBinding(DialogFragmentReportContentBinding.inflate(inflater, container, false))
+  private fun onSendReportStateChange(isSending: Boolean) {
+    if (!isBindingAvailable()) return
 
-        return binding.root
+    with(binding) {
+      reason.isEnabled = !isSending
+      report.isEnabled = !isSending
+
+      if (isSending) {
+        loadingView.showProgressBar()
+      } else {
+        loadingView.hideAll()
+      }
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val commentRef = args.commentRef
-        val postRef = args.postRef
-
-        if (commentRef == null && postRef == null) {
-            dismiss()
-            return
-        }
-        val target = if (postRef != null) {
-            Either.Left(postRef)
-        } else {
-            Either.Right(requireNotNull(commentRef))
-        }
-
-        binding.report.setOnClickListener {
-            viewModel.sendReport(
-                target,
-                binding.reasonEditText.text.toString(),
-            )
-        }
-        binding.cancel.setOnClickListener {
-            if (viewModel.reportState.isLoading) {
-                viewModel.cancelSendReport()
-            } else {
-                dismiss()
-            }
-        }
-
-        viewModel.reportState.observe(viewLifecycleOwner) {
-            when (it) {
-                is StatefulData.Error -> {
-                    onSendReportStateChange(isSending = false)
-                    ErrorDialogFragment.show(
-                        getString(R.string.error_unable_to_send_report),
-                        it.error,
-                        childFragmentManager,
-                    )
-
-                    unsavedChangesBackPressedHandler.isEnabled = false
-                }
-                is StatefulData.Loading -> {
-                    onSendReportStateChange(isSending = true)
-
-                    unsavedChangesBackPressedHandler.isEnabled = true
-                }
-                is StatefulData.NotStarted -> {
-                    onSendReportStateChange(isSending = false)
-
-                    unsavedChangesBackPressedHandler.isEnabled = false
-                }
-                is StatefulData.Success -> {
-                    unsavedChangesBackPressedHandler.isEnabled = false
-
-                    onSendReportStateChange(isSending = false)
-                    dismiss()
-                }
-            }
-        }
-
-        onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            unsavedChangesBackPressedHandler,
-        )
-    }
-
-    private fun onSendReportStateChange(isSending: Boolean) {
-        if (!isBindingAvailable()) return
-
-        with(binding) {
-            reason.isEnabled = !isSending
-            report.isEnabled = !isSending
-
-            if (isSending) {
-                loadingView.showProgressBar()
-            } else {
-                loadingView.hideAll()
-            }
-        }
-    }
+  }
 }

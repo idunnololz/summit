@@ -13,39 +13,39 @@ import kotlinx.serialization.json.Json
 @Entity(tableName = "inbox_entries")
 @TypeConverters(InboxEntryConverters::class)
 data class InboxEntry(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    val id: Long,
-    @ColumnInfo(name = "ts")
-    val ts: Long,
-    @ColumnInfo(name = "item_id")
-    val itemId: Int,
-    @ColumnInfo(name = "notification_id")
-    val notificationId: Int,
-    @ColumnInfo(name = "account_full_name")
-    val accountFullName: String,
-    @ColumnInfo(name = "inbox_item")
-    val inboxItem: InboxItem?,
+  @PrimaryKey(autoGenerate = true)
+  @ColumnInfo(name = "id")
+  val id: Long,
+  @ColumnInfo(name = "ts")
+  val ts: Long,
+  @ColumnInfo(name = "item_id")
+  val itemId: Int,
+  @ColumnInfo(name = "notification_id")
+  val notificationId: Int,
+  @ColumnInfo(name = "account_full_name")
+  val accountFullName: String,
+  @ColumnInfo(name = "inbox_item")
+  val inboxItem: InboxItem?,
 )
 
 @ProvidedTypeConverter
 class InboxEntryConverters(private val json: Json) {
 
-    companion object {
-        private const val TAG = "InboxEntryConverters"
-    }
+  companion object {
+    private const val TAG = "InboxEntryConverters"
+  }
 
-    @TypeConverter
-    fun inboxItemToString(value: InboxItem): String {
-        return json.encodeToString(value)
-    }
+  @TypeConverter
+  fun inboxItemToString(value: InboxItem): String {
+    return json.encodeToString(value)
+  }
 
-    @TypeConverter
-    fun stringToInboxItem(value: String): InboxItem? = try {
-        json.decodeFromString(value)
-    } catch (e: Exception) {
-        Log.e(TAG, "", e)
-        crashLogger?.recordException(e)
-        null
-    }
+  @TypeConverter
+  fun stringToInboxItem(value: String): InboxItem? = try {
+    json.decodeFromString(value)
+  } catch (e: Exception) {
+    Log.e(TAG, "", e)
+    crashLogger?.recordException(e)
+    null
+  }
 }

@@ -79,556 +79,556 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
 
-    companion object {
-        private const val TAG = "PersonTabbedFragment"
-    }
+  companion object {
+    private const val TAG = "PersonTabbedFragment"
+  }
 
-    private val args by navArgs<PersonTabbedFragmentArgs>()
+  private val args by navArgs<PersonTabbedFragmentArgs>()
 
-    @Inject
-    lateinit var offlineManager: OfflineManager
+  @Inject
+  lateinit var offlineManager: OfflineManager
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var avatarHelper: AvatarHelper
+  @Inject
+  lateinit var avatarHelper: AvatarHelper
 
-    @Inject
-    lateinit var accountManager: AccountManager
+  @Inject
+  lateinit var accountManager: AccountManager
 
-    @Inject
-    lateinit var moreActionsHelper: MoreActionsHelper
+  @Inject
+  lateinit var moreActionsHelper: MoreActionsHelper
 
-    @Inject
-    lateinit var userTagsManager: UserTagsManager
+  @Inject
+  lateinit var userTagsManager: UserTagsManager
 
-    val viewModel: PersonTabbedViewModel by viewModels()
-    var slidingPaneController: SlidingPaneController? = null
+  val viewModel: PersonTabbedViewModel by viewModels()
+  var slidingPaneController: SlidingPaneController? = null
 
-    private var isAnimatingTitleIn: Boolean = false
-    private var isAnimatingTitleOut: Boolean = false
+  private var isAnimatingTitleIn: Boolean = false
+  private var isAnimatingTitleOut: Boolean = false
 
-    private val personRef
-        get() = args.personRef
-            ?: accountManager.currentAccount.asAccount?.toPersonRef()
+  private val personRef
+    get() = args.personRef
+      ?: accountManager.currentAccount.asAccount?.toPersonRef()
 
-    private var consumedArgs = false
+  private var consumedArgs = false
 
-    enum class Screen {
-        Posts,
-        Comments,
-        About,
-    }
+  enum class Screen {
+    Posts,
+    Comments,
+    About,
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentPersonBinding.inflate(inflater, container, false))
+    setBinding(FragmentPersonBinding.inflate(inflater, container, false))
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-        val mainActivity = requireSummitActivity()
+    val context = requireContext()
+    val mainActivity = requireSummitActivity()
 
-        requireSummitActivity().apply {
-            setupToolbar(
-                binding.toolbar,
-                "",
-            )
+    requireSummitActivity().apply {
+      setupToolbar(
+        binding.toolbar,
+        "",
+      )
 
-            insetViewAutomaticallyByPaddingAndNavUi(
-                viewLifecycleOwner,
-                binding.coordinatorLayout,
-                applyTopInset = false,
-            )
-            insets.observe(viewLifecycleOwner) {
-                val newToolbarHeight =
-                    context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize).toInt() +
-                        it.topInset
+      insetViewAutomaticallyByPaddingAndNavUi(
+        viewLifecycleOwner,
+        binding.coordinatorLayout,
+        applyTopInset = false,
+      )
+      insets.observe(viewLifecycleOwner) {
+        val newToolbarHeight =
+          context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize).toInt() +
+            it.topInset
 
-                binding.bannerDummy.updateLayoutParams<MarginLayoutParams> {
-                    topMargin = -it.topInset
-                }
-
-                binding.coordinatorLayout.updatePadding(top = it.topInset)
-                binding.collapsingToolbarLayout.scrimVisibleHeightTrigger =
-                    (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()
-                binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
-                    height = newToolbarHeight
-                }
-            }
+        binding.bannerDummy.updateLayoutParams<MarginLayoutParams> {
+          topMargin = -it.topInset
         }
 
-        onPersonChanged()
+        binding.coordinatorLayout.updatePadding(top = it.topInset)
+        binding.collapsingToolbarLayout.scrimVisibleHeightTrigger =
+          (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()
+        binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
+          height = newToolbarHeight
+        }
+      }
+    }
 
-        with(binding) {
-            fab.hide()
-            tabLayoutContainer.visibility = View.GONE
+    onPersonChanged()
 
-            appBar.addOnOffsetChangedListener { appBar, offset ->
-                val topInset = mainActivity.insets.value?.topInset ?: 0
+    with(binding) {
+      fab.hide()
+      tabLayoutContainer.visibility = View.GONE
 
-                val fixedTotalRange = appBar.totalScrollRange - topInset
+      appBar.addOnOffsetChangedListener { appBar, offset ->
+        val topInset = mainActivity.insets.value?.topInset ?: 0
 
-                val progress = min(1f, abs(offset.toFloat() / fixedTotalRange))
-                val scrimEndProgress = 0.7f
+        val fixedTotalRange = appBar.totalScrollRange - topInset
 
-                bannerContainer.alpha = max(0f, 1f - progress / scrimEndProgress)
-            }
+        val progress = min(1f, abs(offset.toFloat() / fixedTotalRange))
+        val scrimEndProgress = 0.7f
 
-            if (args.personRef == null) {
-                viewModel.currentAccountView.observe(viewLifecycleOwner) {
-                    it.loadProfileImageOrDefault(binding.accountImageView)
+        bannerContainer.alpha = max(0f, 1f - progress / scrimEndProgress)
+      }
 
-                    onPersonChanged()
+      if (args.personRef == null) {
+        viewModel.currentAccountView.observe(viewLifecycleOwner) {
+          it.loadProfileImageOrDefault(binding.accountImageView)
+
+          onPersonChanged()
+        }
+        accountImageView.setOnClickListener {
+          AccountsAndSettingsDialogFragment.newInstance()
+            .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
+        }
+      } else {
+        binding.accountImageView.visibility = View.GONE
+      }
+      viewModel.personData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            binding.fab.hide()
+            loadingView.showDefaultErrorMessageFor(it.error)
+          }
+          is StatefulData.Loading -> {
+            binding.fab.hide()
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            binding.fab.show()
+            loadingView.hideAll()
+
+            setup(personRef)
+
+            if (!consumedArgs && savedInstanceState == null) {
+              consumedArgs = true
+
+              viewPager.post {
+                when (args.screen as Screen) {
+                  Screen.Posts -> {
+                    viewPager.currentItem = 0
+                  }
+                  Screen.Comments -> {
+                    viewPager.currentItem = 1
+                  }
+                  Screen.About -> {
+                    viewPager.currentItem = 2
+                  }
                 }
-                accountImageView.setOnClickListener {
-                    AccountsAndSettingsDialogFragment.newInstance()
-                        .showAllowingStateLoss(childFragmentManager, "AccountsDialogFragment")
-                }
-            } else {
-                binding.accountImageView.visibility = View.GONE
+              }
             }
-            viewModel.personData.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        binding.fab.hide()
-                        loadingView.showDefaultErrorMessageFor(it.error)
-                    }
-                    is StatefulData.Loading -> {
-                        binding.fab.hide()
-                        loadingView.showProgressBar()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        binding.fab.show()
-                        loadingView.hideAll()
+          }
+        }
+      }
+      binding.fab.setup(preferences)
 
-                        setup(personRef)
+      slidingPaneController = SlidingPaneController(
+        fragment = this@PersonTabbedFragment,
+        slidingPaneLayout = binding.slidingPaneLayout,
+        childFragmentManager = childFragmentManager,
+        viewModel = viewModel,
+        globalLayoutMode = preferences.globalLayoutMode,
+        lockPanes = true,
+        retainClosedPosts = preferences.retainLastPost,
+        emptyScreenText = getString(R.string.select_a_post_or_comment),
+        fragmentContainerId = R.id.post_fragment_container,
+      ).apply {
+        onPageSelectedListener = { isOpen ->
+        }
+        init()
+      }
 
-                        if (!consumedArgs && savedInstanceState == null) {
-                            consumedArgs = true
+      title.alpha = 0f
+      isAnimatingTitleIn = false
+      isAnimatingTitleOut = false
 
-                            viewPager.post {
-                                when (args.screen as Screen) {
-                                    Screen.Posts -> {
-                                        viewPager.currentItem = 0
-                                    }
-                                    Screen.Comments -> {
-                                        viewPager.currentItem = 1
-                                    }
-                                    Screen.About -> {
-                                        viewPager.currentItem = 2
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            binding.fab.setup(preferences)
+      body.visibility = View.GONE
 
-            slidingPaneController = SlidingPaneController(
-                fragment = this@PersonTabbedFragment,
-                slidingPaneLayout = binding.slidingPaneLayout,
-                childFragmentManager = childFragmentManager,
-                viewModel = viewModel,
-                globalLayoutMode = preferences.globalLayoutMode,
-                lockPanes = true,
-                retainClosedPosts = preferences.retainLastPost,
-                emptyScreenText = getString(R.string.select_a_post_or_comment),
-                fragmentContainerId = R.id.post_fragment_container,
-            ).apply {
-                onPageSelectedListener = { isOpen ->
-                }
-                init()
-            }
+      banner.transitionName = "banner_image"
 
-            title.alpha = 0f
-            isAnimatingTitleIn = false
+      val actionBarHeight = context.getDimenFromAttribute(
+        androidx.appcompat.R.attr.actionBarSize,
+      )
+      appBar.addOnOffsetChangedListener { _, verticalOffset ->
+        if (!isBindingAvailable()) {
+          return@addOnOffsetChangedListener
+        }
+
+        val percentCollapsed = -verticalOffset / collapsingToolbarLayout.height.toDouble()
+        val absPixelsShowing = collapsingToolbarLayout.height + verticalOffset
+
+        if (absPixelsShowing <= actionBarHeight) {
+          if (!isAnimatingTitleIn) {
+            isAnimatingTitleIn = true
             isAnimatingTitleOut = false
-
-            body.visibility = View.GONE
-
-            banner.transitionName = "banner_image"
-
-            val actionBarHeight = context.getDimenFromAttribute(
-                androidx.appcompat.R.attr.actionBarSize,
-            )
-            appBar.addOnOffsetChangedListener { _, verticalOffset ->
-                if (!isBindingAvailable()) {
-                    return@addOnOffsetChangedListener
-                }
-
-                val percentCollapsed = -verticalOffset / collapsingToolbarLayout.height.toDouble()
-                val absPixelsShowing = collapsingToolbarLayout.height + verticalOffset
-
-                if (absPixelsShowing <= actionBarHeight) {
-                    if (!isAnimatingTitleIn) {
-                        isAnimatingTitleIn = true
-                        isAnimatingTitleOut = false
-                        title.animate().alpha(1f)
-                    }
-                } else if (percentCollapsed < 0.66) {
-                    if (!isAnimatingTitleOut) {
-                        isAnimatingTitleOut = true
-                        isAnimatingTitleIn = false
-                        title.animate().alpha(0f)
-                    }
-                }
-            }
-
-            installOnActionResultHandler(
-                context = context,
-                moreActionsHelper = moreActionsHelper,
-                snackbarContainer = coordinatorLayout,
-            )
+            title.animate().alpha(1f)
+          }
+        } else if (percentCollapsed < 0.66) {
+          if (!isAnimatingTitleOut) {
+            isAnimatingTitleOut = true
+            isAnimatingTitleIn = false
+            title.animate().alpha(0f)
+          }
         }
+      }
 
-        binding.fab.setOnClickListener {
-            showOverflowMenu()
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            userTagsManager.onChangedFlow.collect {
-                onUserTagChanged()
-            }
-        }
+      installOnActionResultHandler(
+        context = context,
+        moreActionsHelper = moreActionsHelper,
+        snackbarContainer = coordinatorLayout,
+      )
     }
 
-    private fun onPersonChanged() {
-        val personRef = personRef
-
-        if (personRef != null) {
-            viewModel.fetchPersonIfNotDone(personRef)
-        }
-
-        setup(personRef)
+    binding.fab.setOnClickListener {
+      showOverflowMenu()
     }
 
-    private fun showOverflowMenu() {
-        if (!isBindingAvailable()) return
-
-        val context = requireContext()
-        val personData = viewModel.personData.valueOrNull ?: return
-        val person = personData.personView.person
-        val personRef = person.toPersonRef()
-
-        val bottomMenu = BottomMenu(requireContext()).apply {
-            addItemWithIcon(
-                id = R.id.sort,
-                title = getString(R.string.sort_by),
-                icon = R.drawable.baseline_sort_24,
-            )
-            addDivider()
-
-            addItemWithIcon(
-                id = R.id.message,
-                title = R.string.send_message,
-                icon = R.drawable.baseline_message_24,
-            )
-
-            addItemWithIcon(
-                id = R.id.tag_user,
-                title = getString(R.string.tag_user_format, personRef.name),
-                icon = R.drawable.outline_sell_24,
-            )
-
-            if (moreActionsHelper.fullAccount?.isPersonBlocked(personRef) == true) {
-                addItemWithIcon(
-                    id = R.id.unblock_user,
-                    title = context.getString(R.string.unblock_this_user_format, personRef.name),
-                    icon = R.drawable.baseline_person_24,
-                )
-            } else {
-                addItemWithIcon(
-                    id = R.id.block_user,
-                    title = context.getString(R.string.block_this_user_format, personRef.name),
-                    icon = R.drawable.baseline_person_off_24,
-                )
-            }
-
-            setOnMenuItemClickListener {
-                when (it.id) {
-                    R.id.sort -> {
-                        SortTypeMenuHelper(
-                            requireContext(),
-                            this@PersonTabbedFragment,
-                            { viewModel.sortType },
-                            { viewModel.sortType = it },
-                        ).show()
-                    }
-                    R.id.block_user -> {
-                        moreActionsHelper.blockPerson(id = person.id, block = true)
-                    }
-                    R.id.unblock_user -> {
-                        moreActionsHelper.blockPerson(id = person.id, block = false)
-                    }
-                    R.id.message -> {
-                        AddOrEditCommentFragment.showMessageDialog(
-                            childFragmentManager,
-                            viewModel.instance,
-                            person.id,
-                        )
-                    }
-                    R.id.tag_user -> {
-                        AddOrEditUserTagDialogFragment.show(
-                            fragmentManager = childFragmentManager,
-                            person = person,
-                        )
-                    }
-                }
-            }
-        }
-
-        requireSummitActivity().showBottomMenu(bottomMenu)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        setupForFragment<PersonTabbedFragment>()
-
-        if (binding.viewPager.currentItem == 0) {
-            getMainActivity()?.setNavUiOpenPercent(0f)
-        }
-    }
-
-    private fun setup(personRef: PersonRef?) {
-        if (!isBindingAvailable()) return
-
-        if (personRef == null) {
-            // this can happen if the user tapped on the profile page and is not signed in.
-            binding.loadingView.showErrorText(
-                getString(R.string.error_not_signed_in),
-            )
-            binding.profileIcon.visibility = View.GONE
-            binding.collapsingToolbarContent.visibility = View.GONE
-            binding.viewPager.visibility = View.GONE
-            binding.tabLayoutContainer.visibility = View.GONE
-            binding.fab.hide()
-
-            viewModel.clearPersonData()
-            return
-        }
-
-        val data = viewModel.personData.valueOrNull
-
-        if (viewModel.personData.isLoading) {
-            binding.loadingView.showProgressBar()
-        }
-
-        if (data == null) {
-            binding.profileIcon.visibility = View.GONE
-            binding.collapsingToolbarContent.visibility = View.GONE
-            binding.viewPager.visibility = View.GONE
-            binding.tabLayoutContainer.visibility = View.GONE
-            binding.fab.hide()
-            return
-        }
-
-        val person = data.personView.person
-        val context = requireContext()
-
-        Log.d(TAG, "user id: ${person.id}")
-        Log.d(TAG, "actor id: ${person.actor_id}")
-
-        TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
-
-        with(binding) {
-            profileIcon.visibility = View.VISIBLE
-            collapsingToolbarContent.visibility = View.VISIBLE
-            viewPager.visibility = View.VISIBLE
-            tabLayoutContainer.visibility = View.VISIBLE
-            fab.show()
-
-            val displayName = person.display_name
-                ?: person.name
-
-            title.text = displayName
-
-            val bannerUrl = person.banner
-            if (bannerUrl != null) {
-                bannerDummy.setOnClickListener {
-                    getMainActivity()?.openImage(
-                        banner,
-                        null,
-                        personRef?.fullName,
-                        bannerUrl,
-                        null,
-                    )
-                }
-                offlineManager.fetchImage(root, bannerUrl) {
-                    banner.load(it) {
-                        allowHardware(false)
-                    }
-                }
-            } else {
-                banner.load("file:///android_asset/banner_placeholder.svg") {
-                    allowHardware(false)
-                }
-                bannerDummy.setOnClickListener(null)
-            }
-            avatarHelper.loadAvatar(profileIcon, person)
-            if (person.avatar.isNullOrBlank()) {
-                profileIcon.setOnClickListener {
-                    launchAlertDialog("error_user_has_no_profile_image") {
-                        messageResId = R.string.error_user_has_no_profile_image
-                    }
-                }
-            } else {
-                ViewCompat.setTransitionName(profileIcon, "profileIcon")
-
-                profileIcon.setOnClickListener {
-                    getMainActivity()?.openImage(
-                        profileIcon,
-                        toolbar,
-                        person.fullName,
-                        person.avatar,
-                        null,
-                    )
-                }
-            }
-            name.text = displayName
-
-            val dateTime = LocalDateTime.ofEpochSecond(
-                dateStringToTs(person.published) / 1000,
-                0,
-                ZoneOffset.UTC,
-            )
-            val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
-            val cakeDrawable = context.getDrawableCompat(R.drawable.baseline_cake_24)
-            val drawableSize = Utils.convertDpToPixel(13f).toInt()
-            cakeDrawable?.setBounds(0, 0, drawableSize, drawableSize)
-            cakeDate.setCompoundDrawablesRelative(
-                cakeDrawable,
-                null,
-                null,
-                null,
-            )
-            cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
-            cakeDate.visibility = View.VISIBLE
-
-            val personCreationTs = dateStringToTs(person.published)
-            val isPersonNew =
-                System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
-            body.text = buildSpannedString {
-                if (isPersonNew) {
-                    val s = length
-                    append(
-                        context.getString(
-                            R.string.new_account_desc_format, tsToConcise(context, person.published),
-                        ),
-                    )
-                    val e = length
-                    setSpan(
-                        RoundedBackgroundSpan(
-                            backgroundColor = context.getColorCompat(R.color.style_amber),
-                            textColor = context.getColorCompat(R.color.black97),
-                        ),
-                        s,
-                        e,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
-                    appendLine()
-                    appendLine()
-                }
-
-                append(
-                    context.resources.getQuantityString(
-                        R.plurals.posts_format,
-                        data.personView.counts.post_count,
-                        defaultDecimalFormat.format(data.personView.counts.post_count),
-                    ),
-                )
-
-                appendSeparator()
-
-                append(
-                    context.resources.getQuantityString(
-                        R.plurals.comments_format,
-                        data.personView.counts.comment_count,
-                        defaultDecimalFormat.format(data.personView.counts.comment_count),
-                    ),
-                )
-
-                appendSeparator()
-
-                append(
-                    context.getString(
-                        R.string.account_age_format,
-                        person.getAccountAgeString(),
-                    ),
-                )
-            }
-
-            if (viewPager.adapter == null) {
-                viewPager.offscreenPageLimit = 5
-                val adapter =
-                    ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
-                adapter.addFrag(PersonPostsFragment::class.java, getString(R.string.posts))
-                adapter.addFrag(PersonCommentsFragment::class.java, getString(R.string.comments))
-                adapter.addFrag(PersonAboutFragment::class.java, getString(R.string.about))
-                viewPager.adapter = adapter
-            }
-
-            tabLayoutContainer.visibility = View.VISIBLE
-            TabLayoutMediator(
-                tabLayout,
-                binding.viewPager,
-                binding.viewPager.adapter as ViewPagerAdapter,
-            ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
-
-            if (body.text.isNullOrBlank()) {
-                body.visibility = View.GONE
-            } else {
-                body.visibility = View.VISIBLE
-            }
-        }
+    viewLifecycleOwner.lifecycleScope.launch {
+      userTagsManager.onChangedFlow.collect {
         onUserTagChanged()
+      }
+    }
+  }
+
+  private fun onPersonChanged() {
+    val personRef = personRef
+
+    if (personRef != null) {
+      viewModel.fetchPersonIfNotDone(personRef)
     }
 
-    private fun onUserTagChanged() {
-        val data = viewModel.personData.valueOrNull ?: return
+    setup(personRef)
+  }
 
-        binding.subtitle.text = buildSpannedString {
-            append(data.personView.person.fullName)
+  private fun showOverflowMenu() {
+    if (!isBindingAvailable()) return
 
-            val tag = userTagsManager.getUserTag(data.personView.person.fullName)
-            if (tag != null) {
-                append(" ")
-                val s = length
-                append(tag.tagName)
-                val e = length
+    val context = requireContext()
+    val personData = viewModel.personData.valueOrNull ?: return
+    val person = personData.personView.person
+    val personRef = person.toPersonRef()
 
-                setSpan(
-                    RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
-                    s,
-                    e,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
+    val bottomMenu = BottomMenu(requireContext()).apply {
+      addItemWithIcon(
+        id = R.id.sort,
+        title = getString(R.string.sort_by),
+        icon = R.drawable.baseline_sort_24,
+      )
+      addDivider()
+
+      addItemWithIcon(
+        id = R.id.message,
+        title = R.string.send_message,
+        icon = R.drawable.baseline_message_24,
+      )
+
+      addItemWithIcon(
+        id = R.id.tag_user,
+        title = getString(R.string.tag_user_format, personRef.name),
+        icon = R.drawable.outline_sell_24,
+      )
+
+      if (moreActionsHelper.fullAccount?.isPersonBlocked(personRef) == true) {
+        addItemWithIcon(
+          id = R.id.unblock_user,
+          title = context.getString(R.string.unblock_this_user_format, personRef.name),
+          icon = R.drawable.baseline_person_24,
+        )
+      } else {
+        addItemWithIcon(
+          id = R.id.block_user,
+          title = context.getString(R.string.block_this_user_format, personRef.name),
+          icon = R.drawable.baseline_person_off_24,
+        )
+      }
+
+      setOnMenuItemClickListener {
+        when (it.id) {
+          R.id.sort -> {
+            SortTypeMenuHelper(
+              requireContext(),
+              this@PersonTabbedFragment,
+              { viewModel.sortType },
+              { viewModel.sortType = it },
+            ).show()
+          }
+          R.id.block_user -> {
+            moreActionsHelper.blockPerson(id = person.id, block = true)
+          }
+          R.id.unblock_user -> {
+            moreActionsHelper.blockPerson(id = person.id, block = false)
+          }
+          R.id.message -> {
+            AddOrEditCommentFragment.showMessageDialog(
+              childFragmentManager,
+              viewModel.instance,
+              person.id,
+            )
+          }
+          R.id.tag_user -> {
+            AddOrEditUserTagDialogFragment.show(
+              fragmentManager = childFragmentManager,
+              person = person,
+            )
+          }
         }
+      }
     }
 
-    fun closePost(postFragment: PostFragment) {
-        slidingPaneController?.closePost(postFragment)
+    requireSummitActivity().showBottomMenu(bottomMenu)
+  }
+
+  override fun onResume() {
+    super.onResume()
+
+    setupForFragment<PersonTabbedFragment>()
+
+    if (binding.viewPager.currentItem == 0) {
+      getMainActivity()?.setNavUiOpenPercent(0f)
+    }
+  }
+
+  private fun setup(personRef: PersonRef?) {
+    if (!isBindingAvailable()) return
+
+    if (personRef == null) {
+      // this can happen if the user tapped on the profile page and is not signed in.
+      binding.loadingView.showErrorText(
+        getString(R.string.error_not_signed_in),
+      )
+      binding.profileIcon.visibility = View.GONE
+      binding.collapsingToolbarContent.visibility = View.GONE
+      binding.viewPager.visibility = View.GONE
+      binding.tabLayoutContainer.visibility = View.GONE
+      binding.fab.hide()
+
+      viewModel.clearPersonData()
+      return
     }
 
-    override fun navigateToSignInScreen() {
-        val direction = PostFragmentDirections.actionGlobalLogin()
-        findNavController().navigateSafe(direction)
+    val data = viewModel.personData.valueOrNull
+
+    if (viewModel.personData.isLoading) {
+      binding.loadingView.showProgressBar()
     }
 
-    override fun proceedAnyways(tag: Int) {
+    if (data == null) {
+      binding.profileIcon.visibility = View.GONE
+      binding.collapsingToolbarContent.visibility = View.GONE
+      binding.viewPager.visibility = View.GONE
+      binding.tabLayoutContainer.visibility = View.GONE
+      binding.fab.hide()
+      return
     }
+
+    val person = data.personView.person
+    val context = requireContext()
+
+    Log.d(TAG, "user id: ${person.id}")
+    Log.d(TAG, "actor id: ${person.actor_id}")
+
+    TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
+
+    with(binding) {
+      profileIcon.visibility = View.VISIBLE
+      collapsingToolbarContent.visibility = View.VISIBLE
+      viewPager.visibility = View.VISIBLE
+      tabLayoutContainer.visibility = View.VISIBLE
+      fab.show()
+
+      val displayName = person.display_name
+        ?: person.name
+
+      title.text = displayName
+
+      val bannerUrl = person.banner
+      if (bannerUrl != null) {
+        bannerDummy.setOnClickListener {
+          getMainActivity()?.openImage(
+            banner,
+            null,
+            personRef?.fullName,
+            bannerUrl,
+            null,
+          )
+        }
+        offlineManager.fetchImage(root, bannerUrl) {
+          banner.load(it) {
+            allowHardware(false)
+          }
+        }
+      } else {
+        banner.load("file:///android_asset/banner_placeholder.svg") {
+          allowHardware(false)
+        }
+        bannerDummy.setOnClickListener(null)
+      }
+      avatarHelper.loadAvatar(profileIcon, person)
+      if (person.avatar.isNullOrBlank()) {
+        profileIcon.setOnClickListener {
+          launchAlertDialog("error_user_has_no_profile_image") {
+            messageResId = R.string.error_user_has_no_profile_image
+          }
+        }
+      } else {
+        ViewCompat.setTransitionName(profileIcon, "profileIcon")
+
+        profileIcon.setOnClickListener {
+          getMainActivity()?.openImage(
+            profileIcon,
+            toolbar,
+            person.fullName,
+            person.avatar,
+            null,
+          )
+        }
+      }
+      name.text = displayName
+
+      val dateTime = LocalDateTime.ofEpochSecond(
+        dateStringToTs(person.published) / 1000,
+        0,
+        ZoneOffset.UTC,
+      )
+      val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+      val cakeDrawable = context.getDrawableCompat(R.drawable.baseline_cake_24)
+      val drawableSize = Utils.convertDpToPixel(13f).toInt()
+      cakeDrawable?.setBounds(0, 0, drawableSize, drawableSize)
+      cakeDate.setCompoundDrawablesRelative(
+        cakeDrawable,
+        null,
+        null,
+        null,
+      )
+      cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
+      cakeDate.visibility = View.VISIBLE
+
+      val personCreationTs = dateStringToTs(person.published)
+      val isPersonNew =
+        System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
+      body.text = buildSpannedString {
+        if (isPersonNew) {
+          val s = length
+          append(
+            context.getString(
+              R.string.new_account_desc_format, tsToConcise(context, person.published),
+            ),
+          )
+          val e = length
+          setSpan(
+            RoundedBackgroundSpan(
+              backgroundColor = context.getColorCompat(R.color.style_amber),
+              textColor = context.getColorCompat(R.color.black97),
+            ),
+            s,
+            e,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+          )
+          appendLine()
+          appendLine()
+        }
+
+        append(
+          context.resources.getQuantityString(
+            R.plurals.posts_format,
+            data.personView.counts.post_count,
+            defaultDecimalFormat.format(data.personView.counts.post_count),
+          ),
+        )
+
+        appendSeparator()
+
+        append(
+          context.resources.getQuantityString(
+            R.plurals.comments_format,
+            data.personView.counts.comment_count,
+            defaultDecimalFormat.format(data.personView.counts.comment_count),
+          ),
+        )
+
+        appendSeparator()
+
+        append(
+          context.getString(
+            R.string.account_age_format,
+            person.getAccountAgeString(),
+          ),
+        )
+      }
+
+      if (viewPager.adapter == null) {
+        viewPager.offscreenPageLimit = 5
+        val adapter =
+          ViewPagerAdapter(context, childFragmentManager, viewLifecycleOwner.lifecycle)
+        adapter.addFrag(PersonPostsFragment::class.java, getString(R.string.posts))
+        adapter.addFrag(PersonCommentsFragment::class.java, getString(R.string.comments))
+        adapter.addFrag(PersonAboutFragment::class.java, getString(R.string.about))
+        viewPager.adapter = adapter
+      }
+
+      tabLayoutContainer.visibility = View.VISIBLE
+      TabLayoutMediator(
+        tabLayout,
+        binding.viewPager,
+        binding.viewPager.adapter as ViewPagerAdapter,
+      ).attachWithAutoDetachUsingLifecycle(viewLifecycleOwner)
+
+      if (body.text.isNullOrBlank()) {
+        body.visibility = View.GONE
+      } else {
+        body.visibility = View.VISIBLE
+      }
+    }
+    onUserTagChanged()
+  }
+
+  private fun onUserTagChanged() {
+    val data = viewModel.personData.valueOrNull ?: return
+
+    binding.subtitle.text = buildSpannedString {
+      append(data.personView.person.fullName)
+
+      val tag = userTagsManager.getUserTag(data.personView.person.fullName)
+      if (tag != null) {
+        append(" ")
+        val s = length
+        append(tag.tagName)
+        val e = length
+
+        setSpan(
+          RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
+          s,
+          e,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+      }
+    }
+  }
+
+  fun closePost(postFragment: PostFragment) {
+    slidingPaneController?.closePost(postFragment)
+  }
+
+  override fun navigateToSignInScreen() {
+    val direction = PostFragmentDirections.actionGlobalLogin()
+    findNavController().navigateSafe(direction)
+  }
+
+  override fun proceedAnyways(tag: Int) {
+  }
 }

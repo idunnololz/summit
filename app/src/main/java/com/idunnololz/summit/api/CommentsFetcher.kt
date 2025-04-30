@@ -8,32 +8,32 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostId
 
 class CommentsFetcher(
-    private val apiClient: AccountAwareLemmyClient,
+  private val apiClient: AccountAwareLemmyClient,
 ) {
 
-    suspend fun fetchCommentsWithRetry(
-        id: Either<PostId, CommentId>,
-        sort: CommentSortType,
-        maxDepth: Int?,
-        force: Boolean,
-    ): Result<List<CommentView>> = apiClient.fetchCommentsWithRetry(
-        id = id,
-        sort = sort,
-        maxDepth = maxDepth,
-        force = force,
-    )
+  suspend fun fetchCommentsWithRetry(
+    id: Either<PostId, CommentId>,
+    sort: CommentSortType,
+    maxDepth: Int?,
+    force: Boolean,
+  ): Result<List<CommentView>> = apiClient.fetchCommentsWithRetry(
+    id = id,
+    sort = sort,
+    maxDepth = maxDepth,
+    force = force,
+  )
 
-    suspend fun fetchCommentsWithRetry(
-        id: Either<PostId, CommentId>,
-        sort: CommentSortType,
-        maxDepth: Int?,
-        force: Boolean,
-        account: Account?,
-    ): Result<List<CommentView>> = apiClient.fetchCommentsWithRetry(
-        id = id,
-        sort = sort,
-        maxDepth = maxDepth,
-        force = force,
-        account = account,
-    )
+  suspend fun fetchCommentsWithRetry(
+    id: Either<PostId, CommentId>,
+    sort: CommentSortType,
+    maxDepth: Int?,
+    force: Boolean,
+    account: Account?,
+  ): Result<List<CommentView>> = apiClient.fetchCommentsWithRetry(
+    id = id,
+    sort = sort,
+    maxDepth = maxDepth,
+    force = force,
+    account = account,
+  )
 }

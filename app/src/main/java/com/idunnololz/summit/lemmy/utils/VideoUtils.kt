@@ -18,127 +18,127 @@ import com.idunnololz.summit.util.crashLogger.crashLogger
 import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
-    url: String,
-    originalUrl: String,
-    moreActionsHelper: MoreActionsHelper,
-    fragmentManager: FragmentManager,
+  url: String,
+  originalUrl: String,
+  moreActionsHelper: MoreActionsHelper,
+  fragmentManager: FragmentManager,
 ): BottomMenu? {
-    if (!isBindingAvailable()) return null
+  if (!isBindingAvailable()) return null
 
-    val context = requireContext()
+  val context = requireContext()
 
-    val bottomMenu = BottomMenu(requireContext()).apply {
-        setTitle(R.string.more_actions)
+  val bottomMenu = BottomMenu(requireContext()).apply {
+    setTitle(R.string.more_actions)
 
-        addItemWithIcon(R.id.download, R.string.download_video, R.drawable.baseline_download_24)
+    addItemWithIcon(R.id.download, R.string.download_video, R.drawable.baseline_download_24)
 
-        addDivider()
+    addDivider()
 
-        addItemWithIcon(
-            R.id.copy_link,
-            R.string.copy_link_address,
-            R.drawable.baseline_content_copy_24,
-        )
-        addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
-        addItemWithIcon(
-            R.id.open_in_browser,
-            R.string.open_in_browser,
-            R.drawable.baseline_public_24,
-        )
-        addItemWithIcon(
-            R.id.open_link_incognito,
-            R.string.open_in_incognito,
-            R.drawable.ic_incognito_24,
-        )
-        addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
+    addItemWithIcon(
+      R.id.copy_link,
+      R.string.copy_link_address,
+      R.drawable.baseline_content_copy_24,
+    )
+    addItemWithIcon(R.id.share_link, R.string.share_link, R.drawable.baseline_share_24)
+    addItemWithIcon(
+      R.id.open_in_browser,
+      R.string.open_in_browser,
+      R.drawable.baseline_public_24,
+    )
+    addItemWithIcon(
+      R.id.open_link_incognito,
+      R.string.open_in_incognito,
+      R.drawable.ic_incognito_24,
+    )
+    addItemWithIcon(R.id.preview_link, R.string.preview_link, R.drawable.baseline_preview_24)
 
-        setOnMenuItemClickListener {
-            when (it.id) {
-                R.id.download -> {
-                    moreActionsHelper.downloadVideo(url)
-                }
-                R.id.copy_link -> {
-                    Utils.copyToClipboard(context, originalUrl)
-                }
-                R.id.share_link -> {
-                    Utils.shareLink(context, originalUrl)
-                }
-                R.id.open_in_browser -> {
-                    onLinkClick(originalUrl, null, LinkContext.Force)
-                }
-                R.id.open_link_incognito -> {
-                    Utils.openExternalLink(context, originalUrl, openNewIncognitoTab = true)
-                }
-                R.id.preview_link -> {
-                    LinkPreviewDialogFragment.show(fragmentManager, originalUrl)
-                }
-            }
+    setOnMenuItemClickListener {
+      when (it.id) {
+        R.id.download -> {
+          moreActionsHelper.downloadVideo(url)
         }
-    }
-    getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
-
-    val observer = Observer<StatefulData<FileDownloadHelper.DownloadResult>> {
-        val parent = getMainActivity() ?: return@Observer
-
-        when (it) {
-            is StatefulData.NotStarted -> {}
-            is StatefulData.Error -> {
-                if (it.error is FileDownloadHelper.CustomDownloadLocationException) {
-                    Snackbar
-                        .make(
-                            parent.getSnackbarContainer(),
-                            R.string.error_downloading_image,
-                            Snackbar.LENGTH_LONG,
-                        )
-                        .setAction(R.string.downloads_settings) {
-                            getMainActivity()?.showDownloadsSettings()
-                        }
-                        .show()
-                } else {
-                    crashLogger?.recordException(it.error)
-                    Snackbar
-                        .make(
-                            parent.getSnackbarContainer(),
-                            R.string.error_downloading_image,
-                            Snackbar.LENGTH_LONG,
-                        )
-                        .show()
-                }
-            }
-            is StatefulData.Loading -> {}
-            is StatefulData.Success -> {
-                try {
-                    val downloadResult = it.data
-                    val uri = downloadResult.uri
-                    val mimeType = downloadResult.mimeType
-
-                    val snackbarMsg = getString(R.string.video_saved_format, downloadResult.uri)
-                    Snackbar
-                        .make(
-                            parent.getSnackbarContainer(),
-                            snackbarMsg,
-                            Snackbar.LENGTH_LONG,
-                        )
-                        .setAction(R.string.view) {
-                            Utils.safeLaunchExternalIntentWithErrorDialog(
-                                context,
-                                childFragmentManager,
-                                Intent(Intent.ACTION_VIEW).apply {
-                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                    setDataAndType(uri, mimeType)
-                                },
-                            )
-                        }
-                        .show()
-                } catch (e: IOException) {
-                    /* do nothing */
-                }
-            }
+        R.id.copy_link -> {
+          Utils.copyToClipboard(context, originalUrl)
         }
+        R.id.share_link -> {
+          Utils.shareLink(context, originalUrl)
+        }
+        R.id.open_in_browser -> {
+          onLinkClick(originalUrl, null, LinkContext.Force)
+        }
+        R.id.open_link_incognito -> {
+          Utils.openExternalLink(context, originalUrl, openNewIncognitoTab = true)
+        }
+        R.id.preview_link -> {
+          LinkPreviewDialogFragment.show(fragmentManager, originalUrl)
+        }
+      }
     }
+  }
+  getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
 
-    moreActionsHelper.downloadVideoResult.observe(viewLifecycleOwner, observer)
+  val observer = Observer<StatefulData<FileDownloadHelper.DownloadResult>> {
+    val parent = getMainActivity() ?: return@Observer
 
-    return bottomMenu
+    when (it) {
+      is StatefulData.NotStarted -> {}
+      is StatefulData.Error -> {
+        if (it.error is FileDownloadHelper.CustomDownloadLocationException) {
+          Snackbar
+            .make(
+              parent.getSnackbarContainer(),
+              R.string.error_downloading_image,
+              Snackbar.LENGTH_LONG,
+            )
+            .setAction(R.string.downloads_settings) {
+              getMainActivity()?.showDownloadsSettings()
+            }
+            .show()
+        } else {
+          crashLogger?.recordException(it.error)
+          Snackbar
+            .make(
+              parent.getSnackbarContainer(),
+              R.string.error_downloading_image,
+              Snackbar.LENGTH_LONG,
+            )
+            .show()
+        }
+      }
+      is StatefulData.Loading -> {}
+      is StatefulData.Success -> {
+        try {
+          val downloadResult = it.data
+          val uri = downloadResult.uri
+          val mimeType = downloadResult.mimeType
+
+          val snackbarMsg = getString(R.string.video_saved_format, downloadResult.uri)
+          Snackbar
+            .make(
+              parent.getSnackbarContainer(),
+              snackbarMsg,
+              Snackbar.LENGTH_LONG,
+            )
+            .setAction(R.string.view) {
+              Utils.safeLaunchExternalIntentWithErrorDialog(
+                context,
+                childFragmentManager,
+                Intent(Intent.ACTION_VIEW).apply {
+                  flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                  setDataAndType(uri, mimeType)
+                },
+              )
+            }
+            .show()
+        } catch (e: IOException) {
+          /* do nothing */
+        }
+      }
+    }
+  }
+
+  moreActionsHelper.downloadVideoResult.observe(viewLifecycleOwner, observer)
+
+  return bottomMenu
 }

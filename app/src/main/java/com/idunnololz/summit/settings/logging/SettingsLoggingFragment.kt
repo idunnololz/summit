@@ -22,95 +22,95 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsLoggingFragment :
-    BaseFragment<FragmentSettingsLoggingBinding>(),
-    OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentSettingsLoggingBinding>(),
+  OldAlertDialogFragment.AlertDialogFragmentListener {
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var settings: LoggingSettings
+  @Inject
+  lateinit var settings: LoggingSettings
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsLoggingBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsLoggingBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = settings.getPageName(context)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    updateRendering()
+  }
 
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
-        }
-
-        updateRendering()
+  private fun updateRendering() {
+    if (!isBindingAvailable()) {
+      return
     }
 
-    private fun updateRendering() {
-        if (!isBindingAvailable()) {
-            return
-        }
+    val context = requireContext()
 
-        val context = requireContext()
-
-        settings.useFirebase.bindTo(
-            b = binding.useFirebase,
-            { preferences.useFirebase },
-            {
-                OldAlertDialogFragment.Builder()
-                    .setTitle(R.string.app_restart_required_by_setting)
-                    .setMessage(R.string.app_restart_required_by_setting_desc)
-                    .setPositiveButton(R.string.restart_app)
-                    .setNegativeButton(R.string.cancel)
-                    .createAndShow(
-                        childFragmentManager,
-                        if (it) {
-                            "enableFirebase"
-                        } else {
-                            "disableFirebase"
-                        },
-                    )
+    settings.useFirebase.bindTo(
+      b = binding.useFirebase,
+      { preferences.useFirebase },
+      {
+        OldAlertDialogFragment.Builder()
+          .setTitle(R.string.app_restart_required_by_setting)
+          .setMessage(R.string.app_restart_required_by_setting_desc)
+          .setPositiveButton(R.string.restart_app)
+          .setNegativeButton(R.string.cancel)
+          .createAndShow(
+            childFragmentManager,
+            if (it) {
+              "enableFirebase"
+            } else {
+              "disableFirebase"
             },
-        )
-    }
+          )
+      },
+    )
+  }
 
-    override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "enableFirebase" -> {
-                preferences.useFirebase = true
-                ProcessPhoenix.triggerRebirth(requireContext())
-            }
-            "disableFirebase" -> {
-                preferences.useFirebase = false
-                ProcessPhoenix.triggerRebirth(requireContext())
-            }
-        }
+  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
+    when (tag) {
+      "enableFirebase" -> {
+        preferences.useFirebase = true
+        ProcessPhoenix.triggerRebirth(requireContext())
+      }
+      "disableFirebase" -> {
+        preferences.useFirebase = false
+        ProcessPhoenix.triggerRebirth(requireContext())
+      }
     }
+  }
 
-    override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-        when (tag) {
-            "enableFirebase",
-            "disableFirebase",
-            -> {
-                updateRendering()
-            }
-        }
+  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
+    when (tag) {
+      "enableFirebase",
+      "disableFirebase",
+      -> {
+        updateRendering()
+      }
     }
+  }
 }

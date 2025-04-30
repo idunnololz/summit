@@ -5,11 +5,11 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 enum class PageType : Parcelable {
-    Unread,
-    All,
-    Replies,
-    Mentions,
-    Messages,
-    Reports,
-    Conversation,
+  Unread,
+  All,
+  Replies,
+  Mentions,
+  Messages,
+  Reports,
+  Conversation,
 }

@@ -9,24 +9,24 @@ import androidx.navigation.Navigator
 private const val TAG = "NavControllerExt"
 
 fun NavController.navigateSafe(
-    navDirections: NavDirections? = null,
-    navOptions: NavOptions? = null,
+  navDirections: NavDirections? = null,
+  navOptions: NavOptions? = null,
 ) {
-    try {
-        navDirections?.let {
-            this.navigate(navDirections, navOptions)
-        }
-    } catch (e: Exception) {
-        Log.e(TAG, "", e)
+  try {
+    navDirections?.let {
+      this.navigate(navDirections, navOptions)
     }
+  } catch (e: Exception) {
+    Log.e(TAG, "", e)
+  }
 }
 
 fun NavController.navigateSafe(navDirections: NavDirections? = null, extras: Navigator.Extras) {
-    try {
-        navDirections?.let {
-            this.navigate(navDirections, extras)
-        }
-    } catch (e: Exception) {
-        Log.e(TAG, "", e)
+  try {
+    navDirections?.let {
+      this.navigate(navDirections, extras)
     }
+  } catch (e: Exception) {
+    Log.e(TAG, "", e)
+  }
 }

@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GuestAccountSettings(
-    val instance: String = DEFAULT_INSTANCE,
+  val instance: String = DEFAULT_INSTANCE,
 )

@@ -5,14 +5,14 @@ package com.idunnololz.summit.preferences
  */
 object GlobalSettings {
 
-    var warnReplyToOldContentThresholdMs: Long? = null
-        private set
+  var warnReplyToOldContentThresholdMs: Long? = null
+    private set
 
-    fun refresh(preferences: Preferences) {
-        warnReplyToOldContentThresholdMs = if (preferences.warnReplyToOldContent) {
-            preferences.warnReplyToOldContentThresholdMs
-        } else {
-            null
-        }
+  fun refresh(preferences: Preferences) {
+    warnReplyToOldContentThresholdMs = if (preferences.warnReplyToOldContent) {
+      preferences.warnReplyToOldContentThresholdMs
+    } else {
+      null
     }
+  }
 }

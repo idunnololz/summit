@@ -18,80 +18,80 @@ import kotlinx.parcelize.Parcelize
 
 class AddLinkDialogFragment : BaseDialogFragment<DialogFragmentAddLinkBinding>() {
 
-    companion object {
-        const val REQUEST_KEY = "AddLinkDialogFragment_req_key"
-        const val REQUEST_KEY_RESULT = "result"
+  companion object {
+    const val REQUEST_KEY = "AddLinkDialogFragment_req_key"
+    const val REQUEST_KEY_RESULT = "result"
 
-        fun show(prefillText: String?, fragmentManager: FragmentManager) {
-            AddLinkDialogFragment()
-                .apply {
-                    arguments = AddLinkDialogFragmentArgs(prefillText)
-                        .toBundle()
-                }
-                .showAllowingStateLoss(fragmentManager, "AddLinkDialogFragment")
+    fun show(prefillText: String?, fragmentManager: FragmentManager) {
+      AddLinkDialogFragment()
+        .apply {
+          arguments = AddLinkDialogFragmentArgs(prefillText)
+            .toBundle()
         }
+        .showAllowingStateLoss(fragmentManager, "AddLinkDialogFragment")
     }
+  }
 
-    private val args by navArgs<AddLinkDialogFragmentArgs>()
+  private val args by navArgs<AddLinkDialogFragmentArgs>()
 
-    @Parcelize
-    data class AddLinkResult(
-        val text: String,
-        val url: String,
-    ) : Parcelable
+  @Parcelize
+  data class AddLinkResult(
+    val text: String,
+    val url: String,
+  ) : Parcelable
 
-    override fun onStart() {
-        super.onStart()
+  override fun onStart() {
+    super.onStart()
 
-        setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    }
+    setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(DialogFragmentAddLinkBinding.inflate(inflater, container, false))
+    setBinding(DialogFragmentAddLinkBinding.inflate(inflater, container, false))
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
+    val context = requireContext()
 
-        with(binding) {
-            if (savedInstanceState == null) {
-                args.prefillText?.let {
-                    binding.textEditText.setText(it)
-                }
-            }
-
-            binding.link.setEndIconOnClickListener {
-                val pasteData: String? = context.getPlainTextFromClipboard()
-                if (pasteData != null) {
-                    binding.linkEditText.setText(pasteData)
-                }
-            }
-
-            positiveButton.setOnClickListener {
-                setFragmentResult(
-                    REQUEST_KEY,
-                    bundleOf(
-                        REQUEST_KEY_RESULT to AddLinkResult(
-                            textEditText.text.toString(),
-                            linkEditText.text.toString(),
-                        ),
-                    ),
-                )
-                dismiss()
-            }
-            negativeButton.setOnClickListener {
-                dismiss()
-            }
+    with(binding) {
+      if (savedInstanceState == null) {
+        args.prefillText?.let {
+          binding.textEditText.setText(it)
         }
+      }
+
+      binding.link.setEndIconOnClickListener {
+        val pasteData: String? = context.getPlainTextFromClipboard()
+        if (pasteData != null) {
+          binding.linkEditText.setText(pasteData)
+        }
+      }
+
+      positiveButton.setOnClickListener {
+        setFragmentResult(
+          REQUEST_KEY,
+          bundleOf(
+            REQUEST_KEY_RESULT to AddLinkResult(
+              textEditText.text.toString(),
+              linkEditText.text.toString(),
+            ),
+          ),
+        )
+        dismiss()
+      }
+      negativeButton.setOnClickListener {
+        dismiss()
+      }
     }
+  }
 }

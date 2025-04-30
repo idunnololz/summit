@@ -14,38 +14,38 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ReportContentViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
+  private val apiClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
-    val reportState = StatefulLiveData<Unit>()
+  val reportState = StatefulLiveData<Unit>()
 
-    var sendReportJob: Job? = null
+  var sendReportJob: Job? = null
 
-    fun sendReport(postOrCommentRef: Either<PostRef, CommentRef>, reason: String) {
-        reportState.setIsLoading()
+  fun sendReport(postOrCommentRef: Either<PostRef, CommentRef>, reason: String) {
+    reportState.setIsLoading()
 
-        sendReportJob?.cancel()
-        sendReportJob = viewModelScope.launch {
-            postOrCommentRef
-                .fold(
-                    ifLeft = {
-                        apiClient.createPostReport(it.id, reason)
-                    },
-                    ifRight = {
-                        apiClient.createCommentReport(it.id, reason)
-                    },
-                )
-                .onSuccess {
-                    reportState.postValue(Unit)
-                }
-                .onFailure {
-                    reportState.postError(it)
-                }
+    sendReportJob?.cancel()
+    sendReportJob = viewModelScope.launch {
+      postOrCommentRef
+        .fold(
+          ifLeft = {
+            apiClient.createPostReport(it.id, reason)
+          },
+          ifRight = {
+            apiClient.createCommentReport(it.id, reason)
+          },
+        )
+        .onSuccess {
+          reportState.postValue(Unit)
+        }
+        .onFailure {
+          reportState.postError(it)
         }
     }
+  }
 
-    fun cancelSendReport() {
-        sendReportJob?.cancel()
-        reportState.setIdle()
-    }
+  fun cancelSendReport() {
+    sendReportJob?.cancel()
+    reportState.setIdle()
+  }
 }

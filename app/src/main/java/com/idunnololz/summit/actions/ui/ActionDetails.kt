@@ -5,14 +5,14 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import kotlinx.parcelize.Parcelize
 
 sealed interface ActionDetails : Parcelable {
-    @Parcelize
-    data object SuccessDetails : ActionDetails
+  @Parcelize
+  data object SuccessDetails : ActionDetails
 
-    @Parcelize
-    data object PendingDetails : ActionDetails
+  @Parcelize
+  data object PendingDetails : ActionDetails
 
-    @Parcelize
-    data class FailureDetails(
-        val reason: LemmyActionFailureReason,
-    ) : ActionDetails
+  @Parcelize
+  data class FailureDetails(
+    val reason: LemmyActionFailureReason,
+  ) : ActionDetails
 }

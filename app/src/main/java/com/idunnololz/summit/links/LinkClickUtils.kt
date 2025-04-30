@@ -14,98 +14,98 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    getBaseActivity()?.onLinkClick(
-        context ?: return,
-        (activity?.application as? MainApplication) ?: return,
-        childFragmentManager,
-        url,
-        text,
-        linkContext,
-    )
+  getBaseActivity()?.onLinkClick(
+    context ?: return,
+    (activity?.application as? MainApplication) ?: return,
+    childFragmentManager,
+    url,
+    text,
+    linkContext,
+  )
 }
 
 fun BaseDialogFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
-    getBaseActivity()?.onLinkClick(
-        context ?: return,
-        (activity?.application as? MainApplication) ?: return,
-        childFragmentManager,
-        url,
-        text,
-        linkContext,
-    )
+  getBaseActivity()?.onLinkClick(
+    context ?: return,
+    (activity?.application as? MainApplication) ?: return,
+    childFragmentManager,
+    url,
+    text,
+    linkContext,
+  )
 }
 
 fun BaseActivity.onLinkClick(
-    context: Context,
-    application: MainApplication,
-    fragmentManager: FragmentManager,
-    url: String,
-    text: String?,
-    linkContext: LinkContext,
+  context: Context,
+  application: MainApplication,
+  fragmentManager: FragmentManager,
+  url: String,
+  text: String?,
+  linkContext: LinkContext,
 ) {
-    val preferences = application.preferences
+  val preferences = application.preferences
 
-    try {
-        val uri = Uri.parse(url)
+  try {
+    val uri = Uri.parse(url)
 
-        if (this is MainActivity) {
-            if (uri.host.equals("loops.video", ignoreCase = true) &&
-                uri.path?.startsWith("/v/", ignoreCase = true) == true
-            ) {
-                openVideo(url, VideoType.Unknown, null)
-                return
-            }
-        }
-    } catch (e: Exception) {
-        // do nothing
-    }
-
-    if (linkContext == LinkContext.Force) {
-        Utils.openExternalLink(context, url)
+    if (this is MainActivity) {
+      if (uri.host.equals("loops.video", ignoreCase = true) &&
+        uri.path?.startsWith("/v/", ignoreCase = true) == true
+      ) {
+        openVideo(url, VideoType.Unknown, null)
         return
+      }
     }
+  } catch (e: Exception) {
+    // do nothing
+  }
 
-    when (preferences.previewLinks) {
-        PreviewNoLinks -> {
-            Utils.openExternalLink(context, url)
-        }
-        PreviewAllLinks -> {
-            LinkPreviewDialogFragment.show(fragmentManager, url)
-        }
-        else -> {
-            if (linkContext == LinkContext.Text) {
-                LinkPreviewDialogFragment.show(fragmentManager, url)
-            } else {
-                Utils.openExternalLink(context, url)
-            }
-        }
+  if (linkContext == LinkContext.Force) {
+    Utils.openExternalLink(context, url)
+    return
+  }
+
+  when (preferences.previewLinks) {
+    PreviewNoLinks -> {
+      Utils.openExternalLink(context, url)
     }
+    PreviewAllLinks -> {
+      LinkPreviewDialogFragment.show(fragmentManager, url)
+    }
+    else -> {
+      if (linkContext == LinkContext.Text) {
+        LinkPreviewDialogFragment.show(fragmentManager, url)
+      } else {
+        Utils.openExternalLink(context, url)
+      }
+    }
+  }
 }
 
 /**
  * The location of the link. Special logic may be triggered based on where the click was.
  */
 enum class LinkContext {
-    Text,
+  Text,
 
-    /**
-     * Eg. the user tapped on a button that said "Open link"
-     */
-    Action,
+  /**
+   * Eg. the user tapped on a button that said "Open link"
+   */
+  Action,
 
-    /**
-     * Eg. the user tapped on a special view with an image and other information.
-     */
-    Rich,
+  /**
+   * Eg. the user tapped on a special view with an image and other information.
+   */
+  Rich,
 
-    /**
-     * Means to open the link without any bs.
-     */
-    Force,
+  /**
+   * Means to open the link without any bs.
+   */
+  Force,
 }
 
 object PreviewLinkOptions {
-    const val PreviewTextLinks = 0
-    const val PreviewNoLinks = 1
-    const val PreviewAllLinks = 2
+  const val PreviewTextLinks = 0
+  const val PreviewNoLinks = 1
+  const val PreviewAllLinks = 2
 }

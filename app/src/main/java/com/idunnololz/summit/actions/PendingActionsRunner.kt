@@ -31,187 +31,187 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PendingActionsRunner @AssistedInject constructor(
-    @ApplicationContext private val context: Context,
-    private val actionsRunnerHelper: ActionsRunnerHelper,
+  @ApplicationContext private val context: Context,
+  private val actionsRunnerHelper: ActionsRunnerHelper,
 
-    @Assisted private val actions: LinkedList<LemmyPendingAction>,
-    @Assisted private val coroutineScope: CoroutineScope,
-    @Assisted private val actionsContext: CoroutineContext,
+  @Assisted private val actions: LinkedList<LemmyPendingAction>,
+  @Assisted private val coroutineScope: CoroutineScope,
+  @Assisted private val actionsContext: CoroutineContext,
 
-    @Assisted private val delayAction:
-    suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
-    @Assisted private val completeActionError: suspend (
+  @Assisted private val delayAction:
+  suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
+  @Assisted private val completeActionError: suspend (
+    action: LemmyPendingAction,
+    failureReason: LemmyActionFailureReason,
+  ) -> Unit,
+  @Assisted private val completeActionSuccess: suspend (
+    action: LemmyPendingAction,
+    result: LemmyActionResult<*, *>,
+  ) -> Unit,
+) {
+  @AssistedFactory
+  interface Factory {
+    fun create(
+      actions: LinkedList<LemmyPendingAction>,
+      coroutineScope: CoroutineScope,
+      actionsContext: CoroutineContext,
+      delayAction: suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
+      completeActionError: suspend (
         action: LemmyPendingAction,
         failureReason: LemmyActionFailureReason,
-    ) -> Unit,
-    @Assisted private val completeActionSuccess: suspend (
+      ) -> Unit,
+      completeActionSuccess: suspend (
         action: LemmyPendingAction,
         result: LemmyActionResult<*, *>,
-    ) -> Unit,
-) {
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            actions: LinkedList<LemmyPendingAction>,
-            coroutineScope: CoroutineScope,
-            actionsContext: CoroutineContext,
-            delayAction: suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
-            completeActionError: suspend (
-                action: LemmyPendingAction,
-                failureReason: LemmyActionFailureReason,
-            ) -> Unit,
-            completeActionSuccess: suspend (
-                action: LemmyPendingAction,
-                result: LemmyActionResult<*, *>,
-            ) -> Unit,
-        ): PendingActionsRunner
+      ) -> Unit,
+    ): PendingActionsRunner
+  }
+
+  companion object {
+    private const val TAG = "PendingActionsRunner"
+  }
+
+  private val lock = Object()
+  private var isExecutingPendingActions = false
+  private var connectionIssue = false
+
+  private var executePendingActionsJob: Job? = null
+
+  fun executePendingActionsIfNeeded() {
+    synchronized(lock) {
+      if (isExecutingPendingActions) {
+        return
+      }
     }
 
-    companion object {
-        private const val TAG = "PendingActionsRunner"
-    }
+    executePendingActions()
+  }
 
-    private val lock = Object()
-    private var isExecutingPendingActions = false
-    private var connectionIssue = false
+  private fun executePendingActions() {
+    isExecutingPendingActions = true
+    connectionIssue = false
 
-    private var executePendingActionsJob: Job? = null
+    executePendingActionsJob = coroutineScope.launch a@{
+      val newIsExecutingPendingActions = withContext(actionsContext) {
+        actions.isNotEmpty()
+      }
 
-    fun executePendingActionsIfNeeded() {
+      synchronized(lock) {
+        isExecutingPendingActions = newIsExecutingPendingActions
+
+        if (!isExecutingPendingActions) {
+          Log.d(TAG, "All pending actions executed.")
+          return@a
+        }
+      }
+
+      val action = withContext(actionsContext) {
+        actions.removeFirst()
+      }
+
+      checkAndExecuteAction(action)
+
+      if (connectionIssue) {
+        Log.d(TAG, "No internet. Deferring execution until later.")
+        actions.addFirst(action)
         synchronized(lock) {
-            if (isExecutingPendingActions) {
-                return
-            }
+          isExecutingPendingActions = false
         }
-
+        scheduleWaitForConnectionWorker()
+      } else {
+        Log.d(TAG, "Executing more pending actions")
         executePendingActions()
+      }
+    }
+  }
+
+  private suspend fun checkAndExecuteAction(action: LemmyPendingAction) {
+    if (action.info == null) {
+      completeActionError(action, LemmyActionFailureReason.DeserializationError)
+      return
+    } else if (action.info.isAffectedByRateLimit && RateLimitManager.isRateLimitHit()) {
+      Log.d(TAG, "Delaying pending action $action")
+      val nextRefresh = RateLimitManager.getTimeUntilNextRefreshMs()
+      delayAction(action, nextRefresh)
+      return
     }
 
-    private fun executePendingActions() {
-        isExecutingPendingActions = true
-        connectionIssue = false
+    try {
+      Log.d(TAG, "Executing action $action")
+      val result = actionsRunnerHelper.executeAction(action.info, action.info.retries)
 
-        executePendingActionsJob = coroutineScope.launch a@{
-            val newIsExecutingPendingActions = withContext(actionsContext) {
-                actions.isNotEmpty()
-            }
-
-            synchronized(lock) {
-                isExecutingPendingActions = newIsExecutingPendingActions
-
-                if (!isExecutingPendingActions) {
-                    Log.d(TAG, "All pending actions executed.")
-                    return@a
-                }
-            }
-
-            val action = withContext(actionsContext) {
-                actions.removeFirst()
-            }
-
-            checkAndExecuteAction(action)
-
-            if (connectionIssue) {
-                Log.d(TAG, "No internet. Deferring execution until later.")
-                actions.addFirst(action)
-                synchronized(lock) {
-                    isExecutingPendingActions = false
-                }
-                scheduleWaitForConnectionWorker()
-            } else {
-                Log.d(TAG, "Executing more pending actions")
-                executePendingActions()
-            }
+      when (result) {
+        is PendingActionsManager.ActionExecutionResult.Success -> {
+          completeActionSuccess(action, result.result)
         }
-    }
+        is Failure -> {
+          when (result.failureReason) {
+            is AccountNotFoundError ->
+              completeActionError(
+                action,
+                AccountNotFoundError(
+                  result.failureReason.accountId,
+                ),
+              )
+            LemmyActionFailureReason.NoInternetError ->
+              connectionIssue = true
+            is RateLimit ->
+              delayAction(action, result.failureReason.recommendedTimeoutMs)
+            is TooManyRequests ->
+              if (result.failureReason.retries < PendingActionsManager.MAX_RETRIES) {
+                // Prob just sending too fast...
+                val delay =
+                  (2.0.pow(result.failureReason.retries + 1) * 1000).toLong() +
+                    (Random.nextFloat() * 2000).toInt()
+                Log.d(TAG, "429. Retrying after $delay...")
 
-    private suspend fun checkAndExecuteAction(action: LemmyPendingAction) {
-        if (action.info == null) {
-            completeActionError(action, LemmyActionFailureReason.DeserializationError)
-            return
-        } else if (action.info.isAffectedByRateLimit && RateLimitManager.isRateLimitHit()) {
-            Log.d(TAG, "Delaying pending action $action")
-            val nextRefresh = RateLimitManager.getTimeUntilNextRefreshMs()
-            delayAction(action, nextRefresh)
-            return
-        }
+                delayAction(action, delay)
+              } else {
+                Log.e(
+                  TAG,
+                  "Request failed. Too many retries. ",
+                  RuntimeException(),
+                )
 
-        try {
-            Log.d(TAG, "Executing action $action")
-            val result = actionsRunnerHelper.executeAction(action.info, action.info.retries)
+                completeActionError(action, result.failureReason)
+              }
+            LemmyActionFailureReason.ServerError ->
+              delayAction(action, 10_000)
 
-            when (result) {
-                is PendingActionsManager.ActionExecutionResult.Success -> {
-                    completeActionSuccess(action, result.result)
-                }
-                is Failure -> {
-                    when (result.failureReason) {
-                        is AccountNotFoundError ->
-                            completeActionError(
-                                action,
-                                AccountNotFoundError(
-                                    result.failureReason.accountId,
-                                ),
-                            )
-                        LemmyActionFailureReason.NoInternetError ->
-                            connectionIssue = true
-                        is RateLimit ->
-                            delayAction(action, result.failureReason.recommendedTimeoutMs)
-                        is TooManyRequests ->
-                            if (result.failureReason.retries < PendingActionsManager.MAX_RETRIES) {
-                                // Prob just sending too fast...
-                                val delay =
-                                    (2.0.pow(result.failureReason.retries + 1) * 1000).toLong() +
-                                        (Random.nextFloat() * 2000).toInt()
-                                Log.d(TAG, "429. Retrying after $delay...")
-
-                                delayAction(action, delay)
-                            } else {
-                                Log.e(
-                                    TAG,
-                                    "Request failed. Too many retries. ",
-                                    RuntimeException(),
-                                )
-
-                                completeActionError(action, result.failureReason)
-                            }
-                        LemmyActionFailureReason.ServerError ->
-                            delayAction(action, 10_000)
-
-                        is LemmyActionFailureReason.ConnectionError -> {
-                            if (action.info is ActionInfo.CommentActionInfo) {
-                                completeActionError(action, result.failureReason)
-                            } else {
-                                delayAction(action, 10_000)
-                            }
-                        }
-
-                        is LemmyActionFailureReason.UnknownError,
-                        LemmyActionFailureReason.DeserializationError,
-                        LemmyActionFailureReason.ActionOverwritten,
-                        ->
-                            completeActionError(action, result.failureReason)
-                    }
-                }
+            is LemmyActionFailureReason.ConnectionError -> {
+              if (action.info is ActionInfo.CommentActionInfo) {
+                completeActionError(action, result.failureReason)
+              } else {
+                delayAction(action, 10_000)
+              }
             }
-        } catch (e: Exception) {
-            crashLogger?.recordException(e)
-            Log.e(TAG, "Error executing pending action.", e)
+
+            is LemmyActionFailureReason.UnknownError,
+            LemmyActionFailureReason.DeserializationError,
+            LemmyActionFailureReason.ActionOverwritten,
+            ->
+              completeActionError(action, result.failureReason)
+          }
         }
+      }
+    } catch (e: Exception) {
+      crashLogger?.recordException(e)
+      Log.e(TAG, "Error executing pending action.", e)
     }
+  }
 
-    private fun scheduleWaitForConnectionWorker() {
-        val workRequest = OneTimeWorkRequestBuilder<ConnectivityChangedWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build(),
-            )
-            .build()
-        WorkManager.getInstance(context).enqueue(workRequest)
-    }
+  private fun scheduleWaitForConnectionWorker() {
+    val workRequest = OneTimeWorkRequestBuilder<ConnectivityChangedWorker>()
+      .setConstraints(
+        Constraints.Builder()
+          .setRequiredNetworkType(NetworkType.CONNECTED)
+          .build(),
+      )
+      .build()
+    WorkManager.getInstance(context).enqueue(workRequest)
+  }
 
-    fun stopPendingActions() {
-        executePendingActionsJob?.cancel()
-    }
+  fun stopPendingActions() {
+    executePendingActionsJob?.cancel()
+  }
 }

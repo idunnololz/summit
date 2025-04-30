@@ -5,18 +5,18 @@ import java.io.File
 import javax.inject.Inject
 
 class SaveForLaterManager @Inject constructor(
-    private val directoryHelper: DirectoryHelper,
+  private val directoryHelper: DirectoryHelper,
 ) {
-    companion object {
-        private const val SLOTS = 3
+  companion object {
+    private const val SLOTS = 3
+  }
+
+  fun getSlotFiles(): List<File> {
+    val files = mutableListOf<File>()
+    repeat(SLOTS) {
+      files.add(File(directoryHelper.saveForLaterDir, "slot_$it"))
     }
 
-    fun getSlotFiles(): List<File> {
-        val files = mutableListOf<File>()
-        repeat(SLOTS) {
-            files.add(File(directoryHelper.saveForLaterDir, "slot_$it"))
-        }
-
-        return files
-    }
+    return files
+  }
 }

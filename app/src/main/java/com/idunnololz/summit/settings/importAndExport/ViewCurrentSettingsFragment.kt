@@ -24,109 +24,109 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViewCurrentSettingsFragment :
-    BaseFragment<FragmentViewCurrentSettingsBinding>() {
+  BaseFragment<FragmentViewCurrentSettingsBinding>() {
 
-    private val viewModel: ViewCurrentSettingsViewModel by viewModels()
+  private val viewModel: ViewCurrentSettingsViewModel by viewModels()
 
-    @Inject
-    lateinit var allSettings: AllSettings
+  @Inject
+  lateinit var allSettings: AllSettings
 
-    private val resetSettingDialogLauncher = newAlertDialogLauncher("reset_setting") {
-        val context = context ?: return@newAlertDialogLauncher
+  private val resetSettingDialogLauncher = newAlertDialogLauncher("reset_setting") {
+    val context = context ?: return@newAlertDialogLauncher
 
-        if (it.isOk) {
-            val settingKey = it.extras?.getString("key")
-            viewModel.resetSetting(
-                settingKey = settingKey,
-                databaseFile = context.getDatabasePath(DATABASE_NAME),
-            )
-        }
+    if (it.isOk) {
+      val settingKey = it.extras?.getString("key")
+      viewModel.resetSetting(
+        settingKey = settingKey,
+        databaseFile = context.getDatabasePath(DATABASE_NAME),
+      )
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(FragmentViewCurrentSettingsBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      insetViewStartAndEndByPadding(viewLifecycleOwner, binding.recyclerView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    with(binding) {
+      toolbar.title = getString(R.string.view_current_settings)
+      toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
+      toolbar.setNavigationIconTint(
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+      )
+      toolbar.setNavigationOnClickListener {
+        findNavController().navigateUp()
+      }
 
-        setBinding(FragmentViewCurrentSettingsBinding.inflate(inflater, container, false))
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            insetViewStartAndEndByPadding(viewLifecycleOwner, binding.recyclerView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-        }
-
-        with(binding) {
-            toolbar.title = getString(R.string.view_current_settings)
-            toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
-            toolbar.setNavigationIconTint(
-                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-            )
-            toolbar.setNavigationOnClickListener {
-                findNavController().navigateUp()
+      val adapter = SettingDataAdapter(
+        context = context,
+        isImporting = false,
+        onSettingPreviewClick = { settingKey, settingsDataPreview ->
+          ImportSettingItemPreviewDialogFragment.show(
+            childFragmentManager,
+            settingKey,
+            settingsDataPreview.settingsPreview[settingKey] ?: "",
+            settingsDataPreview.keyToType[settingKey] ?: "?",
+          )
+        },
+        onTableClick = {
+          TableDetailsDialogFragment.show(
+            childFragmentManager,
+            context.getDatabasePath(DATABASE_NAME).toUri(),
+            it,
+          )
+        },
+        style = SettingDataAdapter.Style.Delete(
+          onDeleteClick = {
+            resetSettingDialogLauncher.launchDialog {
+              messageResId = R.string.warn_reset_setting
+              positionButtonResId = R.string.reset
+              negativeButtonResId = R.string.cancel
+              extras.putString("key", it)
             }
+          },
+        ),
+      )
+      recyclerView.adapter = adapter
+      recyclerView.setHasFixedSize(true)
+      recyclerView.layoutManager = LinearLayoutManager(context)
 
-            val adapter = SettingDataAdapter(
-                context = context,
-                isImporting = false,
-                onSettingPreviewClick = { settingKey, settingsDataPreview ->
-                    ImportSettingItemPreviewDialogFragment.show(
-                        childFragmentManager,
-                        settingKey,
-                        settingsDataPreview.settingsPreview[settingKey] ?: "",
-                        settingsDataPreview.keyToType[settingKey] ?: "?",
-                    )
-                },
-                onTableClick = {
-                    TableDetailsDialogFragment.show(
-                        childFragmentManager,
-                        context.getDatabasePath(DATABASE_NAME).toUri(),
-                        it,
-                    )
-                },
-                style = SettingDataAdapter.Style.Delete(
-                    onDeleteClick = {
-                        resetSettingDialogLauncher.launchDialog {
-                            messageResId = R.string.warn_reset_setting
-                            positionButtonResId = R.string.reset
-                            negativeButtonResId = R.string.cancel
-                            extras.putString("key", it)
-                        }
-                    },
-                ),
-            )
-            recyclerView.adapter = adapter
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(context)
+      viewModel.model.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error ->
+            loadingView.showDefaultErrorMessageFor(it.error)
+          is StatefulData.Loading ->
+            loadingView.showProgressBar()
+          is StatefulData.NotStarted ->
+            loadingView.hideAll()
+          is StatefulData.Success -> {
+            loadingView.hideAll()
 
-            viewModel.model.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error ->
-                        loadingView.showDefaultErrorMessageFor(it.error)
-                    is StatefulData.Loading ->
-                        loadingView.showProgressBar()
-                    is StatefulData.NotStarted ->
-                        loadingView.hideAll()
-                    is StatefulData.Success -> {
-                        loadingView.hideAll()
-
-                        adapter.setData(it.data.settingsDataPreview)
-                    }
-                }
-            }
-
-            viewModel.generatePreviewFromSettingsJson(
-                databaseFile = context.getDatabasePath(DATABASE_NAME),
-            )
+            adapter.setData(it.data.settingsDataPreview)
+          }
         }
+      }
+
+      viewModel.generatePreviewFromSettingsJson(
+        databaseFile = context.getDatabasePath(DATABASE_NAME),
+      )
     }
+  }
 }

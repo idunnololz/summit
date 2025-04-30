@@ -14,35 +14,35 @@ import kotlinx.serialization.json.Json
 
 @Singleton
 class PerCommunityPreferences @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val json: Json,
+  @ApplicationContext private val context: Context,
+  private val json: Json,
 ) {
-    private val preferences = context.getSharedPreferences("pcp", Context.MODE_PRIVATE)
+  private val preferences = context.getSharedPreferences("pcp", Context.MODE_PRIVATE)
 
-    fun getCommunityConfig(communityRef: CommunityRef): CommunityConfig? {
-        return getCommunityConfig(communityRef.getKey())
-    }
+  fun getCommunityConfig(communityRef: CommunityRef): CommunityConfig? {
+    return getCommunityConfig(communityRef.getKey())
+  }
 
-    fun getCommunityConfig(key: String): CommunityConfig? {
-        return preferences.getJsonValue<CommunityConfig>(json, key)
-    }
+  fun getCommunityConfig(key: String): CommunityConfig? {
+    return preferences.getJsonValue<CommunityConfig>(json, key)
+  }
 
-    fun setCommunityConfig(communityRef: CommunityRef, config: CommunityConfig?) {
-        preferences.putJsonValue(json, communityRef.getKey(), config)
-    }
+  fun setCommunityConfig(communityRef: CommunityRef, config: CommunityConfig?) {
+    preferences.putJsonValue(json, communityRef.getKey(), config)
+  }
 
-    fun getAllCommunityConfigs(): List<CommunityConfig> = preferences.all.keys.mapNotNull {
-        getCommunityConfig(it)
-    }
+  fun getAllCommunityConfigs(): List<CommunityConfig> = preferences.all.keys.mapNotNull {
+    getCommunityConfig(it)
+  }
 
-    fun clear() {
-        preferences.edit().clear().apply()
-    }
+  fun clear() {
+    preferences.edit().clear().apply()
+  }
 
-    @Serializable
-    data class CommunityConfig(
-        val communityRef: CommunityRef,
-        val layout: CommunityLayout? = null,
-        val sortOrder: CommunitySortOrder? = null,
-    )
+  @Serializable
+  data class CommunityConfig(
+    val communityRef: CommunityRef,
+    val layout: CommunityLayout? = null,
+    val sortOrder: CommunitySortOrder? = null,
+  )
 }

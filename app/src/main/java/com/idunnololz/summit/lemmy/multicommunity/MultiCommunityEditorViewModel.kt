@@ -27,94 +27,94 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class MultiCommunityEditorViewModel @Inject constructor(
-    private val apiClient: AccountAwareLemmyClient,
-    private val accountInfoManager: AccountInfoManager,
+  private val apiClient: AccountAwareLemmyClient,
+  private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
-    val showSearch = MutableLiveData<Boolean>()
+  val showSearch = MutableLiveData<Boolean>()
 
-    val searchResults = StatefulLiveData<List<CommunityView>>()
-    val communityIcons = StatefulLiveData<List<String>>()
-    val selectedCommunitiesFlow = MutableStateFlow<List<CommunityRef.CommunityRefByName>>(listOf())
-    val selectedCommunitiesLiveData = selectedCommunitiesFlow.asLiveData()
-    val communityName = MutableLiveData<String>()
-    val selectedIcon = MutableLiveData<String?>()
-    val subscribedCommunities = MutableLiveData<List<AccountSubscription>>()
+  val searchResults = StatefulLiveData<List<CommunityView>>()
+  val communityIcons = StatefulLiveData<List<String>>()
+  val selectedCommunitiesFlow = MutableStateFlow<List<CommunityRef.CommunityRefByName>>(listOf())
+  val selectedCommunitiesLiveData = selectedCommunitiesFlow.asLiveData()
+  val communityName = MutableLiveData<String>()
+  val selectedIcon = MutableLiveData<String?>()
+  val subscribedCommunities = MutableLiveData<List<AccountSubscription>>()
 
-    private var searchJob: Job? = null
+  private var searchJob: Job? = null
 
-    init {
-        viewModelScope.launch(Dispatchers.Default) {
-            selectedCommunitiesFlow.collect {
-                withContext(Dispatchers.Main) {
-                    fetchCommunityIcons(it)
-                }
+  init {
+    viewModelScope.launch(Dispatchers.Default) {
+      selectedCommunitiesFlow.collect {
+        withContext(Dispatchers.Main) {
+          fetchCommunityIcons(it)
+        }
+      }
+    }
+    viewModelScope.launch(Dispatchers.Default) {
+      accountInfoManager.currentFullAccount.collect {
+        val subscriptions = it?.accountInfo?.subscriptions
+          ?: listOf()
+
+        subscribedCommunities.postValue(subscriptions)
+      }
+    }
+  }
+
+  fun doQuery(query: String) {
+    searchResults.setIsLoading()
+
+    if (query.isBlank()) {
+      searchResults.setValue(listOf())
+      return
+    }
+
+    searchJob?.cancel()
+    searchJob = viewModelScope.launch {
+      apiClient
+        .searchWithRetry(
+          sortType = SortType.TopMonth,
+          listingType = ListingType.All,
+          searchType = SearchType.Communities,
+          query = query,
+          limit = 20,
+        )
+        .onSuccess {
+          searchResults.setValue(it.communities)
+        }
+        .onFailure {
+          searchResults.setError(it)
+        }
+    }
+  }
+
+  fun fetchCommunityIcons(communities: List<CommunityRef.CommunityRefByName>) {
+    communityIcons.setIsLoading()
+
+    viewModelScope.launch {
+      val icons = flow {
+        communities.forEach { community ->
+          apiClient
+            .fetchCommunityWithRetry(
+              Either.Right(community.getServerId(apiClient.instance)),
+              false,
+            )
+            .onSuccess {
+              val icon = it.community_view.community.icon
+              if (icon != null) {
+                emit(icon)
+              }
             }
         }
-        viewModelScope.launch(Dispatchers.Default) {
-            accountInfoManager.currentFullAccount.collect {
-                val subscriptions = it?.accountInfo?.subscriptions
-                    ?: listOf()
+      }.flowOn(Dispatchers.Default).toList()
 
-                subscribedCommunities.postValue(subscriptions)
-            }
-        }
+      communityIcons.setValue(icons)
     }
+  }
 
-    fun doQuery(query: String) {
-        searchResults.setIsLoading()
-
-        if (query.isBlank()) {
-            searchResults.setValue(listOf())
-            return
-        }
-
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            apiClient
-                .searchWithRetry(
-                    sortType = SortType.TopMonth,
-                    listingType = ListingType.All,
-                    searchType = SearchType.Communities,
-                    query = query,
-                    limit = 20,
-                )
-                .onSuccess {
-                    searchResults.setValue(it.communities)
-                }
-                .onFailure {
-                    searchResults.setError(it)
-                }
-        }
+  fun setSelectedCommunities(communities: List<CommunityRef.CommunityRefByName>) {
+    viewModelScope.launch {
+      selectedCommunitiesFlow.emit(communities)
     }
-
-    fun fetchCommunityIcons(communities: List<CommunityRef.CommunityRefByName>) {
-        communityIcons.setIsLoading()
-
-        viewModelScope.launch {
-            val icons = flow {
-                communities.forEach { community ->
-                    apiClient
-                        .fetchCommunityWithRetry(
-                            Either.Right(community.getServerId(apiClient.instance)),
-                            false,
-                        )
-                        .onSuccess {
-                            val icon = it.community_view.community.icon
-                            if (icon != null) {
-                                emit(icon)
-                            }
-                        }
-                }
-            }.flowOn(Dispatchers.Default).toList()
-
-            communityIcons.setValue(icons)
-        }
-    }
-
-    fun setSelectedCommunities(communities: List<CommunityRef.CommunityRefByName>) {
-        viewModelScope.launch {
-            selectedCommunitiesFlow.emit(communities)
-        }
-    }
+  }
 }

@@ -13,39 +13,39 @@ const val HIDDEN_POSTS_LIMIT = 1000
 @Dao
 interface HiddenPostsDao {
 
-    @Query("SELECT * FROM hidden_posts WHERE instance = :instance")
-    suspend fun getHiddenPosts(instance: String): List<HiddenPostEntry>
+  @Query("SELECT * FROM hidden_posts WHERE instance = :instance")
+  suspend fun getHiddenPosts(instance: String): List<HiddenPostEntry>
 
-    @Query("SELECT * FROM hidden_posts")
-    suspend fun getAllHiddenPosts(): List<HiddenPostEntry>
+  @Query("SELECT * FROM hidden_posts")
+  suspend fun getAllHiddenPosts(): List<HiddenPostEntry>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertHiddenPost(hiddenPostEntry: HiddenPostEntry): Long
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertHiddenPost(hiddenPostEntry: HiddenPostEntry): Long
 
-    @Query(
-        "DELETE FROM hidden_posts WHERE id IN (SELECT id FROM hidden_posts ORDER BY ts DESC " +
-            "LIMIT 10 OFFSET $HIDDEN_POSTS_LIMIT)",
-    )
-    suspend fun pruneDb()
+  @Query(
+    "DELETE FROM hidden_posts WHERE id IN (SELECT id FROM hidden_posts ORDER BY ts DESC " +
+      "LIMIT 10 OFFSET $HIDDEN_POSTS_LIMIT)",
+  )
+  suspend fun pruneDb()
 
-    @Query("SELECT count(*) FROM hidden_posts")
-    suspend fun count(): Long
+  @Query("SELECT count(*) FROM hidden_posts")
+  suspend fun count(): Long
 
-    @Delete
-    suspend fun delete(entry: HiddenPostEntry)
+  @Delete
+  suspend fun delete(entry: HiddenPostEntry)
 
-    @Query("DELETE FROM hidden_posts WHERE id = :entryId")
-    suspend fun deleteByEntryId(entryId: Long)
+  @Query("DELETE FROM hidden_posts WHERE id = :entryId")
+  suspend fun deleteByEntryId(entryId: Long)
 
-    @Query("DELETE FROM hidden_posts WHERE instance = :instance and postId = :postId")
-    suspend fun deleteByPost(instance: String, postId: PostId)
+  @Query("DELETE FROM hidden_posts WHERE instance = :instance and postId = :postId")
+  suspend fun deleteByPost(instance: String, postId: PostId)
 
-    @Query("DELETE FROM hidden_posts")
-    suspend fun clear()
+  @Query("DELETE FROM hidden_posts")
+  suspend fun clear()
 
-    @Transaction
-    open suspend fun insertHiddenPostRespectingTableLimit(newEntry: HiddenPostEntry) {
-        pruneDb()
-        insertHiddenPost(newEntry)
-    }
+  @Transaction
+  open suspend fun insertHiddenPostRespectingTableLimit(newEntry: HiddenPostEntry) {
+    pruneDb()
+    insertHiddenPost(newEntry)
+  }
 }

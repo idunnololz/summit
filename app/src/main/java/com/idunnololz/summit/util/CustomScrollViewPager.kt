@@ -9,121 +9,121 @@ import kotlin.math.abs
 
 class CustomScrollViewPager : ViewPager {
 
-    private var enabled = true
+  private var enabled = true
 
-    var disableLeftSwipe = false
-    var disableRightSwipe = false
+  var disableLeftSwipe = false
+  var disableRightSwipe = false
 
-    private var lastMotionX = 0f
-    private var activePointerId = 0
-    private var touchSlop = 0
+  private var lastMotionX = 0f
+  private var activePointerId = 0
+  private var touchSlop = 0
 
-    constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+  constructor(context: Context) : super(context)
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
-    init {
-        val configuration = ViewConfiguration.get(context)
-        touchSlop = configuration.scaledPagingTouchSlop
-    }
+  init {
+    val configuration = ViewConfiguration.get(context)
+    touchSlop = configuration.scaledPagingTouchSlop
+  }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return if (enabled) {
-            val action: Int = event.action
-            when (action and MotionEvent.ACTION_MASK) {
-                MotionEvent.ACTION_MOVE -> {
-                    val pointerIndex: Int = event.findPointerIndex(activePointerId)
-                    if (pointerIndex == -1) {
-                        activePointerId = 0
-                        return false
-                    }
+  override fun onTouchEvent(event: MotionEvent): Boolean {
+    return if (enabled) {
+      val action: Int = event.action
+      when (action and MotionEvent.ACTION_MASK) {
+        MotionEvent.ACTION_MOVE -> {
+          val pointerIndex: Int = event.findPointerIndex(activePointerId)
+          if (pointerIndex == -1) {
+            activePointerId = 0
+            return false
+          }
 
-                    val x: Float = event.getX(pointerIndex)
-                    val xDiff = x - lastMotionX
-                    val xDiffAbs = abs(xDiff)
+          val x: Float = event.getX(pointerIndex)
+          val xDiff = x - lastMotionX
+          val xDiffAbs = abs(xDiff)
 
-                    if (xDiffAbs >= touchSlop) {
-                        if (xDiff < 0 && disableLeftSwipe) {
-                            return false
-                        }
-                    }
-                }
-
-                MotionEvent.ACTION_UP -> {}
-
-                MotionEvent.ACTION_CANCEL -> {}
-
-                MotionEvent.ACTION_DOWN -> {
-                    val index: Int = event.actionIndex
-                    activePointerId = event.getPointerId(0)
-                    val x: Float = event.getX(index)
-                    lastMotionX = x
-                }
-                MotionEvent.ACTION_POINTER_DOWN -> {
-                }
-
-                MotionEvent.ACTION_POINTER_UP -> {
-                }
+          if (xDiffAbs >= touchSlop) {
+            if (xDiff < 0 && disableLeftSwipe) {
+              return false
             }
-
-            try {
-                super.onTouchEvent(event)
-            } catch (e: Exception) {
-                // sometimes sht happens...
-                // especially with multi touch
-            }
-            false
-        } else {
-            false
+          }
         }
-    }
 
-    override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-        return if (enabled) {
-            val action: Int = event.action
-            when (action and MotionEvent.ACTION_MASK) {
-                MotionEvent.ACTION_MOVE -> {
-                    val pointerIndex: Int = event.findPointerIndex(activePointerId)
-                    if (pointerIndex == -1) {
-                        activePointerId = 0
-                        return false
-                    }
+        MotionEvent.ACTION_UP -> {}
 
-                    val x: Float = event.getX(pointerIndex)
-                    val xDiff = x - lastMotionX
-                    val xDiffAbs = abs(xDiff)
+        MotionEvent.ACTION_CANCEL -> {}
 
-                    if (xDiffAbs >= touchSlop) {
-                        if (xDiff < 0 && disableLeftSwipe) {
-                            return false
-                        }
-                    }
-                }
-
-                MotionEvent.ACTION_UP -> {}
-
-                MotionEvent.ACTION_CANCEL -> {}
-
-                MotionEvent.ACTION_DOWN -> {
-                    val index: Int = event.actionIndex
-                    activePointerId = event.getPointerId(0)
-                    val x: Float = event.getX(index)
-                    lastMotionX = x
-                }
-                MotionEvent.ACTION_POINTER_DOWN -> {
-                }
-
-                MotionEvent.ACTION_POINTER_UP -> {
-                }
-            }
-            super.onInterceptTouchEvent(event)
-        } else {
-            false
+        MotionEvent.ACTION_DOWN -> {
+          val index: Int = event.actionIndex
+          activePointerId = event.getPointerId(0)
+          val x: Float = event.getX(index)
+          lastMotionX = x
         }
-    }
+        MotionEvent.ACTION_POINTER_DOWN -> {
+        }
 
-    fun setPagingEnabled(enabled: Boolean) {
-        this.enabled = enabled
+        MotionEvent.ACTION_POINTER_UP -> {
+        }
+      }
+
+      try {
+        super.onTouchEvent(event)
+      } catch (e: Exception) {
+        // sometimes sht happens...
+        // especially with multi touch
+      }
+      false
+    } else {
+      false
     }
+  }
+
+  override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+    return if (enabled) {
+      val action: Int = event.action
+      when (action and MotionEvent.ACTION_MASK) {
+        MotionEvent.ACTION_MOVE -> {
+          val pointerIndex: Int = event.findPointerIndex(activePointerId)
+          if (pointerIndex == -1) {
+            activePointerId = 0
+            return false
+          }
+
+          val x: Float = event.getX(pointerIndex)
+          val xDiff = x - lastMotionX
+          val xDiffAbs = abs(xDiff)
+
+          if (xDiffAbs >= touchSlop) {
+            if (xDiff < 0 && disableLeftSwipe) {
+              return false
+            }
+          }
+        }
+
+        MotionEvent.ACTION_UP -> {}
+
+        MotionEvent.ACTION_CANCEL -> {}
+
+        MotionEvent.ACTION_DOWN -> {
+          val index: Int = event.actionIndex
+          activePointerId = event.getPointerId(0)
+          val x: Float = event.getX(index)
+          lastMotionX = x
+        }
+        MotionEvent.ACTION_POINTER_DOWN -> {
+        }
+
+        MotionEvent.ACTION_POINTER_UP -> {
+        }
+      }
+      super.onInterceptTouchEvent(event)
+    } else {
+      false
+    }
+  }
+
+  fun setPagingEnabled(enabled: Boolean) {
+    this.enabled = enabled
+  }
 
 //    fun setDurationScroll(millis: Int) {
 //        try {

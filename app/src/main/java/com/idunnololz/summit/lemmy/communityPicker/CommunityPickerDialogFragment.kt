@@ -34,152 +34,152 @@ import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class CommunityPickerDialogFragment :
-    BaseDialogFragment<DialogFragmentCommunityPickerBinding>(),
-    FullscreenDialogFragment {
+  BaseDialogFragment<DialogFragmentCommunityPickerBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
-        const val REQUEST_KEY = "CommunityPickerDialogFragment_req_key"
-        const val REQUEST_KEY_RESULT = "result"
+  companion object {
+    const val REQUEST_KEY = "CommunityPickerDialogFragment_req_key"
+    const val REQUEST_KEY_RESULT = "result"
 
-        fun show(fragmentManager: FragmentManager, showFeeds: Boolean = false) {
-            CommunityPickerDialogFragment()
-                .apply {
-                    arguments = CommunityPickerDialogFragmentArgs(
-                        showFeeds,
-                    ).toBundle()
-                }
-                .showAllowingStateLoss(fragmentManager, "CommunityPickerDialogFragment")
+    fun show(fragmentManager: FragmentManager, showFeeds: Boolean = false) {
+      CommunityPickerDialogFragment()
+        .apply {
+          arguments = CommunityPickerDialogFragmentArgs(
+            showFeeds,
+          ).toBundle()
         }
+        .showAllowingStateLoss(fragmentManager, "CommunityPickerDialogFragment")
+    }
+  }
+
+  private val args: CommunityPickerDialogFragmentArgs by navArgs()
+
+  private var adapter: CommunityAdapter? = null
+
+  private val viewModel: CommunityPickerViewModel by viewModels()
+
+  @Inject
+  lateinit var communityAdapterFactory: CommunityAdapter.Factory
+
+  @Inject
+  lateinit var offlineManager: OfflineManager
+
+  @Inject
+  lateinit var userCommunitiesManager: UserCommunitiesManager
+
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
+
+  @Inject
+  lateinit var avatarHelper: AvatarHelper
+
+  private val searchEditTextBackPressedHandler = object : OnBackPressedCallback(false) {
+    override fun handleOnBackPressed() {
+      binding.searchEditText.setText("")
+    }
+  }
+
+  @Parcelize
+  data class Result(
+    val communityRef: CommunityRef,
+    val icon: String?,
+    val communityId: Int,
+  ) : Parcelable
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(
+      DialogFragmentCommunityPickerBinding.inflate(
+        inflater,
+        container,
+        false,
+      ),
+    )
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    requireMainActivity().apply {
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
     }
 
-    private val args: CommunityPickerDialogFragmentArgs by navArgs()
+    val context = requireContext()
 
-    private var adapter: CommunityAdapter? = null
-
-    private val viewModel: CommunityPickerViewModel by viewModels()
-
-    @Inject
-    lateinit var communityAdapterFactory: CommunityAdapter.Factory
-
-    @Inject
-    lateinit var offlineManager: OfflineManager
-
-    @Inject
-    lateinit var userCommunitiesManager: UserCommunitiesManager
-
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
-
-    @Inject
-    lateinit var avatarHelper: AvatarHelper
-
-    private val searchEditTextBackPressedHandler = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() {
-            binding.searchEditText.setText("")
+    with(binding) {
+      searchEditText.addTextChangedListener {
+        val query = it?.toString() ?: ""
+        adapter?.setQuery(query) {
+          resultsRecyclerView.scrollToPosition(0)
         }
-    }
+        viewModel.doQuery(query)
 
-    @Parcelize
-    data class Result(
-        val communityRef: CommunityRef,
-        val icon: String?,
-        val communityId: Int,
-    ) : Parcelable
+        searchEditTextBackPressedHandler.isEnabled = !query.isEmpty()
+      }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-            }
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        setBinding(
-            DialogFragmentCommunityPickerBinding.inflate(
-                inflater,
-                container,
-                false,
+      adapter = communityAdapterFactory.create(
+        context = context,
+        canSelectMultipleCommunities = false,
+        showFeeds = args.showFeeds,
+        onSingleCommunitySelected = { ref, icon, communityId ->
+          setFragmentResult(
+            REQUEST_KEY,
+            bundleOf(
+              REQUEST_KEY_RESULT to Result(ref, icon, communityId),
             ),
-        )
+          )
+          dismiss()
+        },
+      )
+      resultsRecyclerView.adapter = adapter
+      resultsRecyclerView.setHasFixedSize(true)
+      resultsRecyclerView.layoutManager = LinearLayoutManager(context)
+      resultsRecyclerView.setup(animationsHelper)
 
-        return binding.root
-    }
+      adapter?.setQueryServerResults(listOf())
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        requireMainActivity().apply {
-            insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
-        }
-
-        val context = requireContext()
-
-        with(binding) {
-            searchEditText.addTextChangedListener {
-                val query = it?.toString() ?: ""
-                adapter?.setQuery(query) {
-                    resultsRecyclerView.scrollToPosition(0)
-                }
-                viewModel.doQuery(query)
-
-                searchEditTextBackPressedHandler.isEnabled = !query.isEmpty()
-            }
-
-            adapter = communityAdapterFactory.create(
-                context = context,
-                canSelectMultipleCommunities = false,
-                showFeeds = args.showFeeds,
-                onSingleCommunitySelected = { ref, icon, communityId ->
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        bundleOf(
-                            REQUEST_KEY_RESULT to Result(ref, icon, communityId),
-                        ),
-                    )
-                    dismiss()
-                },
-            )
-            resultsRecyclerView.adapter = adapter
-            resultsRecyclerView.setHasFixedSize(true)
-            resultsRecyclerView.layoutManager = LinearLayoutManager(context)
-            resultsRecyclerView.setup(animationsHelper)
-
+      viewModel.searchResults.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
             adapter?.setQueryServerResults(listOf())
-
-            viewModel.searchResults.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        adapter?.setQueryServerResults(listOf())
-                    }
-                    is StatefulData.Loading -> {
-                        adapter?.setQueryServerResultsInProgress()
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        adapter?.setQueryServerResults(it.data)
-                    }
-                }
-            }
+          }
+          is StatefulData.Loading -> {
+            adapter?.setQueryServerResultsInProgress()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            adapter?.setQueryServerResults(it.data)
+          }
         }
-
-        onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            searchEditTextBackPressedHandler,
-        )
+      }
     }
+
+    onBackPressedDispatcher.addCallback(
+      viewLifecycleOwner,
+      searchEditTextBackPressedHandler,
+    )
+  }
 }

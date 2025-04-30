@@ -12,26 +12,26 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsAccountsViewModel @Inject constructor(
-    private val accountManager: AccountManager,
-    private val accountInfoManager: AccountInfoManager,
+  private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
-    val accounts = StatefulLiveData<List<AccountView>>()
+  val accounts = StatefulLiveData<List<AccountView>>()
 
-    init {
-        loadAccounts()
+  init {
+    loadAccounts()
+  }
+
+  private fun loadAccounts() {
+    accounts.setIsLoading()
+
+    viewModelScope.launch {
+      val accountViews = accountManager.getAccounts().map {
+        accountInfoManager.getAccountViewForAccount(it)
+          .copy(account = it.copy(current = false))
+      }
+
+      accounts.postValue(accountViews)
     }
-
-    private fun loadAccounts() {
-        accounts.setIsLoading()
-
-        viewModelScope.launch {
-            val accountViews = accountManager.getAccounts().map {
-                accountInfoManager.getAccountViewForAccount(it)
-                    .copy(account = it.copy(current = false))
-            }
-
-            accounts.postValue(accountViews)
-        }
-    }
+  }
 }

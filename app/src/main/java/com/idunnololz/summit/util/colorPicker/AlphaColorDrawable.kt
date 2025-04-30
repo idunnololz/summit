@@ -17,81 +17,81 @@ import com.idunnololz.summit.util.Utils
  * as any ColorDrawable.
  */
 class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
-    private val bitmapPaint: Paint
-    private val paint: Paint
+  private val bitmapPaint: Paint
+  private val paint: Paint
 
-    init {
-        val size: Int = Utils.convertDpToPixel(8f).toInt()
-        bitmapPaint = Paint()
-        bitmapPaint.color = Color.LTGRAY
+  init {
+    val size: Int = Utils.convertDpToPixel(8f).toInt()
+    bitmapPaint = Paint()
+    bitmapPaint.color = Color.LTGRAY
 
-        if (tile == null || tile!!.isRecycled) {
-            tile = Bitmap.createBitmap(size * 4, size * 4, Bitmap.Config.RGB_565)
-            val canvas = Canvas(tile!!)
-            canvas.drawColor(Color.WHITE)
-            var x = 0
-            while (x < canvas.width) {
-                var y = if (x % (size * 2) == 0) 0 else size
-                while (y < canvas.width) {
-                    canvas.drawRect(
-                        x.toFloat(),
-                        y.toFloat(),
-                        (x + size).toFloat(),
-                        (y + size).toFloat(),
-                        bitmapPaint,
-                    )
-                    y += size * 2
-                }
-                x += size
-            }
+    if (tile == null || tile!!.isRecycled) {
+      tile = Bitmap.createBitmap(size * 4, size * 4, Bitmap.Config.RGB_565)
+      val canvas = Canvas(tile!!)
+      canvas.drawColor(Color.WHITE)
+      var x = 0
+      while (x < canvas.width) {
+        var y = if (x % (size * 2) == 0) 0 else size
+        while (y < canvas.width) {
+          canvas.drawRect(
+            x.toFloat(),
+            y.toFloat(),
+            (x + size).toFloat(),
+            (y + size).toFloat(),
+            bitmapPaint,
+          )
+          y += size * 2
         }
-
-        paint = Paint()
-        paint.color = color
+        x += size
+      }
     }
 
-    override fun draw(canvas: Canvas) {
-        val b = bounds
+    paint = Paint()
+    paint.color = color
+  }
 
-        if (paint.alpha < 255) {
-            var x = b.left
-            while (x < b.right) {
-                var y = b.top
-                while (y < b.bottom) {
-                    canvas.drawBitmap(tile!!, x.toFloat(), y.toFloat(), bitmapPaint)
-                    y += tile!!.height
-                }
-                x += tile!!.width
-            }
+  override fun draw(canvas: Canvas) {
+    val b = bounds
+
+    if (paint.alpha < 255) {
+      var x = b.left
+      while (x < b.right) {
+        var y = b.top
+        while (y < b.bottom) {
+          canvas.drawBitmap(tile!!, x.toFloat(), y.toFloat(), bitmapPaint)
+          y += tile!!.height
         }
-
-        canvas.drawRect(
-            b.left.toFloat(),
-            b.top.toFloat(),
-            b.right.toFloat(),
-            b.bottom.toFloat(),
-            paint,
-        )
+        x += tile!!.width
+      }
     }
 
-    override fun setAlpha(alpha: Int) {
-        val color = bitmapPaint.color
-        bitmapPaint.color = Color.argb(
-            alpha,
-            Color.red(color),
-            Color.green(color),
-            Color.blue(color),
-        )
-    }
+    canvas.drawRect(
+      b.left.toFloat(),
+      b.top.toFloat(),
+      b.right.toFloat(),
+      b.bottom.toFloat(),
+      paint,
+    )
+  }
 
-    override fun setColorFilter(colorFilter: ColorFilter?) {
-    }
+  override fun setAlpha(alpha: Int) {
+    val color = bitmapPaint.color
+    bitmapPaint.color = Color.argb(
+      alpha,
+      Color.red(color),
+      Color.green(color),
+      Color.blue(color),
+    )
+  }
 
-    override fun getOpacity(): Int {
-        return PixelFormat.TRANSLUCENT
-    }
+  override fun setColorFilter(colorFilter: ColorFilter?) {
+  }
 
-    companion object {
-        var tile: Bitmap? = null
-    }
+  override fun getOpacity(): Int {
+    return PixelFormat.TRANSLUCENT
+  }
+
+  companion object {
+    var tile: Bitmap? = null
+  }
 }

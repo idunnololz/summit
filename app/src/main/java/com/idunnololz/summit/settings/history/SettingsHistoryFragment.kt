@@ -20,57 +20,57 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsHistoryFragment : BaseFragment<FragmentSettingsHistoryBinding>() {
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var settings: HistorySettings
+  @Inject
+  lateinit var settings: HistorySettings
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(FragmentSettingsHistoryBinding.inflate(inflater, container, false))
+    setBinding(FragmentSettingsHistoryBinding.inflate(inflater, container, false))
 
-        return binding.root
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = context.getString(R.string.history)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    updateRendering()
+  }
 
-        val context = requireContext()
-
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = context.getString(R.string.history)
-        }
-
+  private fun updateRendering() {
+    settings.viewHistory.bindTo(
+      binding.viewHistory,
+    ) {
+      getMainActivity()?.navigateTopLevel(R.id.historyFragment)
+    }
+    settings.recordBrowsingHistory.bindTo(
+      binding.trackBrowsingHistory,
+      { preferences.trackBrowsingHistory },
+      {
+        preferences.trackBrowsingHistory = it
         updateRendering()
-    }
-
-    private fun updateRendering() {
-        settings.viewHistory.bindTo(
-            binding.viewHistory,
-        ) {
-            getMainActivity()?.navigateTopLevel(R.id.historyFragment)
-        }
-        settings.recordBrowsingHistory.bindTo(
-            binding.trackBrowsingHistory,
-            { preferences.trackBrowsingHistory },
-            {
-                preferences.trackBrowsingHistory = it
-                updateRendering()
-            },
-        )
-    }
+      },
+    )
+  }
 }

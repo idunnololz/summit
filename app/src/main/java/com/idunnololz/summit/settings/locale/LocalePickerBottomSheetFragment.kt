@@ -21,127 +21,127 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import java.util.Locale
 
 class LocalePickerBottomSheetFragment :
-    BaseBottomSheetDialogFragment<FragmentLocalePickerBottomSheetBinding>(),
-    FullscreenDialogFragment {
+  BaseBottomSheetDialogFragment<FragmentLocalePickerBottomSheetBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
+  companion object {
 
-        const val RESULT_KEY = "LocalePickerBottomSheetFragment.result"
-        const val REQUEST_KEY = "LocalePickerBottomSheetFragment.request"
+    const val RESULT_KEY = "LocalePickerBottomSheetFragment.result"
+    const val REQUEST_KEY = "LocalePickerBottomSheetFragment.request"
 
-        fun show(fragmentManager: FragmentManager) = LocalePickerBottomSheetFragment()
-            .show(fragmentManager, "LocalePickerBottomSheetFragment")
-    }
+    fun show(fragmentManager: FragmentManager) = LocalePickerBottomSheetFragment()
+      .show(fragmentManager, "LocalePickerBottomSheetFragment")
+  }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(
-            FragmentLocalePickerBottomSheetBinding.inflate(
-                inflater,
-                container,
-                false,
-            ),
-        )
+    setBinding(
+      FragmentLocalePickerBottomSheetBinding.inflate(
+        inflater,
+        container,
+        false,
+      ),
+    )
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
+    val context = requireContext()
 
-        with(binding) {
-            recyclerView.adapter = LocalesAdapter(
-                context.getLocaleListFromXml(),
-                {
-                    if (it == null) {
-                        AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.getEmptyLocaleList(),
-                        )
-                    } else {
-                        val appLocale: LocaleListCompat =
-                            LocaleListCompat.forLanguageTags(it.toLanguageTag())
-                        AppCompatDelegate.setApplicationLocales(appLocale)
-                    }
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        Bundle(),
-                    )
-
-                    dismiss()
-                },
+    with(binding) {
+      recyclerView.adapter = LocalesAdapter(
+        context.getLocaleListFromXml(),
+        {
+          if (it == null) {
+            AppCompatDelegate.setApplicationLocales(
+              LocaleListCompat.getEmptyLocaleList(),
             )
-            recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.setHasFixedSize(false)
-        }
+          } else {
+            val appLocale: LocaleListCompat =
+              LocaleListCompat.forLanguageTags(it.toLanguageTag())
+            AppCompatDelegate.setApplicationLocales(appLocale)
+          }
+          setFragmentResult(
+            REQUEST_KEY,
+            Bundle(),
+          )
+
+          dismiss()
+        },
+      )
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setHasFixedSize(false)
+    }
+  }
+
+  private class LocalesAdapter(
+    private val localeList: LocaleListCompat,
+    private val onLocaleClick: (Locale?) -> Unit,
+  ) : Adapter<ViewHolder>() {
+
+    sealed interface Item {
+      data class LocaleItem(
+        val locale: Locale,
+      ) : Item
+
+      data object ClearItem : Item
     }
 
-    private class LocalesAdapter(
-        private val localeList: LocaleListCompat,
-        private val onLocaleClick: (Locale?) -> Unit,
-    ) : Adapter<ViewHolder>() {
-
-        sealed interface Item {
-            data class LocaleItem(
-                val locale: Locale,
-            ) : Item
-
-            data object ClearItem : Item
+    private val adapterHelper = AdapterHelper<Item>(
+      { old, new ->
+        old::class == new::class && when (old) {
+          Item.ClearItem -> true
+          is Item.LocaleItem ->
+            old.locale.toLanguageTag() ==
+              (new as Item.LocaleItem).locale.toLanguageTag()
         }
+      },
+    ).apply {
+      addItemType(
+        Item.LocaleItem::class,
+        ItemLocalePickerChoiceBinding::inflate,
+      ) { item, b, _ ->
+        b.title.text = item.locale.displayLanguage
 
-        private val adapterHelper = AdapterHelper<Item>(
-            { old, new ->
-                old::class == new::class && when (old) {
-                    Item.ClearItem -> true
-                    is Item.LocaleItem ->
-                        old.locale.toLanguageTag() ==
-                            (new as Item.LocaleItem).locale.toLanguageTag()
-                }
-            },
-        ).apply {
-            addItemType(
-                Item.LocaleItem::class,
-                ItemLocalePickerChoiceBinding::inflate,
-            ) { item, b, _ ->
-                b.title.text = item.locale.displayLanguage
-
-                b.root.setOnClickListener {
-                    onLocaleClick(item.locale)
-                }
-            }
-            addItemType(Item.ClearItem::class, ItemLocalePickerChoiceBinding::inflate) { _, b, _ ->
-                b.title.setText(R.string.use_system_language)
-                b.root.setOnClickListener {
-                    onLocaleClick(null)
-                }
-            }
+        b.root.setOnClickListener {
+          onLocaleClick(item.locale)
         }
-
-        init {
-            val newItems = mutableListOf<Item>()
-
-            for (i in 0 until localeList.size()) {
-                val locale = localeList.get(i) ?: continue
-                newItems.add(Item.LocaleItem(locale))
-            }
-            newItems += Item.ClearItem
-            adapterHelper.setItems(newItems, this)
+      }
+      addItemType(Item.ClearItem::class, ItemLocalePickerChoiceBinding::inflate) { _, b, _ ->
+        b.title.setText(R.string.use_system_language)
+        b.root.setOnClickListener {
+          onLocaleClick(null)
         }
-
-        override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            adapterHelper.onCreateViewHolder(parent, viewType)
-
-        override fun getItemCount(): Int = adapterHelper.itemCount
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            adapterHelper.onBindViewHolder(holder, position)
+      }
     }
+
+    init {
+      val newItems = mutableListOf<Item>()
+
+      for (i in 0 until localeList.size()) {
+        val locale = localeList.get(i) ?: continue
+        newItems.add(Item.LocaleItem(locale))
+      }
+      newItems += Item.ClearItem
+      adapterHelper.setItems(newItems, this)
+    }
+
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int = adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+  }
 }

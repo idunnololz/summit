@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Singleton
 class NsfwModeManager @Inject constructor() {
-    val nsfwModeEnabled = MutableStateFlow(false)
+  val nsfwModeEnabled = MutableStateFlow(false)
 }

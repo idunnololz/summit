@@ -20,145 +20,145 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.newPredictiveBackBackPressHandler
 
 class MultipleChoiceDialogFragment :
-    BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
-    FullscreenDialogFragment {
+  BaseDialogFragment<DialogFragmentBottomMenuBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
-        private const val ARG_SETTING_ITEM = "ARG_SETTING_ITEM"
-        private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
+  companion object {
+    private const val ARG_SETTING_ITEM = "ARG_SETTING_ITEM"
+    private const val ARG_CURRENT_VALUE = "ARG_CURRENT_VALUE"
 
-        fun newInstance(settingItem: RadioGroupSettingItem, currentValue: Int?) =
-            MultipleChoiceDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(ARG_SETTING_ITEM, settingItem)
-                    if (currentValue != null) {
-                        putInt(ARG_CURRENT_VALUE, currentValue)
-                    }
-                }
-            }
-    }
-
-    private var bottomMenu: BottomMenu? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                window.setBackgroundDrawable(null)
-                WindowCompat.setDecorFitsSystemWindows(window, false)
-                window.setWindowAnimations(R.style.BottomSheetAnimations)
-            }
+    fun newInstance(settingItem: RadioGroupSettingItem, currentValue: Int?) =
+      MultipleChoiceDialogFragment().apply {
+        arguments = Bundle().apply {
+          putParcelable(ARG_SETTING_ITEM, settingItem)
+          if (currentValue != null) {
+            putInt(ARG_CURRENT_VALUE, currentValue)
+          }
         }
+      }
+  }
+
+  private var bottomMenu: BottomMenu? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        window.setBackgroundDrawable(null)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.setWindowAnimations(R.style.BottomSheetAnimations)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentBottomMenuBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+    val args = requireArguments()
+    val settingItem = args.getParcelableCompat<RadioGroupSettingItem>(
+      ARG_SETTING_ITEM,
+    )
+
+    if (settingItem == null) {
+      dismiss()
+      return
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        setBinding(DialogFragmentBottomMenuBinding.inflate(inflater, container, false))
-
-        return binding.root
+    val currentValue = if (args.containsKey(ARG_CURRENT_VALUE)) {
+      args.getInt(ARG_CURRENT_VALUE)
+    } else {
+      null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    val faintColor = ContextCompat.getColor(context, R.color.colorTextFaint)
 
-        val context = requireContext()
-        val args = requireArguments()
-        val settingItem = args.getParcelableCompat<RadioGroupSettingItem>(
-            ARG_SETTING_ITEM,
-        )
+    BottomMenu(requireContext())
+      .apply {
+        setTitle(settingItem.title)
+        settingItem.options.forEach {
+          val title = if (it.isDefault) {
+            SpannableStringBuilder().apply {
+              append(it.title)
 
-        if (settingItem == null) {
-            dismiss()
-            return
+              val start = length
+              append(" (")
+              append(getString(R.string._default))
+              append(")")
+              val end = length
+
+              setSpan(
+                ForegroundColorSpan(faintColor),
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+              )
+            }
+          } else {
+            it.title
+          }
+
+          if (it.icon != null) {
+            addItemWithIcon(it.id, title, it.icon)
+          } else {
+            addItem(it.id, title)
+          }
+        }
+        if (currentValue != null) {
+          setChecked(currentValue)
         }
 
-        val currentValue = if (args.containsKey(ARG_CURRENT_VALUE)) {
-            args.getInt(ARG_CURRENT_VALUE)
-        } else {
-            null
+        setOnMenuItemClickListener {
+          (parentFragment as SettingValueUpdateCallback).updateValue(
+            settingItem.id,
+            it.id,
+          )
         }
 
-        val faintColor = ContextCompat.getColor(context, R.color.colorTextFaint)
+        onClose = {
+          dismiss()
+        }
+      }
+      .also {
+        bottomMenu = it
+      }
+      .show(
+        bottomMenuContainer = requireMainActivity(),
+        bottomSheetContainer = binding.root,
+        handleBackPress = false,
+        expandFully = true,
+      )
+  }
 
-        BottomMenu(requireContext())
-            .apply {
-                setTitle(settingItem.title)
-                settingItem.options.forEach {
-                    val title = if (it.isDefault) {
-                        SpannableStringBuilder().apply {
-                            append(it.title)
+  override fun dismiss() {
+    super.dismiss()
+    bottomMenu?.close()
+  }
 
-                            val start = length
-                            append(" (")
-                            append(getString(R.string._default))
-                            append(")")
-                            val end = length
+  override fun dismissAllowingStateLoss() {
+    super.dismissAllowingStateLoss()
+    bottomMenu?.close()
+  }
 
-                            setSpan(
-                                ForegroundColorSpan(faintColor),
-                                start,
-                                end,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                            )
-                        }
-                    } else {
-                        it.title
-                    }
-
-                    if (it.icon != null) {
-                        addItemWithIcon(it.id, title, it.icon)
-                    } else {
-                        addItem(it.id, title)
-                    }
-                }
-                if (currentValue != null) {
-                    setChecked(currentValue)
-                }
-
-                setOnMenuItemClickListener {
-                    (parentFragment as SettingValueUpdateCallback).updateValue(
-                        settingItem.id,
-                        it.id,
-                    )
-                }
-
-                onClose = {
-                    dismiss()
-                }
-            }
-            .also {
-                bottomMenu = it
-            }
-            .show(
-                bottomMenuContainer = requireMainActivity(),
-                bottomSheetContainer = binding.root,
-                handleBackPress = false,
-                expandFully = true,
-            )
-    }
-
-    override fun dismiss() {
-        super.dismiss()
-        bottomMenu?.close()
-    }
-
-    override fun dismissAllowingStateLoss() {
-        super.dismissAllowingStateLoss()
-        bottomMenu?.close()
-    }
-
-    override fun getPredictiveBackBackPressCallback(): OnBackPressedCallback =
-        newPredictiveBackBackPressHandler { bottomMenu }
+  override fun getPredictiveBackBackPressCallback(): OnBackPressedCallback =
+    newPredictiveBackBackPressHandler { bottomMenu }
 }

@@ -4,26 +4,26 @@ import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 fun setupBottomSheetAndShow(
-    bottomSheet: View,
-    bottomSheetContainerInner: View,
-    overlay: View,
-    onClose: () -> Unit,
-    expandFully: Boolean = false,
+  bottomSheet: View,
+  bottomSheetContainerInner: View,
+  overlay: View,
+  onClose: () -> Unit,
+  expandFully: Boolean = false,
 ) {
-    val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
-        isHideable = true
-        state = BottomSheetBehavior.STATE_HIDDEN
-        peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+  val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet).apply {
+    isHideable = true
+    state = BottomSheetBehavior.STATE_HIDDEN
+    peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
 
-        if (expandFully) {
-            skipCollapsed = true
-        }
+    if (expandFully) {
+      skipCollapsed = true
     }
-    overlay.setOnClickListener {
-        bottomSheetBehavior.setState(
-            BottomSheetBehavior.STATE_HIDDEN,
-        )
-    }
+  }
+  overlay.setOnClickListener {
+    bottomSheetBehavior.setState(
+      BottomSheetBehavior.STATE_HIDDEN,
+    )
+  }
 
 //    bottomInset.observeForever {
 //        recyclerView.updatePadding(bottom = it)
@@ -34,35 +34,35 @@ fun setupBottomSheetAndShow(
 //        }
 //    }
 
-    bottomSheet.postDelayed(
-        {
-            if (bottomSheetContainerInner.width > bottomSheetBehavior.maxWidth) {
-                bottomSheetBehavior.skipCollapsed = true
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else if (expandFully) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+  bottomSheet.postDelayed(
+    {
+      if (bottomSheetContainerInner.width > bottomSheetBehavior.maxWidth) {
+        bottomSheetBehavior.skipCollapsed = true
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+      } else if (expandFully) {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+      } else {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+      }
+
+      bottomSheetBehavior.addBottomSheetCallback(
+        object : BottomSheetBehavior.BottomSheetCallback() {
+          override fun onStateChanged(bottomSheet1: View, newState: Int) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+              onClose.invoke()
             }
+          }
 
-            bottomSheetBehavior.addBottomSheetCallback(
-                object : BottomSheetBehavior.BottomSheetCallback() {
-                    override fun onStateChanged(bottomSheet1: View, newState: Int) {
-                        if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                            onClose.invoke()
-                        }
-                    }
-
-                    override fun onSlide(bottomSheet1: View, slideOffset: Float) {
-                        if (java.lang.Float.isNaN(slideOffset)) {
-                            overlay.alpha = 1f
-                        } else {
-                            overlay.alpha = 1 + slideOffset
-                        }
-                    }
-                },
-            )
+          override fun onSlide(bottomSheet1: View, slideOffset: Float) {
+            if (java.lang.Float.isNaN(slideOffset)) {
+              overlay.alpha = 1f
+            } else {
+              overlay.alpha = 1 + slideOffset
+            }
+          }
         },
-        100,
-    )
+      )
+    },
+    100,
+  )
 }

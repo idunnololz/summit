@@ -31,121 +31,121 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SettingsDownloadsFragment : BaseFragment<FragmentSettingsDownloadsBinding>() {
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var settings: DownloadSettings
+  @Inject
+  lateinit var settings: DownloadSettings
 
-    private val openDocumentTreeLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocumentTree(),
-    ) { uri ->
-        // Handle the returned Uri
+  private val openDocumentTreeLauncher = registerForActivityResult(
+    ActivityResultContracts.OpenDocumentTree(),
+  ) { uri ->
+    // Handle the returned Uri
 
-        if (uri != null) {
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                    onDownloadDirectorySelected(uri)
-                }
-            }
+    if (uri != null) {
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.RESUMED) {
+          onDownloadDirectorySelected(uri)
         }
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(FragmentSettingsDownloadsBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = settings.getPageName(context)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    updateRendering()
+  }
 
-        setBinding(FragmentSettingsDownloadsBinding.inflate(inflater, container, false))
+  private fun updateRendering() {
+    val context = context ?: return
 
-        return binding.root
+    settings.downloadDirectory.bindTo(
+      binding.downloadDirectory,
+      { getCurrentDownloadDirectory() },
+      { setting, currentValue ->
+        openDocumentTreeLauncher.launch(null)
+      },
+    )
+    settings.resetDownloadDirectory.bindTo(
+      binding.resetDownloadDirectory,
+    ) {
+      preferences.reset(KEY_DOWNLOAD_DIRECTORY)
+      updateRendering()
+    }
+  }
+
+  private fun getCurrentDownloadDirectory(): String {
+    val context = context ?: return ""
+    val downloadDirectory = preferences.downloadDirectory
+
+    if (downloadDirectory == null) {
+      return context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath
+        ?: ""
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    val oldParentUri = Uri.parse(downloadDirectory)
+    val id = DocumentsContract.getTreeDocumentId(oldParentUri)
+    val parentFolderUri =
+      DocumentsContract.buildChildDocumentsUriUsingTree(oldParentUri, id)
+    val fileStructureReversed = mutableListOf<DocumentFile>()
 
-        val context = requireContext()
+    var currentFile = DocumentFile.fromTreeUri(context, parentFolderUri)
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
-        }
-
-        updateRendering()
+    while (currentFile != null) {
+      fileStructureReversed.add(currentFile)
+      currentFile = currentFile.parentFile
     }
 
-    private fun updateRendering() {
-        val context = context ?: return
-
-        settings.downloadDirectory.bindTo(
-            binding.downloadDirectory,
-            { getCurrentDownloadDirectory() },
-            { setting, currentValue ->
-                openDocumentTreeLauncher.launch(null)
-            },
-        )
-        settings.resetDownloadDirectory.bindTo(
-            binding.resetDownloadDirectory,
-        ) {
-            preferences.reset(KEY_DOWNLOAD_DIRECTORY)
-            updateRendering()
-        }
+    val fullPath = buildString {
+      for (file in fileStructureReversed.reversed()) {
+        append(file.name)
+        append("/")
+      }
     }
 
-    private fun getCurrentDownloadDirectory(): String {
-        val context = context ?: return ""
-        val downloadDirectory = preferences.downloadDirectory
-
-        if (downloadDirectory == null) {
-            return context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.absolutePath
-                ?: ""
-        }
-
-        val oldParentUri = Uri.parse(downloadDirectory)
-        val id = DocumentsContract.getTreeDocumentId(oldParentUri)
-        val parentFolderUri =
-            DocumentsContract.buildChildDocumentsUriUsingTree(oldParentUri, id)
-        val fileStructureReversed = mutableListOf<DocumentFile>()
-
-        var currentFile = DocumentFile.fromTreeUri(context, parentFolderUri)
-
-        while (currentFile != null) {
-            fileStructureReversed.add(currentFile)
-            currentFile = currentFile.parentFile
-        }
-
-        val fullPath = buildString {
-            for (file in fileStructureReversed.reversed()) {
-                append(file.name)
-                append("/")
-            }
-        }
-
-        return fullPath.ifBlank {
-            downloadDirectory
-        }
+    return fullPath.ifBlank {
+      downloadDirectory
     }
+  }
 
-    private fun onDownloadDirectorySelected(uri: Uri) {
-        val context = context ?: return
+  private fun onDownloadDirectorySelected(uri: Uri) {
+    val context = context ?: return
 
-        preferences.downloadDirectory = uri.toString()
+    preferences.downloadDirectory = uri.toString()
 
-        val contentResolver = context.contentResolver
+    val contentResolver = context.contentResolver
 
-        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        contentResolver.takePersistableUriPermission(uri, takeFlags)
+    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+      Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+    contentResolver.takePersistableUriPermission(uri, takeFlags)
 
-        updateRendering()
-    }
+    updateRendering()
+  }
 }

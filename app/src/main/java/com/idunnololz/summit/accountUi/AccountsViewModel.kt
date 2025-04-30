@@ -16,49 +16,49 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class AccountsViewModel @Inject constructor(
-    private val accountManager: AccountManager,
-    private val accountInfoManager: AccountInfoManager,
+  private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
 ) : ViewModel() {
 
-    val accounts = StatefulLiveData<List<AccountView>>()
-    val signOut = StatefulLiveData<Unit>()
+  val accounts = StatefulLiveData<List<AccountView>>()
+  val signOut = StatefulLiveData<Unit>()
 
-    init {
+  init {
+    refreshAccounts()
+  }
+
+  fun signOut(account: Account) {
+    signOut.setIsLoading()
+
+    viewModelScope.launch(Dispatchers.Default) {
+      accountManager.signOut(account)
+      signOut.postValue(Unit)
+
+      withContext(Dispatchers.Main) {
         refreshAccounts()
+      }
     }
+  }
 
-    fun signOut(account: Account) {
-        signOut.setIsLoading()
+  fun switchAccount(account: GuestOrUserAccount) {
+    viewModelScope.launch(Dispatchers.Default) {
+      accountManager.setCurrentAccount(account)
 
-        viewModelScope.launch(Dispatchers.Default) {
-            accountManager.signOut(account)
-            signOut.postValue(Unit)
-
-            withContext(Dispatchers.Main) {
-                refreshAccounts()
-            }
-        }
+      withContext(Dispatchers.Main) {
+        refreshAccounts()
+      }
     }
+  }
 
-    fun switchAccount(account: GuestOrUserAccount) {
-        viewModelScope.launch(Dispatchers.Default) {
-            accountManager.setCurrentAccount(account)
+  fun refreshAccounts() {
+    accounts.setIsLoading()
 
-            withContext(Dispatchers.Main) {
-                refreshAccounts()
-            }
-        }
+    viewModelScope.launch(Dispatchers.Default) {
+      val accountViews = accountManager.getAccounts().map {
+        accountInfoManager.getAccountViewForAccount(it)
+      }
+
+      accounts.postValue(accountViews)
     }
-
-    fun refreshAccounts() {
-        accounts.setIsLoading()
-
-        viewModelScope.launch(Dispatchers.Default) {
-            val accountViews = accountManager.getAccounts().map {
-                accountInfoManager.getAccountViewForAccount(it)
-            }
-
-            accounts.postValue(accountViews)
-        }
-    }
+  }
 }

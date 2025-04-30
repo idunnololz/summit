@@ -17,65 +17,65 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class HelpAndFeedbackDialogFragment :
-    BaseBottomSheetDialogFragment<DialogFragmentHelpAndFeedbackBinding>(),
-    FullscreenDialogFragment {
+  BaseBottomSheetDialogFragment<DialogFragmentHelpAndFeedbackBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
-        fun show(fragmentManager: FragmentManager) = HelpAndFeedbackDialogFragment()
-            .show(fragmentManager, "HelpAndFeedbackDialogFragment")
-    }
+  companion object {
+    fun show(fragmentManager: FragmentManager) = HelpAndFeedbackDialogFragment()
+      .show(fragmentManager, "HelpAndFeedbackDialogFragment")
+  }
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        setBinding(
-            DialogFragmentHelpAndFeedbackBinding.inflate(
-                inflater,
-                container,
-                false,
-            ),
-        )
+    setBinding(
+      DialogFragmentHelpAndFeedbackBinding.inflate(
+        inflater,
+        container,
+        false,
+      ),
+    )
 
-        return binding.root
-    }
+    return binding.root
+  }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-        with(binding) {
-            postToCommunityButton.setOnClickListener {
-                getMainActivity()?.requestScreenshotAndShowFeedbackScreen()
-                dismiss()
-            }
-            emailButton.setOnClickListener {
-                startFeedbackIntent(requireContext())
-                dismiss()
-            }
-            rateButton.setOnClickListener {
-                openAppOnPlayStore()
-                dismiss()
-            }
-            communityButton.setOnClickListener {
-                getMainActivity()?.launchPage(summitCommunityPage)
-                dismiss()
-            }
+    with(binding) {
+      postToCommunityButton.setOnClickListener {
+        getMainActivity()?.requestScreenshotAndShowFeedbackScreen()
+        dismiss()
+      }
+      emailButton.setOnClickListener {
+        startFeedbackIntent(requireContext())
+        dismiss()
+      }
+      rateButton.setOnClickListener {
+        openAppOnPlayStore()
+        dismiss()
+      }
+      communityButton.setOnClickListener {
+        getMainActivity()?.launchPage(summitCommunityPage)
+        dismiss()
+      }
 
-            if (preferences.shakeToSendFeedback) {
-                disableGestureButton.visibility = View.VISIBLE
-                disableGestureButton.setOnClickListener {
-                    preferences.shakeToSendFeedback = false
-                    disableGestureButton.visibility = View.GONE
-                }
-            } else {
-                disableGestureButton.visibility = View.GONE
-            }
+      if (preferences.shakeToSendFeedback) {
+        disableGestureButton.visibility = View.VISIBLE
+        disableGestureButton.setOnClickListener {
+          preferences.shakeToSendFeedback = false
+          disableGestureButton.visibility = View.GONE
         }
+      } else {
+        disableGestureButton.visibility = View.GONE
+      }
     }
+  }
 }

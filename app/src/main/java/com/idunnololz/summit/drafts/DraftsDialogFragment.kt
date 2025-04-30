@@ -26,217 +26,217 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class DraftsDialogFragment :
-    BaseDialogFragment<DialogFragmentDraftsBinding>(),
-    FullscreenDialogFragment {
+  BaseDialogFragment<DialogFragmentDraftsBinding>(),
+  FullscreenDialogFragment {
 
-    companion object {
-        const val REQUEST_KEY = "DraftsDialogFragment_req_key"
-        const val REQUEST_KEY_RESULT = "result"
+  companion object {
+    const val REQUEST_KEY = "DraftsDialogFragment_req_key"
+    const val REQUEST_KEY_RESULT = "result"
 
-        fun show(fragmentManager: FragmentManager, draftType: Int) {
-            DraftsDialogFragment().apply {
-                arguments = DraftsDialogFragmentArgs(draftType).toBundle()
-            }.showAllowingStateLoss(fragmentManager, "DraftsDialogFragment")
+    fun show(fragmentManager: FragmentManager, draftType: Int) {
+      DraftsDialogFragment().apply {
+        arguments = DraftsDialogFragmentArgs(draftType).toBundle()
+      }.showAllowingStateLoss(fragmentManager, "DraftsDialogFragment")
+    }
+  }
+
+  private val args by navArgs<DraftsDialogFragmentArgs>()
+
+  private val viewModel: DraftsViewModel by viewModels()
+
+  @Inject
+  lateinit var animationsHelper: AnimationsHelper
+
+  private val deleteAllDialogLauncher = newAlertDialogLauncher("delete_all") {
+    if (it.isOk) {
+      viewModel.deleteAll(args.draftType)
+    }
+  }
+  private val deleteDraftDialogLauncher = newAlertDialogLauncher("delete") {
+    if (it.isOk) {
+      it.extras?.getLong("draft_id")?.let { draftId ->
+        viewModel.deleteDraft(draftId)
+      }
+    }
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    val dialog = dialog
+    if (dialog != null) {
+      dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(DialogFragmentDraftsBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    viewModel.draftType = args.draftType
+
+    binding.toolbar.title = getString(R.string.drafts)
+    binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
+    binding.toolbar.setNavigationOnClickListener {
+      dismiss()
+    }
+    binding.toolbar.setNavigationIconTint(
+      context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+    )
+    binding.toolbar.inflateMenu(R.menu.menu_drafts)
+    binding.toolbar.setOnMenuItemClickListener {
+      when (it.itemId) {
+        R.id.delete_all -> {
+          deleteAllDialogLauncher.launchDialog {
+            messageResId = R.string.warn_delete_all_drafts
+            positionButtonResId = R.string.delete_all
+            negativeButtonResId = R.string.cancel
+          }
+          true
         }
+        R.id.show_all_drafts -> {
+          if (viewModel.draftType == null) {
+            viewModel.draftType = args.draftType
+            it.setIcon(R.drawable.baseline_filter_list_off_24)
+          } else {
+            viewModel.draftType = null
+            it.setIcon(R.drawable.baseline_filter_list_24)
+          }
+          viewModel.loadMoreDrafts(force = true)
+          true
+        }
+        else -> false
+      }
     }
 
-    private val args by navArgs<DraftsDialogFragmentArgs>()
-
-    private val viewModel: DraftsViewModel by viewModels()
-
-    @Inject
-    lateinit var animationsHelper: AnimationsHelper
-
-    private val deleteAllDialogLauncher = newAlertDialogLauncher("delete_all") {
-        if (it.isOk) {
-            viewModel.deleteAll(args.draftType)
-        }
-    }
-    private val deleteDraftDialogLauncher = newAlertDialogLauncher("delete") {
-        if (it.isOk) {
-            it.extras?.getLong("draft_id")?.let { draftId ->
-                viewModel.deleteDraft(draftId)
+    with(binding) {
+      val adapter = DraftsAdapter(
+        onDraftClick = {
+          // Convert the draft data to the correct type (eg. if comment draft was requested
+          // but the draft selected was a post then convert the post to a comment)
+          val draft = when (args.draftType) {
+            DraftTypes.Post -> {
+              when (it.data) {
+                is DraftData.CommentDraftData ->
+                  it.copy(
+                    id = 0L, // prevent overwriting the original
+                    data = DraftData.PostDraftData(
+                      originalPost = null,
+                      name = null,
+                      body = it.data.content,
+                      url = null,
+                      isNsfw = false,
+                      accountId = it.data.accountId,
+                      accountInstance = it.data.accountInstance,
+                      targetCommunityFullName = "",
+                    ),
+                  )
+                is DraftData.PostDraftData -> it
+                is DraftData.MessageDraftData -> null
+                null -> null
+              }
             }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            dialog.window?.let { window ->
-                WindowCompat.setDecorFitsSystemWindows(window, false)
+            DraftTypes.Comment -> {
+              when (it.data) {
+                is DraftData.CommentDraftData -> it
+                is DraftData.PostDraftData ->
+                  it.copy(
+                    id = 0L, // prevent overwriting the original
+                    data = DraftData.CommentDraftData(
+                      originalComment = null,
+                      postRef = null,
+                      parentCommentId = null,
+                      content = it.data.body ?: "",
+                      accountId = it.data.accountId,
+                      accountInstance = it.data.accountInstance,
+                    ),
+                  )
+                is DraftData.MessageDraftData -> null
+                null -> null
+              }
             }
+            else -> null
+          }
+
+          setFragmentResult(
+            REQUEST_KEY,
+            bundleOf(REQUEST_KEY_RESULT to draft),
+          )
+          dismiss()
+        },
+        onDeleteClick = {
+          deleteDraftDialogLauncher.launchDialog {
+            messageResId = R.string.warn_delete_draft
+            positionButtonResId = R.string.delete
+            negativeButtonResId = R.string.cancel
+            extras.putLong("draft_id", it.id)
+          }
+        },
+      )
+      val layoutManager = LinearLayoutManager(context)
+      recyclerView.adapter = adapter
+      recyclerView.layoutManager = layoutManager
+      recyclerView.setup(animationsHelper)
+      recyclerView.setHasFixedSize(true)
+
+      fun fetchPageIfLoadItem(position: Int) {
+        (adapter.items.getOrNull(position) as? DraftsViewModel.ViewModelItem.LoadingItem)
+          ?.let {
+            viewModel.loadMoreDrafts()
+          }
+      }
+
+      fun checkIfFetchNeeded() {
+        val firstPos = layoutManager.findFirstVisibleItemPosition()
+        val lastPos = layoutManager.findLastVisibleItemPosition()
+
+        fetchPageIfLoadItem(firstPos)
+        fetchPageIfLoadItem(firstPos - 1)
+        fetchPageIfLoadItem(lastPos)
+        fetchPageIfLoadItem(lastPos + 1)
+      }
+
+      viewModel.viewModelItems.observe(viewLifecycleOwner) {
+        val wasAtTop = layoutManager.findFirstVisibleItemPosition() == 0
+
+        adapter.setItems(it) {
+          checkIfFetchNeeded()
+
+          if (wasAtTop) {
+            layoutManager.scrollToPosition(0)
+          }
         }
+      }
+
+      recyclerView.addOnScrollListener(
+        object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            checkIfFetchNeeded()
+          }
+        },
+      )
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-
-        setBinding(DialogFragmentDraftsBinding.inflate(inflater, container, false))
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val context = requireContext()
-
-        viewModel.draftType = args.draftType
-
-        binding.toolbar.title = getString(R.string.drafts)
-        binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)
-        binding.toolbar.setNavigationOnClickListener {
-            dismiss()
-        }
-        binding.toolbar.setNavigationIconTint(
-            context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
-        )
-        binding.toolbar.inflateMenu(R.menu.menu_drafts)
-        binding.toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.delete_all -> {
-                    deleteAllDialogLauncher.launchDialog {
-                        messageResId = R.string.warn_delete_all_drafts
-                        positionButtonResId = R.string.delete_all
-                        negativeButtonResId = R.string.cancel
-                    }
-                    true
-                }
-                R.id.show_all_drafts -> {
-                    if (viewModel.draftType == null) {
-                        viewModel.draftType = args.draftType
-                        it.setIcon(R.drawable.baseline_filter_list_off_24)
-                    } else {
-                        viewModel.draftType = null
-                        it.setIcon(R.drawable.baseline_filter_list_24)
-                    }
-                    viewModel.loadMoreDrafts(force = true)
-                    true
-                }
-                else -> false
-            }
-        }
-
-        with(binding) {
-            val adapter = DraftsAdapter(
-                onDraftClick = {
-                    // Convert the draft data to the correct type (eg. if comment draft was requested
-                    // but the draft selected was a post then convert the post to a comment)
-                    val draft = when (args.draftType) {
-                        DraftTypes.Post -> {
-                            when (it.data) {
-                                is DraftData.CommentDraftData ->
-                                    it.copy(
-                                        id = 0L, // prevent overwriting the original
-                                        data = DraftData.PostDraftData(
-                                            originalPost = null,
-                                            name = null,
-                                            body = it.data.content,
-                                            url = null,
-                                            isNsfw = false,
-                                            accountId = it.data.accountId,
-                                            accountInstance = it.data.accountInstance,
-                                            targetCommunityFullName = "",
-                                        ),
-                                    )
-                                is DraftData.PostDraftData -> it
-                                is DraftData.MessageDraftData -> null
-                                null -> null
-                            }
-                        }
-                        DraftTypes.Comment -> {
-                            when (it.data) {
-                                is DraftData.CommentDraftData -> it
-                                is DraftData.PostDraftData ->
-                                    it.copy(
-                                        id = 0L, // prevent overwriting the original
-                                        data = DraftData.CommentDraftData(
-                                            originalComment = null,
-                                            postRef = null,
-                                            parentCommentId = null,
-                                            content = it.data.body ?: "",
-                                            accountId = it.data.accountId,
-                                            accountInstance = it.data.accountInstance,
-                                        ),
-                                    )
-                                is DraftData.MessageDraftData -> null
-                                null -> null
-                            }
-                        }
-                        else -> null
-                    }
-
-                    setFragmentResult(
-                        REQUEST_KEY,
-                        bundleOf(REQUEST_KEY_RESULT to draft),
-                    )
-                    dismiss()
-                },
-                onDeleteClick = {
-                    deleteDraftDialogLauncher.launchDialog {
-                        messageResId = R.string.warn_delete_draft
-                        positionButtonResId = R.string.delete
-                        negativeButtonResId = R.string.cancel
-                        extras.putLong("draft_id", it.id)
-                    }
-                },
-            )
-            val layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = adapter
-            recyclerView.layoutManager = layoutManager
-            recyclerView.setup(animationsHelper)
-            recyclerView.setHasFixedSize(true)
-
-            fun fetchPageIfLoadItem(position: Int) {
-                (adapter.items.getOrNull(position) as? DraftsViewModel.ViewModelItem.LoadingItem)
-                    ?.let {
-                        viewModel.loadMoreDrafts()
-                    }
-            }
-
-            fun checkIfFetchNeeded() {
-                val firstPos = layoutManager.findFirstVisibleItemPosition()
-                val lastPos = layoutManager.findLastVisibleItemPosition()
-
-                fetchPageIfLoadItem(firstPos)
-                fetchPageIfLoadItem(firstPos - 1)
-                fetchPageIfLoadItem(lastPos)
-                fetchPageIfLoadItem(lastPos + 1)
-            }
-
-            viewModel.viewModelItems.observe(viewLifecycleOwner) {
-                val wasAtTop = layoutManager.findFirstVisibleItemPosition() == 0
-
-                adapter.setItems(it) {
-                    checkIfFetchNeeded()
-
-                    if (wasAtTop) {
-                        layoutManager.scrollToPosition(0)
-                    }
-                }
-            }
-
-            recyclerView.addOnScrollListener(
-                object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-
-                        checkIfFetchNeeded()
-                    }
-                },
-            )
-        }
-    }
+  }
 }

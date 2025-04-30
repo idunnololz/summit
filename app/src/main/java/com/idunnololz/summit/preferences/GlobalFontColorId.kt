@@ -1,7 +1,7 @@
 package com.idunnololz.summit.preferences
 
 object GlobalFontColorId {
-    const val Calm = 0
+  const val Calm = 0
 
-    const val HighContrast = 1
+  const val HighContrast = 1
 }

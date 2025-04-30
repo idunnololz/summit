@@ -33,56 +33,56 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsCacheFragment :
-    BaseFragment<FragmentCacheBinding>(),
-    SettingValueUpdateCallback {
+  BaseFragment<FragmentCacheBinding>(),
+  SettingValueUpdateCallback {
 
-    private val viewModel: SettingsCacheViewModel by viewModels()
+  private val viewModel: SettingsCacheViewModel by viewModels()
 
-    private var progressListener: OfflineDownloadProgressListener? = null
+  private var progressListener: OfflineDownloadProgressListener? = null
 
-    @Inject
-    lateinit var directoryHelper: DirectoryHelper
+  @Inject
+  lateinit var directoryHelper: DirectoryHelper
 
-    @Inject
-    lateinit var offlineManager: OfflineManager
+  @Inject
+  lateinit var offlineManager: OfflineManager
 
-    @Inject
-    lateinit var cacheSettings: CacheSettings
+  @Inject
+  lateinit var cacheSettings: CacheSettings
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var cachePolicyManager: CachePolicyManager
+  @Inject
+  lateinit var cachePolicyManager: CachePolicyManager
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-        }
-
-        setBinding(FragmentCacheBinding.inflate(inflater, container, false))
-
-        return binding.root
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    setBinding(FragmentCacheBinding.inflate(inflater, container, false))
 
-        val context = requireContext()
+    return binding.root
+  }
 
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>()
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-            setupToolbar(binding.toolbar, cacheSettings.getPageName(context))
-        }
+    val context = requireContext()
+
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>()
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setupToolbar(binding.toolbar, cacheSettings.getPageName(context))
+    }
 
 //        doStandardOfflineButton.setOnClickListener {
 //            OfflineService.startWithConfig(context,
@@ -97,102 +97,102 @@ class SettingsCacheFragment :
 //            OfflineManager.instance.deleteOfflineImages()
 //        }
 
-        updateRendering()
+    updateRendering()
 
-        with(binding) {
-            val colors = listOf(
-                ContextCompat.getColor(context, R.color.style_pink),
-                ContextCompat.getColor(context, R.color.style_amber),
-                ContextCompat.getColor(context, R.color.style_blue),
-                ContextCompat.getColor(context, R.color.style_green),
-                ContextCompat.getColor(context, R.color.style_orange),
+    with(binding) {
+      val colors = listOf(
+        ContextCompat.getColor(context, R.color.style_pink),
+        ContextCompat.getColor(context, R.color.style_amber),
+        ContextCompat.getColor(context, R.color.style_blue),
+        ContextCompat.getColor(context, R.color.style_green),
+        ContextCompat.getColor(context, R.color.style_orange),
+      )
+
+      viewModel.dataModel.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            storageUsageView.setErrorText(
+              context.getString(R.string.error_cache_size_calculation),
             )
-
-            viewModel.dataModel.observe(viewLifecycleOwner) {
-                when (it) {
-                    is StatefulData.Error -> {
-                        storageUsageView.setErrorText(
-                            context.getString(R.string.error_cache_size_calculation),
-                        )
-                    }
-                    is StatefulData.Loading -> {
-                        storageUsageView.setLoadingText(
-                            context.getString(R.string.loading),
-                        )
-                    }
-                    is StatefulData.NotStarted -> {}
-                    is StatefulData.Success -> {
-                        storageUsageView.setStorageUsage(
-                            listOf(
-                                StorageUsageItem(
-                                    context.getString(R.string.images),
-                                    it.data.imagesSizeBytes,
-                                    colors[0],
-                                ),
-                                StorageUsageItem(
-                                    context.getString(R.string.videos),
-                                    it.data.videosSizeBytes,
-                                    colors[1],
-                                ),
-                                StorageUsageItem(
-                                    context.getString(R.string.other_cached_media),
-                                    it.data.cacheMediaSizeBytes,
-                                    colors[3],
-                                ),
-                                StorageUsageItem(
-                                    context.getString(R.string.network),
-                                    it.data.cacheNetworkCacheSizeBytes,
-                                    colors[4],
-                                ),
-                                StorageUsageItem(
-                                    context.getString(R.string.other),
-                                    it.data.cacheOtherSizeBytes,
-                                    colors[2],
-                                ),
-                            ),
-                        )
-                    }
-                }
-            }
+          }
+          is StatefulData.Loading -> {
+            storageUsageView.setLoadingText(
+              context.getString(R.string.loading),
+            )
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            storageUsageView.setStorageUsage(
+              listOf(
+                StorageUsageItem(
+                  context.getString(R.string.images),
+                  it.data.imagesSizeBytes,
+                  colors[0],
+                ),
+                StorageUsageItem(
+                  context.getString(R.string.videos),
+                  it.data.videosSizeBytes,
+                  colors[1],
+                ),
+                StorageUsageItem(
+                  context.getString(R.string.other_cached_media),
+                  it.data.cacheMediaSizeBytes,
+                  colors[3],
+                ),
+                StorageUsageItem(
+                  context.getString(R.string.network),
+                  it.data.cacheNetworkCacheSizeBytes,
+                  colors[4],
+                ),
+                StorageUsageItem(
+                  context.getString(R.string.other),
+                  it.data.cacheOtherSizeBytes,
+                  colors[2],
+                ),
+              ),
+            )
+          }
         }
-
-        viewModel.generateDataModel()
+      }
     }
 
-    override fun onDestroyView() {
-        offlineManager.removeOfflineDownloadProgressListener(progressListener)
-        super.onDestroyView()
+    viewModel.generateDataModel()
+  }
+
+  override fun onDestroyView() {
+    offlineManager.removeOfflineDownloadProgressListener(progressListener)
+    super.onDestroyView()
+  }
+
+  private fun updateRendering() {
+    if (!isBindingAvailable()) return
+
+    val context = requireContext()
+
+    cacheSettings.clearCache.bindTo(binding.clearMediaCache) {
+      offlineManager.clearOfflineData()
+
+      updateRendering()
+      viewModel.generateDataModel()
+    }
+    cacheSettings.cachePolicy.bindTo(
+      binding.cachePolicy,
+      { preferences.cachePolicy.value },
+      { setting, currentValue ->
+        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
+          .showAllowingStateLoss(childFragmentManager, "cachePolicy")
+      },
+    )
+  }
+
+  override fun updateValue(key: Int, value: Any?) {
+    when (key) {
+      cacheSettings.cachePolicy.id -> {
+        preferences.cachePolicy = CachePolicy.parse(value as Int)
+        cachePolicyManager.refreshCachePolicy()
+      }
     }
 
-    private fun updateRendering() {
-        if (!isBindingAvailable()) return
-
-        val context = requireContext()
-
-        cacheSettings.clearCache.bindTo(binding.clearMediaCache) {
-            offlineManager.clearOfflineData()
-
-            updateRendering()
-            viewModel.generateDataModel()
-        }
-        cacheSettings.cachePolicy.bindTo(
-            binding.cachePolicy,
-            { preferences.cachePolicy.value },
-            { setting, currentValue ->
-                MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-                    .showAllowingStateLoss(childFragmentManager, "cachePolicy")
-            },
-        )
-    }
-
-    override fun updateValue(key: Int, value: Any?) {
-        when (key) {
-            cacheSettings.cachePolicy.id -> {
-                preferences.cachePolicy = CachePolicy.parse(value as Int)
-                cachePolicyManager.refreshCachePolicy()
-            }
-        }
-
-        updateRendering()
-    }
+    updateRendering()
+  }
 }

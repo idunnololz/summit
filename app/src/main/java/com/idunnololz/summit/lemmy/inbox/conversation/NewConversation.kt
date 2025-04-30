@@ -6,8 +6,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class NewConversation(
-    val personId: PersonId,
-    val personInstance: String,
-    val personName: String,
-    val personAvatar: String?,
+  val personId: PersonId,
+  val personInstance: String,
+  val personName: String,
+  val personAvatar: String?,
 ) : Parcelable

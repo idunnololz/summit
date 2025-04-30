@@ -37,241 +37,241 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsThemeFragment : BaseFragment<FragmentSettingsThemeBinding>() {
 
-    private val args: SettingsThemeFragmentArgs by navArgs()
+  private val args: SettingsThemeFragmentArgs by navArgs()
 
-    private val preferencesViewModel: PreferencesViewModel by viewModels()
+  private val preferencesViewModel: PreferencesViewModel by viewModels()
 
-    lateinit var preferences: Preferences
+  lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var themeManager: ThemeManager
+  @Inject
+  lateinit var themeManager: ThemeManager
 
-    @Inject
-    lateinit var settings: ThemeSettings
+  @Inject
+  lateinit var settings: ThemeSettings
 
-    @Inject
-    lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
+  @Inject
+  lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
-    @Inject
-    lateinit var globalStateStorage: GlobalStateStorage
+  @Inject
+  lateinit var globalStateStorage: GlobalStateStorage
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        preferences = preferencesViewModel.getPreferences(args.account)
+    preferences = preferencesViewModel.getPreferences(args.account)
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    super.onCreateView(inflater, container, savedInstanceState)
+
+    setBinding(FragmentSettingsThemeBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    runOnReady {
+      setup()
+    }
+  }
+
+  private fun setup() {
+    if (!isBindingAvailable()) return
+
+    val context = requireContext()
+    val parentActivity = requireSummitActivity()
+
+    val account = args.account
+    requireSummitActivity().apply {
+      setupForFragment<SettingsFragment>(animate = false)
+
+      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
+      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+
+      setSupportActionBar(binding.toolbar)
+
+      supportActionBar?.setDisplayShowHomeEnabled(true)
+      supportActionBar?.setDisplayHomeAsUpEnabled(true)
+      supportActionBar?.title = settings.getPageName(context)
+      supportActionBar?.subtitle = account?.fullName
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
+    with(binding) {
+      settings.baseTheme.bindToMultiView(
+        baseThemeSetting,
+        listOf(this.option1, this.option2, this.option3),
+        {
+          when (preferences.baseTheme) {
+            BaseTheme.UseSystem -> R.id.setting_option_use_system
+            BaseTheme.Light -> R.id.setting_option_light_theme
+            BaseTheme.Dark -> R.id.setting_option_dark_theme
+          }
+        },
+        {
+          when (it) {
+            R.id.setting_option_use_system ->
+              preferences.baseTheme = BaseTheme.UseSystem
+            R.id.setting_option_light_theme ->
+              preferences.baseTheme = BaseTheme.Light
+            R.id.setting_option_dark_theme ->
+              preferences.baseTheme = BaseTheme.Dark
+          }
 
-        setBinding(FragmentSettingsThemeBinding.inflate(inflater, container, false))
+          binding.root.post {
+            themeManager.onPreferencesChanged()
+          }
+        },
+      )
 
-        return binding.root
+      binding.themeConfiguration.title.text = getString(R.string.theme_config)
+      settings.materialYou.bindTo(
+        binding.useMaterialYou,
+        { preferences.isUseMaterialYou },
+        {
+          if (DynamicColors.isDynamicColorAvailable()) {
+            preferences.isUseMaterialYou = it
+            preferences.colorScheme = ColorSchemes.Default
+            themeManager.onPreferencesChanged()
+          } else if (it) {
+            OldAlertDialogFragment.Builder()
+              .setMessage(R.string.error_dynamic_color_not_supported)
+              .createAndShow(childFragmentManager, "Asdfff")
+            preferences.isUseMaterialYou = false
+          } else {
+            preferences.isUseMaterialYou = false
+          }
+        },
+      )
+
+      settings.colorScheme.bindTo(
+        binding.colorScheme,
+        { preferences.colorScheme },
+        { setting, currentValue ->
+          ColorSchemePickerDialogFragment.newInstance(account)
+            .show(childFragmentManager, "asdaa")
+        },
+      )
+
+      binding.darkThemeSettings.title.text = getString(R.string.dark_theme_settings)
+      settings.blackTheme.bindTo(
+        binding.useBlackTheme,
+        { preferences.isBlackTheme },
+        {
+          preferences.isBlackTheme = it
+          themeManager.onPreferencesChanged()
+        },
+      )
+      settings.lessDarkBackgroundTheme.bindTo(
+        binding.lessDarkBackgroundTheme,
+        { preferences.useLessDarkBackgroundTheme },
+        {
+          preferences.useLessDarkBackgroundTheme = it
+          themeManager.onPreferencesChanged()
+        },
+      )
+
+      binding.fontStyle.title.text = getString(R.string.font_style)
+
+      settings.font.bindTo(
+        binding.font,
+        { preferences.globalFont },
+        { _, _ ->
+          FontPickerDialogFragment.newInstance(account)
+            .show(childFragmentManager, "FontPickerDialogFragment")
+        },
+      )
+
+      settings.fontSize.bindTo(
+        activity = parentActivity,
+        b = binding.fontSize,
+        choices = mapOf(
+          GlobalFontSizeId.Small to getString(R.string.small),
+          GlobalFontSizeId.Normal to getString(R.string.normal),
+          GlobalFontSizeId.Large to getString(R.string.large),
+          GlobalFontSizeId.ExtraLarge to getString(R.string.extra_large),
+          GlobalFontSizeId.Xxl to getString(R.string.xxl),
+          GlobalFontSizeId.Xxxl to getString(R.string.xxxl),
+        ),
+        getCurrentChoice = {
+          preferences.globalFontSize
+        },
+        onChoiceSelected = {
+          preferences.globalFontSize = it
+          themeManager.onPreferencesChanged()
+        },
+      )
+
+      settings.fontColor.bindTo(
+        activity = parentActivity,
+        b = binding.fontColor,
+        choices = mapOf(
+          GlobalFontColorId.Calm to getString(R.string.calm),
+          GlobalFontColorId.HighContrast to getString(R.string.high_contrast),
+        ),
+        getCurrentChoice = {
+          preferences.globalFontColor
+        },
+        onChoiceSelected = {
+          preferences.globalFontColor = it
+          themeManager.onPreferencesChanged()
+        },
+      )
+
+      binding.voteColors.title.text = getString(R.string.vote_colors)
+      settings.upvoteColor.bindTo(
+        binding.upvoteColor,
+        globalStateStorage,
+        { preferences.upvoteColor },
+        {
+          preferences.upvoteColor = it
+
+          postAndCommentViewBuilder.onPreferencesChanged()
+        },
+        { context.getColorCompat(R.color.upvoteColor) },
+      )
+      settings.downvoteColor.bindTo(
+        binding.downvoteColor,
+        globalStateStorage,
+        { preferences.downvoteColor },
+        {
+          preferences.downvoteColor = it
+
+          postAndCommentViewBuilder.onPreferencesChanged()
+        },
+        { context.getColorCompat(R.color.downvoteColor) },
+      )
+      BasicSettingItem(
+        null,
+        context.getString(R.string.swap_colors),
+        null,
+      ).bindTo(
+        binding.swapColors,
+      ) {
+        val upvoteColor = preferences.downvoteColor
+        val downvoteColor = preferences.upvoteColor
+
+        preferences.upvoteColor = upvoteColor
+        preferences.downvoteColor = downvoteColor
+
+        postAndCommentViewBuilder.onPreferencesChanged()
+        setup()
+      }
+
+      binding.misc.title.text = getString(R.string.misc)
+      settings.transparentNotificationBar.bindTo(
+        binding.transparentNotificationBar,
+        { preferences.transparentNotificationBar },
+        {
+          preferences.transparentNotificationBar = it
+          getMainActivity()?.onPreferencesChanged()
+        },
+      )
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        runOnReady {
-            setup()
-        }
-    }
-
-    private fun setup() {
-        if (!isBindingAvailable()) return
-
-        val context = requireContext()
-        val parentActivity = requireSummitActivity()
-
-        val account = args.account
-        requireSummitActivity().apply {
-            setupForFragment<SettingsFragment>(animate = false)
-
-            insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-            insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-            setSupportActionBar(binding.toolbar)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.title = settings.getPageName(context)
-            supportActionBar?.subtitle = account?.fullName
-        }
-
-        with(binding) {
-            settings.baseTheme.bindToMultiView(
-                baseThemeSetting,
-                listOf(this.option1, this.option2, this.option3),
-                {
-                    when (preferences.baseTheme) {
-                        BaseTheme.UseSystem -> R.id.setting_option_use_system
-                        BaseTheme.Light -> R.id.setting_option_light_theme
-                        BaseTheme.Dark -> R.id.setting_option_dark_theme
-                    }
-                },
-                {
-                    when (it) {
-                        R.id.setting_option_use_system ->
-                            preferences.baseTheme = BaseTheme.UseSystem
-                        R.id.setting_option_light_theme ->
-                            preferences.baseTheme = BaseTheme.Light
-                        R.id.setting_option_dark_theme ->
-                            preferences.baseTheme = BaseTheme.Dark
-                    }
-
-                    binding.root.post {
-                        themeManager.onPreferencesChanged()
-                    }
-                },
-            )
-
-            binding.themeConfiguration.title.text = getString(R.string.theme_config)
-            settings.materialYou.bindTo(
-                binding.useMaterialYou,
-                { preferences.isUseMaterialYou },
-                {
-                    if (DynamicColors.isDynamicColorAvailable()) {
-                        preferences.isUseMaterialYou = it
-                        preferences.colorScheme = ColorSchemes.Default
-                        themeManager.onPreferencesChanged()
-                    } else if (it) {
-                        OldAlertDialogFragment.Builder()
-                            .setMessage(R.string.error_dynamic_color_not_supported)
-                            .createAndShow(childFragmentManager, "Asdfff")
-                        preferences.isUseMaterialYou = false
-                    } else {
-                        preferences.isUseMaterialYou = false
-                    }
-                },
-            )
-
-            settings.colorScheme.bindTo(
-                binding.colorScheme,
-                { preferences.colorScheme },
-                { setting, currentValue ->
-                    ColorSchemePickerDialogFragment.newInstance(account)
-                        .show(childFragmentManager, "asdaa")
-                },
-            )
-
-            binding.darkThemeSettings.title.text = getString(R.string.dark_theme_settings)
-            settings.blackTheme.bindTo(
-                binding.useBlackTheme,
-                { preferences.isBlackTheme },
-                {
-                    preferences.isBlackTheme = it
-                    themeManager.onPreferencesChanged()
-                },
-            )
-            settings.lessDarkBackgroundTheme.bindTo(
-                binding.lessDarkBackgroundTheme,
-                { preferences.useLessDarkBackgroundTheme },
-                {
-                    preferences.useLessDarkBackgroundTheme = it
-                    themeManager.onPreferencesChanged()
-                },
-            )
-
-            binding.fontStyle.title.text = getString(R.string.font_style)
-
-            settings.font.bindTo(
-                binding.font,
-                { preferences.globalFont },
-                { _, _ ->
-                    FontPickerDialogFragment.newInstance(account)
-                        .show(childFragmentManager, "FontPickerDialogFragment")
-                },
-            )
-
-            settings.fontSize.bindTo(
-                activity = parentActivity,
-                b = binding.fontSize,
-                choices = mapOf(
-                    GlobalFontSizeId.Small to getString(R.string.small),
-                    GlobalFontSizeId.Normal to getString(R.string.normal),
-                    GlobalFontSizeId.Large to getString(R.string.large),
-                    GlobalFontSizeId.ExtraLarge to getString(R.string.extra_large),
-                    GlobalFontSizeId.Xxl to getString(R.string.xxl),
-                    GlobalFontSizeId.Xxxl to getString(R.string.xxxl),
-                ),
-                getCurrentChoice = {
-                    preferences.globalFontSize
-                },
-                onChoiceSelected = {
-                    preferences.globalFontSize = it
-                    themeManager.onPreferencesChanged()
-                },
-            )
-
-            settings.fontColor.bindTo(
-                activity = parentActivity,
-                b = binding.fontColor,
-                choices = mapOf(
-                    GlobalFontColorId.Calm to getString(R.string.calm),
-                    GlobalFontColorId.HighContrast to getString(R.string.high_contrast),
-                ),
-                getCurrentChoice = {
-                    preferences.globalFontColor
-                },
-                onChoiceSelected = {
-                    preferences.globalFontColor = it
-                    themeManager.onPreferencesChanged()
-                },
-            )
-
-            binding.voteColors.title.text = getString(R.string.vote_colors)
-            settings.upvoteColor.bindTo(
-                binding.upvoteColor,
-                globalStateStorage,
-                { preferences.upvoteColor },
-                {
-                    preferences.upvoteColor = it
-
-                    postAndCommentViewBuilder.onPreferencesChanged()
-                },
-                { context.getColorCompat(R.color.upvoteColor) },
-            )
-            settings.downvoteColor.bindTo(
-                binding.downvoteColor,
-                globalStateStorage,
-                { preferences.downvoteColor },
-                {
-                    preferences.downvoteColor = it
-
-                    postAndCommentViewBuilder.onPreferencesChanged()
-                },
-                { context.getColorCompat(R.color.downvoteColor) },
-            )
-            BasicSettingItem(
-                null,
-                context.getString(R.string.swap_colors),
-                null,
-            ).bindTo(
-                binding.swapColors,
-            ) {
-                val upvoteColor = preferences.downvoteColor
-                val downvoteColor = preferences.upvoteColor
-
-                preferences.upvoteColor = upvoteColor
-                preferences.downvoteColor = downvoteColor
-
-                postAndCommentViewBuilder.onPreferencesChanged()
-                setup()
-            }
-
-            binding.misc.title.text = getString(R.string.misc)
-            settings.transparentNotificationBar.bindTo(
-                binding.transparentNotificationBar,
-                { preferences.transparentNotificationBar },
-                {
-                    preferences.transparentNotificationBar = it
-                    getMainActivity()?.onPreferencesChanged()
-                },
-            )
-        }
-    }
+  }
 }

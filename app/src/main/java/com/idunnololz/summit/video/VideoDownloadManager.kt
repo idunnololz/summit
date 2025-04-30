@@ -37,150 +37,144 @@ private typealias DownloadId = String
 @Singleton
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 class VideoDownloadManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val directoryHelper: DirectoryHelper,
-    private val coroutineScopeFactory: CoroutineScopeFactory,
+  @ApplicationContext private val context: Context,
+  private val directoryHelper: DirectoryHelper,
+  private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
-    companion object {
-        private const val TAG = "VideoDownloadManager"
-    }
+  companion object {
+    private const val TAG = "VideoDownloadManager"
+  }
 
-    private val databaseProvider = StandaloneDatabaseProvider(context)
+  private val databaseProvider = StandaloneDatabaseProvider(context)
 
-    private val downloadCache =
-        SimpleCache(directoryHelper.videosDir, NoOpCacheEvictor(), databaseProvider)
+  private val downloadCache =
+    SimpleCache(directoryHelper.videosDir, NoOpCacheEvictor(), databaseProvider)
 
-    private val dataSourceFactory = DefaultHttpDataSource.Factory()
-    private val downloadExecutor = Executor(Runnable::run)
+  private val dataSourceFactory = DefaultHttpDataSource.Factory()
+  private val downloadExecutor = Executor(Runnable::run)
 
-    private val downloadRequestsContext = Dispatchers.IO.limitedParallelism(1)
+  private val downloadRequestsContext = Dispatchers.IO.limitedParallelism(1)
 
-    private val downloadManager =
-        DownloadManager(
-            context,
-            databaseProvider,
-            downloadCache,
-            dataSourceFactory,
-            downloadExecutor,
-        )
+  private val downloadManager =
+    DownloadManager(
+      context,
+      databaseProvider,
+      downloadCache,
+      dataSourceFactory,
+      downloadExecutor,
+    )
 
-    private val downloadRequests = mutableMapOf<DownloadId, DownloadVideoRequest>()
+  private val downloadRequests = mutableMapOf<DownloadId, DownloadVideoRequest>()
 
-    private val coroutineScope = coroutineScopeFactory.create()
+  private val coroutineScope = coroutineScopeFactory.create()
 
-    init {
-        downloadManager.addListener(
-            object : DownloadManager.Listener {
-                override fun onDownloadChanged(
-                    downloadManager: DownloadManager,
-                    download: Download,
-                    finalException: Exception?,
-                ) {
-                    super.onDownloadChanged(downloadManager, download, finalException)
+  init {
+    downloadManager.addListener(
+      object : DownloadManager.Listener {
+        override fun onDownloadChanged(
+          downloadManager: DownloadManager,
+          download: Download,
+          finalException: Exception?,
+        ) {
+          super.onDownloadChanged(downloadManager, download, finalException)
 
-                    Log.d(
-                        TAG,
-                        "onDownloadChanged(): ${download.request.uri} - " +
-                            "s: ${download.state} ${download.percentDownloaded} - $finalException",
-                    )
+          Log.d(
+            TAG,
+            "onDownloadChanged(): ${download.request.uri} - " +
+              "s: ${download.state} ${download.percentDownloaded} - $finalException",
+          )
 
-                    if (download.state == Download.STATE_COMPLETED) {
-                        onDownloadComplete(download.request)
-                    }
-                }
+          if (download.state == Download.STATE_COMPLETED) {
+            onDownloadComplete(download.request)
+          }
+        }
 
-                override fun onWaitingForRequirementsChanged(
-                    downloadManager: DownloadManager,
-                    waitingForRequirements: Boolean,
-                ) {
-                    super.onWaitingForRequirementsChanged(downloadManager, waitingForRequirements)
-                }
+        override fun onWaitingForRequirementsChanged(
+          downloadManager: DownloadManager,
+          waitingForRequirements: Boolean,
+        ) {
+          super.onWaitingForRequirementsChanged(downloadManager, waitingForRequirements)
+        }
 
-                override fun onDownloadsPausedChanged(
-                    downloadManager: DownloadManager,
-                    downloadsPaused: Boolean,
-                ) {
-                    super.onDownloadsPausedChanged(downloadManager, downloadsPaused)
-                }
+        override fun onDownloadsPausedChanged(
+          downloadManager: DownloadManager,
+          downloadsPaused: Boolean,
+        ) {
+          super.onDownloadsPausedChanged(downloadManager, downloadsPaused)
+        }
 
-                override fun onDownloadRemoved(
-                    downloadManager: DownloadManager,
-                    download: Download,
-                ) {
-                    super.onDownloadRemoved(downloadManager, download)
-                }
+        override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
+          super.onDownloadRemoved(downloadManager, download)
+        }
 
-                override fun onIdle(downloadManager: DownloadManager) {
-                    super.onIdle(downloadManager)
-                }
+        override fun onIdle(downloadManager: DownloadManager) {
+          super.onIdle(downloadManager)
+        }
 
-                override fun onRequirementsStateChanged(
-                    downloadManager: DownloadManager,
-                    requirements: Requirements,
-                    notMetRequirements: Int,
-                ) {
-                    super.onRequirementsStateChanged(
-                        downloadManager,
-                        requirements,
-                        notMetRequirements,
-                    )
-                }
+        override fun onRequirementsStateChanged(
+          downloadManager: DownloadManager,
+          requirements: Requirements,
+          notMetRequirements: Int,
+        ) {
+          super.onRequirementsStateChanged(
+            downloadManager,
+            requirements,
+            notMetRequirements,
+          )
+        }
+      },
+    )
+    downloadManager.requirements = Requirements(Requirements.NETWORK)
+    downloadManager.maxParallelDownloads = 3
+  }
+
+  private fun onDownloadComplete(exoDownloadRequest: DownloadRequest) {
+    coroutineScope.launch(Dispatchers.Default) {
+      val downloadRequest = withContext(downloadRequestsContext) {
+        downloadRequests[exoDownloadRequest.id]
+      } ?: return@launch
+
+      val mediaItem = exoDownloadRequest.toMediaItem()
+      val transformer = Transformer.Builder(context)
+        .build()
+      val outputFile = File(directoryHelper.videosDir, downloadRequest.finalFileName)
+
+      withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine<Result<File>> { continuation ->
+          transformer.addListener(
+            object : Transformer.Listener {
+              override fun onCompleted(composition: Composition, exportResult: ExportResult) {
+                continuation.resume(Result.success(outputFile))
+              }
+
+              override fun onError(
+                composition: Composition,
+                exportResult: ExportResult,
+                exportException: ExportException,
+              ) {
+                continuation.resume(Result.failure(exportException))
+              }
             },
-        )
-        downloadManager.requirements = Requirements(Requirements.NETWORK)
-        downloadManager.maxParallelDownloads = 3
-    }
-
-    private fun onDownloadComplete(exoDownloadRequest: DownloadRequest) {
-        coroutineScope.launch(Dispatchers.Default) {
-            val downloadRequest = withContext(downloadRequestsContext) {
-                downloadRequests[exoDownloadRequest.id]
-            } ?: return@launch
-
-            val mediaItem = exoDownloadRequest.toMediaItem()
-            val transformer = Transformer.Builder(context)
-                .build()
-            val outputFile = File(directoryHelper.videosDir, downloadRequest.finalFileName)
-
-            withContext(Dispatchers.Main) {
-                suspendCancellableCoroutine<Result<File>> { continuation ->
-                    transformer.addListener(
-                        object : Transformer.Listener {
-                            override fun onCompleted(
-                                composition: Composition,
-                                exportResult: ExportResult,
-                            ) {
-                                continuation.resume(Result.success(outputFile))
-                            }
-
-                            override fun onError(
-                                composition: Composition,
-                                exportResult: ExportResult,
-                                exportException: ExportException,
-                            ) {
-                                continuation.resume(Result.failure(exportException))
-                            }
-                        },
-                    )
-                    transformer.start(mediaItem, outputFile.absolutePath)
-                }
-            }
-
-            downloadRequest.resultFlow.emit(Result.success(outputFile))
+          )
+          transformer.start(mediaItem, outputFile.absolutePath)
         }
+      }
+
+      downloadRequest.resultFlow.emit(Result.success(outputFile))
     }
+  }
 
-    suspend fun downloadVideo(url: String): Result<File> {
-        val request = DownloadVideoRequest(
-            url = url,
-            finalFileName = UrlUtils.getFileName(url),
-            id = url,
-        )
+  suspend fun downloadVideo(url: String): Result<File> {
+    val request = DownloadVideoRequest(
+      url = url,
+      finalFileName = UrlUtils.getFileName(url),
+      id = url,
+    )
 
-        withContext(downloadRequestsContext) {
-            downloadRequests[request.id] = request
-        }
+    withContext(downloadRequestsContext) {
+      downloadRequests[request.id] = request
+    }
 
 //        withContext(Dispatchers.IO) {
 //            val downloadRequest = request.toDownloadRequest()
@@ -188,21 +182,21 @@ class VideoDownloadManager @Inject constructor(
 //            downloadManager.resumeDownloads()
 //        }
 
-        // Transformer appears to know how to download items by itself...
-        onDownloadComplete(request.toDownloadRequest())
+    // Transformer appears to know how to download items by itself...
+    onDownloadComplete(request.toDownloadRequest())
 
-        return request.resultFlow.first { it != null }
-            ?: Result.failure(RuntimeException("Unknown error"))
-    }
+    return request.resultFlow.first { it != null }
+      ?: Result.failure(RuntimeException("Unknown error"))
+  }
 
-    data class DownloadVideoRequest(
-        val url: String,
-        val finalFileName: String,
-        val id: DownloadId,
-    ) {
-        val resultFlow = MutableStateFlow<Result<File>?>(null)
-    }
+  data class DownloadVideoRequest(
+    val url: String,
+    val finalFileName: String,
+    val id: DownloadId,
+  ) {
+    val resultFlow = MutableStateFlow<Result<File>?>(null)
+  }
 
-    private fun DownloadVideoRequest.toDownloadRequest() =
-        DownloadRequest.Builder(id, Uri.parse(url)).build()
+  private fun DownloadVideoRequest.toDownloadRequest() =
+    DownloadRequest.Builder(id, Uri.parse(url)).build()
 }

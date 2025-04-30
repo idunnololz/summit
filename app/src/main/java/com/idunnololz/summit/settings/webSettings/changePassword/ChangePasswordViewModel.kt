@@ -10,29 +10,29 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ChangePasswordViewModel @Inject constructor(
-    private val lemmyClient: AccountAwareLemmyClient,
+  private val lemmyClient: AccountAwareLemmyClient,
 ) : ViewModel() {
 
-    val changePasswordState = StatefulLiveData<ChangePasswordResult>()
+  val changePasswordState = StatefulLiveData<ChangePasswordResult>()
 
-    fun changePassword(currentPassword: String, newPassword: String, newPasswordAgain: String) {
-        changePasswordState.setIsLoading()
+  fun changePassword(currentPassword: String, newPassword: String, newPasswordAgain: String) {
+    changePasswordState.setIsLoading()
 
-        viewModelScope.launch {
-            lemmyClient
-                .changePassword(
-                    newPassword = newPassword,
-                    newPasswordVerify = newPasswordAgain,
-                    oldPassword = currentPassword,
-                )
-                .onSuccess {
-                    changePasswordState.postValue(ChangePasswordResult)
-                }
-                .onFailure {
-                    changePasswordState.postError(it)
-                }
+    viewModelScope.launch {
+      lemmyClient
+        .changePassword(
+          newPassword = newPassword,
+          newPasswordVerify = newPasswordAgain,
+          oldPassword = currentPassword,
+        )
+        .onSuccess {
+          changePasswordState.postValue(ChangePasswordResult)
+        }
+        .onFailure {
+          changePasswordState.postError(it)
         }
     }
+  }
 
-    data object ChangePasswordResult
+  data object ChangePasswordResult
 }

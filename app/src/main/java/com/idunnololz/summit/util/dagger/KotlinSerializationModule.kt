@@ -10,15 +10,15 @@ import kotlinx.serialization.json.Json
 @Module
 @InstallIn(SingletonComponent::class)
 object KotlinSerializationModule {
-    @Provides
-    @Singleton
-    fun provideKotlinSerialization(): Json = json
+  @Provides
+  @Singleton
+  fun provideKotlinSerialization(): Json = json
 }
 
 val json: Json by lazy {
-    Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        explicitNulls = false
-    }
+  Json {
+    ignoreUnknownKeys = true
+    isLenient = true
+    explicitNulls = false
+  }
 }

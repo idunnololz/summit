@@ -12,49 +12,49 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsCacheViewModel @Inject constructor(
-    private val directoryHelper: DirectoryHelper,
+  private val directoryHelper: DirectoryHelper,
 ) : ViewModel() {
 
-    data class DataModel(
-        val cacheTotalSizeBytes: Long,
-        val imagesSizeBytes: Long,
-        val videosSizeBytes: Long,
-        val cacheMediaSizeBytes: Long,
-        val cacheNetworkCacheSizeBytes: Long,
-    ) {
+  data class DataModel(
+    val cacheTotalSizeBytes: Long,
+    val imagesSizeBytes: Long,
+    val videosSizeBytes: Long,
+    val cacheMediaSizeBytes: Long,
+    val cacheNetworkCacheSizeBytes: Long,
+  ) {
 
-        val cacheOtherSizeBytes: Long
-            get() = cacheTotalSizeBytes -
-                cacheMediaSizeBytes -
-                cacheNetworkCacheSizeBytes
+    val cacheOtherSizeBytes: Long
+      get() = cacheTotalSizeBytes -
+        cacheMediaSizeBytes -
+        cacheNetworkCacheSizeBytes
+  }
+
+  val dataModel = StatefulLiveData<DataModel>()
+
+  fun generateDataModel() {
+    dataModel.setIsLoading()
+
+    viewModelScope.launch {
+      val fileOrFolderToSize = mutableMapOf<File, Long>()
+
+      val mediaCacheDir = File(directoryHelper.cacheDir, "image_cache")
+      val imageDirSize = Utils.getSizeOfFile(directoryHelper.imagesDir)
+      val videoDirSize = Utils.getSizeOfFile(directoryHelper.videoCacheDir)
+
+      directoryHelper.cacheDir.listFiles()?.forEach {
+        fileOrFolderToSize[it] = Utils.getSizeOfFile(it)
+      }
+
+      dataModel.postValue(
+        DataModel(
+          cacheTotalSizeBytes = fileOrFolderToSize.values.sum(),
+          imagesSizeBytes = imageDirSize,
+          videosSizeBytes = videoDirSize,
+          cacheMediaSizeBytes = fileOrFolderToSize[mediaCacheDir] ?: 0,
+          cacheNetworkCacheSizeBytes =
+          fileOrFolderToSize[directoryHelper.okHttpCacheDir] ?: 0,
+        ),
+      )
     }
-
-    val dataModel = StatefulLiveData<DataModel>()
-
-    fun generateDataModel() {
-        dataModel.setIsLoading()
-
-        viewModelScope.launch {
-            val fileOrFolderToSize = mutableMapOf<File, Long>()
-
-            val mediaCacheDir = File(directoryHelper.cacheDir, "image_cache")
-            val imageDirSize = Utils.getSizeOfFile(directoryHelper.imagesDir)
-            val videoDirSize = Utils.getSizeOfFile(directoryHelper.videoCacheDir)
-
-            directoryHelper.cacheDir.listFiles()?.forEach {
-                fileOrFolderToSize[it] = Utils.getSizeOfFile(it)
-            }
-
-            dataModel.postValue(
-                DataModel(
-                    cacheTotalSizeBytes = fileOrFolderToSize.values.sum(),
-                    imagesSizeBytes = imageDirSize,
-                    videosSizeBytes = videoDirSize,
-                    cacheMediaSizeBytes = fileOrFolderToSize[mediaCacheDir] ?: 0,
-                    cacheNetworkCacheSizeBytes =
-                    fileOrFolderToSize[directoryHelper.okHttpCacheDir] ?: 0,
-                ),
-            )
-        }
-    }
+  }
 }

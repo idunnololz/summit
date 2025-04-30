@@ -14,66 +14,66 @@ import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 
 class ReactiveImageView : AppCompatImageView {
-    private val isRipple = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-    private var drawOverlay = false
-    private lateinit var paint: Paint
+  private val isRipple = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+  private var drawOverlay = false
+  private lateinit var paint: Paint
 
-    constructor(context: Context) : super(context) {
-        init()
+  constructor(context: Context) : super(context) {
+    init()
+  }
+
+  constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+    init()
+  }
+
+  constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+    context,
+    attrs,
+    defStyleAttr,
+  ) {
+    init()
+  }
+
+  @SuppressLint("NewApi")
+  private fun init() {
+    paint = Paint().apply {
+      color = ContextCompat.getColor(context, R.color.white50)
     }
 
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init()
+    if (isRipple) {
+      foreground = RippleDrawable(
+        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white97)),
+        null,
+        null,
+      )
     }
+  }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr,
-    ) {
-        init()
-    }
-
-    @SuppressLint("NewApi")
-    private fun init() {
-        paint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.white50)
+  override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+    if (!isRipple && isClickable && drawable != null) {
+      when (event.action) {
+        MotionEvent.ACTION_DOWN -> {
+          drawOverlay = true
+          invalidate()
         }
-
-        if (isRipple) {
-            foreground = RippleDrawable(
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white97)),
-                null,
-                null,
-            )
+        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+          drawOverlay = false
+          invalidate()
         }
+      }
     }
 
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (!isRipple && isClickable && drawable != null) {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    drawOverlay = true
-                    invalidate()
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    drawOverlay = false
-                    invalidate()
-                }
-            }
-        }
+    return super.dispatchTouchEvent(event)
+  }
 
-        return super.dispatchTouchEvent(event)
+  override fun onDraw(canvas: Canvas) {
+    super.onDraw(canvas)
+
+    if (!canvas.isHardwareAccelerated) {
+      return
     }
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-
-        if (!canvas.isHardwareAccelerated) {
-            return
-        }
-        if (drawOverlay) {
-            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
-        }
+    if (drawOverlay) {
+      canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
     }
+  }
 }

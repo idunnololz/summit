@@ -14,57 +14,57 @@ import javax.inject.Singleton
 
 @Singleton
 class PostPrefetcher @Inject constructor(
-    coroutineScopeFactory: CoroutineScopeFactory,
-    private val apiClientFactory: AccountAwareLemmyClient.Factory,
+  coroutineScopeFactory: CoroutineScopeFactory,
+  private val apiClientFactory: AccountAwareLemmyClient.Factory,
 ) {
-    companion object {
-        private const val TAG = "PostPrefetcher"
-    }
+  companion object {
+    private const val TAG = "PostPrefetcher"
+  }
 
-    suspend fun prefetchPosts(
-        postOrCommentRefs: List<Either<PostRef, CommentRef>>,
-        sortOrder: CommentSortType,
-        maxDepth: Int?,
-        account: Account?,
-        onProgress: suspend (count: Int, maxCount: Int) -> Unit,
-    ) {
-        var count = 0
-        for (postOrCommentRef in postOrCommentRefs) {
-            Log.d(TAG, "Prefetching post $postOrCommentRef")
-            val apiClient = apiClientFactory.create()
-            apiClient.changeInstance(
-                postOrCommentRef.fold(
-                    { it.instance },
-                    { it.instance },
-                ),
+  suspend fun prefetchPosts(
+    postOrCommentRefs: List<Either<PostRef, CommentRef>>,
+    sortOrder: CommentSortType,
+    maxDepth: Int?,
+    account: Account?,
+    onProgress: suspend (count: Int, maxCount: Int) -> Unit,
+  ) {
+    var count = 0
+    for (postOrCommentRef in postOrCommentRefs) {
+      Log.d(TAG, "Prefetching post $postOrCommentRef")
+      val apiClient = apiClientFactory.create()
+      apiClient.changeInstance(
+        postOrCommentRef.fold(
+          { it.instance },
+          { it.instance },
+        ),
+      )
+      val commentsFetcher = CommentsFetcher(apiClient)
+
+      postOrCommentRef
+        .fold(
+          {
+            commentsFetcher.fetchCommentsWithRetry(
+              id = Either.Left(it.id),
+              sort = sortOrder,
+              maxDepth = maxDepth,
+              force = false,
+              account = account,
             )
-            val commentsFetcher = CommentsFetcher(apiClient)
+          },
+          {
+            commentsFetcher.fetchCommentsWithRetry(
+              id = Either.Right(it.id),
+              sort = sortOrder,
+              maxDepth = maxDepth,
+              force = false,
+              account = account,
+            )
+          },
+        )
 
-            postOrCommentRef
-                .fold(
-                    {
-                        commentsFetcher.fetchCommentsWithRetry(
-                            id = Either.Left(it.id),
-                            sort = sortOrder,
-                            maxDepth = maxDepth,
-                            force = false,
-                            account = account,
-                        )
-                    },
-                    {
-                        commentsFetcher.fetchCommentsWithRetry(
-                            id = Either.Right(it.id),
-                            sort = sortOrder,
-                            maxDepth = maxDepth,
-                            force = false,
-                            account = account,
-                        )
-                    },
-                )
+      count++
 
-            count++
-
-            onProgress(count, postOrCommentRefs.size)
-        }
+      onProgress(count, postOrCommentRefs.size)
     }
+  }
 }

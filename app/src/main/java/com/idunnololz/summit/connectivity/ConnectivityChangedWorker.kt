@@ -11,20 +11,20 @@ import dagger.assisted.AssistedInject
 
 @HiltWorker
 class ConnectivityChangedWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val pendingActionsManager: PendingActionsManager,
+  @Assisted appContext: Context,
+  @Assisted workerParams: WorkerParameters,
+  private val pendingActionsManager: PendingActionsManager,
 ) : Worker(appContext, workerParams) {
 
-    companion object {
-        private const val TAG = "ConnectivityChangedWork"
-    }
+  companion object {
+    private const val TAG = "ConnectivityChangedWork"
+  }
 
-    override fun doWork(): Result {
-        Log.d(TAG, "Connectivity change detected!")
+  override fun doWork(): Result {
+    Log.d(TAG, "Connectivity change detected!")
 
-        pendingActionsManager.executePendingActionsIfNeeded()
+    pendingActionsManager.executePendingActionsIfNeeded()
 
-        return Result.success()
-    }
+    return Result.success()
+  }
 }
