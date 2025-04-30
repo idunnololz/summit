@@ -90,6 +90,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
+import com.idunnololz.summit.util.PreferenceUtils.KEY_POSTS_IN_FEED_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FEED_SHOW_SCROLL_BAR
@@ -525,6 +526,8 @@ class Preferences(
         by jsonPreference(KEY_POST_QUICK_ACTIONS) { null }
     var commentQuickActions: CommentQuickActionsSettings?
         by jsonPreference(KEY_COMMENT_QUICK_ACTIONS) { null }
+    var postsInFeedQuickActions: PostsInFeedQuickActionsSettings?
+        by jsonPreference(KEY_POSTS_IN_FEED_QUICK_ACTIONS) { null }
 
     var globalLayoutMode: GlobalLayoutMode
         by intPreference(KEY_GLOBAL_LAYOUT_MODE, GlobalLayoutModes.Auto)

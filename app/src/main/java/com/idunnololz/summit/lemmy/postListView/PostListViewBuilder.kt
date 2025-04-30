@@ -9,10 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
@@ -24,6 +27,7 @@ import androidx.viewbinding.ViewBinding
 import coil3.dispose
 import coil3.load
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -62,6 +66,18 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PostQuickActionIds.CommunityInfo
+import com.idunnololz.summit.preferences.PostQuickActionIds.CrossPost
+import com.idunnololz.summit.preferences.PostQuickActionIds.DetailedView
+import com.idunnololz.summit.preferences.PostQuickActionIds.Reply
+import com.idunnololz.summit.preferences.PostQuickActionIds.Save
+import com.idunnololz.summit.preferences.PostQuickActionIds.Share
+import com.idunnololz.summit.preferences.PostQuickActionIds.ShareSourceLink
+import com.idunnololz.summit.preferences.PostQuickActionIds.TakeScreenshot
+import com.idunnololz.summit.preferences.PostQuickActionIds.ViewSource
+import com.idunnololz.summit.preferences.PostQuickActionIds.Voting
+import com.idunnololz.summit.preferences.PostQuickActionsSettings
+import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
@@ -71,6 +87,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
+import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.getErrorDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
@@ -150,6 +167,9 @@ class PostListViewBuilder @Inject constructor(
     private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
     private var hapticsOnActions: Boolean = preferences.hapticsOnActions
     private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
+    var postsInFeedQuickActions = preferences.postsInFeedQuickActions
+        ?: PostsInFeedQuickActionsSettings()
+    private val paddingIcon = Utils.convertDpToPixel(12f).toInt()
 
     private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -204,6 +224,8 @@ class PostListViewBuilder @Inject constructor(
         hapticsOnActions = preferences.hapticsOnActions
         upvoteColor = preferences.upvoteColor
         downvoteColor = preferences.downvoteColor
+        postsInFeedQuickActions = preferences.postsInFeedQuickActions
+            ?: PostsInFeedQuickActionsSettings()
     }
 
     /**
@@ -253,6 +275,7 @@ class PostListViewBuilder @Inject constructor(
             linkContext: LinkContext,
         ) -> Unit,
         onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
+        onPostActionClick: (PostView, actionId: Int) -> Unit,
     ) {
         if (!isExpanded && !holder.layoutShowsFullContent) {
             recycle(holder, cancelFetch = false)
@@ -267,7 +290,9 @@ class PostListViewBuilder @Inject constructor(
         val useMultilineHeader = showCommunityIcon
 
         with(holder) {
-            if (holder.state.preferUpAndDownVotes != showUpAndDownVotes) {
+            if (holder.state.preferUpAndDownVotes != showUpAndDownVotes ||
+                holder.state.postsInFeedQuickActions != postsInFeedQuickActions ||
+                postsInFeedQuickActions.enabled) {
                 when (val rb = rawBinding) {
                     is ListingItemCompactBinding -> {
                         val downvoteCount = TextView(
@@ -300,13 +325,25 @@ class PostListViewBuilder @Inject constructor(
                         rb.contentView.addView(downvoteCount)
                     }
                     is ListingItemListBinding -> {
-                        ensureActionButtons(rb.contentView, leftHandMode)
+                        ensureActionButtons(
+                            root = rb.contentView,
+                            leftHandMode = leftHandMode,
+                            isSaved = postView.saved,
+                        )
                     }
                     is ListingItemListWithCardsBinding -> {
-                        ensureActionButtons(rb.constraintLayout, leftHandMode)
+                        ensureActionButtons(
+                            rb.constraintLayout,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                     }
                     is ListingItemCardBinding -> {
-                        ensureActionButtons(rb.constraintLayout, leftHandMode)
+                        ensureActionButtons(
+                            rb.constraintLayout,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         rb.bottomBarrier.referencedIds = intArrayOf(commentButton!!.id)
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.title
@@ -315,7 +352,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemCard2Binding -> {
-                        ensureActionButtons(rb.constraintLayout, leftHandMode)
+                        ensureActionButtons(
+                            rb.constraintLayout,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.image
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -323,7 +364,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemCard3Binding -> {
-                        ensureActionButtons(rb.constraintLayout, leftHandMode)
+                        ensureActionButtons(
+                            rb.constraintLayout,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.header_container
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -331,7 +376,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemLargeListBinding -> {
-                        ensureActionButtons(rb.contentView, leftHandMode)
+                        ensureActionButtons(
+                            rb.contentView,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.image
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -339,7 +388,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemFullBinding -> {
-                        ensureActionButtons(rb.contentView, leftHandMode)
+                        ensureActionButtons(
+                            rb.contentView,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -347,7 +400,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is ListingItemFullWithCardsBinding -> {
-                        ensureActionButtons(rb.contentView, leftHandMode)
+                        ensureActionButtons(
+                            rb.contentView,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -355,7 +412,11 @@ class PostListViewBuilder @Inject constructor(
                         }
                     }
                     is SearchResultPostItemBinding -> {
-                        ensureActionButtons(rb.contentView, leftHandMode)
+                        ensureActionButtons(
+                            rb.contentView,
+                            leftHandMode,
+                            isSaved = postView.saved,
+                        )
                         commentButton!!.updateLayoutParams<ConstraintLayout.LayoutParams> {
                             topToBottom = R.id.bottom_barrier
                             bottomToBottom = ConstraintLayout.LayoutParams.UNSET
@@ -365,6 +426,19 @@ class PostListViewBuilder @Inject constructor(
                 }
 
                 holder.state.preferUpAndDownVotes = showUpAndDownVotes
+                holder.state.postsInFeedQuickActions = postsInFeedQuickActions
+            }
+
+            holder.actionButtons?.forEach {
+                it.setOnClickListener {
+                    onPostActionClick(postView, it.id)
+                    if (preferences.hapticsOnActions) {
+                        it.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
+                    }
+                }
+                if (it.id == R.id.pa_reply) {
+                    it.isEnabled = !postView.post.locked
+                }
             }
 
             if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
@@ -1306,187 +1380,511 @@ class PostListViewBuilder @Inject constructor(
         }
     }
 
-    private fun ListingItemViewHolder.ensureActionButtons(root: ViewGroup, leftHandMode: Boolean) {
+    private fun ListingItemViewHolder.ensureActionButtons(
+        root: ConstraintLayout,
+        leftHandMode: Boolean,
+        isSaved: Boolean,
+    ) {
         root.removeView(commentButton)
-        root.removeView(upvoteButton)
-        root.removeView(downvoteButton)
-        root.removeView(upvoteCount)
 
-        if (showUpAndDownVotes) {
-            val commentButton = MaterialButton(
-                context,
-                null,
-                R.attr.summitTextButton,
+        quickActionViews?.forEach {
+            root.removeView(it)
+        }
+
+        val commentButton = MaterialButton(
+            context,
+            null,
+            R.attr.summitTextButton,
+        ).apply {
+            id = View.generateViewId()
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
             ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    if (leftHandMode) {
-                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                    } else {
-                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                    }
-                    topToBottom = R.id.bottom_barrier
-                }
-                setIconResource(R.drawable.outline_mode_comment_24)
-                compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
-                includeFontPadding = false
-                setPadding(context.getDimen(R.dimen.padding))
-            }.also {
-                commentButton = it
-                commentText = it
-            }
-            root.addView(commentButton)
-
-            val buttons = makeUpAndDownVoteButtons(context)
-
-            if (leftHandMode) {
-                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
-
-                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                    marginStart = context.getDimen(R.dimen.padding)
-                }
-                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
-
-                    startToEnd = buttons.upvoteButton.id
-                }
-            } else {
-                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
-
+                if (leftHandMode) {
                     endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                    marginEnd = context.getDimen(R.dimen.padding)
+                } else {
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
                 }
-                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
+                topToBottom = R.id.bottom_barrier
+            }
+            setIconResource(R.drawable.outline_mode_comment_24)
+            compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
+            includeFontPadding = false
+            setPadding(context.getDimen(R.dimen.padding))
+        }.also {
+            commentButton = it
+            commentText = it
+        }
+        root.addView(commentButton)
 
-                    endToStart = buttons.downvoteButton.id
+        if (postsInFeedQuickActions.enabled) {
+            var endId = ConstraintLayout.LayoutParams.PARENT_ID
+            val views = mutableListOf<View>()
+            val actionViews = mutableListOf<ImageView>()
+
+            postsInFeedQuickActions.actions.forEachIndexed { index, action ->
+                if (index > 0) {
+                    views.add(
+                        MaterialDivider(
+                            context,
+                        ).apply {
+                            id = View.generateViewId()
+                            layoutParams = ConstraintLayout.LayoutParams(
+                                Utils.convertDpToPixel(1f).toInt(),
+                                0,
+                            ).apply {
+                                topToTop = commentButton.id
+                                bottomToBottom = commentButton.id
+
+                                topMargin = padding
+                                bottomMargin = padding
+
+                                if (leftHandMode) {
+                                    startToEnd = endId
+                                } else {
+                                    endToStart = endId
+                                }
+                            }
+
+                            root.addView(this)
+                        }
+                    )
+                }
+
+                when (action) {
+                    Voting -> {
+                        if (showUpAndDownVotes) {
+                            val buttons = makeUpAndDownVoteButtons(context)
+
+                            if (leftHandMode) {
+                                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+
+                                    startToEnd = endId
+                                    marginStart = context.getDimen(R.dimen.padding)
+                                }
+                                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+
+                                    startToEnd = buttons.upvoteButton.id
+                                }
+                            } else {
+                                buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+
+                                    endToStart = endId
+                                    marginEnd = context.getDimen(R.dimen.padding)
+                                }
+                                buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+
+                                    endToStart = buttons.downvoteButton.id
+                                }
+                            }
+                            root.addView(buttons.upvoteButton)
+                            root.addView(buttons.downvoteButton)
+
+                            upvoteButton = buttons.upvoteButton
+                            upvoteCount = buttons.upvoteButton
+                            downvoteButton = buttons.downvoteButton
+                            downvoteCount = buttons.downvoteButton
+
+                            views.add(buttons.upvoteButton)
+                            views.add(buttons.downvoteButton)
+                        } else {
+                            val button1 = ImageView(
+                                context,
+                            ).apply {
+                                id = View.generateViewId()
+                                layoutParams = ConstraintLayout.LayoutParams(
+                                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ).apply {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+                                    if (leftHandMode) {
+                                        startToEnd = endId
+                                        marginStart = context.getDimen(R.dimen.padding_quarter)
+                                    } else {
+                                        endToStart = endId
+                                        marginEnd = context.getDimen(R.dimen.padding_quarter)
+                                    }
+                                }
+                                setPadding(context.getDimen(R.dimen.padding_half))
+                                setBackgroundResource(selectableItemBackgroundBorderless)
+                            }
+                            root.addView(button1)
+
+                            val upvoteCount = TextView(
+                                context,
+                            ).apply {
+                                id = View.generateViewId()
+                                layoutParams = ConstraintLayout.LayoutParams(
+                                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ).apply {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+
+                                    if (leftHandMode) {
+                                        startToEnd = button1.id
+                                    } else {
+                                        endToStart = button1.id
+                                    }
+                                }
+                            }.also {
+                                upvoteCount = it
+                            }
+                            root.addView(upvoteCount)
+
+                            val button2 = ImageView(
+                                context,
+                            ).apply {
+                                id = View.generateViewId()
+                                layoutParams = ConstraintLayout.LayoutParams(
+                                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                                ).apply {
+                                    topToTop = commentButton.id
+                                    bottomToBottom = commentButton.id
+
+                                    if (leftHandMode) {
+                                        startToEnd = upvoteCount.id
+                                    } else {
+                                        endToStart = upvoteCount.id
+                                    }
+                                }
+                                setPadding(context.getDimen(R.dimen.padding_half))
+                                setBackgroundResource(selectableItemBackgroundBorderless)
+                            }
+                            root.addView(button2)
+
+                            if (leftHandMode) {
+                                button1.setImageResource(R.drawable.baseline_arrow_upward_24)
+                                button2.setImageResource(R.drawable.baseline_arrow_downward_24)
+
+                                upvoteButton = button1
+                                downvoteButton = button2
+                            } else {
+                                button2.setImageResource(R.drawable.baseline_arrow_upward_24)
+                                button1.setImageResource(R.drawable.baseline_arrow_downward_24)
+
+                                upvoteButton = button2
+                                downvoteButton = button1
+                            }
+
+                            quickActionViews = listOf(
+                                button1,
+                                button2,
+                                upvoteCount,
+                            )
+                            views.add(button1)
+                            views.add(upvoteCount)
+                            views.add(button2)
+                        }
+                    }
+                    Reply -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_reply,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.baseline_add_comment_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    Save -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_save_toggle,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            if (isSaved) {
+                                setImageResource(R.drawable.baseline_bookmark_24)
+                            } else {
+                                setImageResource(R.drawable.outline_bookmark_border_24)
+                            }
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    Share -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_share,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.baseline_share_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    TakeScreenshot -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_screenshot,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.baseline_screenshot_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    CrossPost -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_cross_post,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.baseline_content_copy_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    ShareSourceLink -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_share_fediverse_link,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.ic_fediverse_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    CommunityInfo -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_community_info,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.ic_community_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    ViewSource -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_view_source,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.baseline_code_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                    DetailedView -> {
+                        makePostsInFeedActionButton(
+                            idRes = R.id.pa_detailed_view,
+                            endId = endId,
+                            alignmentViewId = commentButton.id
+                        ).apply {
+                            setImageResource(R.drawable.baseline_open_in_full_24)
+                            root.addView(this)
+                            views.add(this)
+                            actionViews.add(this)
+                        }
+                    }
+                }
+
+                endId = views.last().id
+            }
+
+            if (views.isNotEmpty()) {
+                views[0].updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    if (leftHandMode) {
+                        startToEnd = ConstraintLayout.LayoutParams.UNSET
+                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    } else {
+                        endToStart = ConstraintLayout.LayoutParams.UNSET
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
                 }
             }
-            root.addView(buttons.upvoteButton)
-            root.addView(buttons.downvoteButton)
-
-            upvoteButton = buttons.upvoteButton
-            upvoteCount = buttons.upvoteButton
-            downvoteButton = buttons.downvoteButton
-            downvoteCount = buttons.downvoteButton
+            quickActionViews = views
+            actionButtons = actionViews
         } else {
-            val commentButton = MaterialButton(
-                context,
-                null,
-                R.attr.summitTextButton,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    if (leftHandMode) {
-                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                    } else {
+            if (showUpAndDownVotes) {
+                val buttons = makeUpAndDownVoteButtons(context)
+
+                if (leftHandMode) {
+                    buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
+
                         startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        marginStart = context.getDimen(R.dimen.padding)
                     }
-                    topToBottom = R.id.bottom_barrier
-                }
-                setIconResource(R.drawable.outline_mode_comment_24)
-                compoundDrawablePadding = context.getDimen(R.dimen.padding_half)
-                includeFontPadding = false
-                setPadding(context.getDimen(R.dimen.padding))
-            }.also {
-                commentButton = it
-                commentText = it
-            }
-            root.addView(commentButton)
+                    buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
 
-            val button1 = ImageView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
-                    if (leftHandMode) {
-                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                        marginStart = context.getDimen(R.dimen.padding_quarter)
-                    } else {
+                        startToEnd = buttons.upvoteButton.id
+                    }
+                } else {
+                    buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
+
                         endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                        marginEnd = context.getDimen(R.dimen.padding_quarter)
+                        marginEnd = context.getDimen(R.dimen.padding)
+                    }
+                    buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
+
+                        endToStart = buttons.downvoteButton.id
                     }
                 }
-                setPadding(context.getDimen(R.dimen.padding_half))
-                setBackgroundResource(selectableItemBackgroundBorderless)
-            }
-            root.addView(button1)
+                root.addView(buttons.upvoteButton)
+                root.addView(buttons.downvoteButton)
 
-            val upvoteCount = TextView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
+                upvoteButton = buttons.upvoteButton
+                upvoteCount = buttons.upvoteButton
+                downvoteButton = buttons.downvoteButton
+                downvoteCount = buttons.downvoteButton
 
-                    if (leftHandMode) {
-                        startToEnd = button1.id
-                    } else {
-                        endToStart = button1.id
-                    }
-                }
-            }.also {
-                upvoteCount = it
-            }
-            root.addView(upvoteCount)
-
-            val button2 = ImageView(
-                context,
-            ).apply {
-                id = View.generateViewId()
-                layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ).apply {
-                    topToTop = commentButton.id
-                    bottomToBottom = commentButton.id
-
-                    if (leftHandMode) {
-                        startToEnd = upvoteCount.id
-                    } else {
-                        endToStart = upvoteCount.id
-                    }
-                }
-                setPadding(context.getDimen(R.dimen.padding_half))
-                setBackgroundResource(selectableItemBackgroundBorderless)
-            }
-            root.addView(button2)
-
-            if (leftHandMode) {
-                button1.setImageResource(R.drawable.baseline_arrow_upward_24)
-                button2.setImageResource(R.drawable.baseline_arrow_downward_24)
-
-                upvoteButton = button1
-                downvoteButton = button2
+                quickActionViews = listOf(
+                    buttons.upvoteButton,
+                    buttons.downvoteButton
+                )
             } else {
-                button2.setImageResource(R.drawable.baseline_arrow_upward_24)
-                button1.setImageResource(R.drawable.baseline_arrow_downward_24)
+                val button1 = ImageView(
+                    context,
+                ).apply {
+                    id = View.generateViewId()
+                    layoutParams = ConstraintLayout.LayoutParams(
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ).apply {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
+                        if (leftHandMode) {
+                            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                            marginStart = context.getDimen(R.dimen.padding_quarter)
+                        } else {
+                            endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                            marginEnd = context.getDimen(R.dimen.padding_quarter)
+                        }
+                    }
+                    setPadding(context.getDimen(R.dimen.padding_half))
+                    setBackgroundResource(selectableItemBackgroundBorderless)
+                }
+                root.addView(button1)
 
-                upvoteButton = button2
-                downvoteButton = button1
+                val upvoteCount = TextView(
+                    context,
+                ).apply {
+                    id = View.generateViewId()
+                    layoutParams = ConstraintLayout.LayoutParams(
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ).apply {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
+
+                        if (leftHandMode) {
+                            startToEnd = button1.id
+                        } else {
+                            endToStart = button1.id
+                        }
+                    }
+                }.also {
+                    upvoteCount = it
+                }
+                root.addView(upvoteCount)
+
+                val button2 = ImageView(
+                    context,
+                ).apply {
+                    id = View.generateViewId()
+                    layoutParams = ConstraintLayout.LayoutParams(
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ).apply {
+                        topToTop = commentButton.id
+                        bottomToBottom = commentButton.id
+
+                        if (leftHandMode) {
+                            startToEnd = upvoteCount.id
+                        } else {
+                            endToStart = upvoteCount.id
+                        }
+                    }
+                    setPadding(context.getDimen(R.dimen.padding_half))
+                    setBackgroundResource(selectableItemBackgroundBorderless)
+                }
+                root.addView(button2)
+
+                if (leftHandMode) {
+                    button1.setImageResource(R.drawable.baseline_arrow_upward_24)
+                    button2.setImageResource(R.drawable.baseline_arrow_downward_24)
+
+                    upvoteButton = button1
+                    downvoteButton = button2
+                } else {
+                    button2.setImageResource(R.drawable.baseline_arrow_upward_24)
+                    button1.setImageResource(R.drawable.baseline_arrow_downward_24)
+
+                    upvoteButton = button2
+                    downvoteButton = button1
+                }
+
+                quickActionViews = listOf(
+                    button1,
+                    button2,
+                    upvoteCount,
+                )
             }
         }
+    }
+
+    private fun makePostsInFeedActionButton(
+        @IdRes idRes: Int,
+        @IdRes endId: Int,
+        @IdRes alignmentViewId: Int,
+    ) = ImageView(
+        context,
+    ).apply {
+        id = idRes
+        layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+        ).apply {
+            topToTop = alignmentViewId
+            bottomToBottom = alignmentViewId
+
+            if (leftHandMode) {
+                startToEnd = endId
+                marginStart = context.getDimen(R.dimen.padding_quarter)
+            } else {
+                endToStart = endId
+                marginEnd = context.getDimen(R.dimen.padding_quarter)
+            }
+        }
+        setPadding(
+            paddingIcon,
+            paddingHalf,
+            paddingIcon,
+            paddingHalf,
+        )
+        setBackgroundResource(selectableItemBackgroundBorderless)
+        imageTintList = ColorStateList.valueOf(normalTextColor)
     }
 
     fun loadImage(

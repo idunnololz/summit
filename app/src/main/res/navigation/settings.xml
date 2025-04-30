@@ -280,6 +280,9 @@
             app:exitAnim="@animator/fade_out"
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingsContentFragment_to_postsInFeedQuickActionsFragment"
+            app:destination="@id/postsInFeedQuickActionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFilterListFragment"
@@ -515,4 +518,8 @@
         android:id="@+id/adminPresetsFragment"
         android:name="com.idunnololz.summit.presets.AdminPresetsFragment"
         android:label="AdminPresetsFragment" />
+    <fragment
+        android:id="@+id/postsInFeedQuickActionsFragment"
+        android:name="com.idunnololz.summit.settings.postsInFeedQuickActions.PostsInFeedQuickActionsFragment"
+        android:label="PostsInFeedQuickActionsFragment" />
 </navigation>

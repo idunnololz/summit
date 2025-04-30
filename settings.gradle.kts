@@ -18,3 +18,4 @@ pluginManagement {
         mavenCentral()
     }
 }
+include(":tools")

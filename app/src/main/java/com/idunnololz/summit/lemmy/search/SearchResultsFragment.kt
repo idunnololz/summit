@@ -664,6 +664,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                     onLinkLongClick = { accountId, url, text ->
                         onLinkLongClick(url, text)
                     },
+                    onPostActionClick = onPostActionClick,
                 )
             }
             addItemType(Item.UserItem::class, UserItemBinding::inflate) { item, b, _ ->

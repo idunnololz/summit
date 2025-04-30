@@ -949,6 +949,11 @@ class PostsFeedSettings @Inject constructor(
         context.getString(R.string.use_posts_feed_header_desc),
         relatedKeys = listOf(KEY_USE_POSTS_FEED_HEADER),
     )
+    val customizePostsInFeedQuickActions = BasicSettingItem(
+        null,
+        context.getString(R.string.customize_post_in_post_feed_quick_actions),
+        context.getString(R.string.customize_post_in_post_feed_quick_actions_desc),
+    )
 
     override val allSettings: List<SettingItem> = listOf(
         infinity,
@@ -973,6 +978,7 @@ class PostsFeedSettings @Inject constructor(
         homePage,
         postFeedShowScrollBar,
         hideDuplicatePostsOnRead,
+        customizePostsInFeedQuickActions,
     )
 }
 
@@ -1791,6 +1797,7 @@ class HapticSettings @Inject constructor(
 
     override val allSettings: List<SettingItem> = listOf(
         haptics,
+        moreHaptics,
     )
 }
 

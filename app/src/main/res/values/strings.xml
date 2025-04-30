@@ -2075,6 +2075,9 @@
     <string name="warn_pii_found_in_preset">Some values in the preset resemble PII (Personal Identifiable Information). Please review the issues found carefully before proceeding to avoid submitting sensitive information.</string>
 
     <string name="compose_post">Compose post</string>
+    <string name="customize_post_in_post_feed_quick_actions">Customize posts (in feed) quick actions</string>
+    <string name="customize_post_in_post_feed_quick_actions_desc">Change which actions appear under a post in the post feed.</string>
+    <string name="custom_post_in_feed_quick_actions">Custom post in feed quick actions</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

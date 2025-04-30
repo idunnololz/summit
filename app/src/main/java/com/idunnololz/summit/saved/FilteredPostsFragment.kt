@@ -17,6 +17,7 @@ import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
 import com.idunnololz.summit.lemmy.community.PostListAdapter
 import com.idunnololz.summit.lemmy.community.PostListEngineItem
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
@@ -159,6 +160,15 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
             },
             onLinkLongClick = { accountId, url, text ->
                 getMainActivity()?.showMoreLinkOptions(url, text)
+            },
+            onPostActionClick = { postView, actionId ->
+                createPostActionHandler(
+                    instance = viewModel.instance,
+                    accountId = null,
+                    postView = postView,
+                    moreActionsHelper = moreActionsHelper,
+                    fragmentManager = childFragmentManager,
+                )(actionId)
             },
         ).apply {
             alwaysRenderAsUnread = true

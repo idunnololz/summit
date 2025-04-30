@@ -16,6 +16,7 @@ import com.idunnololz.summit.databinding.ListingItemLargeListBinding
 import com.idunnololz.summit.databinding.ListingItemListBinding
 import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.databinding.SearchResultPostItemBinding
+import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.view.LemmyHeaderView
 
 class ListingItemViewHolder(
@@ -41,6 +42,8 @@ class ListingItemViewHolder(
     val linkText: TextView? = null,
     val linkIcon: View? = null,
     val linkOverlay: View? = null,
+    var quickActionViews: List<View>? = null,
+    var actionButtons: List<ImageView>? = null,
 ) : RecyclerView.ViewHolder(root) {
 
     data class State(
@@ -48,6 +51,7 @@ class ListingItemViewHolder(
         var preferFullSizeImages: Boolean = true,
         var preferTitleText: Boolean = false,
         var preferUpAndDownVotes: Boolean? = null,
+        var postsInFeedQuickActions: PostsInFeedQuickActionsSettings? = null,
     )
 
     var state = State()

@@ -22,6 +22,7 @@ import com.idunnololz.summit.databinding.ListingItemListWithCardsBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.defaultDimReadPosts
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.LemmyFakeModels
@@ -388,6 +389,7 @@ class SettingsViewTypeFragment :
             onHighlightComplete = {},
             onLinkClick = { _, _, _, _ -> },
             onLinkLongClick = { _, _, _ -> },
+            onPostActionClick = { _, _ -> },
         )
     }
 

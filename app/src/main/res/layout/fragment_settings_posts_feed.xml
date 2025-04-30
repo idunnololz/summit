@@ -47,12 +47,6 @@
                     style="@style/SettingsDivider"/>
 
                 <include
-                    android:id="@+id/infinity"
-                    layout="@layout/setting_item_on_off"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <include
                     android:id="@+id/mark_posts_as_read_on_scroll"
                     layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
@@ -141,6 +135,11 @@
                     layout="@layout/setting_item_on_off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/customize_posts_in_feed_quick_actions"
+                    layout="@layout/basic_setting_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/filters_title"
@@ -221,6 +220,12 @@
                     android:paddingBottom="@dimen/padding"
                     android:paddingTop="@dimen/padding_three"
                     style="@style/SettingHeaderStyle"/>
+
+                <include
+                    android:id="@+id/infinity"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <include
                     android:id="@+id/auto_load_more_posts"

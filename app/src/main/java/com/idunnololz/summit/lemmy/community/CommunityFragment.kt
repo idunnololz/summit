@@ -65,6 +65,7 @@ import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
+import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -86,6 +87,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.dialog.MakeOfflineDialogFragment
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
+import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
@@ -426,6 +428,15 @@ class CommunityFragment :
                 },
                 onLinkLongClick = { accountId, url, text ->
                     getMainActivity()?.showMoreLinkOptions(url, text)
+                },
+                onPostActionClick = { postView, actionId ->
+                    createPostActionHandler(
+                        instance = viewModel.apiInstance,
+                        accountId = null,
+                        postView = postView,
+                        moreActionsHelper = moreActionsHelper,
+                        fragmentManager = childFragmentManager,
+                    )(actionId)
                 },
             ).apply {
                 stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -1871,6 +1882,8 @@ class CommunityFragment :
         val newPostUiConfig = preferences.getPostInListUiConfig(currentLayout)
         val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
         val didLayoutChange = adapter?.layout != currentLayout
+        val didActionsChange =
+            postListViewBuilder.postsInFeedQuickActions != preferences.postsInFeedQuickActions
 
         if (didLayoutChange) {
             if (isBindingAvailable()) {
@@ -1882,7 +1895,12 @@ class CommunityFragment :
             postListViewBuilder.postUiConfig = newPostUiConfig
         }
 
-        if (didLayoutChange || didUiConfigChange) {
+        if (didActionsChange) {
+            postListViewBuilder.postsInFeedQuickActions = preferences.postsInFeedQuickActions
+                ?: PostsInFeedQuickActionsSettings()
+        }
+
+        if (didLayoutChange || didUiConfigChange || didActionsChange) {
             adapter?.layout = currentLayout
 
             // Need to manually call this in case the layout didn't change

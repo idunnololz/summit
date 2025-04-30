@@ -258,7 +258,6 @@ class SettingsPostsFeedFragment :
                 preferences.showNsfwPosts = it
             },
         )
-
         settings.viewImageOnSingleTap.bindTo(
             binding.viewImageOnSingleTap,
             { preferences.postListViewImageOnSingleTap },
@@ -266,7 +265,6 @@ class SettingsPostsFeedFragment :
                 preferences.postListViewImageOnSingleTap = it
             },
         )
-
         settings.lockBottomBar.bindTo(
             binding.lockBottomBar,
             { preferences.lockBottomBar },
@@ -360,6 +358,14 @@ class SettingsPostsFeedFragment :
             {
                 preferences.usePostsFeedHeader = it
             },
+        )
+        settings.customizePostsInFeedQuickActions.bindTo(
+            binding.customizePostsInFeedQuickActions,
+            {
+                val direction = SettingsPostsFeedFragmentDirections
+                    .actionSettingsContentFragmentToPostsInFeedQuickActionsFragment()
+                findNavController().navigateSafe(direction)
+            }
         )
     }
 

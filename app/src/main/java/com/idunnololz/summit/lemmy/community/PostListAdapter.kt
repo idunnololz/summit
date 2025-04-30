@@ -80,6 +80,7 @@ class PostListAdapter(
         linkContext: LinkContext,
     ) -> Unit,
     private val onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
+    private val onPostActionClick: (PostView, actionId: Int) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val inflater = LayoutInflater.from(context)
@@ -263,6 +264,9 @@ class PostListAdapter(
                         },
                         onLinkClick = onLinkClick,
                         onLinkLongClick = onLinkLongClick,
+                        onPostActionClick = { postView, actionId ->
+                            onPostActionClick(postView, actionId)
+                        },
                     )
                 }
             }
@@ -361,6 +365,9 @@ class PostListAdapter(
                     },
                     onLinkClick = onLinkClick,
                     onLinkLongClick = onLinkLongClick,
+                    onPostActionClick = { postView, actionId ->
+                        onPostActionClick(postView, actionId)
+                    },
                 )
                 h.root.setTag(R.id.post_item, true)
             }

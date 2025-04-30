@@ -8,7 +8,7 @@ hilt = "2.56.2"
 javaStringSimilarity = "2.0.0"
 kotlin = "2.1.20"
 kotlinxSerializationJson = "1.8.0"
-ksp = "2.1.20-1.0.31"
+ksp = "2.1.20-2.0.0"
 kotlinx = "1.10.1"
 navigation = "2.8.9"
 room = "2.7.1"
@@ -21,6 +21,9 @@ coil = "3.1.0"
 retrofit = "2.11.0"
 jetbrainsKotlinJvm = "2.0.21"
 commonmark = "0.13.0"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -107,6 +110,9 @@ hilt-compiler = { module = "androidx.hilt:hilt-compiler", version = "1.2.0" }
 commonmark = { module = "com.atlassian.commonmark:commonmark", version.ref = "commonmark"}
 commonmark-strikethrough = { module = "com.atlassian.commonmark:commonmark-ext-gfm-strikethrough", version.ref = "commonmark"}
 commonmark-table = { module = "com.atlassian.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark"}
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
