@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -68,12 +69,13 @@ class AccountManager @Inject constructor(
   }
 
   fun addAccountAndSetCurrent(account: Account) {
+    val fixedAccount = account.fix()
     coroutineScope.launch {
-      accountDao.insert(account)
-      accountDao.clearAndSetCurrent(account.id)
-      doSwitchAccountWork(account)
+      accountDao.insert(fixedAccount)
+      accountDao.clearAndSetCurrent(fixedAccount.id)
+      doSwitchAccountWork(fixedAccount)
 
-      _currentAccount.emit(account)
+      _currentAccount.emit(fixedAccount)
       updateNumAccounts()
     }
   }
@@ -134,7 +136,7 @@ class AccountManager @Inject constructor(
   }
 
   suspend fun getAccountById(id: Long): Account? {
-    return accountDao.getAccountById(id)
+    return accountDao.getAccountById(id)?.fix()
   }
 
   suspend fun getAccountByIdOrDefault(accountId: Long?): Account? = if (accountId == null) {
@@ -222,4 +224,4 @@ val StateFlow<GuestOrUserAccount?>.asAccount
 
 fun StateFlow<GuestOrUserAccount?>.asAccountLiveData() = this.asLiveData().map { it as? Account }
 
-private fun Account.fix() = copy(instance = instance.trim())
+private fun Account.fix() = copy(instance = instance.trim().lowercase(Locale.US))
