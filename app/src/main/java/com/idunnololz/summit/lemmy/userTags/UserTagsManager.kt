@@ -21,7 +21,8 @@ class UserTagsManager @Inject constructor(
 
   private val coroutineScope = coroutineScopeFactory.createConfined()
 
-  private var userTagsByName: Map<String, UserTagConfig> = mapOf()
+  private var userTagsByName: Map<String, UserTag> = mapOf()
+  private var recentTagsCache: List<UserTag>? = null
 
   val onChangedFlow = MutableSharedFlow<Unit>()
 
@@ -37,7 +38,7 @@ class UserTagsManager @Inject constructor(
     Log.d(TAG, "reload()")
 
     userTagsByName = dao.getAllUserTags()
-      .associate { it.actorId to it.tag }
+      .associate { it.actorId to it.toUserTag() }
   }
 
   fun addOrUpdateTag(personName: String, tag: String, fillColor: Int, strokeColor: Int) {
@@ -50,7 +51,7 @@ class UserTagsManager @Inject constructor(
     }
 
     coroutineScope.launch {
-      val entry = dao.getUserTag(personName).firstOrNull()
+      val entry = dao.getUserTagByName(personName).firstOrNull()
       val ts = System.currentTimeMillis()
 
       if (entry == null) {
@@ -65,6 +66,7 @@ class UserTagsManager @Inject constructor(
             ),
             createTs = ts,
             updateTs = ts,
+            usedTs = ts,
           ),
         )
       } else {
@@ -79,6 +81,7 @@ class UserTagsManager @Inject constructor(
             ),
             createTs = entry.createTs,
             updateTs = ts,
+            usedTs = ts,
           ),
         )
       }
@@ -87,19 +90,22 @@ class UserTagsManager @Inject constructor(
     }
   }
 
-  suspend fun getAllUserTags(): List<UserTagEntry> {
+  suspend fun getAllUserTagEntries(): List<UserTagEntry> {
     return coroutineScope.async {
       dao.getAllUserTags()
     }.await()
   }
 
   fun getUserTag(fullName: String): UserTagConfig? {
-    return userTagsByName[fullName.lowercase(Locale.US)]
+    return userTagsByName[fullName.lowercase(Locale.US)]?.config
   }
+
+  fun getUserTags() =
+    userTagsByName.values.toList()
 
   fun deleteTag(personName: String) {
     coroutineScope.launch {
-      dao.getUserTag(personName).forEach {
+      dao.getUserTagByName(personName).forEach {
         dao.delete(it)
       }
 
@@ -107,8 +113,45 @@ class UserTagsManager @Inject constructor(
     }
   }
 
+  fun onTagUsed(tag: UserTag) {
+    coroutineScope.launch {
+      dao.getUserTagById(tag.id).forEach {
+        dao.insertUserTag(it.copy(
+          usedTs = System.currentTimeMillis()
+        ))
+      }
+
+      onChanged()
+    }
+  }
+
+  suspend fun getRecentTags(): List<UserTag> {
+    val recentTagsCache = recentTagsCache
+    if (recentTagsCache != null) {
+      return recentTagsCache
+    }
+
+    val seenTags = mutableSetOf<UserTagConfig>()
+    val recent = coroutineScope.async {
+      dao.getRecentUserTags()
+        .mapNotNull {
+          if (seenTags.add(it.tag)) {
+            it.toUserTag()
+          } else {
+            null
+          }
+        }
+        .also {
+          this@UserTagsManager.recentTagsCache = it
+        }
+    }.await()
+
+    return recent
+  }
+
   private suspend fun onChanged() {
     reload()
+    recentTagsCache = null // clear the cache since it's probably out of date
 
     onChangedFlow.emit(Unit)
   }

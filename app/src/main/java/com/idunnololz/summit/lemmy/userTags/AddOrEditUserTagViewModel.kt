@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.R
+import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -73,8 +74,34 @@ class AddOrEditUserTagViewModel @Inject constructor(
   val isSubmitted = state.getLiveData<Boolean>("is_submitted")
 
   val model = MutableLiveData<Model>()
+  val recentTags = StatefulLiveData<List<UserTag>>()
 
-  fun loadUserTag(personName: String) {
+  init {
+    recentTags.setIsLoading()
+    viewModelScope.launch {
+      recentTags.postValue(userTagsManager.getRecentTags())
+    }
+  }
+
+  fun addTag() {
+    generateModel(validate = true)
+
+    val model = model.value ?: return
+
+    if (model.tagError != null || model.personNameError != null) {
+      return
+    }
+
+    userTagsManager.addOrUpdateTag(model.personName, tag, fillColor, strokeColor)
+    isSubmitted.value = true
+    generateModel()
+  }
+
+  fun deleteUserTag() {
+    userTagsManager.deleteTag(personName)
+  }
+
+  private fun loadUserTag(personName: String) {
     viewModelScope.launch {
       val userTag = userTagsManager.getUserTag(personName) ?: return@launch
 
@@ -88,7 +115,7 @@ class AddOrEditUserTagViewModel @Inject constructor(
     }
   }
 
-  fun generateModel(validate: Boolean = false) {
+  private fun generateModel(validate: Boolean = false) {
     Log.d(TAG, "generateModel()")
     val last = model.value
     val newModel = Model(
@@ -123,23 +150,5 @@ class AddOrEditUserTagViewModel @Inject constructor(
     }
 
     model.value = newModel
-  }
-
-  fun addTag() {
-    generateModel(validate = true)
-
-    val model = model.value ?: return
-
-    if (model.tagError != null || model.personNameError != null) {
-      return
-    }
-
-    userTagsManager.addOrUpdateTag(model.personName, tag, fillColor, strokeColor)
-    isSubmitted.value = true
-    generateModel()
-  }
-
-  fun deleteUserTag() {
-    userTagsManager.deleteTag(personName)
   }
 }

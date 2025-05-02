@@ -34,13 +34,7 @@ class StatefulLiveData<T> {
 
   val valueOrNull: T?
     get() {
-      val value = value
-
-      return if (value is StatefulData.Success) {
-        value.data
-      } else {
-        null
-      }
+      return value.valueOrNull
     }
 
   @MainThread
@@ -164,4 +158,14 @@ sealed class StatefulData<T> {
   class Error<T>(val error: Throwable) : StatefulData<T>()
 }
 
-fun StatefulData<*>.isLoading() = this is StatefulData.Loading<*>
+val StatefulData<*>.isLoading
+  get() = this is StatefulData.Loading<*>
+
+val <T> StatefulData<T>.valueOrNull: T?
+  get() {
+    return if (this is StatefulData.Success) {
+      this.data
+    } else {
+      null
+    }
+  }

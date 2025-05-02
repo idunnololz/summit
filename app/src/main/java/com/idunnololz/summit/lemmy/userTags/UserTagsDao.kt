@@ -12,8 +12,14 @@ interface UserTagsDao {
   @Query("SELECT * FROM user_tags")
   suspend fun getAllUserTags(): List<UserTagEntry>
 
+  @Query("SELECT * FROM user_tags ORDER BY used_ts DESC LIMIT 10")
+  suspend fun getRecentUserTags(): List<UserTagEntry>
+
   @Query("SELECT * FROM user_tags WHERE actor_id = :user COLLATE NOCASE")
-  suspend fun getUserTag(user: String): List<UserTagEntry>
+  suspend fun getUserTagByName(user: String): List<UserTagEntry>
+
+  @Query("SELECT * FROM user_tags WHERE id = :id")
+  suspend fun getUserTagById(id: Long): List<UserTagEntry>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertUserTag(entry: UserTagEntry): Long

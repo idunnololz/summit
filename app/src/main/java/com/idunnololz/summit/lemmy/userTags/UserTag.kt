@@ -7,4 +7,8 @@ import kotlinx.parcelize.Parcelize
 data class UserTag(
   val personName: String,
   val config: UserTagConfig,
+  val id: Long,
 ) : Parcelable
+
+fun UserTagEntry.toUserTag() =
+  UserTag(this.actorId, this.tag, this.id)

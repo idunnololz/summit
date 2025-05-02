@@ -2078,6 +2078,8 @@
     <string name="customize_post_in_post_feed_quick_actions">Customize posts (in feed) quick actions</string>
     <string name="customize_post_in_post_feed_quick_actions_desc">Change which actions appear under a post in the post feed.</string>
     <string name="custom_post_in_feed_quick_actions">Custom post in feed quick actions</string>
+    <string name="recently_used_tags">Recently used tags</string>
+    <string name="view_all_user_tags">View all user tags</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

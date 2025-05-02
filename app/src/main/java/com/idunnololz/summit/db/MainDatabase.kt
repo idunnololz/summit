@@ -82,7 +82,7 @@ import kotlinx.serialization.json.Json
     AutoMigration(from = 42, to = 43),
     AutoMigration(from = 43, to = 44),
   ],
-  version = 44,
+  version = 45,
   exportSchema = true,
 )
 @TypeConverters(HistoryConverters::class, DraftConverters::class)
@@ -155,6 +155,7 @@ abstract class MainDatabase : RoomDatabase() {
         .addMigrations(MIGRATION_39_38)
         .addMigrations(MIGRATION_39_40)
         .addMigrations(MIGRATION_40_41)
+        .addMigrations(MIGRATION_44_45)
         .build()
     }
   }
@@ -308,6 +309,12 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
     db.execSQL(
       "CREATE TABLE IF NOT EXISTS `read_posts` (`post_key` TEXT NOT NULL, `read` INTEGER NOT NULL, PRIMARY KEY(`post_key`))",
     )
+  }
+}
+
+val MIGRATION_44_45 = object : Migration(44, 45) {
+  override fun migrate(db: SupportSQLiteDatabase) {
+    db.execSQL("ALTER TABLE user_tags ADD COLUMN used_ts INTEGER NOT NULL DEFAULT 0;")
   }
 }
 

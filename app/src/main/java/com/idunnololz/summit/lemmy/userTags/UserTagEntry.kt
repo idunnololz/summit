@@ -28,6 +28,8 @@ data class UserTagEntry(
   val createTs: Long,
   @ColumnInfo(name = "update_ts")
   val updateTs: Long,
+  @ColumnInfo(name = "used_ts")
+  val usedTs: Long,
 ) : Parcelable
 
 @Parcelize

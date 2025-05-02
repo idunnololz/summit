@@ -48,13 +48,8 @@ class UserTagsViewModel @Inject constructor(
     withContext(Dispatchers.Default) {
       model.postValue(
         Model(
-          userTagsManager.getAllUserTags()
-            .map {
-              UserTag(
-                it.actorId,
-                it.tag,
-              )
-            },
+          userTagsManager.getAllUserTagEntries()
+            .map { it.toUserTag() },
         ),
       )
     }

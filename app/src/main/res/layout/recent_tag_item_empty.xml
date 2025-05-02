@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?textAppearanceBodySmall"
+    android:minHeight="48dp"
+    android:text="@string/there_doesnt_seem_to_be_anything_here"
+    android:layout_marginTop="@dimen/padding_half"
+    android:textColor="@color/colorTextFaint"/>

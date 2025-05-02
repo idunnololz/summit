@@ -1,28 +1,49 @@
 package com.idunnololz.summit.lemmy.userTags
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil3.load
+import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.DialogFragmentAddOrEditUserTagBinding
+import com.idunnololz.summit.databinding.GenericShimmerPlaceholderBinding
+import com.idunnololz.summit.databinding.RecentTagItemEmptyBinding
+import com.idunnololz.summit.databinding.RecentTagItemUserTagBinding
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.StatefulLiveData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.colorPicker.ColorPickerDialog
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.isLoading
+import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable
+import com.idunnololz.summit.util.valueOrNull
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -59,8 +80,8 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
     super.onStart()
 
     setSizeDynamically(
-      width = ViewGroup.LayoutParams.MATCH_PARENT,
-      height = ViewGroup.LayoutParams.WRAP_CONTENT,
+      width = LayoutParams.MATCH_PARENT,
+      height = LayoutParams.WRAP_CONTENT,
     )
   }
 
@@ -142,6 +163,9 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
           viewModel.strokeColor = it
         }
       }
+      viewTags.setOnClickListener {
+        requireMainActivity().openAllUserTagsFragment()
+      }
 
       positiveButton.setOnClickListener {
         // Remember the values before we set them as setting them will revert their values
@@ -159,6 +183,23 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
       neutralButton.setOnClickListener {
         viewModel.deleteUserTag()
         dismiss()
+      }
+
+      recentTagsRecyclerView.layoutManager = LinearLayoutManager(
+        context, LinearLayoutManager.HORIZONTAL, false)
+      recentTagsRecyclerView.setHasFixedSize(true)
+      val adapter = RecentUserTagsAdapter(
+        context,
+        onClickUserTag = {
+          viewModel.tag = it.config.tagName
+          viewModel.fillColor = it.config.fillColor
+          viewModel.strokeColor = it.config.borderColor
+        }
+      )
+      recentTagsRecyclerView.adapter = adapter
+
+      viewModel.recentTags.observe(viewLifecycleOwner) {
+        adapter.setData(it)
       }
 
       viewModel.model.observe(viewLifecycleOwner) {
@@ -236,5 +277,101 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
         }
       })
       .show()
+  }
+
+  private class RecentUserTagsAdapter(
+    private val context: Context,
+    private val onClickUserTag: (UserTag) -> Unit,
+  ) : Adapter<ViewHolder>() {
+
+    private sealed interface Item {
+      data class PlaceholderItem(val id: Int) : Item
+      data class UserTagItem(val userTag: UserTag) : Item
+
+      data object EmptyItem : Item
+    }
+
+    private var data: StatefulData<List<UserTag>>? = null
+
+    private val adapterHelper = AdapterHelper<Item>(
+      { old, new ->
+        old::class == new::class && when (old) {
+          is Item.PlaceholderItem ->
+            old.id == (new as Item.PlaceholderItem).id
+          is Item.UserTagItem ->
+            old.userTag.id == (new as Item.UserTagItem).userTag.id
+          Item.EmptyItem -> true
+        }
+      }
+    ).apply {
+      addItemType(
+        Item.PlaceholderItem::class,
+        GenericShimmerPlaceholderBinding::inflate,
+      ) { item, b, h ->
+        b.root.updateLayoutParams<LayoutParams> {
+          width = Utils.convertDpToPixel(96f).toInt()
+          height = Utils.convertDpToPixel(48f).toInt()
+        }
+        b.root.load(newShimmerDrawable(context, 0.5f))
+      }
+      addItemType(
+        Item.UserTagItem::class,
+        RecentTagItemUserTagBinding::inflate,
+      ) { item, b, h ->
+        b.chip.text = item.userTag.config.tagName
+        val borderColor = ColorStateList.valueOf(item.userTag.config.borderColor)
+        b.chip.chipBackgroundColor = ColorStateList.valueOf(item.userTag.config.fillColor)
+        b.chip.chipStrokeColor = borderColor
+        b.chip.setTextColor(borderColor)
+        b.chip.setOnClickListener {
+          onClickUserTag(item.userTag)
+        }
+      }
+      addItemType(
+        Item.EmptyItem::class,
+        RecentTagItemEmptyBinding::inflate,
+      ) { item, b, h ->
+      }
+    }
+
+    override fun getItemViewType(position: Int): Int =
+      adapterHelper.getItemViewType(position)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+      adapterHelper.onCreateViewHolder(parent, viewType)
+
+    override fun getItemCount(): Int =
+      adapterHelper.itemCount
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
+      adapterHelper.onBindViewHolder(holder, position)
+
+    fun setData(data: StatefulData<List<UserTag>>) {
+      this.data = data
+
+      refresh()
+    }
+
+    private fun refresh() {
+      val data = data ?: return
+      val newItems = mutableListOf<Item>()
+
+      if (data.isLoading) {
+        newItems += Item.PlaceholderItem(0)
+        newItems += Item.PlaceholderItem(1)
+        newItems += Item.PlaceholderItem(2)
+      } else {
+        val recentTags = data.valueOrNull
+        if (recentTags?.isEmpty() == true) {
+          newItems += Item.EmptyItem
+        } else {
+          recentTags?.mapTo(newItems) {
+            Item.UserTagItem(it)
+          }
+        }
+      }
+
+      adapterHelper.setItems(newItems, this)
+    }
   }
 }

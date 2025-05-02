@@ -2,18 +2,20 @@ package com.idunnololz.summit.lemmy.utils.stateStorage
 
 import com.idunnololz.summit.lemmy.utils.StableAccountId
 import com.idunnololz.summit.preferences.SharedPreferencesManager
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class StateStorageManager @Inject constructor(
   private val sharedPreferencesManager: SharedPreferencesManager,
+  private val json: Json,
 ) {
 
   private val accountStateStorageByAccount = mutableMapOf<StableAccountId, AccountStateStorage>()
 
   val globalStateStorage by lazy {
-    GlobalStateStorage(sharedPreferencesManager.getGlobalStateSharedPreferences())
+    GlobalStateStorage(sharedPreferencesManager.getGlobalStateSharedPreferences(), json)
   }
 
   fun getAccountStateStorage(accountId: Long, accountInstance: String): AccountStateStorage {

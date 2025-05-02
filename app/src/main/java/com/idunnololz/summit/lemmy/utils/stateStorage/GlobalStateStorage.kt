@@ -1,26 +1,21 @@
 package com.idunnololz.summit.lemmy.utils.stateStorage
 
 import android.content.SharedPreferences
+import com.idunnololz.summit.preferences.SharedPreferencesPreferences
+import com.idunnololz.summit.preferences.floatPreference
+import com.idunnololz.summit.preferences.stringPreference
+import kotlinx.serialization.json.Json
 
 class GlobalStateStorage(
-  private val prefs: SharedPreferences,
-) {
+  override val sharedPreferences: SharedPreferences,
+  override val json: Json,
+): SharedPreferencesPreferences {
   var videoStateVolume: Float
-    get() = prefs.getFloat("VIDEO_STATE_VOLUME", 0f)
-    set(value) {
-      prefs.edit()
-        .putFloat("VIDEO_STATE_VOLUME", value)
-        .apply()
-    }
+    by floatPreference("VIDEO_STATE_VOLUME")
 
   var colorPickerHistory: String?
-    get() = prefs.getString(
+    by stringPreference(
       "COLOR_PICKER_HISTORY",
-      "#ffff4500,#ff7193ff,#FFF44336,#FFFFC107,#FFFF9800,#FF4CAF50,#FF2196F3,#FF607D8B",
+      "#ffff4500,#ff7193ff,#FFF44336,#FFFFC107,#FFFF9800,#FF4CAF50,#FF2196F3,#FF607D8B"
     )
-    set(value) {
-      prefs.edit()
-        .putString("COLOR_PICKER_HISTORY", value)
-        .apply()
-    }
 }

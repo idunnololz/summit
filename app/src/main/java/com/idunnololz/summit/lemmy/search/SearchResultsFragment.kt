@@ -305,7 +305,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             }
 
             adapter?.setData(queryEngine.getItems()) {
-              if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading()) {
+              if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading) {
                 binding.recyclerView.scrollToPosition(0)
               }
             }

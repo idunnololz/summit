@@ -15,15 +15,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:id="@+id/recent_tags_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/recently_used_tags"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recent_tags_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/dialog_padding"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/recent_tags_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/person_input_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:hint="@string/user"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/recent_tags_recycler_view">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/person_edit_text"
@@ -115,7 +136,7 @@
         android:text="@string/tag_text_color"
         android:paddingVertical="@dimen/padding"
         app:layout_constraintTop_toBottomOf="@+id/tag_fill_color_text"
-        app:layout_constraintBottom_toTopOf="@+id/positive_button"
+        app:layout_constraintBottom_toTopOf="@+id/view_tags"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tag_stroke_color_outer"/>
 
@@ -141,6 +162,21 @@
         app:layout_constraintBottom_toBottomOf="@+id/tag_stroke_color_outer"
         app:layout_constraintStart_toStartOf="@+id/tag_stroke_color_outer"
         app:layout_constraintEnd_toEndOf="@+id/tag_stroke_color_outer"/>
+
+    <TextView
+        android:id="@+id/view_tags"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:text="@string/view_all_user_tags"
+        android:textColor="?colorPrimary"
+        android:paddingHorizontal="@dimen/dialog_padding"
+        android:paddingVertical="@dimen/padding_half"
+        android:background="?selectableItemBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tag_stroke_color_inner"
+        app:layout_constraintBottom_toTopOf="@+id/positive_button"/>
 
     <Button
         android:id="@+id/neutral_button"
@@ -169,7 +205,6 @@
         android:text="@string/save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/padding"
         android:layout_marginBottom="@dimen/padding_half"
         style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintEnd_toEndOf="parent"

@@ -30,6 +30,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.window.layout.WindowMetricsCalculator
 import coil3.Image
@@ -963,6 +964,11 @@ class MainActivity : SummitActivity() {
     } else {
       imageViewerLauncher.launch(args)
     }
+  }
+
+  fun openAllUserTagsFragment() {
+    val direction = MainDirections.actionGlobalUserTagsFragment()
+    currentNavController?.navigateSafe(direction)
   }
 
   override fun showCommunityInfo(communityRef: CommunityRef) {
