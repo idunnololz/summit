@@ -187,9 +187,24 @@ class SettingsViewTypeFragment :
             updateRendering()
           },
         )
+
+        binding.verticalMarginSizeSetting.root.visibility = View.VISIBLE
+        settings.verticalMarginSize.bindTo(
+          binding.verticalMarginSizeSetting,
+          { viewModel.currentPostUiConfig.verticalMarginDp ?: 0f },
+          {
+            viewModel.currentPostUiConfig =
+              viewModel.currentPostUiConfig.copy(
+                verticalMarginDp = it,
+              )
+
+            updateRendering()
+          },
+        )
       }
       else -> {
         binding.horizontalMarginSizeSetting.root.visibility = View.GONE
+        binding.verticalMarginSizeSetting.root.visibility = View.GONE
       }
     }
     settings.preferImageAtEnd.bindTo(
@@ -285,7 +300,7 @@ class SettingsViewTypeFragment :
     )
   }
 
-  private val lastH: ListingItemViewHolder? = null
+  private var lastH = listOf<ListingItemViewHolder>()
   private fun updateRendering() {
     if (!isBindingAvailable()) return
 
@@ -305,91 +320,103 @@ class SettingsViewTypeFragment :
     val context = requireContext()
     val inflater = LayoutInflater.from(context)
 
-    val h = when (preferences.getPostsLayout()) {
-      CommunityLayout.Compact ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemCompactBinding.inflate(inflater, binding.demoViewContainer, true),
-        )
-      CommunityLayout.List ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemListBinding.inflate(inflater, binding.demoViewContainer, false),
-        )
-      CommunityLayout.LargeList ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemLargeListBinding.inflate(inflater, binding.demoViewContainer, false),
-        )
-      CommunityLayout.Card ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemCardBinding.inflate(inflater, binding.demoViewContainer, false),
-        )
-      CommunityLayout.Card2 ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemCard2Binding.inflate(inflater, binding.demoViewContainer, false),
-        )
-      CommunityLayout.Card3 ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemCard3Binding.inflate(inflater, binding.demoViewContainer, false),
-        )
-      CommunityLayout.Full ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemFullBinding.inflate(inflater, binding.demoViewContainer, false),
-        )
-      CommunityLayout.ListWithCards ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemListWithCardsBinding.inflate(
-            inflater,
-            binding.demoViewContainer,
-            false,
-          ),
-        )
-      CommunityLayout.FullWithCards ->
-        ListingItemViewHolder.fromBinding(
-          ListingItemFullWithCardsBinding.inflate(
-            inflater,
-            binding.demoViewContainer,
-            false,
-          ),
-        )
+    lastH.forEach {
+      postListViewBuilder.recycle(it)
     }
 
-    if (lastH != null) {
-      postListViewBuilder.recycle(lastH)
+    fun newH(id: Int): ListingItemViewHolder {
+      val h = when (preferences.getPostsLayout()) {
+        CommunityLayout.Compact ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemCompactBinding.inflate(inflater, binding.demoViewContainer, true),
+          )
+        CommunityLayout.List ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemListBinding.inflate(inflater, binding.demoViewContainer, false),
+          )
+        CommunityLayout.LargeList ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemLargeListBinding.inflate(inflater, binding.demoViewContainer, false),
+          )
+        CommunityLayout.Card ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemCardBinding.inflate(inflater, binding.demoViewContainer, false),
+          )
+        CommunityLayout.Card2 ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemCard2Binding.inflate(inflater, binding.demoViewContainer, false),
+          )
+        CommunityLayout.Card3 ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemCard3Binding.inflate(inflater, binding.demoViewContainer, false),
+          )
+        CommunityLayout.Full ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemFullBinding.inflate(inflater, binding.demoViewContainer, false),
+          )
+        CommunityLayout.ListWithCards ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemListWithCardsBinding.inflate(
+              inflater,
+              binding.demoViewContainer,
+              false,
+            ),
+          )
+        CommunityLayout.FullWithCards ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemFullWithCardsBinding.inflate(
+              inflater,
+              binding.demoViewContainer,
+              false,
+            ),
+          )
+      }
+
+      postListViewBuilder.bind(
+        holder = h,
+        fetchedPost = LemmyFakeModels.fakeFetchedPost,
+        instance = "https://fake.instance",
+        isRevealed = true,
+        contentMaxWidth = binding.demoViewContainer.width,
+        contentPreferredHeight = binding.demoViewContainer.height,
+        viewLifecycleOwner = viewLifecycleOwner,
+        isExpanded = false,
+        isActionsExpanded = false,
+        alwaysRenderAsUnread = true,
+        updateContent = true,
+        highlight = false,
+        highlightForever = false,
+        themeColor = null,
+        isDuplicatePost = false,
+        onRevealContentClickedFn = {},
+        onImageClick = { _, _, _, _ -> },
+        onVideoClick = { _, _, _ -> },
+        onVideoLongClickListener = { _ -> },
+        onPageClick = { _, _ -> },
+        onItemClick = { _, _, _, _, _, _, _, _ -> },
+        onShowMoreOptions = { _, _ -> },
+        toggleItem = {},
+        toggleActions = {},
+        onSignInRequired = {},
+        onInstanceMismatch = { _, _ -> },
+        onHighlightComplete = {},
+        onLinkClick = { _, _, _, _ -> },
+        onLinkLongClick = { _, _, _ -> },
+        onPostActionClick = { _, _ -> },
+      )
+
+      return h.apply {
+        this.root.id = id
+      }
     }
+
     binding.demoViewContainer.removeAllViews()
-    binding.demoViewContainer.addView(h.root)
 
-    postListViewBuilder.bind(
-      holder = h,
-      fetchedPost = LemmyFakeModels.fakeFetchedPost,
-      instance = "https://fake.instance",
-      isRevealed = true,
-      contentMaxWidth = binding.demoViewContainer.width,
-      contentPreferredHeight = binding.demoViewContainer.height,
-      viewLifecycleOwner = viewLifecycleOwner,
-      isExpanded = false,
-      isActionsExpanded = false,
-      alwaysRenderAsUnread = true,
-      updateContent = true,
-      highlight = false,
-      highlightForever = false,
-      themeColor = null,
-      isDuplicatePost = false,
-      onRevealContentClickedFn = {},
-      onImageClick = { _, _, _, _ -> },
-      onVideoClick = { _, _, _ -> },
-      onVideoLongClickListener = { _ -> },
-      onPageClick = { _, _ -> },
-      onItemClick = { _, _, _, _, _, _, _, _ -> },
-      onShowMoreOptions = { _, _ -> },
-      toggleItem = {},
-      toggleActions = {},
-      onSignInRequired = {},
-      onInstanceMismatch = { _, _ -> },
-      onHighlightComplete = {},
-      onLinkClick = { _, _, _, _ -> },
-      onLinkLongClick = { _, _, _ -> },
-      onPostActionClick = { _, _ -> },
-    )
+    lastH = listOf(
+      newH(R.id.fake_post_1),
+    ).onEach {
+      binding.demoViewContainer.addView(it.root)
+    }
   }
 
   override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {

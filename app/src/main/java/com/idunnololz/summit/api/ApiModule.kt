@@ -22,7 +22,7 @@ class ApiModule {
     return Retrofit.Builder()
       .apply {
         if (BuildConfig.DEBUG) {
-          baseUrl("http://10.0.2.2:8080")
+          baseUrl("https://summitforlemmyserver.idunnololz.com")
         } else {
           baseUrl("https://summitforlemmyserver.idunnololz.com")
         }

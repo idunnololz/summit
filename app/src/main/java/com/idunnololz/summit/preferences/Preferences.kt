@@ -28,6 +28,7 @@ import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_HIDE_UI_ON_PLAY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_IP_ADDRESSES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LOAD_MORE_POSTS
@@ -89,6 +90,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
+import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POSTS_IN_FEED_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -117,17 +119,20 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_VIDEO_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SWIPE_BETWEEN_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_TAP_ANYWHERE_TO_PLAY_PAUSE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TAP_COMMENT_TO_COLLAPSE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TEXT_FIELD_TOOLBAR_SETTINGS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TRACK_BROWSING_HISTORY
@@ -505,6 +510,8 @@ class Preferences(
 
   var showProfileIcons: Boolean
     by booleanPreference(KEY_SHOW_PROFILE_ICONS, true)
+  var showDefaultProfileIcons: Boolean
+    by booleanPreference(KEY_SHOW_DEFAULT_PROFILE_ICONS, true)
 
   var commentHeaderLayout: Int
     by intPreference(KEY_COMMENT_HEADER_LAYOUT, CommentHeaderLayoutId.SingleLine)
@@ -564,6 +571,10 @@ class Preferences(
 
   var autoPlayVideos: Boolean
     by booleanPreference(KEY_AUTO_PLAY_VIDEOS, true)
+  var autoHideUiOnPlay: Boolean
+    by booleanPreference(KEY_AUTO_HIDE_UI_ON_PLAY, true)
+  var tapAnywhereToPlayPause: Boolean
+    by booleanPreference(KEY_TAP_ANYWHERE_TO_PLAY_PAUSE, false)
 
   var uploadImagesToImgur: Boolean
     by booleanPreference(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
@@ -642,6 +653,10 @@ class Preferences(
     by booleanPreference(KEY_POST_FULL_BLEED_IMAGE, true)
   var userAgentChoice: Int
     by intPreference(KEY_USER_AGENT_CHOICE, UserAgentChoiceIds.UNSET)
+  var openLinkWhenThumbnailTapped: Boolean
+    by booleanPreference(KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED, false)
+  var showPostType: Boolean
+    by booleanPreference(KEY_SHOW_POST_TYPE, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

@@ -95,6 +95,7 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @FragmentScoped
 class PostListViewBuilder @Inject constructor(
@@ -131,10 +132,11 @@ class PostListViewBuilder @Inject constructor(
 
   private val lemmyHeaderHelper = lemmyHeaderHelperFactory.create(context)
   private val lemmyContentHelper = LemmyContentHelper(
-    context,
-    offlineManager,
-    lemmyTextHelper,
-    { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
+    context = context,
+    offlineManager = offlineManager,
+    lemmyTextHelper = lemmyTextHelper,
+    getExoPlayerManager = { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
+    preferences = preferences,
   ).also {
     it.globalFontSizeMultiplier = globalFontSizeMultiplier
     it.fullBleedImage = preferences.postFullBleedImage
@@ -149,6 +151,7 @@ class PostListViewBuilder @Inject constructor(
   private val voteUiHandler = accountActionsManager.voteUiHandler
   private var textSizeMultiplier: Float = postUiConfig.textSizeMultiplier
   private var postHorizontalMarginDp: Float? = postUiConfig.horizontalMarginDp
+  private var postVerticalMarginDp: Float? = postUiConfig.verticalMarginDp
   private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
   private var contentMaxLines: Int = postUiConfig.contentMaxLines
   private var showUpAndDownVotes: Boolean = preferences.postShowUpAndDownVotes
@@ -166,6 +169,8 @@ class PostListViewBuilder @Inject constructor(
   private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
   var postsInFeedQuickActions = preferences.postsInFeedQuickActions
     ?: PostsInFeedQuickActionsSettings()
+  private var openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
+  private var showPostType = preferences.showPostType
   private val paddingIcon = Utils.convertDpToPixel(12f).toInt()
 
   private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
@@ -200,6 +205,7 @@ class PostListViewBuilder @Inject constructor(
     contentMaxLines = postUiConfig.contentMaxLines
     dimReadPosts = postUiConfig.dimReadPosts
     postHorizontalMarginDp = postUiConfig.horizontalMarginDp
+    postVerticalMarginDp = postUiConfig.verticalMarginDp
     showTextPreviewIcon = postUiConfig.showTextPreviewIcon ?: true
 
     globalFontSizeMultiplier =
@@ -223,6 +229,8 @@ class PostListViewBuilder @Inject constructor(
     downvoteColor = preferences.downvoteColor
     postsInFeedQuickActions = preferences.postsInFeedQuickActions
       ?: PostsInFeedQuickActionsSettings()
+    openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
+    showPostType = preferences.showPostType
   }
 
   /**
@@ -701,7 +709,7 @@ class PostListViewBuilder @Inject constructor(
             linkIcon?.visibility = View.VISIBLE
             linkOverlay?.visibility = View.VISIBLE
 
-            val t = Uri.parse(url).host ?: url
+            val t = url.toUri().host ?: url
             linkText?.text = t
             linkOverlay?.setOnClickListener {
               onLinkClick(accountId, url, null, LinkContext.Rich)
@@ -778,6 +786,12 @@ class PostListViewBuilder @Inject constructor(
         } else {
           null
         }
+        val postVerticalMarginDp = postVerticalMarginDp
+        val verticalMargin = if (postVerticalMarginDp != null) {
+          Utils.convertDpToPixel(postVerticalMarginDp).toInt()
+        } else {
+          null
+        }
 
         when (val rb = rawBinding) {
           is ListingItemCardBinding -> {
@@ -790,6 +804,17 @@ class PostListViewBuilder @Inject constructor(
                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                   marginStart = horizontalMargin
                   marginEnd = horizontalMargin
+                }
+              }
+            }
+
+            if (verticalMargin != null) {
+              if (lp.topMargin != verticalMargin ||
+                lp.bottomMargin != verticalMargin
+              ) {
+                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                  topMargin = verticalMargin
+                  bottomMargin = verticalMargin
                 }
               }
             }
@@ -807,6 +832,17 @@ class PostListViewBuilder @Inject constructor(
                 }
               }
             }
+
+            if (verticalMargin != null) {
+              if (lp.topMargin != verticalMargin ||
+                lp.bottomMargin != verticalMargin
+              ) {
+                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                  topMargin = verticalMargin
+                  bottomMargin = verticalMargin
+                }
+              }
+            }
           }
           is ListingItemCard3Binding -> {
             val lp = rb.cardView.layoutParams as MarginLayoutParams
@@ -818,6 +854,17 @@ class PostListViewBuilder @Inject constructor(
                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                   marginStart = horizontalMargin
                   marginEnd = horizontalMargin
+                }
+              }
+            }
+
+            if (verticalMargin != null) {
+              if (lp.topMargin != verticalMargin ||
+                lp.bottomMargin != verticalMargin
+              ) {
+                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                  topMargin = verticalMargin
+                  bottomMargin = verticalMargin
                 }
               }
             }
@@ -835,6 +882,17 @@ class PostListViewBuilder @Inject constructor(
                 }
               }
             }
+
+            if (verticalMargin != null) {
+              if (lp.topMargin != verticalMargin ||
+                lp.bottomMargin != verticalMargin
+              ) {
+                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                  topMargin = verticalMargin
+                  bottomMargin = verticalMargin
+                }
+              }
+            }
           }
           is ListingItemFullWithCardsBinding -> {
             val lp = rb.cardView.layoutParams as MarginLayoutParams
@@ -846,6 +904,17 @@ class PostListViewBuilder @Inject constructor(
                 rb.cardView.updateLayoutParams<MarginLayoutParams> {
                   marginStart = horizontalMargin
                   marginEnd = horizontalMargin
+                }
+              }
+            }
+
+            if (verticalMargin != null) {
+              if (lp.topMargin != verticalMargin ||
+                lp.bottomMargin != verticalMargin
+              ) {
+                rb.cardView.updateLayoutParams<MarginLayoutParams> {
+                  topMargin = verticalMargin
+                  bottomMargin = verticalMargin
                 }
               }
             }
@@ -979,14 +1048,39 @@ class PostListViewBuilder @Inject constructor(
           }
 
           imageView.transitionName = "image_$absoluteAdapterPosition"
-          imageView.setOnClickListener {
-            if (fullContentContainerView != null) {
+
+          if (showPostType || fullContentContainerView == null || openLinkWhenThumbnailTapped) {
+            postTypeIcon?.apply {
+              visibility = View.VISIBLE
+              when (postType) {
+                PostType.Image -> {
+                  setImageResource(R.drawable.outline_image_16)
+                }
+                PostType.Video -> {
+                  setImageResource(R.drawable.outline_play_circle_outline_16)
+                }
+                PostType.Text -> {
+                  setImageResource(R.drawable.outline_article_16)
+                }
+                PostType.Link -> {
+                  setImageResource(R.drawable.outline_link_16)
+                }
+              }
+            }
+          } else {
+            postTypeIcon?.visibility = View.GONE
+          }
+
+          if (fullContentContainerView != null && !openLinkWhenThumbnailTapped) {
+            imageView.setOnClickListener {
               if (singleTapToViewImage) {
                 showImageOrVideo()
               } else {
                 toggleItem(fetchedPost)
               }
-            } else {
+            }
+          } else {
+            imageView.setOnClickListener {
               if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
                 onLinkClick(accountId, url, null, LinkContext.Rich)
               } else {
@@ -995,7 +1089,7 @@ class PostListViewBuilder @Inject constructor(
             }
           }
 
-          if (fullContentContainerView != null) {
+          if (fullContentContainerView != null && !openLinkWhenThumbnailTapped) {
             imageView.setOnLongClickListener {
               if (singleTapToViewImage) {
                 toggleItem(fetchedPost)
@@ -1012,6 +1106,7 @@ class PostListViewBuilder @Inject constructor(
           }
         }
 
+        postTypeIcon?.visibility = View.GONE
         iconImage?.visibility = View.GONE
         iconImage?.setOnClickListener(null)
         iconImage?.isClickable = false
@@ -1076,7 +1171,7 @@ class PostListViewBuilder @Inject constructor(
             iconImage?.visibility = View.VISIBLE
             iconImage?.setImageResource(R.drawable.baseline_play_circle_filled_24)
             iconImage?.setOnClickListener {
-              if (fullContentContainerView != null) {
+              if (fullContentContainerView != null && !openLinkWhenThumbnailTapped) {
                 toggleItem(fetchedPost)
               } else {
                 onItemClick()
@@ -1100,7 +1195,7 @@ class PostListViewBuilder @Inject constructor(
               if (hasAdditionalContent && showTextPreviewIcon && iconImage != null) {
                 showDefaultImage()
                 iconImage.setOnClickListener {
-                  if (fullContentContainerView != null) {
+                  if (fullContentContainerView != null && !openLinkWhenThumbnailTapped) {
                     toggleItem(fetchedPost)
                   } else {
                     onItemClick()

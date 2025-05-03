@@ -2080,6 +2080,15 @@
     <string name="custom_post_in_feed_quick_actions">Custom post in feed quick actions</string>
     <string name="recently_used_tags">Recently used tags</string>
     <string name="view_all_user_tags">View all user tags</string>
+    <string name="auto_hide_ui_on_play">Auto-hide UI on play</string>
+    <string name="tap_anywhere_to_play_pause">Tap anywhere to play/pause</string>
+    <string name="show_default_profile_icons">Show default profile icons</string>
+    <string name="show_default_profile_icons_desc">When enabled, if a user does not have a profile icon set, a default profile icon is used instead.</string>
+    <string name="vertical_margin_size">Vertical margin size</string>
+    <string name="open_link_when_thumbnail_tapped">Open link when thumbnail tapped</string>
+    <string name="open_link_when_thumbnail_tapped_desc">When enabled, tapping a thumbnail in certain layouts will open the link of the post instead of expanding the post.</string>
+    <string name="top_communities">Top communities</string>
+    <string name="show_post_type">Show post type</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

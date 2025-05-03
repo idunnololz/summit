@@ -140,6 +140,16 @@
                     layout="@layout/basic_setting_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/open_link_when_thumbnail_tapped"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <include
+                    android:id="@+id/show_post_type"
+                    layout="@layout/setting_item_on_off"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/filters_title"

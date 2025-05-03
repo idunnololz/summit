@@ -22,6 +22,7 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_HIDE_UI_ON_PLAY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_IP_ADDRESSES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_PHONE_NUMBERS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LOAD_MORE_POSTS
@@ -69,6 +70,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_MARK_POSTS_AS_READ_ON_SCRO
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
+import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
@@ -92,16 +94,19 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_LINK_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_NSFW_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_POST_UPVOTE_PERCENTAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_VIDEO_POSTS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_TAP_ANYWHERE_TO_PLAY_PAUSE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_TRANSPARENT_NOTIFICATION_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_UPLOAD_IMAGES_TO_IMGUR
@@ -954,6 +959,18 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.customize_post_in_post_feed_quick_actions),
     context.getString(R.string.customize_post_in_post_feed_quick_actions_desc),
   )
+  val openLinkWhenThumbnailTapped = OnOffSettingItem(
+    null,
+    context.getString(R.string.open_link_when_thumbnail_tapped),
+    context.getString(R.string.open_link_when_thumbnail_tapped_desc),
+    relatedKeys = listOf(KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED),
+  )
+  val showPostType = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_post_type),
+    null,
+    relatedKeys = listOf(KEY_SHOW_POST_TYPE),
+  )
 
   override val allSettings: List<SettingItem> = listOf(
     infinity,
@@ -1109,6 +1126,12 @@ class PostAndCommentsSettings @Inject constructor(
     context.getString(R.string.show_profile_icons),
     context.getString(R.string.show_profile_icons_desc),
     relatedKeys = listOf(KEY_SHOW_PROFILE_ICONS),
+  )
+  val showDefaultProfileIcons = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_default_profile_icons),
+    context.getString(R.string.show_default_profile_icons_desc),
+    relatedKeys = listOf(KEY_SHOW_DEFAULT_PROFILE_ICONS),
   )
   val commentHeaderLayout = RadioGroupSettingItem(
     null,
@@ -1636,6 +1659,13 @@ class PostsFeedAppearanceSettings @Inject constructor(
     1f,
   )
 
+  val verticalMarginSize = SliderSettingItem(
+    context.getString(R.string.vertical_margin_size),
+    0f,
+    32f,
+    1f,
+  )
+
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
     PostsFeedSettings::class,
@@ -1650,6 +1680,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
     preferCommunityIcon,
     dimReadPosts,
     horizontalMarginSize,
+    verticalMarginSize,
   )
 }
 
@@ -2712,6 +2743,18 @@ class VideoPlayerSettings @Inject constructor(
     null,
     relatedKeys = listOf(KEY_AUTO_PLAY_VIDEOS),
   )
+  val autoHideUiOnPlay = OnOffSettingItem(
+    null,
+    context.getString(R.string.auto_hide_ui_on_play),
+    null,
+    relatedKeys = listOf(KEY_AUTO_HIDE_UI_ON_PLAY),
+  )
+  val tapAnywhereToPlayPause = OnOffSettingItem(
+    null,
+    context.getString(R.string.tap_anywhere_to_play_pause),
+    null,
+    relatedKeys = listOf(KEY_TAP_ANYWHERE_TO_PLAY_PAUSE),
+  )
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -2720,6 +2763,8 @@ class VideoPlayerSettings @Inject constructor(
   override val allSettings: List<SettingItem> = listOf(
     inlineVideoVolume,
     autoPlayVideos,
+    autoHideUiOnPlay,
+    tapAnywhereToPlayPause,
   )
 }
 

@@ -16,8 +16,11 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.annotation.OptIn
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import arrow.core.Either
 import coil3.load
 import coil3.request.allowHardware
@@ -40,6 +43,7 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.getVideoType
@@ -62,6 +66,7 @@ class LemmyContentHelper(
   private val offlineManager: OfflineManager,
   private val lemmyTextHelper: LemmyTextHelper,
   private val getExoPlayerManager: () -> ExoPlayerManager,
+  private val preferences: Preferences,
   private val viewRecycler: ViewRecycler<View> = ViewRecycler(),
 ) {
 
@@ -415,14 +420,16 @@ class LemmyContentHelper(
             playerView.setup()
 
             playerView.player = null
-            playerView.player =
+            playerView.setPlayerWithPreferences(
               getExoPlayerManager().getPlayerForUrl(
                 url = videoInfo.videoUrl,
                 videoType = videoType,
                 videoState = videoState,
                 isInline = true,
                 autoPlay = autoPlayVideos,
-              )
+              ),
+              preferences
+            )
           } else {
             playerView.visibility = View.GONE
           }

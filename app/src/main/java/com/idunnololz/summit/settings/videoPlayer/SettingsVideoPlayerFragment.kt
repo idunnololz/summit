@@ -57,6 +57,20 @@ class SettingsVideoPlayerFragment :
   }
 
   private fun updateRendering() {
+    settings.autoHideUiOnPlay.bindTo(
+      binding.autoHideUiOnPlay,
+      { preferences.autoHideUiOnPlay },
+      {
+        preferences.autoHideUiOnPlay = it
+      },
+    )
+    settings.tapAnywhereToPlayPause.bindTo(
+      binding.tapAnywhereToPlayPause,
+      { preferences.tapAnywhereToPlayPause },
+      {
+        preferences.tapAnywhereToPlayPause = it
+      },
+    )
     settings.autoPlayVideos.bindTo(
       binding.autoPlayVideos,
       { preferences.autoPlayVideos },

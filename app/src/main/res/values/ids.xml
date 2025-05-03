@@ -268,4 +268,8 @@
     <item name="tablet_binding" type="id" />
     <item name="phone_binding" type="id" />
     <item name="admin" type="id" />
+    <item name="custom_player_listener" type="id" />
+    <item name="fake_post_1" type="id" />
+    <item name="fake_post_2" type="id" />
+    <item name="fake_post_3" type="id" />
 </resources>

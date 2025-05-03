@@ -157,6 +157,7 @@ class LemmyHeaderView : FrameLayout {
 
   private fun ensureIconView() {
     if (iconImageView != null) {
+      iconImageView?.visibility = View.VISIBLE
       return
     }
 
@@ -224,7 +225,7 @@ class LemmyHeaderView : FrameLayout {
 
       var viewHeight = totalTextHeight
       var viewWidth = 0
-      if (iconImageView != null) {
+      if (iconImageView != null && iconImageView.visibility != View.GONE) {
         val iconImageViewHeight = getViewHeight(iconImageView)
         viewHeight = max(viewHeight, iconImageViewHeight)
 
@@ -297,7 +298,7 @@ class LemmyHeaderView : FrameLayout {
       var start = paddingLeft
       val iconImageView = iconImageView
 
-      if (iconImageView != null) {
+      if (iconImageView != null && iconImageView.visibility != View.GONE) {
         val child = iconImageView
         val layoutParams = child.layoutParams as LayoutParams
         val childTop = (

@@ -367,6 +367,20 @@ class SettingsPostsFeedFragment :
         findNavController().navigateSafe(direction)
       },
     )
+    settings.openLinkWhenThumbnailTapped.bindTo(
+      binding.openLinkWhenThumbnailTapped,
+      { preferences.openLinkWhenThumbnailTapped },
+      {
+        preferences.openLinkWhenThumbnailTapped = it
+      },
+    )
+    settings.showPostType.bindTo(
+      binding.showPostType,
+      { preferences.showPostType },
+      {
+        preferences.showPostType = it
+      },
+    )
   }
 
   override fun updateValue(key: Int, value: Any?) {

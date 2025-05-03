@@ -122,6 +122,9 @@ fun PostView.getType(): PostType {
   if (post.url != null && isUrlVideo(post.url)) {
     return PostType.Video
   }
+  if (post.url != null) {
+    return PostType.Link
+  }
   return PostType.Text
 }
 

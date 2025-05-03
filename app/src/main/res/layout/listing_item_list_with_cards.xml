@@ -90,6 +90,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/header_view" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/post_type_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="center"
+                android:layout_margin="2dp"
+                style="@style/PostTypeIconImageView"
+                app:layout_constraintTop_toTopOf="@+id/image"
+                app:layout_constraintEnd_toEndOf="@+id/image" />
+
             <Space
                 android:id="@+id/icon_gone_spacer"
                 android:layout_width="@dimen/padding_half"

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.account.info
 
 import android.net.Uri
+import android.util.Log
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
@@ -35,6 +36,10 @@ class AccountInfoManager @Inject constructor(
   private val accountImageGenerator: AccountImageGenerator,
 ) {
 
+  companion object {
+    private const val TAG = "AccountInfoManager"
+  }
+
   private val coroutineScope = coroutineScopeFactory.create()
 
   private val unreadCountInvalidates = MutableSharedFlow<Unit>()
@@ -62,6 +67,7 @@ class AccountInfoManager @Inject constructor(
         }
 
         override suspend fun onAccountChanged(newAccount: Account?) {
+          Log.d(TAG, "onAccountChanged()")
           // Don't emit null as it will trigger multiple updates
 //                    currentFullAccount.emit(null)
           subscribedCommunities.emit(listOf())
@@ -73,6 +79,8 @@ class AccountInfoManager @Inject constructor(
 
     coroutineScope.launch {
       accountManager.currentAccount.collect {
+        Log.d(TAG, "currentAccount changed!")
+
         accountInfoUpdateState.emit(StatefulData.NotStarted())
 
         loadAccountInfo(it as? Account)

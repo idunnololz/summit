@@ -58,11 +58,12 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?textAppearanceTitleMedium"/>
 
-                        <FrameLayout
+                        <LinearLayout
                             android:id="@+id/demo_view_container"
                             android:layout_marginTop="@dimen/padding"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:background="?backgroundColor"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -113,6 +114,12 @@
 
                 <include
                     android:id="@+id/horizontal_margin_size_setting"
+                    layout="@layout/setting_slider_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <include
+                    android:id="@+id/vertical_margin_size_setting"
                     layout="@layout/setting_slider_item"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

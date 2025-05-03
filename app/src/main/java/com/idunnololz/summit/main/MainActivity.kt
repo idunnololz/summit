@@ -99,13 +99,13 @@ import kotlinx.coroutines.withContext
 class MainActivity : SummitActivity() {
 
   companion object {
-    private val TAG = SummitActivity::class.java.simpleName
+    private val TAG = MainActivity::class.java.simpleName
 
     private const val ARG_ACCOUNT_FULL_NAME = "ARG_ACCOUNT_FULL_NAME"
     private const val ARG_NOTIFICATION_ID = "ARG_NOTIFICATION_ID"
 
     fun createInboxItemIntent(context: Context, account: Account, notificationId: Int): Intent {
-      return Intent(context, SummitActivity::class.java).apply {
+      return Intent(context, MainActivity::class.java).apply {
         putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
         putExtra(ARG_NOTIFICATION_ID, notificationId)
         action = Intent.ACTION_VIEW
@@ -113,7 +113,7 @@ class MainActivity : SummitActivity() {
     }
 
     fun createInboxPageIntent(context: Context, account: Account): Intent {
-      return Intent(context, SummitActivity::class.java).apply {
+      return Intent(context, MainActivity::class.java).apply {
         putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
         action = Intent.ACTION_VIEW
       }
@@ -320,7 +320,9 @@ class MainActivity : SummitActivity() {
     navBarController.setup()
 
     if (savedInstanceState == null) {
-      handleIntent(intent) // must be called after navBarController.setup()
+      runOnReady(this) {
+        handleIntent(intent) // must be called after navBarController.setup()
+      }
     }
 
     val newInstall = preferences.appVersionLastLaunch == 0
@@ -503,7 +505,9 @@ class MainActivity : SummitActivity() {
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
 
-    handleIntent(intent)
+    runOnReady(this) {
+      handleIntent(intent)
+    }
   }
 
   fun showNotificationBarBg() {

@@ -176,6 +176,14 @@ class SettingsPostAndCommentsFragment :
         updateRendering()
       },
     )
+    settings.showDefaultProfileIcons.bindTo(
+      binding.showDefaultProfileIcons,
+      { preferences.showDefaultProfileIcons },
+      {
+        preferences.showDefaultProfileIcons = it
+        updateRendering()
+      },
+    )
     settings.commentHeaderLayout.bindTo(
       binding.commentHeaderLayout,
       { preferences.commentHeaderLayout },

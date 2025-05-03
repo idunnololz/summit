@@ -856,7 +856,7 @@ class CommunitySelectorController @AssistedInject constructor(
         addRecentItems(query)
 
         if (preferences.communitySelectorShowCommunitySuggestions) {
-          newItems.add(Item.GroupHeaderItem(context.getString(R.string.communities)))
+          newItems.add(Item.GroupHeaderItem(context.getString(R.string.top_communities)))
 
           val filteredPopularCommunities = rawData.filter {
             query.isNullOrBlank() || it.community.name.contains(

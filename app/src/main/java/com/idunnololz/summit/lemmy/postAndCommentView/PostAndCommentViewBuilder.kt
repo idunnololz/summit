@@ -151,10 +151,11 @@ class PostAndCommentViewBuilder @Inject constructor(
 
   val lemmyHeaderHelper = lemmyHeaderHelperFactory.create(context)
   private val lemmyContentHelper = LemmyContentHelper(
-    context,
-    offlineManager,
-    lemmyTextHelper,
-    { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
+    context = context,
+    offlineManager = offlineManager,
+    lemmyTextHelper = lemmyTextHelper,
+    getExoPlayerManager = { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
+    preferences = preferences,
   ).also {
     it.globalFontSizeMultiplier = globalFontSizeMultiplier
     it.fullBleedImage = preferences.postFullBleedImage
@@ -174,6 +175,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private var useMultilinePostHeaders: Boolean = preferences.useMultilinePostHeaders
   private var indicateCurrentUser: Boolean = preferences.indicatePostsAndCommentsCreatedByCurrentUser
   private var showProfileIcons: Boolean = preferences.showProfileIcons
+  private var showDefaultProfileIcons: Boolean = preferences.showDefaultProfileIcons
   private var commentHeaderLayout: Int = preferences.commentHeaderLayout
   private var commentQuickActions: CommentQuickActionsSettings = preferences.commentQuickActions
     ?: CommentQuickActionsSettings()
@@ -228,6 +230,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     useMultilinePostHeaders = preferences.useMultilinePostHeaders
     indicateCurrentUser = preferences.indicatePostsAndCommentsCreatedByCurrentUser
     showProfileIcons = preferences.showProfileIcons
+    showDefaultProfileIcons = preferences.showDefaultProfileIcons
     showEditedDate = preferences.showEditedDate
     autoPlayVideos = preferences.autoPlayVideos
     useCondensedTypefaceForCommentHeaders = preferences.useCondensedTypefaceForCommentHeaders
@@ -697,10 +700,14 @@ class PostAndCommentViewBuilder @Inject constructor(
     )
 
     if (showProfileIcons) {
-      val iconImageView = headerView.getIconImageView()
-      avatarHelper.loadAvatar(iconImageView, commentView.creator)
-      iconImageView.setOnClickListener {
-        onPageClick(commentView.creator.toPersonRef())
+      if (commentView.creator.avatar.isNullOrBlank() && !showDefaultProfileIcons) {
+        headerView.ensureNoIconImageView()
+      } else {
+        val iconImageView = headerView.getIconImageView()
+        avatarHelper.loadAvatar(iconImageView, commentView.creator)
+        iconImageView.setOnClickListener {
+          onPageClick(commentView.creator.toPersonRef())
+        }
       }
     }
 

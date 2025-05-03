@@ -11,9 +11,11 @@ import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import androidx.annotation.OptIn
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
@@ -99,6 +101,20 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
       globalStateStorage.videoStateVolume = volume
     }
+
+    @OptIn(UnstableApi::class)
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+      if (isPlaying) {
+        if (preferenceManager.currentPreferences.autoHideUiOnPlay) {
+          binding.playerView.hideController()
+        }
+      } else {
+        // Not playing because playback is paused, ended, suppressed, or the player
+        // is buffering, stopped or failed. Check player.playWhenReady,
+        // player.playbackState, player.playbackSuppressionReason and
+        // player.playerError for details.
+      }
+    }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,60 +184,61 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     val parent = requireSummitActivity()
     parent.hideSystemUI()
 
-    parent.insets.observe(viewLifecycleOwner) {
-      binding.playerView.findViewById<View>(R.id.controller_root_view).setPadding(
-        it.leftInset,
-        it.topInset,
-        it.rightInset,
-        it.bottomInset,
-      )
-    }
-
-    binding.playerView.setControllerVisibilityListener(
-      ControllerVisibilityListener {
-        if (it == View.VISIBLE) {
-          parent.showSystemUI()
-        } else {
-          parent.hideSystemUI()
-        }
-      },
-    )
-
-    binding.playerView.findViewById<View>(androidx.media3.ui.R.id.exo_fullscreen)
-      .visibility = View.GONE
-
-    binding.playerView.getRotateControl().apply {
-      visibility = View.VISIBLE
-
-      fun updateUi() {
-        if (currentPreferences.isVideoPlayerRotationLocked) {
-          setImageResource(R.drawable.ic_baseline_screen_rotation_24)
-        } else {
-          setImageResource(R.drawable.ic_baseline_screen_lock_rotation_24)
-        }
+    with(binding) {
+      parent.insets.observe(viewLifecycleOwner) {
+        playerView.findViewById<View>(R.id.controller_root_view).setPadding(
+          it.leftInset,
+          it.topInset,
+          it.rightInset,
+          it.bottomInset,
+        )
       }
 
-      setOnClickListener {
-        val isOrientationLocked = !currentPreferences.isVideoPlayerRotationLocked
-        currentPreferences.isVideoPlayerRotationLocked = isOrientationLocked
-        if (currentPreferences.isVideoPlayerRotationLocked) {
-          orientationListener?.disable()
-        } else {
-          orientationListener?.enable()
+      playerView.setControllerVisibilityListener(
+        ControllerVisibilityListener {
+          if (it == View.VISIBLE) {
+            parent.showSystemUI()
+          } else {
+            parent.hideSystemUI()
+          }
+        },
+      )
+
+      playerView.findViewById<View>(androidx.media3.ui.R.id.exo_fullscreen).visibility = View.GONE
+
+      playerView.getRotateControl().apply {
+        visibility = View.VISIBLE
+
+        fun updateUi() {
+          if (currentPreferences.isVideoPlayerRotationLocked) {
+            setImageResource(R.drawable.ic_baseline_screen_rotation_24)
+          } else {
+            setImageResource(R.drawable.ic_baseline_screen_lock_rotation_24)
+          }
+        }
+
+        setOnClickListener {
+          val isOrientationLocked = !currentPreferences.isVideoPlayerRotationLocked
+          currentPreferences.isVideoPlayerRotationLocked = isOrientationLocked
+          if (currentPreferences.isVideoPlayerRotationLocked) {
+            orientationListener?.disable()
+          } else {
+            orientationListener?.enable()
+          }
+          updateUi()
         }
         updateUi()
       }
-      updateUi()
+
+      val videoState: VideoState? =
+        if (savedInstanceState != null && savedInstanceState.containsKey(SIS_VIDEO_STATE)) {
+          savedInstanceState.getParcelableCompat(SIS_VIDEO_STATE)
+        } else {
+          args.videoState
+        }
+
+      loadVideo(context, LinkUtils.convertToHttps(args.url), args.videoType, videoState)
     }
-
-    val videoState: VideoState? =
-      if (savedInstanceState != null && savedInstanceState.containsKey(SIS_VIDEO_STATE)) {
-        savedInstanceState.getParcelableCompat(SIS_VIDEO_STATE)
-      } else {
-        args.videoState
-      }
-
-    loadVideo(context, LinkUtils.convertToHttps(args.url), args.videoType, videoState)
   }
 
   override fun onDestroyView() {
@@ -302,27 +319,30 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
       -> {
         binding.playerView.player?.removeListener(playerListener)
         @Suppress("UnsafeOptInUsageError")
-        binding.playerView.player = exoPlayerManagerManager.get(viewLifecycleOwner)
-          .getPlayerForUrl(
-            url = url,
-            videoType = videoType,
-            videoState = videoState ?: VideoState(
-              0,
-              volume = globalStateStorage.videoStateVolume,
-              playing = true,
-            ),
-            autoPlay = currentPreferences.autoPlayVideos,
-            isInline = false,
-          )
-          .apply {
-            addListener(playerListener)
+        binding.playerView.setPlayerWithPreferences(
+          exoPlayerManagerManager.get(viewLifecycleOwner)
+            .getPlayerForUrl(
+              url = url,
+              videoType = videoType,
+              videoState = videoState ?: VideoState(
+                0,
+                volume = globalStateStorage.videoStateVolume,
+                playing = true,
+              ),
+              autoPlay = currentPreferences.autoPlayVideos,
+              isInline = false,
+            )
+            .apply {
+              addListener(playerListener)
 
-            if (videoState?.volume == null) {
-              volume = globalStateStorage.videoStateVolume
-            } else {
-              volume = videoState.volume
-            }
-          }
+              if (videoState?.volume == null) {
+                volume = globalStateStorage.videoStateVolume
+              } else {
+                volume = videoState.volume
+              }
+            },
+          preferenceManager.currentPreferences
+        )
         setupMoreButton(context, url, args.url, videoType)
       }
     }

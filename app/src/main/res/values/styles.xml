@@ -412,6 +412,16 @@
         <item name="android:foreground">@drawable/card_image_ripple</item>
     </style>
 
+    <style name="PostTypeIconImageView">
+        <item name="shapeAppearanceOverlay">@style/PostTypeIconAppearanceOverlay</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="android:cropToPadding">true</item>
+        <item name="android:padding">1dp</item>
+        <item name="android:background">?backgroundColor</item>
+        <item name="android:tint">?colorOnBackground</item>
+    </style>
+<!--    <item name="tint">?attr/colorControlNormal</item>-->
+
     <style name="CardImageView">
         <item name="shapeAppearanceOverlay">@style/CardImageViewAppearanceOverlay</item>
         <item name="strokeColor">@color/colorDivider</item>
@@ -430,6 +440,9 @@
     </style>
     <style name="ListImageViewAppearanceOverlay">
         <item name="cornerSize">8dp</item>
+    </style>
+    <style name="PostTypeIconAppearanceOverlay">
+        <item name="cornerSize">4dp</item>
     </style>
 
     <style name="BottomSheetAnimations">
