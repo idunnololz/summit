@@ -14,12 +14,15 @@ import android.widget.ImageButton
 import androidx.annotation.OptIn
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView.ControllerVisibilityListener
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.error.ErrorDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
@@ -32,6 +35,7 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.LoopsVideoUtils
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.toErrorMessage
 import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
@@ -81,19 +85,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
   private val playerListener: Player.Listener = object : Player.Listener {
     override fun onPlaybackStateChanged(playbackState: Int) {
       super.onPlaybackStateChanged(playbackState)
-
-      if (!isBindingAvailable()) {
-        return
-      }
-
-      if (playbackState == Player.STATE_BUFFERING) {
-        binding.loadingView.showProgressBar()
-      } else {
-        binding.loadingView.hideAll()
-      }
-
-      binding.playerView.keepScreenOn =
-        !(playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED)
+      this@VideoViewerFragment.onPlaybackStateChanged(playbackState)
     }
 
     override fun onVolumeChanged(volume: Float) {
@@ -114,6 +106,16 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         // player.playbackState, player.playbackSuppressionReason and
         // player.playerError for details.
       }
+    }
+
+    override fun onPlayerError(error: PlaybackException) {
+      super.onPlayerError(error)
+
+      ErrorDialogFragment.show(
+        message = getString(R.string.error_unable_to_play_video),
+        error = error,
+        fm = childFragmentManager
+      )
     }
   }
 
@@ -334,6 +336,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
             )
             .apply {
               addListener(playerListener)
+              onPlaybackStateChanged(playbackState)
 
               if (videoState?.volume == null) {
                 volume = globalStateStorage.videoStateVolume
@@ -367,5 +370,20 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
       showMoreVideoOptions(url, originalUrl, moreActionsHelper, childFragmentManager)
     }
+  }
+
+  private fun onPlaybackStateChanged(playbackState: Int) {
+    if (!isBindingAvailable()) {
+      return
+    }
+
+    if (playbackState == Player.STATE_BUFFERING) {
+      binding.loadingView.showProgressBar()
+    } else {
+      binding.loadingView.hideAll()
+    }
+
+    binding.playerView.keepScreenOn =
+      !(playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED)
   }
 }

@@ -2,6 +2,7 @@ package com.idunnololz.summit.offline
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.core.net.toUri
@@ -86,8 +87,8 @@ class OfflineManager @Inject constructor(
     url: String?,
     listener: TaskListener,
     errorListener: TaskFailedListener?,
+    registerListenersIfTaskExists: Boolean = true,
   ) {
-    CoroutineScope(SupervisorJob())
     Log.d(TAG, "fetchImageWithError(): $url")
     url ?: return
     val registrations: MutableList<Registration> = (
@@ -98,7 +99,12 @@ class OfflineManager @Inject constructor(
       rootView.setTag(R.id.offline_manager_registrations, it)
     }
     registrations.add(
-      fetchImage(url, listener, errorListener),
+      fetchImage(
+        url = url,
+        listener = listener,
+        errorListener = errorListener,
+        registerListenersIfTaskExists = registerListenersIfTaskExists,
+      ),
     )
   }
 
@@ -159,12 +165,14 @@ class OfflineManager @Inject constructor(
     listener: TaskListener,
     errorListener: TaskFailedListener? = null,
     force: Boolean = false,
+    registerListenersIfTaskExists: Boolean = true,
   ): Registration = fetchGeneric(
     url = url,
     destDir = imagesDir,
     force = force,
     listener = listener,
     errorListener = errorListener,
+    registerListenersIfTaskExists = registerListenersIfTaskExists,
   )
 
 //    fun postProgressUpdate(message: String, progress: Double) {
@@ -216,6 +224,7 @@ class OfflineManager @Inject constructor(
     force: Boolean = false,
     listener: TaskListener,
     errorListener: TaskFailedListener?,
+    registerListenersIfTaskExists: Boolean
   ): Registration {
     assertMainThread()
     check(!destDir.exists() || destDir.isDirectory)
@@ -224,9 +233,11 @@ class OfflineManager @Inject constructor(
 
     // This task is already scheduled... abort
     if (task != null) {
-      task.listeners += listener
-      if (errorListener != null) {
-        task.errorListeners += errorListener
+      if (registerListenersIfTaskExists) {
+        task.listeners += listener
+        if (errorListener != null) {
+          task.errorListeners += errorListener
+        }
       }
       return Registration(url, listener, errorListener)
     }
@@ -238,13 +249,30 @@ class OfflineManager @Inject constructor(
       }
     }
 
-    val job = coroutineScope.launch(Dispatchers.Default) {
-      val result = withContext(Dispatchers.IO) {
-        downloadFileIfNeeded(
-          url = url,
-          destDir = destDir,
-          force = force,
-        )
+    val job = coroutineScope.launch(Dispatchers.Unconfined) {
+      val fileName = getFilenameForUrl(url)
+      val downloadedFile = File(destDir, fileName)
+
+      val result = if (!force && downloadedFile.exists()) {
+        Result.success(downloadedFile)
+      } else {
+        val downloadingFile = File(downloadInProgressDir, fileName)
+
+        downloadingFile.parentFile?.mkdirs()
+
+        withContext(Dispatchers.IO) {
+          downloadUrlToFile(url, downloadingFile)
+            .map {
+              if (downloadedFile.exists()) {
+                downloadedFile.delete()
+              }
+
+              downloadedFile.parentFile?.mkdirs()
+              downloadingFile.renameTo(downloadedFile)
+
+              downloadedFile
+            }
+        }
       }
 
       val file = result.fold(
@@ -254,7 +282,6 @@ class OfflineManager @Inject constructor(
 
           // Delete downloaded file if there is an error in case the file is corrupt due to
           // network issue, etc.
-          val downloadedFile = File(destDir, getFilenameForUrl(url))
           downloadedFile.delete()
 
           withContext(Dispatchers.Main) {
@@ -268,9 +295,15 @@ class OfflineManager @Inject constructor(
         },
       ) ?: return@launch
 
-      withContext(Dispatchers.Main) {
+      if (Looper.myLooper() == Looper.getMainLooper()) {
         downloadTasks.remove(url)?.listeners?.forEach {
           it(file)
+        }
+      } else {
+        withContext(Dispatchers.Main) {
+          downloadTasks.remove(url)?.listeners?.forEach {
+            it(file)
+          }
         }
       }
     }
@@ -278,35 +311,6 @@ class OfflineManager @Inject constructor(
     jobMap.getOrPut(url) { arrayListOf() }.add(job)
 
     return Registration(url, listener, errorListener)
-  }
-
-  private suspend fun downloadFileIfNeeded(
-    url: String,
-    destDir: File,
-    force: Boolean,
-  ): Result<File> {
-    val fileName = getFilenameForUrl(url)
-    val downloadedFile = File(destDir, fileName)
-    val downloadingFile = File(downloadInProgressDir, fileName)
-    Log.d(TAG, "dl file: " + downloadedFile.absolutePath)
-
-    if (!force && downloadedFile.exists()) {
-      return Result.success(downloadedFile)
-    }
-
-    downloadingFile.parentFile?.mkdirs()
-
-    return downloadUrlToFile(url, downloadingFile)
-      .map {
-        if (downloadedFile.exists()) {
-          downloadedFile.delete()
-        }
-
-        downloadedFile.parentFile?.mkdirs()
-        downloadingFile.renameTo(downloadedFile)
-
-        downloadedFile
-      }
   }
 
   private suspend fun downloadUrlToFile(url: String, destFile: File): Result<Unit> {

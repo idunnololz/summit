@@ -443,7 +443,11 @@ class GalleryImageView : ShapeableImageView {
       }
 
       savedZoomState = ZoomState(
-        relativeZoom = curZoom / minZoom.toDouble(),
+        relativeZoom = if (minZoom == 0f) {
+          1.0
+        } else {
+          curZoom / minZoom.toDouble()
+        },
         imageRatio = oldDrawable.intrinsicWidth.toDouble() / oldDrawable.intrinsicHeight,
         relativeOffX = offX.toDouble() / oldDrawable.intrinsicWidth,
         relativeOffY = offY.toDouble() / oldDrawable.intrinsicHeight,

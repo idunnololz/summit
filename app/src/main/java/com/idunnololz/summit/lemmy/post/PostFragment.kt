@@ -171,6 +171,7 @@ class PostFragment :
     BottomMenu(requireContext()).apply {
       addItem(R.id.sort_order_hot, R.string.sort_order_hot)
       addItem(R.id.sort_order_top, R.string.sort_order_top)
+      addItem(R.id.sort_order_controversial, R.string.sort_order_controversial)
       addItem(R.id.sort_order_new, R.string.sort_order_new)
       addItem(R.id.sort_order_old, R.string.sort_order_old)
       setTitle(R.string.comments_sort_order)
@@ -1318,6 +1319,7 @@ class PostFragment :
       CommentsSortOrder.Top -> _sortByMenu.setChecked(R.id.sort_order_top)
       CommentsSortOrder.New -> _sortByMenu.setChecked(R.id.sort_order_new)
       CommentsSortOrder.Old -> _sortByMenu.setChecked(R.id.sort_order_old)
+      CommentsSortOrder.Controversial -> _sortByMenu.setChecked(R.id.sort_order_controversial)
       else -> {}
     }
 

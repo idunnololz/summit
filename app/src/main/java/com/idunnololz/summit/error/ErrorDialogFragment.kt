@@ -29,11 +29,29 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
 
       Log.d("ErrorDialogFragment", "Displaying error dialog for error.", error)
 
+      val errorMessage = if (error.message != null) {
+        buildString {
+          var curErr: Throwable? = error
+          while (curErr != null) {
+            if (curErr == error) {
+              appendLine(curErr.message)
+            } else {
+              appendLine("\tCaused by: ${curErr.message}")
+            }
+
+
+            curErr = curErr.cause
+          }
+        }
+      } else {
+        null
+      }
+
       ErrorDialogFragment()
         .apply {
           arguments = ErrorDialogFragmentArgs(
             message = message,
-            errorMessage = error.message ?: stackTrace,
+            errorMessage = errorMessage ?: stackTrace,
             errorType = error::class.simpleName ?: "UNKNOWN",
           ).toBundle()
         }

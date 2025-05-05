@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.app.SharedElementCallback
 import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
@@ -396,7 +397,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
   override fun onResume() {
     super.onResume()
 
-    setupForFragment<PersonTabbedFragment>()
+    setupForFragment<PersonTabbedFragment>(animate = false)
 
     if (binding.viewPager.currentItem == 0) {
       getMainActivity()?.setNavUiOpenPercent(0f)
@@ -490,11 +491,11 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
 
         profileIcon.setOnClickListener {
           getMainActivity()?.openImage(
-            profileIcon,
-            toolbar,
-            person.fullName,
-            person.avatar,
-            null,
+            sharedElement = profileIcon,
+            appBar = null,
+            title = person.fullName,
+            url = person.avatar,
+            mimeType = null,
           )
         }
       }

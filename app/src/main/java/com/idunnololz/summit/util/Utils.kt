@@ -526,10 +526,12 @@ fun Fragment.openAppOnPlayStore() = try {
   )
 }
 
-fun Context.getErrorDrawable() = getDrawableCompat(R.drawable.broken_image_with_padding)
+fun Context.getImageErrorDrawable() = getDrawableCompat(R.drawable.broken_image_with_padding)
   ?.apply {
     tint(getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
   }
 
-fun Context.getErrorImage() = getErrorDrawable()
-  ?.asImage()
+fun Context.getVideoErrorDrawable() = getDrawableCompat(R.drawable.video_icon_with_padding)
+  ?.apply {
+    tint(getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+  }

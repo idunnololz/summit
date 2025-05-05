@@ -32,6 +32,11 @@ sealed interface CommentsSortOrder : Parcelable {
   @SerialName("4")
   @Parcelize
   data object Old : CommentsSortOrder
+
+  @Serializable
+  @SerialName("5")
+  @Parcelize
+  data object Controversial : CommentsSortOrder
 }
 
 fun CommentsSortOrder.getLocalizedName(context: Context) = when (this) {
@@ -39,6 +44,7 @@ fun CommentsSortOrder.getLocalizedName(context: Context) = when (this) {
   CommentsSortOrder.Top -> context.getString(R.string.sort_order_top)
   CommentsSortOrder.New -> context.getString(R.string.sort_order_new)
   CommentsSortOrder.Old -> context.getString(R.string.sort_order_old)
+  CommentsSortOrder.Controversial -> context.getString(R.string.sort_order_controversial)
 }
 
 fun CommentsSortOrder.toApiSortOrder(): CommentSortType = when (this) {
@@ -46,12 +52,14 @@ fun CommentsSortOrder.toApiSortOrder(): CommentSortType = when (this) {
   CommentsSortOrder.Top -> CommentSortType.Top
   CommentsSortOrder.New -> CommentSortType.New
   CommentsSortOrder.Old -> CommentSortType.Old
+  CommentsSortOrder.Controversial -> CommentSortType.Controversial
 }
 fun CommentSortType.toId(): Int = when (this) {
   CommentSortType.Hot -> R.id.sort_order_hot
   CommentSortType.Top -> R.id.sort_order_top
   CommentSortType.New -> R.id.sort_order_new
   CommentSortType.Old -> R.id.sort_order_old
+  CommentSortType.Controversial -> R.id.sort_order_controversial
 }
 
 fun idToCommentsSortOrder(id: Int) = when (id) {
@@ -63,5 +71,7 @@ fun idToCommentsSortOrder(id: Int) = when (id) {
     CommentsSortOrder.New
   R.id.sort_order_old ->
     CommentsSortOrder.Old
+  R.id.sort_order_controversial ->
+    CommentsSortOrder.Controversial
   else -> null
 }

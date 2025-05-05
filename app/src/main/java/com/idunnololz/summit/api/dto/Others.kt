@@ -150,6 +150,9 @@ enum class CommentSortType {
    */
   @SerializedName("Old")
   Old,
+
+  @SerializedName("Controversial")
+  Controversial,
 }
 
 /**

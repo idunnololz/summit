@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
+import android.transition.Transition
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -417,10 +418,14 @@ class MainActivity : SummitActivity() {
       .show()
   }
 
-  override fun onResume() {
-    super.onResume()
+  override fun onStart() {
+    super.onStart()
 
     viewModel.updateUnreadCount()
+  }
+
+  override fun onResume() {
+    super.onResume()
 
     if (preferences.shakeToSendFeedback) {
       shakeFeedbackHelper.start()
@@ -954,10 +959,7 @@ class MainActivity : SummitActivity() {
       }
 
       if (navBarController.useBottomNavBar && !navBarController.useNavigationRail) {
-        sharedElements += Pair.create(
-          navBarController.navBar,
-          SharedElementNames.NAV_BAR,
-        )
+        sharedElements += Pair.create(navBarController.navBar, SharedElementNames.NAV_BAR)
       }
 
       val options = ActivityOptionsCompat.makeSceneTransitionAnimation(

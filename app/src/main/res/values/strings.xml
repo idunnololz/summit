@@ -2089,6 +2089,7 @@
     <string name="open_link_when_thumbnail_tapped_desc">When enabled, tapping a thumbnail in certain layouts will open the link of the post instead of expanding the post.</string>
     <string name="top_communities">Top communities</string>
     <string name="show_post_type">Show post type</string>
+    <string name="error_unable_to_play_video">Unable to play video.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

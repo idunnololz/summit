@@ -684,30 +684,42 @@ class LemmyContentHelper(
           this.size(finalW, finalH)
         }
 
-        listener { _, result ->
-          loadingView?.hideAll(animate = false)
+        listener(
+          onError = { _, error ->
+            if (isUrlVideo) {
+              // video url loading takes a different path. It doesn't handle errors normally so we
+              // need to handle them here.
 
-          tempSize.width = result.image.width
-          tempSize.height = result.image.height
+              loadingView?.showDefaultErrorMessageFor(error.throwable)
+              errorListener?.invoke(error.throwable)
+            }
+            Log.d(TAG, "Coil - Failed to load icon: ${imageUrl}")
+          },
+          onSuccess = { _, result ->
+            loadingView?.hideAll(animate = false)
 
-          Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
-          imageView.alpha = 1f
+            tempSize.width = result.image.width
+            tempSize.height = result.image.height
 
-          if (preferFullSizeImage) {
-            if (tempSize.width > 0 && tempSize.height > 0) {
-              offlineManager.setImageSizeHint(
-                imageSizeKey,
-                tempSize.width,
-                tempSize.height,
+            Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
+            imageView.alpha = 1f
+
+            if (preferFullSizeImage) {
+              if (tempSize.width > 0 && tempSize.height > 0) {
+                offlineManager.setImageSizeHint(
+                  imageSizeKey,
+                  tempSize.width,
+                  tempSize.height,
+                )
+              }
+              imageView.updateLayoutParams(
+                contentMaxWidth = contentMaxWidth,
+                imageUrl = imageSizeKey,
+                tempSize = tempSize,
               )
             }
-            imageView.updateLayoutParams(
-              contentMaxWidth = contentMaxWidth,
-              imageUrl = imageSizeKey,
-              tempSize = tempSize,
-            )
           }
-        }
+        )
       }
     }
 
@@ -738,6 +750,7 @@ class LemmyContentHelper(
           } else {
             loadingView?.showDefaultErrorMessageFor(it)
           }
+          Log.d(TAG, "Failed to load icon: ${imageUrl}")
           errorListener?.invoke(it)
         },
       )

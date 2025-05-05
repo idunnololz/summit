@@ -46,6 +46,7 @@ import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
+import androidx.core.view.isVisible
 
 class NavBarController(
   val context: Context,
@@ -280,6 +281,7 @@ class NavBarController(
 
   fun showBottomNav(supportOpenness: Boolean = false) {
     if (!useBottomNavBar) return
+
     if (enableBottomNavViewScrolling && navBar.visibility == View.VISIBLE && navBar.alpha == 1f) {
       return
     }
@@ -301,8 +303,6 @@ class NavBarController(
         } else {
           navBarContainer.height.toFloat()
         }
-
-    _navBarOffsetPercent.value = 0f
 
     if (useNavigationRail) {
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
@@ -326,6 +326,7 @@ class NavBarController(
           .translationX(navigationBarOffset).duration = 250
       }
     } else {
+      Log.d("HAHA", "navBarContainer.vis: ${navBarContainer.isVisible} y:${navBarContainer.translationY}")
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
         navBarContainer.visibility = View.VISIBLE
         navBarContainer.translationY = navBarContainer.height.toFloat()
@@ -336,6 +337,9 @@ class NavBarController(
           .apply {
             duration = 250
           }
+          .withEndAction {
+//            _navBarOffsetPercent.value = 1f
+          }
       } else {
         if (navBarContainer.translationY == 0f) {
           navBarContainer.alpha = 1f
@@ -344,7 +348,13 @@ class NavBarController(
 
         navBarContainer.animate()
           .alpha(1f)
-          .translationY(navigationBarOffset).duration = 250
+          .translationY(navigationBarOffset)
+          .apply {
+            duration = 250
+          }
+          .withEndAction {
+//            _navBarOffsetPercent.value = 1f
+          }
       }
     }
   }

@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.postListView
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -85,7 +84,7 @@ import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
-import com.idunnololz.summit.util.getErrorDrawable
+import com.idunnololz.summit.util.getImageErrorDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.ExoPlayerManagerManager
@@ -96,6 +95,8 @@ import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.idunnololz.summit.util.ContentUtils.isUrlVideo
+import com.idunnololz.summit.util.getVideoErrorDrawable
 
 @FragmentScoped
 class PostListViewBuilder @Inject constructor(
@@ -1027,14 +1028,19 @@ class PostListViewBuilder @Inject constructor(
               preferFullSizeImage = preferFullSizeImages,
               imageViewWidth = postImageWidth,
               shouldBlur = !isRevealed && postView.post.nsfw,
-            ) {
-              if (!useBackupUrl && backupImageUrl != null) {
-                loadImage(true)
-              } else {
-                imageView.dispose()
-                imageView.setImageDrawable(context.getErrorDrawable())
+              errorListener = {
+                if (!useBackupUrl && backupImageUrl != null) {
+                  loadImage(true)
+                } else {
+                  imageView.dispose()
+                  if (isUrlVideo(urlToLoad)) {
+                    imageView.setImageDrawable(context.getVideoErrorDrawable())
+                  } else {
+                    imageView.setImageDrawable(context.getImageErrorDrawable())
+                  }
+                }
               }
-            }
+            )
           }
 
           loadImage()
