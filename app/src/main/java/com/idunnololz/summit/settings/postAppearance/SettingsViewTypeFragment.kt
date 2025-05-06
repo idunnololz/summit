@@ -328,7 +328,7 @@ class SettingsViewTypeFragment :
       val h = when (preferences.getPostsLayout()) {
         CommunityLayout.Compact ->
           ListingItemViewHolder.fromBinding(
-            ListingItemCompactBinding.inflate(inflater, binding.demoViewContainer, true),
+            ListingItemCompactBinding.inflate(inflater, binding.demoViewContainer, false),
           )
         CommunityLayout.List ->
           ListingItemViewHolder.fromBinding(

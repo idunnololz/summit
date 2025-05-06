@@ -11,6 +11,8 @@ import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentsThreadStyle
 import com.idunnololz.summit.preferences.FontIds
 import com.idunnololz.summit.preferences.GestureSwipeDirectionIds
+import com.idunnololz.summit.preferences.GlobalFontColorId
+import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.PostFabQuickActions
@@ -1539,15 +1541,29 @@ class ThemeSettings @Inject constructor(
     relatedKeys = listOf(KEY_GLOBAL_FONT),
   )
 
-  val fontSize = TextOnlySettingItem(
+  val fontSize = RadioGroupSettingItem(
+    null,
     context.getString(R.string.font_size),
     "",
+    mapOf(
+      GlobalFontSizeId.Small to context.getString(R.string.small),
+      GlobalFontSizeId.Normal to context.getString(R.string.normal),
+      GlobalFontSizeId.Large to context.getString(R.string.large),
+      GlobalFontSizeId.ExtraLarge to context.getString(R.string.extra_large),
+      GlobalFontSizeId.Xxl to context.getString(R.string.xxl),
+      GlobalFontSizeId.Xxxl to context.getString(R.string.xxxl),
+    ).toOptions(GlobalFontSizeId.Normal),
     relatedKeys = listOf(KEY_GLOBAL_FONT_SIZE),
   )
 
-  val fontColor = TextOnlySettingItem(
+  val fontColor = RadioGroupSettingItem(
+    null,
     context.getString(R.string.font_color),
     "",
+    mapOf(
+      GlobalFontColorId.Calm to context.getString(R.string.calm),
+      GlobalFontColorId.HighContrast to context.getString(R.string.high_contrast),
+    ).toOptions(GlobalFontColorId.Calm),
     relatedKeys = listOf(KEY_GLOBAL_FONT_COLOR),
   )
 
@@ -3026,3 +3042,14 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
     null,
   ),
 )
+
+private fun Map<Int, String>.toOptions(default: Int) =
+  entries.map { (key, value) ->
+    RadioGroupSettingItem.RadioGroupOption(
+      key,
+      value,
+      null,
+      null,
+      isDefault = key == default
+    )
+  }
