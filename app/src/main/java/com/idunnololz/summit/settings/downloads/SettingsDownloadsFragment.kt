@@ -15,9 +15,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.idunnololz.summit.databinding.FragmentSettingsDownloadsBinding
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.DownloadSettings
+import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.asCustomItem
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
@@ -29,13 +32,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SettingsDownloadsFragment : BaseFragment<FragmentSettingsDownloadsBinding>() {
+class SettingsDownloadsFragment : BaseSettingsFragment() {
 
   @Inject
-  lateinit var preferences: Preferences
-
-  @Inject
-  lateinit var settings: DownloadSettings
+  override lateinit var settings: DownloadSettings
 
   private val openDocumentTreeLauncher = registerForActivityResult(
     ActivityResultContracts.OpenDocumentTree(),
@@ -51,55 +51,18 @@ class SettingsDownloadsFragment : BaseFragment<FragmentSettingsDownloadsBinding>
     }
   }
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    super.onCreateView(inflater, container, savedInstanceState)
-
-    setBinding(FragmentSettingsDownloadsBinding.inflate(inflater, container, false))
-
-    return binding.root
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
-    val context = requireContext()
-
-    requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-      setSupportActionBar(binding.toolbar)
-
-      supportActionBar?.setDisplayShowHomeEnabled(true)
-      supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      supportActionBar?.title = settings.getPageName(context)
-    }
-
-    updateRendering()
-  }
-
-  private fun updateRendering() {
-    val context = context ?: return
-
-    settings.downloadDirectory.bindTo(
-      binding.downloadDirectory,
+  override fun generateData(): List<SettingModelItem> = listOf(
+    settings.downloadDirectory.asCustomItem(
       { getCurrentDownloadDirectory() },
-      { setting, currentValue ->
-        openDocumentTreeLauncher.launch(null)
-      },
+      { openDocumentTreeLauncher.launch(null) },
+    ),
+    settings.resetDownloadDirectory.asCustomItem(
+      {
+        preferences.reset(KEY_DOWNLOAD_DIRECTORY)
+        refresh()
+      }
     )
-    settings.resetDownloadDirectory.bindTo(
-      binding.resetDownloadDirectory,
-    ) {
-      preferences.reset(KEY_DOWNLOAD_DIRECTORY)
-      updateRendering()
-    }
-  }
+  )
 
   private fun getCurrentDownloadDirectory(): String {
     val context = context ?: return ""
@@ -146,6 +109,6 @@ class SettingsDownloadsFragment : BaseFragment<FragmentSettingsDownloadsBinding>
       Intent.FLAG_GRANT_WRITE_URI_PERMISSION
     contentResolver.takePersistableUriPermission(uri, takeFlags)
 
-    updateRendering()
+    refresh()
   }
 }
