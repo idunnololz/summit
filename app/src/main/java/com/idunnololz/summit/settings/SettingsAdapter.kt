@@ -3,15 +3,20 @@ package com.idunnololz.summit.settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import coil3.load
+import com.google.android.material.slider.Slider
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.SettingColorItemBinding
+import com.idunnololz.summit.databinding.SettingDividerItemBinding
 import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffBinding
+import com.idunnololz.summit.databinding.SettingSliderItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
@@ -57,7 +62,7 @@ sealed interface SettingModelItem {
   data class ColorItem(
     override val setting: ColorSettingItem,
     val defaultValue: Int,
-    val getCurrentValue: () -> Int,
+    val getCurrentValue: () -> Int?,
     val onValueChanged: (Int) -> Unit,
   ): SettingModelItem
 
@@ -67,7 +72,7 @@ sealed interface SettingModelItem {
     val description: String?,
     val icon: Int,
     val getCurrentValue: () -> String?,
-    val onValueChanged: () -> Unit,
+    val onValueChanged: SettingsAdapter.() -> Unit,
   ): SettingModelItem
 
   data class CustomViewItem<T, VB : ViewBinding>(
@@ -84,6 +89,19 @@ sealed interface SettingModelItem {
     val getCurrentValue: () -> String?,
     val onValueChanged: () -> Unit,
   ): SettingModelItem
+
+  data class SliderSettingItem(
+    override val setting: com.idunnololz.summit.settings.SliderSettingItem,
+    val getCurrentValue: () -> Float,
+    val onValueChanged: (Float) -> Unit,
+  ): SettingModelItem
+
+  data class DividerItem(
+    @IdRes val id: Int
+  ) : SettingModelItem {
+    override val setting: SettingItem
+      get() = TODO("Not yet implemented")
+  }
 }
 
 fun RadioGroupSettingItem.asRadioGroup(
@@ -99,7 +117,7 @@ fun RadioGroupSettingItem.asRadioGroup(
 
 fun RadioGroupSettingItem.asCustomItem(
   getCurrentValue: () -> Int?,
-  onValueChanged: (RadioGroupSettingItem) -> Unit,
+  onValueChanged: SettingsAdapter.(RadioGroupSettingItem) -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
     this,
@@ -107,7 +125,7 @@ fun RadioGroupSettingItem.asCustomItem(
     this.description,
     0,
     { this.options.firstOrNull { it.id == getCurrentValue() }?.title },
-    { onValueChanged(this) },
+    { onValueChanged(this@asCustomItem) },
   )
 }
 
@@ -118,9 +136,9 @@ fun BasicSettingItem.asCustomItem(
     this,
     this.title,
     this.description,
-    0,
+    this.icon ?: 0,
     { null },
-    { onValueChanged(this) },
+    { onValueChanged(this@asCustomItem) },
   )
 }
 
@@ -134,7 +152,7 @@ fun BasicSettingItem.asCustomItem(
     this.description,
     drawableRes,
     { null },
-    { onValueChanged(this) },
+    { onValueChanged(this@asCustomItem) },
   )
 }
 
@@ -155,13 +173,13 @@ inline fun <T, reified VB : ViewBinding> BasicSettingItem.asCustomViewSettingsIt
 }
 
 fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
-  activity: SummitActivity,
   getCurrentValue: () -> Int?,
-  onValueChanged: (Int) -> Unit,
+  onValueChanged: SettingsAdapter.(Int) -> Unit,
 ): SettingModelItem.CustomItem {
   return asCustomItem(
     getCurrentValue,
-    {
+    a@{
+      val activity = getSummitActivity()
       val curChoice = getCurrentValue()
       val bottomMenu = BottomMenu(activity)
         .apply {
@@ -181,6 +199,7 @@ fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
 
           setOnMenuItemClickListener {
             onValueChanged(requireNotNull(idToChoice[it.id]))
+            this@a.onValueChanged()
           }
         }
       activity.showBottomMenu(bottomMenu)
@@ -200,7 +219,7 @@ fun OnOffSettingItem.asOnOffSwitch(
 }
 
 fun ColorSettingItem.asColorItem(
-  getCurrentValue: () -> Int,
+  getCurrentValue: () -> Int?,
   onValueChanged: (Int) -> Unit,
   defaultColor: () -> Int,
 ): SettingModelItem {
@@ -214,7 +233,7 @@ fun ColorSettingItem.asColorItem(
 
 fun TextValueSettingItem.asCustomItem(
   getCurrentValue: () -> String,
-  onValueChanged: () -> Unit,
+  onValueChanged: SettingsAdapter.() -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
     this,
@@ -237,17 +256,18 @@ fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
     0,
     getCurrentValue,
     {
-      if (this.supportsRichText) {
+      val setting = this@asCustomItemWithTextEditorDialog
+      if (setting.supportsRichText) {
         RichTextValueDialogFragment.newInstance(
-          this.title,
-          this.id,
+          setting.title,
+          setting.id,
           getCurrentValue() as? String,
         ).showAllowingStateLoss(fragmentManager, "asdf")
       } else {
         TextValueDialogFragment.newInstance(
-          this.title,
-          this.id,
-          this.hint,
+          setting.title,
+          setting.id,
+          setting.hint,
           getCurrentValue() as? String,
         ).showAllowingStateLoss(fragmentManager, "asdf")
       }
@@ -266,8 +286,22 @@ fun ImageValueSettingItem.asImageValueItem(
   )
 }
 
+
+fun SliderSettingItem.asSliderItem(
+  getCurrentValue: () -> Float,
+  onValueChanged: (Float) -> Unit,
+): SettingModelItem.SliderSettingItem {
+  return SettingModelItem.SliderSettingItem(
+    this,
+    getCurrentValue,
+    onValueChanged,
+  )
+}
+
 class SettingsAdapter(
   private val globalStateStorage: GlobalStateStorage,
+  val getSummitActivity: () -> SummitActivity,
+  val onValueChanged: () -> Unit,
 ) : Adapter<ViewHolder>() {
 
   sealed interface Item {
@@ -312,13 +346,42 @@ class SettingsAdapter(
       override val setting: ImageValueSettingItem,
       val value: String?,
     ): Item
+
+    data class SliderItem(
+      override val setting: SliderSettingItem,
+      val value: Float,
+    ): Item
+
+    data object FooterItem : Item {
+      override val setting: SettingItem
+        get() = TODO("Not yet implemented")
+    }
+
+    data class DividerItem(
+      @IdRes val id: Int
+    ) : Item {
+      override val setting: SettingItem
+        get() = TODO("Not yet implemented")
+    }
   }
 
   private var data: List<SettingModelItem> = listOf()
 
   private val adapterHelper = AdapterHelper<Item>(
     { old, new ->
-      old::class == new::class && old.setting.id == new.setting.id
+      old::class == new::class &&
+        when (old) {
+          Item.FooterItem -> true
+          is Item.DividerItem -> {
+            old.id == (new as Item.DividerItem).id
+          }
+          is Item.SubtitleItem -> {
+            old.setting.title == new.setting.title
+          }
+          else -> {
+            old.setting.id == new.setting.id
+          }
+        }
     }
   ).apply {
     addItemType(Item.RadioGroupOptionItem::class, RadioGroupOptionSettingItemBinding::inflate) { item, b, h ->
@@ -347,7 +410,7 @@ class SettingsAdapter(
           ?.onValueChanged
           ?.invoke(option.id)
 
-        refreshItems()
+        onValueChanged()
       }
     }
     addItemType(Item.SubtitleItem::class, SubgroupSettingItemBinding::inflate) { item, b, h ->
@@ -361,8 +424,7 @@ class SettingsAdapter(
           findSettingModel<SettingModelItem.OnOffSwitchItem>(item.setting.id)
             ?.onValueChanged
             ?.invoke(it)
-
-          refreshItems()
+          onValueChanged()
         }
       )
     }
@@ -375,7 +437,8 @@ class SettingsAdapter(
           findSettingModel<SettingModelItem.ColorItem>(item.setting.id)
             ?.onValueChanged
             ?.invoke(it)
-          refreshItems()
+
+          onValueChanged()
         },
         defaultValue = { item.defaultValue },
       )
@@ -399,7 +462,7 @@ class SettingsAdapter(
           ?.onValueChanged
           ?.invoke()
 
-        refreshItems()
+        onValueChanged()
       }
     }
     addItemType(Item.CustomItem::class, SettingTextValueBinding::inflate) { item, b, h ->
@@ -436,8 +499,9 @@ class SettingsAdapter(
         b.root.setOnClickListener {
           findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
             ?.onValueChanged
-            ?.invoke()
-          refreshItems()
+            ?.invoke(this@SettingsAdapter)
+
+          onValueChanged()
         }
       } else {
         b.title.isEnabled = false
@@ -446,6 +510,42 @@ class SettingsAdapter(
         b.root.isEnabled = false
       }
     }
+    addItemType(Item.SliderItem::class, SettingSliderItemBinding::inflate) { item, b, h ->
+      val setting = item.setting
+      b.title.text = setting.title
+      b.slider.valueFrom = setting.minValue
+      b.slider.valueTo = setting.maxValue
+
+      val stepSize = setting.stepSize
+      if (stepSize != null) {
+        b.slider.stepSize = stepSize
+        b.slider.value =
+          ((item.value / stepSize).toInt() * b.slider.stepSize)
+            .coerceIn(setting.minValue, setting.maxValue)
+      } else {
+        b.slider.value = item.value.coerceIn(setting.minValue, setting.maxValue)
+      }
+
+      b.slider.addOnSliderTouchListener(
+        object : Slider.OnSliderTouchListener {
+          override fun onStartTrackingTouch(slider: Slider) {}
+
+          override fun onStopTrackingTouch(slider: Slider) {
+            findSettingModel<SettingModelItem.SliderSettingItem>(item.setting.id)
+              ?.onValueChanged
+              ?.invoke(slider.value)
+
+            onValueChanged()
+          }
+        },
+      )
+
+      // Prevent auto state restoration since multiple checkboxes can have the same id
+      b.slider.isSaveEnabled = false
+    }
+
+    addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { item, b, h ->  }
+    addItemType(Item.DividerItem::class, SettingDividerItemBinding::inflate) { item, b, h ->  }
   }
 
   private inline fun <reified T : SettingModelItem> findSettingModel(id: Int): T? {
@@ -503,7 +603,11 @@ class SettingsAdapter(
           newItems += Item.OnOffSwitchItem(item.setting, item.getCurrentValue())
         }
         is SettingModelItem.ColorItem -> {
-          newItems += Item.ColorItem(item.setting, item.getCurrentValue(), item.defaultValue)
+          newItems += Item.ColorItem(
+            setting = item.setting,
+            currentValue = item.getCurrentValue() ?: item.defaultValue,
+            defaultValue = item.defaultValue
+          )
         }
         is SettingModelItem.CustomItem -> {
           newItems += Item.CustomItem(
@@ -540,12 +644,23 @@ class SettingsAdapter(
             value = item.getCurrentValue(),
           )
         }
+        is SettingModelItem.SliderSettingItem -> {
+          newItems += Item.SliderItem(
+            setting = item.setting,
+            value = item.getCurrentValue(),
+          )
+        }
+        is SettingModelItem.DividerItem -> {
+          newItems += Item.DividerItem(item.id)
+        }
       }
     }
 
     data.forEach { item ->
       processItem(item)
     }
+
+    newItems += Item.FooterItem
 
     adapterHelper.setItems(newItems, this)
   }

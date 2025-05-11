@@ -9,9 +9,15 @@ import com.idunnololz.summit.databinding.FragmentSettingsGesturesBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.GestureSettings
+import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.asColorItem
+import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.asSliderItem
 import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.util.bindTo
@@ -26,231 +32,108 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsGesturesFragment :
-  BaseFragment<FragmentSettingsGesturesBinding>(),
-  SettingValueUpdateCallback {
-
-  @Inject
-  lateinit var preferences: Preferences
+  BaseSettingsFragment() {
 
   @Inject
   lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
   @Inject
-  lateinit var settings: GestureSettings
+  override lateinit var settings: GestureSettings
 
-  @Inject
-  lateinit var globalStateStorage: GlobalStateStorage
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    super.onCreateView(inflater, container, savedInstanceState)
-
-    requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-    }
-
-    setBinding(FragmentSettingsGesturesBinding.inflate(inflater, container, false))
-
-    return binding.root
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
+  override fun generateData(): List<SettingModelItem> {
     val context = requireContext()
 
-    requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+    return listOf(
+      settings.useGestureActions.asOnOffSwitch(
+        { preferences.useGestureActions },
+        {
+          preferences.useGestureActions = it
+          preferences.hideCommentActions = preferences.useGestureActions
 
-      setSupportActionBar(binding.toolbar)
-
-      supportActionBar?.setDisplayShowHomeEnabled(true)
-      supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      supportActionBar?.title = settings.getPageName(context)
-    }
-
-    updateRendering()
-  }
-
-  private fun updateRendering() {
-    val context = requireContext()
-
-    settings.useGestureActions.bindTo(
-      binding.gestureActions,
-      { preferences.useGestureActions },
-      {
-        preferences.useGestureActions = it
-        preferences.hideCommentActions = preferences.useGestureActions
-
-        postAndCommentViewBuilder.onPreferencesChanged()
-
-        updateRendering()
-      },
+          postAndCommentViewBuilder.onPreferencesChanged()
+        },
+      ),
+      settings.gestureSwipeDirection.asSingleChoiceSelectorItem(
+        { preferences.gestureSwipeDirection },
+        { preferences.gestureSwipeDirection = it },
+      ),
+      SettingModelItem.SubgroupItem(
+        getString(R.string.post_actions),
+        listOf(
+          settings.postGestureAction1.asSingleChoiceSelectorItem(
+            { preferences.postGestureAction1 },
+            { preferences.postGestureAction1 = it },
+          ),
+          settings.postGestureActionColor1.asColorItem(
+            { preferences.postGestureActionColor1 },
+            { preferences.postGestureActionColor1 = it },
+            { context.getColorCompat(R.color.style_red) },
+          ),
+          settings.postGestureAction2.asSingleChoiceSelectorItem(
+            { preferences.postGestureAction2 },
+            { preferences.postGestureAction2 = it },
+          ),
+          settings.postGestureActionColor2.asColorItem(
+            { preferences.postGestureActionColor2 },
+            { preferences.postGestureActionColor2 = it },
+            { context.getColorCompat(R.color.style_blue) },
+          ),
+          settings.postGestureAction3.asSingleChoiceSelectorItem(
+            { preferences.postGestureAction3 },
+            { preferences.postGestureAction3 = it },
+          ),
+          settings.postGestureActionColor3.asColorItem(
+            { preferences.postGestureActionColor3 },
+            { preferences.postGestureActionColor3 = it },
+            { context.getColorCompat(R.color.style_amber) },
+          ),
+          settings.postGestureSize.asSliderItem(
+            { preferences.postGestureSize },
+            { preferences.postGestureSize = it },
+          ),
+        )
+      ),
+      SettingModelItem.SubgroupItem(
+        getString(R.string.comment_actions),
+        listOf(
+          settings.commentGestureAction1.asSingleChoiceSelectorItem(
+            { preferences.commentGestureAction1 },
+            { preferences.commentGestureAction1 = it },
+          ),
+          settings.commentGestureActionColor1.asColorItem(
+            { preferences.commentGestureActionColor1 },
+            {
+              preferences.commentGestureActionColor1 = it
+            },
+            { context.getColorCompat(R.color.style_red) },
+          ),
+          settings.commentGestureAction2.asSingleChoiceSelectorItem(
+            { preferences.commentGestureAction2 },
+            { preferences.commentGestureAction2 = it },
+          ),
+          settings.commentGestureActionColor2.asColorItem(
+            { preferences.commentGestureActionColor2 },
+            { preferences.commentGestureActionColor2 = it
+            },
+            { context.getColorCompat(R.color.style_blue) },
+          ),
+          settings.commentGestureAction3.asSingleChoiceSelectorItem(
+            { preferences.commentGestureAction3 },
+            { preferences.commentGestureAction3 = it },
+          ),
+          settings.commentGestureActionColor3.asColorItem(
+            { preferences.commentGestureActionColor3 },
+            {
+              preferences.commentGestureActionColor3 = it
+            },
+            { context.getColorCompat(R.color.style_amber) },
+          ),
+          settings.commentGestureSize.asSliderItem(
+            { preferences.commentGestureSize },
+            { preferences.commentGestureSize = it },
+          ),
+        )
+      ),
     )
-    settings.gestureSwipeDirection.bindTo(
-      binding.gestureSwipeDirection,
-      { preferences.gestureSwipeDirection },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-
-    settings.postGestureAction1.bindTo(
-      binding.postGestureAction1,
-      { preferences.postGestureAction1 },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-    settings.postGestureActionColor1.bindTo(
-      binding.postGestureAction1Color,
-      globalStateStorage,
-      { preferences.postGestureActionColor1 },
-      {
-        preferences.postGestureActionColor1 = it
-      },
-      { context.getColorCompat(R.color.style_red) },
-    )
-
-    settings.postGestureAction2.bindTo(
-      binding.postGestureAction2,
-      { preferences.postGestureAction2 },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-    settings.postGestureActionColor2.bindTo(
-      binding.postGestureAction2Color,
-      globalStateStorage,
-      { preferences.postGestureActionColor2 },
-      {
-        preferences.postGestureActionColor2 = it
-      },
-      { context.getColorCompat(R.color.style_blue) },
-    )
-
-    settings.postGestureAction3.bindTo(
-      binding.postGestureAction3,
-      { preferences.postGestureAction3 },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-    settings.postGestureActionColor3.bindTo(
-      binding.postGestureAction3Color,
-      globalStateStorage,
-      { preferences.postGestureActionColor3 },
-      {
-        preferences.postGestureActionColor3 = it
-      },
-      { context.getColorCompat(R.color.style_amber) },
-    )
-
-    settings.postGestureSize.bindTo(
-      binding.postGestureSize,
-      { preferences.postGestureSize },
-      {
-        preferences.postGestureSize = it
-      },
-    )
-
-    settings.commentGestureAction1.bindTo(
-      binding.commentGestureAction1,
-      { preferences.commentGestureAction1 },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-    settings.commentGestureActionColor1.bindTo(
-      binding.commentGestureAction1Color,
-      globalStateStorage,
-      { preferences.commentGestureActionColor1 },
-      {
-        preferences.commentGestureActionColor1 = it
-      },
-      { context.getColorCompat(R.color.style_red) },
-    )
-
-    settings.commentGestureAction2.bindTo(
-      binding.commentGestureAction2,
-      { preferences.commentGestureAction2 },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-    settings.commentGestureActionColor2.bindTo(
-      binding.commentGestureAction2Color,
-      globalStateStorage,
-      { preferences.commentGestureActionColor2 },
-      {
-        preferences.commentGestureActionColor2 = it
-      },
-      { context.getColorCompat(R.color.style_blue) },
-    )
-
-    settings.commentGestureAction3.bindTo(
-      binding.commentGestureAction3,
-      { preferences.commentGestureAction3 },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-    settings.commentGestureActionColor3.bindTo(
-      binding.commentGestureAction3Color,
-      globalStateStorage,
-      { preferences.commentGestureActionColor3 },
-      {
-        preferences.commentGestureActionColor3 = it
-      },
-      { context.getColorCompat(R.color.style_amber) },
-    )
-
-    settings.commentGestureSize.bindTo(
-      binding.commentGestureSize,
-      { preferences.commentGestureSize },
-      {
-        preferences.commentGestureSize = it
-      },
-    )
-  }
-
-  override fun updateValue(key: Int, value: Any?) {
-    when (key) {
-      settings.postGestureAction1.id -> {
-        preferences.postGestureAction1 = value as Int
-      }
-      settings.postGestureAction2.id -> {
-        preferences.postGestureAction2 = value as Int
-      }
-      settings.postGestureAction3.id -> {
-        preferences.postGestureAction3 = value as Int
-      }
-      settings.commentGestureAction1.id -> {
-        preferences.commentGestureAction1 = value as Int
-      }
-      settings.commentGestureAction2.id -> {
-        preferences.commentGestureAction2 = value as Int
-      }
-      settings.commentGestureAction3.id -> {
-        preferences.commentGestureAction3 = value as Int
-      }
-      settings.gestureSwipeDirection.id -> {
-        preferences.gestureSwipeDirection = value as Int
-      }
-    }
-
-    updateRendering()
   }
 }

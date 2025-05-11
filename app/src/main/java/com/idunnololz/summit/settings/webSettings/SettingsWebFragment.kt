@@ -205,7 +205,6 @@ class SettingsWebFragment :
         },
       ),
       settings.defaultSortType.asSingleChoiceSelectorItem(
-        requireSummitActivity(),
         { settingValues.defaultSortType },
         { updateValue(settings.defaultSortType.id, it) }
       ),

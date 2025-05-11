@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingItem
+import com.idunnololz.summit.settings.getAllSettings
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -209,7 +210,7 @@ class SettingsWebViewModel @Inject constructor(
       AccountData(
         data,
         account,
-        lemmyWebSettings.allSettings,
+        lemmyWebSettings.getAllSettings(),
         updatedSettingsValues(lemmyWebSettings),
       ),
     )

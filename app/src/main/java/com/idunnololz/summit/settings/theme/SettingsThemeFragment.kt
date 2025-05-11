@@ -181,7 +181,6 @@ class SettingsThemeFragment : BaseSettingsFragment() {
             },
           ),
           settings.fontSize.asSingleChoiceSelectorItem(
-            activity = parentActivity,
             {
               preferences.globalFontSize
             },
@@ -191,7 +190,6 @@ class SettingsThemeFragment : BaseSettingsFragment() {
             },
           ),
           settings.fontColor.asSingleChoiceSelectorItem(
-            activity = parentActivity,
             {
               preferences.globalFontColor
             },

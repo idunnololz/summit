@@ -19,6 +19,7 @@ import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.UserAgentChoiceIds
 import com.idunnololz.summit.settings.SettingPath.getPageName
+import com.idunnololz.summit.settings.SettingsViewModel.SettingSearchResultItem
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtils
@@ -133,10 +134,52 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 import kotlin.reflect.KClass
+import kotlin.reflect.KVisibility
+import kotlin.reflect.full.memberProperties
 
 sealed interface SearchableSettings {
-  val allSettings: List<SettingItem>
   val parents: List<KClass<out SearchableSettings>>
+}
+
+fun SearchableSettings.getAllSettings(): MutableList<SettingItem> {
+  val results = mutableListOf<SettingItem>()
+
+  fun recursiveSearch(
+    settingItem: SettingItem,
+    settingPage: SearchableSettings,
+    result: MutableList<SettingItem>,
+  ) {
+    when (settingItem) {
+      is BasicSettingItem,
+      is ImageValueSettingItem,
+      is OnOffSettingItem,
+      is RadioGroupSettingItem,
+      is SliderSettingItem,
+      is TextOnlySettingItem,
+      is TextValueSettingItem,
+      is ColorSettingItem,
+      is DescriptionSettingItem,
+        -> {
+        result += settingItem
+      }
+      is SubgroupItem -> {
+        result += settingItem
+
+        settingItem.settings.forEach {
+          recursiveSearch(it, settingPage, result)
+        }
+      }
+    }
+  }
+
+  for (member in this.javaClass.kotlin.memberProperties) {
+    if (member.visibility == KVisibility.PUBLIC) {
+      val setting = member.getter.call(this) as? SettingItem
+        ?: continue
+      recursiveSearch(setting, this, results)
+    }
+  }
+  return results
 }
 
 object SettingPath {
@@ -328,7 +371,7 @@ class MainSettings @Inject constructor(
     context.getString(R.string.default_apps_desc),
   )
 
-  override val allSettings = listOf(
+  val allSettings = listOf(
     SubgroupItem(
       context.getString(R.string.look_and_feel),
       listOf(
@@ -475,24 +518,6 @@ class LemmyWebSettings @Inject constructor(
     null,
     context.getString(R.string.change_password),
     null,
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    instanceSetting,
-    displayNameSetting,
-    bioSetting,
-    emailSetting,
-    matrixSetting,
-    avatarSetting,
-    bannerSetting,
-    defaultSortType,
-    showNsfwSetting,
-    showReadPostsSetting,
-    botAccountSetting,
-    showBotAccountsSetting,
-    sendNotificationsToEmailSetting,
-    blockSettings,
-    changePassword,
   )
 }
 
@@ -711,18 +736,6 @@ class GestureSettings @Inject constructor(
     1f,
     0.01f,
     relatedKeys = listOf(KEY_COMMENT_GESTURE_SIZE),
-  )
-  override val allSettings: List<SettingItem> = listOf(
-    postGestureAction1,
-    postGestureAction2,
-    postGestureAction3,
-    postGestureSize,
-    gestureSwipeDirection,
-
-    commentGestureAction1,
-    commentGestureAction2,
-    commentGestureAction3,
-    commentGestureSize,
   )
 }
 
@@ -972,32 +985,6 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.show_post_type),
     null,
     relatedKeys = listOf(KEY_SHOW_POST_TYPE),
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    infinity,
-    markPostsAsReadOnScroll,
-    blurNsfwPosts,
-    defaultCommunitySortOrder,
-    viewImageOnSingleTap,
-    postScores,
-    keywordFilters,
-    instanceFilters,
-    communityFilters,
-    userFilters,
-    showLinkPosts,
-    showImagePosts,
-    showVideoPosts,
-    showTextPosts,
-    showNsfwPosts,
-    lockBottomBar,
-    showFilteredPosts,
-    homeFabQuickAction,
-    prefetchPosts,
-    homePage,
-    postFeedShowScrollBar,
-    hideDuplicatePostsOnRead,
-    customizePostsInFeedQuickActions,
   )
 }
 
@@ -1249,17 +1236,6 @@ class PostAndCommentsSettings @Inject constructor(
     ),
     relatedKeys = listOf(KEY_POST_FAB_QUICK_ACTION),
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    defaultCommentsSortOrder,
-    relayStyleNavigation,
-    useVolumeButtonNavigation,
-    commentHeaderLayout,
-    settingPostAndCommentsAppearance,
-    commentScores,
-    swipeBetweenPosts,
-    postFabQuickAction,
-  )
 }
 
 class PostAndCommentsAppearanceSettings @Inject constructor(
@@ -1372,19 +1348,6 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
     title = context.getString(R.string.use_condensed_style_for_comment_header),
     description = null,
     relatedKeys = listOf(KEY_USE_CONDENSED_FOR_COMMENT_HEADERS),
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    resetPostStyles,
-    resetCommentStyles,
-    postFontSize,
-    commentFontSize,
-    commentIndentationLevel,
-    showCommentActions,
-    commentsThreadStyle,
-    tapCommentToCollapse,
-    alwaysShowLinkBelowPost,
-    useCondensedTypefaceForCommentHeader,
   )
 }
 
@@ -1591,18 +1554,6 @@ class ThemeSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    baseTheme,
-    colorScheme,
-    blackTheme,
-    font,
-    fontSize,
-    fontColor,
-    upvoteColor,
-    downvoteColor,
-    transparentNotificationBar,
-  )
 }
 
 class PostsFeedAppearanceSettings @Inject constructor(
@@ -1686,18 +1637,6 @@ class PostsFeedAppearanceSettings @Inject constructor(
     MainSettings::class,
     PostsFeedSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    baseViewType,
-    fontSize,
-    preferImageAtEnd,
-    preferFullImage,
-    preferTitleText,
-    preferCommunityIcon,
-    dimReadPosts,
-    horizontalMarginSize,
-    verticalMarginSize,
-  )
 }
 
 class AboutSettings @Inject constructor(
@@ -1730,13 +1669,6 @@ class AboutSettings @Inject constructor(
     R.drawable.baseline_translate_24,
     context.getString(R.string.translators),
     context.getString(R.string.translators_desc),
-  )
-  override val allSettings: List<SettingItem> = listOf(
-    version,
-    googlePlayLink,
-    giveFeedback,
-    patreonSettings,
-    translatorsSettings,
   )
 }
 
@@ -1785,11 +1717,6 @@ class CacheSettings @Inject constructor(
     ),
     relatedKeys = listOf(KEY_CACHE_POLICY),
   )
-  override val allSettings: List<SettingItem> = listOf(
-    clearCache,
-    cachePolicy,
-    cacheInfo
-  )
 }
 
 class HiddenPostsSettings @Inject constructor(
@@ -1819,11 +1746,6 @@ class HiddenPostsSettings @Inject constructor(
     context.getString(R.string.view_hidden_posts),
     null,
   )
-  override val allSettings: List<SettingItem> = listOf(
-    resetHiddenPosts,
-    hiddenPostsCount,
-    viewHiddenPosts,
-  )
 }
 
 class HapticSettings @Inject constructor(
@@ -1843,11 +1765,6 @@ class HapticSettings @Inject constructor(
     context.getString(R.string.more_haptics),
     context.getString(R.string.more_haptics_desc),
     relatedKeys = listOf(KEY_HAPTICS_ON_ACTIONS),
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    haptics,
-    moreHaptics,
   )
 }
 
@@ -2171,31 +2088,6 @@ class MiscSettings @Inject constructor(
       KEY_ANIMATION_LEVEL,
     ),
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    openLinksInExternalBrowser,
-    autoLinkPhoneNumbers,
-    retainLastPost,
-    leftHandMode,
-    previewLinks,
-    usePredictiveBack,
-    perCommunitySettings,
-    indicatePostsAndCommentsCreatedByCurrentUser,
-    warnReplyToOldContentThresholdMs,
-    saveDraftsAutomatically,
-    largeScreenSupport,
-    showEditedDate,
-    imagePreviewHideUiByDefault,
-    rotateInstanceOnUploadFail,
-    uploadImagesToImgur,
-    animationLevel,
-    shakeToSendFeedback,
-    showLabelsInNavBar,
-    showNewPersonWarning,
-    preferredLocale,
-    communitySelectorShowCommunitySuggestions,
-    userAgentChoice,
-  )
 }
 
 /**
@@ -2207,7 +2099,6 @@ class ActionsSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-  override val allSettings: List<SettingItem> = listOf()
 }
 
 class LoggingSettings @Inject constructor(
@@ -2223,10 +2114,6 @@ class LoggingSettings @Inject constructor(
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    useFirebase,
   )
 }
 
@@ -2249,10 +2136,6 @@ class HistorySettings @Inject constructor(
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    recordBrowsingHistory,
   )
 }
 
@@ -2398,17 +2281,6 @@ class NavigationSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    navBarDest1,
-    navBarDest2,
-    navBarDest3,
-    navBarDest4,
-    navBarDest5,
-    useBottomNavBar,
-    useCustomNavBar,
-    navigationRailMode,
-  )
 }
 
 class ImportAndExportSettings @Inject constructor(
@@ -2447,13 +2319,6 @@ class ImportAndExportSettings @Inject constructor(
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    importSettings,
-    exportSettings,
-    resetSettingsWithBackup,
-    manageInternalSettingsBackups,
   )
 }
 
@@ -2561,7 +2426,7 @@ class PerAccountSettings @Inject constructor(
     MainSettings::class,
   )
 
-  override val allSettings: List<SettingItem> = listOf(
+  val allSettings: List<SettingItem> = listOf(
     desc,
     settingTheme,
     settingPostList,
@@ -2590,11 +2455,6 @@ class DownloadSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    downloadDirectory,
-    resetDownloadDirectory,
-  )
 }
 
 class PerCommunitySettings @Inject constructor(
@@ -2617,11 +2477,6 @@ class PerCommunitySettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
     MiscSettings::class,
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    usePerCommunitySettings,
-    clearPerCommunitySettings,
   )
 }
 
@@ -2687,11 +2542,6 @@ class NotificationSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    isNotificationsEnabled,
-    checkInterval,
-  )
 }
 
 class SearchHomeSettings @Inject constructor(
@@ -2736,14 +2586,6 @@ class SearchHomeSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    searchSuggestions,
-    subscribedCommunities,
-    topCommunities,
-    trendingCommunities,
-    risingCommunities,
-  )
 }
 
 class VideoPlayerSettings @Inject constructor(
@@ -2778,13 +2620,6 @@ class VideoPlayerSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
-
-  override val allSettings: List<SettingItem> = listOf(
-    inlineVideoVolume,
-    autoPlayVideos,
-    autoHideUiOnPlay,
-    tapAnywhereToPlayPause,
-  )
 }
 
 class DefaultAppsSettings @Inject constructor(
@@ -2799,10 +2634,6 @@ class DefaultAppsSettings @Inject constructor(
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
-  )
-
-  override val allSettings: List<SettingItem> = listOf(
-    defaultWebApp,
   )
 }
 
@@ -2880,11 +2711,55 @@ class AllSettings @Inject constructor(
     }
   }
 
+  fun getAllSettings(): MutableList<SettingItem> {
+    val results = mutableListOf<SettingItem>()
+
+    fun recursiveSearch(
+      settingItem: SettingItem,
+      settingPage: SearchableSettings,
+      result: MutableList<SettingItem>,
+    ) {
+      when (settingItem) {
+        is BasicSettingItem,
+        is ImageValueSettingItem,
+        is OnOffSettingItem,
+        is RadioGroupSettingItem,
+        is SliderSettingItem,
+        is TextOnlySettingItem,
+        is TextValueSettingItem,
+        is ColorSettingItem,
+        is DescriptionSettingItem,
+          -> {
+          result += settingItem
+        }
+        is SubgroupItem -> {
+          result += settingItem
+
+          settingItem.settings.forEach {
+            recursiveSearch(it, settingPage, result)
+          }
+        }
+      }
+    }
+
+    val allSettings = allSearchableSettings
+    allSettings.forEach { page ->
+      for (member in page.javaClass.kotlin.memberProperties) {
+        if (member.visibility == KVisibility.PUBLIC) {
+          val setting = member.getter.call(page) as? SettingItem
+            ?: continue
+          recursiveSearch(setting, page, results)
+        }
+      }
+    }
+    return results
+  }
+
   fun generateMapFromKeysToRelatedSettingItems(): MutableMap<String, MutableList<SettingItem>> {
     val keyToSettingItems = mutableMapOf<String, MutableList<SettingItem>>()
 
     allSearchableSettings.forEach {
-      it.allSettings.forEach { settingItem ->
+      it.getAllSettings().forEach { settingItem ->
         for (key in settingItem.relatedKeys) {
           val list = keyToSettingItems.getOrPut(key) { mutableListOf() }
           list.add(settingItem)

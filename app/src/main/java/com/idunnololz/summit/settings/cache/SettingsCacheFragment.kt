@@ -144,7 +144,6 @@ class SettingsCacheFragment :
         viewModel.generateDataModel()
       },
       settings.cachePolicy.asSingleChoiceSelectorItem(
-        requireSummitActivity(),
         { preferences.cachePolicy.value },
         {
           preferences.cachePolicy = CachePolicy.parse(it)

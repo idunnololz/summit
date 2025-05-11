@@ -63,7 +63,11 @@ abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBindin
 
   private fun updateRendering() {
     with(binding) {
-      val adapter = SettingsAdapter(globalStateStorage)
+      val adapter = SettingsAdapter(
+        globalStateStorage = globalStateStorage,
+        getSummitActivity = { requireSummitActivity() },
+        onValueChanged = { refresh() }
+      )
       recyclerView.layoutManager = LinearLayoutManager(context)
       recyclerView.setHasFixedSize(true)
       recyclerView.adapter = adapter
