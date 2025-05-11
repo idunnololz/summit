@@ -2,6 +2,7 @@ package com.idunnololz.summit.util.recyclerView
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -10,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
+import com.idunnololz.summit.util.recyclerView.AdapterHelper.RuntimeItemType
 import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
 
 class AdapterHelper<T : Any>(
   private val areItemsTheSame: (old: T, new: T) -> Boolean,
@@ -27,6 +30,11 @@ class AdapterHelper<T : Any>(
     val bindViewHolder: (item: T, b: ViewBinding, h: ViewHolder) -> Unit,
     val onViewCreated: ((b: ViewBinding) -> Unit)?,
   )
+
+  interface RuntimeItemType {
+    @get:IdRes
+    val typeId: Int
+  }
 
   private var adapter: Adapter<ViewHolder>? = null
   private val differ = AsyncListDiffer(
@@ -75,14 +83,20 @@ class AdapterHelper<T : Any>(
     viewBindingClass: KClass<VB>,
     inflateFn: (LayoutInflater, ViewGroup, Boolean) -> ViewBinding,
     bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit,
+    id: Int? = null,
     onViewCreated: ((b: VB) -> Unit)? = null,
   ) {
-    require(itemInfoByItemType[clazz] == null) {
-      "Item type $clazz has already been added."
+    val isRuntimeItemType = clazz.isRuntimeItemType
+    if (!isRuntimeItemType) {
+      require(itemInfoByItemType[clazz] == null) {
+        "Item type $clazz has already been added."
+      }
+    } else if (id == null) {
+      error("View type ID must be supplied when using a runtime view type.")
     }
 
     val itemInfo = ItemInfo(
-      viewType = viewTypeGenerator.generateType(),
+      viewType = id ?: viewTypeGenerator.generateType(),
       viewBindingClass = viewBindingClass,
       inflateFn = inflateFn,
       bindViewHolder = { item: T, b, h ->
@@ -119,11 +133,12 @@ class AdapterHelper<T : Any>(
 
   inline fun <R : T, reified VB : ViewBinding> addItemType(
     clazz: KClass<R>,
+    id: Int? = null,
     noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,
     noinline onViewCreated: ((b: VB) -> Unit),
     noinline bindViewHolder: (item: R, b: VB, h: ViewHolder) -> Unit,
   ) {
-    addItemTypeInternal(clazz, VB::class, inflateFn, bindViewHolder, onViewCreated)
+    addItemTypeInternal(clazz, VB::class, inflateFn, bindViewHolder, id, onViewCreated)
   }
 
   private fun getItemInfoFromPosition(position: Int): ItemInfo<T> {
@@ -187,3 +202,6 @@ fun <T : ViewBinding> ViewHolder.getBinding() = (this as ViewBindingViewHolder<T
 @Suppress("unchecked_cast")
 inline fun <reified T : ViewBinding> ViewHolder.isBinding() =
   (this as? ViewBindingViewHolder<ViewBinding>)?.binding is T
+
+private val KClass<*>.isRuntimeItemType
+  get() = this.isSubclassOf(RuntimeItemType::class)

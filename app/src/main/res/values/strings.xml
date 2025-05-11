@@ -2090,6 +2090,7 @@
     <string name="top_communities">Top communities</string>
     <string name="show_post_type">Show post type</string>
     <string name="error_unable_to_play_video">Unable to play video.</string>
+    <string name="cache_info">Cache info</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

@@ -1,9 +1,12 @@
 package com.idunnololz.summit.settings
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.SettingColorItemBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffBinding
@@ -11,11 +14,17 @@ import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.settings.RadioGroupSettingItem.RadioGroupOption
+import com.idunnololz.summit.settings.SettingItemsAdapter.Item
+import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
+import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.SummitActivity
+import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import java.util.LinkedList
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 
 sealed interface SettingModelItem {
@@ -57,6 +66,20 @@ sealed interface SettingModelItem {
     val icon: Int,
     val getCurrentValue: () -> String?,
     val onValueChanged: () -> Unit,
+  ): SettingModelItem
+
+  data class CustomViewItem<T, VB : ViewBinding>(
+    override val setting: SettingItem,
+    val viewBindingClass: KClass<VB>,
+    val typeId: Int,
+    val createBinding: (LayoutInflater, ViewGroup, Boolean) -> ViewBinding,
+    val bindViewHolder: (item: SettingsAdapter.Item.CustomViewItem<T>, b: VB, h: ViewHolder) -> Unit,
+    val payload: T,
+  ): SettingModelItem
+
+  data class ImageValueItem(
+    override val setting: ImageValueSettingItem,
+    val value: String?,
   ): SettingModelItem
 }
 
@@ -109,6 +132,22 @@ fun BasicSettingItem.asCustomItem(
     drawableRes,
     { null },
     { onValueChanged(this) },
+  )
+}
+
+inline fun <T, reified VB : ViewBinding> BasicSettingItem.asCustomViewSettingsItem(
+  typeId: Int,
+  payload: T,
+  noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,
+  noinline bindViewHolder: (item: SettingsAdapter.Item.CustomViewItem<T>, b: VB, h: ViewHolder) -> Unit,
+): SettingModelItem.CustomViewItem<T, VB> {
+  return SettingModelItem.CustomViewItem(
+    setting = this,
+    viewBindingClass = VB::class,
+    typeId = typeId,
+    createBinding = inflateFn,
+    bindViewHolder = bindViewHolder,
+    payload = payload,
   )
 }
 
@@ -181,6 +220,35 @@ fun TextValueSettingItem.asCustomItem(
   )
 }
 
+fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
+  getCurrentValue: () -> String,
+  fragmentManager: FragmentManager,
+): SettingModelItem.CustomItem {
+  return SettingModelItem.CustomItem(
+    this,
+    title,
+    description,
+    0,
+    getCurrentValue,
+    {
+      if (this.supportsRichText) {
+        RichTextValueDialogFragment.newInstance(
+          this.title,
+          this.id,
+          getCurrentValue() as? String,
+        ).showAllowingStateLoss(fragmentManager, "asdf")
+      } else {
+        TextValueDialogFragment.newInstance(
+          this.title,
+          this.id,
+          this.hint,
+          getCurrentValue() as? String,
+        ).showAllowingStateLoss(fragmentManager, "asdf")
+      }
+    },
+  )
+}
+
 class SettingsAdapter(
   private val globalStateStorage: GlobalStateStorage,
 ) : Adapter<ViewHolder>() {
@@ -215,6 +283,17 @@ class SettingsAdapter(
       val title: String,
       val description: String?,
       val currentValue: String?,
+    ): Item
+
+    class CustomViewItem<T>(
+      override val typeId: Int,
+      override val setting: SettingItem,
+      val payload: T,
+    ): Item, AdapterHelper.RuntimeItemType
+
+    data class ImageValueItem(
+      override val setting: ImageValueSettingItem,
+      val value: String?,
     ): Item
   }
 
@@ -309,11 +388,17 @@ class SettingsAdapter(
       }
 
       b.root.tag = this
-      b.root.setOnClickListener {
-        findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
-          ?.onValueChanged
-          ?.invoke()
-        refreshItems()
+
+      if (item.setting.isEnabled) {
+        b.root.isEnabled = false
+      } else {
+        b.root.isEnabled = true
+        b.root.setOnClickListener {
+          findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
+            ?.onValueChanged
+            ?.invoke()
+          refreshItems()
+        }
       }
     }
   }
@@ -382,6 +467,32 @@ class SettingsAdapter(
             title = item.title,
             description = item.description,
             currentValue = item.getCurrentValue()
+          )
+        }
+        is SettingModelItem.CustomViewItem<*, *> -> {
+          val castedItem = item as SettingModelItem.CustomViewItem<Any, ViewBinding>
+          adapterHelper.addItemTypeInternal(
+            clazz = Item.CustomViewItem::class,
+            viewBindingClass = item.viewBindingClass,
+            inflateFn = item.createBinding,
+            bindViewHolder = { i: Item.CustomViewItem<Any>, b: Any, h: ViewHolder ->
+              castedItem.bindViewHolder(i, b as ViewBinding, h)
+            },
+            id = item.typeId,
+            onViewCreated = {}
+          )
+
+          newItems += Item.CustomViewItem(
+            setting = item.setting,
+            typeId = item.typeId,
+            payload = item.payload,
+          )
+        }
+
+        is SettingModelItem.ImageValueItem -> {
+          newItems += Item.ImageValueItem(
+            setting = item.setting,
+            value = item.value,
           )
         }
       }

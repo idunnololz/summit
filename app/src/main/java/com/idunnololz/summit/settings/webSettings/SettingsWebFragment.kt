@@ -21,10 +21,15 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
+import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.LemmyWebSettings
+import com.idunnololz.summit.settings.SearchableSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
+import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.SettingsFragment
+import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.asCustomItemWithTextEditorDialog
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.webSettings.changePassword.ChangePasswordDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
@@ -43,7 +48,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsWebFragment :
-  BaseFragment<FragmentSettingsWebBinding>(),
+  BaseSettingsFragment,
   SettingValueUpdateCallback {
 
   private val viewModel: SettingsWebViewModel by viewModels()
@@ -51,7 +56,7 @@ class SettingsWebFragment :
   private var adapter: SettingItemsAdapter? = null
 
   @Inject
-  lateinit var lemmyWebSettings: LemmyWebSettings
+  override lateinit var settings: LemmyWebSettings
 
   @Inject
   lateinit var animationsHelper: AnimationsHelper
@@ -83,29 +88,12 @@ class SettingsWebFragment :
       }
     }
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    super.onCreateView(inflater, container, savedInstanceState)
-
-    setBinding(FragmentSettingsWebBinding.inflate(inflater, container, false))
-
-    return binding.root
-  }
-
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     val context = requireContext()
 
     requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByMargins(viewLifecycleOwner, binding.recyclerView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-      setupToolbar(binding.toolbar, lemmyWebSettings.getPageName(context))
       binding.toolbar.addMenuProvider(
         object : MenuProvider {
           override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -132,7 +120,7 @@ class SettingsWebFragment :
         is StatefulData.Error -> {
           binding.loadingView.showDefaultErrorMessageFor(it.error)
           binding.loadingView.setOnRefreshClickListener {
-            viewModel.fetchAccountInfo(lemmyWebSettings)
+            viewModel.fetchAccountInfo(settings)
           }
         }
         is StatefulData.Loading -> binding.loadingView.showProgressBar()
@@ -184,7 +172,39 @@ class SettingsWebFragment :
       }
     }
 
-    viewModel.fetchAccountInfo(lemmyWebSettings)
+    viewModel.fetchAccountInfo(settings)
+  }
+
+  override fun generateData(): List<SettingModelItem> {
+
+    val settingValues = viewModel.accountData.valueOrNull?.settingValues ?: return listOf()
+
+    return listOf(
+      settings.instanceSetting.asCustomItem(
+        { settingValues.instance },
+        {},
+      ),
+      settings.displayNameSetting.asCustomItemWithTextEditorDialog(
+        { settingValues.name },
+        childFragmentManager,
+      ),
+      settings.bioSetting.asCustomItemWithTextEditorDialog(
+        { settingValues.bio },
+        childFragmentManager,
+      ),
+      settings.emailSetting.asCustomItemWithTextEditorDialog(
+        { settingValues.email },
+        childFragmentManager,
+      ),
+      settings.matrixSetting.asCustomItemWithTextEditorDialog(
+        { settingValues.matrixUserId },
+        childFragmentManager,
+      ),
+      settings.avatarSetting.as(
+        { settingValues.matrixUserId },
+        childFragmentManager,
+      ),
+    )
   }
 
   private fun save() {
@@ -198,7 +218,7 @@ class SettingsWebFragment :
       return
     }
 
-    viewModel.save(lemmyWebSettings, updatedSettingValues)
+    viewModel.save(settings, updatedSettingValues)
   }
 
   private fun loadWith(data: SettingsWebViewModel.AccountData) {

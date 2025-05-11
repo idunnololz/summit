@@ -1746,6 +1746,7 @@ class CacheSettings @Inject constructor(
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
+  val cacheInfo = BasicSettingItem(null, context.getString(R.string.cache_info), null)
   val clearCache = BasicSettingItem(
     null,
     context.getString(R.string.clear_media_cache),
@@ -1786,6 +1787,8 @@ class CacheSettings @Inject constructor(
   )
   override val allSettings: List<SettingItem> = listOf(
     clearCache,
+    cachePolicy,
+    cacheInfo
   )
 }
 

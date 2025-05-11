@@ -272,4 +272,5 @@
     <item name="fake_post_1" type="id" />
     <item name="fake_post_2" type="id" />
     <item name="fake_post_3" type="id" />
+    <item name="custom_setting_cache_info" type="id" />
 </resources>
