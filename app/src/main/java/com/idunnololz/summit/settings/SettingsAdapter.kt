@@ -7,8 +7,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
+import coil3.load
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.SettingColorItemBinding
+import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
@@ -79,7 +81,8 @@ sealed interface SettingModelItem {
 
   data class ImageValueItem(
     override val setting: ImageValueSettingItem,
-    val value: String?,
+    val getCurrentValue: () -> String?,
+    val onValueChanged: () -> Unit,
   ): SettingModelItem
 }
 
@@ -95,7 +98,7 @@ fun RadioGroupSettingItem.asRadioGroup(
 }
 
 fun RadioGroupSettingItem.asCustomItem(
-  getCurrentValue: () -> Int,
+  getCurrentValue: () -> Int?,
   onValueChanged: (RadioGroupSettingItem) -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
@@ -153,10 +156,10 @@ inline fun <T, reified VB : ViewBinding> BasicSettingItem.asCustomViewSettingsIt
 
 fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
   activity: SummitActivity,
-  getCurrentValue: () -> Int,
+  getCurrentValue: () -> Int?,
   onValueChanged: (Int) -> Unit,
-): SettingModelItem.CustomItem =
-  asCustomItem(
+): SettingModelItem.CustomItem {
+  return asCustomItem(
     getCurrentValue,
     {
       val curChoice = getCurrentValue()
@@ -167,7 +170,9 @@ fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
             idToChoice[index] = option.id
             addItem(index, option.title)
 
-            if (curChoice == option.id) {
+            if (curChoice == null && option.isDefault) {
+              setChecked(index)
+            } else if (curChoice == option.id) {
               setChecked(index)
             }
           }
@@ -181,6 +186,7 @@ fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
       activity.showBottomMenu(bottomMenu)
     }
   )
+}
 
 fun OnOffSettingItem.asOnOffSwitch(
   getCurrentValue: () -> Boolean,
@@ -246,6 +252,17 @@ fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
         ).showAllowingStateLoss(fragmentManager, "asdf")
       }
     },
+  )
+}
+
+fun ImageValueSettingItem.asImageValueItem(
+  getCurrentValue: () -> String,
+  onValueChanged: () -> Unit,
+): SettingModelItem.ImageValueItem {
+  return SettingModelItem.ImageValueItem(
+    this,
+    getCurrentValue,
+    onValueChanged,
   )
 }
 
@@ -363,6 +380,28 @@ class SettingsAdapter(
         defaultValue = { item.defaultValue },
       )
     }
+    addItemType(Item.ImageValueItem::class, SettingImageValueBinding::inflate) { item, b, h ->
+      val settingItem = item.setting
+
+      b.title.text = settingItem.title
+      if (settingItem.description != null) {
+        b.desc.visibility = View.VISIBLE
+        b.desc.text = settingItem.description
+      } else {
+        b.desc.visibility = View.GONE
+      }
+
+      b.imageView.load(item.value)
+
+      b.root.tag = settingItem
+      b.root.setOnClickListener {
+        findSettingModel<SettingModelItem.ImageValueItem>(item.setting.id)
+          ?.onValueChanged
+          ?.invoke()
+
+        refreshItems()
+      }
+    }
     addItemType(Item.CustomItem::class, SettingTextValueBinding::inflate) { item, b, h ->
       if (item.icon == 0) {
         b.icon.visibility = View.GONE
@@ -390,8 +429,9 @@ class SettingsAdapter(
       b.root.tag = this
 
       if (item.setting.isEnabled) {
-        b.root.isEnabled = false
-      } else {
+        b.title.isEnabled = true
+        b.desc.isEnabled = true
+        b.value.isEnabled = true
         b.root.isEnabled = true
         b.root.setOnClickListener {
           findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
@@ -399,6 +439,11 @@ class SettingsAdapter(
             ?.invoke()
           refreshItems()
         }
+      } else {
+        b.title.isEnabled = false
+        b.desc.isEnabled = false
+        b.value.isEnabled = false
+        b.root.isEnabled = false
       }
     }
   }
@@ -492,7 +537,7 @@ class SettingsAdapter(
         is SettingModelItem.ImageValueItem -> {
           newItems += Item.ImageValueItem(
             setting = item.setting,
-            value = item.value,
+            value = item.getCurrentValue(),
           )
         }
       }

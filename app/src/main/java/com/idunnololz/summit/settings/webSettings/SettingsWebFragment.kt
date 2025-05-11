@@ -2,12 +2,10 @@ package com.idunnololz.summit.settings.webSettings
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
@@ -20,40 +18,33 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
-import com.idunnololz.summit.databinding.FragmentSettingsWebBinding
 import com.idunnololz.summit.settings.BaseSettingsFragment
+import com.idunnololz.summit.settings.ImageValueSettingItem
 import com.idunnololz.summit.settings.LemmyWebSettings
-import com.idunnololz.summit.settings.SearchableSettings
 import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.asCustomItem
 import com.idunnololz.summit.settings.asCustomItemWithTextEditorDialog
+import com.idunnololz.summit.settings.asImageValueItem
+import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.webSettings.changePassword.ChangePasswordDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
-import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsWebFragment :
-  BaseSettingsFragment,
+  BaseSettingsFragment(),
   SettingValueUpdateCallback {
 
   private val viewModel: SettingsWebViewModel by viewModels()
-
-  private var adapter: SettingItemsAdapter? = null
 
   @Inject
   override lateinit var settings: LemmyWebSettings
@@ -127,7 +118,8 @@ class SettingsWebFragment :
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {
           binding.loadingView.hideAll()
-          loadWith(it.data)
+          refresh()
+          backPressHandler.isEnabled = viewModel.updatedSettingValues.isNotEmpty()
         }
       }
     }
@@ -146,7 +138,7 @@ class SettingsWebFragment :
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {
           binding.loadingView.hideAll()
-          adapter?.changesCommitted()
+          viewModel.updatedSettingValues.clear()
 
           Snackbar.make(binding.root, R.string.settings_saved, Snackbar.LENGTH_LONG)
             .show()
@@ -167,7 +159,7 @@ class SettingsWebFragment :
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {
           binding.loadingView.hideAll()
-          adapter?.updateSettingValue(it.data.first, it.data.second)
+          viewModel.updateSettingValue(settings, it.data.first, it.data.second)
         }
       }
     }
@@ -176,8 +168,8 @@ class SettingsWebFragment :
   }
 
   override fun generateData(): List<SettingModelItem> {
-
-    val settingValues = viewModel.accountData.valueOrNull?.settingValues ?: return listOf()
+    val accountData = viewModel.accountData.valueOrNull ?: return listOf()
+    val settingValues = accountData.settingValues
 
     return listOf(
       settings.instanceSetting.asCustomItem(
@@ -200,16 +192,135 @@ class SettingsWebFragment :
         { settingValues.matrixUserId },
         childFragmentManager,
       ),
-      settings.avatarSetting.as(
-        { settingValues.matrixUserId },
-        childFragmentManager,
+      settings.avatarSetting.asImageValueItem(
+        { settingValues.avatar },
+        {
+          openImagePicker(accountData, settings.avatarSetting)
+        },
       ),
+      settings.bannerSetting.asImageValueItem(
+        { settingValues.banner },
+        {
+          openImagePicker(accountData, settings.bannerSetting)
+        },
+      ),
+      settings.defaultSortType.asSingleChoiceSelectorItem(
+        requireSummitActivity(),
+        { settingValues.defaultSortType },
+        { updateValue(settings.defaultSortType.id, it) }
+      ),
+      settings.showNsfwSetting.asOnOffSwitch(
+        { settingValues.showNsfw },
+        { updateValue(settings.showNsfwSetting.id, it) }
+      ),
+      settings.showReadPostsSetting.asOnOffSwitch(
+        { settingValues.showReadPosts },
+        { updateValue(settings.showReadPostsSetting.id, it) }
+      ),
+      settings.botAccountSetting.asOnOffSwitch(
+        { settingValues.botAccount },
+        { updateValue(settings.botAccountSetting.id, it) }
+      ),
+      settings.sendNotificationsToEmailSetting.asOnOffSwitch(
+        { settingValues.sendNotificationsToEmail },
+        { updateValue(settings.sendNotificationsToEmailSetting.id, it) }
+      ),
+      settings.blockSettings.asCustomItem {
+        val direction = SettingsWebFragmentDirections
+          .actionSettingWebFragmentToSettingsAccountBlockListFragment()
+        findNavController().navigateSafe(direction)
+      },
+      settings.changePassword.asCustomItem {
+        ChangePasswordDialogFragment
+          .show(childFragmentManager)
+      },
     )
   }
 
+  private fun openImagePicker(
+    accountData: SettingsWebViewModel.AccountData,
+    settingItem: ImageValueSettingItem
+  ) {
+    val context = requireContext()
+    viewModel.imagePickerKey.value = settingItem.id
+
+    val bottomMenu = BottomMenu(context).apply {
+      setTitle(settingItem.title)
+      addItemWithIcon(
+        id = R.id.generate_lemming,
+        title = R.string.generate_your_own_lemming,
+        icon = R.drawable.ic_lemmy_24,
+      )
+      addItemWithIcon(
+        id = R.id.from_camera,
+        title = R.string.take_a_photo,
+        icon = R.drawable.baseline_photo_camera_24,
+      )
+      addItemWithIcon(
+        id = R.id.from_gallery,
+        title = R.string.choose_from_gallery,
+        icon = R.drawable.baseline_image_24,
+      )
+      addItemWithIcon(R.id.clear, R.string.clear_image, R.drawable.baseline_clear_24)
+
+      setOnMenuItemClickListener {
+        when (it.id) {
+          R.id.generate_lemming -> {
+            viewModel.generateLemming(accountData.account)
+          }
+          R.id.from_camera -> {
+            val intent = ImagePicker.with(requireActivity())
+              .apply {
+                if (settingItem.isSquare) {
+                  cropSquare()
+                } else {
+                  crop()
+                  cropFreeStyle()
+                }
+              }
+              .cameraOnly()
+              .maxResultSize(
+                1024,
+                1024,
+                true,
+              )
+              // Final image resolution will be less than 1080 x 1080
+              .createIntent()
+            launcher.launch(intent)
+          }
+          R.id.from_gallery -> {
+            val intent = ImagePicker.with(requireActivity())
+              .apply {
+                if (settingItem.isSquare) {
+                  cropSquare()
+                } else {
+                  crop()
+                  cropFreeStyle()
+                }
+              }
+              .galleryOnly()
+              .maxResultSize(
+                1024,
+                1024,
+                true,
+              )
+              // Final image resolution will be less than 1080 x 1080
+              .createIntent()
+            launcher.launch(intent)
+          }
+          R.id.clear -> {
+            viewModel.updateSettingValue(settings, settingItem.id, "")
+          }
+        }
+      }
+    }
+
+    getMainActivity()?.showBottomMenu(bottomMenu)
+  }
+
   private fun save() {
-    val updatedSettingValues = adapter?.updatedSettingValues
-    if (updatedSettingValues.isNullOrEmpty()) {
+    val updatedSettingValues = viewModel.updatedSettingValues
+    if (updatedSettingValues.isEmpty()) {
       launchAlertDialog("no_changes") {
         titleResId = R.string.error_no_settings_changed
         messageResId = R.string.error_no_settings_changed_desc
@@ -221,124 +332,7 @@ class SettingsWebFragment :
     viewModel.save(settings, updatedSettingValues)
   }
 
-  private fun loadWith(data: SettingsWebViewModel.AccountData) {
-    val context = requireContext()
-    val adapter = SettingItemsAdapter(
-      context = context,
-      onSettingClick = {
-        when (it.id) {
-          lemmyWebSettings.blockSettings.id -> {
-            val direction = SettingsWebFragmentDirections
-              .actionSettingWebFragmentToSettingsAccountBlockListFragment()
-            findNavController().navigateSafe(direction)
-            true
-          }
-          lemmyWebSettings.changePassword.id -> {
-            ChangePasswordDialogFragment
-              .show(childFragmentManager)
-            true
-          }
-          else -> false
-        }
-      },
-      fragmentManager = childFragmentManager,
-      onImagePickerClick = { settingItem ->
-        viewModel.imagePickerKey.value = settingItem.id
-
-        val bottomMenu = BottomMenu(context).apply {
-          setTitle(settingItem.title)
-          addItemWithIcon(
-            id = R.id.generate_lemming,
-            title = R.string.generate_your_own_lemming,
-            icon = R.drawable.ic_lemmy_24,
-          )
-          addItemWithIcon(
-            id = R.id.from_camera,
-            title = R.string.take_a_photo,
-            icon = R.drawable.baseline_photo_camera_24,
-          )
-          addItemWithIcon(
-            id = R.id.from_gallery,
-            title = R.string.choose_from_gallery,
-            icon = R.drawable.baseline_image_24,
-          )
-          addItemWithIcon(R.id.clear, R.string.clear_image, R.drawable.baseline_clear_24)
-
-          setOnMenuItemClickListener {
-            when (it.id) {
-              R.id.generate_lemming -> {
-                viewModel.generateLemming(data.account)
-              }
-              R.id.from_camera -> {
-                val intent = ImagePicker.with(requireActivity())
-                  .apply {
-                    if (settingItem.isSquare) {
-                      cropSquare()
-                    } else {
-                      crop()
-                      cropFreeStyle()
-                    }
-                  }
-                  .cameraOnly()
-                  .maxResultSize(
-                    1024,
-                    1024,
-                    true,
-                  )
-                  // Final image resolution will be less than 1080 x 1080
-                  .createIntent()
-                launcher.launch(intent)
-              }
-              R.id.from_gallery -> {
-                val intent = ImagePicker.with(requireActivity())
-                  .apply {
-                    if (settingItem.isSquare) {
-                      cropSquare()
-                    } else {
-                      crop()
-                      cropFreeStyle()
-                    }
-                  }
-                  .galleryOnly()
-                  .maxResultSize(
-                    1024,
-                    1024,
-                    true,
-                  )
-                  // Final image resolution will be less than 1080 x 1080
-                  .createIntent()
-                launcher.launch(intent)
-              }
-              R.id.clear -> {
-                adapter?.updateSettingValue(settingItem.id, "")
-              }
-            }
-          }
-        }
-
-        getMainActivity()?.showBottomMenu(bottomMenu)
-      },
-    ).apply {
-      this.stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-      this.defaultSettingValues = data.defaultValues
-      this.setData(data.settings)
-
-      this.settingsChanged = {
-        backPressHandler.isEnabled = this.updatedSettingValues.isNotEmpty()
-      }
-    }.also {
-      adapter = it
-    }
-
-    with(binding) {
-      recyclerView.setup(animationsHelper)
-      recyclerView.layoutManager = LinearLayoutManager(context)
-      recyclerView.setHasFixedSize(true)
-      recyclerView.adapter = adapter
-    }
-  }
-
   override fun updateValue(key: Int, value: Any?) {
-    adapter?.updateSettingValue(key, value)
+    viewModel.updateSettingValue(settings, key, value)
   }
 }

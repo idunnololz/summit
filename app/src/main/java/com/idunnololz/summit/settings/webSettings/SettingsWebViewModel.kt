@@ -46,6 +46,9 @@ class SettingsWebViewModel @Inject constructor(
   val saveUserSettings = StatefulLiveData<Unit>()
   val uploadImageStatus = StatefulLiveData<Pair<Int, String>>()
 
+  var defaultSettingValues = mapOf<Int, Any?>()
+  val updatedSettingValues = mutableMapOf<Int, Any?>()
+
   fun fetchAccountInfo(lemmyWebSettings: LemmyWebSettings) {
     accountData.setIsLoading()
 
@@ -185,27 +188,50 @@ class SettingsWebViewModel @Inject constructor(
     val localUser = myUser.local_user_view.local_user
     val person = myUser.local_user_view.person
 
+    defaultSettingValues = mapOf(
+      lemmyWebSettings.instanceSetting.id to account.instance,
+      lemmyWebSettings.displayNameSetting.id to person.name,
+      lemmyWebSettings.bioSetting.id to person.bio,
+      lemmyWebSettings.emailSetting.id to localUser.email,
+      lemmyWebSettings.matrixSetting.id to person.matrix_user_id,
+      lemmyWebSettings.avatarSetting.id to person.avatar,
+      lemmyWebSettings.bannerSetting.id to person.banner,
+      lemmyWebSettings.defaultSortType.id to localUser.default_sort_type?.toId(),
+      lemmyWebSettings.showNsfwSetting.id to localUser.show_nsfw,
+      lemmyWebSettings.showReadPostsSetting.id to localUser.show_read_posts,
+      lemmyWebSettings.botAccountSetting.id to person.bot_account,
+      lemmyWebSettings.showBotAccountsSetting.id to localUser.show_bot_accounts,
+      lemmyWebSettings.sendNotificationsToEmailSetting.id to
+        localUser.send_notifications_to_email,
+    )
+
     accountData.postValue(
       AccountData(
         data,
         account,
         lemmyWebSettings.allSettings,
-        SettingValues(
-          account.instance,
-          person.name,
-          person.bio ?: "",
-          localUser.email ?: "",
-          person.matrix_user_id ?: "",
-          person.avatar ?: "",
-          person.banner ?: "",
-          localUser.default_sort_type?.toId(),
-          localUser.show_nsfw,
-          localUser.show_read_posts,
-          person.bot_account,
-          localUser.show_bot_accounts,
-          localUser.send_notifications_to_email,
-        ),
+        updatedSettingsValues(lemmyWebSettings),
       ),
+    )
+  }
+
+  private fun updatedSettingsValues(settings: LemmyWebSettings): SettingValues {
+    val merged = defaultSettingValues + updatedSettingValues
+
+    return SettingValues(
+      instance = merged[settings.instanceSetting.id] as String,
+      name = merged[settings.displayNameSetting.id] as? String ?: "",
+      bio = merged[settings.bioSetting.id] as? String ?: "",
+      email = merged[settings.emailSetting.id] as? String ?: "",
+      matrixUserId = merged[settings.matrixSetting.id] as? String ?: "",
+      avatar = merged[settings.avatarSetting.id] as? String ?: "",
+      banner = merged[settings.bannerSetting.id] as? String ?: "",
+      defaultSortType = merged[settings.defaultSortType.id] as? Int,
+      showNsfw = merged[settings.showNsfwSetting.id] as? Boolean ?: true,
+      showReadPosts = merged[settings.showReadPostsSetting.id] as? Boolean ?: true,
+      botAccount = merged[settings.botAccountSetting.id] as? Boolean ?: false,
+      showBotAccounts = merged[settings.showBotAccountsSetting.id] as? Boolean ?: true,
+      sendNotificationsToEmail = merged[settings.sendNotificationsToEmailSetting.id] as? Boolean ?: false,
     )
   }
 
@@ -255,7 +281,17 @@ class SettingsWebViewModel @Inject constructor(
     }
   }
 
-  class AccountData(
+  fun updateSettingValue(settings: LemmyWebSettings, key: Int, value: Any?) {
+    updatedSettingValues[key] = value
+
+    val currentAccountData = accountData.valueOrNull ?: return
+
+    accountData.postValue(
+      currentAccountData.copy(settingValues = updatedSettingsValues(settings))
+    )
+  }
+
+  data class AccountData(
     val accountInfo: GetSiteResponse,
     val account: Account,
     val settings: List<SettingItem>,
