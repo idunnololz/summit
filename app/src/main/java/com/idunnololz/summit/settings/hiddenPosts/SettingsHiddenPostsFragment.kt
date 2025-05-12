@@ -1,27 +1,18 @@
 package com.idunnololz.summit.settings.hiddenPosts
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.databinding.FragmentSettingsHiddenPostsBinding
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
-import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.HiddenPostsSettings
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.util.bindTo
-import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.settings.SettingModelItem
+import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.asOnOffSwitch
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -30,135 +21,83 @@ import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class SettingsHiddenPostsFragment :
-  BaseFragment<FragmentSettingsHiddenPostsBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
-
-  @Inject
-  lateinit var preferences: Preferences
+  BaseSettingsFragment() {
 
   @Inject
   lateinit var hiddenPostsManager: HiddenPostsManager
 
   @Inject
-  lateinit var settings: HiddenPostsSettings
+  override lateinit var settings: HiddenPostsSettings
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    super.onCreateView(inflater, container, savedInstanceState)
+  private var count: Long? = null
 
-    setBinding(FragmentSettingsHiddenPostsBinding.inflate(inflater, container, false))
+  val resetHiddenPostsDialogLauncher = newAlertDialogLauncher("reset") {
+    if (it.isOk) {
+      lifecycleScope.launch {
+        val count = withContext(Dispatchers.Default) {
+          hiddenPostsManager.getHiddenPostsCount()
+        }
+        hiddenPostsManager.clearHiddenPosts()
 
-    return binding.root
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
-    val context = requireContext()
-
-    requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-      setSupportActionBar(binding.toolbar)
-
-      supportActionBar?.setDisplayShowHomeEnabled(true)
-      supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      supportActionBar?.title = settings.getPageName(context)
+        Snackbar
+          .make(
+            binding.coordinatorLayout,
+            getString(R.string.removed_hidden_posts_format, count.toString()),
+            Snackbar.LENGTH_LONG,
+          )
+          .show()
+      }
     }
-
-    updateRendering()
   }
 
-  private fun updateRendering() {
+  override fun generateData(): List<SettingModelItem> {
     val defaultDecimalFormat = PrettyPrintUtils.defaultDecimalFormat
 
     lifecycleScope.launch {
-      val count = hiddenPostsManager.getHiddenPostsCount()
-
-      withContext(Dispatchers.Main) {
-        settings.hiddenPostsCount.copy(
-          description = getString(
-            R.string.hidden_posts_format,
-            defaultDecimalFormat.format(count),
-            defaultDecimalFormat.format(hiddenPostsManager.hiddenPostsLimit),
-          ),
-        ).bindTo(
-          b = binding.hiddenPostsStats,
-          {},
-        )
+      if (count == null) {
+        count = hiddenPostsManager.getHiddenPostsCount()
+        refresh()
       }
     }
 
-    settings.enableHiddenPosts.bindTo(
-      binding.hiddenPosts,
-      { preferences.isHiddenPostsEnabled },
-      {
-        preferences.isHiddenPostsEnabled = it
-        updateRendering()
-      },
-    )
-
-    settings.resetHiddenPosts.bindTo(
-      b = binding.resetHiddenPosts,
-      onValueChanged = {
+    return listOf(
+      settings.enableHiddenPosts.asOnOffSwitch(
+        { preferences.isHiddenPostsEnabled },
+        {
+          preferences.isHiddenPostsEnabled = it
+        },
+      ),
+      settings.hiddenPostsCount.copy(
+        description = getString(
+          R.string.hidden_posts_format,
+          defaultDecimalFormat.format(count ?: 0),
+          defaultDecimalFormat.format(hiddenPostsManager.hiddenPostsLimit),
+        ),
+      ).asCustomItem { },
+      settings.resetHiddenPosts.asCustomItem {
         lifecycleScope.launch {
           val count = withContext(Dispatchers.Default) {
             hiddenPostsManager.getHiddenPostsCount()
           }
 
           withContext(Dispatchers.Main) {
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.reset_hidden_posts_confirm_title)
-              .setMessage(
-                getString(
-                  R.string.reset_hidden_posts_confirm_desc_format,
-                  count.toString(),
-                ),
+            resetHiddenPostsDialogLauncher.launchDialog {
+              titleResId = R.string.reset_hidden_posts_confirm_title
+              message = getString(
+                R.string.reset_hidden_posts_confirm_desc_format,
+                count.toString(),
               )
-              .setPositiveButton(R.string.yes)
-              .setNegativeButton(R.string.no)
-              .createAndShow(childFragmentManager, "reset_hidden_posts")
+              positionButtonResId = R.string.yes
+              negativeButtonResId = R.string.no
+            }
           }
         }
       },
-    )
-
-    settings.viewHiddenPosts.bindTo(
-      b = binding.viewHiddenPosts,
-      onValueChanged = {
+      settings.viewHiddenPosts.asCustomItem {
         val directions = SettingsHiddenPostsFragmentDirections
           .actionSettingHiddenPostsFragmentToHiddenPostsFragment()
         findNavController().navigateSafe(directions)
       },
     )
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    when (tag) {
-      "reset_hidden_posts" -> {
-        lifecycleScope.launch {
-          val count = withContext(Dispatchers.Default) {
-            hiddenPostsManager.getHiddenPostsCount()
-          }
-          hiddenPostsManager.clearHiddenPosts()
-
-          Snackbar
-            .make(
-              binding.coordinatorLayout,
-              getString(R.string.removed_hidden_posts_format, count.toString()),
-              Snackbar.LENGTH_LONG,
-            )
-            .show()
-        }
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

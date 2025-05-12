@@ -56,6 +56,7 @@ class SettingsPerCommunityViewModel @Inject constructor(
       allSettings.add(
         SubgroupItem(
           context.getString(R.string.per_community_overrides),
+          null,
           listOf(),
         ),
       )
@@ -97,6 +98,11 @@ class SettingsPerCommunityViewModel @Inject constructor(
   private fun getSettingValues(settings: PerCommunitySettings) = mapOf(
     settings.usePerCommunitySettings.id to preferences.usePerCommunitySettings,
   )
+
+  fun clearPerCommunitySettings(settings: PerCommunitySettings) {
+    perCommunityPreferences.clear()
+    loadData(settings)
+  }
 
   data class SettingData(
     val settingItems: List<SettingItem>,

@@ -19,6 +19,8 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
 import com.idunnololz.summit.lemmy.search.SearchHomeConfigDialogFragment
+import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -26,7 +28,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
@@ -41,7 +42,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
   private val args by navArgs<SettingsFragmentArgs>()
 
   @Inject
-  lateinit var mainSettings: MainSettings
+  lateinit var settings: MainSettings
 
   @Inject
   lateinit var animationsHelper: AnimationsHelper
@@ -49,9 +50,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
   @Inject
   lateinit var allSettings: dagger.Lazy<AllSettings>
 
-  private val viewModel: SettingsViewModel by viewModels()
+  @Inject
+  lateinit var globalStateStorage: GlobalStateStorage
 
-  private var adapter: SettingItemsAdapter? = null
+  private val viewModel: SettingsViewModel by viewModels()
 
   private var handledLink = false
 
@@ -103,157 +105,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         findNavController().navigateUp()
       }
 
-      recyclerView.setup(animationsHelper)
-      recyclerView.layoutManager = LinearLayoutManager(context)
-      recyclerView.setHasFixedSize(true)
-
-      if (adapter == null) {
-        adapter = SettingItemsAdapter(
-          context = context,
-          onSettingClick = {
-            when (it.id) {
-              mainSettings.settingTheme.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingThemeFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingPostAndComments.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingPostAndCommentsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingLemmyWeb.id -> {
-                launchWebSettings(popSettingsFragment = false)
-                true
-              }
-              mainSettings.settingGestures.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingGesturesFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingCache.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingCacheFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingPostsFeed.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingsContentFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.commentListSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingCommentListFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingHiddenPosts.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingHiddenPostsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingAbout.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingAboutFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingSummitCommunity.id -> {
-                getMainActivity()?.launchPage(summitCommunityPage)
-                true
-              }
-              mainSettings.miscSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingMiscFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.loggingSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingLoggingFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.historySettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingHistoryFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.navigationSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingNavigationFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.userActionsSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToActions()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingAccount.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingAccountsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.backupAndRestoreSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingBackupAndRestoreFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.downloadSettings.id -> {
-                launchDownloadsSettings()
-                true
-              }
-              mainSettings.notificationSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingNotificationsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.hapticSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingsHapticsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.videoPlayerSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingsVideoPlayerFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.defaultAppsSettings.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToSettingsDefaultAppsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              mainSettings.settingPresets.id -> {
-                val directions = SettingsFragmentDirections
-                  .actionSettingsFragmentToPresetsFragment()
-                findNavController().navigateSafe(directions)
-                true
-              }
-              else -> false
-            }
-          },
-          childFragmentManager,
-        )
-      }
-      recyclerView.adapter = adapter?.apply {
-        this.firstTitleHasTopMargin = false
-        this.setData(mainSettings.allSettings)
-      }
+      updateRendering()
 
       viewModel.showSearch.observe(viewLifecycleOwner) {
         if (it) {
@@ -516,6 +368,168 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     }
 
     searchViewBackPressedHandler.isEnabled = false
+  }
+
+  private fun updateRendering() {
+    val context = requireContext()
+
+    with(binding) {
+      val adapter = SettingsAdapter(
+        context = context,
+        globalStateStorage = globalStateStorage,
+        getSummitActivity = { requireSummitActivity() },
+        onValueChanged = { refresh() },
+        onLinkClick = { url, text, linkContext ->
+          onLinkClick(url, text, linkContext)
+        },
+      )
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setHasFixedSize(true)
+      recyclerView.adapter = adapter
+
+      val data = generateData()
+
+      adapter.setData(data)
+    }
+  }
+
+  fun refresh() {
+    if (!isBindingAvailable()) return
+
+    (binding.recyclerView.adapter as? SettingsAdapter)?.setData(generateData())
+  }
+
+  private fun generateData(): List<SettingModelItem> {
+    val context = requireContext()
+
+    return listOf(
+      SettingModelItem.SubgroupItem(
+        context.getString(R.string.look_and_feel),
+        listOf(
+          settings.settingTheme.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingThemeFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.settingPostsFeed.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingsContentFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.settingPostAndComments.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingPostAndCommentsFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.settingGestures.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingGesturesFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.hapticSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingsHapticsFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.videoPlayerSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingsVideoPlayerFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.miscSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingMiscFragment()
+            findNavController().navigateSafe(directions)
+          },
+        ),
+      ),
+      SettingModelItem.SubgroupItem(
+        context.getString(R.string.account_settings),
+        listOf(
+          settings.settingLemmyWeb.asCustomItem {
+            launchWebSettings(popSettingsFragment = false)
+          },
+          settings.settingAccount.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingAccountsFragment()
+            findNavController().navigateSafe(directions)
+          },
+        ),
+      ),
+      SettingModelItem.SubgroupItem(
+        context.getString(R.string.systems),
+        listOf(
+          settings.settingCache.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingCacheFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.settingHiddenPosts.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingHiddenPostsFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.loggingSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingLoggingFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.historySettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingHistoryFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.navigationSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingNavigationFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.userActionsSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToActions()
+            findNavController().navigateSafe(directions)
+          },
+          settings.downloadSettings.asCustomItem {
+            launchDownloadsSettings()
+          },
+          settings.notificationSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingNotificationsFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.defaultAppsSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingsDefaultAppsFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.backupAndRestoreSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingBackupAndRestoreFragment()
+            findNavController().navigateSafe(directions)
+          },
+        ),
+      ),
+//        SubgroupItem(
+//            context.getString(R.string.experimental),
+//            listOf(settingPresets),
+//      val directions = SettingsFragmentDirections
+//      .actionSettingsFragmentToPresetsFragment()
+//    findNavController().navigateSafe(directions)
+//        ),
+      SettingModelItem.SubgroupItem(
+        context.getString(R.string.about),
+        listOf(
+          settings.settingAbout.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingAboutFragment()
+            findNavController().navigateSafe(directions)
+          },
+          settings.settingSummitCommunity.asCustomItem {
+            getMainActivity()?.launchPage(summitCommunityPage)
+          },
+        ),
+      ),
+    )
   }
 
   private class SearchResultAdapter(

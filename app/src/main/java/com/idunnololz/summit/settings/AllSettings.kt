@@ -369,54 +369,6 @@ class MainSettings @Inject constructor(
     context.getString(R.string.default_apps),
     context.getString(R.string.default_apps_desc),
   )
-
-  val allSettings = listOf(
-    SubgroupItem(
-      context.getString(R.string.look_and_feel),
-      listOf(
-        settingTheme,
-        settingPostsFeed,
-        settingPostAndComments,
-        settingGestures,
-        hapticSettings,
-        videoPlayerSettings,
-        miscSettings,
-      ),
-    ),
-    SubgroupItem(
-      context.getString(R.string.account_settings),
-      listOf(
-        settingLemmyWeb,
-        settingAccount,
-      ),
-    ),
-    SubgroupItem(
-      context.getString(R.string.systems),
-      listOf(
-        settingCache,
-        settingHiddenPosts,
-        loggingSettings,
-        historySettings,
-        navigationSettings,
-        userActionsSettings,
-        downloadSettings,
-        notificationSettings,
-        defaultAppsSettings,
-        backupAndRestoreSettings,
-      ),
-    ),
-//        SubgroupItem(
-//            context.getString(R.string.experimental),
-//            listOf(settingPresets),
-//        ),
-    SubgroupItem(
-      context.getString(R.string.about),
-      listOf(
-        settingAbout,
-        settingSummitCommunity,
-      ),
-    ),
-  )
 }
 
 class LemmyWebSettings @Inject constructor(
@@ -2029,10 +1981,10 @@ class MiscSettings @Inject constructor(
     context.getString(R.string.show_new_person_tag_desc),
     relatedKeys = listOf(KEY_WARN_NEW_PERSON),
   )
-  val preferredLocale = BasicSettingItem(
-    null,
-    context.getString(R.string.preferred_locale),
-    null,
+  val preferredLocale = TextValueSettingItem(
+    title = context.getString(R.string.preferred_locale),
+    description = null,
+    supportsRichText = false,
     relatedKeys = listOf(KEY_PREFERRED_LOCALE),
   )
   val communitySelectorShowCommunitySuggestions = OnOffSettingItem(

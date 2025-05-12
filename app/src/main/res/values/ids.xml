@@ -274,4 +274,7 @@
     <item name="fake_post_3" type="id" />
     <item name="custom_setting_cache_info" type="id" />
     <item name="settings_posts_feed_divider" type="id" />
+    <item name="give_feedback" type="id" />
+    <item name="hidden_posts" type="id" />
+    <item name="left_hand_mode" type="id" />
 </resources>

@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 var nextId = 1
 
 sealed class SettingItem : Parcelable {
-  open val id: Int = nextId++
+  abstract val id: Int
   abstract val title: String
   abstract val description: String?
   open val isEnabled: Boolean = true
@@ -18,11 +18,11 @@ sealed class SettingItem : Parcelable {
 @Parcelize
 data class SubgroupItem(
   override val title: String,
+  override val description: String?,
   val settings: List<SettingItem>,
   override val relatedKeys: List<String> = listOf(),
-) : SettingItem() {
-  override val description: String? = null
-}
+  override val id: Int = nextId++,
+) : SettingItem()
 
 @Parcelize
 data class BasicSettingItem(
@@ -30,6 +30,7 @@ data class BasicSettingItem(
   override val title: String,
   override val description: String?,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()
 
 @Parcelize
@@ -37,6 +38,7 @@ data class TextOnlySettingItem(
   override val title: String,
   override val description: String?,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()
 
 /**
@@ -47,6 +49,7 @@ data class DescriptionSettingItem(
   override val title: String,
   override val description: String?,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()
 
 @Parcelize
@@ -57,6 +60,7 @@ data class TextValueSettingItem(
   override val isEnabled: Boolean = true,
   val hint: String? = null,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()
 
 @Parcelize
@@ -66,6 +70,7 @@ data class SliderSettingItem(
   val maxValue: Float,
   val stepSize: Float? = null,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem() {
   override val description: String? = null
 }
@@ -76,6 +81,7 @@ data class OnOffSettingItem(
   override val title: String,
   override val description: String?,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()
 
 @Parcelize
@@ -84,6 +90,7 @@ data class ColorSettingItem(
   override val title: String,
   override val description: String?,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()
 
 @Parcelize
@@ -92,8 +99,9 @@ data class RadioGroupSettingItem(
   override val title: String,
   override val description: String?,
   val options: List<RadioGroupOption>,
-  override val relatedKeys: List<String> = listOf(),
   override val isEnabled: Boolean = true,
+  override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem() {
   @Parcelize
   data class RadioGroupOption(
@@ -111,4 +119,5 @@ data class ImageValueSettingItem(
   override val description: String?,
   val isSquare: Boolean,
   override val relatedKeys: List<String> = listOf(),
+  override val id: Int = nextId++,
 ) : SettingItem()

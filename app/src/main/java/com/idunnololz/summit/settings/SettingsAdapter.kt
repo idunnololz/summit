@@ -1,8 +1,11 @@
 package com.idunnololz.summit.settings
 
+import android.content.Context
+import android.graphics.RectF
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -16,19 +19,25 @@ import com.idunnololz.summit.databinding.SettingColorItemBinding
 import com.idunnololz.summit.databinding.SettingDividerItemBinding
 import com.idunnololz.summit.databinding.SettingImageValueBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffBinding
+import com.idunnololz.summit.databinding.SettingItemOnOffMasterBinding
 import com.idunnololz.summit.databinding.SettingSliderItemBinding
 import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
+import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.settings.RadioGroupSettingItem.RadioGroupOption
-import com.idunnololz.summit.settings.SettingItemsAdapter.Item
 import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
 import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
 import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.CustomLinkMovementMethod
+import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.showMoreLinkOptions
+import io.noties.markwon.Markwon
 import java.util.LinkedList
 import kotlin.reflect.KClass
 
@@ -46,7 +55,7 @@ sealed interface SettingModelItem {
     val settings: List<SettingModelItem>,
   ) : SettingModelItem {
     constructor(title: String, settings: List<SettingModelItem>) : this(
-      SubgroupItem(title, listOf(), listOf()),
+      SubgroupItem(title, null, listOf(), listOf()),
       settings,
     )
   }
@@ -69,6 +78,7 @@ sealed interface SettingModelItem {
     val title: String,
     val description: String?,
     val icon: Int,
+    val clickable: Boolean,
     val getCurrentValue: () -> String?,
     val onValueChanged: SettingsAdapter.() -> Unit,
   ) : SettingModelItem
@@ -104,6 +114,12 @@ sealed interface SettingModelItem {
     override val setting: SettingItem
       get() = TODO("Not yet implemented")
   }
+
+  data class MasterSwitchItem(
+    override val setting: OnOffSettingItem,
+    val getCurrentValue: () -> Boolean,
+    val onValueChanged: (Boolean) -> Unit,
+  ) : SettingModelItem
 }
 
 fun RadioGroupSettingItem.asRadioGroup(
@@ -122,12 +138,25 @@ fun RadioGroupSettingItem.asCustomItem(
   onValueChanged: SettingsAdapter.(RadioGroupSettingItem) -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
-    this,
-    this.title,
-    this.description,
-    0,
-    { this.options.firstOrNull { it.id == getCurrentValue() }?.title },
-    { onValueChanged(this@asCustomItem) },
+    setting = this,
+    title = this.title,
+    description = this.description,
+    icon = 0,
+    clickable = true,
+    getCurrentValue = { this.options.firstOrNull { it.id == getCurrentValue() }?.title },
+    onValueChanged = { onValueChanged(this@asCustomItem) },
+  )
+}
+
+fun DescriptionSettingItem.asCustomItem(): SettingModelItem.CustomItem {
+  return SettingModelItem.CustomItem(
+    setting = this,
+    title = this.title,
+    description = this.description,
+    icon = 0,
+    clickable = false,
+    getCurrentValue = { null },
+    onValueChanged = { },
   )
 }
 
@@ -135,12 +164,13 @@ fun BasicSettingItem.asCustomItem(
   onValueChanged: (BasicSettingItem) -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
-    this,
-    this.title,
-    this.description,
-    this.icon ?: 0,
-    { null },
-    { onValueChanged(this@asCustomItem) },
+    setting = this,
+    title = this.title,
+    description = this.description,
+    icon = this.icon ?: 0,
+    clickable = true,
+    getCurrentValue = { null },
+    onValueChanged = { onValueChanged(this@asCustomItem) },
   )
 }
 
@@ -149,12 +179,13 @@ fun BasicSettingItem.asCustomItem(
   onValueChanged: (BasicSettingItem) -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
-    this,
-    this.title,
-    this.description,
-    drawableRes,
-    { null },
-    { onValueChanged(this@asCustomItem) },
+    setting = this,
+    title = this.title,
+    description = this.description,
+    icon = drawableRes,
+    clickable = true,
+    getCurrentValue = { null },
+    onValueChanged = { onValueChanged(this@asCustomItem) },
   )
 }
 
@@ -224,6 +255,17 @@ fun OnOffSettingItem.asOnOffSwitch(
   )
 }
 
+fun OnOffSettingItem.asOnOffMasterSwitch(
+  getCurrentValue: () -> Boolean,
+  onValueChanged: (Boolean) -> Unit,
+): SettingModelItem {
+  return SettingModelItem.MasterSwitchItem(
+    this,
+    getCurrentValue,
+    onValueChanged,
+  )
+}
+
 fun ColorSettingItem.asColorItem(
   getCurrentValue: () -> Int?,
   onValueChanged: (Int) -> Unit,
@@ -242,12 +284,13 @@ fun TextValueSettingItem.asCustomItem(
   onValueChanged: SettingsAdapter.() -> Unit,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
-    this,
-    title,
-    description,
-    0,
-    getCurrentValue,
-    onValueChanged,
+    setting = this,
+    title = title,
+    description = description,
+    icon = 0,
+    clickable = true,
+    getCurrentValue = getCurrentValue,
+    onValueChanged = onValueChanged,
   )
 }
 
@@ -256,12 +299,13 @@ fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
   fragmentManager: FragmentManager,
 ): SettingModelItem.CustomItem {
   return SettingModelItem.CustomItem(
-    this,
-    title,
-    description,
-    0,
-    getCurrentValue,
-    {
+    setting = this,
+    title = title,
+    description = description,
+    icon = 0,
+    clickable = true,
+    getCurrentValue = getCurrentValue,
+    onValueChanged = {
       val setting = this@asCustomItemWithTextEditorDialog
       if (setting.supportsRichText) {
         RichTextValueDialogFragment.newInstance(
@@ -304,62 +348,82 @@ fun SliderSettingItem.asSliderItem(
 }
 
 class SettingsAdapter(
+  private val context: Context,
   private val globalStateStorage: GlobalStateStorage,
   val getSummitActivity: () -> SummitActivity,
   val onValueChanged: () -> Unit,
+  private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
 ) : Adapter<ViewHolder>() {
 
   sealed interface Item {
     val setting: SettingItem
+    val isEnabled: Boolean
 
     data class RadioGroupOptionItem(
       override val setting: RadioGroupSettingItem,
+      override val isEnabled: Boolean,
       val currentValue: Int,
       val option: RadioGroupOption,
     ) : Item
 
     data class SubtitleItem(
       override val setting: SubgroupItem,
+      override val isEnabled: Boolean,
     ) : Item
 
     data class OnOffSwitchItem(
       override val setting: OnOffSettingItem,
+      override val isEnabled: Boolean,
       val currentValue: Boolean,
     ) : Item
 
+    data class MasterSwitchItem(
+      override val setting: OnOffSettingItem,
+      val currentValue: Boolean,
+    ) : Item {
+      override val isEnabled: Boolean = true
+    }
+
     data class ColorItem(
       override val setting: ColorSettingItem,
+      override val isEnabled: Boolean,
       val currentValue: Int,
       val defaultValue: Int,
     ) : Item
 
     data class CustomItem(
       override val setting: SettingItem,
+      override val isEnabled: Boolean,
       val icon: Int,
       val title: String,
       val description: String?,
       val currentValue: String?,
+      val clickable: Boolean,
     ) : Item
 
     class CustomViewItem<T>(
       override val typeId: Int,
       override val setting: SettingItem,
+      override val isEnabled: Boolean,
       val payload: T,
     ) : Item, AdapterHelper.RuntimeItemType
 
     data class ImageValueItem(
       override val setting: ImageValueSettingItem,
+      override val isEnabled: Boolean,
       val value: String?,
     ) : Item
 
     data class SliderItem(
       override val setting: SliderSettingItem,
+      override val isEnabled: Boolean,
       val value: Float,
     ) : Item
 
     data object FooterItem : Item {
       override val setting: SettingItem
         get() = TODO("Not yet implemented")
+      override val isEnabled: Boolean = true
     }
 
     data class DividerItem(
@@ -367,6 +431,7 @@ class SettingsAdapter(
     ) : Item {
       override val setting: SettingItem
         get() = TODO("Not yet implemented")
+      override val isEnabled: Boolean = true
     }
   }
 
@@ -423,6 +488,12 @@ class SettingsAdapter(
     }
     addItemType(Item.SubtitleItem::class, SubgroupSettingItemBinding::inflate) { item, b, h ->
       b.title.text = item.setting.title
+      if (item.setting.description.isNullOrBlank()) {
+        b.subtitle.visibility = View.GONE
+      } else {
+        b.subtitle.visibility = View.VISIBLE
+        b.subtitle.text = item.setting.description
+      }
     }
     addItemType(Item.OnOffSwitchItem::class, SettingItemOnOffBinding::inflate) { item, b, h ->
       item.setting.bindTo(
@@ -435,6 +506,55 @@ class SettingsAdapter(
           onValueChanged()
         },
       )
+
+      b.desc.movementMethod = CustomLinkMovementMethod().apply {
+        onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+          override fun onClick(
+            textView: TextView,
+            url: String,
+            text: String,
+            rect: RectF,
+          ): Boolean {
+            onLinkClick(url, text, LinkContext.Text)
+            return true
+          }
+        }
+        onLinkLongClickListener = DefaultLinkLongClickListener(context) { url, text ->
+          getSummitActivity().showMoreLinkOptions(url, text)
+        }
+      }
+    }
+    addItemType(
+      Item.MasterSwitchItem::class,
+      SettingItemOnOffMasterBinding::inflate,
+    ) { item, b, h ->
+      val setting = item.setting
+      b.title.text = setting.title
+      if (setting.description != null) {
+        b.desc.visibility = View.VISIBLE
+
+        Markwon.create(b.root.context).setMarkdown(b.desc, setting.description)
+      } else {
+        b.desc.visibility = View.GONE
+      }
+
+      // Unbind previous binding
+      b.switchView.setOnCheckedChangeListener(null)
+      b.switchView.isChecked = item.currentValue
+      b.switchView.jumpDrawablesToCurrentState()
+      b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
+        findSettingModel<SettingModelItem.MasterSwitchItem>(item.setting.id)
+          ?.onValueChanged
+          ?.invoke(newValue)
+
+        onValueChanged()
+      }
+      b.card.setOnClickListener {
+        b.switchView.performClick()
+      }
+
+      // Prevent auto state restoration since multiple checkboxes can have the same id
+      b.switchView.isSaveEnabled = false
     }
     addItemType(Item.ColorItem::class, SettingColorItemBinding::inflate) { item, b, h ->
       item.setting.bindTo(
@@ -481,7 +601,12 @@ class SettingsAdapter(
         b.icon.setImageResource(item.icon)
       }
 
-      b.title.text = item.title
+      if (item.title.isBlank()) {
+        b.title.visibility = View.GONE
+      } else {
+        b.title.visibility = View.VISIBLE
+        b.title.text = item.title
+      }
 
       if (item.description.isNullOrBlank()) {
         b.desc.visibility = View.GONE
@@ -504,12 +629,17 @@ class SettingsAdapter(
         b.desc.isEnabled = true
         b.value.isEnabled = true
         b.root.isEnabled = true
-        b.root.setOnClickListener {
-          findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
-            ?.onValueChanged
-            ?.invoke(this@SettingsAdapter)
+        if (item.clickable) {
+          b.root.setOnClickListener {
+            findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
+              ?.onValueChanged
+              ?.invoke(this@SettingsAdapter)
 
-          onValueChanged()
+            onValueChanged()
+          }
+        } else {
+          b.root.isClickable = false
+          b.root.setOnClickListener(null)
         }
       } else {
         b.title.isEnabled = false
@@ -563,8 +693,12 @@ class SettingsAdapter(
       if (d is SettingModelItem.SubgroupItem) {
         data.addAll(d.settings)
       }
-      if (d.setting.id == id) {
-        return d as? T
+      if (d is SettingModelItem.DividerItem) {
+        // dividers are not settings!
+      } else {
+        if (d.setting.id == id) {
+          return d as? T
+        }
       }
     }
     return null
@@ -590,27 +724,41 @@ class SettingsAdapter(
     val data = data
     val newItems = mutableListOf<Item>()
 
+    val masterSwitch = data.firstOrNull { it is SettingModelItem.MasterSwitchItem }
+    val masterSwitchEnabled = masterSwitch?.setting?.isEnabled ?: true
+
     fun processItem(item: SettingModelItem) {
       when (item) {
         is SettingModelItem.RadioGroupItem -> {
           item.setting.options.forEach {
-            newItems += Item.RadioGroupOptionItem(item.setting, item.getCurrentValue(), it)
+            newItems += Item.RadioGroupOptionItem(
+              setting = item.setting,
+              isEnabled = item.setting.isEnabled && masterSwitchEnabled,
+              currentValue = item.getCurrentValue(),
+              option = it,
+            )
           }
         }
         is SettingModelItem.SubgroupItem -> {
           newItems += Item.SubtitleItem(
-            item.setting,
+            setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
           )
           item.settings.forEach {
             processItem(it)
           }
         }
         is SettingModelItem.OnOffSwitchItem -> {
-          newItems += Item.OnOffSwitchItem(item.setting, item.getCurrentValue())
+          newItems += Item.OnOffSwitchItem(
+            setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
+            currentValue = item.getCurrentValue(),
+          )
         }
         is SettingModelItem.ColorItem -> {
           newItems += Item.ColorItem(
             setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
             currentValue = item.getCurrentValue() ?: item.defaultValue,
             defaultValue = item.defaultValue,
           )
@@ -618,10 +766,12 @@ class SettingsAdapter(
         is SettingModelItem.CustomItem -> {
           newItems += Item.CustomItem(
             setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
             icon = item.icon,
             title = item.title,
             description = item.description,
             currentValue = item.getCurrentValue(),
+            clickable = item.clickable,
           )
         }
         is SettingModelItem.CustomViewItem<*, *> -> {
@@ -639,6 +789,7 @@ class SettingsAdapter(
 
           newItems += Item.CustomViewItem(
             setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
             typeId = item.typeId,
             payload = item.payload,
           )
@@ -647,17 +798,22 @@ class SettingsAdapter(
         is SettingModelItem.ImageValueItem -> {
           newItems += Item.ImageValueItem(
             setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
             value = item.getCurrentValue(),
           )
         }
         is SettingModelItem.SliderSettingItem -> {
           newItems += Item.SliderItem(
             setting = item.setting,
+            isEnabled = item.setting.isEnabled && masterSwitchEnabled,
             value = item.getCurrentValue(),
           )
         }
         is SettingModelItem.DividerItem -> {
           newItems += Item.DividerItem(item.id)
+        }
+        is SettingModelItem.MasterSwitchItem -> {
+          newItems += Item.MasterSwitchItem(item.setting, item.getCurrentValue())
         }
       }
     }

@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.notifications.NotificationsManager
+import com.idunnololz.summit.settings.OnOffSettingItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -16,12 +18,32 @@ class SettingsNotificationsViewModel @Inject constructor(
   val notificationsManager: NotificationsManager,
 ) : ViewModel() {
 
-  val accounts = MutableLiveData<List<Account>>()
+  data class AccountSettingItem(
+    val account: Account,
+    val settingItem: OnOffSettingItem,
+  )
+
+  val accountToSetting = LinkedHashMap<String, AccountSettingItem>()
+  val settings = MutableLiveData<List<AccountSettingItem>>()
 
   init {
     viewModelScope.launch {
       accountManager.currentAccount.collect {
-        accounts.postValue(accountManager.getAccounts())
+        accountManager.getAccounts().forEach {
+          if (accountToSetting[it.fullName] == null) {
+            accountToSetting[it.fullName] =
+              AccountSettingItem(
+                it,
+                OnOffSettingItem(
+                  null,
+                  it.fullName,
+                  null,
+                ),
+              )
+          }
+        }
+
+        settings.postValue(accountToSetting.values.toList().sortedBy { it.account.fullName })
       }
     }
   }

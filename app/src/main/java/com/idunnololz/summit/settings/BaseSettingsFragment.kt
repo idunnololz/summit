@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.databinding.FragmentSettingsGenericBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.util.BaseFragment
@@ -55,11 +56,17 @@ abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBindin
   }
 
   private fun updateRendering() {
+    val context = requireContext()
+
     with(binding) {
       val adapter = SettingsAdapter(
+        context = context,
         globalStateStorage = globalStateStorage,
         getSummitActivity = { requireSummitActivity() },
         onValueChanged = { refresh() },
+        onLinkClick = { url, text, linkContext ->
+          onLinkClick(url, text, linkContext)
+        },
       )
       recyclerView.layoutManager = LinearLayoutManager(context)
       recyclerView.setHasFixedSize(true)

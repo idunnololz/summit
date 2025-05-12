@@ -219,7 +219,6 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
               it.posts
             }
         }
-        null -> error("type not set!")
       }
 
       result

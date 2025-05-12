@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.core.app.ActivityCompat
@@ -15,34 +13,23 @@ import androidx.fragment.app.viewModels
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.databinding.FragmentSettingsNotificationsBinding
-import com.idunnololz.summit.databinding.SettingItemOnOffBinding
-import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.BaseSettingsFragment
+import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.NotificationSettings
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
-import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.util.bindTo
-import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.settings.SettingModelItem
+import com.idunnololz.summit.settings.SubgroupItem
+import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsNotificationsFragment :
-  BaseFragment<FragmentSettingsNotificationsBinding>(),
-  SettingValueUpdateCallback {
+  BaseSettingsFragment() {
 
   @Inject
-  lateinit var preferences: Preferences
-
-  @Inject
-  lateinit var settings: NotificationSettings
+  override lateinit var settings: NotificationSettings
 
   private val viewModel: SettingsNotificationsViewModel by viewModels()
 
@@ -52,130 +39,102 @@ class SettingsNotificationsFragment :
     ) { isGranted: Boolean ->
       setNotificationsEnabled(isGranted)
 
-      updateRendering()
+      refresh()
     }
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    super.onCreateView(inflater, container, savedInstanceState)
-
-    setBinding(FragmentSettingsNotificationsBinding.inflate(inflater, container, false))
-
-    return binding.root
-  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val context = requireContext()
-
-    requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-      setSupportActionBar(binding.toolbar)
-
-      supportActionBar?.setDisplayShowHomeEnabled(true)
-      supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      supportActionBar?.title = settings.getPageName(context)
+    viewModel.settings.observe(viewLifecycleOwner) {
+      refresh()
     }
-
-    updateRendering()
   }
 
-  private fun updateRendering() {
-    if (!isBindingAvailable()) {
-      return
-    }
-
+  override fun generateData(): List<SettingModelItem> {
     val context = requireContext()
 
-    settings.isNotificationsEnabled.bindTo(
-      b = binding.notifications,
-      { preferences.isNotificationsOn },
-      {
-        val newState = !preferences.isNotificationsOn
+    val items = mutableListOf(
+      settings.isNotificationsEnabled.asOnOffSwitch(
+        { preferences.isNotificationsOn },
+        {
+          val newState = !preferences.isNotificationsOn
 
-        if (newState &&
-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-        ) {
-          with(NotificationManagerCompat.from(context)) {
-            if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS,
-              ) != PackageManager.PERMISSION_GRANTED
-            ) {
-              requestPermissionLauncher.launch(
-                Manifest.permission.POST_NOTIFICATIONS,
-              )
+          if (newState &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+          ) {
+            with(NotificationManagerCompat.from(context)) {
+              if (ActivityCompat.checkSelfPermission(
+                  context,
+                  Manifest.permission.POST_NOTIFICATIONS,
+                ) != PackageManager.PERMISSION_GRANTED
+              ) {
+                requestPermissionLauncher.launch(
+                  Manifest.permission.POST_NOTIFICATIONS,
+                )
 
-              return@with
+                return@with
+              }
+
+              setNotificationsEnabled(true)
             }
-
-            setNotificationsEnabled(true)
+          } else {
+            setNotificationsEnabled(newState)
           }
-        } else {
-          setNotificationsEnabled(newState)
-        }
+        },
+      ),
+      settings.checkInterval.asSingleChoiceSelectorItem(
+        { convertCheckIntervalToOptionId(preferences.notificationsCheckIntervalMs) },
+        {
+          val checkInterval = convertOptionIdToCheckInterval(it)
+
+          if (checkInterval != null) {
+            preferences.notificationsCheckIntervalMs = checkInterval
+            viewModel.onNotificationCheckIntervalChanged()
+          }
+        },
+      ),
+      *if (BuildConfig.DEBUG) {
+        arrayOf(
+          BasicSettingItem(
+            null,
+            "Force run notifications job",
+            null,
+          ).asCustomItem {
+            (activity?.application as? MainApplication)?.runNotificationsUpdate()
+          },
+        )
+      } else {
+        arrayOf()
       },
     )
 
-    settings.checkInterval.bindTo(
-      binding.checkInterval,
-      { convertCheckIntervalToOptionId(preferences.notificationsCheckIntervalMs) },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
+    items.add(
+      SettingModelItem.SubgroupItem(
+        SubgroupItem(
+          getString(R.string.per_account_settings),
+          getString(R.string.notifications_per_account_settings_desc),
+          listOf(),
+        ),
+        viewModel.settings.value?.map { setting ->
+          setting.settingItem.asOnOffSwitch(
+            {
+              viewModel.notificationsManager.isNotificationsEnabledForAccount(setting.account)
+            },
+            {
+              viewModel.notificationsManager.setNotificationsEnabledForAccount(setting.account, it)
+            },
+          )
+        } ?: listOf(),
+      ),
     )
-//        binding.notifications.root.visibility = View.GONE
 
-    if (BuildConfig.DEBUG) {
-      @Suppress("SetTextI18n") // debug only
-      binding.forceRunNotificationJob.title.text = "Force run notifications job"
-      binding.forceRunNotificationJob.desc.visibility = View.GONE
-      binding.forceRunNotificationJob.value.visibility = View.GONE
-      binding.forceRunNotificationJob.root.setOnClickListener {
-        (activity?.application as? MainApplication)?.runNotificationsUpdate()
-      }
-    } else {
-      binding.forceRunNotificationJob.root.visibility = View.GONE
-    }
-
-    viewModel.accounts.observe(viewLifecycleOwner) {
-      it ?: return@observe
-
-      binding.accountsContainer.removeAllViews()
-      val inflater = LayoutInflater.from(context)
-
-      for (account in it.sortedBy { it.fullName }) {
-        val accountRowBinding = SettingItemOnOffBinding
-          .inflate(inflater, binding.accountsContainer, false)
-
-        accountRowBinding.icon.visibility = View.GONE
-        accountRowBinding.title.text = account.fullName
-        accountRowBinding.switchView.isChecked = viewModel.notificationsManager
-          .isNotificationsEnabledForAccount(account)
-        accountRowBinding.desc.visibility = View.GONE
-
-        accountRowBinding.switchView.setOnCheckedChangeListener { buttonView, isChecked ->
-          viewModel.notificationsManager
-            .setNotificationsEnabledForAccount(account, isChecked)
-        }
-
-        binding.accountsContainer.addView(accountRowBinding.root)
-      }
-    }
+    return items
   }
 
   private fun setNotificationsEnabled(newState: Boolean) {
     preferences.isNotificationsOn = newState
     viewModel.onNotificationSettingsChanged()
-    updateRendering()
+    refresh()
   }
 
   private fun convertCheckIntervalToOptionId(value: Long) = when {
@@ -210,20 +169,5 @@ class SettingsNotificationsFragment :
     R.id.refresh_interval_30_minutes -> 1000L * 60L * 30L
     R.id.refresh_interval_15_minutes -> 1000L * 60L * 15L
     else -> null
-  }
-
-  override fun updateValue(key: Int, value: Any?) {
-    when (key) {
-      settings.checkInterval.id -> {
-        val checkInterval = convertOptionIdToCheckInterval(value as Int)
-
-        if (checkInterval != null) {
-          preferences.notificationsCheckIntervalMs = checkInterval
-          viewModel.onNotificationCheckIntervalChanged()
-        }
-      }
-    }
-
-    updateRendering()
   }
 }

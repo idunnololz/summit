@@ -48,13 +48,12 @@ class SettingsThemeFragment : BaseSettingsFragment() {
   }
 
   override fun generateData(): List<SettingModelItem> {
-    val parentActivity = requireSummitActivity()
     val account = args.account
     val context = requireContext()
 
     return listOf(
       SettingModelItem.SubgroupItem(
-        SubgroupItem(getString(R.string.base_theme), listOf(), listOf()),
+        getString(R.string.base_theme),
         listOf(
           settings.baseTheme.asRadioGroup(
             getCurrentValue = {
@@ -82,7 +81,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
         ),
       ),
       SettingModelItem.SubgroupItem(
-        SubgroupItem(getString(R.string.theme_config), listOf(), listOf()),
+        getString(R.string.theme_config),
         listOf(
           settings.materialYou.asOnOffSwitch(
             { preferences.isUseMaterialYou },
@@ -111,7 +110,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
         ),
       ),
       SettingModelItem.SubgroupItem(
-        SubgroupItem(getString(R.string.dark_theme_settings), listOf(), listOf()),
+        getString(R.string.dark_theme_settings),
         listOf(
           settings.blackTheme.asOnOffSwitch(
             { preferences.isBlackTheme },
@@ -130,7 +129,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
         ),
       ),
       SettingModelItem.SubgroupItem(
-        SubgroupItem(getString(R.string.font_style), listOf(), listOf()),
+        getString(R.string.font_style),
         listOf(
           settings.font.asCustomItem(
             { preferences.globalFont },
@@ -160,7 +159,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
         ),
       ),
       SettingModelItem.SubgroupItem(
-        SubgroupItem(getString(R.string.vote_colors), listOf(), listOf()),
+        getString(R.string.vote_colors),
         listOf(
           settings.upvoteColor.asColorItem(
             { preferences.upvoteColor },
@@ -196,7 +195,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
         ),
       ),
       SettingModelItem.SubgroupItem(
-        SubgroupItem(getString(R.string.misc), listOf(), listOf()),
+        getString(R.string.misc),
         listOf(
           settings.transparentNotificationBar.asOnOffSwitch(
             { preferences.transparentNotificationBar },
