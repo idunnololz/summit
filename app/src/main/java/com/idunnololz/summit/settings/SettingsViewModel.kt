@@ -1,6 +1,5 @@
 package com.idunnololz.summit.settings
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,8 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.memberProperties
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor() : ViewModel() {

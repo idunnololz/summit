@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.forEach
+import androidx.core.view.isVisible
 import androidx.core.view.iterator
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -46,7 +47,6 @@ import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
-import androidx.core.view.isVisible
 
 class NavBarController(
   val context: Context,
@@ -326,7 +326,10 @@ class NavBarController(
           .translationX(navigationBarOffset).duration = 250
       }
     } else {
-      Log.d("HAHA", "navBarContainer.vis: ${navBarContainer.isVisible} y:${navBarContainer.translationY}")
+      Log.d(
+        "HAHA",
+        "navBarContainer.vis: ${navBarContainer.isVisible} y:${navBarContainer.translationY}",
+      )
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
         navBarContainer.visibility = View.VISIBLE
         navBarContainer.translationY = navBarContainer.height.toFloat()

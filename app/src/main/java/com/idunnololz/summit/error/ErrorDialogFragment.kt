@@ -39,7 +39,6 @@ class ErrorDialogFragment : BaseDialogFragment<DialogFragmentErrorBinding>() {
               appendLine("\tCaused by: ${curErr.message}")
             }
 
-
             curErr = curErr.cause
           }
         }

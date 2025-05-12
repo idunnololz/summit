@@ -2,9 +2,9 @@ package com.idunnololz.summit.lemmy.utils.stateStorage
 
 import com.idunnololz.summit.lemmy.utils.StableAccountId
 import com.idunnololz.summit.preferences.SharedPreferencesManager
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.json.Json
 
 @Singleton
 class StateStorageManager @Inject constructor(

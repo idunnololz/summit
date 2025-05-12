@@ -7,6 +7,7 @@ import androidx.lifecycle.map
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.AccountIdsSharedPreference
 import com.idunnololz.summit.preferences.PreferenceManager
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -112,24 +112,23 @@ class AccountManager @Inject constructor(
     deferred.await()
   }
 
-  suspend fun setCurrentAccount(
-    guestOrUserAccount: GuestOrUserAccount?
-  ) = withContext(Dispatchers.IO) {
-    val deferred = coroutineScope.async {
-      if (_currentAccount.value == guestOrUserAccount) {
-        return@async
+  suspend fun setCurrentAccount(guestOrUserAccount: GuestOrUserAccount?) =
+    withContext(Dispatchers.IO) {
+      val deferred = coroutineScope.async {
+        if (_currentAccount.value == guestOrUserAccount) {
+          return@async
+        }
+
+        val account = guestOrUserAccount as? Account
+        accountDao.clearAndSetCurrent(account?.id)
+
+        doSwitchAccountWork(account)
+
+        _currentAccount.emit(guestOrUserAccount)
       }
 
-      val account = guestOrUserAccount as? Account
-      accountDao.clearAndSetCurrent(account?.id)
-
-      doSwitchAccountWork(account)
-
-      _currentAccount.emit(guestOrUserAccount)
+      deferred.await()
     }
-
-    deferred.await()
-  }
 
   private suspend fun updateCurrentAccount() {
     val currentAccount = accountDao.getCurrentAccount()

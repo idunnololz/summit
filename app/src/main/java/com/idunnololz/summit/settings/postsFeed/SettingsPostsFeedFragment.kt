@@ -1,47 +1,29 @@
 package com.idunnololz.summit.settings.postsFeed
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.databinding.FragmentSettingsPostsFeedBinding
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.PostsFeedSettings
 import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsAdapter
-import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asCustomViewSettingsItem
 import com.idunnololz.summit.settings.asOnOffSwitch
 import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
-import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
-import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.util.bindTo
 import com.idunnololz.summit.user.UserCommunitiesManager
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -281,7 +263,7 @@ class SettingsPostsFeedFragment :
                     getString(R.string.user_filters),
                   )
                 findNavController().navigateSafe(direction)
-              }
+              },
             )
           },
 
@@ -315,9 +297,8 @@ class SettingsPostsFeedFragment :
               preferences.showNsfwPosts = it
             },
           ),
-        )
+        ),
       ),
-
 
       SettingModelItem.SubgroupItem(
         getString(R.string.infinity),
@@ -339,10 +320,9 @@ class SettingsPostsFeedFragment :
             {
               preferences.infinityPageIndicator = it
             },
-          )
-        )
+          ),
+        ),
       ),
     )
   }
-
 }

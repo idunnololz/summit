@@ -224,7 +224,7 @@ class OfflineManager @Inject constructor(
     force: Boolean = false,
     listener: TaskListener,
     errorListener: TaskFailedListener?,
-    registerListenersIfTaskExists: Boolean
+    registerListenersIfTaskExists: Boolean,
   ): Registration {
     assertMainThread()
     check(!destDir.exists() || destDir.isDirectory)

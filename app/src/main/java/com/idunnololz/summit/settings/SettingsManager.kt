@@ -93,6 +93,7 @@ data class RadioGroupSettingItem(
   override val description: String?,
   val options: List<RadioGroupOption>,
   override val relatedKeys: List<String> = listOf(),
+  override val isEnabled: Boolean = true,
 ) : SettingItem() {
   @Parcelize
   data class RadioGroupOption(

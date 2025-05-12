@@ -84,21 +84,21 @@ class SettingsCacheFragment :
               StorageViewModel(
                 context.getString(R.string.error_cache_size_calculation),
                 false,
-                listOf()
+                listOf(),
               )
             }
             is StatefulData.Loading -> {
               StorageViewModel(
                 null,
                 true,
-                listOf()
+                listOf(),
               )
             }
             is StatefulData.NotStarted -> {
               StorageViewModel(
                 null,
                 true,
-                listOf()
+                listOf(),
               )
             }
             is StatefulData.Success -> {
@@ -150,7 +150,7 @@ class SettingsCacheFragment :
           cachePolicyManager.refreshCachePolicy()
           refresh()
         },
-      )
+      ),
     )
   }
 }

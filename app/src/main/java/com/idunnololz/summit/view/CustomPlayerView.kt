@@ -30,25 +30,25 @@ class CustomPlayerView : PlayerView {
   @OptIn(UnstableApi::class)
   fun setPlayerWithPreferences(player: Player?, preferences: Preferences) {
     val customPlayerListener =
-      (getTag(R.id.custom_player_listener) as? Player.Listener) ?:
-      object : Player.Listener {
+      (getTag(R.id.custom_player_listener) as? Player.Listener)
+        ?: object : Player.Listener {
 
-        @OptIn(UnstableApi::class)
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-          if (isPlaying) {
-            if (preferences.autoHideUiOnPlay) {
-              hideController()
+          @OptIn(UnstableApi::class)
+          override fun onIsPlayingChanged(isPlaying: Boolean) {
+            if (isPlaying) {
+              if (preferences.autoHideUiOnPlay) {
+                hideController()
+              }
+            } else {
+              // Not playing because playback is paused, ended, suppressed, or the player
+              // is buffering, stopped or failed. Check player.playWhenReady,
+              // player.playbackState, player.playbackSuppressionReason and
+              // player.playerError for details.
             }
-          } else {
-            // Not playing because playback is paused, ended, suppressed, or the player
-            // is buffering, stopped or failed. Check player.playWhenReady,
-            // player.playbackState, player.playbackSuppressionReason and
-            // player.playerError for details.
           }
+        }.also {
+          setTag(R.id.custom_player_listener, it)
         }
-      }.also {
-        setTag(R.id.custom_player_listener, it)
-      }
 
     this.player?.removeListener(customPlayerListener)
 
@@ -101,5 +101,4 @@ class CustomPlayerView : PlayerView {
   fun getRotateControl(): ImageButton = findViewById(R.id.exo_rotate_control)
 
   fun getVideoState(): VideoState? = player?.getVideoState(includeVolume = isVolumeChanged)
-
 }

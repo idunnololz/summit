@@ -12,6 +12,7 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
@@ -78,6 +79,7 @@ import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
+import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -85,6 +87,7 @@ import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.getImageErrorDrawable
+import com.idunnololz.summit.util.getVideoErrorDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.ExoPlayerManagerManager
@@ -94,9 +97,6 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
-import com.idunnololz.summit.util.ContentUtils.isUrlVideo
-import com.idunnololz.summit.util.getVideoErrorDrawable
 
 @FragmentScoped
 class PostListViewBuilder @Inject constructor(
@@ -1039,7 +1039,7 @@ class PostListViewBuilder @Inject constructor(
                     imageView.setImageDrawable(context.getImageErrorDrawable())
                   }
                 }
-              }
+              },
             )
           }
 

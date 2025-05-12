@@ -16,11 +16,8 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import androidx.annotation.OptIn
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import arrow.core.Either
 import coil3.load
 import coil3.request.allowHardware
@@ -428,7 +425,7 @@ class LemmyContentHelper(
                 isInline = true,
                 autoPlay = autoPlayVideos,
               ),
-              preferences
+              preferences,
             )
           } else {
             playerView.visibility = View.GONE
@@ -693,7 +690,7 @@ class LemmyContentHelper(
               loadingView?.showDefaultErrorMessageFor(error.throwable)
               errorListener?.invoke(error.throwable)
             }
-            Log.d(TAG, "Coil - Failed to load icon: ${imageUrl}")
+            Log.d(TAG, "Coil - Failed to load icon: $imageUrl")
           },
           onSuccess = { _, result ->
             loadingView?.hideAll(animate = false)
@@ -718,7 +715,7 @@ class LemmyContentHelper(
                 tempSize = tempSize,
               )
             }
-          }
+          },
         )
       }
     }
@@ -750,7 +747,7 @@ class LemmyContentHelper(
           } else {
             loadingView?.showDefaultErrorMessageFor(it)
           }
-          Log.d(TAG, "Failed to load icon: ${imageUrl}")
+          Log.d(TAG, "Failed to load icon: $imageUrl")
           errorListener?.invoke(it)
         },
       )

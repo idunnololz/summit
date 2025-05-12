@@ -22,7 +22,6 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentVideoViewerBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
-import com.idunnololz.summit.error.ErrorDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
@@ -35,7 +34,6 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.LoopsVideoUtils
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.toErrorMessage
 import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
@@ -114,7 +112,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
       ErrorDialogFragment.show(
         message = getString(R.string.error_unable_to_play_video),
         error = error,
-        fm = childFragmentManager
+        fm = childFragmentManager,
       )
     }
   }
@@ -344,7 +342,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 volume = videoState.volume
               }
             },
-          preferenceManager.currentPreferences
+          preferenceManager.currentPreferences,
         )
         setupMoreButton(context, url, args.url, videoType)
       }

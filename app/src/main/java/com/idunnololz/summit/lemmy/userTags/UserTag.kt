@@ -10,5 +10,4 @@ data class UserTag(
   val id: Long,
 ) : Parcelable
 
-fun UserTagEntry.toUserTag() =
-  UserTag(this.actorId, this.tag, this.id)
+fun UserTagEntry.toUserTag() = UserTag(this.actorId, this.tag, this.id)

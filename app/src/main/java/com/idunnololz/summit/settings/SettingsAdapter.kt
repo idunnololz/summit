@@ -31,8 +31,6 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import java.util.LinkedList
 import kotlin.reflect.KClass
-import kotlin.reflect.cast
-
 
 sealed interface SettingModelItem {
   val setting: SettingItem
@@ -41,15 +39,15 @@ sealed interface SettingModelItem {
     override val setting: RadioGroupSettingItem,
     val getCurrentValue: () -> Int,
     val onValueChanged: (Int) -> Unit,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class SubgroupItem(
     override val setting: com.idunnololz.summit.settings.SubgroupItem,
     val settings: List<SettingModelItem>,
   ) : SettingModelItem {
-    constructor(title: String, settings: List<SettingModelItem>): this(
+    constructor(title: String, settings: List<SettingModelItem>) : this(
       SubgroupItem(title, listOf(), listOf()),
-      settings
+      settings,
     )
   }
 
@@ -57,14 +55,14 @@ sealed interface SettingModelItem {
     override val setting: OnOffSettingItem,
     val getCurrentValue: () -> Boolean,
     val onValueChanged: (Boolean) -> Unit,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class ColorItem(
     override val setting: ColorSettingItem,
     val defaultValue: Int,
     val getCurrentValue: () -> Int?,
     val onValueChanged: (Int) -> Unit,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class CustomItem(
     override val setting: SettingItem,
@@ -73,31 +71,35 @@ sealed interface SettingModelItem {
     val icon: Int,
     val getCurrentValue: () -> String?,
     val onValueChanged: SettingsAdapter.() -> Unit,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class CustomViewItem<T, VB : ViewBinding>(
     override val setting: SettingItem,
     val viewBindingClass: KClass<VB>,
     val typeId: Int,
     val createBinding: (LayoutInflater, ViewGroup, Boolean) -> ViewBinding,
-    val bindViewHolder: (item: SettingsAdapter.Item.CustomViewItem<T>, b: VB, h: ViewHolder) -> Unit,
+    val bindViewHolder: (
+      item: SettingsAdapter.Item.CustomViewItem<T>,
+      b: VB,
+      h: ViewHolder,
+    ) -> Unit,
     val payload: T,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class ImageValueItem(
     override val setting: ImageValueSettingItem,
     val getCurrentValue: () -> String?,
     val onValueChanged: () -> Unit,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class SliderSettingItem(
     override val setting: com.idunnololz.summit.settings.SliderSettingItem,
     val getCurrentValue: () -> Float,
     val onValueChanged: (Float) -> Unit,
-  ): SettingModelItem
+  ) : SettingModelItem
 
   data class DividerItem(
-    @IdRes val id: Int
+    @IdRes val id: Int,
   ) : SettingModelItem {
     override val setting: SettingItem
       get() = TODO("Not yet implemented")
@@ -160,7 +162,11 @@ inline fun <T, reified VB : ViewBinding> BasicSettingItem.asCustomViewSettingsIt
   typeId: Int,
   payload: T,
   noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,
-  noinline bindViewHolder: (item: SettingsAdapter.Item.CustomViewItem<T>, b: VB, h: ViewHolder) -> Unit,
+  noinline bindViewHolder: (
+    item: SettingsAdapter.Item.CustomViewItem<T>,
+    b: VB,
+    h: ViewHolder,
+  ) -> Unit,
 ): SettingModelItem.CustomViewItem<T, VB> {
   return SettingModelItem.CustomViewItem(
     setting = this,
@@ -203,7 +209,7 @@ fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
           }
         }
       activity.showBottomMenu(bottomMenu)
-    }
+    },
   )
 }
 
@@ -286,7 +292,6 @@ fun ImageValueSettingItem.asImageValueItem(
   )
 }
 
-
 fun SliderSettingItem.asSliderItem(
   getCurrentValue: () -> Float,
   onValueChanged: (Float) -> Unit,
@@ -311,22 +316,22 @@ class SettingsAdapter(
       override val setting: RadioGroupSettingItem,
       val currentValue: Int,
       val option: RadioGroupOption,
-    ): Item
+    ) : Item
 
     data class SubtitleItem(
       override val setting: SubgroupItem,
-    ): Item
+    ) : Item
 
     data class OnOffSwitchItem(
       override val setting: OnOffSettingItem,
       val currentValue: Boolean,
-    ): Item
+    ) : Item
 
     data class ColorItem(
       override val setting: ColorSettingItem,
       val currentValue: Int,
       val defaultValue: Int,
-    ): Item
+    ) : Item
 
     data class CustomItem(
       override val setting: SettingItem,
@@ -334,23 +339,23 @@ class SettingsAdapter(
       val title: String,
       val description: String?,
       val currentValue: String?,
-    ): Item
+    ) : Item
 
     class CustomViewItem<T>(
       override val typeId: Int,
       override val setting: SettingItem,
       val payload: T,
-    ): Item, AdapterHelper.RuntimeItemType
+    ) : Item, AdapterHelper.RuntimeItemType
 
     data class ImageValueItem(
       override val setting: ImageValueSettingItem,
       val value: String?,
-    ): Item
+    ) : Item
 
     data class SliderItem(
       override val setting: SliderSettingItem,
       val value: Float,
-    ): Item
+    ) : Item
 
     data object FooterItem : Item {
       override val setting: SettingItem
@@ -358,7 +363,7 @@ class SettingsAdapter(
     }
 
     data class DividerItem(
-      @IdRes val id: Int
+      @IdRes val id: Int,
     ) : Item {
       override val setting: SettingItem
         get() = TODO("Not yet implemented")
@@ -382,9 +387,12 @@ class SettingsAdapter(
             old.setting.id == new.setting.id
           }
         }
-    }
+    },
   ).apply {
-    addItemType(Item.RadioGroupOptionItem::class, RadioGroupOptionSettingItemBinding::inflate) { item, b, h ->
+    addItemType(
+      Item.RadioGroupOptionItem::class,
+      RadioGroupOptionSettingItemBinding::inflate,
+    ) { item, b, h ->
       val setting = item.setting
       val option = item.option
 
@@ -425,7 +433,7 @@ class SettingsAdapter(
             ?.onValueChanged
             ?.invoke(it)
           onValueChanged()
-        }
+        },
       )
     }
     addItemType(Item.ColorItem::class, SettingColorItemBinding::inflate) { item, b, h ->
@@ -544,13 +552,13 @@ class SettingsAdapter(
       b.slider.isSaveEnabled = false
     }
 
-    addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { item, b, h ->  }
-    addItemType(Item.DividerItem::class, SettingDividerItemBinding::inflate) { item, b, h ->  }
+    addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { item, b, h -> }
+    addItemType(Item.DividerItem::class, SettingDividerItemBinding::inflate) { item, b, h -> }
   }
 
   private inline fun <reified T : SettingModelItem> findSettingModel(id: Int): T? {
     val data = LinkedList(data)
-    while(data.isNotEmpty()) {
+    while (data.isNotEmpty()) {
       val d = data.removeFirst()
       if (d is SettingModelItem.SubgroupItem) {
         data.addAll(d.settings)
@@ -562,14 +570,12 @@ class SettingsAdapter(
     return null
   }
 
-  override fun getItemViewType(position: Int): Int =
-    adapterHelper.getItemViewType(position)
+  override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
     adapterHelper.onCreateViewHolder(parent, viewType)
 
-  override fun getItemCount(): Int =
-    adapterHelper.itemCount
+  override fun getItemCount(): Int = adapterHelper.itemCount
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) =
     adapterHelper.onBindViewHolder(holder, position)
@@ -593,7 +599,7 @@ class SettingsAdapter(
         }
         is SettingModelItem.SubgroupItem -> {
           newItems += Item.SubtitleItem(
-            item.setting
+            item.setting,
           )
           item.settings.forEach {
             processItem(it)
@@ -606,7 +612,7 @@ class SettingsAdapter(
           newItems += Item.ColorItem(
             setting = item.setting,
             currentValue = item.getCurrentValue() ?: item.defaultValue,
-            defaultValue = item.defaultValue
+            defaultValue = item.defaultValue,
           )
         }
         is SettingModelItem.CustomItem -> {
@@ -615,7 +621,7 @@ class SettingsAdapter(
             icon = item.icon,
             title = item.title,
             description = item.description,
-            currentValue = item.getCurrentValue()
+            currentValue = item.getCurrentValue(),
           )
         }
         is SettingModelItem.CustomViewItem<*, *> -> {
@@ -628,7 +634,7 @@ class SettingsAdapter(
               castedItem.bindViewHolder(i, b as ViewBinding, h)
             },
             id = item.typeId,
-            onViewCreated = {}
+            onViewCreated = {},
           )
 
           newItems += Item.CustomViewItem(

@@ -1,69 +1,28 @@
 package com.idunnololz.summit.settings.theme
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
-import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.databinding.FragmentSettingsGenericBinding
-import com.idunnololz.summit.databinding.FragmentSettingsThemeBinding
-import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
-import com.idunnololz.summit.databinding.RadioGroupTitleSettingItemBinding
-import com.idunnololz.summit.databinding.SettingColorItemBinding
-import com.idunnololz.summit.databinding.SettingItemOnOffBinding
-import com.idunnololz.summit.databinding.SettingTextValueBinding
-import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
-import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.preferences.BaseTheme
 import com.idunnololz.summit.preferences.ColorSchemes
-import com.idunnololz.summit.preferences.GlobalFontColorId
-import com.idunnololz.summit.preferences.GlobalFontSizeId
-import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.BasicSettingItem
-import com.idunnololz.summit.settings.ColorSettingItem
-import com.idunnololz.summit.settings.OnOffSettingItem
 import com.idunnololz.summit.settings.PreferencesViewModel
-import com.idunnololz.summit.settings.RadioGroupSettingItem
-import com.idunnololz.summit.settings.RadioGroupSettingItem.RadioGroupOption
-import com.idunnololz.summit.settings.SettingItem
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsAdapter
-import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.SubgroupItem
-import com.idunnololz.summit.settings.TextOnlySettingItem
-import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.settings.ThemeSettings
 import com.idunnololz.summit.settings.asColorItem
 import com.idunnololz.summit.settings.asCustomItem
 import com.idunnololz.summit.settings.asOnOffSwitch
 import com.idunnololz.summit.settings.asRadioGroup
 import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
-import com.idunnololz.summit.settings.util.bindTo
-import com.idunnololz.summit.settings.util.bindToMultiView
-import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
-import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.LinkedList
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -119,8 +78,8 @@ class SettingsThemeFragment : BaseSettingsFragment() {
                 themeManager.onPreferencesChanged()
               }
             },
-          )
-        )
+          ),
+        ),
       ),
       SettingModelItem.SubgroupItem(
         SubgroupItem(getString(R.string.theme_config), listOf(), listOf()),
@@ -148,8 +107,8 @@ class SettingsThemeFragment : BaseSettingsFragment() {
               ColorSchemePickerDialogFragment.newInstance(account)
                 .show(childFragmentManager, "asdaa")
             },
-          )
-        )
+          ),
+        ),
       ),
       SettingModelItem.SubgroupItem(
         SubgroupItem(getString(R.string.dark_theme_settings), listOf(), listOf()),
@@ -167,8 +126,8 @@ class SettingsThemeFragment : BaseSettingsFragment() {
               preferences.useLessDarkBackgroundTheme = it
               themeManager.onPreferencesChanged()
             },
-          )
-        )
+          ),
+        ),
       ),
       SettingModelItem.SubgroupItem(
         SubgroupItem(getString(R.string.font_style), listOf(), listOf()),
@@ -197,8 +156,8 @@ class SettingsThemeFragment : BaseSettingsFragment() {
               preferences.globalFontColor = it
               themeManager.onPreferencesChanged()
             },
-          )
-        )
+          ),
+        ),
       ),
       SettingModelItem.SubgroupItem(
         SubgroupItem(getString(R.string.vote_colors), listOf(), listOf()),
@@ -232,9 +191,9 @@ class SettingsThemeFragment : BaseSettingsFragment() {
               preferences.downvoteColor = downvoteColor
 
               postAndCommentViewBuilder.onPreferencesChanged()
-            }
-          )
-        )
+            },
+          ),
+        ),
       ),
       SettingModelItem.SubgroupItem(
         SubgroupItem(getString(R.string.misc), listOf(), listOf()),
@@ -245,8 +204,8 @@ class SettingsThemeFragment : BaseSettingsFragment() {
               preferences.transparentNotificationBar = it
               getMainActivity()?.onPreferencesChanged()
             },
-          )
-        )
+          ),
+        ),
       ),
     )
   }

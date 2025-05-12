@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
-import android.transition.Transition
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -31,7 +30,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.window.layout.WindowMetricsCalculator
 import coil3.Image

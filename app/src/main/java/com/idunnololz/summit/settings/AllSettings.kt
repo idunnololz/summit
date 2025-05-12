@@ -19,7 +19,6 @@ import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.UserAgentChoiceIds
 import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsViewModel.SettingSearchResultItem
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtils
@@ -159,7 +158,7 @@ fun SearchableSettings.getAllSettings(): MutableList<SettingItem> {
       is TextValueSettingItem,
       is ColorSettingItem,
       is DescriptionSettingItem,
-        -> {
+      -> {
         result += settingItem
       }
       is SubgroupItem -> {
@@ -2729,7 +2728,7 @@ class AllSettings @Inject constructor(
         is TextValueSettingItem,
         is ColorSettingItem,
         is DescriptionSettingItem,
-          -> {
+        -> {
           result += settingItem
         }
         is SubgroupItem -> {
@@ -2921,13 +2920,12 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
   ),
 )
 
-private fun Map<Int, String>.toOptions(default: Int) =
-  entries.map { (key, value) ->
-    RadioGroupSettingItem.RadioGroupOption(
-      key,
-      value,
-      null,
-      null,
-      isDefault = key == default
-    )
-  }
+private fun Map<Int, String>.toOptions(default: Int) = entries.map { (key, value) ->
+  RadioGroupSettingItem.RadioGroupOption(
+    key,
+    value,
+    null,
+    null,
+    isDefault = key == default,
+  )
+}

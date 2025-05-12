@@ -288,7 +288,7 @@ class SettingsWebViewModel @Inject constructor(
     val currentAccountData = accountData.valueOrNull ?: return
 
     accountData.postValue(
-      currentAccountData.copy(settingValues = updatedSettingsValues(settings))
+      currentAccountData.copy(settingValues = updatedSettingsValues(settings)),
     )
   }
 

@@ -11,8 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
@@ -21,7 +19,6 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.ImageValueSettingItem
 import com.idunnololz.summit.settings.LemmyWebSettings
-import com.idunnololz.summit.settings.SettingItemsAdapter
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.asCustomItem
 import com.idunnololz.summit.settings.asCustomItemWithTextEditorDialog
@@ -34,7 +31,6 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
-import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -206,23 +202,23 @@ class SettingsWebFragment :
       ),
       settings.defaultSortType.asSingleChoiceSelectorItem(
         { settingValues.defaultSortType },
-        { updateValue(settings.defaultSortType.id, it) }
+        { updateValue(settings.defaultSortType.id, it) },
       ),
       settings.showNsfwSetting.asOnOffSwitch(
         { settingValues.showNsfw },
-        { updateValue(settings.showNsfwSetting.id, it) }
+        { updateValue(settings.showNsfwSetting.id, it) },
       ),
       settings.showReadPostsSetting.asOnOffSwitch(
         { settingValues.showReadPosts },
-        { updateValue(settings.showReadPostsSetting.id, it) }
+        { updateValue(settings.showReadPostsSetting.id, it) },
       ),
       settings.botAccountSetting.asOnOffSwitch(
         { settingValues.botAccount },
-        { updateValue(settings.botAccountSetting.id, it) }
+        { updateValue(settings.botAccountSetting.id, it) },
       ),
       settings.sendNotificationsToEmailSetting.asOnOffSwitch(
         { settingValues.sendNotificationsToEmail },
-        { updateValue(settings.sendNotificationsToEmailSetting.id, it) }
+        { updateValue(settings.sendNotificationsToEmailSetting.id, it) },
       ),
       settings.blockSettings.asCustomItem {
         val direction = SettingsWebFragmentDirections
@@ -238,7 +234,7 @@ class SettingsWebFragment :
 
   private fun openImagePicker(
     accountData: SettingsWebViewModel.AccountData,
-    settingItem: ImageValueSettingItem
+    settingItem: ImageValueSettingItem,
   ) {
     val context = requireContext()
     viewModel.imagePickerKey.value = settingItem.id

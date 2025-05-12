@@ -12,13 +12,11 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil3.load
-import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.utils.fullName
@@ -31,13 +29,11 @@ import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.colorPicker.ColorPickerDialog
 import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
 import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.ext.getColorFromAttribute
-import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.isLoading
@@ -186,7 +182,8 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
       }
 
       recentTagsRecyclerView.layoutManager = LinearLayoutManager(
-        context, LinearLayoutManager.HORIZONTAL, false)
+        context, LinearLayoutManager.HORIZONTAL, false,
+      )
       recentTagsRecyclerView.setHasFixedSize(true)
       val adapter = RecentUserTagsAdapter(
         context,
@@ -194,7 +191,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
           viewModel.tag = it.config.tagName
           viewModel.fillColor = it.config.fillColor
           viewModel.strokeColor = it.config.borderColor
-        }
+        },
       )
       recentTagsRecyclerView.adapter = adapter
 
@@ -302,7 +299,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
             old.userTag.id == (new as Item.UserTagItem).userTag.id
           Item.EmptyItem -> true
         }
-      }
+      },
     ).apply {
       addItemType(
         Item.PlaceholderItem::class,
@@ -334,14 +331,12 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
       }
     }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)

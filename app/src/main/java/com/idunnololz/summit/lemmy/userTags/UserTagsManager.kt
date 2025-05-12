@@ -100,8 +100,7 @@ class UserTagsManager @Inject constructor(
     return userTagsByName[fullName.lowercase(Locale.US)]?.config
   }
 
-  fun getUserTags() =
-    userTagsByName.values.toList()
+  fun getUserTags() = userTagsByName.values.toList()
 
   fun deleteTag(personName: String) {
     coroutineScope.launch {
@@ -116,9 +115,11 @@ class UserTagsManager @Inject constructor(
   fun onTagUsed(tag: UserTag) {
     coroutineScope.launch {
       dao.getUserTagById(tag.id).forEach {
-        dao.insertUserTag(it.copy(
-          usedTs = System.currentTimeMillis()
-        ))
+        dao.insertUserTag(
+          it.copy(
+            usedTs = System.currentTimeMillis(),
+          ),
+        )
       }
 
       onChanged()
