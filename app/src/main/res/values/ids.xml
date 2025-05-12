@@ -277,4 +277,11 @@
     <item name="give_feedback" type="id" />
     <item name="hidden_posts" type="id" />
     <item name="left_hand_mode" type="id" />
+    <item name="post_appearance_preview" type="id" />
+    <item name="binding" type="id"/>
+    <item name="post_and_comment_appearance_preview" type="id" />
+    <item name="divider0" type="id" />
+    <item name="divider1" type="id" />
+    <item name="divider2" type="id" />
+    <item name="divider3" type="id" />
 </resources>

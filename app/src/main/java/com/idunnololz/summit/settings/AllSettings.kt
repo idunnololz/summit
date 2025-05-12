@@ -4,6 +4,7 @@ import android.content.Context
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
+import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.links.PreviewLinkOptions
 import com.idunnololz.summit.preferences.ColorSchemes
 import com.idunnololz.summit.preferences.CommentGestureAction
@@ -1511,9 +1512,27 @@ class PostsFeedAppearanceSettings @Inject constructor(
   @ActivityContext private val context: Context,
 ) : SearchableSettings {
 
-  val baseViewType = TextOnlySettingItem(
+  val baseViewType = RadioGroupSettingItem(
+    null,
     context.getString(R.string.base_view_type),
     "",
+    mapOf(
+      CommunityLayout.Compact.ordinal to context.getString(R.string.compact),
+      CommunityLayout.List.ordinal to context.getString(R.string.list),
+      CommunityLayout.LargeList.ordinal to context.getString(R.string.large_list),
+      CommunityLayout.Card.ordinal to context.getString(R.string.card),
+      CommunityLayout.Card2.ordinal to context.getString(R.string.card2),
+      CommunityLayout.Card3.ordinal to context.getString(R.string.card3),
+      CommunityLayout.Full.ordinal to context.getString(R.string.full),
+      CommunityLayout.ListWithCards.ordinal to context.getString(R.string.list_with_cards),
+      CommunityLayout.FullWithCards.ordinal to context.getString(R.string.full_with_cards),
+    ).toOptions(CommunityLayout.List.ordinal),
+  )
+
+  val reset = BasicSettingItem(
+    null,
+    context.getString(R.string.reset_view_styles),
+    null,
   )
 
   val fontSize = SliderSettingItem(
@@ -1555,9 +1574,22 @@ class PostsFeedAppearanceSettings @Inject constructor(
   )
 
   val contentMaxLines =
-    TextOnlySettingItem(
+    RadioGroupSettingItem(
+      null,
       context.getString(R.string.full_content_max_lines),
       "",
+      mapOf(
+        -1 to context.getString(R.string.no_limit),
+        1 to "1",
+        2 to "2",
+        3 to "3",
+        4 to "4",
+        5 to "5",
+        6 to "6",
+        7 to "7",
+        8 to "8",
+        9 to "9",
+      ).toOptions(-1)
     )
   val dimReadPosts = OnOffSettingItem(
     null,

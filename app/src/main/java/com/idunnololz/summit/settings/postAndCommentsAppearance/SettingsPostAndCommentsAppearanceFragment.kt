@@ -1,7 +1,6 @@
 package com.idunnololz.summit.settings.postAndCommentsAppearance
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -14,40 +13,38 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.databinding.FragmentSettingsPostAndCommentsAppearanceBinding
+import com.idunnololz.summit.databinding.PostAndCommentAppearanceDemoCardBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.BaseSettingsFragment
+import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.PostAndCommentsAppearanceSettings
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.SettingsFragment
-import com.idunnololz.summit.settings.dialogs.MultipleChoiceDialogFragment
-import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
-import com.idunnololz.summit.settings.util.bindTo
+import com.idunnololz.summit.settings.SettingModelItem
+import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.asCustomViewSettingsItem
+import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.asSliderItem
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.setup
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.makeTransition
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
-import com.idunnololz.summit.util.setupForFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsPostAndCommentsAppearanceFragment :
-  BaseFragment<FragmentSettingsPostAndCommentsAppearanceBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener,
-  SettingValueUpdateCallback {
+  BaseSettingsFragment(),
+  OldAlertDialogFragment.AlertDialogFragmentListener {
 
   private val viewModel: SettingsPostAndCommentsAppearanceViewModel by viewModels()
 
@@ -55,45 +52,24 @@ class SettingsPostAndCommentsAppearanceFragment :
   lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder
 
   @Inject
-  lateinit var settings: PostAndCommentsAppearanceSettings
+  override lateinit var settings: PostAndCommentsAppearanceSettings
 
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    super.onCreateView(inflater, container, savedInstanceState)
-
-    setBinding(
-      FragmentSettingsPostAndCommentsAppearanceBinding.inflate(
-        inflater,
-        container,
-        false,
-      ),
-    )
-
-    return binding.root
+  private val resetPostStylesDialogLauncher = newAlertDialogLauncher("reset_post_to_default_styles") {
+    if (it.isOk) {
+      viewModel.resetPostUiConfig()
+    }
+  }
+  private val resetCommentStylesDialogLauncher = newAlertDialogLauncher("reset_comment_to_default_styles") {
+    if (it.isOk) {
+      viewModel.resetCommentUiConfig()
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    val context = requireContext()
-
-    requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.scrollView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
-      setSupportActionBar(binding.toolbar)
-
-      supportActionBar?.setDisplayShowHomeEnabled(true)
-      supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      supportActionBar?.title = settings.getPageName(context)
-    }
 
     binding.root.viewTreeObserver.addOnPreDrawListener(
       object :
@@ -111,6 +87,157 @@ class SettingsPostAndCommentsAppearanceFragment :
   fun setup() {
     if (!isBindingAvailable()) return
 
+    viewModel.onPostUiChanged.observe(viewLifecycleOwner) {
+      updateRendering()
+      refresh()
+    }
+    updateRendering()
+  }
+
+  override fun generateData(): List<SettingModelItem> {
+    return listOf(
+      BasicSettingItem(
+        icon = null,
+        title = getString(R.string.preview),
+        description = null,
+        id = R.id.post_and_comment_appearance_preview,
+      ).asCustomViewSettingsItem(
+        typeId = R.id.post_and_comment_appearance_preview,
+        payload = null,
+        inflateFn = PostAndCommentAppearanceDemoCardBinding::inflate,
+        bindViewHolder = { item, b, h ->
+          b.demoViewContainer.setTag(R.id.binding, b)
+          updateRendering(b)
+        }
+      ),
+      SettingModelItem.SubgroupItem(
+        getString(R.string.post_settings),
+        listOf(
+          settings.postFontSize.asSliderItem(
+            { viewModel.currentPostAndCommentUiConfig.postUiConfig.textSizeMultiplier },
+            {
+              viewModel.currentPostAndCommentUiConfig =
+                viewModel.currentPostAndCommentUiConfig.copy(
+                  postUiConfig = viewModel.currentPostAndCommentUiConfig
+                    .postUiConfig
+                    .updateTextSizeMultiplier(it),
+                )
+
+              updateRendering()
+            },
+          ),
+          settings.alwaysShowLinkBelowPost.asOnOffSwitch(
+            { viewModel.preferences.alwaysShowLinkButtonBelowPost },
+            {
+              viewModel.preferences.alwaysShowLinkButtonBelowPost = it
+
+              updateRendering()
+            },
+          ),
+          settings.fullBleedImage.asOnOffSwitch(
+            { viewModel.preferences.postFullBleedImage },
+            {
+              viewModel.preferences.postFullBleedImage = it
+
+              updateRendering()
+            },
+          ),
+          SettingModelItem.DividerItem(R.id.divider0),
+          settings.resetPostStyles.asCustomItem {
+            resetPostStylesDialogLauncher.launchDialog {
+              messageResId = R.string.reset_view_to_default_styles
+              positionButtonResId = android.R.string.ok
+              negativeButtonResId = R.string.cancel
+            }
+          },
+          SettingModelItem.DividerItem(R.id.divider1),
+        ),
+      ),
+      SettingModelItem.SubgroupItem(
+        getString(R.string.comment_settings),
+        listOf(
+          settings.commentFontSize.asSliderItem(
+            { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
+            {
+              viewModel.currentPostAndCommentUiConfig =
+                viewModel.currentPostAndCommentUiConfig.copy(
+                  commentUiConfig = viewModel.currentPostAndCommentUiConfig
+                    .commentUiConfig
+                    .updateTextSizeMultiplier(it),
+                )
+
+              updateRendering()
+            },
+          ),
+          settings.commentIndentationLevel.asSliderItem(
+            { viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat() },
+            {
+              viewModel.currentPostAndCommentUiConfig =
+                viewModel.currentPostAndCommentUiConfig.copy(
+                  commentUiConfig = viewModel.currentPostAndCommentUiConfig
+                    .commentUiConfig
+                    .updateIndentationPerLevelDp(it),
+                )
+
+              updateRendering()
+            },
+          ),
+          settings.showCommentActions.asOnOffSwitch(
+            { !viewModel.preferences.hideCommentActions },
+            {
+              viewModel.preferences.hideCommentActions = !it
+
+              updateRendering()
+            },
+          ),
+          settings.tapCommentToCollapse.asOnOffSwitch(
+            { viewModel.preferences.tapCommentToCollapse },
+            {
+              viewModel.preferences.tapCommentToCollapse = it
+
+              updateRendering()
+            },
+          ),
+          settings.commentsThreadStyle.asSingleChoiceSelectorItem(
+            { viewModel.preferences.commentThreadStyle },
+            {
+              viewModel.preferences.commentThreadStyle = it
+
+              updateRendering()
+            },
+          ),
+          settings.useCondensedTypefaceForCommentHeader.asOnOffSwitch(
+            { viewModel.preferences.useCondensedTypefaceForCommentHeaders },
+            {
+              viewModel.preferences.useCondensedTypefaceForCommentHeaders = it
+
+              updateRendering()
+            },
+          ),
+          SettingModelItem.DividerItem(R.id.divider2),
+          settings.resetCommentStyles.asCustomItem {
+            resetCommentStylesDialogLauncher.launchDialog {
+              messageResId = R.string.reset_view_to_default_styles
+              positionButtonResId = android.R.string.ok
+              negativeButtonResId = R.string.cancel
+            }
+          },
+          SettingModelItem.DividerItem(R.id.divider3),
+        )
+      )
+    )
+  }
+
+  private fun updateRendering(b: PostAndCommentAppearanceDemoCardBinding? = null) {
+    if (!isBindingAvailable()) return
+
+    val binding = b ?: binding.recyclerView.findViewById<View>(R.id.demo_view_container)
+      ?.getTag(R.id.binding) as? PostAndCommentAppearanceDemoCardBinding
+
+    if (binding == null) {
+      return
+    }
+
     val adapter = FakePostAndCommentsAdapter(
       binding.demoViewContainer,
       postAndCommentViewBuilder,
@@ -120,141 +247,10 @@ class SettingsPostAndCommentsAppearanceFragment :
       viewModel.preferences,
     )
 
-    val context = requireContext()
-
-    settings.resetPostStyles.bindTo(binding.resetPostStyles) {
-      OldAlertDialogFragment.Builder()
-        .setMessage(R.string.reset_view_to_default_styles)
-        .setPositiveButton(android.R.string.ok)
-        .setNegativeButton(R.string.cancel)
-        .createAndShow(childFragmentManager, "reset_post_to_default_styles")
-    }
-
-    settings.resetCommentStyles.bindTo(binding.resetCommentStyles) {
-      OldAlertDialogFragment.Builder()
-        .setMessage(R.string.reset_view_to_default_styles)
-        .setPositiveButton(android.R.string.ok)
-        .setNegativeButton(R.string.cancel)
-        .createAndShow(childFragmentManager, "reset_comment_to_default_styles")
-    }
-
     binding.demoViewContainer.setup(animationsHelper)
     binding.demoViewContainer.adapter = adapter
     binding.demoViewContainer.setHasFixedSize(true)
     binding.demoViewContainer.layoutManager = LinearLayoutManager(context)
-
-    viewModel.onPostUiChanged.observe(viewLifecycleOwner) {
-      updateRendering()
-      bindPostUiSettings()
-    }
-    bindPostUiSettings()
-    updateRendering()
-  }
-
-  private fun bindPostUiSettings() {
-    settings.postFontSize.bindTo(
-      binding.textScalingSetting1,
-      { viewModel.currentPostAndCommentUiConfig.postUiConfig.textSizeMultiplier },
-      {
-        viewModel.currentPostAndCommentUiConfig =
-          viewModel.currentPostAndCommentUiConfig.copy(
-            postUiConfig = viewModel.currentPostAndCommentUiConfig
-              .postUiConfig
-              .updateTextSizeMultiplier(it),
-          )
-
-        updateRendering()
-      },
-    )
-    settings.fullBleedImage.bindTo(
-      binding.fullBleedImage,
-      { viewModel.preferences.postFullBleedImage },
-      {
-        viewModel.preferences.postFullBleedImage = it
-
-        updateRendering()
-      },
-    )
-    settings.commentFontSize.bindTo(
-      binding.textScalingSetting2,
-      { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
-      {
-        viewModel.currentPostAndCommentUiConfig =
-          viewModel.currentPostAndCommentUiConfig.copy(
-            commentUiConfig = viewModel.currentPostAndCommentUiConfig
-              .commentUiConfig
-              .updateTextSizeMultiplier(it),
-          )
-
-        updateRendering()
-      },
-    )
-    settings.commentIndentationLevel.bindTo(
-      binding.indentationPerLevel,
-      { viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat() },
-      {
-        viewModel.currentPostAndCommentUiConfig =
-          viewModel.currentPostAndCommentUiConfig.copy(
-            commentUiConfig = viewModel.currentPostAndCommentUiConfig
-              .commentUiConfig
-              .updateIndentationPerLevelDp(it),
-          )
-
-        updateRendering()
-      },
-    )
-
-    settings.showCommentActions.bindTo(
-      binding.showCommentActions,
-      { !viewModel.preferences.hideCommentActions },
-      {
-        viewModel.preferences.hideCommentActions = !it
-
-        updateRendering()
-      },
-    )
-
-    settings.tapCommentToCollapse.bindTo(
-      binding.tapCommentToCollapse,
-      { viewModel.preferences.tapCommentToCollapse },
-      {
-        viewModel.preferences.tapCommentToCollapse = it
-
-        updateRendering()
-      },
-    )
-
-    settings.commentsThreadStyle.bindTo(
-      binding.commentThreadStyle,
-      { viewModel.preferences.commentThreadStyle },
-      { setting, currentValue ->
-        MultipleChoiceDialogFragment.newInstance(setting, currentValue)
-          .showAllowingStateLoss(childFragmentManager, "aaaaaaa")
-      },
-    )
-
-    settings.alwaysShowLinkBelowPost.bindTo(
-      binding.alwaysShowLinkBelowPost,
-      { viewModel.preferences.alwaysShowLinkButtonBelowPost },
-      {
-        viewModel.preferences.alwaysShowLinkButtonBelowPost = it
-
-        updateRendering()
-      },
-    )
-    settings.useCondensedTypefaceForCommentHeader.bindTo(
-      binding.useCondensedTypefaceForCommentHeader,
-      { viewModel.preferences.useCondensedTypefaceForCommentHeaders },
-      {
-        viewModel.preferences.useCondensedTypefaceForCommentHeaders = it
-
-        updateRendering()
-      },
-    )
-  }
-
-  private fun updateRendering() {
-    if (!isBindingAvailable()) return
 
     TransitionManager.beginDelayedTransition(binding.demoViewContainer, makeTransition())
 
@@ -264,17 +260,6 @@ class SettingsPostAndCommentsAppearanceFragment :
     (binding.demoViewContainer.adapter as? FakePostAndCommentsAdapter)?.refresh()
     binding.demoViewContainer.adapter?.notifyDataSetChanged()
     binding.demoViewContainer.setupForPostAndComments(viewModel.preferences)
-  }
-
-  override fun updateValue(key: Int, value: Any?) {
-    when (key) {
-      settings.commentsThreadStyle.id -> {
-        viewModel.preferences.commentThreadStyle = value as Int
-      }
-    }
-
-    bindPostUiSettings()
-    updateRendering()
   }
 
   private class FakePostAndCommentsAdapter(

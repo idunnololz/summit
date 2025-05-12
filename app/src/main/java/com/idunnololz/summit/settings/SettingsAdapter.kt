@@ -401,7 +401,7 @@ class SettingsAdapter(
       val clickable: Boolean,
     ) : Item
 
-    class CustomViewItem<T>(
+    data class CustomViewItem<T>(
       override val typeId: Int,
       override val setting: SettingItem,
       override val isEnabled: Boolean,
@@ -648,7 +648,26 @@ class SettingsAdapter(
         b.root.isEnabled = false
       }
     }
-    addItemType(Item.SliderItem::class, SettingSliderItemBinding::inflate) { item, b, h ->
+    addItemType(
+      clazz = Item.SliderItem::class,
+      inflateFn = SettingSliderItemBinding::inflate,
+      onViewCreated = {
+        it.slider.addOnSliderTouchListener(
+          object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {}
+
+            override fun onStopTrackingTouch(slider: Slider) {
+              val setting = it.root.tag as? SliderSettingItem ?: return
+              findSettingModel<SettingModelItem.SliderSettingItem>(setting.id)
+                ?.onValueChanged
+                ?.invoke(slider.value)
+
+              onValueChanged()
+            }
+          },
+        )
+      }
+    ) { item, b, h ->
       val setting = item.setting
       b.title.text = setting.title
       b.slider.valueFrom = setting.minValue
@@ -664,22 +683,10 @@ class SettingsAdapter(
         b.slider.value = item.value.coerceIn(setting.minValue, setting.maxValue)
       }
 
-      b.slider.addOnSliderTouchListener(
-        object : Slider.OnSliderTouchListener {
-          override fun onStartTrackingTouch(slider: Slider) {}
-
-          override fun onStopTrackingTouch(slider: Slider) {
-            findSettingModel<SettingModelItem.SliderSettingItem>(item.setting.id)
-              ?.onValueChanged
-              ?.invoke(slider.value)
-
-            onValueChanged()
-          }
-        },
-      )
 
       // Prevent auto state restoration since multiple checkboxes can have the same id
       b.slider.isSaveEnabled = false
+      b.root.tag = setting
     }
 
     addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { item, b, h -> }
