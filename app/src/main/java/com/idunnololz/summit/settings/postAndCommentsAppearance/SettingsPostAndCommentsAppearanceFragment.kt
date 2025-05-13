@@ -251,7 +251,7 @@ class SettingsPostAndCommentsAppearanceFragment :
 
     binding.demoViewContainer.setup(animationsHelper)
     binding.demoViewContainer.adapter = adapter
-    binding.demoViewContainer.setHasFixedSize(true)
+    binding.demoViewContainer.setHasFixedSize(false)
     binding.demoViewContainer.layoutManager = LinearLayoutManager(context)
 
     TransitionManager.beginDelayedTransition(binding.demoViewContainer, makeTransition())
