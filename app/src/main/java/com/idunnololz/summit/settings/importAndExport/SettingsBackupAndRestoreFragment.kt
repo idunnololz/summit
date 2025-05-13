@@ -7,7 +7,7 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.ImportAndExportSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint

@@ -12,9 +12,9 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.CacheSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asCustomViewSettingsItem
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomViewSettingsItem
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.view.StorageUsageItem

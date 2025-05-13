@@ -137,7 +137,9 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 
-sealed interface SearchableSettings {
+interface BaseSettings
+
+sealed interface SearchableSettings : BaseSettings {
   val parents: List<KClass<out SearchableSettings>>
 }
 
@@ -183,7 +185,7 @@ fun SearchableSettings.getAllSettings(): MutableList<SettingItem> {
 }
 
 object SettingPath {
-  fun KClass<out SearchableSettings>.getPageName(context: Context): String {
+  fun KClass<out BaseSettings>.getPageName(context: Context): String {
     return when (this) {
       AboutSettings::class ->
         context.getString(R.string.about_summit)
@@ -241,11 +243,34 @@ object SettingPath {
       DefaultAppsSettings::class ->
         context.getString(R.string.default_apps)
 
+      AccountBlockListSettings::class ->
+        context.getString(R.string.account_block_settings)
+
       else -> error("No name for $this")
     }
   }
 
-  fun SearchableSettings.getPageName(context: Context): String = this::class.getPageName(context)
+  fun BaseSettings.getPageName(context: Context): String = this::class.getPageName(context)
+}
+
+class AccountBlockListSettings @Inject constructor(
+  @ActivityContext context: Context,
+) : BaseSettings {
+  val blockedUsersSetting = BasicSettingItem(
+    R.drawable.baseline_person_24,
+    context.getString(R.string.blocked_users),
+    null,
+  )
+  val blockedCommunitiesSetting = BasicSettingItem(
+    R.drawable.ic_default_community,
+    context.getString(R.string.blocked_communities),
+    null,
+  )
+  val blockedInstancesSetting = BasicSettingItem(
+    R.drawable.ic_lemmy_24,
+    context.getString(R.string.blocked_instances),
+    null,
+  )
 }
 
 class MainSettings @Inject constructor(
@@ -1589,7 +1614,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
         7 to "7",
         8 to "8",
         9 to "9",
-      ).toOptions(-1)
+      ).toOptions(-1),
     )
   val dimReadPosts = OnOffSettingItem(
     null,

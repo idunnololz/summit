@@ -18,9 +18,9 @@ import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.PostsFeedSettings
 import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.getParcelableCompat

@@ -12,10 +12,9 @@ import com.idunnololz.summit.lemmy.toId
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.PostAndCommentsSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
-import com.idunnololz.summit.settings.util.isEnabled
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -77,7 +76,7 @@ class SettingsPostAndCommentsFragment :
           settings.autoCollapseCommentThreshold.asSingleChoiceSelectorItem(
             { convertAutoCollapseCommentToOptionId(preferences.autoCollapseCommentThreshold) },
             {
-              val threshold = convertOptionIdToAutoCollapseCommentThreshold(it as Int)
+              val threshold = convertOptionIdToAutoCollapseCommentThreshold(it)
 
               if (threshold != null) {
                 preferences.autoCollapseCommentThreshold = threshold

@@ -7,8 +7,8 @@ import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.HapticSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asOnOffMasterSwitch
-import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asOnOffMasterSwitch
+import com.idunnololz.summit.settings.util.asOnOffSwitch
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

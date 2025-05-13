@@ -5,15 +5,18 @@ import android.graphics.RectF
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
 import android.widget.TextView
 import androidx.annotation.IdRes
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import coil3.load
 import com.google.android.material.slider.Slider
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
 import com.idunnololz.summit.databinding.SettingColorItemBinding
 import com.idunnololz.summit.databinding.SettingDividerItemBinding
@@ -25,16 +28,12 @@ import com.idunnololz.summit.databinding.SettingTextValueBinding
 import com.idunnololz.summit.databinding.SubgroupSettingItemBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.LinkContext
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.settings.RadioGroupSettingItem.RadioGroupOption
-import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
-import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
-import com.idunnololz.summit.settings.util.bindTo
-import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.SummitActivity
-import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.colorPicker.OnColorPickedListener
+import com.idunnololz.summit.util.colorPicker.utils.ColorPicker
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
 import io.noties.markwon.Markwon
@@ -122,234 +121,10 @@ sealed interface SettingModelItem {
   ) : SettingModelItem
 }
 
-fun RadioGroupSettingItem.asRadioGroup(
-  getCurrentValue: () -> Int,
-  onValueChanged: (Int) -> Unit,
-): SettingModelItem.RadioGroupItem {
-  return SettingModelItem.RadioGroupItem(
-    this,
-    getCurrentValue,
-    onValueChanged,
-  )
-}
-
-fun RadioGroupSettingItem.asCustomItem(
-  getCurrentValue: () -> Int?,
-  onValueChanged: SettingsAdapter.(RadioGroupSettingItem) -> Unit,
-): SettingModelItem.CustomItem {
-  return SettingModelItem.CustomItem(
-    setting = this,
-    title = this.title,
-    description = this.description,
-    icon = 0,
-    clickable = true,
-    getCurrentValue = { this.options.firstOrNull { it.id == getCurrentValue() }?.title },
-    onValueChanged = { onValueChanged(this@asCustomItem) },
-  )
-}
-
-fun DescriptionSettingItem.asCustomItem(): SettingModelItem.CustomItem {
-  return SettingModelItem.CustomItem(
-    setting = this,
-    title = this.title,
-    description = this.description,
-    icon = 0,
-    clickable = false,
-    getCurrentValue = { null },
-    onValueChanged = { },
-  )
-}
-
-fun BasicSettingItem.asCustomItem(
-  onValueChanged: (BasicSettingItem) -> Unit,
-): SettingModelItem.CustomItem {
-  return SettingModelItem.CustomItem(
-    setting = this,
-    title = this.title,
-    description = this.description,
-    icon = this.icon ?: 0,
-    clickable = true,
-    getCurrentValue = { null },
-    onValueChanged = { onValueChanged(this@asCustomItem) },
-  )
-}
-
-fun BasicSettingItem.asCustomItem(
-  drawableRes: Int,
-  onValueChanged: (BasicSettingItem) -> Unit,
-): SettingModelItem.CustomItem {
-  return SettingModelItem.CustomItem(
-    setting = this,
-    title = this.title,
-    description = this.description,
-    icon = drawableRes,
-    clickable = true,
-    getCurrentValue = { null },
-    onValueChanged = { onValueChanged(this@asCustomItem) },
-  )
-}
-
-inline fun <T, reified VB : ViewBinding> BasicSettingItem.asCustomViewSettingsItem(
-  typeId: Int,
-  payload: T,
-  noinline inflateFn: (LayoutInflater, ViewGroup, Boolean) -> VB,
-  noinline bindViewHolder: (
-    item: SettingsAdapter.Item.CustomViewItem<T>,
-    b: VB,
-    h: ViewHolder,
-  ) -> Unit,
-): SettingModelItem.CustomViewItem<T, VB> {
-  return SettingModelItem.CustomViewItem(
-    setting = this,
-    viewBindingClass = VB::class,
-    typeId = typeId,
-    createBinding = inflateFn,
-    bindViewHolder = bindViewHolder,
-    payload = payload,
-  )
-}
-
-fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
-  getCurrentValue: () -> Int?,
-  onValueChanged: SettingsAdapter.(Int) -> Unit,
-): SettingModelItem.CustomItem {
-  return asCustomItem(
-    getCurrentValue,
-    a@{
-      val activity = getSummitActivity()
-      val curChoice = getCurrentValue()
-      val bottomMenu = BottomMenu(activity)
-        .apply {
-          val idToChoice = mutableMapOf<Int, Int>()
-          options.withIndex().forEach { (index, option) ->
-            idToChoice[index] = option.id
-            addItem(index, option.title)
-
-            if (curChoice == null && option.isDefault) {
-              setChecked(index)
-            } else if (curChoice == option.id) {
-              setChecked(index)
-            }
-          }
-
-          setTitle(title)
-
-          setOnMenuItemClickListener {
-            onValueChanged(requireNotNull(idToChoice[it.id]))
-            this@a.onValueChanged()
-          }
-        }
-      activity.showBottomMenu(bottomMenu)
-    },
-  )
-}
-
-fun OnOffSettingItem.asOnOffSwitch(
-  getCurrentValue: () -> Boolean,
-  onValueChanged: (Boolean) -> Unit,
-): SettingModelItem {
-  return SettingModelItem.OnOffSwitchItem(
-    this,
-    getCurrentValue,
-    onValueChanged,
-  )
-}
-
-fun OnOffSettingItem.asOnOffMasterSwitch(
-  getCurrentValue: () -> Boolean,
-  onValueChanged: (Boolean) -> Unit,
-): SettingModelItem {
-  return SettingModelItem.MasterSwitchItem(
-    this,
-    getCurrentValue,
-    onValueChanged,
-  )
-}
-
-fun ColorSettingItem.asColorItem(
-  getCurrentValue: () -> Int?,
-  onValueChanged: (Int) -> Unit,
-  defaultColor: () -> Int,
-): SettingModelItem {
-  return SettingModelItem.ColorItem(
-    this,
-    defaultColor(),
-    getCurrentValue,
-    onValueChanged,
-  )
-}
-
-fun TextValueSettingItem.asCustomItem(
-  getCurrentValue: () -> String,
-  onValueChanged: SettingsAdapter.() -> Unit,
-): SettingModelItem.CustomItem {
-  return SettingModelItem.CustomItem(
-    setting = this,
-    title = title,
-    description = description,
-    icon = 0,
-    clickable = true,
-    getCurrentValue = getCurrentValue,
-    onValueChanged = onValueChanged,
-  )
-}
-
-fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
-  getCurrentValue: () -> String,
-  fragmentManager: FragmentManager,
-): SettingModelItem.CustomItem {
-  return SettingModelItem.CustomItem(
-    setting = this,
-    title = title,
-    description = description,
-    icon = 0,
-    clickable = true,
-    getCurrentValue = getCurrentValue,
-    onValueChanged = {
-      val setting = this@asCustomItemWithTextEditorDialog
-      if (setting.supportsRichText) {
-        RichTextValueDialogFragment.newInstance(
-          setting.title,
-          setting.id,
-          getCurrentValue() as? String,
-        ).showAllowingStateLoss(fragmentManager, "asdf")
-      } else {
-        TextValueDialogFragment.newInstance(
-          setting.title,
-          setting.id,
-          setting.hint,
-          getCurrentValue() as? String,
-        ).showAllowingStateLoss(fragmentManager, "asdf")
-      }
-    },
-  )
-}
-
-fun ImageValueSettingItem.asImageValueItem(
-  getCurrentValue: () -> String,
-  onValueChanged: () -> Unit,
-): SettingModelItem.ImageValueItem {
-  return SettingModelItem.ImageValueItem(
-    this,
-    getCurrentValue,
-    onValueChanged,
-  )
-}
-
-fun SliderSettingItem.asSliderItem(
-  getCurrentValue: () -> Float,
-  onValueChanged: (Float) -> Unit,
-): SettingModelItem.SliderSettingItem {
-  return SettingModelItem.SliderSettingItem(
-    this,
-    getCurrentValue,
-    onValueChanged,
-  )
-}
-
 class SettingsAdapter(
   private val context: Context,
   private val globalStateStorage: GlobalStateStorage,
+  private val useFooter: Boolean,
   val getSummitActivity: () -> SummitActivity,
   val onValueChanged: () -> Unit,
   private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
@@ -420,9 +195,15 @@ class SettingsAdapter(
       val value: Float,
     ) : Item
 
+    data object HeaderItem : Item {
+      override val setting: SettingItem
+        get() = error("should not be called")
+      override val isEnabled: Boolean = true
+    }
+
     data object FooterItem : Item {
       override val setting: SettingItem
-        get() = TODO("Not yet implemented")
+        get() = error("should not be called")
       override val isEnabled: Boolean = true
     }
 
@@ -430,17 +211,19 @@ class SettingsAdapter(
       @IdRes val id: Int,
     ) : Item {
       override val setting: SettingItem
-        get() = TODO("Not yet implemented")
+        get() = error("should not be called")
       override val isEnabled: Boolean = true
     }
   }
 
   private var data: List<SettingModelItem> = listOf()
+  private var highlightSettingId: Int? = null
 
   private val adapterHelper = AdapterHelper<Item>(
     { old, new ->
       old::class == new::class &&
         when (old) {
+          Item.HeaderItem -> true
           Item.FooterItem -> true
           is Item.DividerItem -> {
             old.id == (new as Item.DividerItem).id
@@ -485,6 +268,12 @@ class SettingsAdapter(
 
         onValueChanged()
       }
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
     addItemType(Item.SubtitleItem::class, SubgroupSettingItemBinding::inflate) { item, b, h ->
       b.title.text = item.setting.title
@@ -494,18 +283,42 @@ class SettingsAdapter(
         b.subtitle.visibility = View.VISIBLE
         b.subtitle.text = item.setting.description
       }
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
     addItemType(Item.OnOffSwitchItem::class, SettingItemOnOffBinding::inflate) { item, b, h ->
-      item.setting.bindTo(
-        b = b,
-        getCurrentValue = { item.currentValue },
-        onValueChanged = {
-          findSettingModel<SettingModelItem.OnOffSwitchItem>(item.setting.id)
-            ?.onValueChanged
-            ?.invoke(it)
-          onValueChanged()
-        },
-      )
+      val setting = item.setting
+      if (setting.icon == null) {
+        b.icon.visibility = View.GONE
+      } else {
+        b.icon.setImageResource(setting.icon)
+        b.icon.visibility = View.VISIBLE
+      }
+
+      b.title.text = setting.title
+      if (setting.description != null) {
+        b.desc.visibility = View.VISIBLE
+
+        Markwon.create(b.root.context).setMarkdown(b.desc, setting.description)
+      } else {
+        b.desc.visibility = View.GONE
+      }
+
+      // Unbind previous binding
+      b.switchView.setOnCheckedChangeListener(null)
+      b.switchView.isChecked = item.currentValue
+      b.switchView.jumpDrawablesToCurrentState()
+      b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
+        findSettingModel<SettingModelItem.OnOffSwitchItem>(item.setting.id)
+          ?.onValueChanged
+          ?.invoke(newValue)
+
+        onValueChanged()
+      }
 
       b.desc.movementMethod = CustomLinkMovementMethod().apply {
         onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
@@ -523,6 +336,15 @@ class SettingsAdapter(
           getSummitActivity().showMoreLinkOptions(url, text)
         }
       }
+
+      // Prevent auto state restoration since multiple checkboxes can have the same id
+      b.switchView.isSaveEnabled = false
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
     addItemType(
       Item.MasterSwitchItem::class,
@@ -555,20 +377,64 @@ class SettingsAdapter(
 
       // Prevent auto state restoration since multiple checkboxes can have the same id
       b.switchView.isSaveEnabled = false
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
     addItemType(Item.ColorItem::class, SettingColorItemBinding::inflate) { item, b, h ->
-      item.setting.bindTo(
-        b = b,
-        globalStateStorage = globalStateStorage,
-        getCurrentValue = { item.currentValue },
-        onValueChanged = {
-          findSettingModel<SettingModelItem.ColorItem>(item.setting.id)
-            ?.onValueChanged
-            ?.invoke(it)
+      val setting = item.setting
+      val context = b.title.context
 
-          onValueChanged()
-        },
-        defaultValue = { item.defaultValue },
+      if (setting.icon == null) {
+        b.icon.visibility = View.GONE
+      } else {
+        b.icon.setImageResource(setting.icon)
+        b.icon.visibility = View.VISIBLE
+      }
+
+      b.title.text = setting.title
+
+      if (setting.description == null) {
+        b.desc.visibility = View.GONE
+      } else {
+        b.desc.text = setting.description
+        b.desc.visibility = View.VISIBLE
+      }
+
+      b.colorInner.setBackgroundColor(
+        item.currentValue,
+      )
+
+      b.root.setOnClickListener {
+        com.idunnololz.summit.util.colorPicker.ColorPickerDialog(
+          context = context,
+          title = setting.title,
+          color = item.currentValue,
+          defaultColor = item.defaultValue,
+          globalStateStorage = globalStateStorage,
+        )
+          .withAlphaEnabled(true)
+          .withListener(object : OnColorPickedListener {
+            override fun onColorPicked(pickerView: ColorPicker?, color: Int) {
+              b.colorInner.setBackgroundColor(color)
+
+              findSettingModel<SettingModelItem.ColorItem>(item.setting.id)
+                ?.onValueChanged
+                ?.invoke(color)
+
+              onValueChanged()
+            }
+          })
+          .show()
+      }
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
       )
     }
     addItemType(Item.ImageValueItem::class, SettingImageValueBinding::inflate) { item, b, h ->
@@ -592,6 +458,12 @@ class SettingsAdapter(
 
         onValueChanged()
       }
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
     addItemType(Item.CustomItem::class, SettingTextValueBinding::inflate) { item, b, h ->
       if (item.icon == 0) {
@@ -647,6 +519,12 @@ class SettingsAdapter(
         b.value.isEnabled = false
         b.root.isEnabled = false
       }
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
     addItemType(
       clazz = Item.SliderItem::class,
@@ -666,8 +544,10 @@ class SettingsAdapter(
             }
           },
         )
-      }
+      },
     ) { item, b, h ->
+      b.root.tag = null
+
       val setting = item.setting
       b.title.text = setting.title
       b.slider.valueFrom = setting.minValue
@@ -683,12 +563,19 @@ class SettingsAdapter(
         b.slider.value = item.value.coerceIn(setting.minValue, setting.maxValue)
       }
 
-
       // Prevent auto state restoration since multiple checkboxes can have the same id
       b.slider.isSaveEnabled = false
+
       b.root.tag = setting
+
+      highlightItem(
+        isHighlighted = highlightSettingId == item.setting.id,
+        highlightForever = false,
+        bg = b.highlightBg,
+      )
     }
 
+    addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { item, b, h -> }
     addItemType(Item.FooterItem::class, GenericSpaceFooterItemBinding::inflate) { item, b, h -> }
     addItemType(Item.DividerItem::class, SettingDividerItemBinding::inflate) { item, b, h -> }
   }
@@ -825,12 +712,66 @@ class SettingsAdapter(
       }
     }
 
+    newItems += Item.HeaderItem
+
     data.forEach { item ->
       processItem(item)
     }
 
-    newItems += Item.FooterItem
+    if (useFooter) {
+      newItems += Item.FooterItem
+    }
 
     adapterHelper.setItems(newItems, this)
+  }
+
+  fun findIndex(settingName: String) =
+    adapterHelper.items.indexOfFirst {
+      it !is Item.DividerItem &&
+        it !is Item.FooterItem &&
+        it !is Item.HeaderItem &&
+        it.setting.title == settingName
+    }
+
+  fun highlight(settingName: String) {
+    val index = findIndex(settingName)
+    highlightSettingId = adapterHelper.items[index].setting.id
+    notifyItemChanged(index)
+  }
+
+  private fun highlightItem(
+    isHighlighted: Boolean,
+    highlightForever: Boolean,
+    bg: View,
+  ) {
+    if (highlightForever) {
+      bg.visibility = View.VISIBLE
+      bg.clearAnimation()
+    } else if (isHighlighted) {
+      bg.visibility = View.VISIBLE
+
+      val animation = AlphaAnimation(0f, 0.9f)
+      animation.repeatCount = 5
+      animation.repeatMode = Animation.REVERSE
+      animation.duration = 300
+      animation.fillAfter = true
+      animation.setAnimationListener(object : AnimationListener {
+        override fun onAnimationStart(animation: Animation?) {
+        }
+
+        override fun onAnimationEnd(animation: Animation?) {
+          highlightSettingId = null
+        }
+
+        override fun onAnimationRepeat(animation: Animation?) {
+        }
+
+      })
+
+      bg.startAnimation(animation)
+    } else {
+      bg.visibility = View.GONE
+      bg.clearAnimation()
+    }
   }
 }

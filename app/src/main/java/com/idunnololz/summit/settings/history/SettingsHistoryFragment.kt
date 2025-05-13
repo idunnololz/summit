@@ -4,8 +4,8 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.HistorySettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

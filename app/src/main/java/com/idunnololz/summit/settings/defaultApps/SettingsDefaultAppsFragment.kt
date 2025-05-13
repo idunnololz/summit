@@ -9,7 +9,7 @@ import com.idunnololz.summit.preferences.DefaultAppPreference
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.DefaultAppsSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.getParcelableCompat
 import dagger.hilt.android.AndroidEntryPoint

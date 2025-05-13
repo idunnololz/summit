@@ -13,14 +13,10 @@ import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.forEach
-import androidx.core.view.isVisible
-import androidx.core.view.iterator
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.FloatingWindow
 import androidx.navigation.NavBackStackEntry
@@ -45,6 +41,7 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -105,13 +102,6 @@ class NavBarController(
       } else {
         0
       }
-  private val _navBarOffsetPercent = MutableLiveData<Float>(0f)
-  val navBarOffsetPercent: LiveData<Float>
-    get() = _navBarOffsetPercent
-  val bottomNavViewAnimationOffsetPercent = MutableLiveData<Float>(0f)
-  val bottomNavOpenPercent: Float
-    get() = navBarOffsetPercent.value!! +
-      bottomNavViewAnimationOffsetPercent.value!!
   var useCustomNavBar: Boolean = false
 
   private var enableBottomNavViewScrolling = false
@@ -119,20 +109,6 @@ class NavBarController(
 
   private val onNavigationItemReselectedListeners =
     mutableListOf<NavigationBarView.OnItemReselectedListener>()
-
-  init {
-    navBarOffsetPercent.observe(lifecycleOwner) {
-      updateOpenness(bottomNavOpenPercent)
-    }
-    bottomNavViewAnimationOffsetPercent.observe(lifecycleOwner) {
-      updateOpenness(bottomNavOpenPercent)
-    }
-  }
-
-  fun setNavBarOpenPercent(percent: Float) {
-    val v = max(min(percent, 1f), 0f)
-    _navBarOffsetPercent.value = v
-  }
 
   fun setup() {
     onWindowSizeChanged()
@@ -280,120 +256,97 @@ class NavBarController(
   }
 
   fun showBottomNav(supportOpenness: Boolean = false) {
+    animateNavBar(1f)
+  }
+
+  fun animateNavBar(percentShown: Float) {
     if (!useBottomNavBar) return
 
-    if (enableBottomNavViewScrolling && navBar.visibility == View.VISIBLE && navBar.alpha == 1f) {
+    val percentShown = percentShown.coerceIn(0f, 1f)
+
+    val currentPercentShown: Float = if (useNavigationRail) {
+      if (navBarContainer.width == 0) {
+        return
+      } else {
+        (navBarContainer.width.toFloat() + navBarContainer.translationX) / navBarContainer.width
+      }
+    } else {
+      if (navBarContainer.height == 0) {
+        return
+      } else {
+        (navBarContainer.height - navBarContainer.translationY) / navBarContainer.height
+      }
+    }
+
+    if (currentPercentShown + 0.01f > percentShown && currentPercentShown - 0.01f < percentShown) {
       return
     }
 
+    val animate = abs(currentPercentShown - percentShown) > 0.3f
+
     Log.d(
       TAG,
-      "showBottomNav() bottomNavigationView.height: ${navBarContainer.height} " +
-        "bottomNavOpenness: $bottomNavOpenPercent",
+      "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)} bottomNavigationView.height: ${navBarContainer.height} " +
+        "bottomNavOffset: ${navBarContainer.translationY}"
     )
 
     val navigationBarOffset =
-      if (supportOpenness) {
-        bottomNavOpenPercent
+      if (useNavigationRail) {
+        navBarContainer.width.toFloat()
       } else {
-        0f
-      } *
-        if (useNavigationRail) {
-          navBarContainer.width.toFloat()
-        } else {
-          navBarContainer.height.toFloat()
-        }
+        navBarContainer.height.toFloat()
+      } * (1f - percentShown)
 
     if (useNavigationRail) {
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
         navBarContainer.visibility = View.VISIBLE
-        navBarContainer.translationX = -navBar.width.toFloat()
+        navBarContainer.translationX = -navBar.width.toFloat() * (1f - percentShown)
 
+        navBarContainer.animate().cancel()
         navBarContainer.animate()
           .translationX(navigationBarOffset)
           .alpha(1f)
           .apply {
             duration = 250
           }
-      } else {
-        if (navBarContainer.translationX == 0f) {
-          navBarContainer.alpha = 1f
-          return
-        }
-
+      } else if (animate) {
+        navBarContainer.animate().cancel()
         navBarContainer.animate()
           .alpha(1f)
           .translationX(navigationBarOffset).duration = 250
+      } else {
+        navBarContainer.animate().cancel()
+        navBarContainer.translationX = navigationBarOffset
       }
     } else {
-      Log.d(
-        "HAHA",
-        "navBarContainer.vis: ${navBarContainer.isVisible} y:${navBarContainer.translationY}",
-      )
       if (navBarContainer.visibility != View.VISIBLE || navBarContainer.alpha == 0f) {
         navBarContainer.visibility = View.VISIBLE
-        navBarContainer.translationY = navBarContainer.height.toFloat()
+        navBarContainer.translationY = navBarContainer.height.toFloat() * (1f - percentShown)
 
+        navBarContainer.animate().cancel()
         navBarContainer.animate()
           .translationY(navigationBarOffset)
           .alpha(1f)
           .apply {
             duration = 250
           }
-          .withEndAction {
-//            _navBarOffsetPercent.value = 1f
+      } else if (animate) {
+        navBarContainer.animate().cancel()
+        navBarContainer.animate()
+          .alpha(1f)
+          .translationY(navigationBarOffset)
+          .apply {
+            duration = 250
           }
       } else {
-        if (navBarContainer.translationY == 0f) {
-          navBarContainer.alpha = 1f
-          return
-        }
-
-        navBarContainer.animate()
-          .alpha(1f)
-          .translationY(navigationBarOffset)
-          .apply {
-            duration = 250
-          }
-          .withEndAction {
-//            _navBarOffsetPercent.value = 1f
-          }
+        navBarContainer.animate().cancel()
+        navBarContainer.translationY = navigationBarOffset
       }
     }
   }
 
   fun hideNavBar(animate: Boolean) {
-    if (!useBottomNavBar) return
-
-    if (useNavigationRail) {
-      if (animate) {
-        if (navBarContainer.translationX > -navBarContainer.width.toFloat()) {
-          navBarContainer.animate()
-            .translationX(-navBarContainer.width.toFloat())
-            .alpha(0f)
-            .apply {
-              duration = 250
-            }
-        }
-      } else {
-        navBarContainer.translationX = -navBarContainer.width.toFloat()
-        navBarContainer.alpha = 0f
-      }
-    } else {
-      if (animate) {
-        if (navBarContainer.translationY < navBarContainer.height.toFloat()) {
-          navBarContainer.animate()
-            .translationY(navBarContainer.height.toFloat())
-            .alpha(0f)
-            .apply {
-              duration = 250
-            }
-        }
-      } else {
-        navBarContainer.translationY = navBarContainer.height.toFloat()
-        navBarContainer.alpha = 0f
-      }
-    }
+    animateNavBar(0f)
   }
 
   fun updatePaddingForNavBar(contentContainer: View) {
@@ -649,17 +602,6 @@ class NavBarController(
       navController,
       args,
     )
-  }
-
-  private fun updateOpenness(navOpenness: Float) {
-    if (_useNavigationRail == null) return
-    if (!useBottomNavBar) return
-
-    if (useNavigationRail) {
-      navBarContainer.translationX = -navOpenness * navBarContainer.width
-    } else {
-      navBarContainer.translationY = navOpenness * navBarContainer.height
-    }
   }
 
   /**

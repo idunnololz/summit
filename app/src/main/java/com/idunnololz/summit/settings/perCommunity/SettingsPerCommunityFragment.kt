@@ -17,8 +17,8 @@ import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.SubgroupItem
 import com.idunnololz.summit.settings.TextOnlySettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

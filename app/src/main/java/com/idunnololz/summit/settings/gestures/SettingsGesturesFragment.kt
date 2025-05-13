@@ -5,10 +5,10 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.GestureSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asColorItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
-import com.idunnololz.summit.settings.asSliderItem
+import com.idunnololz.summit.settings.util.asColorItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asSliderItem
 import com.idunnololz.summit.util.ext.getColorCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

@@ -20,12 +20,12 @@ import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.ImageValueSettingItem
 import com.idunnololz.summit.settings.LemmyWebSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asCustomItemWithTextEditorDialog
-import com.idunnololz.summit.settings.asImageValueItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItemWithTextEditorDialog
+import com.idunnololz.summit.settings.util.asImageValueItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.settings.webSettings.changePassword.ChangePasswordDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BottomMenu

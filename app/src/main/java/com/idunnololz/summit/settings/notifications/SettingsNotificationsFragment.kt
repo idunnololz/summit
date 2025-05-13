@@ -18,9 +18,9 @@ import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.NotificationSettings
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.SubgroupItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

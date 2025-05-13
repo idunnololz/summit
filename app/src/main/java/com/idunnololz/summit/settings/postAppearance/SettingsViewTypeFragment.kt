@@ -27,11 +27,11 @@ import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.PostsFeedAppearanceSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asCustomViewSettingsItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
-import com.idunnololz.summit.settings.asSliderItem
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomViewSettingsItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asSliderItem
 import com.idunnololz.summit.util.makeTransition
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -95,7 +95,7 @@ class SettingsViewTypeFragment :
         bindViewHolder = { item, b, h ->
           b.demoViewContainer.setTag(R.id.binding, b)
           updateRendering(b)
-        }
+        },
       ),
       settings.baseViewType.asSingleChoiceSelectorItem(
         {
@@ -144,7 +144,7 @@ class SettingsViewTypeFragment :
         CommunityLayout.Card3,
         CommunityLayout.ListWithCards,
         CommunityLayout.FullWithCards,
-          -> {
+        -> {
           arrayOf(
             settings.horizontalMarginSize.asSliderItem(
               { viewModel.currentPostUiConfig.horizontalMarginDp ?: 16f },
@@ -167,7 +167,7 @@ class SettingsViewTypeFragment :
 
                 updateRendering()
               },
-            )
+            ),
           )
         }
         else -> {
@@ -244,7 +244,7 @@ class SettingsViewTypeFragment :
 
           updateRendering()
         },
-      )
+      ),
     )
   }
 

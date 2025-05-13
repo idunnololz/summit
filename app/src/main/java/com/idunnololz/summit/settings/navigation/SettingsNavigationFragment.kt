@@ -9,8 +9,8 @@ import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.NavigationSettings
 import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

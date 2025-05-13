@@ -595,10 +595,10 @@ class CommunityFragment :
             }
 
             if (!navBarController.useNavigationRail) {
-              navBarController.setNavBarOpenPercent(it)
+              navBarController.animateNavBar(it)
             }
 
-            isCustomAppBarExpandedPercent = 1f - it
+            isCustomAppBarExpandedPercent = it
 
             updateFabState()
           }
@@ -722,7 +722,7 @@ class CommunityFragment :
                 setupForFragment<PostFragment>()
                 if (isSlideable && !args.isPreview) {
                   navBarController.hideNavBar(true)
-                  setNavUiOpenPercent(1f)
+                  setNavUiOpenPercent(1f * navBarPercentShown())
                   lockUiOpenness = true
                 }
               }
@@ -738,7 +738,7 @@ class CommunityFragment :
                 setupForFragment<CommunityFragment>()
                 lockUiOpenness = false
                 if (isSlideable && !args.isPreview) {
-                  setNavUiOpenPercent(0f)
+                  setNavUiOpenPercent(0f * navBarPercentShown())
                 }
               }
             }
@@ -795,6 +795,9 @@ class CommunityFragment :
   fun updatePost(postId: PostId, accountId: Long?) {
     viewModel.updatePost(postId, accountId)
   }
+
+  fun navBarPercentShown(): Float =
+    communityAppBarController?.percentShown?.value ?: 1f
 
   private fun onReady() {
     if (!isBindingAvailable()) return

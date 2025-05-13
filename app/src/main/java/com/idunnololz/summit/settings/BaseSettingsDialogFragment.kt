@@ -5,24 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.idunnololz.summit.databinding.FragmentSettingsGenericBinding
+import com.idunnololz.summit.databinding.DialogFragmentBaseSettingsBinding
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
-import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.setupToolbar
 import javax.inject.Inject
 
-abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBinding>() {
-
-  companion object {
-    const val ARG_SETTING_NAME = "ARG_SETTING_NAME"
-  }
+abstract class BaseSettingsDialogFragment : BaseDialogFragment<DialogFragmentBaseSettingsBinding>() {
 
   @Inject
   lateinit var preferences: Preferences
@@ -32,6 +25,12 @@ abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBindin
 
   abstract val settings: BaseSettings
 
+  override fun onStart() {
+    super.onStart()
+
+    setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -39,7 +38,7 @@ abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBindin
   ): View {
     super.onCreateView(inflater, container, savedInstanceState)
 
-    setBinding(FragmentSettingsGenericBinding.inflate(inflater, container, false))
+    setBinding(DialogFragmentBaseSettingsBinding.inflate(inflater, container, false))
 
     return binding.root
   }
@@ -50,24 +49,20 @@ abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBindin
     val context = requireContext()
 
     requireSummitActivity().apply {
-      setupForFragment<SettingsFragment>()
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-
       setupToolbar(binding.toolbar, settings.getPageName(context))
     }
 
-    updateRendering(savedInstanceState)
+    updateRendering()
   }
 
-  private fun updateRendering(savedInstanceState: Bundle?) {
+  private fun updateRendering() {
     val context = requireContext()
 
     with(binding) {
       val adapter = SettingsAdapter(
         context = context,
         globalStateStorage = globalStateStorage,
-        useFooter = true,
+        useFooter = false,
         getSummitActivity = { requireSummitActivity() },
         onValueChanged = { refresh() },
         onLinkClick = { url, text, linkContext ->
@@ -75,25 +70,12 @@ abstract class BaseSettingsFragment : BaseFragment<FragmentSettingsGenericBindin
         },
       )
       recyclerView.layoutManager = LinearLayoutManager(context)
-      recyclerView.setHasFixedSize(true)
+      recyclerView.setHasFixedSize(false)
       recyclerView.adapter = adapter
 
       val data = generateData()
 
       adapter.setData(data)
-
-      if (savedInstanceState == null) {
-        arguments?.getString(ARG_SETTING_NAME)?.let { settingName ->
-          recyclerView.post {
-            val index = adapter.findIndex(settingName)
-            if (index >= 0) {
-              (binding.recyclerView.layoutManager as LinearLayoutManager)
-                .scrollToPositionWithOffset(index, Utils.convertDpToPixel(48f).toInt())
-              adapter.highlight(settingName)
-            }
-          }
-        }
-      }
     }
   }
 

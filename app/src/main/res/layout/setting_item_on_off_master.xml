@@ -16,8 +16,18 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/padding">
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/highlight_bg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/colorHighlight"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
                 android:id="@+id/title"
@@ -27,6 +37,8 @@
                 android:layout_marginStart="@dimen/padding"
                 android:layout_marginEnd="@dimen/padding"
                 android:textColor="?colorOnPrimaryContainer"
+                android:layout_marginTop="@dimen/padding"
+                app:layout_goneMarginBottom="@dimen/padding"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -41,6 +53,7 @@
                 android:textColor="@color/colorTextFaint"
                 android:layout_marginEnd="@dimen/padding"
                 android:layout_marginTop="@dimen/padding_quarter"
+                android:layout_marginBottom="@dimen/padding"
                 app:layout_constraintStart_toStartOf="@+id/title"
                 app:layout_constraintTop_toBottomOf="@+id/title"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -52,6 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/padding"
                 android:saveEnabled="false"
+                android:layout_marginVertical="@dimen/padding"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>

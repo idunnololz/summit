@@ -16,11 +16,11 @@ import com.idunnololz.summit.settings.PreferencesViewModel
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.SubgroupItem
 import com.idunnololz.summit.settings.ThemeSettings
-import com.idunnololz.summit.settings.asColorItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asRadioGroup
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asColorItem
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asRadioGroup
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.util.ext.getColorCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -52,33 +52,28 @@ class SettingsThemeFragment : BaseSettingsFragment() {
     val context = requireContext()
 
     return listOf(
-      SettingModelItem.SubgroupItem(
-        getString(R.string.base_theme),
-        listOf(
-          settings.baseTheme.asRadioGroup(
-            getCurrentValue = {
-              when (preferences.baseTheme) {
-                BaseTheme.UseSystem -> R.id.setting_option_use_system
-                BaseTheme.Light -> R.id.setting_option_light_theme
-                BaseTheme.Dark -> R.id.setting_option_dark_theme
-              }
-            },
-            onValueChanged = {
-              when (it) {
-                R.id.setting_option_use_system ->
-                  preferences.baseTheme = BaseTheme.UseSystem
-                R.id.setting_option_light_theme ->
-                  preferences.baseTheme = BaseTheme.Light
-                R.id.setting_option_dark_theme ->
-                  preferences.baseTheme = BaseTheme.Dark
-              }
+      settings.baseTheme.asRadioGroup(
+        getCurrentValue = {
+          when (preferences.baseTheme) {
+            BaseTheme.UseSystem -> R.id.setting_option_use_system
+            BaseTheme.Light -> R.id.setting_option_light_theme
+            BaseTheme.Dark -> R.id.setting_option_dark_theme
+          }
+        },
+        onValueChanged = {
+          when (it) {
+            R.id.setting_option_use_system ->
+              preferences.baseTheme = BaseTheme.UseSystem
+            R.id.setting_option_light_theme ->
+              preferences.baseTheme = BaseTheme.Light
+            R.id.setting_option_dark_theme ->
+              preferences.baseTheme = BaseTheme.Dark
+          }
 
-              binding.root.post {
-                themeManager.onPreferencesChanged()
-              }
-            },
-          ),
-        ),
+          binding.root.post {
+            themeManager.onPreferencesChanged()
+          }
+        },
       ),
       SettingModelItem.SubgroupItem(
         getString(R.string.theme_config),
@@ -181,6 +176,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
             null,
             context.getString(R.string.swap_colors),
             null,
+            id = R.id.swap_colors,
           ).asCustomItem(
             {
               val upvoteColor = preferences.downvoteColor

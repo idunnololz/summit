@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/highlight_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorHighlight"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:maxLines="1"
@@ -15,14 +26,20 @@
         android:paddingHorizontal="@dimen/padding"
         android:paddingBottom="@dimen/padding"
         android:paddingTop="@dimen/padding_three"
-        style="@style/SettingHeaderStyle"/>
+        style="@style/SettingHeaderStyle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/padding"
         android:paddingBottom="@dimen/padding"
         android:paddingTop="@dimen/padding_half"
-        android:textAppearance="?textAppearanceBodyMedium"/>
-</LinearLayout>
+        android:textAppearance="?textAppearanceBodyMedium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

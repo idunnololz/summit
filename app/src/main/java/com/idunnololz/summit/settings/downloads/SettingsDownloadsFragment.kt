@@ -12,7 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.DownloadSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

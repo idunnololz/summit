@@ -26,6 +26,7 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
       .create(0f, 0f, 0f, 1f)
   }
 
+  fun requireSummitActivity(): SummitActivity = requireActivity() as SummitActivity
   fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
   fun getMainActivity(): MainActivity? = activity as? MainActivity
   fun getBaseActivity(): BaseActivity? = activity as? BaseActivity

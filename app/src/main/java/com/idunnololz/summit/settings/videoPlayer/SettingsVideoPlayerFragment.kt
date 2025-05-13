@@ -4,8 +4,8 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.VideoPlayerSettings
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSliderItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSliderItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

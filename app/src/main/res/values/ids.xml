@@ -284,4 +284,5 @@
     <item name="divider1" type="id" />
     <item name="divider2" type="id" />
     <item name="divider3" type="id" />
+    <item name="swap_colors" type="id" />
 </resources>

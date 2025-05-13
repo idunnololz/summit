@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.search.SearchHomeConfigDialogFragment
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.settings.SettingPath.getPageName
+import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
@@ -139,6 +140,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
     setupForFragment<SettingsFragment>()
   }
 
+  private fun Bundle.addSettingReference(setting: SettingItem): Bundle {
+    this.putString(BaseSettingsFragment.ARG_SETTING_NAME, setting.title)
+    return this
+  }
+
   private fun setupSearchRecyclerView() {
     if (!isBindingAvailable()) {
       return
@@ -154,116 +160,122 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             is PostAndCommentsSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingCommentListFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is GestureSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingGesturesFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is LemmyWebSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingWebFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is MainSettings -> {
               hideSearch()
+
+              binding.recyclerView.post {
+                highlightSetting(it)
+              }
             }
             is PostsFeedSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingsContentFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is AboutSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingAboutFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is CacheSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingCacheFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is HiddenPostsSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingHiddenPostsFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is PostAndCommentsAppearanceSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingPostAndCommentsFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is ThemeSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingThemeFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is PostsFeedAppearanceSettings -> {
               val directions = SettingsFragmentDirections
                 .actionGlobalSettingViewTypeFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is MiscSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingMiscFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is LoggingSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingLoggingFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
             is HistorySettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingHistoryFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is NavigationSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingNavigationFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is ActionsSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToActions()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is ImportAndExportSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingBackupAndRestoreFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is PerAccountSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingAccountsFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is DownloadSettings -> {
-              launchDownloadsSettings()
+              val directions = SettingsFragmentDirections
+                .actionSettingsFragmentToSettingDownloadsFragment()
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is PerCommunitySettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingPerCommunityFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is NotificationSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingNotificationsFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is HapticSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingsHapticsFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is SearchHomeSettings -> {
@@ -273,13 +285,13 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             is VideoPlayerSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingsVideoPlayerFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             is DefaultAppsSettings -> {
               val directions = SettingsFragmentDirections
                 .actionSettingsFragmentToSettingsDefaultAppsFragment()
-              findNavController().navigateSafe(directions)
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
             null -> {
@@ -291,6 +303,21 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
       )
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(context)
+    }
+  }
+
+  private fun highlightSetting(it: SettingItem) {
+    if (!isBindingAvailable()) {
+      return
+    }
+
+    binding.appBar.setExpanded(false)
+    val adapter = binding.recyclerView.adapter as? SettingsAdapter ?: return
+    val index = adapter.findIndex(it.title)
+    if (index >= 0) {
+      (binding.recyclerView.layoutManager as LinearLayoutManager)
+        .scrollToPositionWithOffset(index, Utils.convertDpToPixel(48f).toInt())
+      adapter.highlight(it.title)
     }
   }
 
@@ -377,6 +404,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
       val adapter = SettingsAdapter(
         context = context,
         globalStateStorage = globalStateStorage,
+        useFooter = true,
         getSummitActivity = { requireSummitActivity() },
         onValueChanged = { refresh() },
         onLinkClick = { url, text, linkContext ->

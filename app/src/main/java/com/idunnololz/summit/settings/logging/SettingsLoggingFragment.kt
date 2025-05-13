@@ -5,7 +5,7 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.LoggingSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asOnOffSwitch
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

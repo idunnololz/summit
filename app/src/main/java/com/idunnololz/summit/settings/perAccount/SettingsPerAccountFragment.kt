@@ -8,7 +8,7 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.PerAccountSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint

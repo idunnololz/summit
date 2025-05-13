@@ -14,7 +14,7 @@ import com.idunnololz.summit.lemmy.multicommunity.Source
 
 object LemmyFakeModels {
 
-  val fakeCommunity = Community(
+  private val fakeCommunity = Community(
     id = 0,
     name = "summit",
     title = "summit",
@@ -33,7 +33,7 @@ object LemmyFakeModels {
     instance_id = 1,
   )
 
-  val fakePerson1 = Person(
+  private val fakePerson1 = Person(
     id = 1,
     name = "idunnololz",
     display_name = "idunnololz",
@@ -53,7 +53,7 @@ object LemmyFakeModels {
     instance_id = 1,
   )
 
-  val fakePerson2 = Person(
+  private val fakePerson2 = Person(
     id = 2,
     name = "rumias",
     display_name = "rumias",
@@ -73,7 +73,7 @@ object LemmyFakeModels {
     instance_id = 1,
   )
 
-  val fakePost = Post(
+  private val fakePost = Post(
     id = 10,
     name = "Example post",
     url = "https://lol-catalyst-data.s3.amazonaws.com/manual_uploads/sencha.jpg",

@@ -501,6 +501,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
   }
 
   private fun onPanelStateChange() {
+    val percentShown = (getCurrentFragment() as? CommunityFragment)?.navBarPercentShown() ?: 1f
+    Log.d("HAHA", "percentShown: $percentShown")
     when (val panelState = binding.root.startPanelState) {
       PanelState.Closed -> {
         if (!args.isPreview) {
@@ -513,16 +515,16 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
         updatePaneBackPressHandler()
       }
       is PanelState.Closing -> {
-        getMainActivity()?.setNavUiOpenPercent(panelState.progress)
+        getMainActivity()?.setNavUiOpenPercent(panelState.progress * percentShown)
       }
       PanelState.Opened -> {
-        getMainActivity()?.setNavUiOpenPercent(100f)
+        getMainActivity()?.setNavUiOpenPercent(1f * percentShown)
         communitiesPaneController?.onShown()
 
         updatePaneBackPressHandler()
       }
       is PanelState.Opening -> {
-        getMainActivity()?.setNavUiOpenPercent(panelState.progress)
+        getMainActivity()?.setNavUiOpenPercent(panelState.progress * percentShown)
       }
     }
   }

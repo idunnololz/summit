@@ -28,11 +28,11 @@ import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.LemmyFakeModels
 import com.idunnololz.summit.settings.PostAndCommentsAppearanceSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asCustomViewSettingsItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
-import com.idunnololz.summit.settings.asSliderItem
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomViewSettingsItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asSliderItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.setup
@@ -57,16 +57,18 @@ class SettingsPostAndCommentsAppearanceFragment :
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
-  private val resetPostStylesDialogLauncher = newAlertDialogLauncher("reset_post_to_default_styles") {
-    if (it.isOk) {
-      viewModel.resetPostUiConfig()
+  private val resetPostStylesDialogLauncher =
+    newAlertDialogLauncher("reset_post_to_default_styles") {
+      if (it.isOk) {
+        viewModel.resetPostUiConfig()
+      }
     }
-  }
-  private val resetCommentStylesDialogLauncher = newAlertDialogLauncher("reset_comment_to_default_styles") {
-    if (it.isOk) {
-      viewModel.resetCommentUiConfig()
+  private val resetCommentStylesDialogLauncher =
+    newAlertDialogLauncher("reset_comment_to_default_styles") {
+      if (it.isOk) {
+        viewModel.resetCommentUiConfig()
+      }
     }
-  }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -108,7 +110,7 @@ class SettingsPostAndCommentsAppearanceFragment :
         bindViewHolder = { item, b, h ->
           b.demoViewContainer.setTag(R.id.binding, b)
           updateRendering(b)
-        }
+        },
       ),
       SettingModelItem.SubgroupItem(
         getString(R.string.post_settings),
@@ -223,8 +225,8 @@ class SettingsPostAndCommentsAppearanceFragment :
             }
           },
           SettingModelItem.DividerItem(R.id.divider3),
-        )
-      )
+        ),
+      ),
     )
   }
 

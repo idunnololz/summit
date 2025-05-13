@@ -61,7 +61,7 @@ abstract class SummitActivity :
 
   fun setNavUiOpenPercent(progress: Float) {
     if (lockUiOpenness) return
-    navBarController.bottomNavViewAnimationOffsetPercent.value = progress
+    navBarController.animateNavBar(1f - progress)
   }
 
   fun registerOnNavigationItemReselectedListener(

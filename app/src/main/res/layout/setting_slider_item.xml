@@ -3,8 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/padding_half"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/highlight_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorHighlight"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/title"
@@ -12,6 +22,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceTitleMedium"
         android:layout_marginStart="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,6 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding_half"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"

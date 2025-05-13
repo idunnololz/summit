@@ -15,11 +15,11 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
-import com.idunnololz.summit.settings.asSingleChoiceSelectorItem
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe

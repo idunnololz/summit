@@ -7,7 +7,7 @@ import com.idunnololz.summit.settings.AboutSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.SubgroupItem
-import com.idunnololz.summit.settings.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.util.openAppOnPlayStore

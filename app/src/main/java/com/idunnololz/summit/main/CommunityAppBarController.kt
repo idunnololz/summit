@@ -202,8 +202,9 @@ class CommunityAppBarController(
       val toolbarHeight = vh.toolbar.height
       val restOfAppBarHeight = vh.root.height - toolbarHeight
       val realOffset = verticalOffset + restOfAppBarHeight
-      val percentShown = -realOffset.toFloat() / toolbarHeight
+      val percentShown = 1 - (-realOffset.toFloat() / toolbarHeight)
 
+      Log.d("HAHA", "percentShown: ${percentShown}")
       this@CommunityAppBarController.percentShown.value = percentShown
     }
     viewLifecycleOwner.lifecycleScope.launch {

@@ -9,8 +9,8 @@ import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.HiddenPostsSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.asCustomItem
-import com.idunnololz.summit.settings.asOnOffSwitch
+import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.ext.navigateSafe
 import dagger.hilt.android.AndroidEntryPoint
