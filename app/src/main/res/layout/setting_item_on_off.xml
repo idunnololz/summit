@@ -48,7 +48,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceBodyMedium"
-        android:textColor="@color/colorTextFaint"
+        android:textColor="@color/text_color_faint"
         android:layout_marginEnd="@dimen/padding"
         android:layout_marginTop="@dimen/padding_quarter"
         android:layout_marginBottom="@dimen/padding_half"

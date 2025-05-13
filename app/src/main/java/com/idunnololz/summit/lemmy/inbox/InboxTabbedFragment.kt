@@ -109,7 +109,7 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         }
 
         if (isOpen) {
-          getMainActivity()?.setNavUiOpenPercent(1f)
+          getMainActivity()?.setNavUiOpenPercent(0f)
 
           inboxViewModel.isUserOnInboxScreen.value = false
         } else {
@@ -117,13 +117,13 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             setupForFragment<CommunityFragment>()
             lockUiOpenness = false
             if (isSlideable) {
-              setNavUiOpenPercent(0f)
+              setNavUiOpenPercent(1f)
             }
           }
 
           viewModel.removeAllButFirst()
 
-          getMainActivity()?.setNavUiOpenPercent(0f)
+          getMainActivity()?.setNavUiOpenPercent(1f)
 
           val fragment = childFragmentManager.findFragmentById(R.id.message_fragment_container)
 

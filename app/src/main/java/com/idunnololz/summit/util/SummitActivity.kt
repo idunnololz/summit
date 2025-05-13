@@ -59,9 +59,9 @@ abstract class SummitActivity :
     currentNavController?.navigateSafe(directions)
   }
 
-  fun setNavUiOpenPercent(progress: Float) {
+  fun setNavUiOpenPercent(showPercent: Float) {
     if (lockUiOpenness) return
-    navBarController.animateNavBar(1f - progress)
+    navBarController.animateNavBar(showPercent, animate = false)
   }
 
   fun registerOnNavigationItemReselectedListener(

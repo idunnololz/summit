@@ -32,7 +32,6 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
       when (t) {
         CommunityFragment::class -> {
           navBarController.enableBottomNavViewScrolling()
-          navBarController.showBottomNav()
           showNotificationBarBg()
         }
         PostFragment::class -> {

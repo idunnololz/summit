@@ -594,9 +594,10 @@ class CommunityFragment :
               return@observe
             }
 
-            if (!navBarController.useNavigationRail) {
-              navBarController.animateNavBar(it)
+            if (!navBarController.useNavigationRail && slidingPaneController?.isOpen != true) {
+              setNavUiOpenPercent(it)
             }
+            slidingPaneController?.navBarOpenPercent = it
 
             isCustomAppBarExpandedPercent = it
 
@@ -722,7 +723,7 @@ class CommunityFragment :
                 setupForFragment<PostFragment>()
                 if (isSlideable && !args.isPreview) {
                   navBarController.hideNavBar(true)
-                  setNavUiOpenPercent(1f * navBarPercentShown())
+                  setNavUiOpenPercent(0f)
                   lockUiOpenness = true
                 }
               }
@@ -738,7 +739,7 @@ class CommunityFragment :
                 setupForFragment<CommunityFragment>()
                 lockUiOpenness = false
                 if (isSlideable && !args.isPreview) {
-                  setNavUiOpenPercent(0f * navBarPercentShown())
+                  setNavUiOpenPercent(1f * navBarPercentShown())
                 }
               }
             }
@@ -1124,6 +1125,7 @@ class CommunityFragment :
     requireSummitActivity().apply {
       if (!args.isPreview) {
         setupForFragment<CommunityFragment>()
+        setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
       }
     }
 

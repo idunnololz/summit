@@ -351,19 +351,19 @@ class InboxFragment :
           override fun onPanelStateChange(panelState: PanelState) {
             when (panelState) {
               PanelState.Closed -> {
-                getMainActivity()?.setNavUiOpenPercent(0f)
+                getMainActivity()?.setNavUiOpenPercent(1f)
 
                 updatePaneBackPressHandler()
               }
               is PanelState.Closing -> {
-                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
+                getMainActivity()?.setNavUiOpenPercent(1f - panelState.progress)
               }
               PanelState.Opened -> {
-                getMainActivity()?.setNavUiOpenPercent(100f)
+                getMainActivity()?.setNavUiOpenPercent(0f)
                 updatePaneBackPressHandler()
               }
               is PanelState.Opening -> {
-                getMainActivity()?.setNavUiOpenPercent(panelState.progress)
+                getMainActivity()?.setNavUiOpenPercent(1f - panelState.progress)
               }
             }
           }

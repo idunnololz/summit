@@ -141,7 +141,7 @@ class SettingsAdapter(
       val option: RadioGroupOption,
     ) : Item
 
-    data class SubtitleItem(
+    data class GroupItem(
       override val setting: SubgroupItem,
       override val isEnabled: Boolean,
     ) : Item
@@ -220,7 +220,7 @@ class SettingsAdapter(
   private var highlightSettingId: Int? = null
 
   private val adapterHelper = AdapterHelper<Item>(
-    { old, new ->
+    areItemsTheSame = { old, new ->
       old::class == new::class &&
         when (old) {
           Item.HeaderItem -> true
@@ -228,13 +228,26 @@ class SettingsAdapter(
           is Item.DividerItem -> {
             old.id == (new as Item.DividerItem).id
           }
-          is Item.SubtitleItem -> {
+
+          is Item.GroupItem -> {
             old.setting.title == new.setting.title
           }
+
           else -> {
             old.setting.id == new.setting.id
           }
         }
+    },
+    areContentsTheSame = { oldItem, newItem ->
+      when (oldItem) {
+            Item.HeaderItem -> true
+            Item.FooterItem -> true
+            is Item.DividerItem -> true
+            is Item.GroupItem -> true
+            else -> {
+              oldItem == newItem
+            }
+      }
     },
   ).apply {
     addItemType(
@@ -269,13 +282,23 @@ class SettingsAdapter(
         onValueChanged()
       }
 
+      if (item.isEnabled) {
+        b.title.isEnabled = true
+        b.desc.isEnabled = true
+        b.radioButton.isEnabled = true
+      } else {
+        b.title.isEnabled = false
+        b.desc.isEnabled = false
+        b.radioButton.isEnabled = false
+      }
+
       highlightItem(
         isHighlighted = highlightSettingId == item.setting.id,
         highlightForever = false,
         bg = b.highlightBg,
       )
     }
-    addItemType(Item.SubtitleItem::class, SubgroupSettingItemBinding::inflate) { item, b, h ->
+    addItemType(Item.GroupItem::class, SubgroupSettingItemBinding::inflate) { item, b, h ->
       b.title.text = item.setting.title
       if (item.setting.description.isNullOrBlank()) {
         b.subtitle.visibility = View.GONE
@@ -311,7 +334,7 @@ class SettingsAdapter(
       // Unbind previous binding
       b.switchView.setOnCheckedChangeListener(null)
       b.switchView.isChecked = item.currentValue
-      b.switchView.jumpDrawablesToCurrentState()
+//      b.switchView.jumpDrawablesToCurrentState()
       b.switchView.setOnCheckedChangeListener { compoundButton, newValue ->
         findSettingModel<SettingModelItem.OnOffSwitchItem>(item.setting.id)
           ?.onValueChanged
@@ -339,6 +362,18 @@ class SettingsAdapter(
 
       // Prevent auto state restoration since multiple checkboxes can have the same id
       b.switchView.isSaveEnabled = false
+
+      if (item.isEnabled) {
+        b.icon.isEnabled = true
+        b.title.isEnabled = true
+        b.desc.isEnabled = true
+        b.switchView.isEnabled = true
+      } else {
+        b.icon.isEnabled = false
+        b.title.isEnabled = false
+        b.desc.isEnabled = false
+        b.switchView.isEnabled = false
+      }
 
       highlightItem(
         isHighlighted = highlightSettingId == item.setting.id,
@@ -431,6 +466,16 @@ class SettingsAdapter(
           .show()
       }
 
+      if (item.isEnabled) {
+        b.icon.isEnabled = true
+        b.title.isEnabled = true
+        b.desc.isEnabled = true
+      } else {
+        b.icon.isEnabled = false
+        b.title.isEnabled = false
+        b.desc.isEnabled = false
+      }
+
       highlightItem(
         isHighlighted = highlightSettingId == item.setting.id,
         highlightForever = false,
@@ -457,6 +502,14 @@ class SettingsAdapter(
           ?.invoke()
 
         onValueChanged()
+      }
+
+      if (item.isEnabled) {
+        b.title.isEnabled = true
+        b.desc.isEnabled = true
+      } else {
+        b.title.isEnabled = false
+        b.desc.isEnabled = false
       }
 
       highlightItem(
@@ -496,7 +549,7 @@ class SettingsAdapter(
 
       b.root.tag = this
 
-      if (item.setting.isEnabled) {
+      if (item.isEnabled) {
         b.title.isEnabled = true
         b.desc.isEnabled = true
         b.value.isEnabled = true
@@ -568,6 +621,14 @@ class SettingsAdapter(
 
       b.root.tag = setting
 
+      if (item.isEnabled) {
+        b.title.isEnabled = true
+        b.slider.isEnabled = true
+      } else {
+        b.title.isEnabled = false
+        b.slider.isEnabled = false
+      }
+
       highlightItem(
         isHighlighted = highlightSettingId == item.setting.id,
         highlightForever = false,
@@ -619,7 +680,8 @@ class SettingsAdapter(
     val newItems = mutableListOf<Item>()
 
     val masterSwitch = data.firstOrNull { it is SettingModelItem.MasterSwitchItem }
-    val masterSwitchEnabled = masterSwitch?.setting?.isEnabled ?: true
+      as? SettingModelItem.MasterSwitchItem
+    val masterSwitchEnabled = masterSwitch?.getCurrentValue?.invoke() ?: true
 
     fun processItem(item: SettingModelItem) {
       when (item) {
@@ -634,7 +696,7 @@ class SettingsAdapter(
           }
         }
         is SettingModelItem.SubgroupItem -> {
-          newItems += Item.SubtitleItem(
+          newItems += Item.GroupItem(
             setting = item.setting,
             isEnabled = item.setting.isEnabled && masterSwitchEnabled,
           )

@@ -259,19 +259,21 @@ class NavBarController(
     animateNavBar(1f)
   }
 
-  fun animateNavBar(percentShown: Float) {
+  fun animateNavBar(percentShown: Float, animate: Boolean? = null) {
     if (!useBottomNavBar) return
 
     val percentShown = percentShown.coerceIn(0f, 1f)
 
     val currentPercentShown: Float = if (useNavigationRail) {
       if (navBarContainer.width == 0) {
+        Log.d(TAG, "navbar percentShown set before laid out")
         return
       } else {
         (navBarContainer.width.toFloat() + navBarContainer.translationX) / navBarContainer.width
       }
     } else {
       if (navBarContainer.height == 0) {
+        Log.d(TAG, "navbar percentShown set before laid out")
         return
       } else {
         (navBarContainer.height - navBarContainer.translationY) / navBarContainer.height
@@ -282,12 +284,13 @@ class NavBarController(
       return
     }
 
-    val animate = abs(currentPercentShown - percentShown) > 0.3f
+    val animate = animate ?: (abs(currentPercentShown - percentShown) > 0.1f)
 
     Log.d(
       TAG,
       "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)} bottomNavigationView.height: ${navBarContainer.height} " +
-        "bottomNavOffset: ${navBarContainer.translationY}"
+        "bottomNavOffset: ${navBarContainer.translationY}",
+      RuntimeException()
     )
 
     val navigationBarOffset =

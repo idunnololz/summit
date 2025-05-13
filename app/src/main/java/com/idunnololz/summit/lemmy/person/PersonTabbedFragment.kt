@@ -397,10 +397,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     super.onResume()
 
     setupForFragment<PersonTabbedFragment>(animate = false)
-
-    if (binding.viewPager.currentItem == 0) {
-      getMainActivity()?.setNavUiOpenPercent(0f)
-    }
   }
 
   private fun setup(personRef: PersonRef?) {

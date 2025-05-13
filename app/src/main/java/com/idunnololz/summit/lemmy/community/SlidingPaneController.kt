@@ -71,6 +71,8 @@ class SlidingPaneController(
   val isOpen: Boolean
     get() = slidingPaneLayout.isOpen
 
+  var navBarOpenPercent: Float = 1f
+
   private val panelSlideListener =
     object : PanelSlideListener {
       override fun onPanelSlide(panel: View, slideOffset: Float) {
@@ -79,7 +81,7 @@ class SlidingPaneController(
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.apply {
             lockUiOpenness = false
-            setNavUiOpenPercent(1f - slideOffset)
+            setNavUiOpenPercent(slideOffset * navBarOpenPercent)
           }
 
           slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
@@ -116,7 +118,7 @@ class SlidingPaneController(
           }
         }
         if (slidingPaneLayout.isSlideable) {
-          fragment.getMainActivity()?.setNavUiOpenPercent(0f)
+          fragment.getMainActivity()?.setNavUiOpenPercent(1f * navBarOpenPercent)
         }
         onPageSelectedListener(false)
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
