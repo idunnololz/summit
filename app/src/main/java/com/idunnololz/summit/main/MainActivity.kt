@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.ViewTreeObserver
@@ -883,6 +884,37 @@ class MainActivity : SummitActivity() {
             rootView.paddingBottom
           },
         )
+      }
+    }
+  }
+
+  override fun insetViewAutomaticallyByMarginsAndNavUi(
+    lifecycleOwner: LifecycleOwner,
+    view: View,
+    applyLeftInset: Boolean,
+    applyTopInset: Boolean,
+    applyRightInset: Boolean,
+    applyBottomInset: Boolean,
+  ) {
+    insets.observe(lifecycleOwner) {
+      var bottomPadding = getBottomNavHeight()
+      if (bottomPadding == 0) {
+        bottomPadding = it.bottomInset
+      }
+
+      view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        if (applyLeftInset) {
+          leftMargin = navBarController.newLeftInset
+        }
+        if (applyTopInset) {
+          topMargin = it.topInset
+        }
+        if (applyRightInset) {
+          rightMargin = navBarController.newRightInset
+        }
+        if (applyBottomInset) {
+          bottomMargin = bottomPadding
+        }
       }
     }
   }

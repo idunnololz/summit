@@ -3,6 +3,8 @@ package com.idunnololz.summit.util
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.google.android.material.navigation.NavigationBarView
@@ -61,6 +63,8 @@ abstract class SummitActivity :
 
   fun setNavUiOpenPercent(showPercent: Float) {
     if (lockUiOpenness) return
+    if (navBarController.useNavigationRail) return
+
     navBarController.animateNavBar(showPercent, animate = false)
   }
 
@@ -122,6 +126,15 @@ abstract class SummitActivity :
   abstract fun insetViewAutomaticallyByPaddingAndNavUi(
     lifecycleOwner: LifecycleOwner,
     rootView: View,
+    applyLeftInset: Boolean = true,
+    applyTopInset: Boolean = true,
+    applyRightInset: Boolean = true,
+    applyBottomInset: Boolean = true,
+  )
+
+  abstract fun insetViewAutomaticallyByMarginsAndNavUi(
+    lifecycleOwner: LifecycleOwner,
+    view: View,
     applyLeftInset: Boolean = true,
     applyTopInset: Boolean = true,
     applyRightInset: Boolean = true,

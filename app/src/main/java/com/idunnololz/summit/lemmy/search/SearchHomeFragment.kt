@@ -76,6 +76,7 @@ import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -176,8 +177,16 @@ class SearchHomeFragment :
     }
 
     requireSummitActivity().apply {
-      insetViewStartAndEndByPadding(viewLifecycleOwner, binding.contentContainer)
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+      insetViewAutomaticallyByPaddingAndNavUi(
+        lifecycleOwner = viewLifecycleOwner,
+        rootView = binding.contentContainer,
+        applyTopInset = false,
+      )
+      insetViewAutomaticallyByMarginsAndNavUi(
+        viewLifecycleOwner,
+        binding.toolbar,
+        applyBottomInset = false,
+      )
       insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.searchContainer)
     }
 

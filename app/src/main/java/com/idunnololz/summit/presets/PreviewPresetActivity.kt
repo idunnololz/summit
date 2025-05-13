@@ -334,6 +334,37 @@ class PreviewPresetActivity : SummitActivity() {
     insetViewAutomaticallyByPadding(lifecycleOwner, rootView, 0)
   }
 
+  override fun insetViewAutomaticallyByMarginsAndNavUi(
+    lifecycleOwner: LifecycleOwner,
+    view: View,
+    applyLeftInset: Boolean,
+    applyTopInset: Boolean,
+    applyRightInset: Boolean,
+    applyBottomInset: Boolean,
+  ) {
+    insets.observe(lifecycleOwner) {
+      var bottomPadding = getBottomNavHeight()
+      if (bottomPadding == 0) {
+        bottomPadding = it.bottomInset
+      }
+
+      view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        if (applyLeftInset) {
+          leftMargin = navBarController.newLeftInset
+        }
+        if (applyTopInset) {
+          topMargin = it.topInset
+        }
+        if (applyRightInset) {
+          rightMargin = navBarController.newRightInset
+        }
+        if (applyBottomInset) {
+          bottomMargin = bottomPadding
+        }
+      }
+    }
+  }
+
   override fun launchPage(
     page: PageRef,
     switchToNativeInstance: Boolean,
