@@ -15,6 +15,7 @@ import com.idunnololz.summit.preferences.GestureSwipeDirectionIds
 import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
+import com.idunnololz.summit.preferences.NavRailGravityIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
@@ -71,6 +72,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_RAIL_GRAVITY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
@@ -2284,6 +2286,18 @@ class NavigationSettings @Inject constructor(
     relatedKeys = listOf(
       PreferenceUtils.KEY_NAVIGATION_RAIL_MODE,
     ),
+  )
+
+  val navRailGravity = RadioGroupSettingItem(
+    icon = null,
+    title = context.getString(R.string.navigation_rail_gravity),
+    description = null,
+    options = mapOf(
+      NavRailGravityIds.TOP to context.getString(R.string.gravity_top),
+      NavRailGravityIds.CENTER to context.getString(R.string.gravity_center),
+      NavRailGravityIds.BOTTOM to context.getString(R.string.gravity_bottom),
+    ).toOptions(NavRailGravityIds.TOP),
+    relatedKeys = listOf(KEY_NAV_RAIL_GRAVITY),
   )
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(

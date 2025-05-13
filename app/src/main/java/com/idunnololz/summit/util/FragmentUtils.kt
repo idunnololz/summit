@@ -85,7 +85,7 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
         }
         InboxTabbedFragment::class -> {
           navBarController.disableBottomNavViewScrolling()
-          navBarController.showBottomNav(supportOpenness = true)
+          navBarController.showBottomNav()
           showNotificationBarBg()
         }
         ActionsTabbedFragment::class -> {

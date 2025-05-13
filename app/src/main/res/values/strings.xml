@@ -2091,6 +2091,10 @@
     <string name="show_post_type">Show post type</string>
     <string name="error_unable_to_play_video">Unable to play video.</string>
     <string name="cache_info">Cache info</string>
+    <string name="navigation_rail_gravity">Navigation rail menu gravity</string>
+    <string name="gravity_top">Top</string>
+    <string name="gravity_center">Center</string>
+    <string name="gravity_bottom">Bottom</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

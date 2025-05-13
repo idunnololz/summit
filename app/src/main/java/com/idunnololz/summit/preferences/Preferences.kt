@@ -88,6 +88,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
+import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_RAIL_GRAVITY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
@@ -657,6 +658,8 @@ class Preferences(
     by booleanPreference(KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED, false)
   var showPostType: Boolean
     by booleanPreference(KEY_SHOW_POST_TYPE, false)
+  var navRailGravity: Int
+    by intPreference(KEY_NAV_RAIL_GRAVITY, NavRailGravityIds.TOP)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

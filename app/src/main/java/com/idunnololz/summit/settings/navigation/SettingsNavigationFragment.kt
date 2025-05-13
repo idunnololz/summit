@@ -89,6 +89,15 @@ class SettingsNavigationFragment :
           setupNavBarOption(4, settings.navBarDest5),
         ),
       ),
+      SettingModelItem.SubgroupItem(
+        getString(R.string.navigation_rail_mode),
+        listOf(
+          settings.navRailGravity.asSingleChoiceSelectorItem(
+            { preferences.navRailGravity },
+            { preferences.navRailGravity = it },
+          )
+        )
+      )
     )
   }
 }

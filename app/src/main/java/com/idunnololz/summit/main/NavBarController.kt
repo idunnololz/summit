@@ -34,6 +34,7 @@ import com.google.android.material.navigationrail.NavigationRailView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
+import com.idunnololz.summit.preferences.NavRailGravityIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.navigation.NavBarConfig
@@ -66,6 +67,7 @@ class NavBarController(
   private var navRailMode = NavigationRailModeId.Auto
   private var globalLayoutMode: GlobalLayoutMode = GlobalLayoutModes.Auto
   private var showLabels = true
+  private var navRailGravity: Int = NavRailGravityIds.TOP
 
   lateinit var navBar: NavigationBarView
   private lateinit var navBarContainer: View
@@ -255,7 +257,7 @@ class NavBarController(
     enableBottomNavViewScrolling = false
   }
 
-  fun showBottomNav(supportOpenness: Boolean = false) {
+  fun showBottomNav() {
     animateNavBar(1f)
   }
 
@@ -316,7 +318,7 @@ class NavBarController(
         navBarContainer.animate().cancel()
         navBarContainer.animate()
           .alpha(1f)
-          .translationX(navigationBarOffset).duration = 250
+          .translationX(-navigationBarOffset).duration = 250
       } else {
         navBarContainer.animate().cancel()
         navBarContainer.translationX = navigationBarOffset
@@ -375,6 +377,7 @@ class NavBarController(
     navBarConfig = preferences.navBarConfig
     globalLayoutMode = preferences.globalLayoutMode
     showLabels = preferences.showLabelsInNavBar
+    navRailGravity = preferences.navRailGravity
 
     navRailMode =
       if (globalLayoutMode == GlobalLayoutModes.SmallScreen) {
@@ -389,6 +392,15 @@ class NavBarController(
       NavigationBarView.LABEL_VISIBILITY_LABELED
     } else {
       NavigationBarView.LABEL_VISIBILITY_UNLABELED
+    }
+
+    (navBar as? NavigationRailView)?.let { navBar ->
+      navBar.menuGravity = when (navRailGravity) {
+        NavRailGravityIds.TOP -> Gravity.TOP
+        NavRailGravityIds.CENTER -> Gravity.CENTER
+        NavRailGravityIds.BOTTOM -> Gravity.BOTTOM
+        else -> Gravity.TOP
+      }
     }
 
     if (!useBottomNavBar) {
