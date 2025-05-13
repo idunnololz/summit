@@ -43,8 +43,6 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import java.lang.ref.WeakReference
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 class NavBarController(
   val context: Context,
@@ -106,7 +104,6 @@ class NavBarController(
       }
   var useCustomNavBar: Boolean = false
 
-  private var enableBottomNavViewScrolling = false
   private var navBarConfig: NavBarConfig = NavBarConfig()
 
   private val onNavigationItemReselectedListeners =
@@ -245,18 +242,6 @@ class NavBarController(
     }
   }
 
-  fun enableBottomNavViewScrolling() {
-    if (!useBottomNavBar) return
-    if (useNavigationRail) return
-
-    enableBottomNavViewScrolling = true
-    navBar.visibility = View.VISIBLE
-  }
-
-  fun disableBottomNavViewScrolling() {
-    enableBottomNavViewScrolling = false
-  }
-
   fun showBottomNav() {
     animateNavBar(1f)
   }
@@ -290,10 +275,7 @@ class NavBarController(
 
     Log.d(
       TAG,
-      "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)} bottomNavigationView.height: ${navBarContainer.height} " +
-        "bottomNavOffset: ${navBarContainer.translationY}",
-      RuntimeException()
-    )
+      "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)}")
 
     val navigationBarOffset =
       if (useNavigationRail) {
@@ -350,7 +332,7 @@ class NavBarController(
     }
   }
 
-  fun hideNavBar(animate: Boolean) {
+  fun hideNavBar() {
     animateNavBar(0f)
   }
 

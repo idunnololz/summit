@@ -1,10 +1,13 @@
 package com.idunnololz.summit.util
 
+import android.os.Bundle
 import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.google.android.material.navigation.NavigationBarView
@@ -27,13 +30,14 @@ abstract class SummitActivity :
   ) {
 
   val keyPressRegistrationManager = KeyPressRegistrationManager()
+  private var windowInsetsController: WindowInsetsControllerCompat? = null
 
   fun getBottomNavHeight() = navBarController.bottomNavHeight
-  fun showBottomNav() {
+  fun showNavBar() {
     navBarController.showBottomNav()
   }
-  fun hideBottomNav() {
-    navBarController.hideNavBar(animate = true)
+  fun hideNavBar() {
+    navBarController.hideNavBar()
   }
 
   fun openVideo(url: String, videoType: VideoType, videoState: VideoState?) {
@@ -62,7 +66,6 @@ abstract class SummitActivity :
   }
 
   fun setNavUiOpenPercent(showPercent: Float) {
-    if (lockUiOpenness) return
     if (navBarController.useNavigationRail) return
 
     navBarController.animateNavBar(showPercent, animate = false)
@@ -84,36 +87,20 @@ abstract class SummitActivity :
     )
   }
 
-  fun hideSystemUI() {
-    // Enables regular immersive mode.
-    // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
-    // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-    window.decorView.systemUiVisibility = (
-      View.SYSTEM_UI_FLAG_IMMERSIVE
-        // Set the content to appear under the system bars so that the
-        // content doesn't resize when the system bars hide and show.
-        or SYSTEM_UI_FLAG_LAYOUT_STABLE
-        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        // Hide the nav bar and status bar
-        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-        or View.SYSTEM_UI_FLAG_FULLSCREEN
-      )
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    this.windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
   }
 
-  // Shows the system bars by removing all the flags
-  // except for the ones that make the content appear under the system bars.
+  fun hideSystemUI() {
+    windowInsetsController?.systemBarsBehavior =
+      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
+  }
+
   fun showSystemUI() {
-    window.decorView.systemUiVisibility = (
-      SYSTEM_UI_FLAG_LAYOUT_STABLE
-        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        or if (resources.getBoolean(R.bool.isLightTheme)) {
-          View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        } else {
-          0
-        }
-      )
+    windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
   }
 
   abstract var navBarController: NavBarController

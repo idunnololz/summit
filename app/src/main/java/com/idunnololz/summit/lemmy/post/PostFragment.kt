@@ -1235,9 +1235,8 @@ class PostFragment :
 
     if (args.isSinglePage) {
       requireSummitActivity().apply {
-        navBarController.hideNavBar(true)
         if (!navBarController.useNavigationRail) {
-          navBarController.hideNavBar(animate = true)
+          hideNavBar()
         }
         lockUiOpenness = true
       }

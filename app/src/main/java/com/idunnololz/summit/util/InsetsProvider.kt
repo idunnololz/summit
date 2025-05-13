@@ -47,6 +47,8 @@ class InsetsHelper(
         rightInset = rightInset,
         mainLeftInset = mainLeftInset,
         mainRightInset = mainRightInset,
+        isStatusBarVisible = insets.isVisible(WindowInsetsCompat.Type.statusBars()),
+        isNavigationBarVisible = insets.isVisible(WindowInsetsCompat.Type.navigationBars()),
       )
 
       onInsetsChanged?.invoke(newInsets)

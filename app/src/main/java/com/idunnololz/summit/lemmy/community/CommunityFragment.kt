@@ -722,7 +722,7 @@ class CommunityFragment :
               requireSummitActivity().apply {
                 setupForFragment<PostFragment>()
                 if (isSlideable && !args.isPreview) {
-                  navBarController.hideNavBar(true)
+                  hideNavBar()
                   setNavUiOpenPercent(0f)
                   lockUiOpenness = true
                 }
@@ -742,7 +742,9 @@ class CommunityFragment :
                   if (navBarController.useNavigationRail) {
                     navBarController.showBottomNav()
                   } else {
-                    setNavUiOpenPercent(1f * navBarPercentShown())
+                    if (!viewModel.lockBottomBar) {
+                      setNavUiOpenPercent(1f * navBarPercentShown())
+                    }
                   }
                 }
               }
@@ -1131,7 +1133,11 @@ class CommunityFragment :
         if (navBarController.useNavigationRail) {
           navBarController.showBottomNav()
         } else {
-          setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
+          if (!viewModel.lockBottomBar) {
+            setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
+          } else {
+            showNavBar()
+          }
         }
         setupForFragment<CommunityFragment>()
       }

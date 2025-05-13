@@ -207,7 +207,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         },
       )
 
-      hideBottomNav()
+      hideNavBar()
     }
 
     with(binding) {

@@ -31,85 +31,68 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
     runWhenLaidOut {
       when (t) {
         CommunityFragment::class -> {
-          navBarController.enableBottomNavViewScrolling()
           showNotificationBarBg()
         }
         PostFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           showNotificationBarBg()
         }
         VideoViewerFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.hideNavBar(animate)
+          navBarController.hideNavBar()
           hideNotificationBarBg()
         }
         ImageViewerActivity::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.hideNavBar(animate)
+          navBarController.hideNavBar()
           hideNotificationBarBg()
         }
         SettingsCacheFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           showNotificationBarBg()
         }
         HistoryFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           showNotificationBarBg()
         }
         LoginFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.hideNavBar(animate)
+          navBarController.hideNavBar()
           hideNotificationBarBg()
         }
         SettingsFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.hideNavBar(animate)
+          navBarController.hideNavBar()
           hideNotificationBarBg()
         }
         PersonTabbedFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           hideNotificationBarBg()
         }
         CommunityInfoFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           hideNotificationBarBg()
         }
         FilteredPostsAndCommentsTabbedFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           showNotificationBarBg()
         }
         InboxTabbedFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.showBottomNav()
+          showNavBar()
           showNotificationBarBg()
         }
         ActionsTabbedFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.hideNavBar(animate)
+          navBarController.hideNavBar()
           hideNotificationBarBg()
         }
         CommunitiesFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           showNotificationBarBg()
         }
         ModLogsFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           showNotificationBarBg()
         }
         CreateOrEditCommunityFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
-          navBarController.hideNavBar(animate)
+          navBarController.hideNavBar()
           hideNotificationBarBg()
         }
         YouFragment::class -> {
-          navBarController.disableBottomNavViewScrolling()
           navBarController.showBottomNav()
           showNotificationBarBg()
         }

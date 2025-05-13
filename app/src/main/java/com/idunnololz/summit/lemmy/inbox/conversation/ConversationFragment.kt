@@ -297,7 +297,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
     requireSummitActivity().apply {
       if (!navBarController.useNavigationRail) {
-        navBarController.hideNavBar(animate = true)
+        hideNavBar()
       }
     }
   }

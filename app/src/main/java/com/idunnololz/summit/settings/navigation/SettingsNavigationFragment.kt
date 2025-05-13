@@ -75,7 +75,7 @@ class SettingsNavigationFragment :
           getMainActivity()?.onPreferencesChanged()
 
           binding.root.doOnPreDraw {
-            getMainActivity()?.navBarController?.hideNavBar(animate = false)
+            getMainActivity()?.hideNavBar()
           }
         },
       ),
