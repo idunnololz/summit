@@ -2095,6 +2095,10 @@
     <string name="gravity_top">Top</string>
     <string name="gravity_center">Center</string>
     <string name="gravity_bottom">Bottom</string>
+    <string name="url_filters">Url filters</string>
+    <string name="url_filters_desc">Filter posts based on the url of the post. Only works if the post has an image or post URL.</string>
+    <string name="inline_images_in_private_messages">Display inline images as links in private messages</string>
+    <string name="inline_images_in_private_messages_desc">This feature prevents tracking in private messages. See this page on [Spy pixels](https://en.wikipedia.org/wiki/Spy_pixel) for more details.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

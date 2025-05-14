@@ -752,6 +752,7 @@ class PostListViewBuilder @Inject constructor(
             false
           },
           showEditedDate = showEditedDate,
+          useCondensedTypeface = false,
         )
 
         if (showCommunityIcon) {

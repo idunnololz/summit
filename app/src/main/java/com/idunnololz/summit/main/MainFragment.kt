@@ -439,9 +439,11 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     )
 
     updateBackHandler()
-    onPanelStateChange()
     panelsChildGestureRegionObserver.addGestureRegionsUpdateListener(this)
   }
+
+  fun isPaneOpen() =
+    binding.root.startPanelState == PanelState.Opened
 
   override fun onPause() {
     panelsChildGestureRegionObserver.removeGestureRegionsUpdateListener(this)

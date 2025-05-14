@@ -2,6 +2,7 @@ package com.idunnololz.summit.offline
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.os.Looper
 import android.util.Log
 import android.view.View
@@ -210,6 +211,16 @@ class OfflineManager @Inject constructor(
 
   private fun getFilenameForUrl(url: String): String {
     val baseUrl = url.split("?")[0]
+    if (baseUrl.endsWith("/image_proxy")) {
+      try {
+        val realUrl = url.toUri().getQueryParameter("url")
+        if (realUrl != null) {
+          return getFilenameForUrl(realUrl)
+        }
+      } catch (e: Exception) {
+        // do nothing
+      }
+    }
     val extension = if (baseUrl.lastIndexOf(".") != -1) {
       baseUrl.substring(baseUrl.lastIndexOf("."))
     } else {

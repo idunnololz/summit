@@ -36,7 +36,11 @@ data class CommunityViewState(
 fun CommunityViewState.toUrl(apiInstance: String): String =
   communityState.communityRef.toUri(apiInstance)
     .buildUpon()
-    .appendQueryParameter("page", this.communityState.currentPageIndex.toString())
+    .apply {
+      if (communityState.currentPageIndex > 0) {
+        appendQueryParameter("page", communityState.currentPageIndex.toString())
+      }
+    }
     .build()
     .toString()
 

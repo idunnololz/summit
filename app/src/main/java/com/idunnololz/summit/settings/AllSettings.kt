@@ -67,6 +67,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_IMAGE_PREVIEW_HIDE_UI_BY_D
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_INLINE_URLS_IN_PRIVATE_MESSAGES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LOCK_BOTTOM_BAR
@@ -814,6 +815,11 @@ class PostsFeedSettings @Inject constructor(
     null,
     context.getString(R.string.user_filters),
     context.getString(R.string.user_filters_desc),
+  )
+  val urlFilters = BasicSettingItem(
+    null,
+    context.getString(R.string.url_filters),
+    context.getString(R.string.url_filters_desc),
   )
   val showLinkPosts = OnOffSettingItem(
     R.drawable.baseline_link_24,
@@ -2097,6 +2103,12 @@ class MiscSettings @Inject constructor(
     relatedKeys = listOf(
       KEY_ANIMATION_LEVEL,
     ),
+  )
+  val inlineUrlsInPrivateMessages = OnOffSettingItem(
+    null,
+    context.getString(R.string.inline_images_in_private_messages),
+    context.getString(R.string.inline_images_in_private_messages_desc),
+    relatedKeys = listOf(KEY_INLINE_URLS_IN_PRIVATE_MESSAGES),
   )
 }
 

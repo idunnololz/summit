@@ -19,9 +19,6 @@
         android:layout_marginTop="@dimen/padding_half"
         android:paddingStart="@dimen/content_horizontal_padding"
         android:paddingEnd="@dimen/content_horizontal_padding"
-        android:fadingEdge="horizontal"
-        android:requiresFadingEdge="horizontal"
-        android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
         app:layout_constraintEnd_toEndOf="parent"/>

@@ -1128,6 +1128,8 @@ class CommunityFragment :
   override fun onResume() {
     super.onResume()
 
+    val mainFragment = parentFragment?.parentFragment as? MainFragment
+
     requireSummitActivity().apply {
       if (!args.isPreview) {
         if (navBarController.useNavigationRail) {
@@ -1136,7 +1138,9 @@ class CommunityFragment :
           if (!viewModel.lockBottomBar) {
             setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
           } else {
-            showNavBar()
+            if (slidingPaneController?.isOpen == false && mainFragment?.isPaneOpen() != true) {
+              showNavBar()
+            }
           }
         }
         setupForFragment<CommunityFragment>()

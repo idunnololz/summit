@@ -349,6 +349,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       showUpvotePercentage = showPostUpvotePercentage,
       useMultilineHeader = useMultilineHeader,
       wrapHeader = useMultilinePostHeaders && !useMultilineHeader,
+      useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
       isCurrentUser = if (indicateCurrentUser) {
         currentUser?.id == postView.creator.id &&
           currentUser?.instance == postView.creator.instance

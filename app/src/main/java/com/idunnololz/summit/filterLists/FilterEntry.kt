@@ -29,6 +29,7 @@ object FilterTypes {
   const val InstanceFilter = 2
   const val CommunityFilter = 3
   const val UserFilter = 4
+  const val UrlFilter = 5
 }
 
 typealias ContentTypeId = Int

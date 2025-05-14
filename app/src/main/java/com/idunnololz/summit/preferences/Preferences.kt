@@ -80,6 +80,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_IMAGE_PREVIEW_HIDE_UI_BY_D
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INFINITY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_INLINE_URLS_IN_PRIVATE_MESSAGES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_INLINE_VIDEO_DEFAULT_VOLUME
 import com.idunnololz.summit.util.PreferenceUtils.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LAST_ACCOUNT_NOTIFICATION_ID
@@ -660,6 +661,8 @@ class Preferences(
     by booleanPreference(KEY_SHOW_POST_TYPE, false)
   var navRailGravity: Int
     by intPreference(KEY_NAV_RAIL_GRAVITY, NavRailGravityIds.TOP)
+  var inlineUrlsInPrivateMessages: Boolean
+    by booleanPreference(KEY_INLINE_URLS_IN_PRIVATE_MESSAGES, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

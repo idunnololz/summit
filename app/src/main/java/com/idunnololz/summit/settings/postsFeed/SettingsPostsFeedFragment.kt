@@ -264,6 +264,15 @@ class SettingsPostsFeedFragment :
                   )
                 findNavController().navigateSafe(direction)
               },
+              settings.urlFilters.asCustomItem {
+                val direction = SettingsPostsFeedFragmentDirections
+                  .actionSettingsContentFragmentToSettingsFilterListFragment(
+                    ContentTypes.PostListType,
+                    FilterTypes.UrlFilter,
+                    getString(R.string.url_filters),
+                  )
+                findNavController().navigateSafe(direction)
+              }
             )
           },
 

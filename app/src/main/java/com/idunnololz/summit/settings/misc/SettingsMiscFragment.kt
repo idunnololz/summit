@@ -217,6 +217,10 @@ class SettingsMiscFragment :
         { preferences.userAgentChoice },
         { preferences.userAgentChoice = it },
       ),
+      settings.inlineUrlsInPrivateMessages.asOnOffSwitch(
+        { preferences.inlineUrlsInPrivateMessages },
+        { preferences.inlineUrlsInPrivateMessages = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

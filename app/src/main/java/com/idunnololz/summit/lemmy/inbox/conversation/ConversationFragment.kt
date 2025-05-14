@@ -31,6 +31,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -63,6 +64,9 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  @Inject
+  lateinit var preferences: Preferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -143,6 +147,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
         context = context,
         instance = args.instance,
         lemmyTextHelper = lemmyTextHelper,
+        showMediaAsLinks = preferences.inlineUrlsInPrivateMessages,
         onImageClick = { url ->
           getMainActivity()?.openImage(null, binding.appBar, null, url, null)
         },
@@ -312,6 +317,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
     private val context: Context,
     private val instance: String,
     private val lemmyTextHelper: LemmyTextHelper,
+    private val showMediaAsLinks: Boolean,
     private val onImageClick: (String) -> Unit,
     private val onVideoClick: (
       url: String,
@@ -378,6 +384,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
           textView = b.text,
           text = item.messageItem.content,
           instance = instance,
+          showMediaAsLinks = showMediaAsLinks,
           onImageClick = {
             onImageClick(it)
           },

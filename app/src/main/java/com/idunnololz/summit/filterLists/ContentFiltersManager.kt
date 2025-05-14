@@ -104,6 +104,18 @@ class ContentFiltersManager @Inject constructor(
             postView.creator.name.contains(filter.filter, ignoreCase = true)
           }
         }
+        FilterTypes.UrlFilter -> {
+          val url = postView.post.url
+          if (url != null) {
+            if (filter.isRegex) {
+              getPattern(filter).matcher(url).find()
+            } else {
+              url.contains(filter.filter, ignoreCase = true)
+            }
+          } else {
+            false
+          }
+        }
         else -> false
       }
     }

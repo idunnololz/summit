@@ -218,6 +218,7 @@ class SettingsAdapter(
 
   private var data: List<SettingModelItem> = listOf()
   private var highlightSettingId: Int? = null
+  private val markwon = Markwon.create(context)
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
@@ -326,7 +327,7 @@ class SettingsAdapter(
       if (setting.description != null) {
         b.desc.visibility = View.VISIBLE
 
-        Markwon.create(b.root.context).setMarkdown(b.desc, setting.description)
+        markwon.setMarkdown(b.desc, setting.description)
       } else {
         b.desc.visibility = View.GONE
       }

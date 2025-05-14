@@ -93,6 +93,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     wrapHeader: Boolean,
     isCurrentUser: Boolean,
     showEditedDate: Boolean,
+    useCondensedTypeface: Boolean,
   ) {
     var currentTextView = headerContainer.textView1
 
@@ -101,6 +102,12 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
     fun iconSize() = // Use SP since the icons are inline with text.
       context.spToPx(headerContainer.textSize * 1.33f).toInt()
+
+    if (useCondensedTypeface) {
+      headerContainer.setTypeface(condensedTypeface)
+    } else {
+      headerContainer.setTypeface(null)
+    }
 
     if (isCurrentUser) {
       val s = sb.length

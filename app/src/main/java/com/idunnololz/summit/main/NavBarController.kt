@@ -275,7 +275,8 @@ class NavBarController(
 
     Log.d(
       TAG,
-      "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)}")
+      "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)}",
+      RuntimeException())
 
     val navigationBarOffset =
       if (useNavigationRail) {
