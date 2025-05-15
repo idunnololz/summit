@@ -22,11 +22,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.BottomMenuBinding
 import com.idunnololz.summit.databinding.MenuItemBinding
 import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.main.ActivityInsets
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -77,22 +79,26 @@ class BottomMenu(
     this.title = title
   }
 
+  fun addRawItem(item: MenuItem.ActionItem) {
+    adapter.menuItems.add(item)
+  }
+
   fun addItem(@IdRes id: Int, @StringRes title: Int) {
-    adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title)))
+    adapter.menuItems.add(MenuItem.ActionItem(id, context.getString(title), null))
   }
 
   fun addItem(@IdRes id: Int, title: CharSequence) {
-    adapter.menuItems.add(MenuItem.ActionItem(id, title))
+    adapter.menuItems.add(MenuItem.ActionItem(id, title, null))
   }
 
   fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes checkIcon: Int) {
     adapter.menuItems.add(
-      MenuItem.ActionItem(id, context.getString(title), checkIcon = checkIcon),
+      MenuItem.ActionItem(id, context.getString(title), null, checkIcon = checkIcon),
     )
   }
 
   fun addItem(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
-    adapter.menuItems.add(MenuItem.ActionItem(id, title, checkIcon = icon))
+    adapter.menuItems.add(MenuItem.ActionItem(id, title, null, checkIcon = icon))
   }
 
   fun addItemWithIcon(@IdRes id: Int, @StringRes title: Int, @DrawableRes icon: Int) {
@@ -100,12 +106,12 @@ class BottomMenu(
   }
 
   fun addItemWithIcon(@IdRes id: Int, title: CharSequence, @DrawableRes icon: Int) {
-    adapter.menuItems.add(MenuItem.ActionItem(id, title, icon = MenuIcon.ResourceIcon(icon)))
+    adapter.menuItems.add(MenuItem.ActionItem(id, title, null, icon = MenuIcon.ResourceIcon(icon)))
   }
 
   fun addItemWithIcon(@IdRes id: Int, title: CharSequence, drawable: Drawable) {
     adapter.menuItems.add(
-      MenuItem.ActionItem(id, title, icon = MenuIcon.DrawableIcon(drawable)),
+      MenuItem.ActionItem(id, title, null, icon = MenuIcon.DrawableIcon(drawable)),
     )
   }
 
@@ -114,6 +120,7 @@ class BottomMenu(
       MenuItem.ActionItem(
         id,
         context.getString(title),
+        null,
         icon = MenuIcon.ResourceIcon(icon),
         modifier = ModifierIds.DANGER,
       ),
@@ -144,6 +151,7 @@ class BottomMenu(
     handleInsets: Boolean = true,
     onBackPressedDispatcher: OnBackPressedDispatcher =
       bottomMenuContainer.onBackPressedDispatcher,
+    avatarHelper: AvatarHelper? = null,
   ) {
     if (handleInsets) {
       bottomMenuContainer.insets.observeForever(insetsObserver)
@@ -151,6 +159,7 @@ class BottomMenu(
 
     parent = bottomSheetContainer
 
+    adapter.avatarHelper = avatarHelper
     adapter.title = title
     adapter.checked = checked
     adapter.onMenuItemClickListener = onMenuItemClickListener
@@ -281,6 +290,7 @@ class BottomMenu(
     val menuItems: MutableList<MenuItem> = ArrayList<MenuItem>(),
     var onMenuItemClickListener: ((menuItem: MenuItem.ActionItem) -> Unit)? = null,
     var bottomSheetBehavior: BottomSheetBehavior<*>? = null,
+    var avatarHelper: AvatarHelper? = null,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val checkedTextColor = context.getColorFromAttribute(
@@ -367,16 +377,40 @@ class BottomMenu(
 
         val icon = menuItem.icon
         if (icon != null) {
-          b.icon.visibility = View.VISIBLE
-
           when (icon) {
-            is MenuIcon.ResourceIcon ->
+            is MenuIcon.ResourceIcon -> {
+              b.iconSpace.visibility = View.VISIBLE
+              b.icon.visibility = View.VISIBLE
+              b.richImage.visibility = View.GONE
+
               b.icon.setImageResource(icon.customIcon)
-            is MenuIcon.DrawableIcon ->
+            }
+            is MenuIcon.DrawableIcon -> {
+              b.iconSpace.visibility = View.VISIBLE
+              b.icon.visibility = View.VISIBLE
+              b.richImage.visibility = View.GONE
+
               b.icon.setImageDrawable(icon.customIcon)
+            }
+            is MenuIcon.CommunityIcon -> {
+              b.iconSpace.visibility = View.VISIBLE
+              b.icon.visibility = View.GONE
+              b.richImage.visibility = View.VISIBLE
+
+              avatarHelper?.loadCommunityIcon(b.richImage, icon.communityRef, icon.url)
+            }
           }
         } else {
           b.icon.visibility = View.GONE
+          b.richImage.visibility = View.GONE
+          b.iconSpace.visibility = View.GONE
+        }
+
+        if (item.menuItem.description == null) {
+          b.description.visibility = View.GONE
+        } else {
+          b.description.visibility = View.VISIBLE
+          b.description.text = item.menuItem.description
         }
 
         if (onMenuItemClickListener != null) {
@@ -387,22 +421,6 @@ class BottomMenu(
         }
       }
       addItemType(Item.FooterItem::class, MenuItemFooterBinding::inflate) { _, _, _ -> }
-    }
-
-    fun addItem(@IdRes id: Int, @StringRes title: Int) {
-      menuItems.add(MenuItem.ActionItem(id, context.getString(title)))
-    }
-
-    fun addItem(@IdRes id: Int, title: String) {
-      menuItems.add(MenuItem.ActionItem(id, title))
-    }
-
-    fun addItem(@IdRes id: Int, @StringRes title: Int, @DrawableRes checkIcon: Int) {
-      menuItems.add(MenuItem.ActionItem(id, context.getString(title), checkIcon = checkIcon))
-    }
-
-    fun addItem(@IdRes id: Int, title: String, @DrawableRes icon: Int) {
-      menuItems.add(MenuItem.ActionItem(id, title, checkIcon = icon))
     }
 
     fun addItemWithIcon(
@@ -424,6 +442,7 @@ class BottomMenu(
         MenuItem.ActionItem(
           id = id,
           title = title,
+          description = null,
           icon = MenuIcon.ResourceIcon(icon),
           modifier = modifier,
         ),
@@ -474,6 +493,7 @@ class BottomMenu(
     class ActionItem(
       @IdRes val id: Int,
       val title: CharSequence,
+      val description: CharSequence?,
       val icon: MenuIcon? = null,
       @DrawableRes val checkIcon: Int = 0,
       val modifier: Int = ModifierIds.NONE,
@@ -487,6 +507,10 @@ class BottomMenu(
     ) : MenuIcon
     data class DrawableIcon(
       val customIcon: Drawable,
+    ) : MenuIcon
+    data class CommunityIcon(
+      val communityRef: CommunityRef,
+      val url: String?
     ) : MenuIcon
   }
 }

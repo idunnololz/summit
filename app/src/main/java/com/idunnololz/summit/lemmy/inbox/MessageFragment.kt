@@ -572,6 +572,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             getMainActivity()?.showMoreLinkOptions(url, text)
           },
           switchToNativeInstance = {},
+          onCrossPostsClick = {},
         ).apply {
           stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
@@ -605,6 +606,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           accountInstance = viewModel.apiInstance,
           isCommentsLoaded = true,
           commentPath = null,
+          crossPosts = listOf(),
         ),
       )
 

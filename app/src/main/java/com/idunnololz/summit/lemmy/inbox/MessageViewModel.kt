@@ -130,7 +130,7 @@ class MessageViewModel @Inject constructor(
 
       commentContext.postValue(
         CommentContext(
-          requireNotNull(postResult.getOrNull()),
+          requireNotNull(postResult.getOrNull()?.post_view),
           tree.firstOrNull(),
         ),
       )

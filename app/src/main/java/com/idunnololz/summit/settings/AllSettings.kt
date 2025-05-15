@@ -100,6 +100,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_SAVE_DRAFTS_AUTOMATICALLY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_FILTERED_POSTS
@@ -1220,6 +1221,12 @@ class PostAndCommentsSettings @Inject constructor(
       ),
     ),
     relatedKeys = listOf(KEY_POST_FAB_QUICK_ACTION),
+  )
+  val showCrossPostsInPost = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_cross_posts_in_post),
+    context.getString(R.string.show_cross_posts_in_post_desc),
+    relatedKeys = listOf(KEY_SHOW_CROSS_POSTS_IN_POST),
   )
 }
 

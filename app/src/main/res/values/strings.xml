@@ -2099,6 +2099,10 @@
     <string name="url_filters_desc">Filter posts based on the url of the post. Only works if the post has an image or post URL.</string>
     <string name="inline_images_in_private_messages">Display inline images as links in private messages</string>
     <string name="inline_images_in_private_messages_desc">This feature prevents tracking in private messages. See this page on [Spy pixels](https://en.wikipedia.org/wiki/Spy_pixel) for more details.</string>
+    <string name="cross_posted">Cross-posted</string>
+    <string name="cross_posted_to">Cross-posted to</string>
+    <string name="show_cross_posts_in_post">Show cross-posts in post</string>
+    <string name="show_cross_posts_in_post_desc">When enabled, a \"cross-posted\" badge will appear on the post screen if the post has been cross-posted elsewhere.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

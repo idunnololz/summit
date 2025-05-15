@@ -754,7 +754,7 @@ class CommunityViewModel @Inject constructor(
       apiClient.setAccount(account, accountChanged = true)
       apiClient.fetchPostWithRetry(Either.Left(postId), true)
         .onSuccess {
-          postListEngine.updatePost(it)
+          postListEngine.updatePost(it.post_view)
           postListEngine.createItems()
           loadedPostsData.postValue(PostUpdateInfo())
         }

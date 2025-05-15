@@ -26,6 +26,7 @@ import com.idunnololz.summit.api.dto.EditCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
 import com.idunnololz.summit.api.dto.GetModlogResponse
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetPostResponse
 import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.GetRepliesResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
@@ -178,7 +179,10 @@ class AccountAwareLemmyClient @Inject constructor(
     ).autoSignOut(account)
   }
 
-  suspend fun fetchPostWithRetry(id: Either<PostId, CommentId>, force: Boolean): Result<PostView> =
+  suspend fun fetchPostWithRetry(
+    id: Either<PostId, CommentId>,
+    force: Boolean,
+  ): Result<GetPostResponse> =
     retry {
       apiClient.fetchPost(accountForInstance(), id, force)
     }

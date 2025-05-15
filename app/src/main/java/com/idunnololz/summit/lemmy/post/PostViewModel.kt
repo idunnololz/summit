@@ -25,6 +25,7 @@ import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.GetPostResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentNavControlsState
@@ -108,7 +109,9 @@ class PostViewModel @Inject constructor(
   val screenshotMode = MutableLiveData<Boolean>(false)
   private val findInPageQueryFlow = MutableStateFlow<String>("")
 
+  private var getPostResponse: GetPostResponse? = null
   private var postView: PostView? = null
+  private var crossPosts: List<PostView>? = null
   private var comments: List<CommentView>? = null
   private var pendingComments: List<PendingCommentView>? = null
   private var newlyPostedCommentId: CommentId? = null
@@ -303,7 +306,7 @@ class PostViewModel @Inject constructor(
       )
 
       val apiInstance = lemmyApiClient.instance
-      val postResult = if (fetchPostData) {
+      val postResult: Result<GetPostResponse?> = if (fetchPostData) {
         postOrCommentRef
           .fold(
             {
@@ -314,15 +317,17 @@ class PostViewModel @Inject constructor(
             },
           )
       } else {
-        Result.success(this@PostViewModel.postView)
+        Result.success(this@PostViewModel.getPostResponse)
       }
 
-      this@PostViewModel.postView = if (force) {
+      this@PostViewModel.getPostResponse = if (force) {
         postResult.getOrNull()
       } else {
         postResult.getOrNull()
-          ?: this@PostViewModel.postView
+          ?: this@PostViewModel.getPostResponse
       }
+
+      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view
 
       this@PostViewModel.postView?.let {
         postRef = PostRef(instance = apiInstance, id = it.post.id)
@@ -366,12 +371,13 @@ class PostViewModel @Inject constructor(
 
       val post = postResult.getOrNull()
       val comments = commentsResult.getOrNull()
+      val postView = post?.post_view
 
-      if (post != null) {
-        postReadManager.markPostAsReadLocal(apiInstance, post.post.id, read = true)
-        duplicatePostsDetector.addReadOrHiddenPost(post)
+      if (postView != null) {
+        postReadManager.markPostAsReadLocal(apiInstance, postView.post.id, read = true)
+        duplicatePostsDetector.addReadOrHiddenPost(postView)
         if (force) {
-          accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
+          accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
         }
       }
 
@@ -381,15 +387,14 @@ class PostViewModel @Inject constructor(
             accountActionsManager.setScore(it.toVotableRef(), it.counts.score)
           }
         }
-        if (post != null && fetchPostData) {
-          accountActionsManager.setScore(post.toVotableRef(), post.counts.score)
+        if (postView != null && fetchPostData) {
+          accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
         }
       }
 
       if (post == null || comments == null) {
         // see if we can recover gracefully
 
-        val postView = postView
         if (postView != null && comments != null && !force) {
           // lets recover!
           updateData()
@@ -439,7 +444,7 @@ class PostViewModel @Inject constructor(
             unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
               .fold(
                 onSuccess = {
-                  Result.success(it.post.ap_id)
+                  Result.success(it.post_view.post.ap_id)
                 },
                 onFailure = {
                   Result.failure(it)
@@ -545,7 +550,7 @@ class PostViewModel @Inject constructor(
           unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
             .fold(
               onSuccess = {
-                Result.success(it.post.ap_id)
+                Result.success(it.post_view.post.ap_id)
               },
               onFailure = {
                 Result.failure(it)
@@ -787,6 +792,7 @@ class PostViewModel @Inject constructor(
 
     val post = postView ?: return
     val comments = comments
+    val crossPosts = getPostResponse?.cross_posts
     val pendingComments = pendingComments
     val supplementaryComments = supplementaryComments
     val postOrCommentRef = postOrCommentRef
@@ -812,6 +818,7 @@ class PostViewModel @Inject constructor(
             { it },
           ),
       ),
+      crossPosts = crossPosts ?: listOf(),
       newlyPostedCommentId = newlyPostedCommentId,
       selectedCommentId = originalPostOrCommentRef?.getOrNull()?.id
         ?: commentRef?.id,
@@ -919,6 +926,7 @@ class PostViewModel @Inject constructor(
   data class PostData(
     val postView: ListView.PostListView,
     val commentTree: List<CommentNodeData>,
+    val crossPosts: List<PostView>,
     val newlyPostedCommentId: CommentId?,
     val selectedCommentId: CommentId?,
     val isSingleComment: Boolean,

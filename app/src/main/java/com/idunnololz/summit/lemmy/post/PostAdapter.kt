@@ -92,6 +92,7 @@ class PostAdapter(
   private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
   private val onLinkLongClick: (url: String, text: String?) -> Unit,
   private val switchToNativeInstance: (instance: String) -> Unit,
+  private val onCrossPostsClick: () -> Unit,
 ) : RecyclerView.Adapter<ViewHolder>() {
 
   interface ScreenshotOptions
@@ -115,6 +116,7 @@ class PostAdapter(
       val query: String?,
       val currentMatch: QueryResult?,
       val screenshotMode: Boolean,
+      val hasCrossPosts: Boolean,
     ) : Item(postView.getUniqueKey()), ScreenshotOptions
 
     data class VisibleCommentItem(
@@ -437,6 +439,7 @@ class PostAdapter(
               )
             },
             contentSpannable = contentCache[k],
+            hasCrossPosts = item.hasCrossPosts,
             onRevealContentClickedFn = {
               revealedItems.add(postKey)
               notifyItemChanged(holder.absoluteAdapterPosition)
@@ -456,6 +459,9 @@ class PostAdapter(
             screenshotConfig = screenshotConfig,
             onTextBound = {
               contentCache[k] = it
+            },
+            onCrossPostsClick = {
+              onCrossPostsClick()
             },
           )
 
@@ -530,6 +536,7 @@ class PostAdapter(
             )
           },
           contentSpannable = contentCache[k],
+          hasCrossPosts = item.hasCrossPosts,
           onRevealContentClickedFn = {
             revealedItems.add(postKey)
             notifyItemChanged(holder.absoluteAdapterPosition)
@@ -549,6 +556,9 @@ class PostAdapter(
           screenshotConfig = screenshotConfig,
           onTextBound = {
             contentCache[k] = it
+          },
+          onCrossPostsClick = {
+            onCrossPostsClick()
           },
         )
 
@@ -975,7 +985,8 @@ class PostAdapter(
           } else {
             null
           },
-          screenshotMode,
+          screenshotMode = screenshotMode,
+          hasCrossPosts = rawData.crossPosts.isNotEmpty(),
         )
 
         absolutionPositionToTopLevelCommentPosition += -1
@@ -1162,7 +1173,8 @@ class PostAdapter(
             } else {
               null
             },
-            screenshotMode,
+            screenshotMode = screenshotMode,
+            hasCrossPosts = rawData.crossPosts.isNotEmpty(),
           )
         }
         finalItems += ProgressOrErrorItem(error)

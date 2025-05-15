@@ -53,6 +53,10 @@ class SettingsPostAndCommentsFragment :
         { preferences.postFabQuickAction },
         { preferences.postFabQuickAction = it },
       ),
+      settings.showCrossPostsInPost.asOnOffSwitch(
+        { preferences.showCrossPostsInPost },
+        { preferences.showCrossPostsInPost = it },
+      ),
       SettingModelItem.SubgroupItem(
         getString(R.string.comments),
         listOf(

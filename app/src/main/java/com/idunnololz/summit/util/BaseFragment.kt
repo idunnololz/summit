@@ -19,6 +19,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     javaClass.canonicalName ?: "UNKNOWN_CLASS"
   }
 
+  fun getSummitActivity(): SummitActivity? = activity as? SummitActivity
   fun requireSummitActivity(): SummitActivity = requireActivity() as SummitActivity
   fun getMainActivity(): MainActivity? = activity as? MainActivity
   fun getBaseActivity(): BaseActivity? = activity as? BaseActivity

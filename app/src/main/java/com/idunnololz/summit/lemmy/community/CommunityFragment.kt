@@ -597,7 +597,7 @@ class CommunityFragment :
             if (!navBarController.useNavigationRail && slidingPaneController?.isOpen != true) {
               setNavUiOpenPercent(it)
             }
-            slidingPaneController?.navBarOpenPercent = it
+            slidingPaneController?.navBarOpenPercent = it.coerceIn(0f, 1f)
 
             isCustomAppBarExpandedPercent = it
 
@@ -804,7 +804,11 @@ class CommunityFragment :
   }
 
   fun navBarPercentShown(): Float =
-    communityAppBarController?.percentShown?.value ?: 1f
+    if (viewModel.lockBottomBar) {
+      1f
+    } else {
+      communityAppBarController?.percentShown?.value ?: 1f
+    }
 
   private fun onReady() {
     if (!isBindingAvailable()) return
@@ -1129,17 +1133,22 @@ class CommunityFragment :
     super.onResume()
 
     val mainFragment = parentFragment?.parentFragment as? MainFragment
+    val slidingPaneLayout = binding.slidingPaneLayout
 
     requireSummitActivity().apply {
       if (!args.isPreview) {
         if (navBarController.useNavigationRail) {
           navBarController.showBottomNav()
         } else {
-          if (!viewModel.lockBottomBar) {
-            setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
+          if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
+            // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
           } else {
-            if (slidingPaneController?.isOpen == false && mainFragment?.isPaneOpen() != true) {
-              showNavBar()
+            if (!viewModel.lockBottomBar) {
+              setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
+            } else {
+              if (!slidingPaneLayout.isOpen && mainFragment?.isPaneOpen() != true) {
+                showNavBar()
+              }
             }
           }
         }

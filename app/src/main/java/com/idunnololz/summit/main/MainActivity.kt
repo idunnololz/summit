@@ -952,6 +952,7 @@ class MainActivity : SummitActivity() {
       bottomMenuContainer = this,
       bottomSheetContainer = binding.root,
       expandFully = expandFully,
+      avatarHelper = avatarHelper,
     )
     currentBottomMenu = bottomMenu
   }

@@ -116,14 +116,14 @@ class ModActionsViewModel @Inject constructor(
       if (postResult != null) {
         allModState +=
           ModState.PostModState(
-            isRemoved = postResult.post.removed,
-            isFeatured = postResult.post.featured_community,
-            isLocked = postResult.post.locked,
+            isRemoved = postResult.post_view.post.removed,
+            isFeatured = postResult.post_view.post.featured_community,
+            isLocked = postResult.post_view.post.locked,
           )
         allModState +=
           ModState.UserModState(
-            isBannedFromCommunity = postResult.creator_banned_from_community,
-            isBannedFromSite = postResult.creator.banned,
+            isBannedFromCommunity = postResult.post_view.creator_banned_from_community,
+            isBannedFromSite = postResult.post_view.creator.banned,
           )
       }
       if (commentResult != null) {

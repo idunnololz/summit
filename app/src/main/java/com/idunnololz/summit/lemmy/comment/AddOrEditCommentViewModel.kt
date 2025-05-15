@@ -282,7 +282,7 @@ class AddOrEditCommentViewModel @Inject constructor(
       contextModel.postValue(
         ContextModel(
           originalCommentView = postOrComment.getOrNull(),
-          post = requireNotNull(postResult.getOrNull()),
+          post = requireNotNull(postResult.getOrNull()?.post_view),
           commentTree = tree.firstOrNull(),
         ),
       )

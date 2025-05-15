@@ -273,6 +273,7 @@ class NavBarController(
 
     val animate = animate ?: (abs(currentPercentShown - percentShown) > 0.1f)
 
+    // To easily debug what is messing with the nav bar, add an exception to this log statement.
     Log.d(
       TAG,
       "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)}",

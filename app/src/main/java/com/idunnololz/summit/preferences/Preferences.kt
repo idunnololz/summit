@@ -121,6 +121,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_CROSS_POSTS_IN_POST
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_DEFAULT_PROFILE_ICONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_EDITED_DATE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_SHOW_FILTERED_POSTS
@@ -663,6 +664,8 @@ class Preferences(
     by intPreference(KEY_NAV_RAIL_GRAVITY, NavRailGravityIds.TOP)
   var inlineUrlsInPrivateMessages: Boolean
     by booleanPreference(KEY_INLINE_URLS_IN_PRIVATE_MESSAGES, true)
+  var showCrossPostsInPost: Boolean
+    by booleanPreference(KEY_SHOW_CROSS_POSTS_IN_POST, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

@@ -989,6 +989,7 @@ class AddOrEditCommentFragment :
           showError()
         },
         switchToNativeInstance = {},
+        onCrossPostsClick = {},
       ).apply {
         stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
       }
@@ -1021,6 +1022,7 @@ class AddOrEditCommentFragment :
           accountInstance = viewModel.apiInstance,
           isCommentsLoaded = true,
           commentPath = null,
+          crossPosts = listOf(),
         ),
       )
 

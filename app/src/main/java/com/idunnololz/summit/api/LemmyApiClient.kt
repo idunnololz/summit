@@ -53,6 +53,7 @@ import com.idunnololz.summit.api.dto.GetPersonDetails
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPost
+import com.idunnololz.summit.api.dto.GetPostResponse
 import com.idunnololz.summit.api.dto.GetPosts
 import com.idunnololz.summit.api.dto.GetPostsResponse
 import com.idunnololz.summit.api.dto.GetPrivateMessages
@@ -282,7 +283,7 @@ class LemmyApiClient @Inject constructor(
     account: Account?,
     id: Either<PostId, CommentId>,
     force: Boolean,
-  ): Result<PostView> {
+  ): Result<GetPostResponse> {
     val postForm = id.fold({
       GetPost(id = it, auth = account?.jwt)
     }, {
@@ -300,7 +301,7 @@ class LemmyApiClient @Inject constructor(
       }
     }.fold(
       onSuccess = {
-        Result.success(it.post_view)
+        Result.success(it)
       },
       onFailure = {
         Result.failure(it)

@@ -10,6 +10,7 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.View.LAYOUT_DIRECTION_LTR
 import android.view.ViewGroup
@@ -34,6 +35,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.transition.TransitionManager
 import arrow.core.Either
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
@@ -46,6 +48,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.InboxListItemBinding
+import com.idunnololz.summit.databinding.PostBadgeCrossPostedBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
@@ -186,6 +189,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private var autoPlayVideos: Boolean = preferences.autoPlayVideos
   private var useCondensedTypefaceForCommentHeaders: Boolean = preferences.useCondensedTypefaceForCommentHeaders
   private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
+  private var showCrossPostsInPost: Boolean = preferences.showCrossPostsInPost
 
   private val viewRecycler: ViewRecycler<View> = ViewRecycler()
 
@@ -235,6 +239,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     autoPlayVideos = preferences.autoPlayVideos
     useCondensedTypefaceForCommentHeaders = preferences.useCondensedTypefaceForCommentHeaders
     parseMarkdownInPostTitles = preferences.parseMarkdownInPostTitles
+    showCrossPostsInPost = preferences.showCrossPostsInPost
 
     upvoteColor = preferences.upvoteColor
     downvoteColor = preferences.downvoteColor
@@ -255,6 +260,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     val root: ViewGroup,
     val commentButton: View,
     val startGuideline: View? = null,
+    val badgesContainer: View,
+    val badgesView: ViewGroup,
     override val quickActionsTopBarrier: View,
     override val quickActionsStartBarrier: View? = null,
     override val quickActionsEndBarrier: View? = null,
@@ -280,6 +287,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     updateContent: Boolean,
     highlightTextData: HighlightTextData?,
     contentSpannable: Spanned?,
+    hasCrossPosts: Boolean,
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
@@ -293,6 +301,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
     onTextBound: (Spanned?) -> Unit = {},
+    onCrossPostsClick: () -> Unit,
   ) = with(binding) {
     val showCommunityIcon = postInListUiConfig.showCommunityIcon
     val useMultilineHeader = showCommunityIcon
@@ -304,6 +313,8 @@ class PostAndCommentViewBuilder @Inject constructor(
             root = root,
             commentButton = commentButton,
             startGuideline = startGuideline,
+            badgesContainer = badgesContainer,
+            badgesView = badges,
             quickActionsTopBarrier = bottomBarrier,
             quickActionsStartBarrier = startBarrier,
             quickActionsEndBarrier = endBarrier,
@@ -312,6 +323,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           vh
         }
 
+    ensureBadges(viewHolder, postView, hasCrossPosts, onCrossPostsClick)
     ensureContent(viewHolder)
 
     if (screenshotConfig != null) {
@@ -349,7 +361,6 @@ class PostAndCommentViewBuilder @Inject constructor(
       showUpvotePercentage = showPostUpvotePercentage,
       useMultilineHeader = useMultilineHeader,
       wrapHeader = useMultilinePostHeaders && !useMultilineHeader,
-      useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
       isCurrentUser = if (indicateCurrentUser) {
         currentUser?.id == postView.creator.id &&
           currentUser?.instance == postView.creator.instance
@@ -357,6 +368,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         false
       },
       showEditedDate = showEditedDate,
+      useCondensedTypeface = false,
     )
 
     if (showCommunityIcon) {
@@ -549,6 +561,67 @@ class PostAndCommentViewBuilder @Inject constructor(
       null -> {
       }
     }
+  }
+
+  private enum class Badge {
+    CrossPosted
+  }
+
+  private fun ensureBadges(
+    vh: PostViewHolder,
+    postView: PostView,
+    hasCrossPosts: Boolean,
+    onCrossPostsClick: () -> Unit,
+  ) = with(vh) {
+    val badges = mutableListOf<Badge>()
+    if (hasCrossPosts && showCrossPostsInPost) {
+      badges.add(Badge.CrossPosted)
+    }
+    if ((vh.badgesView.tag as? List<String>) == badges) {
+      return@with
+    }
+
+    val context = vh.root.context
+    val inflater = LayoutInflater.from(context)
+    var isFirst = true
+
+    if (vh.badgesView.tag != null) {
+      TransitionManager.beginDelayedTransition(vh.root)
+    }
+
+    vh.badgesView.removeAllViews()
+
+    for (badge in badges) {
+      when (badge) {
+        Badge.CrossPosted -> {
+          val b = PostBadgeCrossPostedBinding.inflate(inflater, vh.badgesView, false)
+
+          b.root.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            R.drawable.baseline_content_copy_16, 0, 0, 0)
+          b.root.setText(R.string.cross_posted)
+          b.root.setOnClickListener {
+            onCrossPostsClick()
+          }
+
+          if (isFirst) {
+            isFirst = false
+            b.root.updateLayoutParams<MarginLayoutParams> {
+              marginStart = context.resources.getDimensionPixelOffset(R.dimen.padding)
+            }
+          }
+
+          vh.badgesView.addView(b.root)
+        }
+      }
+    }
+
+    if (badges.isEmpty()) {
+      vh.badgesContainer.visibility = View.GONE
+    } else {
+      vh.badgesContainer.visibility = View.VISIBLE
+    }
+
+    vh.badgesView.tag = badges
   }
 
   private fun ensureContent(vh: PostViewHolder) = with(vh) {
@@ -1494,14 +1567,22 @@ class PostAndCommentViewBuilder @Inject constructor(
     removeOnly: Boolean = false,
     fullWidth: Boolean = true,
   ) {
-    root.removeView(quickActionsBar)
+    if (removeOnly) {
+      root.removeView(quickActionsBar)
+      return
+    }
 
-    if (removeOnly) return
+    quickActionsBar?.let {
+      if (it.parent != null && it.tag == actions) {
+        return
+      }
+    }
 
     val quickActionsBarContainer = AutoHorizontalScrollView(context)
       .also {
         quickActionsBar = it
       }
+    quickActionsBarContainer.tag = actions
     val quickActionsBar = LinearLayout(context).apply {
       orientation = LinearLayout.HORIZONTAL
       setPadding(

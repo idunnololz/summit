@@ -55,6 +55,7 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
+import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
@@ -64,6 +65,7 @@ import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
@@ -83,6 +85,7 @@ import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolat
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -527,6 +530,52 @@ class PostFragment :
           },
           switchToNativeInstance = {
             viewModel.switchToNativeInstance()
+          },
+          onCrossPostsClick = a@{
+            val activity = getSummitActivity() ?: return@a
+            val crossPosts = viewModel.postData.valueOrNull?.crossPosts ?: return@a
+            val bottomMenu = BottomMenu(activity)
+              .apply {
+                val idToChoice = mutableMapOf<Int, PostView>()
+
+                setTitle(R.string.cross_posted_to)
+
+                crossPosts.withIndex().forEach { (index, crossPost) ->
+                  idToChoice[index] = crossPost
+
+                  addRawItem(BottomMenu.MenuItem.ActionItem(
+                    id = index,
+                    title = crossPost.community.toCommunityRef().fullName,
+                    description = buildString {
+                      append(
+                        context.resources.getQuantityString(
+                          R.plurals.point_count_format,
+                          crossPost.counts.score,
+                          PrettyPrintUtils.defaultDecimalFormat.format(crossPost.counts.score),
+                        )
+                      )
+                      append(", ")
+                      append(
+                        context.resources.getQuantityString(
+                          R.plurals.comments_format,
+                          crossPost.counts.comments,
+                          PrettyPrintUtils.defaultDecimalFormat.format(crossPost.counts.comments),
+                        )
+                      )
+                    },
+                    icon = BottomMenu.MenuIcon.CommunityIcon(
+                      crossPost.community.toCommunityRef(), crossPost.community.icon,
+                    )
+                  ))
+                }
+
+                setOnMenuItemClickListener {
+                  val crossPost = requireNotNull(idToChoice[it.id])
+
+                  getMainActivity()?.launchPage(PostRef(viewModel.apiInstance, crossPost.post.id))
+                }
+              }
+            activity.showBottomMenu(bottomMenu)
           },
         ).apply {
           stateRestorationPolicy =
@@ -987,6 +1036,7 @@ class PostFragment :
         PostViewModel.PostData(
           postView = PostViewModel.ListView.PostListView(post),
           commentTree = listOf(),
+          crossPosts = listOf(),
           newlyPostedCommentId = null,
           selectedCommentId = null,
           isSingleComment = false,

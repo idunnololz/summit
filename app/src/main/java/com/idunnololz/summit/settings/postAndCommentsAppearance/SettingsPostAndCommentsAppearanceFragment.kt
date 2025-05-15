@@ -303,7 +303,6 @@ class SettingsPostAndCommentsAppearanceFragment :
         clazz = PostView::class,
         inflateFn = PostHeaderItemBinding::inflate,
       ) { item, b, _ ->
-
         postAndCommentViewBuilder.bindPostView(
           b,
           postView = item,
@@ -316,6 +315,7 @@ class SettingsPostAndCommentsAppearanceFragment :
           updateContent = true,
           highlightTextData = null,
           contentSpannable = null,
+          hasCrossPosts = false,
           onRevealContentClickedFn = {},
           onImageClick = { _, _, _ -> },
           onVideoClick = { _, _, _ -> },
@@ -329,6 +329,7 @@ class SettingsPostAndCommentsAppearanceFragment :
           onLinkClick = { _, _, _ -> },
           onLinkLongClick = { _, _ -> },
           onTextBound = {},
+          onCrossPostsClick = {},
         )
       }
       adapterHelper.addItemType(
