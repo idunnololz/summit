@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/baseline_add_comment_24"
+        android:src="@drawable/outline_add_comment_24"
         android:layout_gravity="center_vertical"/>
 
     <com.google.android.material.divider.MaterialDivider

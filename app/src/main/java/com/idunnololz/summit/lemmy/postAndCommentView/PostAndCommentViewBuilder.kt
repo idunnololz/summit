@@ -35,7 +35,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView.LAYOUT_DIRECTION_RTL
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import arrow.core.Either
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
@@ -527,36 +529,48 @@ class PostAndCommentViewBuilder @Inject constructor(
     root.tag = postView
 
     when (screenshotConfig?.postViewType) {
+      ScreenshotModeViewModel.PostViewType.JustWithoutBadges -> {
+        title.visibility = View.VISIBLE
+        headerContainer.visibility = View.VISIBLE
+        fullContent.visibility = View.VISIBLE
+        badgesContainer.visibility = View.GONE
+      }
       ScreenshotModeViewModel.PostViewType.Full -> {
         title.visibility = View.VISIBLE
         headerContainer.visibility = View.VISIBLE
         fullContent.visibility = View.VISIBLE
+        badgesContainer.visibility = View.VISIBLE
       }
       ScreenshotModeViewModel.PostViewType.ImageOnly -> {
         title.visibility = View.GONE
         headerContainer.visibility = View.GONE
         fullContent.visibility = View.VISIBLE
+        badgesContainer.visibility = View.GONE
       }
       ScreenshotModeViewModel.PostViewType.TextOnly -> {
         title.visibility = View.VISIBLE
         headerContainer.visibility = View.VISIBLE
         fullContent.visibility = View.VISIBLE
+        badgesContainer.visibility = View.GONE
       }
       ScreenshotModeViewModel.PostViewType.TitleOnly -> {
         fullContent.visibility = View.GONE
 
         title.visibility = View.VISIBLE
         headerContainer.visibility = View.VISIBLE
+        badgesContainer.visibility = View.GONE
       }
       ScreenshotModeViewModel.PostViewType.TitleAndImageOnly -> {
         title.visibility = View.VISIBLE
         fullContent.visibility = View.VISIBLE
         headerContainer.visibility = View.VISIBLE
+        badgesContainer.visibility = View.GONE
       }
       ScreenshotModeViewModel.PostViewType.Compact -> {
         title.visibility = View.VISIBLE
         headerContainer.visibility = View.VISIBLE
         fullContent.visibility = View.VISIBLE
+        badgesContainer.visibility = View.GONE
       }
       null -> {
       }
@@ -586,7 +600,13 @@ class PostAndCommentViewBuilder @Inject constructor(
     var isFirst = true
 
     if (vh.badgesView.tag != null) {
-      TransitionManager.beginDelayedTransition(vh.root)
+      TransitionManager.beginDelayedTransition(
+        vh.root,
+        AutoTransition()
+          .apply {
+            setOrdering(TransitionSet.ORDERING_TOGETHER)
+          },
+      )
     }
 
     vh.badgesView.removeAllViews()
@@ -1721,14 +1741,14 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
         PostQuickActionIds.Reply -> {
           makeCommentActionButton(R.id.pa_reply).apply {
-            setImageResource(R.drawable.baseline_add_comment_24)
+            setImageResource(R.drawable.outline_add_comment_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.Reply -> {
           makeCommentActionButton(R.id.ca_reply).apply {
-            setImageResource(R.drawable.baseline_add_comment_24)
+            setImageResource(R.drawable.outline_add_comment_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }

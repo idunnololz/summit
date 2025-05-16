@@ -1106,7 +1106,9 @@ class PostFragment :
 
     if (viewModel.postData.valueOrNull == null) {
       lifecycleScope.launch(Dispatchers.Default) {
-        delay(400)
+        if (preferences.delayWhenLoadingData) {
+          delay(400)
+        }
 
         withContext(Dispatchers.Main) {
           viewModel.fetchPostData(switchToNativeInstance = args.switchToNativeInstance)

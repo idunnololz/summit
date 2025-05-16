@@ -272,6 +272,7 @@ class PostViewModel @Inject constructor(
       TAG,
       "fetchPostData(): fetchPostData = $fetchPostData " +
         "fetchCommentData = $fetchCommentData force = $force",
+      RuntimeException()
     )
 
     postOrCommentRef ?: return null
@@ -332,6 +333,7 @@ class PostViewModel @Inject constructor(
       this@PostViewModel.postView?.let {
         postRef = PostRef(instance = apiInstance, id = it.post.id)
       }
+      updateData()
 
       val commentsResult = if (fetchCommentData) {
         postOrCommentRef

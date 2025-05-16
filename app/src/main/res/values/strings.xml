@@ -2103,6 +2103,8 @@
     <string name="cross_posted_to">Cross-posted to</string>
     <string name="show_cross_posts_in_post">Show cross-posts in post</string>
     <string name="show_cross_posts_in_post_desc">When enabled, a \"cross-posted\" badge will appear on the post screen if the post has been cross-posted elsewhere.</string>
+    <string name="delay_when_loading_data">Delay when loading large datasets</string>
+    <string name="delay_when_loading_data_desc">When enabled, Summit will add a small pause before loading large amounts of data. This will help on lower end devices to keep the user experience snappy.</string>
 
     <!-- Text for the total number of children (comments) under a comment. -->
     <plurals name="children_count_format">

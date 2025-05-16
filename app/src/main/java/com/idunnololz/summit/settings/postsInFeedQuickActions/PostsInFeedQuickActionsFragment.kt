@@ -25,6 +25,8 @@ import com.idunnololz.summit.databinding.InactiveActionsTitleBinding
 import com.idunnololz.summit.databinding.QuickActionBinding
 import com.idunnololz.summit.databinding.QuickActionsTitleBinding
 import com.idunnololz.summit.databinding.SettingItemOnOffMasterBinding
+import com.idunnololz.summit.preferences.PostInFeedQuickActionId
+import com.idunnololz.summit.preferences.PostInFeedQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionId
 import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
@@ -283,49 +285,53 @@ class PostsInFeedQuickActionsFragment :
     fun refreshItems() {
       val data = data ?: return
 
-      fun toQuickAction(actionId: Int): Item.QuickAction? {
+      fun toQuickAction(actionId: PostInFeedQuickActionId): Item.QuickAction? {
         val icon: Int
         val name: String
         when (actionId) {
-          PostQuickActionIds.Voting -> {
+          PostInFeedQuickActionIds.Voting -> {
             icon = R.drawable.baseline_swap_vert_24
             name = context.getString(R.string.vote_actions)
           }
-          PostQuickActionIds.Reply -> {
+          PostInFeedQuickActionIds.Reply -> {
             icon = R.drawable.baseline_reply_24
             name = context.getString(R.string.reply)
           }
-          PostQuickActionIds.Save -> {
+          PostInFeedQuickActionIds.Save -> {
             icon = R.drawable.baseline_bookmark_24
             name = context.getString(R.string.save)
           }
-          PostQuickActionIds.Share -> {
+          PostInFeedQuickActionIds.Share -> {
             icon = R.drawable.baseline_share_24
             name = context.getString(R.string.share)
           }
-          PostQuickActionIds.TakeScreenshot -> {
+          PostInFeedQuickActionIds.TakeScreenshot -> {
             icon = R.drawable.baseline_screenshot_24
             name = context.getString(R.string.take_screenshot)
           }
-          PostQuickActionIds.CrossPost -> {
+          PostInFeedQuickActionIds.CrossPost -> {
             icon = R.drawable.baseline_content_copy_24
             name = context.getString(R.string.cross_post)
           }
-          PostQuickActionIds.ShareSourceLink -> {
+          PostInFeedQuickActionIds.ShareSourceLink -> {
             icon = R.drawable.ic_fediverse_24
             name = context.getString(R.string.share_source_link)
           }
-          PostQuickActionIds.CommunityInfo -> {
+          PostInFeedQuickActionIds.CommunityInfo -> {
             icon = R.drawable.ic_community_24
             name = context.getString(R.string.community_info)
           }
-          PostQuickActionIds.ViewSource -> {
+          PostInFeedQuickActionIds.ViewSource -> {
             icon = R.drawable.baseline_code_24
             name = context.getString(R.string.view_raw)
           }
-          PostQuickActionIds.DetailedView -> {
+          PostInFeedQuickActionIds.DetailedView -> {
             icon = R.drawable.baseline_open_in_full_24
             name = context.getString(R.string.detailed_view)
+          }
+          PostInFeedQuickActionIds.MarkAsRead -> {
+            icon = R.drawable.baseline_check_24
+            name = context.getString(R.string.mark_as_read)
           }
           else -> return null
         }
@@ -384,9 +390,7 @@ class PostsInFeedQuickActionsFragment :
       this.data = data
       this.quickActions = data.actions
 
-      val allActions = PostQuickActionIds.AllActions.filter {
-        it != PostQuickActionIds.More
-      }
+      val allActions = PostInFeedQuickActionIds.AllActions
 
       unusedActions = allActions.filter { !quickActions.contains(it) }
       this.quickActions = quickActions

@@ -31,6 +31,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.api.dto.MarkPostAsRead
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
@@ -64,6 +65,7 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.MarkAsRead
 import com.idunnololz.summit.preferences.PostQuickActionIds.CommunityInfo
 import com.idunnololz.summit.preferences.PostQuickActionIds.CrossPost
 import com.idunnololz.summit.preferences.PostQuickActionIds.DetailedView
@@ -1525,11 +1527,12 @@ class PostListViewBuilder @Inject constructor(
 
       postsInFeedQuickActions.actions.forEachIndexed { index, action ->
         if (index > 0) {
+          val dividerId = View.generateViewId()
           views.add(
             MaterialDivider(
               context,
             ).apply {
-              id = View.generateViewId()
+              id = dividerId
               layoutParams = ConstraintLayout.LayoutParams(
                 Utils.convertDpToPixel(1f).toInt(),
                 0,
@@ -1550,6 +1553,8 @@ class PostListViewBuilder @Inject constructor(
               root.addView(this)
             },
           )
+
+          endId = dividerId
         }
 
         when (action) {
@@ -1586,16 +1591,16 @@ class PostListViewBuilder @Inject constructor(
                   endToStart = buttons.downvoteButton.id
                 }
               }
-              root.addView(buttons.upvoteButton)
               root.addView(buttons.downvoteButton)
+              root.addView(buttons.upvoteButton)
 
               upvoteButton = buttons.upvoteButton
               upvoteCount = buttons.upvoteButton
               downvoteButton = buttons.downvoteButton
               downvoteCount = buttons.downvoteButton
 
-              views.add(buttons.upvoteButton)
               views.add(buttons.downvoteButton)
+              views.add(buttons.upvoteButton)
             } else {
               val button1 = ImageView(
                 context,
@@ -1694,7 +1699,7 @@ class PostListViewBuilder @Inject constructor(
               endId = endId,
               alignmentViewId = commentButton.id,
             ).apply {
-              setImageResource(R.drawable.baseline_add_comment_24)
+              setImageResource(R.drawable.outline_add_comment_24)
               root.addView(this)
               views.add(this)
               actionViews.add(this)
@@ -1795,6 +1800,18 @@ class PostListViewBuilder @Inject constructor(
               alignmentViewId = commentButton.id,
             ).apply {
               setImageResource(R.drawable.baseline_open_in_full_24)
+              root.addView(this)
+              views.add(this)
+              actionViews.add(this)
+            }
+          }
+          MarkAsRead -> {
+            makePostsInFeedActionButton(
+              idRes = R.id.pa_toggle_mark_post_as_read,
+              endId = endId,
+              alignmentViewId = commentButton.id,
+            ).apply {
+              setImageResource(R.drawable.baseline_check_24)
               root.addView(this)
               views.add(this)
               actionViews.add(this)

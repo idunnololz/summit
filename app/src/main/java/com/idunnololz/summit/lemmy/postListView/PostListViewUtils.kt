@@ -50,7 +50,7 @@ fun BaseFragment<*>.showMorePostOptions(
     addItemWithIcon(
       R.id.pa_reply,
       getString(R.string.add_comment),
-      R.drawable.baseline_add_comment_24,
+      R.drawable.outline_add_comment_24,
     )
 
     if (isPostMenu) {
@@ -412,6 +412,14 @@ fun BaseFragment<*>.createPostActionHandler(
         onRefreshClick = onRefreshClick,
         onFindInPageClick = onFindInPageClick,
         onScreenshotClick = onScreenshotClick,
+      )
+    }
+    R.id.pa_toggle_mark_post_as_read -> {
+      moreActionsHelper.onPostRead(
+        postView = postView,
+        delayMs = 0,
+        read = !postView.read,
+        accountId = accountId,
       )
     }
     R.id.pa_mark_post_as_unread -> {

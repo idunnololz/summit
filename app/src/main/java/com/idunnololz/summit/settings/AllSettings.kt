@@ -78,6 +78,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERV
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PERF_DELAY_WHEN_LOADING_DATA
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FEED_SHOW_SCROLL_BAR
@@ -2116,6 +2117,12 @@ class MiscSettings @Inject constructor(
     context.getString(R.string.inline_images_in_private_messages),
     context.getString(R.string.inline_images_in_private_messages_desc),
     relatedKeys = listOf(KEY_INLINE_URLS_IN_PRIVATE_MESSAGES),
+  )
+  val delayWhenLoadingData = OnOffSettingItem(
+    null,
+    context.getString(R.string.delay_when_loading_data),
+    context.getString(R.string.delay_when_loading_data_desc),
+    relatedKeys = listOf(KEY_PERF_DELAY_WHEN_LOADING_DATA),
   )
 }
 

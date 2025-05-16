@@ -186,8 +186,12 @@ class ScreenshotModeDialogFragment :
 
       binding.bottomAppBar.menu.findItem(R.id.toggle_post_view)?.apply {
         when (nextPostViewType) {
-          ScreenshotModeViewModel.PostViewType.Full -> {
+          ScreenshotModeViewModel.PostViewType.JustWithoutBadges -> {
             setIcon(R.drawable.baseline_view_list_24)
+            setTitle(R.string.full_post)
+          }
+          ScreenshotModeViewModel.PostViewType.Full -> {
+            setIcon(R.drawable.baseline_all_inclusive_24)
             setTitle(R.string.full_post)
           }
           ScreenshotModeViewModel.PostViewType.ImageOnly -> {
@@ -227,6 +231,7 @@ class ScreenshotModeDialogFragment :
             postViewType = currentConfig.postViewType.nextValue,
           )
         }
+
         R.id.screenshot_settings -> {
           ScreenshotSettingsDialogFragment()
             .showAllowingStateLoss(
@@ -234,6 +239,7 @@ class ScreenshotModeDialogFragment :
               "ScreenshotSettingsDialogFragment",
             )
         }
+
         R.id.record -> {
           RecordScreenshotDialogFragment
             .show(
@@ -443,6 +449,11 @@ class ScreenshotModeDialogFragment :
     adapter.screenshotConfig = screenshotConfig
 
     when (screenshotConfig?.postViewType) {
+      ScreenshotModeViewModel.PostViewType.JustWithoutBadges -> {
+        screenshotStage.contentContainer.updatePadding(
+          top = context.getDimen(R.dimen.padding),
+        )
+      }
       ScreenshotModeViewModel.PostViewType.Full -> {
         screenshotStage.contentContainer.updatePadding(
           top = context.getDimen(R.dimen.padding),

@@ -94,6 +94,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERV
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PERF_DELAY_WHEN_LOADING_DATA
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POSTS_IN_FEED_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_FAB_QUICK_ACTION
@@ -449,7 +450,7 @@ class Preferences(
     }
 
   var screenshotWidthDp: Int
-    by intPreference(KEY_SCREENSHOT_WIDTH_DP, 360)
+    by intPreference(KEY_SCREENSHOT_WIDTH_DP, 400)
 
   var dateScreenshots: Boolean
     by booleanPreference(KEY_DATE_SCREENSHOTS, true)
@@ -666,6 +667,8 @@ class Preferences(
     by booleanPreference(KEY_INLINE_URLS_IN_PRIVATE_MESSAGES, true)
   var showCrossPostsInPost: Boolean
     by booleanPreference(KEY_SHOW_CROSS_POSTS_IN_POST, true)
+  var delayWhenLoadingData: Boolean
+    by booleanPreference(KEY_PERF_DELAY_WHEN_LOADING_DATA, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

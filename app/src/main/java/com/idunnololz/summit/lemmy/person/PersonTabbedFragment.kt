@@ -46,6 +46,7 @@ import com.idunnololz.summit.lemmy.utils.SortTypeMenuHelper
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
+import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
@@ -396,7 +397,22 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
   override fun onResume() {
     super.onResume()
 
-    setupForFragment<PersonTabbedFragment>(animate = false)
+    val slidingPaneLayout = binding.slidingPaneLayout
+
+    requireSummitActivity().apply {
+      if (navBarController.useNavigationRail) {
+        navBarController.showBottomNav()
+      } else {
+        if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
+          // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
+        } else {
+          if (!slidingPaneLayout.isOpen) {
+            showNavBar()
+          }
+        }
+      }
+      setupForFragment<PersonTabbedFragment>(animate = false)
+    }
   }
 
   private fun setup(personRef: PersonRef?) {

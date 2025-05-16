@@ -110,6 +110,7 @@ import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -765,7 +766,11 @@ class CommunityFragment :
             if (!postView.read) {
               moreActionsHelper.onPostRead(
                 postView = postView,
-                delayMs = 0,
+                delayMs = if (preferences.delayWhenLoadingData) {
+                  750
+                } else {
+                  500
+                },
                 accountId = accountId,
                 read = true,
               )

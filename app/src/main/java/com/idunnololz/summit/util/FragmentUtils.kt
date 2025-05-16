@@ -61,7 +61,6 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
           hideNotificationBarBg()
         }
         PersonTabbedFragment::class -> {
-          navBarController.showBottomNav()
           hideNotificationBarBg()
         }
         CommunityInfoFragment::class -> {

@@ -145,11 +145,12 @@ class ScreenshotModeViewModel @Inject constructor(
   }
 
   data class ScreenshotConfig(
-    val postViewType: PostViewType = PostViewType.Full,
+    val postViewType: PostViewType = PostViewType.JustWithoutBadges,
     val showPostDivider: Boolean = true,
   )
 
   enum class PostViewType {
+    JustWithoutBadges,
     Full,
     ImageOnly,
     TextOnly,

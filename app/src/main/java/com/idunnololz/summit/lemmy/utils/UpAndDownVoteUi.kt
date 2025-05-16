@@ -63,8 +63,8 @@ fun makeUpAndDownVoteButtons(
   }
 
   return UpAndDownVoteUi(
-    upvoteButton,
-    downvoteButton,
+    upvoteButton = upvoteButton,
+    downvoteButton = downvoteButton,
   )
 }
 

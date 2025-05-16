@@ -130,7 +130,8 @@ class LemmyContentHelper(
       postViewType != PostViewType.TitleAndImageOnly
     val showImage = postViewType != PostViewType.TextOnly
     val showLink = postViewType == null ||
-      screenshotConfig.postViewType == PostViewType.Full
+      screenshotConfig.postViewType == PostViewType.Full ||
+      screenshotConfig.postViewType == PostViewType.JustWithoutBadges
     val onlyImage = postViewType == PostViewType.ImageOnly
     val thumbnailUrl = postView.post.thumbnail_url
     val isThumbnailUrlValid = thumbnailUrl != null && ContentUtils.isUrlImage(thumbnailUrl)
