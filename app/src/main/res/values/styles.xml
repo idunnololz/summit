@@ -250,6 +250,25 @@
         <item name="textAppearanceLabelSmall">@style/TextAppearance.App.Small.LabelSmall</item>
     </style>
 
+
+    <style name="TextStyle.MediumSmall">
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.App.MediumSmall.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.App.MediumSmall.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.App.MediumSmall.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.MediumSmall.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.App.MediumSmall.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.App.MediumSmall.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.App.MediumSmall.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.App.MediumSmall.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.App.MediumSmall.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.MediumSmall.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.MediumSmall.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.App.MediumSmall.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.App.MediumSmall.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.App.MediumSmall.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.App.MediumSmall.LabelSmall</item>
+    </style>
+
     <style name="TextStyle.Large">
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.App.Large.DisplayLarge</item>
         <item name="textAppearanceDisplayMedium">@style/TextAppearance.App.Large.DisplayMedium</item>

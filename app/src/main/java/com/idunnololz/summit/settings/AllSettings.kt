@@ -1503,6 +1503,7 @@ class ThemeSettings @Inject constructor(
     "",
     mapOf(
       GlobalFontSizeId.Small to context.getString(R.string.small),
+      GlobalFontSizeId.MediumSmall to context.getString(R.string.medium_small),
       GlobalFontSizeId.Normal to context.getString(R.string.normal),
       GlobalFontSizeId.Large to context.getString(R.string.large),
       GlobalFontSizeId.ExtraLarge to context.getString(R.string.extra_large),

@@ -169,6 +169,8 @@ class ThemeManager @Inject constructor(
     when (preferences.globalFontSize) {
       GlobalFontSizeId.Small ->
         activity.theme.applyStyle(R.style.TextStyle_Small, true)
+      GlobalFontSizeId.MediumSmall ->
+        activity.theme.applyStyle(R.style.TextStyle_MediumSmall, true)
       GlobalFontSizeId.Normal ->
         activity.theme.applyStyle(R.style.TextStyle, true)
       GlobalFontSizeId.Large ->
