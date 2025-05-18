@@ -221,6 +221,10 @@ class SettingsMiscFragment :
         { preferences.inlineUrlsInPrivateMessages },
         { preferences.inlineUrlsInPrivateMessages = it },
       ),
+      settings.delayWhenLoadingData.asOnOffSwitch(
+        { preferences.delayWhenLoadingData },
+        { preferences.delayWhenLoadingData = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

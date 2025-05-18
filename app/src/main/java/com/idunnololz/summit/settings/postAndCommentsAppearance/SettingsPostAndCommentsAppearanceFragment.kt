@@ -315,7 +315,7 @@ class SettingsPostAndCommentsAppearanceFragment :
           updateContent = true,
           highlightTextData = null,
           contentSpannable = null,
-          hasCrossPosts = false,
+          crossPosts = 0,
           onRevealContentClickedFn = {},
           onImageClick = { _, _, _ -> },
           onVideoClick = { _, _, _ -> },

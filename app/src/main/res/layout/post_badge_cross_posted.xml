@@ -5,8 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minHeight="24dp"
+    android:paddingHorizontal="@dimen/padding"
     android:background="@drawable/badge_bg"
-    android:textColor="?colorOnPrimaryContainer"
     android:drawablePadding="@dimen/padding"
+    android:textAppearance="?textAppearanceBodySmall"
+    android:textColor="?colorOnPrimaryContainer"
     app:backgroundTint="?colorPrimaryContainer"
     app:drawableTint="?colorOnPrimaryContainer" />

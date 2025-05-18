@@ -116,7 +116,7 @@ class PostAdapter(
       val query: String?,
       val currentMatch: QueryResult?,
       val screenshotMode: Boolean,
-      val hasCrossPosts: Boolean,
+      val crossPosts: Int,
     ) : Item(postView.getUniqueKey()), ScreenshotOptions
 
     data class VisibleCommentItem(
@@ -439,7 +439,7 @@ class PostAdapter(
               )
             },
             contentSpannable = contentCache[k],
-            hasCrossPosts = item.hasCrossPosts,
+            crossPosts = item.crossPosts,
             onRevealContentClickedFn = {
               revealedItems.add(postKey)
               notifyItemChanged(holder.absoluteAdapterPosition)
@@ -536,7 +536,7 @@ class PostAdapter(
             )
           },
           contentSpannable = contentCache[k],
-          hasCrossPosts = item.hasCrossPosts,
+          crossPosts = item.crossPosts,
           onRevealContentClickedFn = {
             revealedItems.add(postKey)
             notifyItemChanged(holder.absoluteAdapterPosition)
@@ -986,7 +986,7 @@ class PostAdapter(
             null
           },
           screenshotMode = screenshotMode,
-          hasCrossPosts = rawData.crossPosts.isNotEmpty(),
+          crossPosts = rawData.crossPosts.size,
         )
 
         absolutionPositionToTopLevelCommentPosition += -1
@@ -1174,7 +1174,7 @@ class PostAdapter(
               null
             },
             screenshotMode = screenshotMode,
-            hasCrossPosts = rawData.crossPosts.isNotEmpty(),
+            crossPosts = rawData.crossPosts.size,
           )
         }
         finalItems += ProgressOrErrorItem(error)

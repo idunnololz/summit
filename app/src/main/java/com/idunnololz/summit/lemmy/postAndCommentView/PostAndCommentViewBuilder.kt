@@ -93,6 +93,7 @@ import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
@@ -166,6 +167,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     it.fullBleedImage = preferences.postFullBleedImage
   }
   val voteUiHandler = accountActionsManager.voteUiHandler
+  private val transitionAnimation =
+    AutoTransition()
+      .apply {
+        setDuration(200)
+        setOrdering(TransitionSet.ORDERING_TOGETHER)
+      }
 
   private var upvoteColor = preferences.upvoteColor
   private var downvoteColor = preferences.downvoteColor
@@ -289,7 +296,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     updateContent: Boolean,
     highlightTextData: HighlightTextData?,
     contentSpannable: Spanned?,
-    hasCrossPosts: Boolean,
+    crossPosts: Int,
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
@@ -325,7 +332,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           vh
         }
 
-    ensureBadges(viewHolder, postView, hasCrossPosts, onCrossPostsClick)
+    ensureBadges(viewHolder, postView, crossPosts, onCrossPostsClick)
     ensureContent(viewHolder)
 
     if (screenshotConfig != null) {
@@ -584,11 +591,11 @@ class PostAndCommentViewBuilder @Inject constructor(
   private fun ensureBadges(
     vh: PostViewHolder,
     postView: PostView,
-    hasCrossPosts: Boolean,
+    crossPosts: Int,
     onCrossPostsClick: () -> Unit,
   ) = with(vh) {
     val badges = mutableListOf<Badge>()
-    if (hasCrossPosts && showCrossPostsInPost) {
+    if (crossPosts > 0 && showCrossPostsInPost) {
       badges.add(Badge.CrossPosted)
     }
     if ((vh.badgesView.tag as? List<String>) == badges) {
@@ -602,10 +609,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     if (vh.badgesView.tag != null) {
       TransitionManager.beginDelayedTransition(
         vh.root,
-        AutoTransition()
-          .apply {
-            setOrdering(TransitionSet.ORDERING_TOGETHER)
-          },
+        transitionAnimation,
       )
     }
 
@@ -617,8 +621,11 @@ class PostAndCommentViewBuilder @Inject constructor(
           val b = PostBadgeCrossPostedBinding.inflate(inflater, vh.badgesView, false)
 
           b.root.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            R.drawable.baseline_content_copy_16, 0, 0, 0)
-          b.root.setText(R.string.cross_posted)
+            R.drawable.baseline_content_copy_12, 0, 0, 0)
+          b.root.text = context.resources.getQuantityString(
+            R.plurals.cross_posted_times,
+            crossPosts,
+            PrettyPrintUtils.defaultDecimalFormat.format(crossPosts))
           b.root.setOnClickListener {
             onCrossPostsClick()
           }
