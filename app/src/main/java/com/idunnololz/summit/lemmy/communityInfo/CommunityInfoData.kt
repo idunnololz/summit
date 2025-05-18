@@ -45,10 +45,8 @@ fun GetCommunityResponse.toPageData(): CommunityInfoData {
 
   return CommunityInfoData(
     backingObject = Either.Left(communityView),
-    name = if (communityView.community.title.isBlank()) {
+    name = communityView.community.title.ifBlank {
       name
-    } else {
-      communityView.community.title
     },
     fullName = "!$name@$instance",
     iconUrl = communityView.community.icon,

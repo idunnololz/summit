@@ -272,6 +272,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           adapter.multiCommunity = it.data
           binding.recyclerView.adapter = adapter
 
+          val name = it.data.communityRef.getMultiCommunityName(context)
+          binding.title.text = name
+          binding.name.text = name
+          binding.subtitle.text = it.data.instance
           binding.icon.setImageResource(it.data.icon)
           binding.icon.strokeWidth = 0f
           ImageViewCompat.setImageTintList(
@@ -397,8 +401,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     TransitionManager.beginDelayedTransition(binding.collapsingToolbarContent)
 
     with(binding) {
-      title.text = data.name
-
       if (data.iconUrl != null) {
         ViewCompat.setTransitionName(icon, "profileIcon")
 
@@ -453,6 +455,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
       if (communityView != null) {
         avatarHelper.loadCommunityIcon(icon, communityView.community)
+        title.text = communityView.community.title
+        name.text = communityView.community.title
+        subtitle.text = communityView.community.fullName
 
         binding.fab.visibility = View.VISIBLE
         binding.fab.setOnClickListener {
@@ -460,6 +465,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         }
       } else if (siteView != null) {
         avatarHelper.loadInstanceIcon(icon, siteView)
+        title.text = data.name
+        name.text = data.name
+        subtitle.text = data.fullName
 
         binding.fab.visibility = View.VISIBLE
         binding.fab.setOnClickListener {
@@ -467,6 +475,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         }
       } else {
         avatarHelper.loadInstanceIcon(icon, null)
+        title.text = data.name
+        name.text = data.name
+        subtitle.text = data.fullName
 
         binding.fab.visibility = View.GONE
       }
@@ -777,9 +788,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         clazz = Item.MultiCommunityHeaderItem::class,
         inflateFn = CommunityInfoHeaderItemBinding::inflate,
       ) { item, b, _ ->
-        b.name.text = item.title
-        b.subtitle.text = item.subtitle
-
         b.subscribe.visibility = View.GONE
         b.instanceInfo.visibility = View.VISIBLE
 
@@ -791,9 +799,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         clazz = Item.InstanceHeaderItem::class,
         inflateFn = CommunityInfoHeaderItemBinding::inflate,
       ) { item, b, _ ->
-        b.name.text = item.title
-        b.subtitle.text = item.subtitle
-
         b.instanceInfo.visibility = View.GONE
 
         b.subscribe.visibility = View.VISIBLE
@@ -806,9 +811,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         clazz = Item.CommunityHeaderItem::class,
         inflateFn = CommunityInfoHeaderItemBinding::inflate,
       ) { item, b, _ ->
-        b.name.text = item.communityView.community.title
-        b.subtitle.text = item.communityView.community.fullName
-
         b.subscribe.visibility = View.VISIBLE
 
         when (item.subscribedStatus) {
@@ -988,18 +990,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         )
       } else if (multiCommunityData != null) {
         newItems += Item.MultiCommunityHeaderItem(
-          title = when (multiCommunityData.communityRef) {
-            is CommunityRef.All -> TODO()
-            is CommunityRef.CommunityRefByName -> TODO()
-            is CommunityRef.Local -> TODO()
-            is CommunityRef.ModeratedCommunities ->
-              context.getString(R.string.moderated_communities)
-            is CommunityRef.MultiCommunity -> TODO()
-            is CommunityRef.Subscribed ->
-              context.getString(R.string.subscribed_communities)
-            is CommunityRef.AllSubscribed ->
-              context.getString(R.string.all_subscribed)
-          },
+          title = multiCommunityData.communityRef.getMultiCommunityName(context),
           subtitle = multiCommunityData.instance,
           instance = multiCommunityData.instance,
         )
@@ -1024,3 +1015,17 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     }
   }
 }
+
+private fun CommunityRef.getMultiCommunityName(context: Context) =
+  when (this) {
+    is CommunityRef.All -> TODO()
+    is CommunityRef.CommunityRefByName -> TODO()
+    is CommunityRef.Local -> TODO()
+    is CommunityRef.ModeratedCommunities ->
+      context.getString(R.string.moderated_communities)
+    is CommunityRef.MultiCommunity -> TODO()
+    is CommunityRef.Subscribed ->
+      context.getString(R.string.subscribed_communities)
+    is CommunityRef.AllSubscribed ->
+      context.getString(R.string.all_subscribed)
+  }

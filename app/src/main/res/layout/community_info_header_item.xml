@@ -5,36 +5,6 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceHeadlineMedium"
-        android:layout_marginTop="@dimen/padding"
-        android:layout_marginHorizontal="@dimen/padding"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:gravity="start"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/subtitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceBodyMedium"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:layout_marginTop="@dimen/padding_half"
-        android:layout_marginHorizontal="@dimen/padding"
-        android:gravity="start"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/name"/>
-
     <!-- Text is set programmatically -->
     <Button
         android:id="@+id/subscribe"
@@ -45,7 +15,7 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
         android:id="@+id/instance_info"
@@ -58,7 +28,7 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/subscribe"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Space
         android:layout_width="wrap_content"
