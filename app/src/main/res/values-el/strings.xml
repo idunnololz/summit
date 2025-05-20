@@ -1254,4 +1254,26 @@
         <item quantity="one">%1$s Χρήστης</item>
         <item quantity="other">%1$s Χρήστες</item>
     </plurals>
+    <string name="remove_speak_as_moderator">Αφαίρεση του \"Μίλα ως συντονιστής\"</string>
+    <string name="speak_as_moderator">Μίλα ως συντονιστής</string>
+    <string name="create_preset">Δημιουργία προρύθμισης</string>
+    <string name="submit_preset">Υποβολή προρύθμισης</string>
+    <string name="choose_preferences">Επέλεξε προτιμήσεις</string>
+    <string name="submit_preset_confirm">Υποβολή προρύθμισης;</string>
+    <string name="preset_submitted">Η προρύθμιση υποβλήθηκε!</string>
+    <string name="button_back">Πίσω</string>
+    <string name="name_required">Όνομα (απαιτείται)</string>
+    <string name="error_submit_preset">Δεν είναι δυνατή η υποβολή της προρύθμισης</string>
+    <string name="exit_create_preset_flow">Έξοδος από τη δημιουργία προρύθμισης;</string>
+    <string name="feature_under_construction">Χαρακτηριστικό υπό κατασκευή</string>
+    <string name="take_preview_screenshot_instructions">Παρακαλώ περίμενε μέχρι να φορτώσουν πλήρως οι παρακάτω προεπισκοπήσεις. Βεβαιώσου ότι οι προεπισκοπήσεις φαίνονται εντάξει και πάτα το κουμπί λήψης.</string>
+    <string name="body">Σώμα</string>
+    <string name="preset_form_instructions">Δώσε ένα όνομα στην προρύθμισή σου (απαιτείται). Τα ονόματα πρέπει να είναι σύντομα και να περιγράφουν τι επιτυγχάνει η προρύθμιση. Πχ. \"Μοντέρνο και απλό\" ή \"Μινιμαλιστικό\". Μπορείς επίσης να περιγράψεις την προρύθμισή σου (προαιρετικά).</string>
+    <string name="unmark_important">Αφαίρεση σήμανσης σημαντικό</string>
+    <string name="choose_preferences_to_include">Επέλεξε προτιμήσεις για συμπερίληψη</string>
+    <string name="mark_important">Επισήμανση ως σημαντικό</string>
+    <string name="choose_preferences_to_include_desc">Προσπάθησε να συμπεριλάβεις μόνο βασικές ρυθμίσεις για να διατηρήσεις την προρύθμιση εστιασμένη.</string>
+    <string name="submit_preset_confirm_desc">Η προρύθμισή σου ενδέχεται να δημοσιευτεί στο διαδίκτυο.
+\n
+\nΗ υποβολή μιας προρύθμισης θα στείλει την προρύθμιση για έλεγχο. Μόλις εγκριθεί, θα είναι ορατή σε άλλους χρήστες.</string>
 </resources>
