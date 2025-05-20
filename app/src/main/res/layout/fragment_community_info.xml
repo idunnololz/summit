@@ -77,7 +77,7 @@
                     android:layout_marginHorizontal="@dimen/padding"
                     android:layout_marginTop="-20dp"
                     android:scaleType="centerCrop"
-                    android:padding="2dp"
+                    android:padding="3dp"
                     android:background="?backgroundColor"
                     style="@style/RoundImageView"
                     app:layout_constraintHorizontal_bias="0"
@@ -85,7 +85,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/banner_dummy"
                     app:strokeColor="?colorOnSurface"
-                    app:strokeWidth="2dp"/>
+                    app:strokeWidth="3dp"/>
 
 
                 <TextView
@@ -95,12 +95,13 @@
                     android:textAppearance="?textAppearanceTitleLarge"
                     android:layout_marginStart="@dimen/padding_three_quarters"
                     android:layout_marginEnd="@dimen/padding"
+                    android:layout_marginTop="28dp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:includeFontPadding="false"
                     app:layout_constraintStart_toEndOf="@+id/icon"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/banner_overlay"/>
+                    app:layout_constraintTop_toTopOf="@+id/icon"/>
 
                 <TextView
                     android:id="@+id/subtitle"

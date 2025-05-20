@@ -14,6 +14,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SortType
@@ -48,6 +49,7 @@ data class MiscAccountInfo(
   val blockedCommunities: List<BlockedCommunity>? = null,
   val blockedInstances: List<BlockedInstance>? = null,
   val isAdmin: Boolean? = null,
+  val modCommunities: List<Community>? = null,
 )
 
 @Serializable

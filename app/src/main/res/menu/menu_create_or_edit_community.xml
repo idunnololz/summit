@@ -7,7 +7,7 @@
         android:id="@+id/publish"
         android:title="@string/publish"
         android:orderInCategory="100"
-        android:icon="@drawable/baseline_publish_24"
+        android:icon="@drawable/baseline_check_24"
         app:showAsAction="always"
         app:iconTint="?attr/colorControlNormal"/>
     <item

@@ -286,4 +286,5 @@
     <item name="divider3" type="id" />
     <item name="swap_colors" type="id" />
     <item name="pa_toggle_mark_post_as_read" type="id" />
+    <item name="create_a_new_community" type="id" />
 </resources>

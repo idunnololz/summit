@@ -56,6 +56,7 @@ fun GetSiteResponse.toFullAccount(account: Account): FullAccount {
           it.instance.domain,
         )
       },
+      modCommunities = this.my_user?.moderates?.map { it.community },
     ),
   )
   return FullAccount(

@@ -9,6 +9,7 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
@@ -45,6 +46,7 @@ class AccountInfoManager @Inject constructor(
   private val unreadCountInvalidates = MutableSharedFlow<Unit>()
 
   val subscribedCommunities = MutableStateFlow<List<AccountSubscription>>(listOf())
+  val moderatedCommunities = MutableStateFlow<List<Community>>(listOf())
   val accountInfoUpdateState = MutableStateFlow<StatefulData<Account?>>(StatefulData.NotStarted())
   val unreadCount = MutableStateFlow<UnreadCount>(UnreadCount())
   val currentFullAccount = MutableStateFlow<FullAccount?>(null)
@@ -71,6 +73,7 @@ class AccountInfoManager @Inject constructor(
           // Don't emit null as it will trigger multiple updates
 //                    currentFullAccount.emit(null)
           subscribedCommunities.emit(listOf())
+          moderatedCommunities.emit(listOf())
           accountInfoUpdateState.emit(StatefulData.NotStarted())
           unreadCount.emit(UnreadCount())
         }
@@ -168,6 +171,7 @@ class AccountInfoManager @Inject constructor(
     accountInfoDao.insert(fullAccount.accountInfo)
 
     subscribedCommunities.emit(fullAccount.accountInfo.subscriptions ?: listOf())
+    moderatedCommunities.emit(fullAccount.accountInfo.miscAccountInfo?.modCommunities ?: listOf())
   }
 
   private suspend fun updateUnreadCount(fullAccount: FullAccount) {
@@ -261,6 +265,7 @@ class AccountInfoManager @Inject constructor(
     )
 
     subscribedCommunities.emit(accountInfo.subscriptions ?: listOf())
+    moderatedCommunities.emit(accountInfo.miscAccountInfo?.modCommunities ?: listOf())
   }
 
   data class UnreadCount(

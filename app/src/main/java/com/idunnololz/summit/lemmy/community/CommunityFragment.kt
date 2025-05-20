@@ -596,9 +596,10 @@ class CommunityFragment :
             }
 
             if (!navBarController.useNavigationRail && slidingPaneController?.isOpen != true) {
-              setNavUiOpenPercent(it)
+//              setNavUiOpenPercent(it)
+              (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
             }
-            slidingPaneController?.navBarOpenPercent = it.coerceIn(0f, 1f)
+            slidingPaneController?.navBarOpenPercent = it
 
             isCustomAppBarExpandedPercent = it
 
@@ -1498,6 +1499,11 @@ class CommunityFragment :
         icon = R.drawable.baseline_dynamic_feed_24,
       )
       addItemWithIcon(
+        id = R.id.create_a_new_community,
+        title = R.string.create_a_new_community,
+        icon = R.drawable.baseline_add_24,
+      )
+      addItemWithIcon(
         id = R.id.settings,
         title = R.string.settings,
         icon = R.drawable.baseline_settings_24,
@@ -1837,6 +1843,9 @@ class CommunityFragment :
       }
       R.id.give_feedback -> {
         showHelpAndFeedbackOptions()
+      }
+      R.id.create_a_new_community -> {
+        getMainActivity()?.showCreateCommunityScreen()
       }
     }
   }

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.tabs.TabsManager
@@ -30,6 +31,7 @@ class CommunitiesPaneViewModel @Inject constructor(
 ) : ViewModel() {
 
   private var subscriptionCommunities: List<AccountSubscription> = listOf()
+  private var moderatedCommunities: List<Community> = listOf()
   private var userCommunities: List<UserCommunityItem> = listOf()
   private var tabsState: Map<TabsManager.Tab, TabsManager.TabState> = mapOf()
   private var accountInfoUpdateState: StatefulData<Account?> = StatefulData.NotStarted()
@@ -40,6 +42,15 @@ class CommunitiesPaneViewModel @Inject constructor(
     viewModelScope.launch(Dispatchers.Default) {
       accountInfoManager.subscribedCommunities.collect {
         subscriptionCommunities = it.sortedBy {
+          it.toCommunityRef().getLocalizedFullName(context)
+        }
+
+        updateCommunities()
+      }
+    }
+    viewModelScope.launch(Dispatchers.Default) {
+      accountInfoManager.moderatedCommunities.collect {
+        moderatedCommunities = it.sortedBy {
           it.toCommunityRef().getLocalizedFullName(context)
         }
 
@@ -112,6 +123,7 @@ class CommunitiesPaneViewModel @Inject constructor(
         subscriptionCommunities = subscriptionCommunities,
         accountInfoUpdateState = accountInfoUpdateState,
         tabsState = tabsState,
+        moderatedCommunities = moderatedCommunities,
       ),
     )
   }
@@ -121,5 +133,6 @@ class CommunitiesPaneViewModel @Inject constructor(
     val userCommunities: List<UserCommunityItem>,
     val accountInfoUpdateState: StatefulData<Account?>,
     val tabsState: Map<TabsManager.Tab, TabsManager.TabState>,
+    val moderatedCommunities: List<Community>,
   )
 }

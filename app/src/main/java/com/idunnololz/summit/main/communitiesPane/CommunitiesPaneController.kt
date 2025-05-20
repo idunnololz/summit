@@ -15,6 +15,7 @@ import arrow.core.Either
 import coil3.dispose
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
+import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
 import com.idunnololz.summit.databinding.BookmarkedCommunityHeaderItemBinding
@@ -127,31 +128,46 @@ class CommunitiesPaneController @AssistedInject constructor(
   ) : Adapter<ViewHolder>() {
 
     private sealed interface Item {
+
+      interface CommunityBackedItem {
+        val communityRef: CommunityRef
+      }
+
       data object BookmarkHeaderItem : Item
       data class HomeCommunityItem(
-        val communityRef: CommunityRef,
+        override val communityRef: CommunityRef,
         val userCommunityItem: UserCommunityItem,
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
-      ) : Item
+      ) : Item, CommunityBackedItem
       data class BookmarkedCommunityItem(
-        val communityRef: CommunityRef,
+        override val communityRef: CommunityRef,
         val iconUrl: String?,
         val userCommunityItem: UserCommunityItem,
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
         val needsDisambiguation: Boolean,
-      ) : Item
+      ) : Item, CommunityBackedItem
       data class SubscriptionHeaderItem(
         val isRefreshing: Boolean,
       ) : Item
       data class SubscribedCommunityItem(
-        val communityRef: CommunityRef,
+        override val communityRef: CommunityRef,
         val iconUrl: String?,
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
         val needsDisambiguation: Boolean,
+      ) : Item, CommunityBackedItem
+      data class ModeratedHeaderItem(
+        val isRefreshing: Boolean,
       ) : Item
+      data class ModeratedCommunityItem(
+        override val communityRef: CommunityRef,
+        val iconUrl: String?,
+        val isSelected: Boolean,
+        val resetTabOnClick: Boolean,
+        val needsDisambiguation: Boolean,
+      ) : Item, CommunityBackedItem
       data object NoSubscriptionsItem : Item
 
       data class TabStateItem(
@@ -197,6 +213,10 @@ class CommunitiesPaneController @AssistedInject constructor(
           Item.NoSubscriptionsItem -> true
           is Item.TabStateItem ->
             old.parentKey == (new as Item.TabStateItem).parentKey
+          is Item.ModeratedCommunityItem ->
+            old.communityRef.getKey() ==
+              (new as Item.ModeratedCommunityItem).communityRef.getKey()
+          is Item.ModeratedHeaderItem -> true
         }
       },
     ).apply {
@@ -365,6 +385,40 @@ class CommunitiesPaneController @AssistedInject constructor(
         }
       }
       addItemType(
+        clazz = Item.ModeratedHeaderItem::class,
+        inflateFn = BookmarkedCommunityHeaderItemBinding::inflate,
+      ) { item, b, h ->
+        b.bookmarksTitle.setText(R.string.moderated_communities)
+        if (item.isRefreshing) {
+          b.progressBar.visibility = View.VISIBLE
+        } else {
+          b.progressBar.visibility = View.GONE
+        }
+      }
+      addItemType(
+        clazz = Item.ModeratedCommunityItem::class,
+        inflateFn = GenericCommunityItemBinding::inflate,
+      ) { item, b, h ->
+        avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
+
+        b.selectedIndicator.visibility = if (item.isSelected) {
+          View.VISIBLE
+        } else {
+          View.GONE
+        }
+        b.title.text = item.communityRef.getName(context)
+        if (item.needsDisambiguation && item.communityRef.instance != null) {
+          b.subtitle.visibility = View.VISIBLE
+          b.subtitle.text = "@${item.communityRef.instance}"
+        } else {
+          b.subtitle.visibility = View.GONE
+        }
+
+        b.root.setOnClickListener {
+          onCommunitySelected(Either.Right(item.communityRef), item.resetTabOnClick)
+        }
+      }
+      addItemType(
         clazz = Item.NoSubscriptionsItem::class,
         inflateFn = NoSubscriptionsItemBinding::inflate,
       ) { _, _, _ -> }
@@ -407,6 +461,7 @@ class CommunitiesPaneController @AssistedInject constructor(
 
       fun UserCommunityItem.getKey() = "uc:" + communityRef.getName(context).lowercase()
       fun AccountSubscription.getKey() = "sc:" + toCommunityRef().getName(context).lowercase()
+      fun Community.getKey() = "c:" + toCommunityRef().getName(context).lowercase()
 
       val seenCount = mutableMapOf<String, Int>()
       for (userCommunity in data.userCommunities) {
@@ -511,7 +566,48 @@ class CommunitiesPaneController @AssistedInject constructor(
         } else {
           newItems.add(Item.NoSubscriptionsItem)
         }
+
+        if (data.moderatedCommunities.isNotEmpty()) {
+          newItems.add(
+            Item.ModeratedHeaderItem(
+              data.accountInfoUpdateState is StatefulData.Loading,
+            ),
+          )
+
+          for (community in data.moderatedCommunities) {
+            val isSelected = currentTab
+              ?.isSubscribedCommunity(community.toCommunityRef())
+              ?: false
+            val tab = community.toCommunityRef().toTab()
+
+            val tabStateItem = data.tabsState[tab]?.let {
+              if (it.currentCommunity == community.toCommunityRef()) {
+                null
+              } else {
+                Item.TabStateItem(
+                  community.name,
+                  tab,
+                  tabState = it,
+                  isSelected = isSelected,
+                )
+              }
+            }
+
+            newItems += Item.ModeratedCommunityItem(
+              communityRef = community.toCommunityRef(),
+              iconUrl = community.icon,
+              isSelected = isSelected && tabStateItem == null,
+              resetTabOnClick = tabStateItem != null,
+              needsDisambiguation =
+                needsDisambiguate.contains(community.getKey()),
+            )
+            if (tabStateItem != null) {
+              newItems += tabStateItem
+            }
+          }
+        }
       } else {
+        val seenResult = mutableSetOf<CommunityRef>()
         for (userCommunity in data.userCommunities) {
           val isSelected = currentTab?.hasTabId(userCommunity.id) ?: false
           val tab = userCommunity.toTab()
@@ -537,27 +633,29 @@ class CommunitiesPaneController @AssistedInject constructor(
             }
           }
 
-          if (userCommunity.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
-            newItems += Item.HomeCommunityItem(
-              communityRef = userCommunity.communityRef,
-              userCommunityItem = userCommunity,
-              isSelected = isSelected && tabStateItem == null,
-              resetTabOnClick = tabStateItem != null,
-            )
-          } else {
-            newItems += Item.BookmarkedCommunityItem(
-              communityRef = userCommunity.communityRef,
-              iconUrl = userCommunity.iconUrl,
-              userCommunityItem = userCommunity,
-              isSelected = isSelected && tabStateItem == null,
-              resetTabOnClick = tabStateItem != null,
-              needsDisambiguation =
-              needsDisambiguate.contains(userCommunity.getKey()),
-            )
-          }
+          if (seenResult.add(userCommunity.communityRef)) {
+            if (userCommunity.id == UserCommunitiesManager.FIRST_FRAGMENT_TAB_ID) {
+              newItems += Item.HomeCommunityItem(
+                communityRef = userCommunity.communityRef,
+                userCommunityItem = userCommunity,
+                isSelected = isSelected && tabStateItem == null,
+                resetTabOnClick = tabStateItem != null,
+              )
+            } else {
+              newItems += Item.BookmarkedCommunityItem(
+                communityRef = userCommunity.communityRef,
+                iconUrl = userCommunity.iconUrl,
+                userCommunityItem = userCommunity,
+                isSelected = isSelected && tabStateItem == null,
+                resetTabOnClick = tabStateItem != null,
+                needsDisambiguation =
+                  needsDisambiguate.contains(userCommunity.getKey()),
+              )
+            }
 
-          if (tabStateItem != null) {
-            newItems += tabStateItem
+            if (tabStateItem != null) {
+              newItems += tabStateItem
+            }
           }
         }
         for (subscriptionCommunity in data.subscriptionCommunities) {
@@ -588,16 +686,60 @@ class CommunitiesPaneController @AssistedInject constructor(
             }
           }
 
-          newItems += Item.SubscribedCommunityItem(
-            communityRef = communityRef,
-            iconUrl = subscriptionCommunity.icon,
-            isSelected = isSelected && tabStateItem == null,
-            resetTabOnClick = tabStateItem != null,
-            needsDisambiguation =
-            needsDisambiguate.contains(subscriptionCommunity.getKey()),
-          )
-          if (tabStateItem != null) {
-            newItems += tabStateItem
+          if (seenResult.add(communityRef)) {
+            newItems += Item.SubscribedCommunityItem(
+              communityRef = communityRef,
+              iconUrl = subscriptionCommunity.icon,
+              isSelected = isSelected && tabStateItem == null,
+              resetTabOnClick = tabStateItem != null,
+              needsDisambiguation =
+                needsDisambiguate.contains(subscriptionCommunity.getKey()),
+            )
+            if (tabStateItem != null) {
+              newItems += tabStateItem
+            }
+          }
+        }
+        for (community in data.moderatedCommunities) {
+          val communityRef = community.toCommunityRef()
+          val isSelected = currentTab
+            ?.isSubscribedCommunity(communityRef)
+            ?: false
+          val tab = communityRef.toTab()
+          val tabState = data.tabsState[tab]
+          val tabStateName = tabState?.currentCommunity?.getName(context)
+
+          if (tabStateName?.contains(filter, ignoreCase = true) != true &&
+            !communityRef.getName(context).contains(filter, ignoreCase = true)
+          ) {
+            continue
+          }
+
+          val tabStateItem = tabState?.let {
+            if (it.currentCommunity == communityRef) {
+              null
+            } else {
+              Item.TabStateItem(
+                community.name,
+                tab,
+                tabState = it,
+                isSelected = isSelected,
+              )
+            }
+          }
+
+          if (seenResult.add(communityRef)) {
+            newItems += Item.SubscribedCommunityItem(
+              communityRef = communityRef,
+              iconUrl = community.icon,
+              isSelected = isSelected && tabStateItem == null,
+              resetTabOnClick = tabStateItem != null,
+              needsDisambiguation =
+                needsDisambiguate.contains(community.getKey()),
+            )
+            if (tabStateItem != null) {
+              newItems += tabStateItem
+            }
           }
         }
       }

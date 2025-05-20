@@ -1035,6 +1035,11 @@ class MainActivity : SummitActivity() {
     }
   }
 
+  fun showCreateCommunityScreen() {
+    val direction = MainDirections.actionGlobalCreateOrEditCommunityFragment(null)
+    currentNavController?.navigateSafe(direction)
+  }
+
   fun navigateTopLevel(menuId: Int) {
     val currentNavController = currentNavController ?: return
     val menuItem = navBarController.navBar.menu.findItem(menuId)
