@@ -332,6 +332,11 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 0,
                 volume = globalStateStorage.videoStateVolume,
                 playing = true,
+                repeatMode = if (currentPreferences.loopVideoByDefault) {
+                  Player.REPEAT_MODE_ALL
+                } else {
+                  Player.REPEAT_MODE_OFF
+                }
               ),
               autoPlay = currentPreferences.autoPlayVideos,
               isInline = false,
@@ -346,6 +351,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
                 volume = videoState.volume
               }
             },
+          videoState,
           preferenceManager.currentPreferences,
         )
         setupMoreButton(context, url, args.url, videoType)

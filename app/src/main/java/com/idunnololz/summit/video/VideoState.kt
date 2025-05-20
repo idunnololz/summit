@@ -9,6 +9,7 @@ data class VideoState(
   val currentTime: Long,
   val volume: Float?,
   val playing: Boolean,
+  val repeatMode: Int,
 ) : Parcelable
 
 fun Player.getVideoState(includeVolume: Boolean = true): VideoState = VideoState(
@@ -19,4 +20,5 @@ fun Player.getVideoState(includeVolume: Boolean = true): VideoState = VideoState
     null
   },
   playing = isPlaying,
+  repeatMode = this.repeatMode,
 )

@@ -28,7 +28,8 @@ class CustomPlayerView : PlayerView {
   private var isVolumeChanged = false
 
   @OptIn(UnstableApi::class)
-  fun setPlayerWithPreferences(player: Player?, preferences: Preferences) {
+  fun setPlayerWithPreferences(player: Player?, videoState: VideoState?, preferences: Preferences) {
+    var restoreState = true
     val customPlayerListener =
       (getTag(R.id.custom_player_listener) as? Player.Listener)
         ?: object : Player.Listener {
@@ -36,6 +37,14 @@ class CustomPlayerView : PlayerView {
           @OptIn(UnstableApi::class)
           override fun onIsPlayingChanged(isPlaying: Boolean) {
             if (isPlaying) {
+              if (restoreState) {
+                restoreState = false
+                player?.repeatMode = videoState?.repeatMode ?: if (preferences.loopVideoByDefault) {
+                  Player.REPEAT_MODE_ALL
+                } else {
+                  Player.REPEAT_MODE_OFF
+                }
+              }
               if (preferences.autoHideUiOnPlay) {
                 hideController()
               }

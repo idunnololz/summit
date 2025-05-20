@@ -86,6 +86,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LAST_ACCOUNT_NOTIFICATION_ID
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LOCK_BOTTOM_BAR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_LOOP_VIDEO_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
@@ -669,6 +670,8 @@ class Preferences(
     by booleanPreference(KEY_SHOW_CROSS_POSTS_IN_POST, true)
   var delayWhenLoadingData: Boolean
     by booleanPreference(KEY_PERF_DELAY_WHEN_LOADING_DATA, true)
+  var loopVideoByDefault: Boolean
+    by booleanPreference(KEY_LOOP_VIDEO_BY_DEFAULT, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

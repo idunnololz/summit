@@ -71,6 +71,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_INLINE_URLS_IN_PRIVATE_MES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_LOCK_BOTTOM_BAR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_LOOP_VIDEO_BY_DEFAULT
 import com.idunnololz.summit.util.PreferenceUtils.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_RAIL_GRAVITY
@@ -2664,6 +2665,12 @@ class VideoPlayerSettings @Inject constructor(
     context.getString(R.string.tap_anywhere_to_play_pause),
     null,
     relatedKeys = listOf(KEY_TAP_ANYWHERE_TO_PLAY_PAUSE),
+  )
+  val loopVideoByDefault = OnOffSettingItem(
+    null,
+    context.getString(R.string.loop_videos_by_default),
+    null,
+    relatedKeys = listOf(KEY_LOOP_VIDEO_BY_DEFAULT)
   )
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(

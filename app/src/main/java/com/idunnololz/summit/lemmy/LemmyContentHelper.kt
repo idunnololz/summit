@@ -426,6 +426,7 @@ class LemmyContentHelper(
                 isInline = true,
                 autoPlay = autoPlayVideos,
               ),
+              videoState,
               preferences,
             )
           } else {

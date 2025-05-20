@@ -29,6 +29,12 @@ class SettingsVideoPlayerFragment :
         preferences.tapAnywhereToPlayPause = it
       },
     ),
+    settings.loopVideoByDefault.asOnOffSwitch(
+      { preferences.loopVideoByDefault },
+      {
+        preferences.loopVideoByDefault = it
+      },
+    ),
     SettingModelItem.SubgroupItem(
       getString(R.string.inline_video_player),
       listOf(
