@@ -663,7 +663,9 @@ class CommunityViewModel @Inject constructor(
 
   fun restoreFromState(state: CommunityViewState?) {
     state ?: return
-    currentCommunityRef.value = state.communityState.communityRef
+    if (currentCommunityRef.value != state.communityState.communityRef) {
+      currentCommunityRef.value = state.communityState.communityRef
+    }
     currentPageIndex.value = state.communityState.currentPageIndex
     pagePositions = ArrayList(state.pageScrollStates)
   }
