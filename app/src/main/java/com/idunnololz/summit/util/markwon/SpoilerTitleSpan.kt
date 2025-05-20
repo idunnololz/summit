@@ -53,7 +53,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
           DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
           start,
           start + match.groups[2]!!.range.last,
-          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
         )
       }
 
@@ -64,7 +64,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
           if (start + 4 >= this.length) {
             append(" ")
           }
-          setSpan(DetailsEndSpan(), start, start + 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+          setSpan(DetailsEndSpan(), start, start + 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY)
         }
       }
     }
@@ -116,12 +116,10 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
           val spoilerContent =
             spanned.subSequence(
               spanned.getSpanEnd(detailsStartSpan) + 1,
-              spoilerEnd - 4,
+              // -5 because -4 for the spoiler end tag and then we remove the newline character
+              // added by LemmyTextHelper. See LemmyPlugin.processAll()
+              spoilerEnd - 5,
             ) as SpannableStringBuilder
-
-          if (spoilerContent.last() != '\n') {
-            spoilerContent.append("\n")
-          }
 
           spoilerContent.setSpan(
             BlockQuoteSpan(detailsStartSpan.theme),

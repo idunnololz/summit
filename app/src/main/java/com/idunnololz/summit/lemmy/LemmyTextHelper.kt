@@ -235,10 +235,11 @@ class LemmyTextHelper @Inject constructor(
     }
 
     /**
-     * Matches against full community names (!a@b.com)
+     * 1. Matches against full community names (!a@b.com)
+     * 2. Matches against spoiler (ending) tags
      */
     private val largeRegex = Pattern.compile(
-      """(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)""",
+      """(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)|([^\n])(\n:::(?:\n|${'$'}))""",
     )
 
     private fun processAll(s: String): String {
@@ -246,6 +247,16 @@ class LemmyTextHelper @Inject constructor(
       val matcher = largeRegex.matcher(s)
       val sb = StringBuffer()
       while (matcher.find()) {
+        val characterBeforeSpoilerEndTag = matcher.group(5)
+        val spoilerEndTag = matcher.group(6)
+        if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
+          matcher.appendReplacement(
+            sb,
+            "$characterBeforeSpoilerEndTag\n$spoilerEndTag"
+          )
+          continue
+        }
+
         val linkStart = matcher.group(1)
         val referenceTypeToken = matcher.group(2)
         val name = matcher.group(3)
