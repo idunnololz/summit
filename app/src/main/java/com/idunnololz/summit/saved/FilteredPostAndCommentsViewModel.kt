@@ -235,6 +235,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
                 pageIndex = pageIndex,
                 dedupingKey = pageIndex.toString(),
                 hasMore = it.size == pageSize,
+                feed = null,
               ),
             )
             postListEngine.createItems()
@@ -260,6 +261,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
                   isRetryable = true,
                   isLoading = false,
                 ),
+                feed = null,
               ),
             )
             postListEngine.createItems()

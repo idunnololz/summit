@@ -209,6 +209,7 @@ class PersonTabbedViewModel @Inject constructor(
                 pageIndex = pageIndex,
                 dedupingKey = pageIndex.toString(),
                 hasMore = result.posts.size == PAGE_SIZE,
+                feed = null,
               ),
             )
             postListEngine.createItems()
@@ -253,6 +254,7 @@ class PersonTabbedViewModel @Inject constructor(
                   isRetryable = true,
                   isLoading = false,
                 ),
+                feed = null,
               ),
             )
             postListEngine.createItems()

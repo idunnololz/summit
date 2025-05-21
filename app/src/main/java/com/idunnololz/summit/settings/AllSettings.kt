@@ -51,6 +51,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_COMMUNITY_SORT_ORD
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT
@@ -751,6 +752,12 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.blur_nsfw_posts),
     null,
     relatedKeys = listOf(KEY_BLUR_NSFW_POSTS),
+  )
+  val doNotBlurNsfwContentInNsfwCommunityFeed = OnOffSettingItem(
+    null,
+    context.getString(R.string.do_not_blur_nsfw_posts_in_nsfw_communities),
+    context.getString(R.string.do_not_blur_nsfw_posts_in_nsfw_communities_desc),
+    relatedKeys = listOf(KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED),
   )
   val defaultCommunitySortOrder = RadioGroupSettingItem(
     null,

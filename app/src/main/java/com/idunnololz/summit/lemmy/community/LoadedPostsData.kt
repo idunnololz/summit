@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.os.Parcelable
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LocalPostView
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -17,6 +18,7 @@ data class LoadedPostsData(
   val hasMore: Boolean,
   val isReadPostUpdate: Boolean = true,
   val error: PostLoadError? = null,
+  val feed: CommunityRef?,
 ) : Parcelable
 
 @Parcelize

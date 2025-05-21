@@ -453,6 +453,7 @@ class CommunityViewModel @Inject constructor(
               pageIndex = pageToFetch,
               dedupingKey = pageToFetch.toString(),
               hasMore = it.hasMore,
+              feed = it.feed,
             )
           if (clearPagesOnSuccess) {
             postListEngine.clear()
@@ -493,6 +494,7 @@ class CommunityViewModel @Inject constructor(
                 isRetryable = true,
                 isLoading = false,
               ),
+              feed = postsRepository.communityRef,
             ),
           )
           postListEngine.createItems()
@@ -799,6 +801,7 @@ class CommunityViewModel @Inject constructor(
         pageIndex = 0,
         dedupingKey = 0.toString(),
         hasMore = false,
+        feed = postsRepository.communityRef,
       ),
     )
     loadedPostsData.setValue(PostUpdateInfo())

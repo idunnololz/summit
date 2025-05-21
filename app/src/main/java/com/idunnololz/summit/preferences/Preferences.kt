@@ -62,6 +62,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_DEFAULT_PAGE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DISPLAY_INSTANCE_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_DOWNVOTE_COLOR
+import com.idunnololz.summit.util.PreferenceUtils.KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ENABLE_HIDDEN_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_GLOBAL_FONT
@@ -672,6 +673,8 @@ class Preferences(
     by booleanPreference(KEY_PERF_DELAY_WHEN_LOADING_DATA, true)
   var loopVideoByDefault: Boolean
     by booleanPreference(KEY_LOOP_VIDEO_BY_DEFAULT, false)
+  var doNotBlurNsfwContentInNsfwCommunityFeed: Boolean
+    by booleanPreference(KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

@@ -91,6 +91,10 @@ class SettingsPostsFeedFragment :
         { preferences.blurNsfwPosts },
         { preferences.blurNsfwPosts = it },
       ),
+      settings.doNotBlurNsfwContentInNsfwCommunityFeed.asOnOffSwitch(
+        { preferences.doNotBlurNsfwContentInNsfwCommunityFeed },
+        { preferences.doNotBlurNsfwContentInNsfwCommunityFeed = it },
+      ),
       settings.defaultCommunitySortOrder.asSingleChoiceSelectorItem(
         {
           preferences.defaultCommunitySortOrder?.toApiSortOrder()?.toId()

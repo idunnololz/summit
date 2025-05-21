@@ -94,6 +94,8 @@
     <color name="style_amber10">#1AFFC107</color>
     <color name="style_green10">#1A4CAF50</color>
 
+    <color name="ucrop_color_widget_active">@color/md_theme_light_primary</color>
+
     <!-- Generated -->
     <color name="seed">#3a5ba9</color>
     <color name="md_theme_light_primary">@color/orangeTheme</color>

@@ -88,6 +88,7 @@ class PostListAdapter(
   var markPostsAsReadOnScroll: Boolean = false
   var alwaysRenderAsUnread: Boolean = false
   var blurNsfwPosts: Boolean = true
+  var doNotBlurNsfwContentInNsfwCommunityFeed: Boolean = false
 
   var items: List<PostListEngineItem> = listOf()
     private set
@@ -208,9 +209,13 @@ class PostListAdapter(
           super.onBindViewHolder(holder, position, payloads)
         } else {
           val h: ListingItemViewHolder = holder as ListingItemViewHolder
+          val revealDueToNsfwSetting = doNotBlurNsfwContentInNsfwCommunityFeed &&
+            item.feed is CommunityRef.CommunityRefByName &&
+            item.fetchedPost.postView.community.nsfw
           val isRevealed =
             revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
               !blurNsfwPosts ||
+              revealDueToNsfwSetting ||
               nsfwMode
           val isActionsExpanded = item.isActionExpanded
           val isExpanded = item.isExpanded
@@ -310,8 +315,12 @@ class PostListAdapter(
       }
       is PostListEngineItem.VisiblePostItem -> {
         val h: ListingItemViewHolder = holder as ListingItemViewHolder
+        val revealDueToNsfwSetting = doNotBlurNsfwContentInNsfwCommunityFeed &&
+          item.feed is CommunityRef.CommunityRefByName &&
+          item.fetchedPost.postView.community.nsfw
         val isRevealed = revealedItems.contains(item.fetchedPost.postView.getUniqueKey()) ||
           !blurNsfwPosts ||
+          revealDueToNsfwSetting ||
           nsfwMode
         val isActionsExpanded = item.isActionExpanded
         val isExpanded = item.isExpanded
@@ -596,6 +605,7 @@ class PostListAdapter(
   fun updateWithPreferences(preferences: Preferences) {
     markPostsAsReadOnScroll = preferences.markPostsAsReadOnScroll
     blurNsfwPosts = preferences.blurNsfwPosts
+    doNotBlurNsfwContentInNsfwCommunityFeed = preferences.doNotBlurNsfwContentInNsfwCommunityFeed
   }
 
   fun updateNsfwMode(nsfwModeManager: NsfwModeManager) {

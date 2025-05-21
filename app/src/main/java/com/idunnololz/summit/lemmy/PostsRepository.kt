@@ -71,7 +71,8 @@ class PostsRepository @AssistedInject constructor(
   private var seenPosts = mutableSetOf<String>()
   var persistentErrors: List<Exception> = listOf()
 
-  private var communityRef: CommunityRef = CommunityRef.All()
+  var communityRef: CommunityRef = CommunityRef.All()
+    private set
 
   private var endReached = false
 
@@ -208,6 +209,7 @@ class PostsRepository @AssistedInject constructor(
         pageIndex = pageIndex,
         instance = apiClient.instance,
         hasMore = hasMore,
+        feed = communityRef,
       ),
     )
   }
@@ -400,7 +402,6 @@ class PostsRepository @AssistedInject constructor(
           if (newPosts.first().postView.community.nsfw &&
             communityRef is CommunityRef.CommunityRefByName &&
             !showNsfwPosts &&
-
             !nsfwMode
           ) {
             return@fold Result.failure(LoadNsfwCommunityWhenNsfwDisabled())
@@ -568,6 +569,7 @@ class PostsRepository @AssistedInject constructor(
     val pageIndex: Int,
     val instance: String,
     val hasMore: Boolean,
+    val feed: CommunityRef,
   )
 }
 

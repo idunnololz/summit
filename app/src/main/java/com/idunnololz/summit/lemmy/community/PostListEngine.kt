@@ -8,6 +8,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.FilterReason
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
@@ -29,6 +30,7 @@ sealed interface PostListEngineItem {
 
   data class VisiblePostItem(
     override val fetchedPost: FetchedPost,
+    val feed: CommunityRef?,
     val instance: String,
     val isExpanded: Boolean,
     val isActionExpanded: Boolean,
@@ -40,6 +42,7 @@ sealed interface PostListEngineItem {
 
   data class FilteredPostItem(
     override val fetchedPost: FetchedPost,
+    val feed: CommunityRef?,
     val instance: String,
     val isExpanded: Boolean,
     val isActionExpanded: Boolean,
@@ -262,6 +265,7 @@ class PostListEngine @AssistedInject constructor(
                 highlightForever = postToHighlightForever?.id == postView.post.id,
                 pageIndex = page.pageIndex,
                 filterReason = it.filterReason,
+                feed = page.feed,
               )
             } else {
               PostListEngineItem.VisiblePostItem(
@@ -273,6 +277,7 @@ class PostListEngine @AssistedInject constructor(
                 highlightForever = postToHighlightForever?.id == postView.post.id,
                 pageIndex = page.pageIndex,
                 isDuplicatePost = it.isDuplicatePost,
+                feed = page.feed,
               )
             }
           }

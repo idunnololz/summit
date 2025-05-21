@@ -34,7 +34,7 @@
     <color name="ucrop_color_toolbar_widget" tools:ignore="MissingDefaultResource">@color/colorOnSurface</color>
     <color name="ucrop_color_statusbar" tools:ignore="MissingDefaultResource">@color/colorBackground</color>
     <color name="ucrop_color_widget" tools:ignore="MissingDefaultResource">@color/colorOnSurface</color>
-    <color name="ucrop_color_widget_active" tools:ignore="MissingDefaultResource">@color/md_theme_dark_primary</color>
+    <color name="ucrop_color_widget_active">@color/md_theme_dark_primary</color>
     <color name="ucrop_color_progress_wheel_line" tools:ignore="MissingDefaultResource">@color/white66</color>
     <color name="ucrop_color_widget_rotate_angle" tools:ignore="MissingDefaultResource">@color/white66</color>
 
