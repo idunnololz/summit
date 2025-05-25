@@ -23,6 +23,7 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.CenteredImageSpan
@@ -231,13 +232,21 @@ class LemmyHeaderHelper @AssistedInject constructor(
     if (displayFullName) {
       sb.appendNameWithInstance(
         context = context,
-        name = postView.community.name,
+        name = if (preferences.preferCommunityDisplayName) {
+          postView.community.title
+        } else {
+          postView.community.name
+        },
         instance = postInstance,
         url = LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
       )
     } else {
       sb.appendLink(
-        postView.community.name,
+        if (preferences.preferCommunityDisplayName) {
+          postView.community.title
+        } else {
+          postView.community.name
+        },
         LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
       )
     }
@@ -289,8 +298,14 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
       val s = sb.length
       sb.appendLink(
-        LemmyUtils.formatAuthor(postView.creator.name),
-        LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+        text = LemmyUtils.formatAuthor(
+          if (preferences.preferUserDisplayName) {
+            postView.creator.display_name ?: postView.creator.name
+          } else {
+            postView.creator.name
+          }
+        ),
+        url = LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
       )
       val e = sb.length
 
@@ -448,7 +463,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
       }
       else -> false
     }
-    val creatorName = commentView.creator.name.trim()
+    val creatorName = if (preferences.preferUserDisplayName) {
+      commentView.creator.display_name ?: commentView.creator.name
+    } else {
+      commentView.creator.name
+    }.trim()
 
     val nameStart = sb.length
     val nameEnd = nameStart + creatorName.length
@@ -512,25 +531,62 @@ class LemmyHeaderHelper @AssistedInject constructor(
       )
     }
 
+    var insertBigSpaceAfterName = true
     if (commentView.creator.id == commentView.post.creator_id) {
       run {
-        val d = Utils.tint(
-          context = context,
-          res = R.drawable.ic_op,
-          color = context.getColorCompat(R.color.style_blue),
-        )
-        val size: Int = Utils.convertDpToPixel(14f).toInt()
-        d.setBounds(0, 0, size, size)
-        sb.append(" ")
-        val s = sb.length
-        sb.append("  ")
-        val e = sb.length
-        sb.setSpan(
-          CenteredImageSpan(d),
-          s,
-          e,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
+        when (preferences.opTagStyle) {
+          OpTagStyleIds.TEXT_TAG_1 -> {
+            sb.append(" ")
+            val s = sb.length
+            sb.append("OP")
+            val e = sb.length
+            sb.setSpan(
+              RoundedBackgroundSpan(backgroundColor = context.getColorCompat(R.color.style_blue), textColor = whiteTextColor),
+              s,
+              e,
+              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+          }
+          OpTagStyleIds.TEXT_TAG_2 -> {
+            sb.append(" ")
+            val s = sb.length
+            sb.append("OP")
+            val e = sb.length
+            sb.setSpan(
+              ForegroundColorSpan(context.getColorCompat(R.color.style_blue)),
+              s,
+              e,
+              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.setSpan(
+              StyleSpan(Typeface.BOLD),
+              s,
+              e,
+              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            sb.appendSeparator()
+            insertBigSpaceAfterName = false
+          }
+          else -> {
+            val d = Utils.tint(
+              context = context,
+              res = R.drawable.ic_op,
+              color = context.getColorCompat(R.color.style_blue),
+            )
+            val size: Int = Utils.convertDpToPixel(14f).toInt()
+            d.setBounds(0, 0, size, size)
+            sb.append(" ")
+            val s = sb.length
+            sb.append("  ")
+            val e = sb.length
+            sb.setSpan(
+              CenteredImageSpan(d),
+              s,
+              e,
+              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+          }
+        }
       }
     }
 
@@ -551,7 +607,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       )
     }
 
-    if (sb.isNotEmpty()) {
+    if (insertBigSpaceAfterName && sb.isNotEmpty()) {
       sb.append("  ")
     }
     sb.append(

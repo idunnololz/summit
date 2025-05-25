@@ -7,8 +7,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -548,6 +550,7 @@ class CommunityFragment :
         userCommunitiesManager = userCommunitiesManager,
         state = communityAppBarController?.state,
         lemmyTextHelper = lemmyTextHelper,
+        preferences = preferences,
       )
 
       // Prevent flickers by setting the app bar here first

@@ -53,6 +53,7 @@ import com.idunnololz.summit.util.ext.obtainNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.isPredictiveBackSupported
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -304,6 +305,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
         }
         getMainActivity()?.showBottomMenu(bottomMenu)
       },
+      onLongClick = { url, text ->
+        getMainActivity()?.showMoreLinkOptions(url, text)
+      }
     )
 
     changeCommunity(requireNotNull(tabsManager.currentTab.value))

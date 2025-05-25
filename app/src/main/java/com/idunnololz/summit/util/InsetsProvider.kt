@@ -29,6 +29,7 @@ class InsetsHelper(
       val systemBarsInsets = insets.getInsetsIgnoringVisibility(
         WindowInsetsCompat.Type.systemBars(),
       )
+      val windowGestureRegion = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
       val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()) // keyboard
       val imeHeight = imeInsets.bottom
       val topInset = systemBarsInsets.top
@@ -47,6 +48,8 @@ class InsetsHelper(
         rightInset = rightInset,
         mainLeftInset = mainLeftInset,
         mainRightInset = mainRightInset,
+        gestureRegionLeft = windowGestureRegion.left,
+        gestureRegionRight = windowGestureRegion.right,
         isStatusBarVisible = insets.isVisible(WindowInsetsCompat.Type.statusBars()),
         isNavigationBarVisible = insets.isVisible(WindowInsetsCompat.Type.navigationBars()),
       )

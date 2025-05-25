@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import coil3.dispose
 import coil3.load
 import coil3.request.allowHardware
+import coil3.request.placeholder
 import com.discord.panels.PanelsChildGestureRegionObserver
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
@@ -44,6 +45,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.BaseFragment
@@ -53,6 +55,7 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.relativeTimeToConcise
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.toErrorMessage
@@ -70,6 +73,7 @@ class CommunityAppBarController(
   private val moreActionsHelper: MoreActionsHelper,
   private val userCommunitiesManager: UserCommunitiesManager,
   private val lemmyTextHelper: LemmyTextHelper,
+  private val preferences: Preferences,
   useHeader: Boolean,
   state: State? = null,
 ) {
@@ -149,6 +153,7 @@ class CommunityAppBarController(
       val feedInfoText: TextView,
       val communities: TextView,
       val scrollView: View,
+      val headerBg: View,
     ) : ViewHolder {
       override fun setSortOrderText(text: String) {
         communitySortOrder.text = text
@@ -251,6 +256,12 @@ class CommunityAppBarController(
         showCommunitySelectorInternal()
       }
       vh.titleHotspot.setOnLongClickListener {
+        onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
+      }
+      vh.headerBg.setOnClickListener {
+        showCommunitySelectorInternal()
+      }
+      vh.headerBg.setOnLongClickListener {
         onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
       }
       vh.communitySortOrder2.setOnClickListener {
@@ -388,9 +399,7 @@ class CommunityAppBarController(
         vh.feedInfoText.text = "-"
       }
       is StatefulData.Loading -> {
-        vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-          allowHardware(false)
-        }
+        vh.updateBanner("", isLoading = true)
         vh.icon.forCoil()
         vh.icon.load(newShimmerDrawableSquare(context))
         vh.body.text = buildSpannedString {
@@ -426,17 +435,11 @@ class CommunityAppBarController(
 
         updateDescription()
 
+        vh.updateBanner(bannerUrl, isLoading = false)
         if (bannerUrl == null) {
-          vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-            allowHardware(false)
-          }
           vh.banner.setOnClickListener(null)
           vh.banner.isClickable = false
         } else {
-          vh.banner.transitionName = "app_bar_banner"
-          vh.banner.load(bannerUrl) {
-            allowHardware(false)
-          }
           vh.banner.setOnClickListener {
             summitActivity.openImage(
               sharedElement = vh.banner,
@@ -517,9 +520,7 @@ class CommunityAppBarController(
 
     when (currentCommunity) {
       is CommunityRef.MultiCommunity -> {
-        vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-          allowHardware(false)
-        }
+        vh.updateBanner(url = null, isLoading = false)
         vh.icon.forCoil()
         vh.icon.load(currentCommunity.icon)
         vh.body.visibility = View.VISIBLE
@@ -531,27 +532,21 @@ class CommunityAppBarController(
         vh.feedInfoText.visibility = View.GONE
       }
       is CommunityRef.Subscribed -> {
-        vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-          allowHardware(false)
-        }
+        vh.updateBanner(url = null, isLoading = false)
         vh.icon.forIcon()
         vh.icon.setImageResource(R.drawable.baseline_subscriptions_24)
         vh.body.visibility = View.GONE
         vh.feedInfoText.visibility = View.GONE
       }
       is CommunityRef.AllSubscribed -> {
-        vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-          allowHardware(false)
-        }
+        vh.updateBanner(url = null, isLoading = false)
         vh.icon.forIcon()
         vh.icon.setImageResource(R.drawable.outline_groups_24)
         vh.body.visibility = View.GONE
         vh.feedInfoText.visibility = View.GONE
       }
       is CommunityRef.ModeratedCommunities -> {
-        vh.banner.load("file:///android_asset/banner_placeholder.svg") {
-          allowHardware(false)
-        }
+        vh.updateBanner(url = null, isLoading = false)
         vh.icon.forIcon()
         vh.icon.setImageResource(R.drawable.outline_shield_24)
         vh.body.visibility = View.GONE
@@ -606,6 +601,36 @@ class CommunityAppBarController(
     vh.info.setOnClickListener {
       if (currentCommunity != null) {
         summitActivity.showCommunityInfo(currentCommunity)
+      }
+    }
+  }
+
+  private fun ViewHolder.LargeAppBarViewHolder.updateBanner(url: String?, isLoading: Boolean) {
+    banner.transitionName = "app_bar_banner"
+
+    if (url == null) {
+      if (preferences.hideHeaderBannerIfNoBanner) {
+        banner.visibility = View.INVISIBLE
+      } else {
+        banner.visibility = View.VISIBLE
+        banner.load("file:///android_asset/banner_placeholder.svg") {
+          allowHardware(false)
+        }
+        banner.setOnClickListener(null)
+        banner.isClickable = false
+      }
+    } else {
+      banner.visibility = View.VISIBLE
+
+      if (isLoading) {
+        banner.load(newShimmerDrawable(context, 0.25f)) {
+          allowHardware(false)
+        }
+      } else {
+        banner.load(url) {
+          allowHardware(false)
+          placeholder(newShimmerDrawable(context, 0.25f))
+        }
       }
     }
   }
@@ -947,28 +972,29 @@ class CommunityAppBarController(
     return if (useHeader) {
       val b = CustomAppBarLargeBinding.inflate(inflater, parentContainer, false)
       ViewHolder.LargeAppBarViewHolder(
-        b.root,
-        b.customActionBar,
-        b.communityTextView,
-        b.pageTextView,
-        b.customAppBar,
-        b.accountImageView,
-        b.communitySortOrder,
-        b.collapsingToolbarLayout,
-        b.toolbar,
-        b.title,
-        b.subtitle,
-        b.body,
-        b.banner,
-        b.communitySortOrder2,
-        b.toolbarPlaceholder,
-        b.icon,
-        b.subscribe,
-        b.info,
-        b.titleHotspot,
-        b.feedInfoText,
-        b.communities,
-        b.scrollView,
+        root = b.root,
+        customActionBar = b.customActionBar,
+        communityTextView = b.communityTextView,
+        pageTextView = b.pageTextView,
+        customAppBar = b.customAppBar,
+        accountImageView = b.accountImageView,
+        communitySortOrder = b.communitySortOrder,
+        collapsingToolbarLayout = b.collapsingToolbarLayout,
+        toolbar = b.toolbar,
+        title = b.title,
+        subtitle = b.subtitle,
+        body = b.body,
+        banner = b.banner,
+        communitySortOrder2 = b.communitySortOrder2,
+        toolbarPlaceholder = b.toolbarPlaceholder,
+        icon = b.icon,
+        subscribe = b.subscribe,
+        info = b.info,
+        titleHotspot = b.titleHotspot,
+        feedInfoText = b.feedInfoText,
+        communities = b.communities,
+        scrollView = b.scrollView,
+        headerBg = b.headerBg,
       )
     } else {
       val b = CustomAppBarSmallBinding.inflate(inflater, parentContainer, false)

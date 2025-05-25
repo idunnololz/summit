@@ -34,6 +34,7 @@ import com.idunnololz.summit.tabs.toTab
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.AnimationsHelper
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
@@ -54,6 +55,7 @@ class CommunitiesPaneController @AssistedInject constructor(
   @Assisted private val onCommunitySelected: OnCommunitySelected,
   @Assisted private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
   @Assisted private val onAddBookmarkClick: () -> Unit,
+  @Assisted private val onLongClick: (url: String, text: String?) -> Unit,
 ) {
 
   @AssistedFactory
@@ -65,6 +67,7 @@ class CommunitiesPaneController @AssistedInject constructor(
       onCommunitySelected: OnCommunitySelected,
       onEditMultiCommunity: (UserCommunityItem) -> Unit,
       onAddBookmarkClick: () -> Unit,
+      onLongClick: (url: String, text: String?) -> Unit,
     ): CommunitiesPaneController
   }
 
@@ -84,6 +87,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         onEditMultiCommunity(ref)
       },
       onAddBookmarkClick = onAddBookmarkClick,
+      onLongClick = onLongClick,
     )
 
     binding.swipeRefreshLayout.setOnRefreshListener {
@@ -125,6 +129,7 @@ class CommunitiesPaneController @AssistedInject constructor(
     private val onDeleteUserCommunity: (Long) -> Unit,
     private val onEditMultiCommunity: (UserCommunityItem) -> Unit,
     private val onAddBookmarkClick: () -> Unit,
+    private val onLongClick: (url: String, text: String?) -> Unit,
   ) : Adapter<ViewHolder>() {
 
     private sealed interface Item {
@@ -372,7 +377,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         } else {
           View.GONE
         }
-        b.title.text = item.communityRef.getName(context)
+        val name = item.communityRef.getName(context)
+        b.title.text = name
         if (item.needsDisambiguation && item.communityRef.instance != null) {
           b.subtitle.visibility = View.VISIBLE
           b.subtitle.text = "@${item.communityRef.instance}"
@@ -382,6 +388,10 @@ class CommunitiesPaneController @AssistedInject constructor(
 
         b.root.setOnClickListener {
           onCommunitySelected(Either.Right(item.communityRef), item.resetTabOnClick)
+        }
+        b.root.setOnLongClickListener {
+          onLongClick(LinkUtils.getLinkForCommunity(item.communityRef), name)
+          true
         }
       }
       addItemType(
@@ -406,7 +416,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         } else {
           View.GONE
         }
-        b.title.text = item.communityRef.getName(context)
+        val name = item.communityRef.getName(context)
+        b.title.text = name
         if (item.needsDisambiguation && item.communityRef.instance != null) {
           b.subtitle.visibility = View.VISIBLE
           b.subtitle.text = "@${item.communityRef.instance}"
@@ -416,6 +427,10 @@ class CommunitiesPaneController @AssistedInject constructor(
 
         b.root.setOnClickListener {
           onCommunitySelected(Either.Right(item.communityRef), item.resetTabOnClick)
+        }
+        b.root.setOnLongClickListener {
+          onLongClick(LinkUtils.getLinkForCommunity(item.communityRef), name)
+          true
         }
       }
       addItemType(

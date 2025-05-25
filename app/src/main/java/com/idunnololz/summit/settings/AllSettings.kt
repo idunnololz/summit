@@ -17,6 +17,7 @@ import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.NavRailGravityIds
 import com.idunnololz.summit.preferences.NavigationRailModeId
+import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.UserAgentChoiceIds
@@ -26,6 +27,7 @@ import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_FOCUS_SEARCH_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_HIDE_UI_ON_PLAY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_IP_ADDRESSES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_PHONE_NUMBERS
@@ -62,6 +64,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_HAPTICS_ENABLED
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HAPTICS_ON_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_DUPLICATE_POSTS_ON_READ
+import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_HEADER_BANNER_IF_NO_BANNER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
@@ -79,6 +82,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_RAIL_GRAVITY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
+import com.idunnololz.summit.util.PreferenceUtils.KEY_OP_TAG_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PERF_DELAY_WHEN_LOADING_DATA
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -95,6 +99,8 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_GESTURE_SIZE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_LIST_VIEW_IMAGE_ON_SINGLE_TAP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFERRED_LOCALE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFER_COMMUNITY_DISPLAY_NAME
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFER_USER_DISPLAY_NAME
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREVIEW_LINKS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_RETAIN_LAST_POST
@@ -964,6 +970,12 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.use_posts_feed_header_desc),
     relatedKeys = listOf(KEY_USE_POSTS_FEED_HEADER),
   )
+  val hideHeaderBannerIfNoBanner = OnOffSettingItem(
+    null,
+    context.getString(R.string.hide_banner_if_no_banner),
+    null,
+    relatedKeys = listOf(KEY_HIDE_HEADER_BANNER_IF_NO_BANNER),
+  )
   val customizePostsInFeedQuickActions = BasicSettingItem(
     null,
     context.getString(R.string.customize_post_in_post_feed_quick_actions),
@@ -1236,6 +1248,17 @@ class PostAndCommentsSettings @Inject constructor(
     context.getString(R.string.show_cross_posts_in_post),
     context.getString(R.string.show_cross_posts_in_post_desc),
     relatedKeys = listOf(KEY_SHOW_CROSS_POSTS_IN_POST),
+  )
+  val opTagStyle = RadioGroupSettingItem(
+    null,
+    context.getString(R.string.op_tag_style),
+    null,
+    mapOf(
+      OpTagStyleIds.MIC to context.getString(R.string.blue_microphone),
+      OpTagStyleIds.TEXT_TAG_1 to context.getString(R.string.blue_op_label),
+      OpTagStyleIds.TEXT_TAG_2 to context.getString(R.string.blue_op_label_alternate_style),
+    ).toOptions(OpTagStyleIds.MIC),
+    relatedKeys = listOf(KEY_OP_TAG_STYLE),
   )
 }
 
@@ -2132,6 +2155,24 @@ class MiscSettings @Inject constructor(
     context.getString(R.string.delay_when_loading_data),
     context.getString(R.string.delay_when_loading_data_desc),
     relatedKeys = listOf(KEY_PERF_DELAY_WHEN_LOADING_DATA),
+  )
+  val preferUserDisplayNames = OnOffSettingItem(
+    null,
+    context.getString(R.string.prefer_user_display_names),
+    context.getString(R.string.prefer_user_display_names_desc),
+    relatedKeys = listOf(KEY_PREFER_USER_DISPLAY_NAME),
+  )
+  val preferCommunityDisplayNames = OnOffSettingItem(
+    null,
+    context.getString(R.string.prefer_community_display_names),
+    null,
+    relatedKeys = listOf(KEY_PREFER_COMMUNITY_DISPLAY_NAME),
+  )
+  val autoFocusSearchBar = OnOffSettingItem(
+    null,
+    context.getString(R.string.auto_focus_search_bar),
+    context.getString(R.string.auto_focus_search_bar_desc),
+    relatedKeys = listOf(KEY_AUTO_FOCUS_SEARCH_BAR),
   )
 }
 

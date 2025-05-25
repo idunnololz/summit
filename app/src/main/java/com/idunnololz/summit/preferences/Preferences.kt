@@ -28,6 +28,7 @@ import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.util.PreferenceUtils.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
+import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_FOCUS_SEARCH_BAR
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_HIDE_UI_ON_PLAY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_IP_ADDRESSES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_AUTO_LINK_PHONE_NUMBERS
@@ -75,6 +76,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_HAPTICS_ON_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_COMMENT_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_DUPLICATE_POSTS_ON_READ
+import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_HEADER_BANNER_IF_NO_BANNER
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
@@ -95,6 +97,7 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_NAV_RAIL_GRAVITY
 import com.idunnololz.summit.util.PreferenceUtils.KEY_NOTIFICATIONS_CHECK_INTERVAL_MS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.util.PreferenceUtils.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
+import com.idunnololz.summit.util.PreferenceUtils.KEY_OP_TAG_STYLE
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PARSE_MARKDOWN_IN_POST_TITLES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PERF_DELAY_WHEN_LOADING_DATA
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POSTS_IN_FEED_QUICK_ACTIONS
@@ -113,6 +116,8 @@ import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_LIST_VIEW_IMAGE_ON_SI
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_QUICK_ACTIONS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_POST_SHOW_UP_AND_DOWN_VOTES
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFERRED_LOCALE
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFER_COMMUNITY_DISPLAY_NAME
+import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFER_USER_DISPLAY_NAME
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREF_VERSION
 import com.idunnololz.summit.util.PreferenceUtils.KEY_PREVIEW_LINKS
@@ -675,6 +680,16 @@ class Preferences(
     by booleanPreference(KEY_LOOP_VIDEO_BY_DEFAULT, false)
   var doNotBlurNsfwContentInNsfwCommunityFeed: Boolean
     by booleanPreference(KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED, false)
+  var preferUserDisplayName: Boolean
+    by booleanPreference(KEY_PREFER_USER_DISPLAY_NAME, false)
+  var preferCommunityDisplayName: Boolean
+    by booleanPreference(KEY_PREFER_COMMUNITY_DISPLAY_NAME, false)
+  var opTagStyle: Int
+    by intPreference(KEY_OP_TAG_STYLE, OpTagStyleIds.MIC)
+  var autoFocusSearchBar: Boolean
+    by booleanPreference(KEY_AUTO_FOCUS_SEARCH_BAR, false)
+  var hideHeaderBannerIfNoBanner
+    by booleanPreference(KEY_HIDE_HEADER_BANNER_IF_NO_BANNER, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

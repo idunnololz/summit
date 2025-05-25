@@ -60,7 +60,20 @@ class LemmySwipeActionCallback(
   var postOnlyGestureSize: Float = 0.5f
   var actions: List<SwipeAction> = listOf()
 
+  private var gestureStartTs = 0L
+  private var startDx = 0f
+  private var dragEventCount = 0
+  private var isDragging = false
+
+  private var gestureInsetLeft = 0
+  private var gestureInsetRight = 0
+
   private val expandDrawable = context.getDrawableCompat(R.drawable.baseline_unfold_more_24)!!
+
+  fun setGestureInsets(left: Int, right: Int) {
+    gestureInsetLeft = left
+    gestureInsetRight = right
+  }
 
   private fun ViewHolder.isSwipeEnabled() =
     this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
@@ -111,6 +124,16 @@ class LemmySwipeActionCallback(
       "Selected action: $currentSwipeAction animateDx: $animateDx animateDy: $animateDy",
     )
 
+    val gestureTimeMs = System.currentTimeMillis() - gestureStartTs
+
+    if (dragEventCount < 3 && gestureTimeMs < 100) {
+      // This is likely an erroneous action
+      this.currentSwipeAction = null
+      this.lastVhSwiped = null
+
+      return super.getAnimationDuration(recyclerView, animationType, animateDx, animateDy)
+    }
+
     val currentSwipeAction = currentSwipeAction
     val lastVhSwiped = lastVhSwiped
 
@@ -141,6 +164,8 @@ class LemmySwipeActionCallback(
     }
 
     if (!viewHolder.isSwipeEnabled()) {
+      isDragging = false
+
       val finalDx = dX / 4
       disabledBackground.setBounds(
         itemView.right + finalDx.toInt(),
@@ -163,6 +188,8 @@ class LemmySwipeActionCallback(
 
     val isCancelled = dX == 0f && !isCurrentlyActive
     if (isCancelled) {
+      isDragging = false
+
       clearCanvas(
         c,
         itemView.right + dX,
@@ -172,6 +199,20 @@ class LemmySwipeActionCallback(
       )
       super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
       return
+    }
+
+    if (!isCurrentlyActive) {
+      if (isDragging) {
+        isDragging = false
+      }
+    } else {
+      if (!isDragging) {
+        startDx = dX
+        dragEventCount = 0
+        isDragging = true
+        gestureStartTs = System.currentTimeMillis()
+      }
+      dragEventCount++
     }
 
     var maxActionW = itemView.width * gestureSize

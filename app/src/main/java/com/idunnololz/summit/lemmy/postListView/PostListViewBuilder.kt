@@ -82,6 +82,7 @@ import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -767,6 +768,14 @@ class PostListViewBuilder @Inject constructor(
           avatarHelper.loadCommunityIcon(iconImageView, postView.community)
           iconImageView.setOnClickListener {
             onPageClick(accountId, postView.community.toCommunityRef())
+          }
+          iconImageView.setOnLongClickListener {
+            onLinkLongClick(
+              accountId,
+              LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+              null,
+            )
+            true
           }
         } else {
           headerContainer.ensureNoIconImageView()

@@ -201,12 +201,6 @@ class SettingsPostsFeedFragment :
           preferences.hideDuplicatePostsOnRead = it
         },
       ),
-      settings.usePostsFeedHeader.asOnOffSwitch(
-        { preferences.usePostsFeedHeader },
-        {
-          preferences.usePostsFeedHeader = it
-        },
-      ),
       settings.customizePostsInFeedQuickActions.asCustomItem {
         val direction = SettingsPostsFeedFragmentDirections
           .actionSettingsContentFragmentToPostsInFeedQuickActionsFragment()
@@ -223,6 +217,24 @@ class SettingsPostsFeedFragment :
         {
           preferences.showPostType = it
         },
+      ),
+
+      SettingModelItem.SubgroupItem(
+        getString(R.string.posts_feed_header),
+        listOf(
+          settings.usePostsFeedHeader.asOnOffSwitch(
+            { preferences.usePostsFeedHeader },
+            {
+              preferences.usePostsFeedHeader = it
+            },
+          ),
+          settings.hideHeaderBannerIfNoBanner.asOnOffSwitch(
+            { preferences.hideHeaderBannerIfNoBanner },
+            {
+              preferences.hideHeaderBannerIfNoBanner = it
+            },
+          ),
+        )
       ),
 
       SettingModelItem.SubgroupItem(

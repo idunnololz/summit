@@ -8,6 +8,8 @@ data class ActivityInsets(
   val rightInset: Int = 0,
   val mainLeftInset: Int = 0,
   val mainRightInset: Int = 0,
+  val gestureRegionLeft: Int = 0,
+  val gestureRegionRight: Int = 0,
   val isStatusBarVisible: Boolean = true,
   val isNavigationBarVisible: Boolean = true,
 )

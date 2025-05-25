@@ -89,6 +89,7 @@ class CommunitiesPaneViewModel @Inject constructor(
     onCommunitySelected: OnCommunitySelected,
     onEditMultiCommunity: (UserCommunityItem) -> Unit,
     onAddBookmarkClick: () -> Unit,
+    onLongClick: (url: String, text: String?) -> Unit,
   ) = communitiesPaneControllerFactory.create(
     this,
     binding,
@@ -96,6 +97,7 @@ class CommunitiesPaneViewModel @Inject constructor(
     onCommunitySelected,
     onEditMultiCommunity,
     onAddBookmarkClick,
+    onLongClick,
   )
 
   fun loadCommunities(force: Boolean) {

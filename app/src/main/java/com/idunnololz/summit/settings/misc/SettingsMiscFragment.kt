@@ -225,6 +225,18 @@ class SettingsMiscFragment :
         { preferences.delayWhenLoadingData },
         { preferences.delayWhenLoadingData = it },
       ),
+      settings.preferUserDisplayNames.asOnOffSwitch(
+        { preferences.preferUserDisplayName },
+        { preferences.preferUserDisplayName = it },
+      ),
+      settings.preferCommunityDisplayNames.asOnOffSwitch(
+        { preferences.preferCommunityDisplayName },
+        { preferences.preferCommunityDisplayName = it },
+      ),
+      settings.autoFocusSearchBar.asOnOffSwitch(
+        { preferences.autoFocusSearchBar },
+        { preferences.autoFocusSearchBar = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

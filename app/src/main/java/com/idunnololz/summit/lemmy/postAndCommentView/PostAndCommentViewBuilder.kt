@@ -387,6 +387,13 @@ class PostAndCommentViewBuilder @Inject constructor(
       iconImageView.setOnClickListener {
         onPageClick(postView.community.toCommunityRef())
       }
+      iconImageView.setOnLongClickListener {
+        onLinkLongClick(
+          LinkUtils.getLinkForCommunity(postView.community.toCommunityRef()),
+          null,
+        )
+        true
+      }
     }
 
     if ((title.getTag(R.id.show_community_icon) as? Boolean) != showCommunityIcon) {
@@ -712,7 +719,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     toggleActionsExpanded: () -> Unit,
     onCommentActionClick: (CommentView, actionId: Int) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
-    onLinkLongClick: (url: String, text: String) -> Unit,
+    onLinkLongClick: (url: String, text: String?) -> Unit,
     onSignInRequired: () -> Unit,
     onInstanceMismatch: (String, String) -> Unit,
     onTextBound: (Spanned?) -> Unit = {},
@@ -808,6 +815,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         avatarHelper.loadAvatar(iconImageView, commentView.creator)
         iconImageView.setOnClickListener {
           onPageClick(commentView.creator.toPersonRef())
+        }
+        iconImageView.setOnLongClickListener {
+          onLinkLongClick(
+            LinkUtils.getLinkForPerson(commentView.creator.toPersonRef()),
+            null,
+          )
+          true
         }
       }
     }

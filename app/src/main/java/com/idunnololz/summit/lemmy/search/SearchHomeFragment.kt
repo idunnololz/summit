@@ -52,21 +52,17 @@ import com.idunnololz.summit.databinding.ItemSearchHomeTrendingCommunitiesBindin
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
-import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchHomeFragment.SearchHomeAdapter.Item
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toUrl
-import com.idunnololz.summit.main.MainFragment
-import com.idunnololz.summit.main.MainFragment.Companion
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.SearchHomeConfig
 import com.idunnololz.summit.preferences.anySectionsEnabled
 import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
 import com.idunnololz.summit.settings.util.HorizontalSpaceItemDecoration
-import com.idunnololz.summit.tabs.isHomeTab
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.GravitySnapHelper
@@ -81,9 +77,6 @@ import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
@@ -122,12 +115,13 @@ class SearchHomeFragment :
   @Inject
   lateinit var preferences: Preferences
 
+  private var onCreateViewCalled = false
   private var adapter: SearchHomeAdapter? = null
 
   private val onNavigationItemReselectedListener =
     NavigationBarView.OnItemReselectedListener a@{
       if (it.itemId == R.id.searchHomeFragment) {
-        viewModel.showSearch.value = true
+        viewModel.showSearch.value = !(viewModel.showSearch.value ?: false)
       }
     }
 
@@ -439,7 +433,13 @@ class SearchHomeFragment :
           }
         }
       }
+
+      if (savedInstanceState == null && preferences.autoFocusSearchBar && !onCreateViewCalled) {
+        viewModel.showSearch.value = true
+      }
     }
+
+    onCreateViewCalled = true
   }
 
   override fun onResume() {
@@ -449,6 +449,13 @@ class SearchHomeFragment :
       onNavigationItemReselectedListener,
     )
     setupForFragment<FilteredPostsAndCommentsTabbedFragment>()
+  }
+
+  override fun onPause() {
+    requireSummitActivity().unregisterOnNavigationItemReselectedListener(
+      onNavigationItemReselectedListener,
+    )
+    super.onPause()
   }
 
   private fun showSearch() {
