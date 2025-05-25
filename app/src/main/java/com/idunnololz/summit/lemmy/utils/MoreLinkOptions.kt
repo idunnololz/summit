@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.utils
 
+import android.util.Log
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.isCommunityBlocked
@@ -21,6 +22,7 @@ import com.idunnololz.summit.util.AdvancedLink
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.UrlUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
@@ -370,7 +372,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   val mainActivity = this as? MainActivity
   val url = advancedLink.url
 
-  val fileName = with(textOrFileName ?: url) {
+  val fileName = with(textOrFileName ?: UrlUtils.getFileName(url, mimeType = mimeType)) {
     val s = substring(lastIndexOf('/') + 1)
     val indexOfDot = s.lastIndexOf('.')
     if (indexOfDot != -1) {

@@ -51,6 +51,7 @@ class FileDownloadHelper @Inject constructor(
         .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(url))
       ?: MimeTypeMap.getSingleton()
         .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(cacheFile?.absolutePath))
+      ?: guessMimeType(cacheFile)
 
     val uriOrFilePath: String
     val outputStream: OutputStream? = if (downloadDirectory != null) {

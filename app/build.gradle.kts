@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 35
-    versionCode = 255
-    versionName = "1.62.0"
+    versionCode = 256
+    versionName = "1.63.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -78,6 +78,10 @@ sentry {
     features.set(
       EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP,
     )
+
+    logcat {
+      enabled.set(false) // Do not log Log.e() to sentry
+    }
   }
 }
 

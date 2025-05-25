@@ -84,6 +84,8 @@ class SearchTabbedFragment :
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
+  private var isOnViewCreatedCalled = false
+
   private val searchViewBackPressedHandler = object : OnBackPressedCallback(true) {
     override fun handleOnBackPressed() {
       viewModel.showSearch.value = false
@@ -150,7 +152,9 @@ class SearchTabbedFragment :
     val personFilter = args.personFilter
     val communityFilter = args.communityFilter
 
-    viewModel.setSortType(args.sortType)
+    if (!isOnViewCreatedCalled && savedInstanceState == null) {
+      viewModel.setSortType(args.sortType)
+    }
     viewModel.setCurrentPersonFilter(personFilter)
     viewModel.setCurrentCommunityFilter(communityFilter)
     viewModel.nextCommunityFilter.value = communityFilter
@@ -411,6 +415,8 @@ class SearchTabbedFragment :
         }
       }
     }
+
+    isOnViewCreatedCalled = true
   }
 
   private fun showMoreOptions() {

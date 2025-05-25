@@ -1,7 +1,9 @@
 package com.idunnololz.summit.lemmy.search
 
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -26,10 +28,13 @@ import kotlinx.parcelize.Parcelize
 class SearchTabbedViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val savedStateHandle: SavedStateHandle,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
   companion object {
     private const val MAX_QUERY_PAGE_LIMIT = 20
+
+    private const val KEY_CURRENT_SORT_TYPE = "currentSortType"
   }
 
   val showSearch = MutableLiveData<Boolean>(true)
@@ -42,7 +47,7 @@ class SearchTabbedViewModel @Inject constructor(
   private var currentType: SearchType = SearchType.All
 
   val currentQueryFlow = MutableStateFlow<String>("")
-  val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
+  val currentSortTypeFlow = savedStateHandle.getStateFlow(KEY_CURRENT_SORT_TYPE, SortType.Active)
   val currentPersonFilter = MutableStateFlow<PersonFilter?>(null)
   val currentCommunityFilter = MutableStateFlow<CommunityFilter?>(null)
   val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
@@ -139,7 +144,7 @@ class SearchTabbedViewModel @Inject constructor(
 
   fun setSortType(type: SortType) {
     viewModelScope.launch {
-      currentSortTypeFlow.value = type
+      savedStateHandle[KEY_CURRENT_SORT_TYPE] = type
     }
   }
 

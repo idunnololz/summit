@@ -405,19 +405,19 @@ class ImageViewerActivity :
     binding.shareButton.setOnClickListener {
       val url = viewModel.url ?: return@setOnClickListener
       createImageOrLinkActionsHandler(
-        url,
-        moreActionsHelper,
-        supportFragmentManager,
-        args.mimeType,
+        url = url,
+        moreActionsHelper = moreActionsHelper,
+        fragmentManager = supportFragmentManager,
+        textOrFileName = args.mimeType,
       )(R.id.share_image)
     }
     binding.downloadButton.setOnClickListener {
       val url = viewModel.url ?: return@setOnClickListener
       createImageOrLinkActionsHandler(
-        url,
-        moreActionsHelper,
-        supportFragmentManager,
-        args.mimeType,
+        url = url,
+        moreActionsHelper = moreActionsHelper,
+        fragmentManager = supportFragmentManager,
+        textOrFileName = args.mimeType,
       )(R.id.download)
     }
     binding.infoButton.setOnClickListener {
