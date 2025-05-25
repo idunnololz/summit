@@ -28,7 +28,6 @@ import com.idunnololz.summit.databinding.SettingItemOnOffMasterBinding
 import com.idunnololz.summit.preferences.PostInFeedQuickActionId
 import com.idunnololz.summit.preferences.PostInFeedQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionId
-import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper

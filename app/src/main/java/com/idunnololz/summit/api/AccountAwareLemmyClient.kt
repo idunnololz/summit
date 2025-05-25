@@ -182,10 +182,9 @@ class AccountAwareLemmyClient @Inject constructor(
   suspend fun fetchPostWithRetry(
     id: Either<PostId, CommentId>,
     force: Boolean,
-  ): Result<GetPostResponse> =
-    retry {
-      apiClient.fetchPost(accountForInstance(), id, force)
-    }
+  ): Result<GetPostResponse> = retry {
+    apiClient.fetchPost(accountForInstance(), id, force)
+  }
 
   suspend fun markPostAsRead(
     postId: PostId,

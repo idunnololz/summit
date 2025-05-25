@@ -592,7 +592,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   }
 
   private enum class Badge {
-    CrossPosted
+    CrossPosted,
   }
 
   private fun ensureBadges(
@@ -628,11 +628,16 @@ class PostAndCommentViewBuilder @Inject constructor(
           val b = PostBadgeCrossPostedBinding.inflate(inflater, vh.badgesView, false)
 
           b.root.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            R.drawable.baseline_content_copy_12, 0, 0, 0)
+            R.drawable.baseline_content_copy_12,
+            0,
+            0,
+            0,
+          )
           b.root.text = context.resources.getQuantityString(
             R.plurals.cross_posted_times,
             crossPosts,
-            PrettyPrintUtils.defaultDecimalFormat.format(crossPosts))
+            PrettyPrintUtils.defaultDecimalFormat.format(crossPosts),
+          )
           b.root.setOnClickListener {
             onCrossPostsClick()
           }

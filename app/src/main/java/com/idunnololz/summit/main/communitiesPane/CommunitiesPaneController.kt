@@ -614,7 +614,7 @@ class CommunitiesPaneController @AssistedInject constructor(
               isSelected = isSelected && tabStateItem == null,
               resetTabOnClick = tabStateItem != null,
               needsDisambiguation =
-                needsDisambiguate.contains(community.getKey()),
+              needsDisambiguate.contains(community.getKey()),
             )
             if (tabStateItem != null) {
               newItems += tabStateItem
@@ -664,7 +664,7 @@ class CommunitiesPaneController @AssistedInject constructor(
                 isSelected = isSelected && tabStateItem == null,
                 resetTabOnClick = tabStateItem != null,
                 needsDisambiguation =
-                  needsDisambiguate.contains(userCommunity.getKey()),
+                needsDisambiguate.contains(userCommunity.getKey()),
               )
             }
 
@@ -708,7 +708,7 @@ class CommunitiesPaneController @AssistedInject constructor(
               isSelected = isSelected && tabStateItem == null,
               resetTabOnClick = tabStateItem != null,
               needsDisambiguation =
-                needsDisambiguate.contains(subscriptionCommunity.getKey()),
+              needsDisambiguate.contains(subscriptionCommunity.getKey()),
             )
             if (tabStateItem != null) {
               newItems += tabStateItem
@@ -750,7 +750,7 @@ class CommunitiesPaneController @AssistedInject constructor(
               isSelected = isSelected && tabStateItem == null,
               resetTabOnClick = tabStateItem != null,
               needsDisambiguation =
-                needsDisambiguate.contains(community.getKey()),
+              needsDisambiguate.contains(community.getKey()),
             )
             if (tabStateItem != null) {
               newItems += tabStateItem

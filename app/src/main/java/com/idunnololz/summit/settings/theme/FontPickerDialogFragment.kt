@@ -74,8 +74,6 @@ class FontPickerDialogFragment :
 
     val context = requireContext()
 
-    ViewPump.init(null)
-
     with(binding) {
       recyclerView.setup(animationsHelper)
       recyclerView.setHasFixedSize(true)

@@ -5,10 +5,9 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 
-fun guessMimeType(file: File?): String? =
-  file?.inputStream()?.use {
-    guessMimeType(it)
-  }
+fun guessMimeType(file: File?): String? = file?.inputStream()?.use {
+  guessMimeType(it)
+}
 
 fun guessMimeType(inputStream: InputStream): String? {
   val bufferedStream = inputStream as? BufferedInputStream
@@ -59,19 +58,19 @@ private fun guessContentTypeFromStream(`is`: InputStream): String? {
   }
   if (c1 == '<'.code) {
     if ((
-        c2 == '!'.code || c2 == 'h'.code && (
-          c3 == 't'.code && c4 == 'm'.code && c5 == 'l'.code ||
-            c3 == 'e'.code && c4 == 'a'.code && c5 == 'd'.code
-          ) || c2 == 'b'.code && c3 == 'o'.code && c4 == 'd'.code && c5 == 'y'.code ||
+      c2 == '!'.code || c2 == 'h'.code && (
+        c3 == 't'.code && c4 == 'm'.code && c5 == 'l'.code ||
+          c3 == 'e'.code && c4 == 'a'.code && c5 == 'd'.code
+        ) || c2 == 'b'.code && c3 == 'o'.code && c4 == 'd'.code && c5 == 'y'.code ||
+        (
           (
-            (
-              c2 == 'H'.code && (
-                c3 == 'T'.code && c4 == 'M'.code && c5 == 'L'.code ||
-                  c3 == 'E'.code && c4 == 'A'.code && c5 == 'D'.code
-                ) || c2 == 'B'.code && c3 == 'O'.code && c4 == 'D'.code && c5 == 'Y'.code
-              )
+            c2 == 'H'.code && (
+              c3 == 'T'.code && c4 == 'M'.code && c5 == 'L'.code ||
+                c3 == 'E'.code && c4 == 'A'.code && c5 == 'D'.code
+              ) || c2 == 'B'.code && c3 == 'O'.code && c4 == 'D'.code && c5 == 'Y'.code
             )
-        )
+          )
+      )
     ) {
       return "text/html"
     }
@@ -168,9 +167,9 @@ private fun guessContentTypeFromStream(`is`: InputStream): String? {
     return "image/jpeg"
   }
   if ((
-      ((c1 == 0x49) && (c2 == 0x49) && (c3 == 0x2a) && (c4 == 0x00)) ||
-        ((c1 == 0x4d) && (c2 == 0x4d) && (c3 == 0x00) && (c4 == 0x2a))
-      )
+    ((c1 == 0x49) && (c2 == 0x49) && (c3 == 0x2a) && (c4 == 0x00)) ||
+      ((c1 == 0x4d) && (c2 == 0x4d) && (c3 == 0x00) && (c4 == 0x2a))
+    )
   ) {
     return "image/tiff"
   }

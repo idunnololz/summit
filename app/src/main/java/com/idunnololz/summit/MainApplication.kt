@@ -52,6 +52,12 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
   companion object {
     private val TAG = MainApplication::class.java.simpleName
+    private var instance: MainApplication? = null
+
+    fun getInstance(): MainApplication =
+      instance ?: synchronized(this) {
+        instance!!
+      }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -62,6 +68,8 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
   }
 
   override fun onCreate() {
+    instance = this
+
     super.onCreate()
 
 //        if (BuildConfig.DEBUG) {

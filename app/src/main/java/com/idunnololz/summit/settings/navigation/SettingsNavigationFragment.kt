@@ -95,9 +95,9 @@ class SettingsNavigationFragment :
           settings.navRailGravity.asSingleChoiceSelectorItem(
             { preferences.navRailGravity },
             { preferences.navRailGravity = it },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
   }
 }

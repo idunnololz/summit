@@ -128,7 +128,7 @@ class SettingsPostAndCommentsFragment :
           ),
           settings.opTagStyle.asSingleChoiceSelectorItem(
             { preferences.opTagStyle },
-            { preferences.opTagStyle = it }
+            { preferences.opTagStyle = it },
           ),
           settings.customizeCommentQuickActions.asCustomItem {
             val directions = SettingsPostAndCommentsFragmentDirections

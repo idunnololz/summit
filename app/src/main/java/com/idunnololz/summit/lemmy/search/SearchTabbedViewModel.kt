@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.search
 
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

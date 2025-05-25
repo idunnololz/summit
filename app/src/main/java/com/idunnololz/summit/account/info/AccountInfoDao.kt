@@ -14,7 +14,6 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.idunnololz.summit.api.dto.Community
 import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.CommunityModeratorView
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SortType

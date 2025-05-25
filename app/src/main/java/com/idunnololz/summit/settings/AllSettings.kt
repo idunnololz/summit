@@ -2718,7 +2718,7 @@ class VideoPlayerSettings @Inject constructor(
     null,
     context.getString(R.string.loop_videos_by_default),
     null,
-    relatedKeys = listOf(KEY_LOOP_VIDEO_BY_DEFAULT)
+    relatedKeys = listOf(KEY_LOOP_VIDEO_BY_DEFAULT),
   )
 
   override val parents: List<KClass<out SearchableSettings>> = listOf(

@@ -241,13 +241,13 @@ class SettingsAdapter(
     },
     areContentsTheSame = { oldItem, newItem ->
       when (oldItem) {
-            Item.HeaderItem -> true
-            Item.FooterItem -> true
-            is Item.DividerItem -> true
-            is Item.GroupItem -> true
-            else -> {
-              oldItem == newItem
-            }
+        Item.HeaderItem -> true
+        Item.FooterItem -> true
+        is Item.DividerItem -> true
+        is Item.GroupItem -> true
+        else -> {
+          oldItem == newItem
+        }
       }
     },
   ).apply {
@@ -788,13 +788,12 @@ class SettingsAdapter(
     adapterHelper.setItems(newItems, this)
   }
 
-  fun findIndex(settingName: String) =
-    adapterHelper.items.indexOfFirst {
-      it !is Item.DividerItem &&
-        it !is Item.FooterItem &&
-        it !is Item.HeaderItem &&
-        it.setting.title == settingName
-    }
+  fun findIndex(settingName: String) = adapterHelper.items.indexOfFirst {
+    it !is Item.DividerItem &&
+      it !is Item.FooterItem &&
+      it !is Item.HeaderItem &&
+      it.setting.title == settingName
+  }
 
   fun highlight(settingName: String) {
     val index = findIndex(settingName)
@@ -802,11 +801,7 @@ class SettingsAdapter(
     notifyItemChanged(index)
   }
 
-  private fun highlightItem(
-    isHighlighted: Boolean,
-    highlightForever: Boolean,
-    bg: View,
-  ) {
+  private fun highlightItem(isHighlighted: Boolean, highlightForever: Boolean, bg: View) {
     if (highlightForever) {
       bg.visibility = View.VISIBLE
       bg.clearAnimation()
@@ -828,7 +823,6 @@ class SettingsAdapter(
 
         override fun onAnimationRepeat(animation: Animation?) {
         }
-
       })
 
       bg.startAnimation(animation)

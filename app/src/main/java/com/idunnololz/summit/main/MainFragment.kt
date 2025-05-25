@@ -307,7 +307,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
       },
       onLongClick = { url, text ->
         getMainActivity()?.showMoreLinkOptions(url, text)
-      }
+      },
     )
 
     changeCommunity(requireNotNull(tabsManager.currentTab.value))
@@ -446,8 +446,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     panelsChildGestureRegionObserver.addGestureRegionsUpdateListener(this)
   }
 
-  fun isPaneOpen() =
-    binding.root.startPanelState == PanelState.Opened
+  fun isPaneOpen() = binding.root.startPanelState == PanelState.Opened
 
   override fun onPause() {
     panelsChildGestureRegionObserver.removeGestureRegionsUpdateListener(this)

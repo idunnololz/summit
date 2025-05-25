@@ -1016,16 +1016,15 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
   }
 }
 
-private fun CommunityRef.getMultiCommunityName(context: Context) =
-  when (this) {
-    is CommunityRef.All -> TODO()
-    is CommunityRef.CommunityRefByName -> TODO()
-    is CommunityRef.Local -> TODO()
-    is CommunityRef.ModeratedCommunities ->
-      context.getString(R.string.moderated_communities)
-    is CommunityRef.MultiCommunity -> TODO()
-    is CommunityRef.Subscribed ->
-      context.getString(R.string.subscribed_communities)
-    is CommunityRef.AllSubscribed ->
-      context.getString(R.string.all_subscribed)
-  }
+private fun CommunityRef.getMultiCommunityName(context: Context) = when (this) {
+  is CommunityRef.All -> TODO()
+  is CommunityRef.CommunityRefByName -> TODO()
+  is CommunityRef.Local -> TODO()
+  is CommunityRef.ModeratedCommunities ->
+    context.getString(R.string.moderated_communities)
+  is CommunityRef.MultiCommunity -> TODO()
+  is CommunityRef.Subscribed ->
+    context.getString(R.string.subscribed_communities)
+  is CommunityRef.AllSubscribed ->
+    context.getString(R.string.all_subscribed)
+}

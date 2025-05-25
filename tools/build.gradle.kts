@@ -13,11 +13,11 @@ kotlin {
 }
 
 dependencies {
-  implementation("com.patreon:patreon:0.4.2")
+  implementation(libs.tools.patreon)
 }
 
 tasks.register<JavaExec>("patreon") {
   workingDir = project.rootProject.projectDir
-  mainClass.set("com.example.tools.UpdatePatreonMembers")
+  mainClass.set("com.idunnololz.tools.UpdatePatreonMembers")
   classpath = sourceSets.main.get().runtimeClasspath
 }

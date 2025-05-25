@@ -252,7 +252,7 @@ class LemmyTextHelper @Inject constructor(
         if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
           matcher.appendReplacement(
             sb,
-            "$characterBeforeSpoilerEndTag\n$spoilerEndTag"
+            "$characterBeforeSpoilerEndTag\n$spoilerEndTag",
           )
           continue
         }

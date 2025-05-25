@@ -1,4 +1,4 @@
-package com.example.tools
+package com.idunnololz.tools
 
 import com.patreon.PatreonAPI
 import java.io.File

@@ -510,7 +510,7 @@ class BottomMenu(
     ) : MenuIcon
     data class CommunityIcon(
       val communityRef: CommunityRef,
-      val url: String?
+      val url: String?,
     ) : MenuIcon
   }
 }

@@ -276,8 +276,9 @@ class NavBarController(
     // To easily debug what is messing with the nav bar, add an exception to this log statement.
     Log.d(
       TAG,
-      "animateNavBar() p${percentShown} diff${abs(currentPercentShown - percentShown)}",
-      RuntimeException())
+      "animateNavBar() p$percentShown diff${abs(currentPercentShown - percentShown)}",
+      RuntimeException(),
+    )
 
     val navigationBarOffset =
       if (useNavigationRail) {
@@ -646,10 +647,15 @@ class NavBarController(
   }
 
   private fun NavController.backQueueInternal(): ArrayDeque<NavBackStackEntry> {
-    return NavController::class.java.getDeclaredField("backQueue").let { field ->
+    val impl = NavController::class.java.getDeclaredField("impl").let { field ->
+      field.isAccessible = true
+      field.get(this@backQueueInternal)
+    }
+
+    return impl::class.java.getDeclaredField("backQueue").let { field ->
       field.isAccessible = true
       @Suppress("UNCHECKED_CAST")
-      field.get(this@backQueueInternal) as ArrayDeque<NavBackStackEntry>
+      field.get(impl) as ArrayDeque<NavBackStackEntry>
     }
   }
 

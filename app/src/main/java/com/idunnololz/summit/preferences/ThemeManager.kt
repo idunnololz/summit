@@ -47,6 +47,7 @@ class ThemeManager @Inject constructor(
   val useMaterialYou = MutableStateFlow<Boolean>(preferences.isUseMaterialYou)
   val themeOverlayChanged = MutableSharedFlow<Unit>()
   val useCustomFont = MutableStateFlow<Boolean>(preferences.globalFont != 0)
+  var viewPump: ViewPump? = null
 
   var isLightTheme =
     when (preferences.baseTheme) {
@@ -108,20 +109,16 @@ class ThemeManager @Inject constructor(
 
   private fun applyThemeFromPreferences(currentConfig: ThemeOverlayConfig) {
     val fontAsset = currentConfig.globalFont.toFontAsset()
-    fontAsset?.let {
-      ViewPump.init(
-        ViewPump.builder()
-          .addInterceptor(
-            CalligraphyInterceptor(
-              CalligraphyConfig.Builder()
-                .setDefaultFontPath(it)
-                .build(),
-            ),
-          )
-          .build(),
-      )
-    } ?: run {
-      ViewPump.init(null)
+    viewPump = fontAsset?.let {
+      ViewPump.builder()
+        .addInterceptor(
+          CalligraphyInterceptor(
+            CalligraphyConfig.Builder()
+              .setDefaultFontPath(it)
+              .build(),
+          ),
+        )
+        .build()
     }
 
     val themeValue = when (currentConfig.baseTheme) {

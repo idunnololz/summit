@@ -2,7 +2,6 @@ package com.idunnololz.summit.offline
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.os.Looper
 import android.util.Log
 import android.view.View

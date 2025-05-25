@@ -303,7 +303,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
             postView.creator.display_name ?: postView.creator.name
           } else {
             postView.creator.name
-          }
+          },
         ),
         url = LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
       )
@@ -541,7 +541,10 @@ class LemmyHeaderHelper @AssistedInject constructor(
             sb.append("OP")
             val e = sb.length
             sb.setSpan(
-              RoundedBackgroundSpan(backgroundColor = context.getColorCompat(R.color.style_blue), textColor = whiteTextColor),
+              RoundedBackgroundSpan(
+                backgroundColor = context.getColorCompat(R.color.style_blue),
+                textColor = whiteTextColor,
+              ),
               s,
               e,
               Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,

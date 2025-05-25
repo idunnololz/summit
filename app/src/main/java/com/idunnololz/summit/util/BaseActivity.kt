@@ -9,8 +9,10 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.idunnololz.summit.MainApplication
+import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
+import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -26,10 +28,9 @@ abstract class BaseActivity : AppCompatActivity() {
   var isMaterialYou = false
 
   override fun attachBaseContext(base: Context) {
-    if (PreferenceUtils.usingCustomFont) {
-      super.attachBaseContext(
-        ViewPumpContextWrapper.wrap(base),
-      )
+    val viewPump = MainApplication.getInstance().themeManager.viewPump
+    if (viewPump != null) {
+      super.attachBaseContext(ViewPumpContextWrapper.wrap(base, viewPump))
     } else {
       super.attachBaseContext(base)
     }

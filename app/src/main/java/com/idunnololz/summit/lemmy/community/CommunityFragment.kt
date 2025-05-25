@@ -7,10 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -112,7 +110,6 @@ import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -812,12 +809,11 @@ class CommunityFragment :
     viewModel.updatePost(postId, accountId)
   }
 
-  fun navBarPercentShown(): Float =
-    if (viewModel.lockBottomBar) {
-      1f
-    } else {
-      communityAppBarController?.percentShown?.value ?: 1f
-    }
+  fun navBarPercentShown(): Float = if (viewModel.lockBottomBar) {
+    1f
+  } else {
+    communityAppBarController?.percentShown?.value ?: 1f
+  }
 
   private fun onReady() {
     if (!isBindingAvailable()) return

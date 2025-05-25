@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.utils
 
-import android.util.Log
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.isCommunityBlocked

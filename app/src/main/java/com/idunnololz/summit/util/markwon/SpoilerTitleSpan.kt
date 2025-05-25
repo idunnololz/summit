@@ -64,7 +64,12 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
           if (start + 4 >= this.length) {
             append(" ")
           }
-          setSpan(DetailsEndSpan(), start, start + 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY)
+          setSpan(
+            DetailsEndSpan(),
+            start,
+            start + 4,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
+          )
         }
       }
     }

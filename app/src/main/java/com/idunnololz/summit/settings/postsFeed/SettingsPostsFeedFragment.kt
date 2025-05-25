@@ -234,7 +234,7 @@ class SettingsPostsFeedFragment :
               preferences.hideHeaderBannerIfNoBanner = it
             },
           ),
-        )
+        ),
       ),
 
       SettingModelItem.SubgroupItem(
@@ -288,7 +288,7 @@ class SettingsPostsFeedFragment :
                     getString(R.string.url_filters),
                   )
                 findNavController().navigateSafe(direction)
-              }
+              },
             )
           },
 

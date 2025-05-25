@@ -55,7 +55,6 @@ import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
-import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
@@ -543,30 +542,32 @@ class PostFragment :
                 crossPosts.withIndex().forEach { (index, crossPost) ->
                   idToChoice[index] = crossPost
 
-                  addRawItem(BottomMenu.MenuItem.ActionItem(
-                    id = index,
-                    title = crossPost.community.toCommunityRef().fullName,
-                    description = buildString {
-                      append(
-                        context.resources.getQuantityString(
-                          R.plurals.point_count_format,
-                          crossPost.counts.score,
-                          PrettyPrintUtils.defaultDecimalFormat.format(crossPost.counts.score),
+                  addRawItem(
+                    BottomMenu.MenuItem.ActionItem(
+                      id = index,
+                      title = crossPost.community.toCommunityRef().fullName,
+                      description = buildString {
+                        append(
+                          context.resources.getQuantityString(
+                            R.plurals.point_count_format,
+                            crossPost.counts.score,
+                            PrettyPrintUtils.defaultDecimalFormat.format(crossPost.counts.score),
+                          ),
                         )
-                      )
-                      append(", ")
-                      append(
-                        context.resources.getQuantityString(
-                          R.plurals.comments_format,
-                          crossPost.counts.comments,
-                          PrettyPrintUtils.defaultDecimalFormat.format(crossPost.counts.comments),
+                        append(", ")
+                        append(
+                          context.resources.getQuantityString(
+                            R.plurals.comments_format,
+                            crossPost.counts.comments,
+                            PrettyPrintUtils.defaultDecimalFormat.format(crossPost.counts.comments),
+                          ),
                         )
-                      )
-                    },
-                    icon = BottomMenu.MenuIcon.CommunityIcon(
-                      crossPost.community.toCommunityRef(), crossPost.community.icon,
-                    )
-                  ))
+                      },
+                      icon = BottomMenu.MenuIcon.CommunityIcon(
+                        crossPost.community.toCommunityRef(), crossPost.community.icon,
+                      ),
+                    ),
+                  )
                 }
 
                 setOnMenuItemClickListener {
