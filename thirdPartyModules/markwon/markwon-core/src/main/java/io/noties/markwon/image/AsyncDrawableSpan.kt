@@ -12,6 +12,7 @@ import io.noties.markwon.core.spans.TextViewSpan
 import io.noties.markwon.tables.TableDrawableSpan
 import io.noties.markwon.utils.SpanUtils
 import kotlin.math.max
+import kotlin.math.min
 
 // @since 4.2.1 we do not set intrinsic bounds
 //  at this point they will always be 0,0-1,1, but this
@@ -91,10 +92,18 @@ class AsyncDrawableSpan(
 
     canvasSize = canvasWidth
 
-    drawable.initWithKnownDimensions(
-      max(canvasWidth - x.toInt(), minWidth),
-      paint.textSize,
-    )
+    if (canvasWidth - x.toInt() < minWidth) {
+      // Just take the entire column...
+      drawable.initWithKnownDimensions(
+        max(canvasWidth, minWidth),
+        paint.textSize,
+      )
+    } else {
+      drawable.initWithKnownDimensions(
+        max(canvasWidth - x.toInt(), minWidth),
+        paint.textSize,
+      )
+    }
 
     val drawable = this.drawable
 
