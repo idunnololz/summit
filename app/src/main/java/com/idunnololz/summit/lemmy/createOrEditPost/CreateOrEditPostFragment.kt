@@ -959,9 +959,6 @@ class CreateOrEditPostFragment :
   }
 
   private fun Post.getCrossPostContent(): String = buildString {
-    appendLine(getString(R.string.cross_posted_from_format, ap_id))
-    appendLine()
-
     body ?: return@buildString
 
     body.split("\n").forEach {

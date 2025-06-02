@@ -115,7 +115,7 @@ dependencies {
   implementation(libs.ksoup)
   implementation(libs.swiperefreshlayout)
   implementation(libs.transition.ktx)
-  implementation(libs.kotlinx.coroutine.android)
+  implementation(libs.kotlinx.coroutines.android)
   implementation(libs.disklrucache)
   implementation(libs.slidingpanelayout)
 

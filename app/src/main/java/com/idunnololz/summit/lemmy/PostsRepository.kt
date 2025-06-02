@@ -20,6 +20,7 @@ import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
+import com.idunnololz.summit.preferences.DisplayDeletedPostIds
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.assisted.Assisted
@@ -513,6 +514,11 @@ class PostsRepository @AssistedInject constructor(
           consecutiveFilteredPostsByFilter++
           continue
         }
+      }
+      if (preferences.displayDeletedPosts != DisplayDeletedPostIds.ALWAYS_SHOW_DELETED_POSTS &&
+        post.post.deleted) {
+
+        continue
       }
 
       consecutiveFilteredPostsByFilter = 0

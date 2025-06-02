@@ -256,7 +256,8 @@ class MainActivity : SummitActivity() {
       navBarController.navBar.getOrCreateBadge(R.id.inboxTabbedFragment).apply {
         val allUnreads =
           unreadCount.totalUnreadCount +
-            unreadCount.totalUnresolvedReportsCount
+            unreadCount.totalUnresolvedReportsCount +
+            unreadCount.totalUnreadApplicationsCount
 
         if (allUnreads > 0) {
           isVisible = true

@@ -1010,9 +1010,9 @@ class PostListViewBuilder @Inject constructor(
             return
           }
 
-          val isUrlMp4 = ContentUtils.isUrlMp4(imageUrl)
+          val urlVideo = ContentUtils.isUrlVideo(imageUrl)
 
-          if (!ContentUtils.isUrlImage(imageUrl) && !isUrlMp4) {
+          if (!ContentUtils.isUrlImage(imageUrl) && !urlVideo) {
             imageView.visibility = View.GONE
             return
           }
@@ -1057,7 +1057,7 @@ class PostListViewBuilder @Inject constructor(
           loadImage()
 
           fun showImageOrVideo() {
-            if (isUrlMp4) {
+            if (urlVideo) {
               onVideoClick(imageUrl, VideoType.Mp4, null)
             } else {
               onImageClick(accountId, postView, imageView, imageUrl)

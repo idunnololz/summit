@@ -12,4 +12,5 @@ enum class PageType : Parcelable {
   Messages,
   Reports,
   Conversation,
+  Applications,
 }

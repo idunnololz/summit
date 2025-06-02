@@ -12,7 +12,7 @@ import com.idunnololz.summit.settings.importAndExport.Diff
 import com.idunnololz.summit.settings.importAndExport.DiffType
 import com.idunnololz.summit.settings.importAndExport.SettingsDataPreview
 import com.idunnololz.summit.util.PiiDetector
-import com.idunnololz.summit.util.PreferenceUtils.PREFERENCE_VERSION_CODE
+import com.idunnololz.summit.preferences.PreferenceKeys.PREFERENCE_VERSION_CODE
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.asJson

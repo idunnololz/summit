@@ -392,6 +392,7 @@ class SearchHomeFragment :
               is Item.HotCommunitiesItem -> spanCount
               is Item.TrendingCommunitiesItem -> spanCount
               Item.EmptyNoSectionsEnabledItem -> spanCount
+              is Item.RandomCommunitiesItem -> spanCount
             }
           }
         }
@@ -601,6 +602,11 @@ class SearchHomeFragment :
         val hotCommunities: List<TrendingCommunityData>,
         val isLoading: Boolean,
       ) : Item
+
+      data class RandomCommunitiesItem(
+        val randomCommunities: List<TrendingCommunityData>,
+        val isLoading: Boolean,
+      ) : Item
     }
 
     class RecyclerViewSectionData(
@@ -620,6 +626,7 @@ class SearchHomeFragment :
     private val topCommunitiesSectionData = newRecyclerViewSection("top")
     private val trendingCommunitiesSectionData = newRecyclerViewSection("trending")
     private val hotCommunitiesSectionData = newRecyclerViewSection("hot")
+    private val randomCommunitiesSectionData = newRecyclerViewSection("random")
 
     private val sections = listOf(
       topCommunitiesSectionData,
@@ -641,6 +648,7 @@ class SearchHomeFragment :
           is Item.TrendingCommunitiesItem -> true
           is Item.TopCommunitiesItem -> true
           Item.EmptyNoSectionsEnabledItem -> true
+          is Item.RandomCommunitiesItem -> true
         }
       },
     ).apply {
@@ -810,6 +818,41 @@ class SearchHomeFragment :
           b.recyclerView.visibility = View.VISIBLE
         }
       }
+      addItemType(
+        clazz = Item.RandomCommunitiesItem::class,
+        inflateFn = ItemSearchHomeTrendingCommunitiesBinding::inflate,
+        onViewCreated = { b ->
+          val sectionData = randomCommunitiesSectionData
+          b.recyclerView.layoutManager = LinearLayoutManager(
+            context, LinearLayoutManager.HORIZONTAL, false,
+          ).apply {
+            onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
+          }.also {
+            sectionData.layoutManager = it
+          }
+          b.recyclerView.adapter = sectionData.adapter
+          b.recyclerView.addItemDecoration(
+            HorizontalSpaceItemDecoration(
+              context.resources.getDimensionPixelSize(R.dimen.padding_half),
+              context.resources.getDimensionPixelSize(R.dimen.padding),
+            ),
+          )
+
+          GravitySnapHelper(Gravity.START)
+            .apply {
+              this.snapPadding = -Utils.convertDpToPixel(16f).toInt()
+            }
+            .attachToRecyclerView(b.recyclerView)
+        },
+      ) { item, b, _ ->
+        if (item.isLoading) {
+          b.progressBar.visibility = View.VISIBLE
+          b.recyclerView.visibility = View.GONE
+        } else {
+          b.progressBar.visibility = View.GONE
+          b.recyclerView.visibility = View.VISIBLE
+        }
+      }
     }
 
     override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
@@ -923,6 +966,26 @@ class SearchHomeFragment :
             .setData(communitySuggestions.hot)
           sectionIndex++
         }
+
+        if (communitySuggestions.randomCommunities.isNotEmpty() &&
+          searchHomeConfig.showRandomCommunitySuggestions
+        ) {
+          newItems.add(
+            Item.TitleItem(
+              title = context.getString(R.string.random_communities),
+              showSettingsButton = sectionIndex == 0,
+            ),
+          )
+          newItems.add(
+            Item.RandomCommunitiesItem(
+              communitySuggestions.randomCommunities,
+              isLoading = false,
+            ),
+          )
+          randomCommunitiesSectionData.adapter
+            .setData(communitySuggestions.randomCommunities)
+          sectionIndex++
+        }
       } else if (model.isCommunitySuggestionsLoading) {
         if (searchHomeConfig.showTopCommunity7DaysSuggestions) {
           newItems.add(
@@ -963,6 +1026,21 @@ class SearchHomeFragment :
           )
           newItems.add(
             Item.HotCommunitiesItem(
+              listOf(),
+              isLoading = true,
+            ),
+          )
+          sectionIndex++
+        }
+        if (searchHomeConfig.showRandomCommunitySuggestions) {
+          newItems.add(
+            Item.TitleItem(
+              title = context.getString(R.string.random_communities),
+              showSettingsButton = sectionIndex == 0,
+            ),
+          )
+          newItems.add(
+            Item.RandomCommunitiesItem(
               listOf(),
               isLoading = true,
             ),

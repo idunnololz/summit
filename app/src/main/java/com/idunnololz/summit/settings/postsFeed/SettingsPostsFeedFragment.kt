@@ -14,6 +14,7 @@ import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
+import com.idunnololz.summit.preferences.DisplayDeletedPostIds
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.PostsFeedSettings
 import com.idunnololz.summit.settings.PreferencesViewModel
@@ -218,7 +219,16 @@ class SettingsPostsFeedFragment :
           preferences.showPostType = it
         },
       ),
-
+      settings.displayDeletedPosts.asOnOffSwitch(
+        { preferences.displayDeletedPosts == DisplayDeletedPostIds.ALWAYS_SHOW_DELETED_POSTS },
+        {
+          if (it) {
+            preferences.displayDeletedPosts = DisplayDeletedPostIds.ALWAYS_SHOW_DELETED_POSTS
+          } else {
+            preferences.displayDeletedPosts = DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
+          }
+        },
+      ),
       SettingModelItem.SubgroupItem(
         getString(R.string.posts_feed_header),
         listOf(

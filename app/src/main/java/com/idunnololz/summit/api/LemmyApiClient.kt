@@ -65,6 +65,8 @@ import com.idunnololz.summit.api.dto.GetSite
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCount
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
+import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.InstanceId
 import com.idunnololz.summit.api.dto.ListCommentReports
@@ -74,6 +76,8 @@ import com.idunnololz.summit.api.dto.ListPostReports
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
+import com.idunnololz.summit.api.dto.ListRegistrationApplications
+import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
@@ -1874,6 +1878,52 @@ class LemmyApiClient @Inject constructor(
         api.getModLogsNoCache(authorization = account?.bearer, form.serializeToMap())
       } else {
         api.getModLogs(authorization = account?.bearer, form.serializeToMap())
+      }
+    }.fold(
+      onSuccess = { Result.success(it) },
+      onFailure = { Result.failure(it) },
+    )
+  }
+
+  suspend fun getUnreadRegistrationApplicationsCount(
+    account: Account,
+    force: Boolean,
+  ): Result<GetUnreadRegistrationApplicationCountResponse> {
+    val form = GetUnreadRegistrationApplicationCount(
+      auth = account.jwt,
+    )
+
+    return retrofitErrorHandler {
+      if (force) {
+        api.getRegistrationApplicationsCountNoCache(authorization = account.bearer, form.serializeToMap())
+      } else {
+        api.getRegistrationApplicationsCount(authorization = account.bearer, form.serializeToMap())
+      }
+    }.fold(
+      onSuccess = { Result.success(it) },
+      onFailure = { Result.failure(it) },
+    )
+  }
+
+  suspend fun getRegistrationApplications(
+    page: Int? = null,
+    limit: Int? = null,
+    unreadOnly: Boolean? = null,
+    account: Account,
+    force: Boolean,
+  ): Result<ListRegistrationApplicationsResponse> {
+    val form = ListRegistrationApplications(
+      page = page,
+      limit = limit,
+      unread_only = unreadOnly,
+      auth = account.jwt,
+    )
+
+    return retrofitErrorHandler {
+      if (force) {
+        api.listRegistrationApplicationsNoCache(authorization = account.bearer, form.serializeToMap())
+      } else {
+        api.listRegistrationApplications(authorization = account.bearer, form.serializeToMap())
       }
     }.fold(
       onSuccess = { Result.success(it) },

@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.canhub.cropper.CropImageContract
 import com.github.drjacky.imagepicker.constant.ImageProvider
 import com.github.drjacky.imagepicker.provider.CameraProvider
 import com.github.drjacky.imagepicker.provider.CompressionProvider
@@ -58,9 +59,29 @@ class ImagePickerActivity : AppCompatActivity() {
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
       mCameraProvider?.handleResult(it)
     }
+//  private val cropLauncher =
+//    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+//      mCropProvider.handleResult(it)
+//    }
   private val cropLauncher =
-    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-      mCropProvider.handleResult(it)
+    registerForActivityResult(CropImageContract()) { result ->
+      if (result.isSuccessful) {
+        // Use the cropped image URI.
+        val croppedImageUri = result.uriContent
+        val croppedImageFilePath = result.getUriFilePath(this) // optional usage
+        // Process the cropped image URI as needed.
+
+        if (croppedImageUri != null) {
+          setResult(croppedImageUri)
+        } else {
+          setResultCancel()
+        }
+      } else {
+        // An error occurred.
+        val exception = result.error
+        // Handle the error.
+        setResultCancel()
+      }
     }
 
   /** Uri provided by GalleryProvider or CameraProvider */
@@ -104,7 +125,7 @@ class ImagePickerActivity : AppCompatActivity() {
    */
   private fun loadBundle(savedInstanceState: Bundle?) {
     // Create Crop Provider
-    mCropProvider = CropProvider(this) { cropLauncher.launch(it) }
+    mCropProvider = CropProvider(this, cropLauncher)
     mCropProvider.onRestoreInstanceState(savedInstanceState)
 
     // Create Compression Provider

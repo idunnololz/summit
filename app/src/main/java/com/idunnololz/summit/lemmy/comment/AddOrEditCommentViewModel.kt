@@ -125,6 +125,7 @@ class AddOrEditCommentViewModel @Inject constructor(
           is InboxItem.ReportMessageInboxItem,
           is InboxItem.ReportCommentInboxItem,
           is InboxItem.ReportPostInboxItem,
+          is InboxItem.RegistrationApplicationInboxItem
           -> error("Should never happen!")
           is InboxItem.MessageInboxItem -> {
             lemmyApiClient

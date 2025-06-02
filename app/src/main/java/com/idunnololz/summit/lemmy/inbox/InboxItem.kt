@@ -8,8 +8,10 @@ import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostReportView
 import com.idunnololz.summit.api.dto.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.RegistrationApplicationView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -44,6 +46,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
   val isDeleted: Boolean
   val isRemoved: Boolean
   val isRead: Boolean
+  val canMarkAsRead: Boolean
 
   @Serializable
   @SerialName("1")
@@ -95,6 +98,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override fun toString(): String = "ReplyInboxItem { content = $content }"
 
     override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = true
   }
 
   @Serializable
@@ -147,6 +153,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override fun toString(): String = "MentionInboxItem { content = $content }"
 
     override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = true
   }
 
   @Serializable
@@ -198,6 +207,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override fun toString(): String = "MessageInboxItem { content = $content }"
 
     override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = true
   }
 
   @Serializable
@@ -241,6 +253,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override fun toString(): String = "ReportInboxItem { content = $content }"
 
     override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = true
   }
 
   @Serializable
@@ -285,6 +300,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override fun toString(): String = "ReplyInboxItem { content = $content }"
 
     override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = true
   }
 
   @Serializable
@@ -334,6 +352,53 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override fun toString(): String = "ReplyInboxItem { content = $content }"
 
     override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = true
+  }
+
+  @Serializable
+  @SerialName("7")
+  @Parcelize
+  data class RegistrationApplicationInboxItem(
+    override val id: Int,
+    override val authorId: PersonId,
+    override val authorName: String,
+    override val authorInstance: String,
+    override val authorAvatar: String?,
+    override val title: String,
+    override val content: String,
+    override val lastUpdate: String,
+    override val lastUpdateTs: Long,
+    override val score: Int?,
+    override val isDeleted: Boolean,
+    override val isRemoved: Boolean,
+    override val isRead: Boolean,
+  ) : InboxItem {
+
+    constructor(application: RegistrationApplicationView) : this(
+      id = application.registration_application.id,
+
+      authorId = application.creator.id,
+      authorName = application.creator.name,
+      authorInstance = application.creator.instance,
+      authorAvatar = application.creator.avatar,
+      title = "",
+      content = application.registration_application.answer,
+      lastUpdate = application.registration_application.published,
+      lastUpdateTs = dateStringToTs(application.registration_application.published),
+      score = 0,
+      isDeleted = false,
+      isRemoved = false,
+      isRead = application.registration_application.deny_reason != null,
+    )
+
+    override fun toString(): String = "RegistrationApplicationInboxItem { content = $content }"
+
+    override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = false)
+
+    @IgnoredOnParcel
+    override val canMarkAsRead: Boolean = false
   }
 
   val commentId: Int?
@@ -344,6 +409,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       is ReportMessageInboxItem -> null
       is ReportCommentInboxItem -> null
       is ReportPostInboxItem -> null
+      is RegistrationApplicationInboxItem -> null
     }
 }
 

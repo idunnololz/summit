@@ -184,6 +184,9 @@ class AccountInfoManager @Inject constructor(
               lastUpdateTimeMs = System.currentTimeMillis(),
               account = account,
               totalUnreadCount = it.mentions + it.private_messages + it.replies,
+              mentions = it.mentions,
+              privateMessages = it.private_messages,
+              replies = it.replies,
             ),
           )
         }
@@ -205,9 +208,24 @@ class AccountInfoManager @Inject constructor(
           }
       }
     }
+    val j3 = coroutineScope.launch {
+      if (fullAccount.isAdmin()) {
+        accountAwareLemmyClient.getUnreadRegistrationApplicationsCount(force = true, account)
+          .onSuccess {
+            unreadCount.emit(
+              unreadCount.value.copy(
+                lastUpdateTimeMs = System.currentTimeMillis(),
+                account = account,
+                totalUnreadApplicationsCount = it.registration_applications,
+              ),
+            )
+          }
+      }
+    }
 
     j1.join()
     j2.join()
+    j3.join()
   }
 
   private suspend fun refreshAccountInfo(
@@ -272,7 +290,11 @@ class AccountInfoManager @Inject constructor(
     val lastUpdateTimeMs: Long = 0,
     val account: Account? = null,
     val totalUnreadCount: Int = 0,
+    val mentions: Int = 0,
+    val privateMessages: Int = 0,
+    val replies: Int = 0,
     val totalUnresolvedReportsCount: Int = 0,
+    val totalUnreadApplicationsCount: Int = 0,
   )
 
 //    private class AccountInfo(

@@ -529,6 +529,7 @@ fun PageType.getName(context: Context) = when (this) {
   PageType.Messages -> context.getString(R.string.messages)
   PageType.Reports -> context.getString(R.string.reports)
   PageType.Conversation -> context.getString(R.string.messages)
+  PageType.Applications -> context.getString(R.string.registration_applications)
 }
 
 data class InboxUpdate(

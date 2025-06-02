@@ -1,4 +1,4 @@
-package com.idunnololz.summit.lemmy.inbox
+package com.idunnololz.summit.lemmy.inbox.message
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

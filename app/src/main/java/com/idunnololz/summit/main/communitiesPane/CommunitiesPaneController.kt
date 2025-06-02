@@ -238,11 +238,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         inflateFn = HomeCommunityItemBinding::inflate,
       ) { item, b, _ ->
         b.title.text = context.getString(R.string.home) + " (${item.communityRef.getLocalizedFullName(context)})"
-        b.selectedIndicator.visibility = if (item.isSelected) {
-          View.VISIBLE
-        } else {
-          View.GONE
-        }
+        b.root.isSelected = item.isSelected
         b.root.setOnClickListener {
           onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)
         }
@@ -251,11 +247,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         clazz = Item.BookmarkedCommunityItem::class,
         inflateFn = GenericCommunityItemBinding::inflate,
       ) { item, b, h ->
-        b.selectedIndicator.visibility = if (item.isSelected) {
-          View.VISIBLE
-        } else {
-          View.GONE
-        }
+        b.root.isSelected = item.isSelected
 
         fun loadCommunityIcon() {
           b.icon.dispose()
@@ -372,11 +364,7 @@ class CommunitiesPaneController @AssistedInject constructor(
       ) { item, b, h ->
         avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
 
-        b.selectedIndicator.visibility = if (item.isSelected) {
-          View.VISIBLE
-        } else {
-          View.GONE
-        }
+        b.root.isSelected = item.isSelected
         val name = item.communityRef.getName(context)
         b.title.text = name
         if (item.needsDisambiguation && item.communityRef.instance != null) {
@@ -411,11 +399,7 @@ class CommunitiesPaneController @AssistedInject constructor(
       ) { item, b, h ->
         avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.iconUrl)
 
-        b.selectedIndicator.visibility = if (item.isSelected) {
-          View.VISIBLE
-        } else {
-          View.GONE
-        }
+        b.root.isSelected = item.isSelected
         val name = item.communityRef.getName(context)
         b.title.text = name
         if (item.needsDisambiguation && item.communityRef.instance != null) {
@@ -442,11 +426,7 @@ class CommunitiesPaneController @AssistedInject constructor(
         inflateFn = TabStateItemBinding::inflate,
       ) { item, b, h ->
         b.textView.text = item.tabState.currentCommunity.getName(context)
-        b.selectedIndicator.visibility = if (item.isSelected) {
-          View.VISIBLE
-        } else {
-          View.GONE
-        }
+        b.root.isSelected = item.isSelected
         b.root.setOnClickListener {
           when (val tab = item.tab) {
             is TabsManager.Tab.SubscribedCommunityTab ->

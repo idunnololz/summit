@@ -29,6 +29,8 @@ import com.idunnololz.summit.lemmy.inbox.conversation.NewConversation
 import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragment
 import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.inbox.InboxViewModel
+import com.idunnololz.summit.lemmy.inbox.message.MessageFragment
+import com.idunnololz.summit.lemmy.inbox.message.MessageFragmentArgs
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem

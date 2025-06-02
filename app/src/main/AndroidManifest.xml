@@ -197,6 +197,21 @@
             android:theme="@style/Theme.App"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
+
+        <activity
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Theme.App"
+            android:exported="false"
+            />
+        <provider
+            android:name="com.canhub.cropper.CropFileProvider"
+            android:authorities="${applicationId}.cropper.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/cropper_library_file_paths"/>
+        </provider>
         <activity
             android:configChanges="layoutDirection"
             android:name=".preview.ImageViewerActivity"

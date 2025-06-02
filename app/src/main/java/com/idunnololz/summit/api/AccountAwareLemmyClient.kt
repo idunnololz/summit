@@ -999,6 +999,40 @@ class AccountAwareLemmyClient @Inject constructor(
       createAccountErrorResult()
     }
 
+  suspend fun getUnreadRegistrationApplicationsCount(
+    force: Boolean,
+    account: Account? = accountForInstance(),
+  ) =
+    if (account != null) {
+      retry {
+        apiClient.getUnreadRegistrationApplicationsCount(account = account, force = force)
+          .autoSignOut(account)
+      }
+    } else {
+      createAccountErrorResult()
+    }
+
+  suspend fun getRegistrationApplications(
+    page: Int? = null,
+    limit: Int? = null,
+    unreadOnly: Boolean? = null,
+    force: Boolean,
+    account: Account? = accountForInstance(),
+  ) =
+    if (account != null) {
+      retry {
+        apiClient.getRegistrationApplications(
+          page = page,
+          limit = limit,
+          unreadOnly = unreadOnly,
+          account = account,
+          force = force,
+        ).autoSignOut(account)
+      }
+    } else {
+      createAccountErrorResult()
+    }
+
   fun changeInstance(site: String) = apiClient.changeInstance(site)
 
   fun defaultInstance() {

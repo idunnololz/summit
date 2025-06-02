@@ -1437,6 +1437,13 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
         context.getDrawableCompat(R.drawable.baseline_outlined_flag_24)
       }
+      is InboxItem.RegistrationApplicationInboxItem -> {
+        TextViewCompat.setCompoundDrawableTintList(
+          b.author,
+          ColorStateList.valueOf(context.getColorCompat(R.color.colorTextTitle)),
+        )
+        context.getDrawableCompat(R.drawable.outline_assignment_24)
+      }
     }
     drawable?.setBounds(
       0,

@@ -36,12 +36,12 @@ class SummitServerClient @Inject constructor(
     "https://summitforlemmyserver.idunnololz.com"
   } + "/v1/auth/public/$fileName"
 
-  suspend fun communitySuggestions(force: Boolean): Result<CommunitySuggestionsDto> {
+  suspend fun communitySuggestions(seed: Long, force: Boolean): Result<CommunitySuggestionsDto> {
     return retrofitErrorHandler {
       if (force) {
-        summitServerApi.communitySuggestionsNoCache()
+        summitServerApi.communitySuggestionsNoCache(seed)
       } else {
-        summitServerApi.communitySuggestions()
+        summitServerApi.communitySuggestions(seed)
       }
     }.fold(
       onSuccess = { Result.success(it) },

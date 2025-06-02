@@ -14,8 +14,8 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.importAndExport.export.ExportableTable
 import com.idunnololz.summit.settings.importAndExport.export.SYSTEM_TABLES
 import com.idunnololz.summit.settings.importAndExport.export.tableNameToExportableTable
-import com.idunnololz.summit.util.PreferenceUtils
-import com.idunnololz.summit.util.PreferenceUtils.KEY_DATABASE_MAIN
+import com.idunnololz.summit.preferences.PreferenceKeys
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DATABASE_MAIN
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -275,7 +275,7 @@ class ImportSettingsViewModel @Inject constructor(
       return
     }
 
-    val o = settingsJson.opt(PreferenceUtils.PREFERENCE_VERSION_CODE)
+    val o = settingsJson.opt(PreferenceKeys.PREFERENCE_VERSION_CODE)
     val rawString = settingsJson.optJSONObject(KEY_DATABASE_MAIN)?.optString("db_1")
     settingsJson.remove(KEY_DATABASE_MAIN)
 

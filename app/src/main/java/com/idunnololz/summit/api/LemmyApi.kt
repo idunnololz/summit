@@ -46,11 +46,15 @@ import com.idunnololz.summit.api.dto.GetReportCountResponse
 import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
+import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
+import com.idunnololz.summit.api.dto.ListRegistrationApplications
+import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
 import com.idunnololz.summit.api.dto.LoginResponse
@@ -681,6 +685,10 @@ interface LemmyApi {
     @Body form: HideCommunity,
   ): Call<SuccessResponse>
 
+  /**
+   * Admin endpoints
+   */
+
   @POST("admin/purge/person")
   fun purgePerson(
     @Header("Authorization") authorization: String?,
@@ -704,6 +712,32 @@ interface LemmyApi {
     @Header("Authorization") authorization: String?,
     @Body form: PurgeComment,
   ): Call<SuccessResponse>
+
+  @GET("admin/registration_application/count")
+  fun getRegistrationApplicationsCount(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<GetUnreadRegistrationApplicationCountResponse>
+
+  @GET("admin/registration_application/count")
+  @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+  fun getRegistrationApplicationsCountNoCache(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<GetUnreadRegistrationApplicationCountResponse>
+
+  @GET("admin/registration_application/list")
+  fun listRegistrationApplications(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListRegistrationApplicationsResponse>
+
+  @GET("admin/registration_application/list")
+  @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+  fun listRegistrationApplicationsNoCache(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListRegistrationApplicationsResponse>
 
   @GET("modlog")
   fun getModLogs(

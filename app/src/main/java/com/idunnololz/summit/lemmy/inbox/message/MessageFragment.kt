@@ -1,4 +1,4 @@
-package com.idunnololz.summit.lemmy.inbox
+package com.idunnololz.summit.lemmy.inbox.message
 
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +20,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.OldAlertDialogFragment.*
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -27,6 +28,10 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
+import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
+import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.inbox.inbox.InboxViewModel
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
@@ -167,6 +172,9 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       }
       is InboxItem.ReportPostInboxItem -> {
         binding.title.setText(R.string.report_on_post)
+      }
+      is InboxItem.RegistrationApplicationInboxItem -> {
+        binding.title.setText(R.string.registration_application)
       }
     }
     lemmyTextHelper.bindText(
@@ -336,7 +344,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               .show(childFragmentManager, "asdf")
           },
           onInstanceMismatch = { accountInstance, apiInstance ->
-            OldAlertDialogFragment.Builder()
+            Builder()
               .setTitle(R.string.error_account_instance_mismatch_title)
               .setMessage(
                 getString(
@@ -372,6 +380,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       is InboxItem.ReportPostInboxItem,
       is InboxItem.ReportMessageInboxItem,
       -> {
+        binding.score.visibility = View.GONE
+        binding.bottomAppBar.menu.findItem(R.id.upvote).isEnabled = false
+        binding.bottomAppBar.menu.findItem(R.id.downvote).isEnabled = false
+      }
+      is InboxItem.RegistrationApplicationInboxItem -> {
         binding.score.visibility = View.GONE
         binding.bottomAppBar.menu.findItem(R.id.upvote).isEnabled = false
         binding.bottomAppBar.menu.findItem(R.id.downvote).isEnabled = false
@@ -458,6 +471,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       is InboxItem.ReportPostInboxItem -> {
         viewModel.fetchCommentContext(inboxItem.reportedPostId, null, force)
       }
+      is InboxItem.RegistrationApplicationInboxItem -> TODO()
     }
   }
 
@@ -557,6 +571,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               is InboxItem.ReportMessageInboxItem -> TODO()
               is InboxItem.ReportCommentInboxItem -> inboxItem.postId
               is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
+              is InboxItem.RegistrationApplicationInboxItem -> TODO()
             }
 
             getMainActivity()?.launchPage(

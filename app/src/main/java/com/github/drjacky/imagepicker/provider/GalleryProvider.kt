@@ -175,7 +175,7 @@ class GalleryProvider(
         } else {
           activity.setMultipleImage(fileList!!)
         }
-      } catch (ex: IOException) {
+      } catch (_: IOException) {
         setError(R.string.error_failed_pick_gallery_image)
       }
     } ?: run {
@@ -184,7 +184,7 @@ class GalleryProvider(
         try {
           activity.selectedNumberOfImages = 1
           activity.setImage(uri, isCamera = false)
-        } catch (ex: IOException) {
+        } catch (_: IOException) {
           setError(R.string.error_failed_to_crop_image)
         }
       } else {

@@ -9,6 +9,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -32,6 +33,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
+import kotlin.random.nextLong
 
 @HiltViewModel
 class SearchHomeViewModel @Inject constructor(
@@ -39,6 +42,7 @@ class SearchHomeViewModel @Inject constructor(
   private val accountInfoManager: AccountInfoManager,
   private val summitServerClient: SummitServerClient,
   private val apiClient: AccountAwareLemmyClient,
+  private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   companion object {
@@ -63,6 +67,7 @@ class SearchHomeViewModel @Inject constructor(
   val model = StatefulLiveData<SearchHomeModel>()
 
   private var componentName: ComponentName? = null
+  private val seed = savedStateHandle.getStateFlow("seed", Random.nextLong())
 
   init {
     viewModelScope.launch {
@@ -98,6 +103,10 @@ class SearchHomeViewModel @Inject constructor(
     if (componentName != null) {
       this.componentName = componentName
     }
+    if (force) {
+      savedStateHandle["seed"] = Random.nextLong()
+    }
+    val seed = seed.value
 
     val componentName = this.componentName ?: return
 
@@ -214,7 +223,7 @@ class SearchHomeViewModel @Inject constructor(
         )
       }
 
-      val communitySessions = summitServerClient.communitySuggestions(force)
+      val communitySessions = summitServerClient.communitySuggestions(seed, force)
 
       communitySessions
         .onFailure {

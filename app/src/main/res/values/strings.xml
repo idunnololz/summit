@@ -2121,6 +2121,20 @@
     <string name="auto_focus_search_bar_desc">When enabled, the search bar will automatically be focused when the screen screen is opened.</string>
     <string name="posts_feed_header">Posts feed header</string>
     <string name="hide_banner_if_no_banner">Hide banner if no banner</string>
+    <string name="random_communities">Random communities</string>
+    <string name="display_deleted_posts">Display deleted posts</string>
+    <string name="registration_applications">Registration applications</string>
+    <string name="registration_application">Registration application</string>
+
+    <string name="ic_rotate_left_24">Rotate counter clockwise</string>
+    <string name="ic_rotate_right_24">Rotate</string>
+    <string name="crop_image_menu_crop">Crop</string>
+    <string name="ic_flip_24">Flip</string>
+    <string name="ic_flip_24_horizontally">Flip horizontally</string>
+    <string name="ic_flip_24_vertically">Flip vertically</string>
+    <string name="pick_image_chooser_title">Select source</string>
+    <string name="pick_image_camera">Camera</string>
+    <string name="pick_image_gallery">Gallery</string>
 
     <plurals name="cross_posted_times">
         <item quantity="one">Cross-posted %1$s time</item>

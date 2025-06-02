@@ -2,7 +2,6 @@ package com.github.drjacky.imagepicker.provider
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
@@ -11,13 +10,16 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.Nullable
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView.Guidelines
 import com.github.drjacky.imagepicker.ImagePicker
 import com.github.drjacky.imagepicker.ImagePickerActivity
 import com.github.drjacky.imagepicker.R
 import com.github.drjacky.imagepicker.util.FileUriUtils
 import com.github.drjacky.imagepicker.util.FileUtil.getCompressFormat
-import com.yalantis.ucrop.UCrop
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -30,7 +32,10 @@ import java.io.IOException
  * @version 1.0
  * @since 04 January 2019
  */
-class CropProvider(activity: ImagePickerActivity, private val launcher: (Intent) -> Unit) :
+class CropProvider(
+  activity: ImagePickerActivity,
+  private val launcher: ActivityResultLauncher<CropImageContractOptions>
+) :
   BaseProvider(activity) {
 
   companion object {
@@ -172,22 +177,31 @@ class CropProvider(activity: ImagePickerActivity, private val launcher: (Intent)
         System.currentTimeMillis().toString() + "_croppedImg" + extension,
       )
 
-      val options = UCrop.Options()
-      options.setCompressionFormat(getCompressFormat(extension))
-      options.setCircleDimmedLayer(cropOval)
-      options.setFreeStyleCropEnabled(cropFreeStyle)
-      val uCrop = UCrop.of(Uri.fromFile(selectedImgFile), Uri.fromFile(croppedImgFile))
-        .withOptions(options)
+//      val options = UCrop.Options()
+//      options.setCompressionFormat(getCompressFormat(extension))
+//      options.setCircleDimmedLayer(cropOval)
+//      options.setFreeStyleCropEnabled(cropFreeStyle)
+//      val uCrop = UCrop.of(Uri.fromFile(selectedImgFile), Uri.fromFile(croppedImgFile))
+//        .withOptions(options)
+//
+//      if (cropAspectX > 0 && cropAspectY > 0) {
+//        uCrop.withAspectRatio(cropAspectX, cropAspectY)
+//      }
+//
+//      if (maxWidth > 0 && maxHeight > 0) {
+//        uCrop.withMaxResultSize(maxWidth, maxHeight)
+//      }
 
-      if (cropAspectX > 0 && cropAspectY > 0) {
-        uCrop.withAspectRatio(cropAspectX, cropAspectY)
-      }
-
-      if (maxWidth > 0 && maxHeight > 0) {
-        uCrop.withMaxResultSize(maxWidth, maxHeight)
-      }
-
-      launcher.invoke(uCrop.getIntent(activity))
+//      launcher.invoke(uCrop.getIntent(activity))
+      launcher.launch(
+        CropImageContractOptions(
+          uri = Uri.fromFile(selectedImgFile),
+          cropImageOptions = CropImageOptions(
+            guidelines = Guidelines.ON,
+            outputCompressFormat = Bitmap.CompressFormat.PNG
+          )
+        )
+      )
     } ?: kotlin.run {
       setError(R.string.error_failed_to_crop_image)
     }
@@ -196,22 +210,22 @@ class CropProvider(activity: ImagePickerActivity, private val launcher: (Intent)
   /**
    * This method will be called when final result fot this provider is enabled.
    */
-  fun handleResult(result: ActivityResult) {
-    if (result.resultCode == Activity.RESULT_OK) {
-      val uri = UCrop.getOutput(result.data!!)
-      if (uri != null) {
-        if (isMultipleFiles) {
-          activity.setMultipleCropImage(uri)
-        } else {
-          activity.setCropImage(uri)
-        }
-      } else {
-        setError(R.string.error_failed_to_crop_image)
-      }
-    } else {
-      setResultCancel()
-    }
-  }
+//  fun handleResult(result: ActivityResult) {
+//    if (result.resultCode == Activity.RESULT_OK) {
+//      val uri = UCrop.getOutput(result.data!!)
+//      if (uri != null) {
+//        if (isMultipleFiles) {
+//          activity.setMultipleCropImage(uri)
+//        } else {
+//          activity.setCropImage(uri)
+//        }
+//      } else {
+//        setError(R.string.error_failed_to_crop_image)
+//      }
+//    } else {
+//      setResultCancel()
+//    }
+//  }
 
   private fun getBitmap(context: Context, imageUri: Uri): Bitmap? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

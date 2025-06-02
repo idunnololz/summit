@@ -24,6 +24,9 @@ fun FullAccount.isMod(): Boolean =
   accountInfo.miscAccountInfo?.modCommunityIds?.isNotEmpty() == true ||
     accountInfo.miscAccountInfo?.isAdmin == true
 
+fun FullAccount.isAdmin(): Boolean =
+  accountInfo.miscAccountInfo?.isAdmin == true
+
 fun GetSiteResponse.toFullAccount(account: Account): FullAccount {
   val localUserView = this.my_user?.local_user_view
   val accountInfo = AccountInfo(

@@ -13,7 +13,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.presets.PreviewPresetActivity
 import com.idunnololz.summit.util.BaseActivity
-import com.idunnololz.summit.util.PreferenceUtils
 import com.idunnololz.summit.util.color.ColorManager
 import com.idunnololz.summit.util.isLightTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -134,7 +133,7 @@ class ThemeManager @Inject constructor(
     coroutineScope.launch {
       useMaterialYou.emit(currentConfig.isMaterialYou)
       useCustomFont.emit(currentConfig.globalFont != 0)
-      PreferenceUtils.usingCustomFont = useCustomFont.value
+      PreferenceKeys.usingCustomFont = useCustomFont.value
     }
   }
 

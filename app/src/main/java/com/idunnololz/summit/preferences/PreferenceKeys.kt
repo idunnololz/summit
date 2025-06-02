@@ -1,19 +1,12 @@
-package com.idunnololz.summit.util
+package com.idunnololz.summit.preferences
 
-private const val TAG = "PreferenceUtils"
-
-object PreferenceUtils {
+object PreferenceKeys {
 
   var usingCustomFont: Boolean = false
 
   const val KEY_DEFAULT_PAGE = "KEY_DEFAULT_PAGE"
 
   const val PREFERENCE_VERSION_CODE = "PREFERENCE_VERSION_CODE"
-
-  /**
-   * END OF DEPRECATED KEYS
-   */
-
   /**
    * Scheduling options
    */
@@ -209,8 +202,13 @@ object PreferenceUtils {
   const val KEY_OP_TAG_STYLE = "KEY_OP_TAG_STYLE"
   const val KEY_AUTO_FOCUS_SEARCH_BAR = "KEY_AUTO_FOCUS_SEARCH_BAR"
   const val KEY_HIDE_HEADER_BANNER_IF_NO_BANNER = "KEY_HIDE_HEADER_BANNER_IF_NO_BANNER"
+  const val KEY_DISPLAY_DELETED_POSTS = "KEY_DISPLAY_DELETED_POSTS"
 
   const val KEY_DATABASE_MAIN = "_key_database_main"
+
+  /**
+   * START OF UNUSED/DEAD KEYS
+   */
 
   // Unused/dead keys
   @Suppress("unused")
@@ -221,4 +219,9 @@ object PreferenceUtils {
 
   @Suppress("unused")
   const val DEAD_KEY_THEME = "theme"
+
+  /**
+   * END OF UNUSED/DEAD KEYS
+   */
+
 }

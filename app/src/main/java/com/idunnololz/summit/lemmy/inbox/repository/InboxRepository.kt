@@ -54,6 +54,8 @@ class InboxRepository @Inject constructor(
     makePostReportsSource(unresolvedOnly = false)
   private val commentReportsStatelessSource: InboxSource<Unit> =
     makeCommentReportsSource(unresolvedOnly = false)
+  private val registrationApplicationsStatelessSource: InboxSource<Unit> =
+    makeRegistrationApplicationsSource(unreadOnly = false)
 
   class InboxMultiDataSource(
     private val sources: List<InboxSource<*>>,
@@ -188,6 +190,10 @@ class InboxRepository @Inject constructor(
       makeCommentReportsSource(unresolvedOnly = true),
     ),
   )
+  private val registrationApplicationsSource =
+    InboxMultiDataSource(
+      listOf(registrationApplicationsStatelessSource),
+    )
 
   private fun getSource(pageType: PageType) = when (pageType) {
     PageType.Unread -> unreadSources
@@ -197,6 +203,7 @@ class InboxRepository @Inject constructor(
     PageType.Messages -> messagesSource
     PageType.Reports -> reportsSource
     PageType.Conversation -> conversationSource
+    PageType.Applications -> registrationApplicationsSource
   }
 
   suspend fun getPage(
@@ -325,6 +332,29 @@ class InboxRepository @Inject constructor(
     )
   }
 
+  private fun makeRegistrationApplicationsSource(unreadOnly: Boolean) = InboxSource(
+    context,
+    Unit,
+  ) { page: Int, _: Unit, limit: Int, force: Boolean ->
+    apiClient.getRegistrationApplications(
+      page = page,
+      limit = limit,
+      unreadOnly = unreadOnly,
+      force = force,
+    ).fold(
+      onSuccess = {
+        Result.success(it.registration_applications.map { InboxItem.RegistrationApplicationInboxItem(it) })
+      },
+      onFailure = {
+        if (it is NotAModOrAdmin) {
+          Result.success(listOf())
+        } else {
+          Result.failure(it)
+        }
+      },
+    )
+  }
+
   suspend fun markAsRead(inboxItem: InboxItem, read: Boolean): Result<Unit> {
     val itemMarked = allSources.markAsRead(inboxItem.id, read)
 
@@ -351,6 +381,9 @@ class InboxRepository @Inject constructor(
       }
       is InboxItem.ReportPostInboxItem -> {
         apiClient.resolvePostReport(inboxItem.id, read)
+      }
+      is InboxItem.RegistrationApplicationInboxItem -> {
+        Result.success(Unit)
       }
     }
 

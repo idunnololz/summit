@@ -31,6 +31,8 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentInboxBinding
@@ -89,8 +91,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class InboxFragment :
-  BaseFragment<FragmentInboxBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentInboxBinding>() {
 
   companion object {
     private const val TAG = "InboxFragment"
@@ -120,6 +121,9 @@ class InboxFragment :
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  @Inject
+  lateinit var inboxPaneControllerFactory: InboxPaneController.Factory
 
   private var lastPageType: PageType? = null
 
@@ -193,7 +197,7 @@ class InboxFragment :
         rootView = binding.coordinatorLayoutContainer,
         applyTopInset = false,
       )
-      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPane)
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPanel.root)
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
     }
 
@@ -203,41 +207,6 @@ class InboxFragment :
       Log.d(TAG, "Page type changed")
 
       binding.toolbar.title = it.getName(context)
-      binding.itemHighlighter.updateLayoutParams<ConstraintLayout.LayoutParams> {
-        when (it) {
-          PageType.Unread -> {
-            topToTop = R.id.unread
-            bottomToBottom = R.id.unread
-          }
-
-          PageType.All -> {
-            topToTop = R.id.all
-            bottomToBottom = R.id.all
-          }
-
-          PageType.Replies -> {
-            topToTop = R.id.replies
-            bottomToBottom = R.id.replies
-          }
-
-          PageType.Mentions -> {
-            topToTop = R.id.mentions
-            bottomToBottom = R.id.mentions
-          }
-
-          PageType.Messages -> {
-            topToTop = R.id.messages
-            bottomToBottom = R.id.messages
-          }
-
-          PageType.Reports -> {
-            topToTop = R.id.reports
-            bottomToBottom = R.id.reports
-          }
-
-          PageType.Conversation -> error("unreachable")
-        }
-      }
 
       when (it) {
         PageType.Messages -> {
@@ -273,13 +242,6 @@ class InboxFragment :
 
     viewModel.inboxUpdate.observe(viewLifecycleOwner) {
       onUpdate()
-    }
-    viewModel.currentFullAccount.observe(viewLifecycleOwner) {
-      if (it?.isMod() == true) {
-        setModReportsVisibility(isVisible = true)
-      } else {
-        setModReportsVisibility(isVisible = false)
-      }
     }
 
     val adapter = this.adapter
@@ -381,30 +343,44 @@ class InboxFragment :
     }
 
     with(binding) {
-      unread.setOnClickListener {
-        viewModel.setPageType(PageType.Unread)
-        paneLayout.closePanels()
-      }
-      all.setOnClickListener {
-        viewModel.setPageType(PageType.All)
-        paneLayout.closePanels()
-      }
-      replies.setOnClickListener {
-        viewModel.setPageType(PageType.Replies)
-        paneLayout.closePanels()
-      }
-      mentions.setOnClickListener {
-        viewModel.setPageType(PageType.Mentions)
-        paneLayout.closePanels()
-      }
-      messages.setOnClickListener {
-        viewModel.setPageType(PageType.Messages)
-        paneLayout.closePanels()
-      }
-      reports.setOnClickListener {
-        viewModel.setPageType(PageType.Reports)
-        paneLayout.closePanels()
-      }
+
+      val inboxPaneController = inboxPaneControllerFactory.create(
+        viewModel = viewModel,
+        binding = binding.startPanel,
+        viewLifecycleOwner = viewLifecycleOwner,
+        onCategoryClickListener = {
+          when (it) {
+            InboxPaneController.InboxCategory.Unread -> {
+              viewModel.setPageType(PageType.Unread)
+              paneLayout.closePanels()
+            }
+            InboxPaneController.InboxCategory.All -> {
+              viewModel.setPageType(PageType.All)
+              paneLayout.closePanels()
+            }
+            InboxPaneController.InboxCategory.Replies -> {
+              viewModel.setPageType(PageType.Replies)
+              paneLayout.closePanels()
+            }
+            InboxPaneController.InboxCategory.Mentions -> {
+              viewModel.setPageType(PageType.Mentions)
+              paneLayout.closePanels()
+            }
+            InboxPaneController.InboxCategory.Messages -> {
+              viewModel.setPageType(PageType.Messages)
+              paneLayout.closePanels()
+            }
+            InboxPaneController.InboxCategory.Reports -> {
+              viewModel.setPageType(PageType.Reports)
+              paneLayout.closePanels()
+            }
+            InboxPaneController.InboxCategory.Applications -> {
+              viewModel.setPageType(PageType.Applications)
+              paneLayout.closePanels()
+            }
+          }
+        }
+      )
     }
 
     viewModel.currentAccountView.observe(viewLifecycleOwner) {
@@ -438,16 +414,6 @@ class InboxFragment :
       moreActionsHelper = moreActionsHelper,
       snackbarContainer = binding.coordinatorLayout,
     )
-  }
-
-  private fun setModReportsVisibility(isVisible: Boolean) {
-    if (!isBindingAvailable()) return
-
-    with(binding) {
-      val visibility = if (isVisible) View.VISIBLE else View.GONE
-      divider.visibility = visibility
-      reports.visibility = visibility
-    }
   }
 
   private fun markAsRead(inboxItem: InboxItem, read: Boolean) {
@@ -539,16 +505,14 @@ class InboxFragment :
           .show(childFragmentManager, "asdf")
       },
       onInstanceMismatch = { accountInstance, apiInstance ->
-        OldAlertDialogFragment.Builder()
-          .setTitle(R.string.error_account_instance_mismatch_title)
-          .setMessage(
-            getString(
-              R.string.error_account_instance_mismatch,
-              accountInstance,
-              apiInstance,
-            ),
+        launchAlertDialog("error_instance_mismatch") {
+          titleResId = R.string.error_account_instance_mismatch_title
+          message = getString(
+            R.string.error_account_instance_mismatch,
+            accountInstance,
+            apiInstance,
           )
-          .createAndShow(childFragmentManager, "aa")
+        }
       },
       onLinkClick = { url, text, linkType ->
         onLinkClick(url, text, linkType)
@@ -877,11 +841,5 @@ class InboxFragment :
       this.inboxModel = inboxModel
       refreshItems(cb)
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

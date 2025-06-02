@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.core.content.edit
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.preferences.ComposedPreferences
-import com.idunnololz.summit.util.PreferenceUtils
+import com.idunnololz.summit.preferences.PreferenceKeys
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
@@ -107,7 +107,7 @@ fun SharedPreferences.asJson(): JSONObject {
     }
   }
 
-  json.put(PreferenceUtils.PREFERENCE_VERSION_CODE, BuildConfig.VERSION_CODE)
+  json.put(PreferenceKeys.PREFERENCE_VERSION_CODE, BuildConfig.VERSION_CODE)
 
   return json
 }

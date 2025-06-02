@@ -11,15 +11,16 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 interface SummitServerApi {
 
   @GET("/v1/community-suggestions")
-  fun communitySuggestions(): Call<CommunitySuggestionsDto>
+  fun communitySuggestions(@Query("seed") seed: Long): Call<CommunitySuggestionsDto>
 
   @GET("/v1/community-suggestions")
   @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-  fun communitySuggestionsNoCache(): Call<CommunitySuggestionsDto>
+  fun communitySuggestionsNoCache(@Query("seed") seed: Long): Call<CommunitySuggestionsDto>
 
   @Multipart
   @POST("/v1/preset")

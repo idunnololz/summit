@@ -1013,7 +1013,9 @@ class PostFragment :
       }
     }
 
-    binding.title.text = viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+    updateTitle(
+      viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+    )
     binding.subtitle.visibility = View.GONE
 
     binding.title.setOnClickListener {
@@ -1141,8 +1143,7 @@ class PostFragment :
     }
 
     viewModel.commentsSortOrderLiveData.observe(viewLifecycleOwner) {
-      binding.toolbar.title =
-        viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+      updateTitle(viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: "")
     }
 
     binding.root.doOnPreDraw {
@@ -1151,6 +1152,11 @@ class PostFragment :
         binding.recyclerView.height,
       )
     }
+  }
+
+  private fun updateTitle(titleText: String) {
+    binding.toolbar.title = titleText
+    binding.title.text = titleText
   }
 
   private fun attachGestureHandlerToRecyclerViewIfNeeded() {

@@ -296,17 +296,45 @@ class LemmyHeaderHelper @AssistedInject constructor(
         sb.appendSeparator()
       }
 
+      val displayFullName = when (displayInstanceStyle) {
+        DisplayInstanceOptions.NeverDisplayInstance -> {
+          false
+        }
+        DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+          instance != postView.creator.instance
+        }
+        DisplayInstanceOptions.AlwaysDisplayInstance -> {
+          true
+        }
+        else -> false
+      }
+
       val s = sb.length
-      sb.appendLink(
-        text = LemmyUtils.formatAuthor(
-          if (preferences.preferUserDisplayName) {
-            postView.creator.display_name ?: postView.creator.name
-          } else {
-            postView.creator.name
-          },
-        ),
-        url = LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
-      )
+      if (displayFullName) {
+        sb.appendNameWithInstance(
+          context = context,
+          name = LemmyUtils.formatAuthor(
+            if (preferences.preferUserDisplayName) {
+              postView.creator.display_name ?: postView.creator.name
+            } else {
+              postView.creator.name
+            },
+          ),
+          instance = postView.creator.instance,
+          url = LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+        )
+      } else {
+        sb.appendLink(
+          text = LemmyUtils.formatAuthor(
+            if (preferences.preferUserDisplayName) {
+              postView.creator.display_name ?: postView.creator.name
+            } else {
+              postView.creator.name
+            },
+          ),
+          url = LinkUtils.getLinkForPerson(postView.creator.instance, postView.creator.name),
+        )
+      }
       val e = sb.length
 
       if (postView.creator_is_admin == true) {

@@ -9,6 +9,7 @@ data class SearchHomeConfig(
   val showTopCommunity7DaysSuggestions: Boolean = true,
   val showTrendingCommunitySuggestions: Boolean = true,
   val showRisingCommunitySuggestions: Boolean = true,
+  val showRandomCommunitySuggestions: Boolean = true,
 )
 
 val SearchHomeConfig.anySectionsEnabled
@@ -16,4 +17,5 @@ val SearchHomeConfig.anySectionsEnabled
     showSubscribedCommunities ||
     showTopCommunity7DaysSuggestions ||
     showTrendingCommunitySuggestions ||
-    showRisingCommunitySuggestions
+    showRisingCommunitySuggestions ||
+    showRandomCommunitySuggestions

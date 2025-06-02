@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.9.3"
+androidGradlePlugin = "8.10.1"
 arrowCore = "2.1.2"
 datastorePreferences = "1.1.7"
 desugar_jdk_libs = "2.1.5"
@@ -38,7 +38,7 @@ java-string-similarity = { module = "info.debatty:java-string-similarity", versi
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
 
-kotlinx-coroutine-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx" }
 
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }

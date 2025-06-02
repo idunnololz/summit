@@ -12,7 +12,7 @@ safeargs.
 
     <fragment
         android:id="@+id/messageFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.MessageFragment"
+        android:name="com.idunnololz.summit.lemmy.inbox.message.MessageFragment"
         android:label="MessageFragment" >
         <argument
             android:name="inboxItem"
