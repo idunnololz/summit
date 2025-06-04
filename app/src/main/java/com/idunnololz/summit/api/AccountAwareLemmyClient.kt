@@ -1033,6 +1033,23 @@ class AccountAwareLemmyClient @Inject constructor(
       createAccountErrorResult()
     }
 
+  suspend fun approveRegistrationApplication(
+    applicationId: Int,
+    approve: Boolean,
+    denyReason: String?,
+    account: Account? = accountForInstance(),
+  ) =
+    if (account != null) {
+      apiClient.approveRegistrationApplication(
+        applicationId = applicationId,
+        approve = approve,
+        denyReason = denyReason,
+        account = account,
+      ).autoSignOut(account)
+    } else {
+      createAccountErrorResult()
+    }
+
   fun changeInstance(site: String) = apiClient.changeInstance(site)
 
   fun defaultInstance() {

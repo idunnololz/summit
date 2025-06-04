@@ -1,6 +1,5 @@
 package com.github.drjacky.imagepicker.provider
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,7 +8,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.Nullable
 import com.canhub.cropper.CropImageContractOptions
@@ -20,6 +18,7 @@ import com.github.drjacky.imagepicker.ImagePickerActivity
 import com.github.drjacky.imagepicker.R
 import com.github.drjacky.imagepicker.util.FileUriUtils
 import com.github.drjacky.imagepicker.util.FileUtil.getCompressFormat
+import com.idunnololz.summit.util.getParcelableCompat
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -87,7 +86,7 @@ class CropProvider(
    * Retrieve CropProvider state
    */
   override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-    cropImageUri = savedInstanceState?.getParcelable(STATE_CROP_URI) as Uri?
+    cropImageUri = savedInstanceState?.getParcelableCompat(STATE_CROP_URI)
   }
 
   /**
@@ -114,7 +113,6 @@ class CropProvider(
    *
    * @return Bitmap.CompressFormat?. In case of Null, it will use the extension from the input file
    */
-  @Nullable
   fun outputFormat() = outputFormat
 
   /**
@@ -171,28 +169,6 @@ class CropProvider(
 
       convertBitmapToFile(selectedImgFile, it, extension)
 
-      /*We have to again create a new file where we will save the cropped image. */
-      val croppedImgFile = File(
-        getExternalFilesDir(path),
-        System.currentTimeMillis().toString() + "_croppedImg" + extension,
-      )
-
-//      val options = UCrop.Options()
-//      options.setCompressionFormat(getCompressFormat(extension))
-//      options.setCircleDimmedLayer(cropOval)
-//      options.setFreeStyleCropEnabled(cropFreeStyle)
-//      val uCrop = UCrop.of(Uri.fromFile(selectedImgFile), Uri.fromFile(croppedImgFile))
-//        .withOptions(options)
-//
-//      if (cropAspectX > 0 && cropAspectY > 0) {
-//        uCrop.withAspectRatio(cropAspectX, cropAspectY)
-//      }
-//
-//      if (maxWidth > 0 && maxHeight > 0) {
-//        uCrop.withMaxResultSize(maxWidth, maxHeight)
-//      }
-
-//      launcher.invoke(uCrop.getIntent(activity))
       launcher.launch(
         CropImageContractOptions(
           uri = Uri.fromFile(selectedImgFile),
@@ -233,7 +209,7 @@ class CropProvider(
         ImageDecoder.decodeBitmap(
           ImageDecoder.createSource(context.contentResolver, imageUri),
         )
-      } catch (e: ImageDecoder.DecodeException) {
+      } catch (_: ImageDecoder.DecodeException) {
         null
       }
     } else {

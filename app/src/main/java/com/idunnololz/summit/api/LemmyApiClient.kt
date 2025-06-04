@@ -6,6 +6,7 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
 import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BanPerson
@@ -104,6 +105,7 @@ import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.api.dto.PurgePerson
 import com.idunnololz.summit.api.dto.PurgePost
 import com.idunnololz.summit.api.dto.Register
+import com.idunnololz.summit.api.dto.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
@@ -1925,6 +1927,27 @@ class LemmyApiClient @Inject constructor(
       } else {
         api.listRegistrationApplications(authorization = account.bearer, form.serializeToMap())
       }
+    }.fold(
+      onSuccess = { Result.success(it) },
+      onFailure = { Result.failure(it) },
+    )
+  }
+
+  suspend fun approveRegistrationApplication(
+    applicationId: Int,
+    approve: Boolean,
+    denyReason: String?,
+    account: Account,
+  ): Result<RegistrationApplicationResponse> {
+    val form = ApproveRegistrationApplication(
+      id = applicationId,
+      approve = approve,
+      deny_reason = denyReason,
+      auth = account.jwt,
+    )
+
+    return retrofitErrorHandler {
+      api.approveRegistrationApplication(authorization = account.bearer, form)
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },

@@ -27,6 +27,13 @@ interface CommentBackedItem {
   val postId: Int
 }
 
+enum class RegistrationDecision {
+  Approved,
+  Declined,
+  NoDecision,
+  Pending,
+}
+
 sealed interface ReportItem
 
 @Serializable
@@ -374,11 +381,11 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
+    val decision: RegistrationDecision,
   ) : InboxItem {
 
     constructor(application: RegistrationApplicationView) : this(
       id = application.registration_application.id,
-
       authorId = application.creator.id,
       authorName = application.creator.name,
       authorInstance = application.creator.instance,
@@ -390,7 +397,16 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       score = 0,
       isDeleted = false,
       isRemoved = false,
-      isRead = application.registration_application.deny_reason != null,
+      isRead = application.registration_application.deny_reason != null || application.admin != null,
+      decision = if (application.admin != null) {
+        if (application.creator_local_user.accepted_application) {
+          RegistrationDecision.Approved
+        } else {
+          RegistrationDecision.Declined
+        }
+      } else {
+        RegistrationDecision.NoDecision
+      },
     )
 
     override fun toString(): String = "RegistrationApplicationInboxItem { content = $content }"

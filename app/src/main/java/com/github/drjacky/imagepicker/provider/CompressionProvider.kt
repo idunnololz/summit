@@ -97,7 +97,7 @@ class CompressionProvider(activity: ImagePickerActivity) : BaseProvider(activity
           delete()
         }
       }
-      out = activity.openFileOutput(temp, Context.MODE_PRIVATE)
+      out = activity.openFileOutput(temp, MODE_PRIVATE)
       bitmap.compress(format, 100, out)
       File(tempPath)
     } catch (e: Exception) {

@@ -400,4 +400,15 @@ safeargs.
             app:argType="string"
             app:nullable="true" />
     </dialog>
+    <dialog
+        android:id="@+id/reasonDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.inbox.inbox.ReasonDialogFragment"
+        android:label="ReasonDialogFragment" >
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="positive_button"
+            app:argType="string" />
+    </dialog>
 </navigation>

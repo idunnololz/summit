@@ -2,6 +2,7 @@ package com.idunnololz.summit.api
 
 import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
 import com.idunnololz.summit.api.dto.BanFromCommunity
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.BanPerson
@@ -74,6 +75,7 @@ import com.idunnololz.summit.api.dto.PurgeCommunity
 import com.idunnololz.summit.api.dto.PurgePerson
 import com.idunnololz.summit.api.dto.PurgePost
 import com.idunnololz.summit.api.dto.Register
+import com.idunnololz.summit.api.dto.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
@@ -738,6 +740,12 @@ interface LemmyApi {
     @Header("Authorization") authorization: String?,
     @QueryMap form: Map<String, String>,
   ): Call<ListRegistrationApplicationsResponse>
+
+  @PUT("admin/registration_application/approve")
+  fun approveRegistrationApplication(
+    @Header("Authorization") authorization: String?,
+    @Body form: ApproveRegistrationApplication,
+  ): Call<RegistrationApplicationResponse>
 
   @GET("modlog")
   fun getModLogs(

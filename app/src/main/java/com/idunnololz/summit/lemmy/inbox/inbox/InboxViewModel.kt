@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
 import com.idunnololz.summit.lemmy.inbox.PageType
+import com.idunnololz.summit.lemmy.inbox.RegistrationDecision
 import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsModel
 import com.idunnololz.summit.lemmy.inbox.repository.InboxRepository
@@ -62,10 +63,12 @@ class InboxViewModel @Inject constructor(
   val currentAccountView = MutableLiveData<AccountView?>()
   val currentFullAccount = MutableLiveData<FullAccount?>()
   val markAsReadResult = StatefulLiveData<Unit>()
+  val approveRegistrationApplicationResult = StatefulLiveData<Unit>()
 
   val inboxUpdate = StatefulLiveData<InboxUpdate>()
 
   val pageTypeFlow = savedStateHandle.getStateFlow("page_type", PageType.Unread)
+  val lastApplicationId = savedStateHandle.getLiveData("lastApplicationId", 0)
 
   val pageType = pageTypeFlow.asLiveData()
 
@@ -352,6 +355,7 @@ class InboxViewModel @Inject constructor(
         id = when (it) {
           is InboxListItem.ConversationItem -> it.conversation.id
           is InboxListItem.RegularInboxItem -> it.item.id.toLong()
+          is InboxListItem.RegistrationApplicationInboxItem -> it.item.id.toLong()
         },
         isRead = true,
       )
@@ -447,6 +451,14 @@ class InboxViewModel @Inject constructor(
             item = data.item.updateIsRead(isRead = isRead) as InboxItem,
           )
         }
+        is InboxListItem.RegistrationApplicationInboxItem -> {
+          if (data.item.id.toLong() != id) {
+            continue
+          }
+          allInboxItems[index] = data.copy(
+            item = data.item.updateIsRead(isRead = isRead) as InboxItem.RegistrationApplicationInboxItem,
+          )
+        }
       }
     }
 
@@ -464,7 +476,12 @@ class InboxViewModel @Inject constructor(
           null
         } else {
           seen.add(it.id)
-          InboxListItem.RegularInboxItem(data.pageIndex, it)
+
+          if (it is InboxItem.RegistrationApplicationInboxItem) {
+            InboxListItem.RegistrationApplicationInboxItem(data.pageIndex, it)
+          } else {
+            InboxListItem.RegularInboxItem(data.pageIndex, it)
+          }
         }
       },
     )
@@ -472,6 +489,7 @@ class InboxViewModel @Inject constructor(
       when (it) {
         is InboxListItem.ConversationItem -> it.conversation.ts
         is InboxListItem.RegularInboxItem -> it.item.lastUpdateTs
+        is InboxListItem.RegistrationApplicationInboxItem -> it.item.lastUpdateTs
       }
     }
 
@@ -510,6 +528,59 @@ class InboxViewModel @Inject constructor(
   fun clearInboxNotifications() {
     currentAccount.value?.let {
       notificationsManager.removeAllInboxNotificationsForAccount(it)
+    }
+  }
+
+  fun approveRegistrationApplication(applicationId: Int, approve: Boolean, denyReason: String?) {
+    approveRegistrationApplicationResult.setIsLoading()
+    viewModelScope.launch {
+      var originalDecision: RegistrationDecision? = null
+
+      updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
+        originalDecision = it.item.decision
+        it.copy(item = it.item.copy(decision = RegistrationDecision.Pending))
+      }
+      if (isLoaded) {
+        publishInboxUpdate(scrollToTop = false)
+      }
+
+      apiClient.approveRegistrationApplication(applicationId, approve, denyReason)
+        .onSuccess {
+          updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
+            it.copy(item = it.item.copy(decision = if (approve) {
+              RegistrationDecision.Approved
+            } else {
+              RegistrationDecision.Declined
+            }))
+          }
+          if (isLoaded) {
+            publishInboxUpdate(scrollToTop = false)
+          }
+          approveRegistrationApplicationResult.postValue(Unit)
+        }
+        .onFailure {
+          if (originalDecision != null) {
+            updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
+              it.copy(item = it.item.copy(decision = originalDecision))
+            }
+            if (isLoaded) {
+              publishInboxUpdate(scrollToTop = false)
+            }
+          }
+          approveRegistrationApplicationResult.postError(it)
+        }
+    }
+  }
+
+  private inline fun <reified T: InboxListItem> updateSingleItem(id: Long, cb: (T) -> T) {
+    for ((index, data) in allInboxItems.withIndex()) {
+      if (data is T) {
+        if (data.id != id) {
+          continue
+        }
+        allInboxItems[index] = cb(data)
+        break
+      }
     }
   }
 }

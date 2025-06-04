@@ -35,15 +35,6 @@ abstract class BaseProvider(protected val activity: ImagePickerActivity) :
   }
 
   /**
-   * Show Short Toast Message
-   *
-   * @param messageRes String message resource
-   */
-  protected fun showToast(messageRes: Int) {
-    Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
-  }
-
-  /**
    * Call this method when task is cancel in between the operation.
    * E.g. user hit back-press
    */

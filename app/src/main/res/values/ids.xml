@@ -287,4 +287,6 @@
     <item name="swap_colors" type="id" />
     <item name="pa_toggle_mark_post_as_read" type="id" />
     <item name="create_a_new_community" type="id" />
+    <item name="approve" type="id" />
+    <item name="decline" type="id" />
 </resources>

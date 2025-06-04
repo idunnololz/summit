@@ -31,6 +31,4 @@ dependencies {
   implementation(libs.documentfile)
   implementation(libs.lifecycle.viewmodel.ktx)
   implementation(libs.navigation.fragment.ktx)
-
-  implementation(libs.ucropnedit)
 }

@@ -2135,6 +2135,13 @@
     <string name="pick_image_chooser_title">Select source</string>
     <string name="pick_image_camera">Camera</string>
     <string name="pick_image_gallery">Gallery</string>
+    <string name="approved">Approved</string>
+    <string name="declined">Declined</string>
+    <string name="make_a_decision">Make a decision</string>
+    <string name="approve">Approve</string>
+    <string name="decline">Decline</string>
+    <string name="decline_reason">Decline reason</string>
+    <string name="error_unable_to_approve_decline_registration_application">Unable to approve/decline registration application.</string>
 
     <plurals name="cross_posted_times">
         <item quantity="one">Cross-posted %1$s time</item>

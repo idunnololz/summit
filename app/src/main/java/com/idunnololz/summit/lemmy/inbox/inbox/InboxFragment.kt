@@ -9,9 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.HapticFeedbackConstantsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.navArgs
@@ -26,18 +24,16 @@ import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountInfoManager
-import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
-import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentInboxBinding
 import com.idunnololz.summit.databinding.InboxListItemBinding
 import com.idunnololz.summit.databinding.InboxListLoaderItemBinding
+import com.idunnololz.summit.databinding.InboxListRegistrationApplicationItemBinding
 import com.idunnololz.summit.databinding.ItemConversationBinding
 import com.idunnololz.summit.databinding.ItemInboxHeaderBinding
 import com.idunnololz.summit.databinding.ItemInboxWarningBinding
@@ -49,6 +45,7 @@ import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.InboxItem.RegistrationApplicationInboxItem
 import com.idunnololz.summit.lemmy.inbox.InboxSwipeToActionCallback
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.inbox.PageType
@@ -169,6 +166,24 @@ class InboxFragment :
         )
       }
     }
+
+    childFragmentManager.setFragmentResultListener(
+      ReasonDialogFragment.REQUEST_KEY,
+      this
+    ) { key, bundle ->
+      val result = bundle.getParcelableCompat<ReasonDialogFragment.Result>(
+        ReasonDialogFragment.RESULT_KEY
+      )
+      if (result != null) {
+        if (result.isOk) {
+          viewModel.approveRegistrationApplication(
+            applicationId = viewModel.lastApplicationId.value ?: return@setFragmentResultListener,
+            approve = false,
+            denyReason = result.reason
+          )
+        }
+      }
+    }
   }
 
   override fun onCreateView(
@@ -210,14 +225,22 @@ class InboxFragment :
 
       when (it) {
         PageType.Messages -> {
+          binding.fab.visibility = View.VISIBLE
           binding.fab.setImageResource(R.drawable.baseline_edit_24)
           binding.fab.setOnClickListener {
             PersonPickerDialogFragment.show(childFragmentManager)
           }
         }
+        PageType.Reports -> {
+          binding.fab.visibility = View.GONE
+        }
+        PageType.Applications -> {
+          binding.fab.visibility = View.GONE
+        }
 
         PageType.Conversation -> error("unreachable")
         else -> {
+          binding.fab.visibility = View.VISIBLE
           binding.fab.setImageResource(R.drawable.baseline_done_all_24)
           binding.fab.setOnClickListener {
             viewModel.markAllAsRead()
@@ -403,10 +426,20 @@ class InboxFragment :
         is StatefulData.Success -> {}
       }
     }
-
-    if (args.pageType == PageType.Reports) {
-      binding.fab.visibility = View.GONE
+    viewModel.approveRegistrationApplicationResult.observe(viewLifecycleOwner) {
+      when (it) {
+        is StatefulData.Error ->
+          ErrorDialogFragment.show(
+            message = getString(R.string.error_unable_to_approve_decline_registration_application),
+            error = it.error,
+            fm = childFragmentManager,
+          )
+        is StatefulData.Loading -> {}
+        is StatefulData.NotStarted -> {}
+        is StatefulData.Success -> {}
+      }
     }
+
     binding.fab.setup(preferences)
 
     installOnActionResultHandler(
@@ -520,6 +553,21 @@ class InboxFragment :
       onLinkLongClick = { url, text ->
         getMainActivity()?.showMoreLinkOptions(url, text)
       },
+      onApproveClick = { id ->
+        viewModel.approveRegistrationApplication(
+          applicationId = id,
+          approve = true,
+          denyReason = null
+        )
+      },
+      onDeclineClick = { id ->
+        viewModel.lastApplicationId.value = id
+        ReasonDialogFragment.show(
+          childFragmentManager,
+          getString(R.string.decline_reason),
+          getString(R.string.decline),
+        )
+      }
     ).apply {
       stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
@@ -622,6 +670,8 @@ class InboxFragment :
     private val onInstanceMismatch: (String, String) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (String, String) -> Unit,
+    private val onApproveClick: (applicationId: Int) -> Unit,
+    private val onDeclineClick: (applicationId: Int) -> Unit,
   ) : RecyclerView.Adapter<ViewHolder>() {
 
     private sealed interface Item {
@@ -634,6 +684,10 @@ class InboxFragment :
 
       data class InboxListItem(
         val inboxItem: InboxItem,
+      ) : Item
+
+      data class RegistrationApplicationItem(
+        val registrationApplication: RegistrationApplicationInboxItem,
       ) : Item
 
       data class ConversationItem(
@@ -652,6 +706,9 @@ class InboxFragment :
       areItemsTheSame = { old, new ->
         old::class == new::class && when (old) {
           is Item.HeaderItem -> true
+          is Item.RegistrationApplicationItem ->
+            old.registrationApplication.id ==
+              (new as Item.RegistrationApplicationItem).registrationApplication.id
           is Item.InboxListItem ->
             old.inboxItem.id == (new as Item.InboxListItem).inboxItem.id
           is Item.ConversationItem ->
@@ -692,6 +749,23 @@ class InboxFragment :
           onInstanceMismatch = onInstanceMismatch,
           onLinkClick = onLinkClick,
           onLinkLongClick = onLinkLongClick,
+        )
+      }
+      addItemType(
+        Item.RegistrationApplicationItem::class,
+        InboxListRegistrationApplicationItemBinding::inflate) { item, b, _ ->
+
+        postAndCommentViewBuilder.bindRegistrationApplication(
+          b = b,
+          instance = instance,
+          item = item.registrationApplication,
+          onImageClick = onImageClick,
+          onVideoClick = onVideoClick,
+          onPageClick = onPageClick,
+          onLinkClick = onLinkClick,
+          onLinkLongClick = onLinkLongClick,
+          onApproveClick = onApproveClick,
+          onDeclineClick = onDeclineClick,
         )
       }
       addItemType(
@@ -785,6 +859,27 @@ class InboxFragment :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
+    fun hasMore(): Boolean = inboxModel.hasMore
+
+    fun isEmpty(): Boolean = inboxModel.items.isEmpty()
+
+    fun getItemAt(position: Int): InboxItem? =
+      when (val item = adapterHelper.items.getOrNull(position)) {
+        is Item.HeaderItem -> null
+        is Item.InboxListItem -> item.inboxItem
+        is Item.ConversationItem -> null
+        is Item.LoaderItem -> null
+        null -> null
+        is Item.TooManyMessagesWarningItem -> null
+        is Item.RegistrationApplicationItem -> item.registrationApplication
+      }
+
+    fun setData(inboxModel: InboxModel, cb: (() -> Unit)? = null) {
+      Log.d(TAG, "Data set! hasMore: ${inboxModel.hasMore}")
+      this.inboxModel = inboxModel
+      refreshItems(cb)
+    }
+
     private fun refreshItems(cb: (() -> Unit)? = null) {
       val newItems = mutableListOf<Item>()
 
@@ -805,6 +900,13 @@ class InboxFragment :
               ),
             )
           }
+          is InboxListItem.RegistrationApplicationInboxItem -> {
+            newItems.add(
+              Item.RegistrationApplicationItem(
+                item.item
+              )
+            )
+          }
           is InboxListItem.RegularInboxItem -> {
             newItems.add(Item.InboxListItem(item.item))
           }
@@ -820,26 +922,6 @@ class InboxFragment :
       }
 
       adapterHelper.setItems(newItems, this, cb)
-    }
-
-    fun hasMore(): Boolean = inboxModel.hasMore
-
-    fun isEmpty(): Boolean = inboxModel.items.isEmpty()
-
-    fun getItemAt(position: Int): InboxItem? =
-      when (val item = adapterHelper.items.getOrNull(position)) {
-        is Item.HeaderItem -> null
-        is Item.InboxListItem -> item.inboxItem
-        is Item.ConversationItem -> null
-        is Item.LoaderItem -> null
-        null -> null
-        is Item.TooManyMessagesWarningItem -> null
-      }
-
-    fun setData(inboxModel: InboxModel, cb: (() -> Unit)? = null) {
-      Log.d(TAG, "Data set! hasMore: ${inboxModel.hasMore}")
-      this.inboxModel = inboxModel
-      refreshItems(cb)
     }
   }
 }

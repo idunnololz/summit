@@ -22,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.annotation.IdRes
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.Barrier
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -39,6 +40,7 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import arrow.core.Either
+import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -50,6 +52,7 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.InboxListItemBinding
+import com.idunnololz.summit.databinding.InboxListRegistrationApplicationItemBinding
 import com.idunnololz.summit.databinding.PostBadgeCrossPostedBinding
 import com.idunnololz.summit.databinding.PostCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
@@ -65,6 +68,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.lemmy.inbox.RegistrationDecision
 import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
@@ -1573,6 +1577,207 @@ class PostAndCommentViewBuilder @Inject constructor(
     if (item.isRead) {
       b.root.setTag(R.id.swipe_enabled, false)
     }
+  }
+
+  fun bindRegistrationApplication(
+    b: InboxListRegistrationApplicationItemBinding,
+    instance: String,
+    item: InboxItem.RegistrationApplicationInboxItem,
+    onImageClick: (String) -> Unit,
+    onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onPageClick: (PageRef) -> Unit,
+    onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
+    onLinkLongClick: (url: String, text: String) -> Unit,
+    onApproveClick: (applicationId: Int) -> Unit,
+    onDeclineClick: (applicationId: Int) -> Unit,
+  ) = with(b) {
+    val leftHandMode = leftHandMode
+    if ((b.root.getTag(R.id.left_hand_mode) as? Boolean) != leftHandMode) {
+      if (leftHandMode) {
+        b.actionsContainer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+          endToEnd = ConstraintLayout.LayoutParams.UNSET
+          startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+        }
+      } else {
+        b.actionsContainer.updateLayoutParams<ConstraintLayout.LayoutParams> {
+          endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+          startToStart = ConstraintLayout.LayoutParams.UNSET
+        }
+      }
+      b.root.setTag(R.id.left_hand_mode, leftHandMode)
+    }
+
+    b.author.text = buildSpannedString {
+      run {
+        val s = length
+        appendLink(
+          item.authorName,
+          LinkUtils.getLinkForPerson(item.authorInstance, item.authorName),
+          underline = false,
+        )
+        val e = length
+        setSpan(
+          ForegroundColorSpan(normalTextColor),
+          s,
+          e,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+        setSpan(
+          StyleSpan(Typeface.BOLD),
+          s,
+          e,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+      }
+    }
+    b.author.movementMethod = CustomLinkMovementMethod().apply {
+      onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
+      onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
+        override fun onClick(textView: TextView, url: String, text: String, rect: RectF): Boolean {
+          val pageRef = LinkResolver.parseUrl(url, instance)
+
+          return if (pageRef != null) {
+            onPageClick(pageRef)
+            true
+          } else {
+            false
+          }
+        }
+      }
+    }
+
+    TextViewCompat.setCompoundDrawableTintList(
+      b.author,
+      ColorStateList.valueOf(context.getColorCompat(R.color.style_red)),
+    )
+
+    val drawable = context.getDrawableCompat(R.drawable.baseline_outlined_flag_24)
+    drawable?.setBounds(
+      0,
+      0,
+      Utils.convertDpToPixel(16f).toInt(),
+      Utils.convertDpToPixel(16f).toInt(),
+    )
+    val faintTextColor = context.getColorCompat(R.color.colorTextFaint)
+
+    b.author.setCompoundDrawablesRelative(
+      drawable,
+      null,
+      null,
+      null,
+    )
+    b.date.text = tsToConcise(context, item.lastUpdate)
+
+    val title = if (item is InboxItem.MessageInboxItem) {
+      context.getString(R.string.message_to_format, item.targetUserName)
+    } else {
+      item.title
+    }
+
+    if (item.isDeleted) {
+      b.content.text = buildSpannedString {
+        val s = length
+        append(context.getString(R.string.deleted))
+        val e = length
+        setSpan(
+          BorderedSpan(context),
+          s,
+          e,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+      }
+    } else if (item.isRemoved) {
+      b.content.text = buildSpannedString {
+        val s = length
+        append(context.getString(R.string.removed))
+        val e = length
+        setSpan(
+          BorderedSpan(context),
+          s,
+          e,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+      }
+    } else {
+      lemmyTextHelper.bindText(
+        textView = b.content,
+        text = item.content,
+        instance = instance,
+        showMediaAsLinks = true,
+        onImageClick = {
+          onImageClick(it)
+        },
+        onVideoClick = { url ->
+          onVideoClick(url, VideoType.Unknown, null)
+        },
+        onPageClick = onPageClick,
+        onLinkClick = onLinkClick,
+        onLinkLongClick = onLinkLongClick,
+      )
+    }
+
+    when (item.decision) {
+      RegistrationDecision.Approved -> {
+        val colorStateList = ColorStateList.valueOf(context.getColorCompat(R.color.style_green))
+
+        b.decision.setText(R.string.approved)
+        b.decision.chipStrokeColor = colorStateList
+        b.decision.chipIconTint = colorStateList
+        b.decision.chipIcon = context.getDrawableCompat(R.drawable.baseline_check_18)
+      }
+      RegistrationDecision.Declined -> {
+        val colorStateList = ColorStateList.valueOf(context.getColorCompat(R.color.style_red))
+
+        b.decision.setText(R.string.declined)
+        b.decision.chipStrokeColor = colorStateList
+        b.decision.chipIconTint = colorStateList
+        b.decision.chipIcon = context.getDrawableCompat(R.drawable.baseline_close_18)
+      }
+      RegistrationDecision.NoDecision -> {
+        val colorStateList = ColorStateList.valueOf(
+          context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+        b.decision.setText(R.string.make_a_decision)
+        b.decision.chipStrokeColor = colorStateList
+      }
+      RegistrationDecision.Pending -> {
+        val colorStateList = ColorStateList.valueOf(
+          context.getColorCompat(R.color.colorTextFaint))
+        b.decision.setText(R.string.pending)
+        b.decision.chipStrokeColor = colorStateList
+      }
+    }
+
+    b.decision.setOnClickListener {
+      PopupMenu(
+        context,
+        b.decision,
+        Gravity.NO_GRAVITY,
+        0,
+        R.style.Theme_App_Widget_Material3_PopupMenu_Overflow,
+      ).apply {
+        menu.apply {
+          add(0, R.id.approve, 0, R.string.approve)
+          add(0, R.id.decline, 0, R.string.decline)
+        }
+
+        setOnMenuItemClickListener {
+          when (it.itemId) {
+            R.id.approve -> {
+              onApproveClick(item.id)
+            }
+            R.id.decline -> {
+              onDeclineClick(item.id)
+            }
+          }
+
+          true
+        }
+
+        show()
+      }
+    }
+
+    b.root.setTag(R.id.swipe_enabled, false)
   }
 
   private fun makeCommentActionButton(@IdRes idRes: Int) = ImageView(
