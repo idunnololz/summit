@@ -1351,4 +1351,6 @@
     <string name="auto_focus_search_bar_desc">Όταν είναι ενεργό, η γραμμή αναζήτησης θα εστιάζεται αυτόματα όταν ανοίγει η οθόνη.</string>
     <string name="open_link_when_thumbnail_tapped_desc">Όταν είναι ενεργό, πατώντας μια μικρογραφία σε συγκεκριμένες διατάξεις θα ανοίξει ο σύνδεσμος της ανάρτησης αντί να επεκταθεί η ανάρτηση.</string>
     <string name="url_filters_desc">Φιλτράρισμα αναρτήσεων με βάση τη διεύθυνση URL της ανάρτησης. Λειτουργεί μόνο εάν η ανάρτηση έχει εικόνα ή διεύθυνση URL ανάρτησης.</string>
+    <string name="random_communities">Τυχαίες κοινότητες</string>
+    <string name="display_deleted_posts">Εμφάνιση διαγραμμένων αναρτήσεων</string>
 </resources>
