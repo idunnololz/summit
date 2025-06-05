@@ -2142,6 +2142,8 @@
     <string name="decline">Decline</string>
     <string name="decline_reason">Decline reason</string>
     <string name="error_unable_to_approve_decline_registration_application">Unable to approve/decline registration application.</string>
+    <string name="view_votes">View votes</string>
+    <string name="votes">Votes</string>
 
     <plurals name="cross_posted_times">
         <item quantity="one">Cross-posted %1$s time</item>

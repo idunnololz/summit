@@ -70,9 +70,13 @@ import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.InstanceId
+import com.idunnololz.summit.api.dto.ListCommentLikes
+import com.idunnololz.summit.api.dto.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.ListCommentReports
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunities
+import com.idunnololz.summit.api.dto.ListPostLikes
+import com.idunnololz.summit.api.dto.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.ListPostReports
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.ListPrivateMessageReports
@@ -776,6 +780,66 @@ class LemmyApiClient @Inject constructor(
       .fold(
         onSuccess = {
           Result.success(it.comment_view)
+        },
+        onFailure = {
+          Result.failure(it)
+        },
+      )
+  }
+
+  suspend fun listCommentVotesWithRetry(
+    commentId: Int,
+    page: Long = 1,
+    limit: Long = 20,
+    force: Boolean = false,
+    account: Account,
+  ): Result<ListCommentLikesResponse> = retry {
+    val form = ListCommentLikes(
+      comment_id = commentId,
+      page = page,
+      limit = limit,
+    )
+
+    retrofitErrorHandler {
+      if (force) {
+        api.listCommentVotesNoCache(authorization = account.bearer, form.serializeToMap())
+      } else {
+        api.listCommentVotes(authorization = account.bearer, form.serializeToMap())
+      }
+    }
+      .fold(
+        onSuccess = {
+          Result.success(it)
+        },
+        onFailure = {
+          Result.failure(it)
+        },
+      )
+  }
+
+  suspend fun listPostVotesWithRetry(
+    postId: Int,
+    page: Long = 1,
+    limit: Long = 20,
+    force: Boolean = false,
+    account: Account,
+  ): Result<ListPostLikesResponse> = retry {
+    val form = ListPostLikes(
+      post_id = postId,
+      page = page,
+      limit = limit,
+    )
+
+    retrofitErrorHandler {
+      if (force) {
+        api.listPostVotesNoCache(authorization = account.bearer, form.serializeToMap())
+      } else {
+        api.listPostVotes(authorization = account.bearer, form.serializeToMap())
+      }
+    }
+      .fold(
+        onSuccess = {
+          Result.success(it)
         },
         onFailure = {
           Result.failure(it)

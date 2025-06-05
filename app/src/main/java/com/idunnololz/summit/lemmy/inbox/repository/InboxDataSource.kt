@@ -3,10 +3,13 @@ package com.idunnololz.summit.lemmy.inbox.repository
 import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
+import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import com.idunnololz.summit.util.ext.hasInternet
 import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.math.min
+
+const val DEFAULT_PAGE_SIZE = 20
 
 class InboxSource<O>(
   @ApplicationContext context: Context,
@@ -21,7 +24,7 @@ class InboxSource<O>(
 ) : LemmyListSource<LiteInboxItem, O>(
   context,
   {
-    id
+    id.toLong()
   },
   defaultSortOrder,
   fetchObjects,
@@ -55,9 +58,13 @@ class InboxSource<O>(
   }
 }
 
+/**
+ * @param T the type of the list.
+ * @param O the type of the sort order.
+ */
 open class LemmyListSource<T, O>(
   @ApplicationContext private val context: Context,
-  private val id: T.() -> Int,
+  private val id: T.() -> Long,
   defaultSortOrder: O,
   private val fetchObjects: suspend (
     pageIndex: Int,
@@ -70,7 +77,7 @@ open class LemmyListSource<T, O>(
    * The source of this source. Useful if the caller needs to be able to differentiate between
    * sources or needs more information about the source.
    */
-  val source: Any,
+  val source: Any = Unit,
 ) {
 
   companion object {
@@ -91,7 +98,7 @@ open class LemmyListSource<T, O>(
   )
 
   protected val allObjects = mutableListOf<ObjectData<T>>()
-  private val seenObjects = mutableSetOf<Int>()
+  private val seenObjects = mutableSetOf<Long>()
   private val invalidatedPages = mutableSetOf<Int>()
 
   private var currentPageInternal = 1
@@ -267,6 +274,98 @@ open class LemmyListSource<T, O>(
   protected fun removeItemAt(position: Int): ObjectData<T> {
     return allObjects.removeAt(position).also {
       seenObjects.remove(it.obj.id())
+    }
+  }
+}
+
+class MultiLemmyListSource<T, O>(
+  private val sources: List<LemmyListSource<T, O>>,
+  private val pageSize: Int = DEFAULT_PAGE_SIZE,
+  private val sortValue: (T) -> Long,
+  private val id: (T) -> Long,
+) {
+
+  companion object {
+    private const val TAG = "MultiLemmyListSource"
+  }
+
+  val seenIds = mutableSetOf<Long>()
+  val allItems = mutableListOf<T>()
+
+  suspend fun getPage(
+    pageIndex: Int,
+    force: Boolean,
+    retainItemsOnForce: Boolean,
+  ): Result<PageResult<T>> {
+    Log.d(
+      TAG,
+      "Index: $pageIndex. Sources: ${sources.size}. Force: $force",
+    )
+
+    if (force) {
+      if (!retainItemsOnForce) {
+        allItems.clear()
+        seenIds.clear()
+      }
+      sources.forEach {
+        it.invalidate()
+      }
+    }
+
+    val startIndex = pageIndex * pageSize
+    val endIndex = (pageIndex + 1) * pageSize
+    var hasMore = true
+
+    while (allItems.size < endIndex) {
+      val sourceToResult = sources.map { it to it.peekNextItem() }
+      val sourceAndError = sourceToResult.firstOrNull { (_, result) -> result.isFailure }
+
+      if (sourceAndError != null) {
+        return Result.failure(requireNotNull(sourceAndError.second.exceptionOrNull()))
+      }
+
+      val nextSourceAndResult = sourceToResult.maxBy {
+          (_, result) ->
+        val value = result.getOrNull() ?: return@maxBy 0L
+        sortValue(value)
+      }
+      val nextItem = nextSourceAndResult.second.getOrNull()
+
+      if (nextItem == null) {
+        // no more items!
+        hasMore = false
+        break
+      }
+
+      val itemId = id(nextItem)
+      Log.d(
+        TAG,
+        "Adding item ${itemId} from source ${nextItem::class.java}",
+      )
+
+      if (seenIds.add(itemId)) {
+        allItems.add(nextItem)
+      }
+
+      // increment the max item
+      nextSourceAndResult.first.next()
+    }
+
+    return Result.success(
+      PageResult(
+        pageIndex,
+        allItems
+          .slice(startIndex until min(endIndex, allItems.size)),
+        hasMore = hasMore,
+      ),
+    )
+  }
+
+  fun invalidate() {
+    allItems.clear()
+    seenIds.clear()
+    sources.forEach {
+      it.invalidate()
     }
   }
 }

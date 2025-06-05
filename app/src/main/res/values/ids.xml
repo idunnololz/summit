@@ -289,4 +289,6 @@
     <item name="create_a_new_community" type="id" />
     <item name="approve" type="id" />
     <item name="decline" type="id" />
+    <item name="comment_view_votes" type="id" />
+    <item name="post_view_votes" type="id" />
 </resources>

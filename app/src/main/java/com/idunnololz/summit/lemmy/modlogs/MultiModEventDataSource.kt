@@ -48,7 +48,7 @@ class MultiModEventDataSource(
       val sources = types.map { type ->
         LemmyListSource<ModEvent, Unit>(
           context,
-          { this.id },
+          { this.id.toLong() },
           Unit,
           { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
             apiClient.fetchModLogs(

@@ -54,7 +54,7 @@ class MultiCommunityDataSource(
       val sources = communities.map { communityRef ->
         LemmyListSource(
           context = context,
-          id = { postView.post.id },
+          id = { postView.post.id.toLong() },
           defaultSortOrder = SortType.Active,
           fetchObjects = { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
             apiClient
@@ -94,7 +94,7 @@ class MultiCommunityDataSource(
         apiClient.changeInstance(account.instance)
         LemmyListSource(
           context = context,
-          id = { postView.post.id },
+          id = { postView.post.id.toLong() },
           defaultSortOrder = SortType.Active,
           fetchObjects = { page: Int, sortOrder: SortType, limit: Int, force: Boolean ->
             apiClient

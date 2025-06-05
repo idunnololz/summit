@@ -40,8 +40,6 @@ class InboxRepository @Inject constructor(
 
   companion object {
     private const val TAG = "InboxRepository"
-
-    private const val DEFAULT_PAGE_SIZE = 20
   }
 
   private val repliesStatelessSource: InboxSource<CommentSortType> =

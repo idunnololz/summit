@@ -672,7 +672,7 @@ class InboxFragment :
     private val onLinkLongClick: (String, String) -> Unit,
     private val onApproveClick: (applicationId: Int) -> Unit,
     private val onDeclineClick: (applicationId: Int) -> Unit,
-  ) : RecyclerView.Adapter<ViewHolder>() {
+  ) : Adapter<ViewHolder>() {
 
     private sealed interface Item {
 

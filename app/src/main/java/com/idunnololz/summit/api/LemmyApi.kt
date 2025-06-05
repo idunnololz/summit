@@ -1,5 +1,6 @@
 package com.idunnololz.summit.api
 
+import androidx.room.Query
 import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
@@ -50,8 +51,10 @@ import com.idunnololz.summit.api.dto.GetUnreadCountResponse
 import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.HideCommunity
+import com.idunnololz.summit.api.dto.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.ListRegistrationApplications
@@ -172,6 +175,34 @@ interface LemmyApi {
     @Header("Authorization") authorization: String?,
     @Body form: CreateCommentLike,
   ): Call<CommentResponse>
+
+
+  @GET("comment/like/list")
+  fun listCommentVotes(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListCommentLikesResponse>
+
+
+  @GET("comment/like/list")
+  @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+  fun listCommentVotesNoCache(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListCommentLikesResponse>
+
+  @GET("post/like/list")
+  fun listPostVotes(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListPostLikesResponse>
+
+  @GET("post/like/list")
+  @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+  fun listPostVotesNoCache(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListPostLikesResponse>
 
   /**
    * Create a comment.

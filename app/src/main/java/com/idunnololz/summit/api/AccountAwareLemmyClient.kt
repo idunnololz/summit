@@ -458,6 +458,34 @@ class AccountAwareLemmyClient @Inject constructor(
       .autoSignOut(account)
   }
 
+  suspend fun listCommentVotesWithRetry(
+    commentId: Int,
+    page: Long = 1,
+    limit: Long = 20,
+    force: Boolean = false,
+    account: Account? = accountForInstance(),
+  ) =
+    if (account != null) {
+      apiClient.listCommentVotesWithRetry(commentId, page, limit, force, account)
+        .autoSignOut(account)
+    } else {
+      createAccountErrorResult()
+    }
+
+  suspend fun listPostVotesWithRetry(
+    postId: Int,
+    page: Long = 1,
+    limit: Long = 20,
+    force: Boolean = false,
+    account: Account? = accountForInstance(),
+  ) =
+    if (account != null) {
+      apiClient.listPostVotesWithRetry(postId, page, limit, force, account)
+        .autoSignOut(account)
+    } else {
+      createAccountErrorResult()
+    }
+
   suspend fun deletePost(
     id: PostId,
     delete: Boolean,

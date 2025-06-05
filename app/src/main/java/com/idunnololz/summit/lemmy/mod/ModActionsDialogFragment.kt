@@ -36,6 +36,7 @@ import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommentModSt
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommunityModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.PostModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.UserModState
+import com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -318,6 +319,22 @@ class ModActionsDialogFragment :
                 ),
               )
             }
+            R.id.post_view_votes -> {
+              ViewVotesDialogFragment.show(
+                args.postId.toLong(),
+                0,
+                parentFragmentManager,
+              )
+              dismiss()
+            }
+            R.id.comment_view_votes -> {
+              ViewVotesDialogFragment.show(
+                0,
+                args.commentId.toLong(),
+                parentFragmentManager,
+              )
+              dismiss()
+            }
           }
         }
       }
@@ -517,6 +534,11 @@ class ModActionsDialogFragment :
               )
             }
           }
+          adapter?.addItemWithIcon(
+            id = R.id.comment_view_votes,
+            title = R.string.view_votes,
+            icon = R.drawable.baseline_arrow_upward_24,
+          )
         }
         is CommunityModState -> {
           if (args.personId != viewModel.currentAccount?.id) {
@@ -577,6 +599,11 @@ class ModActionsDialogFragment :
               icon = R.drawable.outline_lock_24,
             )
           }
+          adapter?.addItemWithIcon(
+            id = R.id.post_view_votes,
+            title = R.string.view_votes,
+            icon = R.drawable.baseline_arrow_upward_24,
+          )
         }
         is UserModState -> {
           adapter?.addDividerIfNeeded()

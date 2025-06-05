@@ -1668,10 +1668,15 @@ class PostAndCommentViewBuilder @Inject constructor(
     )
     b.date.text = tsToConcise(context, item.lastUpdate)
 
-    val title = if (item is InboxItem.MessageInboxItem) {
-      context.getString(R.string.message_to_format, item.targetUserName)
+    if (item.decision == RegistrationDecision.Approved ||
+      item.decision == RegistrationDecision.Declined) {
+
+      b.author.setTextColor(faintTextColor)
+      b.content.setTextColor(faintTextColor)
     } else {
-      item.title
+      b.author.setTextColor(context.getColorCompat(R.color.colorText))
+      b.author.alpha = 1f
+      b.content.setTextColor(context.getColorCompat(R.color.colorText))
     }
 
     if (item.isDeleted) {

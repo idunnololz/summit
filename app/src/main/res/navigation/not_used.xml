@@ -411,4 +411,15 @@ safeargs.
             android:name="positive_button"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/viewVotesDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesDialogFragment"
+        android:label="ViewVotesDialogFragment" >
+        <argument
+            android:name="postId"
+            app:argType="long" />
+        <argument
+            android:name="commentId"
+            app:argType="long" />
+    </dialog>
 </navigation>
