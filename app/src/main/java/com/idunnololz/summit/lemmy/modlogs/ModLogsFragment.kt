@@ -24,11 +24,14 @@ import com.idunnololz.summit.databinding.ModEventItemBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.modlogs.filter.ModLogsFilterDialogFragment
 import com.idunnololz.summit.lemmy.utils.ListEngine
+import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
@@ -64,6 +67,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
 
+  @Inject
+  lateinit var preferences: Preferences
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -86,12 +92,14 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     val context = requireContext()
 
     requireSummitActivity().apply {
-      insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.recyclerView)
+      insetViewAutomaticallyByPaddingAndNavUi(
+        viewLifecycleOwner,
+        binding.coordinatorLayout,
+        applyTopInset = false,
+      )
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
       setupToolbar(binding.toolbar, getString(R.string.mod_logs))
-
-      binding.contentContainer.updatePadding(bottom = getBottomNavHeight())
     }
 
     viewModel.setArguments(args.instance, args.communityRef)
@@ -159,6 +167,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
         },
       )
+      fab.setup(preferences)
+      fab.setOnClickListener {
+        ModLogsFilterDialogFragment.show(childFragmentManager)
+      }
 
       swipeRefreshLayout.setOnRefreshListener {
         viewModel.reset()
@@ -649,8 +661,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         }
 
         b.overtext.text = SpannableStringBuilder().apply {
-          append(tsToConcise(context, modEvent.ts))
-          appendSeparator()
           append(
             context.getString(
               R.string.mod_action_format,
@@ -695,6 +705,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             onLinkLongClick,
           )
         }
+        b.date.text = tsToConcise(context, modEvent.ts)
         lemmyTextHelper.bindText(
           textView = b.title,
           text = description,

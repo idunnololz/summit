@@ -252,7 +252,7 @@ class SignUpFragment :
             setAdapter(
               ArrayAdapter(
                 context,
-                com.google.android.material.R.layout.m3_auto_complete_simple_item,
+                R.layout.auto_complete_simple_item,
                 DEFAULT_LEMMY_INSTANCES,
               ),
             )

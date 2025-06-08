@@ -1336,7 +1336,7 @@
     <!-- Title text for admin actions menu. -->
     <string name="admin_actions">Admin actions</string>
     <!-- Keep short. Button text. -->
-    <string name="ban_user_from_site">Ban user from site</string>
+    <string name="ban_user_from_site">Ban user from instance</string>
     <!-- Keep short. Button text. -->
     <string name="ban_user_from_community">Ban user from community</string>
     <!-- Keep short. Button text. -->
@@ -1532,7 +1532,7 @@
     <!-- Keep short. Button text. -->
     <string name="change_instance">Change instance</string>
     <!-- Keep short. Button text. -->
-    <string name="purge_person">Purge person</string>
+    <string name="purge_person">Purge user</string>
     <!-- Keep short. Button text. -->
     <string name="undo_user_ban">Undo user ban</string>
     <!-- Keep short. Button text. -->
@@ -2144,6 +2144,13 @@
     <string name="error_unable_to_approve_decline_registration_application">Unable to approve/decline registration application.</string>
     <string name="view_votes">View votes</string>
     <string name="votes">Votes</string>
+    <string name="filter_by_action">Filter by action</string>
+    <string name="filter_mod_logs">Filter mod logs</string>
+    <string name="add_admin">Add admin</string>
+    <string name="transferred_ownership_of_community">Transfer ownership of community</string>
+    <string name="add_mod">Add mod</string>
+    <string name="filter_by_user">Filter by user</string>
+    <string name="filter_by_mod">Filter by mod/admin</string>
 
     <plurals name="cross_posted_times">
         <item quantity="one">Cross-posted %1$s time</item>

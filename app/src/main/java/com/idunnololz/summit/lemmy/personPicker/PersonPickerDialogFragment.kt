@@ -38,11 +38,16 @@ class PersonPickerDialogFragment :
     const val REQUEST_KEY = "PersonPickerDialogFragment_req_key"
     const val REQUEST_KEY_RESULT = "result"
 
-    fun show(fragmentManager: FragmentManager, prefill: String? = null) {
+    fun show(
+      fragmentManager: FragmentManager,
+      prefill: String? = null,
+      requestKey: String? = null
+    ) {
       PersonPickerDialogFragment()
         .apply {
           arguments = PersonPickerDialogFragmentArgs(
-            prefill,
+            prefill = prefill,
+            requestKey = requestKey,
           ).toBundle()
         }
         .showAllowingStateLoss(fragmentManager, "PersonPickerDialogFragment")
@@ -85,10 +90,8 @@ class PersonPickerDialogFragment :
   override fun onStart() {
     super.onStart()
     val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
+    dialog?.window?.let { window ->
+      WindowCompat.setDecorFitsSystemWindows(window, false)
     }
   }
 
@@ -131,7 +134,7 @@ class PersonPickerDialogFragment :
         instance = viewModel.instance,
         onSinglePersonSelected = { ref, icon, personId ->
           setFragmentResult(
-            REQUEST_KEY,
+            args.requestKey ?: REQUEST_KEY,
             bundleOf(
               REQUEST_KEY_RESULT to Result(
                 personRef = ref,

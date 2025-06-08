@@ -1010,22 +1010,18 @@ class AccountAwareLemmyClient @Inject constructor(
     force: Boolean,
     account: Account? = accountForInstance(),
   ): Result<GetModlogResponse> =
-    if (account != null) {
-      apiClient
-        .fetchModLogs(
-          personId = personId,
-          communityId = communityId,
-          page = page,
-          limit = limit,
-          actionType = actionType,
-          otherPersonId = otherPersonId,
-          account = account,
-          force = force,
-        )
-        .autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+    apiClient
+      .fetchModLogs(
+        personId = personId,
+        communityId = communityId,
+        page = page,
+        limit = limit,
+        actionType = actionType,
+        otherPersonId = otherPersonId,
+        account = account,
+        force = force,
+      )
+      .autoSignOut(account)
 
   suspend fun getUnreadRegistrationApplicationsCount(
     force: Boolean,
