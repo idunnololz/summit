@@ -100,7 +100,7 @@ class SearchTabbedViewModel @Inject constructor(
     }
     viewModelScope.launch {
       currentPersonFilter.collect {
-        queryEnginesByType[currentType]?.setPersonFilter(it?.personId)
+        queryEnginesByType[currentType]?.setPersonFilter(it?.personRef?.id)
       }
     }
     viewModelScope.launch {
@@ -133,7 +133,7 @@ class SearchTabbedViewModel @Inject constructor(
 
     queryEnginesByType[currentType]?.apply {
       setSortType(currentSortTypeFlow.value)
-      setPersonFilter(currentPersonFilter.value?.personId)
+      setPersonFilter(currentPersonFilter.value?.personRef?.id)
       setCommunityFilter(currentCommunityFilter.value?.communityId)
 
       // Set query must be last to avoid race conditions
@@ -153,8 +153,7 @@ class SearchTabbedViewModel @Inject constructor(
 
   @Parcelize
   data class PersonFilter(
-    val personId: PersonId,
-    val personRef: PersonRef.PersonRefByName,
+    val personRef: PersonRef.PersonRefComplete,
   ) : Parcelable
 
   @Parcelize

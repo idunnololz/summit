@@ -427,4 +427,12 @@ safeargs.
             android:name="commentId"
             app:argType="long" />
     </dialog>
+    <dialog
+        android:id="@+id/modLogsFilterDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.modlogs.filter.ModLogsFilterDialogFragment"
+        android:label="ModLogsFilterDialogFragment" >
+        <argument
+            android:name="filter"
+            app:argType="com.idunnololz.summit.lemmy.modlogs.ModLogsFilterConfig" />
+    </dialog>
 </navigation>

@@ -156,10 +156,10 @@ class InboxFragment :
           accountId = accountId,
           conversation = Either.Right(
             NewConversation(
-              result.personId,
-              result.personRef.instance,
-              result.personRef.name,
-              result.icon,
+              personId = result.personRef.id,
+              personInstance = result.personRef.instance,
+              personName = result.personRef.name,
+              personAvatar = result.icon,
             ),
           ),
           instance = viewModel.instance,

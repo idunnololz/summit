@@ -111,7 +111,6 @@ class PostViewModel @Inject constructor(
 
   private var getPostResponse: GetPostResponse? = null
   private var postView: PostView? = null
-  private var crossPosts: List<PostView>? = null
   private var comments: List<CommentView>? = null
   private var pendingComments: List<PendingCommentView>? = null
   private var newlyPostedCommentId: CommentId? = null

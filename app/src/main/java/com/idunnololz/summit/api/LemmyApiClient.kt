@@ -1915,11 +1915,11 @@ class LemmyApiClient @Inject constructor(
   }
 
   /**
-   * @param personId the id of the mod
+   * @param modPersonId the id of the mod
    * @param otherPersonId the id of the person that the action was against
    */
   suspend fun fetchModLogs(
-    personId: PersonId? = null,
+    modPersonId: PersonId? = null,
     communityId: CommunityId? = null,
     page: Int? = null,
     limit: Int? = null,
@@ -1930,7 +1930,7 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
   ): Result<GetModlogResponse> {
     val form = GetModlog(
-      mod_person_id = personId,
+      mod_person_id = modPersonId,
       community_id = communityId,
       page = page,
       limit = limit,

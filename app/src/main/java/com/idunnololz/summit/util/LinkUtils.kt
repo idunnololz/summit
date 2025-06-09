@@ -49,6 +49,9 @@ object LinkUtils {
   fun getLinkForPerson(personRef: PersonRef.PersonRefByName) =
     getLinkForPerson(personRef.instance, personRef.name)
 
+  fun getLinkForPerson(personRef: PersonRef.PersonRefComplete) =
+    getLinkForPerson(personRef.instance, personRef.name)
+
   fun getLinkForPerson(instance: String, name: String): String = "https://$instance/u/$name"
 
   fun getLinkForPost(instance: String, id: PostId): String = "https://$instance/post/$id"

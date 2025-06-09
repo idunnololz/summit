@@ -1000,7 +1000,7 @@ class AccountAwareLemmyClient @Inject constructor(
   }
 
   suspend fun fetchModLogs(
-    personId: PersonId? = null,
+    modPersonId: PersonId? = null,
     communityId: CommunityId? = null,
     page: Int? = null,
     limit: Int? = null,
@@ -1012,7 +1012,7 @@ class AccountAwareLemmyClient @Inject constructor(
   ): Result<GetModlogResponse> =
     apiClient
       .fetchModLogs(
-        personId = personId,
+        modPersonId = modPersonId,
         communityId = communityId,
         page = page,
         limit = limit,

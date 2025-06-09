@@ -235,6 +235,7 @@ class LinkFixer @Inject constructor(
     is CommunityRef.Subscribed -> this.copy(instance = newInstance)
     is PersonRef.PersonRefByName -> this.copy(instance = newInstance)
     is PersonRef.PersonRefById -> this.copy(instance = newInstance)
+    is PersonRef.PersonRefComplete -> this.copy(instance = newInstance)
     is PostRef -> this.copy(instance = newInstance)
   }
 

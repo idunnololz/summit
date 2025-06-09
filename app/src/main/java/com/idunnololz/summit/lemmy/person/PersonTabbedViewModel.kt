@@ -126,6 +126,15 @@ class PersonTabbedViewModel @Inject constructor(
       }
 
       val result = when (personRef) {
+        is PersonRef.PersonRefComplete -> {
+          apiClient.fetchPersonByNameWithRetry(
+            name = personRef.fullName,
+            page = pageIndex.toLemmyPageIndex(),
+            limit = PAGE_SIZE,
+            force = force,
+            sortType = sortType,
+          )
+        }
         is PersonRef.PersonRefByName -> {
           apiClient.fetchPersonByNameWithRetry(
             name = personRef.fullName,

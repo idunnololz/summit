@@ -61,6 +61,7 @@ class PersonPickerDialogFragment :
   private val viewModel: PersonPickerViewModel by viewModels()
 
   private var isPrefillUsed: Boolean = false
+  private var onViewCreatedCalled: Boolean = false
 
   @Inject
   lateinit var offlineManager: OfflineManager
@@ -76,9 +77,8 @@ class PersonPickerDialogFragment :
 
   @Parcelize
   data class Result(
-    val personRef: PersonRef.PersonRefByName,
+    val personRef: PersonRef.PersonRefComplete,
     val icon: String?,
-    val personId: Long,
   ) : Parcelable
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,7 +139,6 @@ class PersonPickerDialogFragment :
               REQUEST_KEY_RESULT to Result(
                 personRef = ref,
                 icon = icon,
-                personId = personId,
               ),
             ),
           )
@@ -176,11 +175,17 @@ class PersonPickerDialogFragment :
         isPrefillUsed = true
         searchEditText.setText(prefill)
       }
+
+      if (savedInstanceState == null && !onViewCreatedCalled) {
+        searchEditText.requestFocus()
+      }
     }
 
     onBackPressedDispatcher.addCallback(
       viewLifecycleOwner,
       searchEditTextBackPressedHandler,
     )
+
+    onViewCreatedCalled = true
   }
 }

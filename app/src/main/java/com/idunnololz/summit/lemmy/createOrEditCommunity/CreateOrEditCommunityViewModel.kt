@@ -178,6 +178,10 @@ class CreateOrEditCommunityViewModel @Inject constructor(
   }
 
   fun createCommunity() {
+    if (createCommunityResult.isLoading) {
+      return
+    }
+
     createCommunityResult.setIsLoading()
 
     val curCommunityData = currentCommunityData.value ?: return

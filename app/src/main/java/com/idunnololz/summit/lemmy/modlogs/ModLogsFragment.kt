@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,8 +40,8 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.ext.setup
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
@@ -100,6 +99,18 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
       setupToolbar(binding.toolbar, getString(R.string.mod_logs))
+    }
+
+    childFragmentManager.setFragmentResultListener(
+      ModLogsFilterDialogFragment.REQUEST_KEY, viewLifecycleOwner
+    ) { k, bundle ->
+      val result = bundle.getParcelableCompat<ModLogsFilterDialogFragment.Result>(
+        ModLogsFilterDialogFragment.REQUEST_KEY_RESULT,
+      )
+
+      if (result != null) {
+        viewModel.setFilter(result.filterConfig)
+      }
     }
 
     viewModel.setArguments(args.instance, args.communityRef)
@@ -169,7 +180,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
       )
       fab.setup(preferences)
       fab.setOnClickListener {
-        ModLogsFilterDialogFragment.show(childFragmentManager)
+        ModLogsFilterDialogFragment.show(childFragmentManager, viewModel.getFilter())
       }
 
       swipeRefreshLayout.setOnRefreshListener {

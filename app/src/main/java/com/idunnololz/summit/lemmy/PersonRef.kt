@@ -36,12 +36,25 @@ sealed interface PersonRef : Parcelable, PageRef {
     override val instance: String,
   ) : PersonRef
 
+  @Serializable
+  @SerialName("3")
+  @Parcelize
+  data class PersonRefComplete(
+    val name: String,
+    val id: Long,
+    /**
+     * This should be the instance of the actual person.
+     */
+    override val instance: String,
+  ) : PersonRef
+
   val fullName: String
     get() =
       when (this) {
         is PersonRefByName -> "$name@$instance"
         is PersonRefById -> "id:$id@$instance"
+        is PersonRefComplete -> "$name@$instance"
       }
 }
 
-fun Person.toPersonRef() = PersonRef.PersonRefByName(name, instance)
+fun Person.toPersonRef() = PersonRef.PersonRefComplete(name, id, instance)

@@ -243,6 +243,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                   when (pageRef) {
                     is PersonRef.PersonRefById -> pageRef.id
                     is PersonRef.PersonRefByName -> pageRef.name
+                    is PersonRef.PersonRefComplete -> pageRef.name
                   },
                 ),
                 R.drawable.outline_sell_24,
@@ -256,6 +257,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                     when (pageRef) {
                       is PersonRef.PersonRefById -> pageRef.id
                       is PersonRef.PersonRefByName -> pageRef.name
+                      is PersonRef.PersonRefComplete -> pageRef.name
                     },
                   ),
                   icon = R.drawable.baseline_person_24,
@@ -268,6 +270,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                     when (pageRef) {
                       is PersonRef.PersonRefById -> pageRef.id
                       is PersonRef.PersonRefByName -> pageRef.name
+                      is PersonRef.PersonRefComplete -> pageRef.name
                     },
                   ),
                   icon = R.drawable.baseline_person_off_24,

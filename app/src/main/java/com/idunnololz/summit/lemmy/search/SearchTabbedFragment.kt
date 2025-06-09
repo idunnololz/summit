@@ -118,7 +118,6 @@ class SearchTabbedFragment :
       )
       if (result != null) {
         viewModel.nextPersonFilter.value = SearchTabbedViewModel.PersonFilter(
-          result.personId,
           result.personRef,
         )
       }

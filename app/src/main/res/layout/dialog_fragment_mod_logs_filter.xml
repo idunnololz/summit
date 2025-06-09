@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/dialog_padding">
+    android:paddingBottom="@dimen/padding_half">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -49,7 +49,9 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/action_filter">
+                app:layout_constraintTop_toBottomOf="@+id/action_filter"
+                app:endIconDrawable="@drawable/baseline_close_24"
+                app:endIconMode="custom">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/user_filter_edit_text"
@@ -69,7 +71,9 @@
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/user_filter">
+                app:layout_constraintTop_toBottomOf="@+id/user_filter"
+                app:endIconDrawable="@drawable/baseline_close_24"
+                app:endIconMode="custom">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/mod_filter_edit_text"
@@ -78,7 +82,14 @@
                     android:inputType="none"
                     android:focusable="false"/>
             </com.google.android.material.textfield.TextInputLayout>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+    <Button
+        android:id="@+id/filter"
+        android:text="@string/filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_marginTop="@dimen/padding_half"/>
 </LinearLayout>

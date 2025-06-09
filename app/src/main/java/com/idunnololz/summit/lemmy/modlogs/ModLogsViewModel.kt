@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.modlogs
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
@@ -12,8 +13,6 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetModlogResponse
-import com.idunnololz.summit.api.dto.ModlogActionType
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.inbox.repository.MultiLemmyListSource
@@ -33,6 +32,7 @@ class ModLogsViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val noAuthApiClient: LemmyApiClient,
   private val accountManager: AccountManager,
+  private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   companion object {
@@ -57,7 +57,13 @@ class ModLogsViewModel @Inject constructor(
 
   private val pagesFetching = mutableSetOf<Int>()
 
+  private var filter = savedStateHandle.getLiveData("filter", ModLogsFilterConfig())
+
   init {
+    filter.value?.let {
+      apiCallConsolidator.filter = it
+    }
+
     viewModelScope.launch {
       modLogEngine.items.collect {
         modLogData.postValue(ModLogData(it, resetScrollPosition = resetScrollPosition))
@@ -357,13 +363,24 @@ class ModLogsViewModel @Inject constructor(
     this.communityRef = communityRef
   }
 
+  fun setFilter(config: ModLogsFilterConfig) {
+    filter.value = config
+    reset()
+  }
+
+  fun getFilter(): ModLogsFilterConfig {
+    return filter.value ?: ModLogsFilterConfig()
+  }
+
   fun reset() {
+    pagesFetching.clear()
+    apiCallConsolidator.clear()
+    apiCallConsolidator.filter = getFilter()
+
     viewModelScope.launch {
       modLogData.clear()
       fetchModLogs(0, force = true, resetScrollPosition = true)
     }
-    pagesFetching.clear()
-    apiCallConsolidator.clear()
   }
 
   class ApiCallConsolidator(
@@ -376,6 +393,7 @@ class ModLogsViewModel @Inject constructor(
     )
 
     val cache = mutableMapOf<String, CacheData>()
+    var filter = ModLogsFilterConfig()
 
     suspend fun fetchObjects(
       communityId: CommunityId?,
@@ -391,12 +409,12 @@ class ModLogsViewModel @Inject constructor(
       }
 
       val result = apiClient.fetchModLogs(
-        personId = null,
+        modPersonId = filter.filterByMod?.id,
         communityId = communityId,
         page = page,
         limit = limit,
-        actionType = ModlogActionType.All,
-        otherPersonId = null,
+        actionType = filter.filterByActionType,
+        otherPersonId = filter.filterByPerson?.id,
         force = force,
       )
 

@@ -75,6 +75,11 @@ class AddOrEditCommentViewModel @Inject constructor(
   val contextModel = StatefulLiveData<ContextModel>()
 
   fun sendComment(account: Account, postRef: PostRef, parentId: CommentId?, content: String) {
+    if (commentSentEvent.isLoading) {
+      return
+    }
+
+    commentSentEvent.setIsLoading()
     viewModelScope.launch {
       if (postRef.instance != account.instance) {
         commentSentEvent.postError(
@@ -98,6 +103,11 @@ class AddOrEditCommentViewModel @Inject constructor(
   }
 
   fun sendComment(account: Account, instance: String, inboxItem: InboxItem, content: String) {
+    if (commentSentEvent.isLoading) {
+      return
+    }
+
+    commentSentEvent.setIsLoading()
     viewModelScope.launch {
       if (inboxItem is CommentBackedItem) {
         if (instance != account.instance) {
@@ -160,6 +170,11 @@ class AddOrEditCommentViewModel @Inject constructor(
   }
 
   fun sendComment(account: Account, personRef: PersonRef, content: String) {
+    if (commentSentEvent.isLoading) {
+      return
+    }
+
+    commentSentEvent.setIsLoading()
     viewModelScope.launch {
       lemmyApiClient.setAccount(account, accountChanged = true)
       lemmyApiClient

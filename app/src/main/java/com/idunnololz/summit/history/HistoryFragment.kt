@@ -128,6 +128,7 @@ class HistoryFragment :
             }
             is PersonRef.PersonRefByName,
             is PersonRef.PersonRefById,
+            is PersonRef.PersonRefComplete,
             is CommunityRef.All,
             is CommunityRef.AllSubscribed,
             is CommunityRef.CommunityRefByName,

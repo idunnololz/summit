@@ -33,7 +33,7 @@ class PersonAdapter(
   private val instance: String,
   private val onTooManyPersons: (Int) -> Unit = {},
   private val onSinglePersonSelected: (
-    PersonRef.PersonRefByName,
+    PersonRef.PersonRefComplete,
     icon: String?,
     personId: PersonId,
   ) -> Unit = { _, _, _ -> },
@@ -56,7 +56,7 @@ class PersonAdapter(
     ) : Item
 
     data class SelectedPersonItem(
-      val personRef: PersonRef.PersonRefByName,
+      val personRef: PersonRef.PersonRefComplete,
     ) : Item
 
     data class SearchResultPersonItem(
@@ -68,7 +68,7 @@ class PersonAdapter(
 
   private val unimportantColor: Int = ContextCompat.getColor(context, R.color.colorTextFaint)
 
-  var selectedPersons = LinkedHashSet<PersonRef.PersonRefByName>()
+  var selectedPersons = LinkedHashSet<PersonRef.PersonRefComplete>()
   private var serverResultsInProgress = false
   private var serverQueryResults: PersonPickerViewModel.PersonSearchResults? = null
 
@@ -203,7 +203,7 @@ class PersonAdapter(
     }
   }
 
-  private fun toggleCommunity(ref: PersonRef.PersonRefByName) {
+  private fun toggleCommunity(ref: PersonRef.PersonRefComplete) {
     if (selectedPersons.contains(ref)) {
       selectedPersons.remove(ref)
     } else {
@@ -233,7 +233,7 @@ class PersonAdapter(
 
   override fun getItemCount(): Int = adapterHelper.itemCount
 
-  fun setSelectedPersons(selectedCommunities: List<PersonRef.PersonRefByName>) {
+  fun setSelectedPersons(selectedCommunities: List<PersonRef.PersonRefComplete>) {
     this.selectedPersons.clear()
     this.selectedPersons.addAll(selectedCommunities)
 

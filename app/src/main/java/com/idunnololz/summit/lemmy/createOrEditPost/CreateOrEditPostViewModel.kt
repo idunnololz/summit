@@ -88,6 +88,10 @@ class CreateOrEditPostViewModel @Inject constructor(
     url: String,
     isNsfw: Boolean,
   ) {
+    if (createOrEditPostResult.isLoading) {
+      return
+    }
+
     createOrEditPostResult.setIsLoading()
     viewModelScope.launch {
       val communityIdResult =

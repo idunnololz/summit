@@ -52,7 +52,7 @@ class MultiModEventDataSource(
           Unit,
           { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
             apiClient.fetchModLogs(
-              personId = null,
+              modPersonId = null,
               communityId = communityIdOrNull,
               page = page,
               limit = limit,
