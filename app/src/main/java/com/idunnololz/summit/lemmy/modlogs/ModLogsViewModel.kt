@@ -14,8 +14,10 @@ import com.idunnololz.summit.api.dto.CommunityId
 import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.dto.GetModlogResponse
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.inbox.repository.MultiLemmyListSource
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
@@ -57,7 +59,7 @@ class ModLogsViewModel @Inject constructor(
 
   private val pagesFetching = mutableSetOf<Int>()
 
-  private var filter = savedStateHandle.getLiveData("filter", ModLogsFilterConfig())
+  val filter = savedStateHandle.getLiveData("filter", ModLogsFilterConfig())
 
   init {
     filter.value?.let {
@@ -428,6 +430,33 @@ class ModLogsViewModel @Inject constructor(
 
     fun clear() {
       cache.clear()
+    }
+  }
+
+  fun updateFilterWithByMod(personRef: PersonRef?) {
+    personRef ?: return
+    when (personRef) {
+      is PersonRef.PersonRefById -> {
+        viewModelScope.launch {
+          apiClient.fetchPersonByIdWithRetry(
+            personRef.id, force = false
+          ).onSuccess {
+            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
+          }
+        }
+      }
+      is PersonRef.PersonRefByName -> {
+        viewModelScope.launch {
+          apiClient.fetchPersonByNameWithRetry(
+            personRef.fullName, force = false
+          ).onSuccess {
+            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
+          }
+        }
+      }
+      is PersonRef.PersonRefComplete -> {
+        setFilter(getFilter().copy(filterByMod = personRef))
+      }
     }
   }
 

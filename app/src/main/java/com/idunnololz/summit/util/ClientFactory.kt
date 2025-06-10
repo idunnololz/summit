@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.idunnololz.summit.BuildConfig
+import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.LemmyApi.Companion.CACHE_CONTROL_HEADER
 import com.idunnololz.summit.api.LemmyApi.Companion.CACHE_CONTROL_NO_CACHE
 import com.idunnololz.summit.cache.CachePolicy
@@ -26,6 +28,7 @@ class ClientFactory @Inject constructor(
   @ApplicationContext private val context: Context,
   private val preferences: Preferences,
   private val cachePolicyManager: CachePolicyManager,
+  private val accountManager: AccountManager,
 ) {
 
   enum class Purpose {
@@ -169,6 +172,22 @@ class ClientFactory @Inject constructor(
           loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
           addInterceptor(loggingInterceptor)
         }
+      }
+      .addNetworkInterceptor {
+        val requestBuilder = it.request().newBuilder()
+        val account = accountManager.currentAccount.asAccount
+
+        if (account != null &&
+          it.request().header("Authorization") == null &&
+          it.request().url.host == account.instance
+          ) {
+          requestBuilder.header(
+            "Authorization",
+            "Bearer ${account.jwt}",
+          )
+        }
+
+        it.proceed(requestBuilder.build())
       }
       .connectTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)

@@ -18,6 +18,7 @@ import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialog
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -220,6 +221,11 @@ fun BaseFragment<*>.showMorePostOptions(
       R.id.pa_tag_user,
       getString(R.string.tag_user_format, postView.creator.name),
       R.drawable.outline_sell_24,
+    )
+    addItemWithIcon(
+      R.id.pa_user_moderation_history,
+      getString(R.string.view_users_moderation_history),
+      R.drawable.outline_shield_24,
     )
     addItemWithIcon(R.id.pa_view_source, R.string.view_raw, R.drawable.baseline_code_24)
     addItemWithIcon(
@@ -460,6 +466,9 @@ fun BaseFragment<*>.createPostActionHandler(
         fragmentManager = childFragmentManager,
         person = postView.creator,
       )
+    }
+    R.id.pa_user_moderation_history -> {
+      getMainActivity()?.launchModLogs(moreActionsHelper.apiInstance, filterByMod = postView.creator.toPersonRef())
     }
   }
 }

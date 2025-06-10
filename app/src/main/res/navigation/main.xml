@@ -292,6 +292,11 @@
             android:name="communityRef"
             app:argType="com.idunnololz.summit.lemmy.CommunityRef"
             app:nullable="true"/>
+        <argument
+            android:name="filterByMod"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <action android:id="@+id/action_global_inboxTabbedFragment" app:destination="@id/inboxTabbedFragment"/>
     <fragment
@@ -400,5 +405,5 @@
         app:enterAnim="@animator/nav_default_enter_anim"
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim"/><action android:id="@+id/action_global_userTagsFragment" app:destination="@id/userTagsFragment"/><action android:id="@+id/action_global_createOrEditCommunityFragment" app:destination="@id/createOrEditCommunityFragment"/>
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/><action android:id="@+id/action_global_userTagsFragment" app:destination="@id/userTagsFragment"/><action android:id="@+id/action_global_createOrEditCommunityFragment" app:destination="@id/createOrEditCommunityFragment"/><action android:id="@+id/action_global_modLogsFragment" app:destination="@id/modLogsFragment"/>
 </navigation>

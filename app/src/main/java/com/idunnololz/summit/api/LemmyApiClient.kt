@@ -1926,6 +1926,8 @@ class LemmyApiClient @Inject constructor(
     actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ =
       null,
     otherPersonId: PersonId? = null,
+    post_id: PostId? = null,
+    comment_id: CommentId? = null,
     account: Account? = null,
     force: Boolean,
   ): Result<GetModlogResponse> {
@@ -1936,6 +1938,8 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
       type_ = actionType,
       other_person_id = otherPersonId,
+      post_id = post_id,
+      comment_id = comment_id,
       auth = account?.jwt,
     )
 

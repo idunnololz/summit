@@ -182,34 +182,8 @@ class LinkMetadataHelper @Inject constructor(
       siteName = siteName,
       imageUrl = imageUrls.firstOrNull(),
       pageRef = fixedPageRef,
-      publishedTs = extractTs(html, doc),
+      publishedTs = 0,
     )
-  }
-
-  private fun extractTs(html: String, doc: Document): Long {
-    val selectors = listOf(
-      "meta[property=article:published_time]",
-      "meta[name=date]",
-      "meta[name=pubdate]",
-      "meta[name=publish_date]",
-      "meta[itemprop=datePublished]",
-      "time[datetime]",
-      "span.publish-date",
-      "p.date",
-      "div.date"
-    )
-
-    var dateString = ""
-
-    for (selector in selectors) {
-      val element = doc.selectFirst(selector)
-      val content = element?.attr("content") ?: element?.attr("datetime") ?: element?.text()
-      if (!content.isNullOrBlank()) {
-        dateString = content
-      }
-    }
-
-    if
   }
 
   private fun resolveUrl(url: String, part: String): String? {

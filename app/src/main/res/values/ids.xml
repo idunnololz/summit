@@ -291,4 +291,8 @@
     <item name="decline" type="id" />
     <item name="comment_view_votes" type="id" />
     <item name="post_view_votes" type="id" />
+    <item name="ca_user_moderation_history" type="id" />
+    <item name="ca_comment_moderation_history" type="id" />
+    <item name="pa_user_moderation_history" type="id" />
+    <item name="user_moderation_history" type="id" />
 </resources>

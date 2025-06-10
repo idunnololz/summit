@@ -20,6 +20,7 @@ import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.ModernThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.preferences.CommentsThreadStyle
@@ -173,6 +174,11 @@ fun BaseFragment<*>.showMoreCommentOptions(
       getString(R.string.tag_user_format, commentView.creator.name),
       R.drawable.outline_sell_24,
     )
+    addItemWithIcon(
+      R.id.ca_user_moderation_history,
+      getString(R.string.view_users_moderation_history),
+      R.drawable.outline_shield_24,
+    )
     addItemWithIcon(R.id.ca_view_source, R.string.view_raw, R.drawable.baseline_code_24)
     addItemWithIcon(
       R.id.ca_detailed_view,
@@ -218,10 +224,10 @@ fun BaseFragment<*>.createCommentActionHandler(
     AddOrEditCommentFragment().apply {
       arguments =
         AddOrEditCommentFragmentArgs(
-          apiInstance,
-          null,
-          null,
-          it,
+          instance = apiInstance,
+          commentView = null,
+          postView = null,
+          editCommentView = it,
         ).toBundle()
     }.show(childFragmentManager, "asdf")
   }
@@ -346,6 +352,9 @@ fun BaseFragment<*>.createCommentActionHandler(
         fragmentManager = childFragmentManager,
         person = commentView.creator,
       )
+    }
+    R.id.ca_user_moderation_history -> {
+      getMainActivity()?.launchModLogs(apiInstance, filterByMod = commentView.creator.toPersonRef())
     }
   }
 }

@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCE
 import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.databinding.DialogFragmentModLogsFilterBinding
 import com.idunnololz.summit.emoji.TextEmojiEditDialogFragment
+import com.idunnololz.summit.lemmy.getName
 import com.idunnololz.summit.lemmy.modlogs.ModEvent
 import com.idunnololz.summit.lemmy.modlogs.ModLogsFilterConfig
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
@@ -120,30 +121,10 @@ class ModLogsFilterDialogFragment : BaseDialogFragment<DialogFragmentModLogsFilt
     with (binding) {
       setupToolbar(toolbar, getString(R.string.filter_mod_logs))
 
-      fun getActionTypeName(type: ModlogActionType): String =
-        when (type) {
-          ModlogActionType.All -> context.getString(R.string.all)
-          ModlogActionType.ModRemovePost -> context.getString(R.string.remove_post)
-          ModlogActionType.ModLockPost -> context.getString(R.string.lock_post)
-          ModlogActionType.ModFeaturePost -> context.getString(R.string.feature_post)
-          ModlogActionType.ModRemoveComment -> context.getString(R.string.remove_comment)
-          ModlogActionType.ModRemoveCommunity -> context.getString(R.string.remove_community)
-          ModlogActionType.ModBanFromCommunity -> context.getString(R.string.ban_user_from_community)
-          ModlogActionType.ModAddCommunity -> context.getString(R.string.add_mod)
-          ModlogActionType.ModTransferCommunity -> context.getString(R.string.transferred_ownership_of_community)
-          ModlogActionType.ModAdd -> context.getString(R.string.add_admin)
-          ModlogActionType.ModBan -> context.getString(R.string.ban_user_from_site)
-          ModlogActionType.ModHideCommunity -> context.getString(R.string.hide_community)
-          ModlogActionType.AdminPurgePerson -> context.getString(R.string.purge_person)
-          ModlogActionType.AdminPurgeCommunity -> context.getString(R.string.purge_community)
-          ModlogActionType.AdminPurgePost -> context.getString(R.string.purge_post)
-          ModlogActionType.AdminPurgeComment -> context.getString(R.string.purge_comment)
-        }
-
       val options = ModlogActionType.entries.map {
         ActionTypeOption(
           it,
-          getActionTypeName(it),
+          it.getName(context),
         )
       }
 
@@ -154,7 +135,7 @@ class ModLogsFilterDialogFragment : BaseDialogFragment<DialogFragmentModLogsFilt
           options,
         ),
       )
-      actionFilterText.setText(getActionTypeName(viewModel.filter.filterByActionType), false)
+      actionFilterText.setText(viewModel.filter.filterByActionType.getName(context), false)
       actionFilterText.setOnItemClickListener { _, _, position, _ ->
         viewModel.filter = viewModel.filter.copy(filterByActionType = options[position].type)
       }

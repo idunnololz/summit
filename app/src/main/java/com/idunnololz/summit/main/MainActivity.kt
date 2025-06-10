@@ -30,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.window.layout.WindowMetricsCalculator
@@ -778,6 +779,12 @@ class MainActivity : SummitActivity() {
         currentNavController?.navigateSafe(direction)
       }
     }
+  }
+
+  fun launchModLogs(instance: String, filterByMod: PersonRef) {
+    val direction = MainDirections.actionGlobalModLogsFragment(
+      instance, null, filterByMod = filterByMod)
+    currentNavController?.navigateSafe(direction)
   }
 
   private fun executeWhenMainFragmentAvailable(fn: (MainFragment) -> Unit) {

@@ -15,14 +15,20 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.CommunitiesLoadItemBinding
 import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentModLogsBinding
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
+import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.ModEventItemBinding
+import com.idunnololz.summit.databinding.ModLogsFilterItemBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.getName
+import com.idunnololz.summit.lemmy.modlogs.ModLogsFragment.ModEventsAdapter.Item
 import com.idunnololz.summit.lemmy.modlogs.filter.ModLogsFilterDialogFragment
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.lemmy.utils.setup
@@ -93,12 +99,16 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     requireSummitActivity().apply {
       insetViewAutomaticallyByPaddingAndNavUi(
         viewLifecycleOwner,
-        binding.coordinatorLayout,
+        binding.rootView,
         applyTopInset = false,
       )
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
       setupToolbar(binding.toolbar, getString(R.string.mod_logs))
+    }
+
+    if (savedInstanceState == null) {
+      viewModel.updateFilterWithByMod(args.filterByMod)
     }
 
     childFragmentManager.setFragmentResultListener(
@@ -126,6 +136,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
   private fun setupView() {
     val context = context ?: return
 
+    fun showFilterDialog() {
+      ModLogsFilterDialogFragment.show(childFragmentManager, viewModel.getFilter())
+    }
+
     with(binding) {
       val adapter = ModEventsAdapter(
         context = context,
@@ -144,11 +158,14 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         onLinkLongClick = { url: String, text: String ->
           getMainActivity()?.showMoreLinkOptions(url, text)
         },
+        onFilterBannerClick = {
+          showFilterDialog()
+        }
       )
       val layoutManager = LinearLayoutManager(context)
 
       fun fetchPageIfLoadItem(position: Int) {
-        (adapter.items.getOrNull(position) as? ListEngine.Item.LoadItem)
+        (adapter.items.getOrNull(position) as? Item.LoadItem)
           ?.pageIndex
           ?.let {
             viewModel.fetchModLogs(it)
@@ -180,7 +197,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
       )
       fab.setup(preferences)
       fab.setOnClickListener {
-        ModLogsFilterDialogFragment.show(childFragmentManager, viewModel.getFilter())
+        showFilterDialog()
       }
 
       swipeRefreshLayout.setOnRefreshListener {
@@ -203,13 +220,17 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             swipeRefreshLayout.isRefreshing = false
             loadingView.hideAll()
 
-            adapter.setItems(it.data.data) {
-              if (it.data.resetScrollPosition) {
-                layoutManager.scrollToPosition(0)
-              }
+            if (it.data.resetScrollPosition) {
+              layoutManager.scrollToPosition(0)
             }
+
+            adapter.setItems(it.data.data)
           }
         }
+      }
+
+      viewModel.filter.observe(viewLifecycleOwner) {
+        adapter.filter = it
       }
     }
   }
@@ -223,10 +244,35 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     private val onLoadPageClick: (Int) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
+    private val onFilterBannerClick: () -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var items: List<ListEngine.Item<ModEvent>> = listOf()
+    sealed interface Item {
+      data object HeaderItem : Item
+      data class FilterItem(val filter: ModLogsFilterConfig) : Item
+      data class ModEventItem(val modEvent: ModEvent) : Item
+      data object FooterItem : Item
+
+      data class LoadItem(val pageIndex: Int = 0, ) : Item
+      data class ErrorItem(
+        val pageIndex: Int,
+        val error: Throwable,
+      ) : Item
+      data object EmptyItem : Item
+    }
+
+    var filter: ModLogsFilterConfig? = null
+      set(value) {
+        field = value
+
+        refreshItems()
+      }
+
+    var data: List<ListEngine.Item<ModEvent>> = listOf()
       private set
+
+    val items: List<Item>
+      get() = adapterHelper.items
 
     private val summaryCharLength: Int
 
@@ -246,31 +292,42 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
       }
     }
 
-    private val adapterHelper = AdapterHelper<ListEngine.Item<ModEvent>>(
+    private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
         old::class == new::class && when (old) {
-          is ListEngine.Item.DataItem -> {
-            old.data.id ==
-              (new as ListEngine.Item.DataItem).data.id
-          }
-          is ListEngine.Item.ErrorItem ->
-            old.pageIndex == (new as ListEngine.Item.ErrorItem).pageIndex
-          is ListEngine.Item.LoadItem ->
-            old.pageIndex == (new as ListEngine.Item.LoadItem).pageIndex
-          is ListEngine.Item.EmptyItem -> true
+          Item.EmptyItem -> true
+          is Item.ErrorItem ->
+            old.pageIndex == (new as Item.ErrorItem).pageIndex
+          is Item.FilterItem -> true
+          Item.FooterItem -> true
+          Item.HeaderItem -> true
+          is Item.LoadItem ->
+            old.pageIndex == (new as Item.LoadItem).pageIndex
+          is Item.ModEventItem ->
+            old.modEvent.id == (new as Item.ModEventItem).modEvent.id
         }
       },
     ).apply {
       addItemType(
-        clazz = ListEngine.Item.EmptyItem<ModEvent>()::class,
+        clazz = Item.EmptyItem::class,
         inflateFn = EmptyItemBinding::inflate,
       ) { item, b, h ->
       }
       addItemType(
-        clazz = ListEngine.Item.DataItem<ModEvent>(null)::class,
+        clazz = Item.HeaderItem::class,
+        inflateFn = ItemGenericHeaderBinding::inflate,
+      ) { item, b, h ->
+      }
+      addItemType(
+        clazz = Item.FooterItem::class,
+        inflateFn = GenericSpaceFooterItemBinding::inflate,
+      ) { item, b, h ->
+      }
+      addItemType(
+        clazz = Item.ModEventItem::class,
         inflateFn = ModEventItemBinding::inflate,
       ) { item, b, h ->
-        val modEvent = item.data
+        val modEvent = item.modEvent
 
         var description: String = modEvent::class.simpleName ?: ""
         var reason: String? = null
@@ -741,18 +798,39 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         }
       }
       addItemType(
-        clazz = ListEngine.Item.LoadItem<ModEvent>()::class,
+        clazz = Item.LoadItem::class,
         inflateFn = CommunitiesLoadItemBinding::inflate,
       ) { item, b, h ->
         b.loadingView.showProgressBar()
       }
       addItemType(
-        clazz = ListEngine.Item.ErrorItem<ModEvent>()::class,
+        clazz = Item.ErrorItem::class,
         inflateFn = CommunitiesLoadItemBinding::inflate,
       ) { item, b, h ->
         b.loadingView.showDefaultErrorMessageFor(item.error)
         b.loadingView.setOnRefreshClickListener {
           onLoadPageClick(item.pageIndex)
+        }
+      }
+      addItemType(
+        clazz = Item.FilterItem::class,
+        inflateFn = ModLogsFilterItemBinding::inflate,
+      ) { item, b, h ->
+        val filterNames = mutableListOf<String>()
+
+        if (item.filter.filterByActionType != ModlogActionType.All) {
+          filterNames += item.filter.filterByActionType.getName(context)
+        }
+        if (item.filter.filterByMod != null) {
+          filterNames += context.getString(R.string.mod_format, item.filter.filterByMod.name)
+        }
+        if (item.filter.filterByPerson != null) {
+          filterNames += context.getString(R.string.user_format, item.filter.filterByPerson.name)
+        }
+
+        b.text.text = context.getString(R.string.filtering_by_format, filterNames.joinToString())
+        b.root.setOnClickListener {
+          onFilterBannerClick()
         }
       }
     }
@@ -767,14 +845,39 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    fun updateItems(cb: () -> Unit) {
-      adapterHelper.setItems(items, this, cb)
+    fun setItems(newItems: List<ListEngine.Item<ModEvent>>) {
+      data = newItems
+
+      refreshItems()
     }
 
-    fun setItems(newItems: List<ListEngine.Item<ModEvent>>, cb: () -> Unit) {
-      items = newItems
+    private fun refreshItems() {
+      val data = data
+      val filter = filter
+      val newItems = mutableListOf<Item>()
 
-      updateItems(cb)
+      newItems += Item.HeaderItem
+
+      if (filter?.isFilterDefault() == false) {
+        newItems += Item.FilterItem(filter)
+      }
+
+      data.mapTo(newItems) {
+        when (it) {
+          is ListEngine.Item.DataItem<ModEvent> ->
+            Item.ModEventItem(it.data)
+          is ListEngine.Item.EmptyItem<*> ->
+            Item.EmptyItem
+          is ListEngine.Item.ErrorItem<*> ->
+            Item.ErrorItem(it.pageIndex, it.error)
+          is ListEngine.Item.LoadItem<*> ->
+            Item.LoadItem(it.pageIndex)
+        }
+      }
+
+      newItems += Item.FooterItem
+
+      adapterHelper.setItems(newItems, this)
     }
 
     private fun String.summarize() = if (this.length > summaryCharLength + 3) {

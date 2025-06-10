@@ -276,6 +276,11 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                   icon = R.drawable.baseline_person_off_24,
                 )
               }
+              addItemWithIcon(
+                id = R.id.user_moderation_history,
+                title = context.getString(R.string.view_users_moderation_history),
+                icon = R.drawable.outline_shield_24,
+              )
 
 //                            addItemWithIcon(
 //                                id = R.id.more_user_options,
@@ -509,6 +514,13 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
             fragmentManager = fragmentManager,
             personRef = personRef,
           )
+        }
+      }
+    }
+    R.id.user_moderation_history -> {
+      (advancedLink as? AdvancedLink.PageLink)?.let {
+        (it.pageRef as? PersonRef)?.let { personRef ->
+          mainActivity?.launchModLogs(moreActionsHelper.apiInstance, personRef)
         }
       }
     }

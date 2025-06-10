@@ -1007,6 +1007,8 @@ class AccountAwareLemmyClient @Inject constructor(
     actionType: ModlogActionType? /* "All" | "ModRemovePost" | "ModLockPost" | "ModFeaturePost" | "ModRemoveComment" | "ModRemoveCommunity" | "ModBanFromCommunity" | "ModAddCommunity" | "ModTransferCommunity" | "ModAdd" | "ModBan" | "ModHideCommunity" | "AdminPurgePerson" | "AdminPurgeCommunity" | "AdminPurgePost" | "AdminPurgeComment" */ =
       null,
     otherPersonId: PersonId? = null,
+    post_id: PostId? = null,
+    comment_id: CommentId? = null,
     force: Boolean,
     account: Account? = accountForInstance(),
   ): Result<GetModlogResponse> =
@@ -1018,6 +1020,8 @@ class AccountAwareLemmyClient @Inject constructor(
         limit = limit,
         actionType = actionType,
         otherPersonId = otherPersonId,
+        post_id = post_id,
+        comment_id = comment_id,
         account = account,
         force = force,
       )

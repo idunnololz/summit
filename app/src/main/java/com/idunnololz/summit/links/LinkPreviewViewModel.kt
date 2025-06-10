@@ -44,6 +44,7 @@ class LinkPreviewViewModel @Inject constructor(
           siteName = null,
           imageUrl = null,
           pageRef = null,
+          publishedTs = 0L,
         )
         linkMetadata.postValue(metadata)
       }
