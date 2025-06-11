@@ -336,6 +336,40 @@ class ModLogsViewModel @Inject constructor(
     }
   }
 
+  fun updateFilterWithByMod(personRef: PersonRef?) {
+    personRef ?: return
+
+    modLogData.setIsLoading()
+
+    when (personRef) {
+      is PersonRef.PersonRefById -> {
+        viewModelScope.launch {
+          apiClient.fetchPersonByIdWithRetry(
+            personRef.id, force = false
+          ).onSuccess {
+            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
+          }.onFailure {
+            modLogData.setError(it)
+          }
+        }
+      }
+      is PersonRef.PersonRefByName -> {
+        viewModelScope.launch {
+          apiClient.fetchPersonByNameWithRetry(
+            personRef.fullName, force = false
+          ).onSuccess {
+            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
+          }.onFailure {
+            modLogData.setError(it)
+          }
+        }
+      }
+      is PersonRef.PersonRefComplete -> {
+        setFilter(getFilter().copy(filterByMod = personRef))
+      }
+    }
+  }
+
   fun newSource(
     communityId: CommunityId?,
     clazz: KClass<*>,
@@ -430,33 +464,6 @@ class ModLogsViewModel @Inject constructor(
 
     fun clear() {
       cache.clear()
-    }
-  }
-
-  fun updateFilterWithByMod(personRef: PersonRef?) {
-    personRef ?: return
-    when (personRef) {
-      is PersonRef.PersonRefById -> {
-        viewModelScope.launch {
-          apiClient.fetchPersonByIdWithRetry(
-            personRef.id, force = false
-          ).onSuccess {
-            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
-          }
-        }
-      }
-      is PersonRef.PersonRefByName -> {
-        viewModelScope.launch {
-          apiClient.fetchPersonByNameWithRetry(
-            personRef.fullName, force = false
-          ).onSuccess {
-            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
-          }
-        }
-      }
-      is PersonRef.PersonRefComplete -> {
-        setFilter(getFilter().copy(filterByMod = personRef))
-      }
     }
   }
 

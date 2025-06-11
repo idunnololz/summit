@@ -44,30 +44,32 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
 
   private class SpoilerTextAddedListener : CorePlugin.OnTextAddedListener {
     override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
-      val spoilerTitleRegex = Regex("(:::\\s*spoiler\\s+)(.*)")
+      val spoilerTitleRegex = Regex("(:::\\s*spoiler\\s+)(.*)\n?")
       val spoilerTitles = spoilerTitleRegex.findAll(text)
 
       for (match in spoilerTitles) {
+        Log.d("HAHA", "Spoiler start at ${start + match.range.first}")
         val spoilerTitle = match.groups[2]!!.value
         visitor.builder().setSpan(
           DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
-          start,
+          start + match.range.first,
           start + match.groups[2]!!.range.last,
           Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
         )
       }
 
-      val spoilerCloseRegex = Regex("^(?!.*spoiler).*:::")
+      val spoilerCloseRegex = Regex(":::(?!\\s*spoiler)")
       val spoilerCloses = spoilerCloseRegex.findAll(text)
       for (match in spoilerCloses) {
+        Log.d("HAHA", "Spoiler end at ${start + match.range.first}")
         visitor.builder().apply {
           if (start + 4 >= this.length) {
             append(" ")
           }
           setSpan(
             DetailsEndSpan(),
-            start,
-            start + 4,
+            start + match.range.first,
+            start + match.range.first + 4,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
           )
         }
@@ -105,9 +107,18 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
 
         var spoilerEnd = spanned.length
         if (index < detailsEndSpans.size) {
-          val spoilerCloseSpan = detailsEndSpans[index]
+          val spoilerCloseSpan = detailsEndSpans.getOrNull(index)
+
+          if (spoilerCloseSpan == null) {
+            continue // something is malformed...
+          }
+
           spoilerEnd = spanned.getSpanEnd(spoilerCloseSpan)
         }
+
+        Log.d("HAHA", "startSpan: ${spanned.getSpans(spoilerStart, spoilerStart + 3, Any::class.java).joinToString()}")
+
+        Log.d("HAHA", "Spoiler block from ${spoilerStart} - ${spoilerEnd}")
 
         // The space at the end is necessary for the lengths to be the same
         // This reduces complexity as else it would need complex logic to determine the replacement length

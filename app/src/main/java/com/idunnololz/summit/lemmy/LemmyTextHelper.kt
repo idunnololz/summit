@@ -244,82 +244,108 @@ class LemmyTextHelper @Inject constructor(
 
     private fun processAll(s: String): String {
       val s = fixTicks(s)
-      val matcher = largeRegex.matcher(s)
-      val sb = StringBuffer()
-      while (matcher.find()) {
-        val characterBeforeSpoilerEndTag = matcher.group(5)
-        val spoilerEndTag = matcher.group(6)
-        if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
-          matcher.appendReplacement(
-            sb,
-            "$characterBeforeSpoilerEndTag\n$spoilerEndTag",
-          )
-          continue
-        }
-
-        val linkStart = matcher.group(1)
-        val referenceTypeToken = matcher.group(2)
-        val name = matcher.group(3)
-        val instance = matcher.group(4)
-
-        if (linkStart == null &&
-          referenceTypeToken != null &&
-          name != null &&
-          instance != null &&
-          !name.contains("]") &&
-          !instance.contains("]") /* make sure we are not within a link def */
-        ) {
-          when (referenceTypeToken.lowercase(Locale.US)) {
-            "!", "c/", "/c/" -> {
-              val communityRef = CommunityRef.CommunityRefByName(name, instance)
-
-              matcher.appendReplacement(
-                sb,
-                "[${matcher.group(
-                  0,
-                )}](${LinkUtils.getLinkForCommunity(communityRef)})",
-              )
-            }
-            "@", "u/", "/u/" -> {
-              val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
-              matcher.appendReplacement(
-                sb,
-                "[${matcher.group(0)}]($url)",
-              )
-            }
-          }
-        }
-      }
-      matcher.appendTail(sb)
-      return sb.toString()
+      return s
+//      val matcher = largeRegex.matcher(s)
+//      val sb = StringBuffer()
+//      while (matcher.find()) {
+//        val characterBeforeSpoilerEndTag = matcher.group(5)
+//        val spoilerEndTag = matcher.group(6)
+//        if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
+//          matcher.appendReplacement(
+//            sb,
+//            "$characterBeforeSpoilerEndTag\n$spoilerEndTag",
+//          )
+//          continue
+//        }
+//
+//        val linkStart = matcher.group(1)
+//        val referenceTypeToken = matcher.group(2)
+//        val name = matcher.group(3)
+//        val instance = matcher.group(4)
+//
+//        if (linkStart == null &&
+//          referenceTypeToken != null &&
+//          name != null &&
+//          instance != null &&
+//          !name.contains("]") &&
+//          !instance.contains("]") /* make sure we are not within a link def */
+//        ) {
+//          when (referenceTypeToken.lowercase(Locale.US)) {
+//            "!", "c/", "/c/" -> {
+//              val communityRef = CommunityRef.CommunityRefByName(name, instance)
+//
+//              matcher.appendReplacement(
+//                sb,
+//                "[${matcher.group(
+//                  0,
+//                )}](${LinkUtils.getLinkForCommunity(communityRef)})",
+//              )
+//            }
+//            "@", "u/", "/u/" -> {
+//              val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
+//              matcher.appendReplacement(
+//                sb,
+//                "[${matcher.group(0)}]($url)",
+//              )
+//            }
+//          }
+//        }
+//      }
+//      matcher.appendTail(sb)
+//      return sb.toString()
     }
 
-    private fun fixTicks(s: String): CharSequence {
+    private fun fixTicks(s: String): String {
       if (!s.contains('`')) {
         return s
       }
 
+      fun hasUninterruptedBacktick(startIndex: Int): Boolean {
+        var index = startIndex
+        while (true) {
+          if (index >= s.length) {
+            return false
+          }
+          val c = s[index]
+
+          if (c == '>') return false
+          if (c == '\n' && s.getOrNull(index + 1) == '\n') return false
+          if (c == '-' && s.getOrNull(index + 1) == '-' && s.getOrNull(index + 2) == '-') return false
+          if (c == '-' && s.getOrNull(index + 1) == ' ') return false
+          if (c == '`') return true
+
+          index++
+        }
+      }
+
       val sb = StringBuilder()
-      var lastBlockType: Int = 0
+      var currentBlockType: Int = 0
       var index = 0
       while (true) {
         if (index == s.length) {
           break
         }
 
-        var currentBlockType: Int = 0
         val c = s[index]
         if (c == '`') {
           if (s.getOrNull(index + 1) == '`' && s.getOrNull(index + 2) == '`') {
-            currentBlockType = STYLE_BLOCK
+            if (currentBlockType == STYLE_BLOCK) {
+              currentBlockType = 0
+            } else {
+              currentBlockType = STYLE_BLOCK
+            }
             index += 2
             sb.append("```")
           } else {
-            currentBlockType = STYLE_INLINE
+            if (currentBlockType == STYLE_INLINE) {
+              currentBlockType = 0
+            } else if (hasUninterruptedBacktick(index + 1)) {
+              currentBlockType = STYLE_INLINE
+            }
             sb.append("`")
           }
         } else {
-          if (lastBlockType == STYLE_INLINE) {
+          if (currentBlockType == STYLE_INLINE) {
             if (c == '\n') {
               sb.append(" ")
             } else {
@@ -328,12 +354,6 @@ class LemmyTextHelper @Inject constructor(
           } else {
             sb.append(c)
           }
-        }
-
-        if (lastBlockType == 0) {
-          lastBlockType = currentBlockType
-        } else if (lastBlockType == currentBlockType) {
-          lastBlockType = 0
         }
 
         index++

@@ -61,8 +61,8 @@ abstract class SummitActivity :
     currentNavController?.navigateSafe(directions)
   }
 
-  fun setNavUiOpenPercent(showPercent: Float) {
-    if (navBarController.useNavigationRail) return
+  fun setNavUiOpenPercent(showPercent: Float, force: Boolean = false) {
+    if (navBarController.useNavigationRail && !force) return
 
     navBarController.animateNavBar(showPercent, animate = false)
   }

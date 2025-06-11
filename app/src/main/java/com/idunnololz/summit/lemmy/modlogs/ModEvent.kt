@@ -1,5 +1,7 @@
 package com.idunnololz.summit.lemmy.modlogs
 
+import android.content.Context
+import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.AdminPurgeCommentView
 import com.idunnololz.summit.api.dto.AdminPurgeCommunityView
 import com.idunnololz.summit.api.dto.AdminPurgePersonView
@@ -18,6 +20,8 @@ import com.idunnololz.summit.api.dto.ModRemovePostView
 import com.idunnololz.summit.api.dto.ModTransferCommunityView
 import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.util.dateStringToTs
+import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 
 sealed interface ModEvent {
 
@@ -330,3 +334,30 @@ enum class ActionType {
   Mod,
   Admin,
 }
+
+fun ModEvent.getColor(context: Context) =
+  when (this) {
+    is ModEvent.AdminPurgeCommentViewEvent,
+    is ModEvent.AdminPurgeCommunityViewEvent,
+    is ModEvent.AdminPurgePersonViewEvent,
+    is ModEvent.AdminPurgePostViewEvent ->
+      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+    is ModEvent.ModAddCommunityViewEvent,
+    is ModEvent.ModAddViewEvent ->
+      context.getColorCompat(R.color.style_green)
+    is ModEvent.ModBanFromCommunityViewEvent,
+    is ModEvent.ModBanViewEvent ->
+      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+    is ModEvent.ModFeaturePostViewEvent ->
+      context.getColorCompat(R.color.style_green)
+    is ModEvent.ModHideCommunityViewEvent ->
+      context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+    is ModEvent.ModLockPostViewEvent ->
+      context.getColorCompat(R.color.style_amber)
+    is ModEvent.ModRemoveCommentViewEvent,
+    is ModEvent.ModRemoveCommunityViewEvent,
+    is ModEvent.ModRemovePostViewEvent ->
+      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+    is ModEvent.ModTransferCommunityViewEvent ->
+      context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+  }

@@ -1672,11 +1672,34 @@ class PostAndCommentViewBuilder @Inject constructor(
       item.decision == RegistrationDecision.Declined) {
 
       b.author.setTextColor(faintTextColor)
+      b.author.alpha = 0.5f
       b.content.setTextColor(faintTextColor)
     } else {
       b.author.setTextColor(context.getColorCompat(R.color.colorText))
       b.author.alpha = 1f
       b.content.setTextColor(context.getColorCompat(R.color.colorText))
+    }
+
+    if (item.denyReason.isNullOrBlank() || item.decision != RegistrationDecision.Declined) {
+      b.declineReason.visibility = View.GONE
+    } else {
+      b.declineReason.visibility = View.VISIBLE
+
+      lemmyTextHelper.bindText(
+        textView = b.declineReason,
+        text = context.getString(R.string.reason_format, item.denyReason),
+        instance = instance,
+        showMediaAsLinks = true,
+        onImageClick = {
+          onImageClick(it)
+        },
+        onVideoClick = { url ->
+          onVideoClick(url, VideoType.Unknown, null)
+        },
+        onPageClick = onPageClick,
+        onLinkClick = onLinkClick,
+        onLinkLongClick = onLinkLongClick,
+      )
     }
 
     if (item.isDeleted) {

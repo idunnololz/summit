@@ -729,8 +729,8 @@ class MainActivity : SummitActivity() {
         currentNavController?.navigate(
           R.id.action_global_community,
           CommunityFragmentArgs(
-            null,
-            page,
+            communityRef = page,
+            tab = null,
           ).toBundle(),
         )
       }
@@ -738,9 +738,9 @@ class MainActivity : SummitActivity() {
         currentNavController?.navigate(
           R.id.postFragment2,
           PostFragmentArgs(
-            page.instance,
-            page.id,
-            null,
+            instance = page.instance,
+            id = page.id,
+            currentCommunity = null,
             isSinglePage = true,
             switchToNativeInstance = switchToNativeInstance,
           ).toBundle(),
@@ -1047,6 +1047,9 @@ class MainActivity : SummitActivity() {
     val direction = MainDirections.actionGlobalCreateOrEditCommunityFragment(null)
     currentNavController?.navigateSafe(direction)
   }
+
+  val useNavigationRail
+    get() = navBarController.useNavigationRail
 
   fun navigateTopLevel(menuId: Int) {
     val currentNavController = currentNavController ?: return

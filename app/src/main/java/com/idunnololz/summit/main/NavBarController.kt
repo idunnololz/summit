@@ -277,12 +277,12 @@ class NavBarController(
     Log.d(
       TAG,
       "animateNavBar() p$percentShown diff${abs(currentPercentShown - percentShown)}",
-      RuntimeException(),
-    )
+      kotlin.RuntimeException()
+      )
 
     val navigationBarOffset =
       if (useNavigationRail) {
-        navBarContainer.width.toFloat()
+        -navBarContainer.width.toFloat()
       } else {
         navBarContainer.height.toFloat()
       } * (1f - percentShown)

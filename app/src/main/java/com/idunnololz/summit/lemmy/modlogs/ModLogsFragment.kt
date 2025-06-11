@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.modlogs
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.RectF
 import android.os.Bundle
 import android.text.Spannable
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,6 +47,7 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.escapeMarkdown
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -727,6 +730,12 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             )
           }
         }
+        val modEventColor = modEvent.getColor(context)
+        val containerColor = context.getColorFromAttribute(
+          com.google.android.material.R.attr.colorSurfaceContainerHigh)
+        b.icon.imageTintList = ColorStateList.valueOf(modEventColor)
+        b.icon.backgroundTintList = ColorStateList.valueOf(ColorUtils.blendARGB(
+          modEventColor, containerColor, 0.9f))
 
         b.overtext.text = SpannableStringBuilder().apply {
           append(

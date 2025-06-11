@@ -1332,7 +1332,7 @@
     <!-- Keep short. Button text. -->
     <string name="no">No</string>
     <!-- Keep short. Button text. -->
-    <string name="admin_tools">Admin tools</string>
+    <string name="admin_tools">Admin/mod tools</string>
     <!-- Title text for admin actions menu. -->
     <string name="admin_actions">Admin actions</string>
     <!-- Keep short. Button text. -->

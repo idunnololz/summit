@@ -58,6 +58,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/author"/>
 
+    <com.idunnololz.summit.view.LinkifyTextView
+        android:id="@+id/decline_reason"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textAppearance="?textAppearanceBodyMedium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content"/>
+
     <LinearLayout
         android:id="@+id/actions_container"
         android:orientation="horizontal"
@@ -65,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintTop_toBottomOf="@+id/decline_reason"
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.chip.Chip

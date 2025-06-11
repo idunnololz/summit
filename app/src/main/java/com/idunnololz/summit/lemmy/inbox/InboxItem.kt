@@ -382,6 +382,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isRemoved: Boolean,
     override val isRead: Boolean,
     val decision: RegistrationDecision,
+    val denyReason: String?,
   ) : InboxItem {
 
     constructor(application: RegistrationApplicationView) : this(
@@ -407,6 +408,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       } else {
         RegistrationDecision.NoDecision
       },
+      denyReason = application.registration_application.deny_reason,
     )
 
     override fun toString(): String = "RegistrationApplicationInboxItem { content = $content }"

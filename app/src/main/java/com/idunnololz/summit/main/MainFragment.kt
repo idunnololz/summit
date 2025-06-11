@@ -506,22 +506,26 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
   }
 
   fun updateNavUiOpenPercent() {
-    val percentShown = (getCurrentFragment() as? CommunityFragment)?.navBarPercentShown() ?: 1f
     val mainActivity = getMainActivity() ?: return
+    val percentShown = if (mainActivity.useNavigationRail) {
+      1f
+    } else {
+      (getCurrentFragment() as? CommunityFragment)?.navBarPercentShown() ?: 1f
+    }
     when (val panelState = binding.root.startPanelState) {
       PanelState.Closed -> {
         if (!args.isPreview) {
-          mainActivity.setNavUiOpenPercent(1f * percentShown)
+          mainActivity.setNavUiOpenPercent(1f * percentShown, force = true)
         }
       }
       is PanelState.Closing -> {
-        mainActivity.setNavUiOpenPercent((1f - panelState.progress) * percentShown)
+        mainActivity.setNavUiOpenPercent((1f - panelState.progress) * percentShown, force = true)
       }
       PanelState.Opened -> {
-        mainActivity.setNavUiOpenPercent(0f * percentShown)
+        mainActivity.setNavUiOpenPercent(0f * percentShown, force = true)
       }
       is PanelState.Opening -> {
-        mainActivity.setNavUiOpenPercent((1f - panelState.progress) * percentShown)
+        mainActivity.setNavUiOpenPercent((1f - panelState.progress) * percentShown, force = true)
       }
     }
   }
