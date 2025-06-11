@@ -42,7 +42,7 @@
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceTitleMedium"
+        android:textAppearance="?textAppearanceTitleSmall"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginStart="@dimen/padding"
         app:layout_constraintTop_toBottomOf="@+id/overtext"
