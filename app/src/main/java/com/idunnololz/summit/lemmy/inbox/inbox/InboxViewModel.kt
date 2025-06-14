@@ -56,7 +56,7 @@ class InboxViewModel @Inject constructor(
 
   private var fetchInboxJob: Job? = null
 
-  var inboxRepository = inboxRepositoryFactory.create()
+  var inboxRepository = inboxRepositoryFactory.create(null)
 
   val currentAccount
     get() = accountManager.currentAccount.asAccountLiveData()
@@ -91,13 +91,12 @@ class InboxViewModel @Inject constructor(
 
   init {
     viewModelScope.launch {
-      accountManager.currentAccountOnChange.collect {
-        val account = it as? Account
-        if (account != null) {
-          instance = account.instance
+      accountInfoManager.currentFullAccountOnChange.collect { fullAccount ->
+        if (fullAccount != null) {
+          instance = fullAccount.account.instance
         }
 
-        inboxRepository = inboxRepositoryFactory.create()
+        inboxRepository = inboxRepositoryFactory.create(fullAccount)
 
         delay(10) // just in case it takes a second for the api client to update...
 
@@ -559,9 +558,10 @@ class InboxViewModel @Inject constructor(
           approveRegistrationApplicationResult.postValue(Unit)
         }
         .onFailure {
-          if (originalDecision != null) {
+          val originalDecisionFinal = originalDecision
+          if (originalDecisionFinal != null) {
             updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
-              it.copy(item = it.item.copy(decision = originalDecision))
+              it.copy(item = it.item.copy(decision = originalDecisionFinal))
             }
             if (isLoaded) {
               publishInboxUpdate(scrollToTop = false)

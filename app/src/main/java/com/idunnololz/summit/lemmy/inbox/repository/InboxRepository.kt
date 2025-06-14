@@ -2,7 +2,11 @@ package com.idunnololz.summit.lemmy.inbox.repository
 
 import android.content.Context
 import android.util.Log
+import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.FullAccount
+import com.idunnololz.summit.account.info.isAdmin
+import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAModOrAdmin
 import com.idunnololz.summit.api.dto.CommentSortType
@@ -20,6 +24,7 @@ class InboxRepository @Inject constructor(
   @ApplicationContext private val context: Context,
   private val apiClient: AccountAwareLemmyClient,
   private val accountInfoManager: AccountInfoManager,
+  private val fullAccount: FullAccount?,
   private val conversationSource: InboxMultiDataSource,
 ) {
 
@@ -29,11 +34,15 @@ class InboxRepository @Inject constructor(
     private val apiClient: AccountAwareLemmyClient,
     private val accountInfoManager: AccountInfoManager,
   ) {
-    fun create(conversationSource: InboxMultiDataSource = InboxMultiDataSource(listOf())) =
+    fun create(
+      fullAccount: FullAccount?,
+      conversationSource: InboxMultiDataSource = InboxMultiDataSource(listOf())
+    ) =
       InboxRepository(
         context = context,
         apiClient = apiClient,
         accountInfoManager = accountInfoManager,
+        fullAccount = fullAccount,
         conversationSource = conversationSource,
       )
   }
@@ -182,14 +191,19 @@ class InboxRepository @Inject constructor(
     ),
   )
   private val unreadSources = InboxMultiDataSource(
-    listOf(
-      makeRepliesSource(unreadOnly = true),
-      makeMentionsSource(unreadOnly = true),
-      makeMessagesSource(unreadOnly = true),
-      makePostReportsSource(unresolvedOnly = true),
-      makeCommentReportsSource(unresolvedOnly = true),
-      makePrivateMessageReportsSource(unresolvedOnly = true),
-    ),
+    mutableListOf<InboxSource<*>>().apply {
+      add(makeRepliesSource(unreadOnly = true))
+      add(makeMentionsSource(unreadOnly = true))
+      add(makeMessagesSource(unreadOnly = true))
+
+      if (fullAccount?.isMod() == true) {
+        add(makePostReportsSource(unresolvedOnly = true))
+        add(makeCommentReportsSource(unresolvedOnly = true))
+      }
+      if (fullAccount?.isAdmin() == true) {
+        add(makePrivateMessageReportsSource(unresolvedOnly = true))
+      }
+    },
   )
   private val registrationApplicationsSource =
     InboxMultiDataSource(

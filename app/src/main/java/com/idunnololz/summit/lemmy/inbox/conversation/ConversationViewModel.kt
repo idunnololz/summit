@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.InboxItem
@@ -25,6 +26,7 @@ import kotlinx.coroutines.withContext
 class ConversationViewModel @Inject constructor(
   @ApplicationContext private val context: Context,
   private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
   private val apiClient: AccountAwareLemmyClient,
   private val inboxRepositoryFactory: InboxRepository.Factory,
   private val conversationsManager: ConversationsManager,
@@ -51,6 +53,7 @@ class ConversationViewModel @Inject constructor(
     conversation: Conversation?,
     newConversation: NewConversation?,
   ): Result<Unit> {
+    val fullAccount = accountInfoManager.currentFullAccount.value
     val currentAccount = accountManager.currentAccount.asAccount
 
     if (accountId != currentAccount?.id) {
@@ -111,6 +114,7 @@ class ConversationViewModel @Inject constructor(
     personId = otherPersonId
 
     inboxRepository = inboxRepositoryFactory.create(
+      fullAccount,
       InboxRepository.InboxMultiDataSource(
         listOf(
           InboxSource(
