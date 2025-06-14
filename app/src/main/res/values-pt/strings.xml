@@ -1392,4 +1392,7 @@
         <item quantity="many"></item>
         <item quantity="other">%1$s novos itens na sua caixa de entrada</item>
     </plurals>
+    <string name="reset_hidden_posts_confirm_title">Repor publicações escondidas</string>
+    <string name="delete_comment_confirm">Eliminar comentário</string>
+    <string name="gravity_top">Topo</string>
 </resources>
