@@ -52,6 +52,8 @@ class InboxRepository @Inject constructor(
     makePostReportsSource(unresolvedOnly = false)
   private val commentReportsStatelessSource: InboxSource<Unit> =
     makeCommentReportsSource(unresolvedOnly = false)
+  private val makePrivateMessageReportsSource: InboxSource<Unit> =
+    makePrivateMessageReportsSource(unresolvedOnly = false)
   private val registrationApplicationsStatelessSource: InboxSource<Unit> =
     makeRegistrationApplicationsSource(unreadOnly = false)
 
@@ -168,7 +170,7 @@ class InboxRepository @Inject constructor(
     )
   private val reportsSource =
     InboxMultiDataSource(
-      listOf(postReportsStatelessSource, commentReportsStatelessSource),
+      listOf(postReportsStatelessSource, commentReportsStatelessSource, makePrivateMessageReportsSource),
     )
   private val allSources = InboxMultiDataSource(
     listOf(
@@ -186,6 +188,7 @@ class InboxRepository @Inject constructor(
       makeMessagesSource(unreadOnly = true),
       makePostReportsSource(unresolvedOnly = true),
       makeCommentReportsSource(unresolvedOnly = true),
+      makePrivateMessageReportsSource(unresolvedOnly = true),
     ),
   )
   private val registrationApplicationsSource =
@@ -330,6 +333,29 @@ class InboxRepository @Inject constructor(
     )
   }
 
+  private fun makePrivateMessageReportsSource(unresolvedOnly: Boolean) = InboxSource(
+    context,
+    Unit,
+  ) { page: Int, _: Unit, limit: Int, force: Boolean ->
+    apiClient.fetchPrivateMessageReports(
+      page = page,
+      limit = limit,
+      unresolvedOnly = unresolvedOnly,
+      force = force,
+    ).fold(
+      onSuccess = {
+        Result.success(it.private_message_reports.map { InboxItem.ReportMessageInboxItem(it) })
+      },
+      onFailure = {
+        if (it is NotAModOrAdmin) {
+          Result.success(listOf())
+        } else {
+          Result.failure(it)
+        }
+      },
+    )
+  }
+
   private fun makeRegistrationApplicationsSource(unreadOnly: Boolean) = InboxSource(
     context,
     Unit,
@@ -372,7 +398,7 @@ class InboxRepository @Inject constructor(
       is InboxItem.ReplyInboxItem ->
         apiClient.markReplyAsRead(inboxItem.id, read)
       is InboxItem.ReportMessageInboxItem -> {
-        Result.success(Unit)
+        apiClient.resolvePrivateMessageReport(inboxItem.id, read)
       }
       is InboxItem.ReportCommentInboxItem -> {
         apiClient.resolveCommentReport(inboxItem.id, read)

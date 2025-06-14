@@ -712,19 +712,6 @@ class AccountAwareLemmyClient @Inject constructor(
       .autoSignOut(account)
   }
 
-  suspend fun fetchReportMessages(
-    unresolvedOnly: Boolean? = null,
-    page: Int? = 0,
-    limit: Int? = 20,
-    account: Account? = accountForInstance(),
-    force: Boolean,
-  ) = if (account == null) {
-    createAccountErrorResult()
-  } else {
-    apiClient.fetchReportMessages(unresolvedOnly, page, limit, account, force)
-      .autoSignOut(account)
-  }
-
   suspend fun fetchPostReports(
     unresolvedOnly: Boolean? = null,
     page: Int? = 0,
@@ -746,6 +733,41 @@ class AccountAwareLemmyClient @Inject constructor(
     createAccountErrorResult()
   } else {
     apiClient.resolvePostReport(reportId, resolved, account)
+      .autoSignOut(account)
+  }
+
+  suspend fun createPrivateMessageReport(
+    privateMessageId: Int,
+    reason: String,
+    account: Account? = accountForInstance(),
+  ) = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.createPrivateMessageReport(privateMessageId, reason, account)
+      .autoSignOut(account)
+  }
+
+  suspend fun resolvePrivateMessageReport(
+    reportId: Int,
+    resolved: Boolean,
+    account: Account? = accountForInstance(),
+  ) = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.resolvePrivateMessageReport(reportId, resolved, account)
+      .autoSignOut(account)
+  }
+
+  suspend fun fetchPrivateMessageReports(
+    unresolvedOnly: Boolean? = null,
+    page: Int? = 0,
+    limit: Int? = 20,
+    account: Account? = accountForInstance(),
+    force: Boolean,
+  ) = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.fetchPrivateMessageReports(unresolvedOnly, page, limit, account, force)
       .autoSignOut(account)
   }
 

@@ -6,9 +6,7 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowCompat
 import androidx.core.widget.ImageViewCompat
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,18 +16,17 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.VoteView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
-import com.idunnololz.summit.databinding.DialogFragmentViewVotesBinding
+import com.idunnololz.summit.databinding.FragmentViewVotesBinding
 import com.idunnololz.summit.databinding.InboxListLoaderItemBinding
 import com.idunnololz.summit.databinding.ItemInboxHeaderBinding
 import com.idunnololz.summit.databinding.VoteItemBinding
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendNameWithInstance
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
@@ -38,24 +35,20 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.showMoreLinkOptions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBinding>(),
+class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
   FullscreenDialogFragment {
 
   companion object {
-    fun show(postId: Long, commentId: Long, fragmentManager: FragmentManager) =
-      ViewVotesDialogFragment()
-        .apply {
-          arguments = ViewVotesDialogFragmentArgs(postId, commentId).toBundle()
-        }
-        .show(fragmentManager, "ViewVotesDialogFragment")
   }
 
-  private val args: ViewVotesDialogFragmentArgs by navArgs()
+  private val args: ViewVotesFragmentArgs by navArgs()
   private val viewModel: ViewVotesViewModel by viewModels()
 
   @Inject
@@ -67,20 +60,6 @@ class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBindin
   @Inject
   lateinit var preferences: Preferences
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-  }
-
-  override fun onStart() {
-    super.onStart()
-    val dialog = dialog
-    dialog?.window?.let { window ->
-      WindowCompat.setDecorFitsSystemWindows(window, false)
-    }
-  }
-
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -88,7 +67,7 @@ class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBindin
   ): View {
     super.onCreateView(inflater, container, savedInstanceState)
 
-    setBinding(DialogFragmentViewVotesBinding.inflate(inflater, container, false))
+    setBinding(FragmentViewVotesBinding.inflate(inflater, container, false))
 
     return binding.root
   }
@@ -99,7 +78,8 @@ class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBindin
     viewModel.loadVotes(args.postId.toInt(), args.commentId.toInt())
 
     with(binding) {
-      requireMainActivity().apply {
+      requireSummitActivity().apply {
+        setupForFragment<ViewVotesFragment>()
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
         insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.root)
       }
@@ -111,21 +91,23 @@ class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBindin
         avatarHelper = avatarHelper,
         preferences = preferences,
         onPersonClick = {
-          dismiss()
           getMainActivity()?.launchPage(it)
+        },
+        onPersonLongClick = {
+          getMainActivity()?.showMoreLinkOptions(LinkUtils.getLinkForPerson(it), null)
         }
       )
 
       recyclerView.setHasFixedSize(true)
-      binding.recyclerView.setup(animationsHelper)
-      binding.recyclerView.layoutManager = LinearLayoutManager(context)
-      binding.recyclerView.adapter = adapter
-      binding.recyclerView.addOnScrollListener(
+      recyclerView.setup(animationsHelper)
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.adapter = adapter
+      recyclerView.addOnScrollListener(
         object : OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
 
-            val layoutManager = binding.recyclerView.layoutManager as? LinearLayoutManager
+            val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
               ?: return
 
             if (layoutManager.findLastVisibleItemPosition() == adapter.itemCount - 1) {
@@ -164,6 +146,7 @@ class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBindin
     private val avatarHelper: AvatarHelper,
     private val preferences: Preferences,
     private val onPersonClick: (PersonRef) -> Unit,
+    private val onPersonLongClick: (PersonRef.PersonRefComplete) -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed interface Item {
@@ -255,6 +238,10 @@ class ViewVotesDialogFragment : BaseDialogFragment<DialogFragmentViewVotesBindin
 
         b.root.setOnClickListener {
           onPersonClick(person.toPersonRef())
+        }
+        b.root.setOnLongClickListener {
+          onPersonLongClick(person.toPersonRef())
+          true
         }
       }
       addItemType(Item.LoaderItem::class, InboxListLoaderItemBinding::inflate) { item, b, _ ->

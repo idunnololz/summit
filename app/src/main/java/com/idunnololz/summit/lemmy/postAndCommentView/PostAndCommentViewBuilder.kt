@@ -1467,6 +1467,12 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     val title = if (item is InboxItem.MessageInboxItem) {
       context.getString(R.string.message_to_format, item.targetUserName)
+    } else if (item is InboxItem.ReportPostInboxItem) {
+      context.getString(R.string.report_on_post)
+    } else if (item is InboxItem.ReportCommentInboxItem) {
+      context.getString(R.string.report_on_comment)
+    } else if (item is InboxItem.ReportMessageInboxItem) {
+      context.getString(R.string.report_on_private_message)
     } else {
       item.title
     }

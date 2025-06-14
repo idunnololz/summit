@@ -29,12 +29,15 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
+import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -67,6 +70,9 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
   @Inject
   lateinit var preferences: Preferences
+
+  @Inject
+  lateinit var moreActionsHelper: MoreActionsHelper
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -161,8 +167,28 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
           onLinkClick(url, text, linkType)
         },
         onLinkLongClick = { url, text ->
-          getMainActivity()?.showMoreLinkOptions(url, text)
+          getSummitActivity()?.showMoreLinkOptions(url, text)
         },
+        onMessageLongClick = { message ->
+          val bottomMenu = BottomMenu(context).apply {
+            setTitle(R.string.message_actions)
+            addItemWithIcon(
+              id = R.id.report_private_message,
+              title = R.string.report_message,
+              icon = R.drawable.baseline_outlined_flag_24,
+            )
+          }
+
+          bottomMenu.setOnMenuItemClickListener {
+            when (it.id) {
+              R.id.report_private_message -> {
+                ReportContentDialogFragment.show(childFragmentManager, message)
+              }
+            }
+          }
+
+          getSummitActivity()?.showBottomMenu(bottomMenu, expandFully = false)
+        }
       )
 
       fun markMessagesAsReadIfNeeded() {
@@ -327,6 +353,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
     private val onPageClick: (PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (String, String) -> Unit,
+    private val onMessageLongClick: (MessageItem) -> Unit,
   ) : Adapter<ViewHolder>() {
 
     sealed interface Item {
@@ -362,24 +389,6 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
         Item.ConversationItem::class,
         ConversationItemBinding::inflate,
       ) { item, b, h ->
-
-//                LemmyTextHelper.bindText(
-//                    textView = text,
-//                    text = content,
-//                    instance = instance,
-//                    highlight = highlightTextData,
-//                    onImageClick = {
-//                        onImageClick(Either.Right(commentView), null, it)
-//                    },
-//                    onVideoClick = { url ->
-//                        onVideoClick(url, VideoType.Unknown, null)
-//                    },
-//                    onPageClick = onPageClick,
-//                    onLinkClick = onLinkClick,
-//                    onLinkLongClick = onLinkLongClick,
-//                    showMediaAsLinks = commentsShowInlineMediaAsLinks,
-//                )
-
         val spannable = lemmyTextHelper.bindText(
           textView = b.text,
           text = item.messageItem.content,
@@ -476,6 +485,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             this.gravity = Gravity.END
             this.bottomMargin = item.bottomMargin
           }
+          b.cardView.isLongClickable = false
         } else {
           b.text.setTextColor(
             context.getColorFromAttribute(
@@ -507,6 +517,10 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             this.marginEnd = context.getDimen(R.dimen.conversation_bubble_padding)
             this.gravity = Gravity.START
             this.bottomMargin = item.bottomMargin
+          }
+          b.cardView.setOnLongClickListener {
+            onMessageLongClick(item.messageItem)
+            true
           }
         }
       }

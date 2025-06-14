@@ -406,4 +406,18 @@
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim"/><action android:id="@+id/action_global_userTagsFragment" app:destination="@id/userTagsFragment"/><action android:id="@+id/action_global_createOrEditCommunityFragment" app:destination="@id/createOrEditCommunityFragment"/><action android:id="@+id/action_global_modLogsFragment" app:destination="@id/modLogsFragment"/>
+    <fragment
+        android:id="@+id/viewVotesFragment"
+        android:name="com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesFragment"
+        android:label="ViewVotesFragment">
+
+        <argument
+            android:name="postId"
+            app:argType="long" />
+        <argument
+            android:name="commentId"
+            app:argType="long" />
+    </fragment>
+
+    <action android:id="@+id/action_global_viewVotesFragment" app:destination="@id/viewVotesFragment"/>
 </navigation>

@@ -14,6 +14,7 @@ import com.idunnololz.summit.databinding.DialogFragmentReportContentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.inbox.conversation.MessageItem
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setSizeDynamically
@@ -28,7 +29,23 @@ class ReportContentDialogFragment :
     fun show(fragmentManager: FragmentManager, postRef: PostRef?, commentRef: CommentRef?) {
       ReportContentDialogFragment()
         .apply {
-          arguments = ReportContentDialogFragmentArgs(postRef, commentRef).toBundle()
+          arguments = ReportContentDialogFragmentArgs(
+            postRef = postRef,
+            commentRef = commentRef,
+            messageItem = null,
+          ).toBundle()
+        }
+        .showAllowingStateLoss(fragmentManager, "ReportContentDialogFragment")
+    }
+
+    fun show(fragmentManager: FragmentManager, messageItem: MessageItem) {
+      ReportContentDialogFragment()
+        .apply {
+          arguments = ReportContentDialogFragmentArgs(
+            postRef = null,
+            commentRef = null,
+            messageItem = messageItem,
+          ).toBundle()
         }
         .showAllowingStateLoss(fragmentManager, "ReportContentDialogFragment")
     }
@@ -66,21 +83,19 @@ class ReportContentDialogFragment :
 
     val commentRef = args.commentRef
     val postRef = args.postRef
+    val messageItem = args.messageItem
 
-    if (commentRef == null && postRef == null) {
+    if (commentRef == null && postRef == null && messageItem == null) {
       dismiss()
       return
-    }
-    val target = if (postRef != null) {
-      Either.Left(postRef)
-    } else {
-      Either.Right(requireNotNull(commentRef))
     }
 
     binding.report.setOnClickListener {
       viewModel.sendReport(
-        target,
-        binding.reasonEditText.text.toString(),
+        postRef = postRef,
+        commentRef = commentRef,
+        messageItem = messageItem,
+        reason = binding.reasonEditText.text.toString(),
       )
     }
     binding.cancel.setOnClickListener {

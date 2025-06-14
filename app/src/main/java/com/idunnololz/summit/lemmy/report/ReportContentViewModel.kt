@@ -6,6 +6,7 @@ import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.inbox.conversation.MessageItem
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -21,20 +22,23 @@ class ReportContentViewModel @Inject constructor(
 
   var sendReportJob: Job? = null
 
-  fun sendReport(postOrCommentRef: Either<PostRef, CommentRef>, reason: String) {
+  fun sendReport(
+    postRef: PostRef?,
+    commentRef: CommentRef?,
+    messageItem: MessageItem?,
+    reason: String
+  ) {
     reportState.setIsLoading()
 
     sendReportJob?.cancel()
     sendReportJob = viewModelScope.launch {
-      postOrCommentRef
-        .fold(
-          ifLeft = {
-            apiClient.createPostReport(it.id, reason)
-          },
-          ifRight = {
-            apiClient.createCommentReport(it.id, reason)
-          },
-        )
+      if (postRef != null) {
+        apiClient.createPostReport(postRef.id, reason)
+      } else if (commentRef != null) {
+        apiClient.createCommentReport(commentRef.id, reason)
+      } else {
+        apiClient.createPrivateMessageReport(requireNotNull(messageItem).id, reason)
+      }
         .onSuccess {
           reportState.postValue(Unit)
         }

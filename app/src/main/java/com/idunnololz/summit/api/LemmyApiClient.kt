@@ -35,6 +35,7 @@ import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePostReport
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
+import com.idunnololz.summit.api.dto.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.DeletePost
@@ -103,6 +104,7 @@ import com.idunnololz.summit.api.dto.PostReportId
 import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.PrivateMessageId
+import com.idunnololz.summit.api.dto.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.dto.PurgeComment
 import com.idunnololz.summit.api.dto.PurgeCommunity
@@ -117,6 +119,7 @@ import com.idunnololz.summit.api.dto.ResolveCommentReport
 import com.idunnololz.summit.api.dto.ResolveObject
 import com.idunnololz.summit.api.dto.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.ResolvePostReport
+import com.idunnololz.summit.api.dto.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
@@ -1418,7 +1421,7 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
-  suspend fun fetchReportMessages(
+  suspend fun fetchPrivateMessageReports(
     unresolvedOnly: Boolean? = null,
     page: Int? = null,
     limit: Int? = null,
@@ -1434,9 +1437,9 @@ class LemmyApiClient @Inject constructor(
 
     return retrofitErrorHandler {
       if (force) {
-        api.getReportMessagesNoCache(authorization = account.bearer, form.serializeToMap())
+        api.getPrivateMessageReportsNoCache(authorization = account.bearer, form.serializeToMap())
       } else {
-        api.getReportMessages(authorization = account.bearer, form.serializeToMap())
+        api.getPrivateMessageReports(authorization = account.bearer, form.serializeToMap())
       }
     }.fold(
       onSuccess = {
@@ -1479,6 +1482,38 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
+  suspend fun createPrivateMessageReport(
+    privateMessageId: Int,
+    reason: String,
+    account: Account,
+  ): Result<PrivateMessageReportResponse> {
+    val form = CreatePrivateMessageReport(
+      auth = account.jwt,
+      private_message_id = privateMessageId,
+      reason = reason,
+    )
+
+    return retrofitErrorHandler {
+      api.createPrivateMessageReport(authorization = account.bearer, form)
+    }
+  }
+
+  suspend fun resolvePrivateMessageReport(
+    reportId: Int,
+    resolved: Boolean,
+    account: Account,
+  ): Result<PrivateMessageReportResponse> {
+    val form = ResolvePrivateMessageReport(
+      auth = account.jwt,
+      report_id = reportId,
+      resolved = resolved,
+    )
+
+    return retrofitErrorHandler {
+      api.resolvePrivateMessageReport(authorization = account.bearer, form)
+    }
+  }
+
   suspend fun resolvePostReport(
     reportId: PostReportId,
     resolved: Boolean,
@@ -1492,14 +1527,7 @@ class LemmyApiClient @Inject constructor(
 
     return retrofitErrorHandler {
       api.resolvePostReport(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    }
   }
 
   suspend fun fetchCommentReports(

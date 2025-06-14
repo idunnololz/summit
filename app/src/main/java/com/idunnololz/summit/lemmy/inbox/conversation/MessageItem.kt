@@ -1,11 +1,14 @@
 package com.idunnololz.summit.lemmy.inbox.conversation
 
+import android.os.Parcelable
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
 import com.idunnololz.summit.util.dateStringToTs
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class MessageItem(
   override val id: Int,
   val authorId: PersonId,
@@ -19,7 +22,7 @@ data class MessageItem(
   val isDeleted: Boolean,
   val isRead: Boolean,
   val targetUserName: String?,
-) : LiteInboxItem {
+) : LiteInboxItem, Parcelable {
   override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
 }
 

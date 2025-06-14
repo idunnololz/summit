@@ -239,22 +239,22 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
   ) : InboxItem {
 
     constructor(message: PrivateMessageReportView) : this(
-      id = message.private_message.id,
+      id = message.private_message_report.id,
       authorId = message.creator.id,
       authorName = message.creator.name,
       authorInstance = message.creator.instance,
       authorAvatar = message.creator.avatar,
       title = message.creator.name,
-      content = message.private_message.content,
-      lastUpdate = message.private_message.updated ?: message.private_message.published,
+      content = message.private_message_report.reason,
+      lastUpdate = message.private_message_report.updated ?: message.private_message_report.published,
       lastUpdateTs = dateStringToTs(
-        message.private_message.updated
-          ?: message.private_message.published,
+        message.private_message_report.updated
+          ?: message.private_message_report.published,
       ),
       score = null,
-      isDeleted = message.private_message.deleted,
+      isDeleted = false,
       isRemoved = false,
-      isRead = message.private_message.read,
+      isRead = message.private_message_report.resolved,
     )
 
     override fun toString(): String = "ReportInboxItem { content = $content }"
@@ -440,3 +440,5 @@ fun PrivateMessageView.toInboxItem() = InboxItem.MessageInboxItem(this)
 fun CommentReportView.toInboxItem() = InboxItem.ReportCommentInboxItem(this)
 
 fun PostReportView.toInboxItem() = InboxItem.ReportPostInboxItem(this)
+
+fun PrivateMessageReportView.toInboxItem() = InboxItem.ReportMessageInboxItem(this)

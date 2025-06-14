@@ -366,8 +366,7 @@ class InboxFragment :
     }
 
     with(binding) {
-
-      val inboxPaneController = inboxPaneControllerFactory.create(
+      inboxPaneControllerFactory.create(
         viewModel = viewModel,
         binding = binding.startPanel,
         viewLifecycleOwner = viewLifecycleOwner,

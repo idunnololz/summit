@@ -1,6 +1,5 @@
 package com.idunnololz.summit.api
 
-import androidx.room.Query
 import com.idunnololz.summit.api.dto.AddModToCommunity
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
@@ -26,6 +25,7 @@ import com.idunnololz.summit.api.dto.CreatePost
 import com.idunnololz.summit.api.dto.CreatePostLike
 import com.idunnololz.summit.api.dto.CreatePostReport
 import com.idunnololz.summit.api.dto.CreatePrivateMessage
+import com.idunnololz.summit.api.dto.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.DeleteComment
 import com.idunnololz.summit.api.dto.DeleteCommunity
 import com.idunnololz.summit.api.dto.DeletePost
@@ -48,7 +48,6 @@ import com.idunnololz.summit.api.dto.GetReportCountResponse
 import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.ListCommentLikesResponse
@@ -57,7 +56,6 @@ import com.idunnololz.summit.api.dto.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
-import com.idunnololz.summit.api.dto.ListRegistrationApplications
 import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
@@ -71,6 +69,7 @@ import com.idunnololz.summit.api.dto.PersonMentionResponse
 import com.idunnololz.summit.api.dto.PictrsImages
 import com.idunnololz.summit.api.dto.PostReportResponse
 import com.idunnololz.summit.api.dto.PostResponse
+import com.idunnololz.summit.api.dto.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.PrivateMessagesResponse
 import com.idunnololz.summit.api.dto.PurgeComment
@@ -85,6 +84,7 @@ import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.ResolveCommentReport
 import com.idunnololz.summit.api.dto.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.ResolvePostReport
+import com.idunnololz.summit.api.dto.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
@@ -445,17 +445,30 @@ interface LemmyApi {
    * These are instance wide reports that are only visible for instance admins.
    */
   @GET("private_message/report/list")
-  fun getReportMessages(
+  fun getPrivateMessageReports(
     @Header("Authorization") authorization: String?,
     @QueryMap form: Map<String, String>,
   ): Call<ListPrivateMessageReportsResponse>
 
   @GET("private_message/report/list")
   @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
-  fun getReportMessagesNoCache(
+  fun getPrivateMessageReportsNoCache(
     @Header("Authorization") authorization: String?,
     @QueryMap form: Map<String, String>,
   ): Call<ListPrivateMessageReportsResponse>
+
+  @POST("private_message/report")
+  fun createPrivateMessageReport(
+    @Header("Authorization") authorization: String?,
+    @Body form: CreatePrivateMessageReport,
+  ): Call<PrivateMessageReportResponse>
+
+  @PUT("private_message/report/resolve")
+  fun resolvePrivateMessageReport(
+    @Header("Authorization") authorization: String?,
+    @Body resolvePrivateMessageReport: ResolvePrivateMessageReport,
+  ): Call<PrivateMessageReportResponse>
+
 
   @GET("post/report/list")
   fun getPostReports(

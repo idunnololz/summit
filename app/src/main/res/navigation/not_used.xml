@@ -157,6 +157,10 @@ safeargs.
             android:name="commentRef"
             app:argType="com.idunnololz.summit.lemmy.CommentRef"
             app:nullable="true" />
+        <argument
+            android:name="messageItem"
+            app:argType="com.idunnololz.summit.lemmy.inbox.conversation.MessageItem"
+            app:nullable="true" />
     </dialog>
     <dialog
         android:id="@+id/accountsAndSettingsDialogFragment"
@@ -415,17 +419,6 @@ safeargs.
         <argument
             android:name="positive_button"
             app:argType="string" />
-    </dialog>
-    <dialog
-        android:id="@+id/viewVotesDialogFragment"
-        android:name="com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesDialogFragment"
-        android:label="ViewVotesDialogFragment" >
-        <argument
-            android:name="postId"
-            app:argType="long" />
-        <argument
-            android:name="commentId"
-            app:argType="long" />
     </dialog>
     <dialog
         android:id="@+id/modLogsFilterDialogFragment"

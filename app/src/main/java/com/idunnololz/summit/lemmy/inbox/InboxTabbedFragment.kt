@@ -247,6 +247,29 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
     binding.slidingPaneLayout.open()
   }
 
+  fun openReportItem(accountId: Long, item: InboxItem, instance: String) {
+    if (item !is ReportItem) {
+      return
+    }
+
+    childFragmentManager.commit {
+      setReorderingAllowed(true)
+
+      replace(
+        R.id.message_fragment_container,
+        MessageFragment::class.java,
+        MessageFragmentArgs(item, instance).toBundle(),
+      )
+
+      // If it's already open and the detail pane is visible, crossfade
+      // between the fragments.
+      if (binding.slidingPaneLayout.isOpen) {
+        setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+      }
+    }
+    binding.slidingPaneLayout.open()
+  }
+
   fun openConversation(
     accountId: Long,
     conversation: Either<Conversation, NewConversation>,

@@ -244,55 +244,54 @@ class LemmyTextHelper @Inject constructor(
 
     private fun processAll(s: String): String {
       val s = fixTicks(s)
-      return s
-//      val matcher = largeRegex.matcher(s)
-//      val sb = StringBuffer()
-//      while (matcher.find()) {
-//        val characterBeforeSpoilerEndTag = matcher.group(5)
-//        val spoilerEndTag = matcher.group(6)
-//        if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
-//          matcher.appendReplacement(
-//            sb,
-//            "$characterBeforeSpoilerEndTag\n$spoilerEndTag",
-//          )
-//          continue
-//        }
-//
-//        val linkStart = matcher.group(1)
-//        val referenceTypeToken = matcher.group(2)
-//        val name = matcher.group(3)
-//        val instance = matcher.group(4)
-//
-//        if (linkStart == null &&
-//          referenceTypeToken != null &&
-//          name != null &&
-//          instance != null &&
-//          !name.contains("]") &&
-//          !instance.contains("]") /* make sure we are not within a link def */
-//        ) {
-//          when (referenceTypeToken.lowercase(Locale.US)) {
-//            "!", "c/", "/c/" -> {
-//              val communityRef = CommunityRef.CommunityRefByName(name, instance)
-//
-//              matcher.appendReplacement(
-//                sb,
-//                "[${matcher.group(
-//                  0,
-//                )}](${LinkUtils.getLinkForCommunity(communityRef)})",
-//              )
-//            }
-//            "@", "u/", "/u/" -> {
-//              val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
-//              matcher.appendReplacement(
-//                sb,
-//                "[${matcher.group(0)}]($url)",
-//              )
-//            }
-//          }
-//        }
-//      }
-//      matcher.appendTail(sb)
-//      return sb.toString()
+      val matcher = largeRegex.matcher(s)
+      val sb = StringBuffer()
+      while (matcher.find()) {
+        val characterBeforeSpoilerEndTag = matcher.group(5)
+        val spoilerEndTag = matcher.group(6)
+        if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
+          matcher.appendReplacement(
+            sb,
+            "$characterBeforeSpoilerEndTag\n$spoilerEndTag",
+          )
+          continue
+        }
+
+        val linkStart = matcher.group(1)
+        val referenceTypeToken = matcher.group(2)
+        val name = matcher.group(3)
+        val instance = matcher.group(4)
+
+        if (linkStart == null &&
+          referenceTypeToken != null &&
+          name != null &&
+          instance != null &&
+          !name.contains("]") &&
+          !instance.contains("]") /* make sure we are not within a link def */
+        ) {
+          when (referenceTypeToken.lowercase(Locale.US)) {
+            "!", "c/", "/c/" -> {
+              val communityRef = CommunityRef.CommunityRefByName(name, instance)
+
+              matcher.appendReplacement(
+                sb,
+                "[${matcher.group(
+                  0,
+                )}](${LinkUtils.getLinkForCommunity(communityRef)})",
+              )
+            }
+            "@", "u/", "/u/" -> {
+              val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
+              matcher.appendReplacement(
+                sb,
+                "[${matcher.group(0)}]($url)",
+              )
+            }
+          }
+        }
+      }
+      matcher.appendTail(sb)
+      return sb.toString()
     }
 
     private fun fixTicks(s: String): String {

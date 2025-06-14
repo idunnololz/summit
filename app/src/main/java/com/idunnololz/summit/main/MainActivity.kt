@@ -47,6 +47,8 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -784,6 +786,14 @@ class MainActivity : SummitActivity() {
   fun launchModLogs(instance: String, filterByMod: PersonRef) {
     val direction = MainDirections.actionGlobalModLogsFragment(
       instance, null, filterByMod = filterByMod)
+    currentNavController?.navigateSafe(direction)
+  }
+
+  fun launchViewVotes(postId: PostId, commentId: CommentId) {
+    val direction = MainDirections.actionGlobalViewVotesFragment(
+      postId = postId.toLong(),
+      commentId = commentId.toLong(),
+    )
     currentNavController?.navigateSafe(direction)
   }
 

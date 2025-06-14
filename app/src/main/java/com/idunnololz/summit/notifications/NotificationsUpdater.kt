@@ -82,7 +82,7 @@ class NotificationsUpdater @AssistedInject constructor(
               jobs.add(runPostReportsJob(account))
             }
             if ((it.private_message_reports ?: 0) > 0) {
-              // todo?
+              jobs.add(runPrivateMessageReportsJob(account))
             }
             jobs.flatMap { it.await() }
           },
@@ -179,6 +179,21 @@ class NotificationsUpdater @AssistedInject constructor(
         force = true,
       ).fold(
         { it.post_reports.map { it.toInboxItem() } },
+        { listOf() },
+      )
+    }
+
+  private fun runPrivateMessageReportsJob(account: Account): Deferred<List<InboxItem>> =
+    coroutineScope.async {
+      apiClient.fetchPrivateMessageReports(
+        unresolvedOnly = true,
+        page = 1,
+        limit = 10,
+        account = account,
+        force = true,
+      ).fold(
+        {
+          it.private_message_reports.map { it.toInboxItem() } },
         { listOf() },
       )
     }

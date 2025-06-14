@@ -36,7 +36,6 @@ import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommentModSt
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommunityModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.PostModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.UserModState
-import com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesDialogFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -320,18 +319,16 @@ class ModActionsDialogFragment :
               )
             }
             R.id.post_view_votes -> {
-              ViewVotesDialogFragment.show(
-                args.postId.toLong(),
-                0,
-                parentFragmentManager,
+              getMainActivity()?.launchViewVotes(
+                postId = args.postId,
+                commentId = 0,
               )
               dismiss()
             }
             R.id.comment_view_votes -> {
-              ViewVotesDialogFragment.show(
-                0,
-                args.commentId.toLong(),
-                parentFragmentManager,
+              getMainActivity()?.launchViewVotes(
+                postId = 0,
+                commentId = args.commentId,
               )
               dismiss()
             }
