@@ -56,7 +56,7 @@ class InboxViewModel @Inject constructor(
 
   private var fetchInboxJob: Job? = null
 
-  var inboxRepository = inboxRepositoryFactory.create(null)
+  var inboxRepository = inboxRepositoryFactory.create(accountInfoManager.currentFullAccount.value)
 
   val currentAccount
     get() = accountManager.currentAccount.asAccountLiveData()

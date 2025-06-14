@@ -106,6 +106,10 @@ class InboxRepository @Inject constructor(
           return Result.failure(requireNotNull(sourceAndError.second.exceptionOrNull()))
         }
 
+        if (sourceToResult.isEmpty()) {
+          return Result.failure(RuntimeException("No sources!"))
+        }
+
         val nextSourceAndResult = sourceToResult.maxBy {
             (_, result) ->
           result.getOrNull()?.lastUpdateTs ?: 0L
@@ -179,7 +183,15 @@ class InboxRepository @Inject constructor(
     )
   private val reportsSource =
     InboxMultiDataSource(
-      listOf(postReportsStatelessSource, commentReportsStatelessSource, makePrivateMessageReportsSource),
+      mutableListOf<InboxSource<*>>().apply {
+        if (fullAccount?.isMod() == true) {
+          add(postReportsStatelessSource)
+          add(commentReportsStatelessSource)
+        }
+        if (fullAccount?.isAdmin() == true) {
+          add(makePrivateMessageReportsSource)
+        }
+      },
     )
   private val allSources = InboxMultiDataSource(
     listOf(
