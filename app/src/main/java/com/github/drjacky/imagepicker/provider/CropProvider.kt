@@ -15,9 +15,9 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView.Guidelines
 import com.github.drjacky.imagepicker.ImagePicker
 import com.github.drjacky.imagepicker.ImagePickerActivity
-import com.github.drjacky.imagepicker.R
 import com.github.drjacky.imagepicker.util.FileUriUtils
 import com.github.drjacky.imagepicker.util.FileUtil.getCompressFormat
+import com.idunnololz.summit.R
 import com.idunnololz.summit.util.getParcelableCompat
 import java.io.ByteArrayOutputStream
 import java.io.File

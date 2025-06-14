@@ -9,10 +9,10 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.core.app.ActivityCompat.requestPermissions
 import com.github.drjacky.imagepicker.ImagePickerActivity
-import com.github.drjacky.imagepicker.R
 import com.github.drjacky.imagepicker.util.FileUtil
 import com.github.drjacky.imagepicker.util.IntentUtils
 import com.github.drjacky.imagepicker.util.PermissionUtil
+import com.idunnololz.summit.R
 import java.io.File
 import java.io.IOException
 

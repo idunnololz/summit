@@ -15,6 +15,7 @@ import com.github.drjacky.imagepicker.provider.CameraProvider
 import com.github.drjacky.imagepicker.provider.CompressionProvider
 import com.github.drjacky.imagepicker.provider.CropProvider
 import com.github.drjacky.imagepicker.provider.GalleryProvider
+import com.idunnololz.summit.R
 import java.io.File
 import java.io.IOException
 

@@ -7,8 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import com.github.drjacky.imagepicker.constant.ImageProvider
 import com.github.drjacky.imagepicker.listener.DismissListener
-import com.github.drjacky.imagepicker.listener.ResultListener
-import com.github.drjacky.imagepicker.util.DialogHelper
 import java.io.File
 
 /**
@@ -275,24 +273,6 @@ open class ImagePicker {
 
     fun createIntent(): Intent =
       Intent(activity, ImagePickerActivity::class.java).apply { putExtras(getBundle()) }
-
-    fun createIntentFromDialog(onResult: (Intent) -> Unit) {
-      if (imageProvider == ImageProvider.BOTH) {
-        DialogHelper.showChooseAppDialog(
-          context = activity,
-          listener = object : ResultListener<ImageProvider> {
-            override fun onResult(t: ImageProvider?) {
-              t?.let {
-                imageProvider = it
-                imageProviderInterceptor?.invoke(imageProvider)
-                onResult(createIntent())
-              }
-            }
-          },
-          dismissListener,
-        )
-      }
-    }
 
     /**
      * Get Bundle for ImagePickerActivity

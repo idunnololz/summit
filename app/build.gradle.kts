@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 35
-    versionCode = 256
-    versionName = "1.63.0"
+    versionCode = 257
+    versionName = "1.64.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -91,7 +91,6 @@ configurations.configureEach {
 
 dependencies {
   implementation(project(":thirdPartyModules:calligraphy"))
-  implementation(project(":thirdPartyModules:imagepicker"))
   implementation(project(":thirdPartyModules:overlappingPane"))
   implementation(project(":thirdPartyModules:markwon:markwon-core"))
   implementation(project(":thirdPartyModules:markwon:markwon-ext-strikethrough"))

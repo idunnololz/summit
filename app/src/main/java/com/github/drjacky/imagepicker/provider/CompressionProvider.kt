@@ -10,6 +10,7 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.github.drjacky.imagepicker.ImagePickerActivity
 import com.github.drjacky.imagepicker.util.ExifDataCopier
 import com.github.drjacky.imagepicker.util.FileUriUtils
+import com.idunnololz.summit.R
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.launch
@@ -60,7 +61,7 @@ class CompressionProvider(activity: ImagePickerActivity) : BaseProvider(activity
         ExifDataCopier.copyExif(uri, res)
         activity.setCompressedImage(res)
       } else {
-        setError(com.github.drjacky.imagepicker.R.string.error_failed_to_compress_image)
+        setError(R.string.error_failed_to_compress_image)
       }
     }
   }

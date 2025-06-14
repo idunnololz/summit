@@ -12,7 +12,6 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/thirdPartyModules" />
             <option value="$PROJECT_DIR$/thirdPartyModules/calligraphy" />
-            <option value="$PROJECT_DIR$/thirdPartyModules/imagepicker" />
             <option value="$PROJECT_DIR$/thirdPartyModules/markwon" />
             <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-core" />
             <option value="$PROJECT_DIR$/thirdPartyModules/markwon/markwon-ext-strikethrough" />

@@ -1,7 +1,6 @@
 include(":app")
 include(":thirdPartyModules:calligraphy")
 include(":thirdPartyModules:overlappingPane")
-include(":thirdPartyModules:imagepicker")
 include(":thirdPartyModules:markwon:markwon-core")
 include(":thirdPartyModules:markwon:markwon-ext-strikethrough")
 include(":thirdPartyModules:markwon:markwon-ext-tables")
