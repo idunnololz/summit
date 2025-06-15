@@ -26,7 +26,6 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.inflationx.calligraphy3.CalligraphyUtils
-import io.github.inflationx.viewpump.ViewPump
 import javax.inject.Inject
 
 @AndroidEntryPoint

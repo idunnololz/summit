@@ -15,7 +15,6 @@ import com.idunnololz.summit.databinding.InboxPaneCategoryItemBinding
 import com.idunnololz.summit.databinding.InboxPaneDividerItemBinding
 import com.idunnololz.summit.databinding.InboxPaneTitleItemBinding
 import com.idunnololz.summit.lemmy.inbox.PageType
-import com.idunnololz.summit.main.communitiesPane.CommunitiesPaneController
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.assisted.Assisted
@@ -89,7 +88,7 @@ class InboxPaneController @AssistedInject constructor(
   }
 
   private class InboxPaneAdapter(
-    private val onCategoryClickListener: (InboxCategory) -> Unit
+    private val onCategoryClickListener: (InboxCategory) -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed interface Item {
@@ -98,7 +97,7 @@ class InboxPaneController @AssistedInject constructor(
         val category: InboxCategory,
         val unreadCount: Int,
         val isSelected: Boolean,
-      ):  Item
+      ) : Item
       class DividerItem(val name: String) : Item
     }
 
@@ -130,13 +129,14 @@ class InboxPaneController @AssistedInject constructor(
             old.name == (new as Item.DividerItem).name
           Item.TitleItem -> true
         }
-      }
+      },
     ).apply {
       addItemType(
-        Item.CategoryItem::class, InboxPaneCategoryItemBinding::inflate
+        Item.CategoryItem::class,
+        InboxPaneCategoryItemBinding::inflate,
       ) { item, b, h ->
         when (item.category) {
-          InboxCategory.Unread ->{
+          InboxCategory.Unread -> {
             b.text.setText(R.string.unread)
             b.text.setCompoundDrawablesRelativeWithIntrinsicBounds(
               R.drawable.baseline_mark_email_unread_24,
@@ -213,11 +213,13 @@ class InboxPaneController @AssistedInject constructor(
         }
       }
       addItemType(
-        Item.TitleItem::class, InboxPaneTitleItemBinding::inflate
+        Item.TitleItem::class,
+        InboxPaneTitleItemBinding::inflate,
       ) { item, b, h ->
       }
       addItemType(
-        Item.DividerItem::class, InboxPaneDividerItemBinding::inflate
+        Item.DividerItem::class,
+        InboxPaneDividerItemBinding::inflate,
       ) { item, b, h ->
       }
     }
@@ -226,35 +228,26 @@ class InboxPaneController @AssistedInject constructor(
       refreshItems()
     }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int,
-    ): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun onBindViewHolder(
-      holder: RecyclerView.ViewHolder,
-      position: Int,
-    ) =
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     private fun refreshItems() {
       val newItems = mutableListOf<Item>()
       val fullAccount = fullAccount
       val unreadCounts = unreadCounts
 
-      fun newCategoryItem(category: InboxCategory, unreadCount: Int?) =
-        Item.CategoryItem(
-          category,
-          unreadCount ?: 0,
-          category == selectedCategory,
-        )
+      fun newCategoryItem(category: InboxCategory, unreadCount: Int?) = Item.CategoryItem(
+        category,
+        unreadCount ?: 0,
+        category == selectedCategory,
+      )
 
       newItems.add(Item.TitleItem)
       newItems.add(newCategoryItem(InboxCategory.Unread, unreadCounts?.totalUnreadCount))
@@ -272,22 +265,21 @@ class InboxPaneController @AssistedInject constructor(
           newItems.add(
             newCategoryItem(
               InboxCategory.Reports,
-              unreadCounts?.totalUnresolvedReportsCount
-            )
+              unreadCounts?.totalUnresolvedReportsCount,
+            ),
           )
         }
         if (isAdmin) {
           newItems.add(
             newCategoryItem(
               InboxCategory.Applications,
-              unreadCounts?.totalUnreadApplicationsCount
-            )
+              unreadCounts?.totalUnreadApplicationsCount,
+            ),
           )
         }
       }
 
       adapterHelper.setItems(newItems, this)
     }
-
   }
 }

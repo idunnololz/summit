@@ -68,16 +68,14 @@ internal class CropWindowHandler {
   }
 
   /** Minimum width in pixels that the crop window can get. */
-  fun getMinCropWidth() =
-    mMinCropWindowWidth.coerceAtLeast(mMinCropResultWidth / mScaleFactorWidth)
+  fun getMinCropWidth() = mMinCropWindowWidth.coerceAtLeast(mMinCropResultWidth / mScaleFactorWidth)
 
   /** Minimum height in pixels that the crop window can get. */
   fun getMinCropHeight() =
     mMinCropWindowHeight.coerceAtLeast(mMinCropResultHeight / mScaleFactorHeight)
 
   /** Maximum width in pixels that the crop window can get. */
-  fun getMaxCropWidth() =
-    mMaxCropWindowWidth.coerceAtMost(mMaxCropResultWidth / mScaleFactorWidth)
+  fun getMaxCropWidth() = mMaxCropWindowWidth.coerceAtMost(mMaxCropResultWidth / mScaleFactorWidth)
 
   /** Maximum height in pixels that the crop window can get. */
   fun getMaxCropHeight() =
@@ -167,8 +165,18 @@ internal class CropWindowHandler {
     val type: CropWindowMoveHandler.Type? = when (cropShape) {
       RECTANGLE -> getRectanglePressedMoveType(x, y, targetRadius, isCenterMoveEnabled)
       OVAL -> getOvalPressedMoveType(x, y, isCenterMoveEnabled)
-      RECTANGLE_VERTICAL_ONLY -> getRectangleVerticalOnlyPressedMoveType(x, y, targetRadius, isCenterMoveEnabled)
-      RECTANGLE_HORIZONTAL_ONLY -> getRectangleHorizontalOnlyPressedMoveType(x, y, targetRadius, isCenterMoveEnabled)
+      RECTANGLE_VERTICAL_ONLY -> getRectangleVerticalOnlyPressedMoveType(
+        x,
+        y,
+        targetRadius,
+        isCenterMoveEnabled,
+      )
+      RECTANGLE_HORIZONTAL_ONLY -> getRectangleHorizontalOnlyPressedMoveType(
+        x,
+        y,
+        targetRadius,
+        isCenterMoveEnabled,
+      )
     }
 
     return if (type != null) CropWindowMoveHandler(type, this, x, y) else null
@@ -386,12 +394,7 @@ internal class CropWindowHandler {
    * [y2] the y-coordinate of the second point
    * @return the distance between these points
    */
-  private fun distance(
-    x1: Float,
-    y1: Float,
-    x2: Float,
-    y2: Float,
-  ) = max(abs(x1 - x2), abs(y1 - y2))
+  private fun distance(x1: Float, y1: Float, x2: Float, y2: Float) = max(abs(x1 - x2), abs(y1 - y2))
 
   /**
    * Determines if the specified coordinate is in the target touch zone for a horizontal bar handle.

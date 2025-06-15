@@ -2,7 +2,6 @@ package com.github.drjacky.imagepicker.provider
 
 import android.content.ContextWrapper
 import android.os.Bundle
-import android.widget.Toast
 import com.github.drjacky.imagepicker.ImagePickerActivity
 
 /**

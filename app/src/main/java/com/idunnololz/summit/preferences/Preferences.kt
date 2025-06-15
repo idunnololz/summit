@@ -22,10 +22,6 @@ import com.idunnololz.summit.lemmy.postListView.getDefaultPostAndCommentsUiConfi
 import com.idunnololz.summit.lemmy.postListView.getDefaultPostUiConfig
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
-import com.idunnololz.summit.preferences.DisplayDeletedPostIds.SHOW_DELETED_POSTS_IN_MODERATED_COMMUNITIES
-import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
-import com.idunnololz.summit.settings.navigation.NavBarConfig
-import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ALWAYS_SHOW_LINK_BUTTON_BELOW_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
@@ -170,6 +166,9 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_VIDEO_PLAYER_ROTATIO
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
+import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
+import com.idunnololz.summit.settings.navigation.NavBarConfig
+import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.asJson
 import com.idunnololz.summit.util.ext.base

@@ -180,7 +180,7 @@ class ClientFactory @Inject constructor(
         if (account != null &&
           it.request().header("Authorization") == null &&
           it.request().url.host == account.instance
-          ) {
+        ) {
           requestBuilder.header(
             "Authorization",
             "Bearer ${account.jwt}",

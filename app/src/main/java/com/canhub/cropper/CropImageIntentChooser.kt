@@ -41,7 +41,9 @@ internal class CropImageIntentChooser(
     MIUI_GALLERY,
   )
   private var cameraImgUri: Uri? = null
-  private val intentChooser = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityRes ->
+  private val intentChooser = activity.registerForActivityResult(
+    ActivityResultContracts.StartActivityForResult(),
+  ) { activityRes ->
     if (activityRes.resultCode == Activity.RESULT_OK) {
       /**
        * Here we don't know whether a gallery app or the camera app is selected
@@ -119,8 +121,13 @@ internal class CropImageIntentChooser(
 
     val flags = 0
     val listCam = when {
-      SDK_INT >= 33 -> packageManager.queryIntentActivities(captureIntent, PackageManager.ResolveInfoFlags.of(flags.toLong()))
-      else -> @Suppress("DEPRECATION") packageManager.queryIntentActivities(captureIntent, flags)
+      SDK_INT >= 33 -> packageManager.queryIntentActivities(
+        captureIntent,
+        PackageManager.ResolveInfoFlags.of(flags.toLong()),
+      )
+      else ->
+        @Suppress("DEPRECATION")
+        packageManager.queryIntentActivities(captureIntent, flags)
     }
 
     for (resolveInfo in listCam) {
@@ -160,8 +167,13 @@ internal class CropImageIntentChooser(
 
     val flags = 0
     val listGallery = when {
-      SDK_INT >= 33 -> packageManager.queryIntentActivities(galleryIntent, PackageManager.ResolveInfoFlags.of(flags.toLong()))
-      else -> @Suppress("DEPRECATION") packageManager.queryIntentActivities(galleryIntent, flags)
+      SDK_INT >= 33 -> packageManager.queryIntentActivities(
+        galleryIntent,
+        PackageManager.ResolveInfoFlags.of(flags.toLong()),
+      )
+      else ->
+        @Suppress("DEPRECATION")
+        packageManager.queryIntentActivities(galleryIntent, flags)
     }
     for (res in listGallery) {
       val intent = Intent(galleryIntent)
@@ -188,9 +200,10 @@ internal class CropImageIntentChooser(
    * See [StackOverflow
      * question](http://stackoverflow.com/questions/32789027/android-m-camera-intent-permission-bug).
    */
-  private fun isExplicitCameraPermissionRequired(context: Context): Boolean = SDK_INT >= Build.VERSION_CODES.M &&
-    hasCameraPermissionInManifest(context) &&
-    context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+  private fun isExplicitCameraPermissionRequired(context: Context): Boolean =
+    SDK_INT >= Build.VERSION_CODES.M &&
+      hasCameraPermissionInManifest(context) &&
+      context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
 
   /**
    * Check if the app requests a specific permission in the manifest.
@@ -203,8 +216,13 @@ internal class CropImageIntentChooser(
     try {
       val flags = PackageManager.GET_PERMISSIONS
       val packageInfo = when {
-        SDK_INT >= 33 -> context.packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
-        else -> @Suppress("DEPRECATION") context.packageManager.getPackageInfo(packageName, flags)
+        SDK_INT >= 33 -> context.packageManager.getPackageInfo(
+          packageName,
+          PackageManager.PackageInfoFlags.of(flags.toLong()),
+        )
+        else ->
+          @Suppress("DEPRECATION")
+          context.packageManager.getPackageInfo(packageName, flags)
       }
       val declaredPermissions = packageInfo.requestedPermissions
       return declaredPermissions

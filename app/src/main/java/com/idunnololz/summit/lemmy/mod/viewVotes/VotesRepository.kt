@@ -42,7 +42,8 @@ class VotesRepository @AssistedInject constructor(
           { pageIndex: Int,
             sortOrder: Unit,
             limit: Int,
-            force: Boolean ->
+            force: Boolean,
+            ->
 
             postOrCommentId.fold(
               {
@@ -50,7 +51,7 @@ class VotesRepository @AssistedInject constructor(
                   postId = it,
                   page = pageIndex.toLong(),
                   limit = limit.toLong(),
-                  force = force
+                  force = force,
                 ).map { it.post_likes }
               },
               {
@@ -58,12 +59,12 @@ class VotesRepository @AssistedInject constructor(
                   commentId = it,
                   page = pageIndex.toLong(),
                   limit = limit.toLong(),
-                  force = force
+                  force = force,
                 ).map { it.comment_likes }
-              }
+              },
             )
           },
-        )
+        ),
       ),
       sortValue = { it.score },
       id = { it.creator.id },

@@ -135,3 +135,6 @@
 ## End Retrofit
 
 -keep class com.idunnololz.summit.api.** { <fields>; }
+
+# We use reflection to access androidx.navigation.internal.NavControllerImpl.backQueue
+-keepnames class androidx.navigation.** { <fields>; }

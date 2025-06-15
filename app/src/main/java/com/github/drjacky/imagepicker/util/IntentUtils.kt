@@ -7,9 +7,6 @@ import android.hardware.camera2.CameraCharacteristics
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import androidx.core.content.FileProvider
-import androidx.documentfile.provider.DocumentFile
-import java.io.File
 
 /**
  * Get Gallery/Camera Intent

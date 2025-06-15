@@ -8,7 +8,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory

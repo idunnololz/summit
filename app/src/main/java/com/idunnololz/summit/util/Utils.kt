@@ -535,7 +535,6 @@ fun Context.getVideoErrorDrawable() = getDrawableCompat(R.drawable.video_icon_wi
     tint(getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
   }
 
-
 fun requireMainThread() {
   require(Looper.myLooper() == Looper.getMainLooper())
 }

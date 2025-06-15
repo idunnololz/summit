@@ -67,7 +67,7 @@ class PersonPickerViewModel @Inject constructor(
           searchResults.setValue(
             PersonSearchResults(
               people = it.users.filter { it.person.instance.contains(instance, ignoreCase = true) },
-              query = query
+              query = query,
             ),
           )
         }

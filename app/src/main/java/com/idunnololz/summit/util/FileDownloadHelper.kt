@@ -15,6 +15,8 @@ import com.idunnololz.summit.network.BrowserLike
 import com.idunnololz.summit.preferences.Preferences
 import java.io.File
 import java.io.OutputStream
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.runInterruptible
@@ -59,12 +61,14 @@ class FileDownloadHelper @Inject constructor(
       val id = DocumentsContract.getTreeDocumentId(oldParentUri)
       val parentFolderUri =
         DocumentsContract.buildChildDocumentsUriUsingTree(oldParentUri, id)
+      val tokens = destFileName.split('.', limit = 2)
+
       val outputUri = try {
         DocumentsContract.createDocument(
           c.contentResolver,
           parentFolderUri,
           mimeType ?: "*/*",
-          destFileName,
+          tokens[0] + "." + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
         )
       } catch (e: Exception) {
         return Result.failure(CustomDownloadLocationException("Create document failed", e))

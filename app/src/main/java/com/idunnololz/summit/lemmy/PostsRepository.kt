@@ -516,8 +516,8 @@ class PostsRepository @AssistedInject constructor(
         }
       }
       if (preferences.displayDeletedPosts != DisplayDeletedPostIds.ALWAYS_SHOW_DELETED_POSTS &&
-        post.post.deleted) {
-
+        post.post.deleted
+      ) {
         continue
       }
 

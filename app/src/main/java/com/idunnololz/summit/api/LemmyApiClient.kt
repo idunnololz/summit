@@ -1993,7 +1993,10 @@ class LemmyApiClient @Inject constructor(
 
     return retrofitErrorHandler {
       if (force) {
-        api.getRegistrationApplicationsCountNoCache(authorization = account.bearer, form.serializeToMap())
+        api.getRegistrationApplicationsCountNoCache(
+          authorization = account.bearer,
+          form.serializeToMap(),
+        )
       } else {
         api.getRegistrationApplicationsCount(authorization = account.bearer, form.serializeToMap())
       }
@@ -2019,7 +2022,10 @@ class LemmyApiClient @Inject constructor(
 
     return retrofitErrorHandler {
       if (force) {
-        api.listRegistrationApplicationsNoCache(authorization = account.bearer, form.serializeToMap())
+        api.listRegistrationApplicationsNoCache(
+          authorization = account.bearer,
+          form.serializeToMap(),
+        )
       } else {
         api.listRegistrationApplications(authorization = account.bearer, form.serializeToMap())
       }

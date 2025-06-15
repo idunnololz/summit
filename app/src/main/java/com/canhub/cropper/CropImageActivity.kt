@@ -1,9 +1,6 @@
 package com.canhub.cropper
 
 import android.content.Intent
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -18,7 +15,6 @@ import android.view.MenuItem
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -48,9 +44,10 @@ open class CropImageActivity :
   private var cropImageView: CropImageView? = null
   private lateinit var binding: CropImageActivityBinding
   private var latestTmpUri: Uri? = null
-  private val pickImageGallery = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-    onPickImageResult(uri)
-  }
+  private val pickImageGallery =
+    registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+      onPickImageResult(uri)
+    }
 
   private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
     if (it) {
@@ -123,10 +120,7 @@ open class CropImageActivity :
       }
 
       toolbar.addMenuProvider(object : MenuProvider {
-        override fun onCreateMenu(
-          menu: Menu,
-          menuInflater: MenuInflater,
-        ) {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
           if (cropImageOptions.skipEditing) return
 
           menuInflater.inflate(R.menu.crop_image_menu, menu)
@@ -216,7 +210,6 @@ open class CropImageActivity :
             else -> false
           }
         }
-
       })
     }
   }

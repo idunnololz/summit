@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.report
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -26,7 +25,7 @@ class ReportContentViewModel @Inject constructor(
     postRef: PostRef?,
     commentRef: CommentRef?,
     messageItem: MessageItem?,
-    reason: String
+    reason: String,
   ) {
     reportState.setIsLoading()
 
@@ -34,17 +33,19 @@ class ReportContentViewModel @Inject constructor(
     sendReportJob = viewModelScope.launch {
       if (postRef != null) {
         apiClient.createPostReport(postRef.id, reason)
-      } else if (commentRef != null) {
-        apiClient.createCommentReport(commentRef.id, reason)
       } else {
-        apiClient.createPrivateMessageReport(requireNotNull(messageItem).id, reason)
+        if (commentRef != null) {
+          apiClient.createCommentReport(commentRef.id, reason)
+        } else {
+          apiClient.createPrivateMessageReport(requireNotNull(messageItem).id, reason)
+        }
+          .onSuccess {
+            reportState.postValue(Unit)
+          }
+          .onFailure {
+            reportState.postError(it)
+          }
       }
-        .onSuccess {
-          reportState.postValue(Unit)
-        }
-        .onFailure {
-          reportState.postError(it)
-        }
     }
   }
 

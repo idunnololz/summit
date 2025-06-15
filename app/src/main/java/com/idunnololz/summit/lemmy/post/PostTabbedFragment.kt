@@ -106,8 +106,12 @@ class PostTabbedFragment :
           -> {
             val position = viewPager.currentItem
             pagerAdapter.setPages(getViewModel()?.postListEngine?.items ?: listOf())
-            viewPager.runPredrawDiscardingFrame {
-              viewPager.setCurrentItem(position, true)
+
+            if (position > 0) {
+              // Guard again activity recreate, don't scroll if this is an activity recreate
+              viewPager.runPredrawDiscardingFrame {
+                viewPager.setCurrentItem(position, true)
+              }
             }
           }
         }
@@ -117,6 +121,12 @@ class PostTabbedFragment :
 
   fun closePost(postFragment: PostFragment) {
     (parentFragment as? CommunityFragment)?.closePost(postFragment)
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+
+//    outState.remove("android:support:fragments")
   }
 
   class PostAdapter(

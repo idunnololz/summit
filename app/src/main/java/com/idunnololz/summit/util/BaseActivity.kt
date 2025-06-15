@@ -9,10 +9,8 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.idunnololz.summit.MainApplication
-import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
-import javax.inject.Inject
 
 abstract class BaseActivity : AppCompatActivity() {
 

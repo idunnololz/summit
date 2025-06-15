@@ -28,13 +28,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.random.Random
+import kotlin.random.nextLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
-import kotlin.random.nextLong
 
 @HiltViewModel
 class SearchHomeViewModel @Inject constructor(

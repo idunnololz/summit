@@ -9,11 +9,11 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.DownloadSettings
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.util.asCustomItem
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNLOAD_DIRECTORY
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch

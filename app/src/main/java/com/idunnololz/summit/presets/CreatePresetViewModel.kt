@@ -6,13 +6,13 @@ import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.SummitServerClient
+import com.idunnololz.summit.preferences.PreferenceKeys.PREFERENCE_VERSION_CODE
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.SharedPreferencesManager
 import com.idunnololz.summit.settings.importAndExport.Diff
 import com.idunnololz.summit.settings.importAndExport.DiffType
 import com.idunnololz.summit.settings.importAndExport.SettingsDataPreview
 import com.idunnololz.summit.util.PiiDetector
-import com.idunnololz.summit.preferences.PreferenceKeys.PREFERENCE_VERSION_CODE
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.asJson

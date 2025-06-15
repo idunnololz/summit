@@ -42,7 +42,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
+class ViewVotesFragment :
+  BaseFragment<FragmentViewVotesBinding>(),
   FullscreenDialogFragment {
 
   companion object {
@@ -61,9 +62,9 @@ class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
   lateinit var preferences: Preferences
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?,
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
   ): View {
     super.onCreateView(inflater, container, savedInstanceState)
 
@@ -95,7 +96,7 @@ class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
         },
         onPersonLongClick = {
           getMainActivity()?.showMoreLinkOptions(LinkUtils.getLinkForPerson(it), null)
-        }
+        },
       )
 
       recyclerView.setHasFixedSize(true)
@@ -153,8 +154,8 @@ class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
       data object HeaderItem : Item
 
       class VoteItem(
-        val voteView: VoteView
-      ): Item
+        val voteView: VoteView,
+      ) : Item
 
       data class LoaderItem(
         val state: StatefulData<Unit>,
@@ -174,7 +175,7 @@ class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
           Item.HeaderItem -> true
           is Item.LoaderItem -> true
         }
-      }
+      },
     ).apply {
       addItemType(Item.HeaderItem::class, ItemInboxHeaderBinding::inflate) { item, b, _ -> }
       addItemType(Item.VoteItem::class, VoteItemBinding::inflate) { item, b, h ->
@@ -225,13 +226,13 @@ class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
         if (item.voteView.score > 0L) {
           ImageViewCompat.setImageTintList(
             b.voteDirection,
-            ColorStateList.valueOf(preferences.upvoteColor)
+            ColorStateList.valueOf(preferences.upvoteColor),
           )
           b.voteDirection.setImageResource(R.drawable.baseline_arrow_upward_24)
         } else {
           ImageViewCompat.setImageTintList(
             b.voteDirection,
-            ColorStateList.valueOf(preferences.downvoteColor)
+            ColorStateList.valueOf(preferences.downvoteColor),
           )
           b.voteDirection.setImageResource(R.drawable.baseline_arrow_downward_24)
         }
@@ -259,23 +260,15 @@ class ViewVotesFragment : BaseFragment<FragmentViewVotesBinding>(),
       }
     }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int,
-    ): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun onBindViewHolder(
-      holder: RecyclerView.ViewHolder,
-      position: Int,
-    ) =
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     private fun refreshItems() {
       val data = data ?: return

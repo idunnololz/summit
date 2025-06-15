@@ -131,7 +131,11 @@ internal object BitmapUtils {
     val resolver = context.contentResolver
     // First decode with inJustDecodeBounds=true to check dimensions
     val options = decodeImageForOption(resolver, uri)
-    if (options.outWidth == -1 && options.outHeight == -1) throw RuntimeException("File is not a picture")
+    if (options.outWidth == -1 && options.outHeight == -1) {
+      throw RuntimeException(
+        "File is not a picture",
+      )
+    }
     // Calculate inSampleSize
     options.inSampleSize = max(
       calculateInSampleSizeByRequestedSize(
@@ -322,22 +326,26 @@ internal object BitmapUtils {
   /**
    * Get left value of the bounding rectangle of the given points.
    */
-  fun getRectLeft(points: FloatArray): Float = min(min(min(points[0], points[2]), points[4]), points[6])
+  fun getRectLeft(points: FloatArray): Float =
+    min(min(min(points[0], points[2]), points[4]), points[6])
 
   /**
    * Get top value of the bounding rectangle of the given points.
    */
-  fun getRectTop(points: FloatArray): Float = min(min(min(points[1], points[3]), points[5]), points[7])
+  fun getRectTop(points: FloatArray): Float =
+    min(min(min(points[1], points[3]), points[5]), points[7])
 
   /**
    * Get right value of the bounding rectangle of the given points.
    */
-  fun getRectRight(points: FloatArray): Float = max(max(max(points[0], points[2]), points[4]), points[6])
+  fun getRectRight(points: FloatArray): Float =
+    max(max(max(points[0], points[2]), points[4]), points[6])
 
   /**
    * Get bottom value of the bounding rectangle of the given points.
    */
-  fun getRectBottom(points: FloatArray): Float = max(max(max(points[1], points[3]), points[5]), points[7])
+  fun getRectBottom(points: FloatArray): Float =
+    max(max(max(points[1], points[3]), points[5]), points[7])
 
   /**
    * Get width of the bounding rectangle of the given points.
@@ -403,11 +411,7 @@ internal object BitmapUtils {
    * @return the uri where the image was saved in, either the given uri or new pointing to temp
    * file.
    */
-  fun writeTempStateStoreBitmap(
-    context: Context,
-    bitmap: Bitmap?,
-    customOutputUri: Uri?,
-  ): Uri? =
+  fun writeTempStateStoreBitmap(context: Context, bitmap: Bitmap?, customOutputUri: Uri?): Uri? =
     try {
       writeBitmapToUri(
         context = context,
@@ -444,26 +448,22 @@ internal object BitmapUtils {
     }
   }
 
-  private fun buildUri(
-    context: Context,
-    compressFormat: CompressFormat,
-  ): Uri =
-    try {
-      val ext = when (compressFormat) {
-        CompressFormat.JPEG -> ".jpg"
-        CompressFormat.PNG -> ".png"
-        else -> ".webp"
-      }
-      // We have this because of a HUAWEI path bug when we use getUriForFile
-      if (SDK_INT >= 29) {
-        val file = File.createTempFile("cropped", ext, context.cacheDir)
-        getUriForFile(context, file)
-      } else {
-        Uri.fromFile(File.createTempFile("cropped", ext, context.cacheDir))
-      }
-    } catch (e: IOException) {
-      throw RuntimeException("Failed to create temp file for output image", e)
+  private fun buildUri(context: Context, compressFormat: CompressFormat): Uri = try {
+    val ext = when (compressFormat) {
+      CompressFormat.JPEG -> ".jpg"
+      CompressFormat.PNG -> ".png"
+      else -> ".webp"
     }
+    // We have this because of a HUAWEI path bug when we use getUriForFile
+    if (SDK_INT >= 29) {
+      val file = File.createTempFile("cropped", ext, context.cacheDir)
+      getUriForFile(context, file)
+    } else {
+      Uri.fromFile(File.createTempFile("cropped", ext, context.cacheDir))
+    }
+  } catch (e: IOException) {
+    throw RuntimeException("Failed to create temp file for output image", e)
+  }
 
   /**
    * Resize the given bitmap to the given width/height by the given option.<br></br>
@@ -672,13 +672,14 @@ internal object BitmapUtils {
    * Decode image from uri using "inJustDecodeBounds" to get the image dimensions.
    */
   @Throws(FileNotFoundException::class)
-  private fun decodeImageForOption(resolver: ContentResolver, uri: Uri): BitmapFactory.Options = resolver.openInputStream(uri).use {
-    val options = BitmapFactory.Options()
-    options.inJustDecodeBounds = true
-    BitmapFactory.decodeStream(it, EMPTY_RECT, options)
-    options.inJustDecodeBounds = false
-    options
-  }
+  private fun decodeImageForOption(resolver: ContentResolver, uri: Uri): BitmapFactory.Options =
+    resolver.openInputStream(uri).use {
+      val options = BitmapFactory.Options()
+      options.inJustDecodeBounds = true
+      BitmapFactory.decodeStream(it, EMPTY_RECT, options)
+      options.inJustDecodeBounds = false
+      options
+    }
 
   /**
    * Decode image from uri using given "inSampleSize", but if failed due to out-of-memory then raise
@@ -728,7 +729,9 @@ internal object BitmapUtils {
       context.contentResolver.openInputStream(uri).use {
         val decoder = when {
           SDK_INT >= 31 -> BitmapRegionDecoder.newInstance(it!!)
-          else -> @Suppress("DEPRECATION") BitmapRegionDecoder.newInstance(it!!, false)
+          else ->
+            @Suppress("DEPRECATION")
+            BitmapRegionDecoder.newInstance(it!!, false)
         }
 
         try {
@@ -828,10 +831,7 @@ internal object BitmapUtils {
    * Calculate the largest inSampleSize value that is a power of 2 and keeps both height and width
    * smaller than max texture size allowed for the device.
    */
-  private fun calculateInSampleSizeByMaxTextureSize(
-    width: Int,
-    height: Int,
-  ): Int {
+  private fun calculateInSampleSizeByMaxTextureSize(width: Int, height: Int): Int {
     var inSampleSize = 1
     if (mMaxTextureSize == 0) {
       mMaxTextureSize = maxTextureSize

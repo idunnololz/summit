@@ -2,11 +2,9 @@ package com.idunnololz.summit.lemmy.modlogs.filter
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
@@ -14,23 +12,17 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.databinding.DialogFragmentModLogsFilterBinding
-import com.idunnololz.summit.emoji.TextEmojiEditDialogFragment
 import com.idunnololz.summit.lemmy.getName
-import com.idunnololz.summit.lemmy.modlogs.ModEvent
 import com.idunnololz.summit.lemmy.modlogs.ModLogsFilterConfig
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
-import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment.Companion
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment.Result
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupToolbar
 import kotlinx.parcelize.Parcelize
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.primaryConstructor
 
 class ModLogsFilterDialogFragment : BaseDialogFragment<DialogFragmentModLogsFilterBinding>() {
 
@@ -52,7 +44,7 @@ class ModLogsFilterDialogFragment : BaseDialogFragment<DialogFragmentModLogsFilt
 
   @Parcelize
   class Result(
-    val filterConfig: ModLogsFilterConfig
+    val filterConfig: ModLogsFilterConfig,
   ) : Parcelable
 
   data class ActionTypeOption(
@@ -108,17 +100,19 @@ class ModLogsFilterDialogFragment : BaseDialogFragment<DialogFragmentModLogsFilt
     }
 
     childFragmentManager.setFragmentResultListener(
-      USER_REQUEST_KEY, viewLifecycleOwner
+      USER_REQUEST_KEY,
+      viewLifecycleOwner,
     ) { k, bundle ->
       onResult(k, bundle)
     }
     childFragmentManager.setFragmentResultListener(
-      MOD_REQUEST_KEY, viewLifecycleOwner
+      MOD_REQUEST_KEY,
+      viewLifecycleOwner,
     ) { k, bundle ->
       onResult(k, bundle)
     }
 
-    with (binding) {
+    with(binding) {
       setupToolbar(toolbar, getString(R.string.filter_mod_logs))
 
       val options = ModlogActionType.entries.map {
@@ -171,7 +165,7 @@ class ModLogsFilterDialogFragment : BaseDialogFragment<DialogFragmentModLogsFilt
           REQUEST_KEY,
           bundleOf(
             REQUEST_KEY_RESULT to Result(
-              filterConfig = viewModel.filter
+              filterConfig = viewModel.filter,
             ),
           ),
         )

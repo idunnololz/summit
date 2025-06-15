@@ -132,8 +132,7 @@ object CropImage {
       @JvmField
       val CREATOR: Parcelable.Creator<ActivityResult?> =
         object : Parcelable.Creator<ActivityResult?> {
-          override fun createFromParcel(`in`: Parcel): ActivityResult =
-            ActivityResult(`in`)
+          override fun createFromParcel(`in`: Parcel): ActivityResult = ActivityResult(`in`)
 
           override fun newArray(size: Int): Array<ActivityResult?> = arrayOfNulls(size)
         }

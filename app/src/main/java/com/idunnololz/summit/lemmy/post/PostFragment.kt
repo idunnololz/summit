@@ -315,6 +315,7 @@ class PostFragment :
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {
               val background = binding.root
               val progress = gestureInterpolator.getInterpolation(backEvent.progress)
+
               if (initialTouchY < 0f) {
                 initialTouchY = backEvent.touchY
               }
@@ -322,7 +323,7 @@ class PostFragment :
               // https://developer.android.com/design/ui/mobile/guides/patterns/predictive-back#motion-specs
 
               // Shift horizontally.
-              val maxTranslationX = (background.width / 20) - predictiveBackMargin
+              val maxTranslationX = predictiveBackMargin
               background.translationX = progress * maxTranslationX
             }
 
@@ -349,7 +350,6 @@ class PostFragment :
         screenshotModeBackPressHandler,
       )
     }
-//        moreActionsHelper.setPageInstance(getInstance())
   }
 
   private fun goBack() {
@@ -1014,7 +1014,7 @@ class PostFragment :
     }
 
     updateTitle(
-      viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: ""
+      viewModel.commentsSortOrderLiveData.value?.getLocalizedName(context) ?: "",
     )
     binding.subtitle.visibility = View.GONE
 

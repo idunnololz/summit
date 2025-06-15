@@ -464,13 +464,12 @@ class AccountAwareLemmyClient @Inject constructor(
     limit: Long = 20,
     force: Boolean = false,
     account: Account? = accountForInstance(),
-  ) =
-    if (account != null) {
-      apiClient.listCommentVotesWithRetry(commentId, page, limit, force, account)
-        .autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+  ) = if (account != null) {
+    apiClient.listCommentVotesWithRetry(commentId, page, limit, force, account)
+      .autoSignOut(account)
+  } else {
+    createAccountErrorResult()
+  }
 
   suspend fun listPostVotesWithRetry(
     postId: Int,
@@ -478,13 +477,12 @@ class AccountAwareLemmyClient @Inject constructor(
     limit: Long = 20,
     force: Boolean = false,
     account: Account? = accountForInstance(),
-  ) =
-    if (account != null) {
-      apiClient.listPostVotesWithRetry(postId, page, limit, force, account)
-        .autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+  ) = if (account != null) {
+    apiClient.listPostVotesWithRetry(postId, page, limit, force, account)
+      .autoSignOut(account)
+  } else {
+    createAccountErrorResult()
+  }
 
   suspend fun deletePost(
     id: PostId,
@@ -1052,15 +1050,14 @@ class AccountAwareLemmyClient @Inject constructor(
   suspend fun getUnreadRegistrationApplicationsCount(
     force: Boolean,
     account: Account? = accountForInstance(),
-  ) =
-    if (account != null) {
-      retry {
-        apiClient.getUnreadRegistrationApplicationsCount(account = account, force = force)
-          .autoSignOut(account)
-      }
-    } else {
-      createAccountErrorResult()
+  ) = if (account != null) {
+    retry {
+      apiClient.getUnreadRegistrationApplicationsCount(account = account, force = force)
+        .autoSignOut(account)
     }
+  } else {
+    createAccountErrorResult()
+  }
 
   suspend fun getRegistrationApplications(
     page: Int? = null,
@@ -1068,37 +1065,35 @@ class AccountAwareLemmyClient @Inject constructor(
     unreadOnly: Boolean? = null,
     force: Boolean,
     account: Account? = accountForInstance(),
-  ) =
-    if (account != null) {
-      retry {
-        apiClient.getRegistrationApplications(
-          page = page,
-          limit = limit,
-          unreadOnly = unreadOnly,
-          account = account,
-          force = force,
-        ).autoSignOut(account)
-      }
-    } else {
-      createAccountErrorResult()
+  ) = if (account != null) {
+    retry {
+      apiClient.getRegistrationApplications(
+        page = page,
+        limit = limit,
+        unreadOnly = unreadOnly,
+        account = account,
+        force = force,
+      ).autoSignOut(account)
     }
+  } else {
+    createAccountErrorResult()
+  }
 
   suspend fun approveRegistrationApplication(
     applicationId: Int,
     approve: Boolean,
     denyReason: String?,
     account: Account? = accountForInstance(),
-  ) =
-    if (account != null) {
-      apiClient.approveRegistrationApplication(
-        applicationId = applicationId,
-        approve = approve,
-        denyReason = denyReason,
-        account = account,
-      ).autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+  ) = if (account != null) {
+    apiClient.approveRegistrationApplication(
+      applicationId = applicationId,
+      approve = approve,
+      denyReason = denyReason,
+      account = account,
+    ).autoSignOut(account)
+  } else {
+    createAccountErrorResult()
+  }
 
   fun changeInstance(site: String) = apiClient.changeInstance(site)
 

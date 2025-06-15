@@ -10,9 +10,8 @@ data class ModLogsFilterConfig(
   val filterByActionType: ModlogActionType = ModlogActionType.All,
   val filterByMod: PersonRef.PersonRefComplete? = null,
   val filterByPerson: PersonRef.PersonRefComplete? = null,
-): Parcelable {
-  fun isFilterDefault() =
-    filterByActionType == ModlogActionType.All &&
-      filterByMod == null &&
-      filterByPerson == null
+) : Parcelable {
+  fun isFilterDefault() = filterByActionType == ModlogActionType.All &&
+    filterByMod == null &&
+    filterByPerson == null
 }

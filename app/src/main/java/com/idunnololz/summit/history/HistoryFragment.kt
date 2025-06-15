@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +26,6 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
-import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
@@ -280,7 +280,7 @@ class HistoryFragment :
     super.onDestroyView()
   }
 
-  fun closePost(postFragment: PostFragment) {
+  fun closePost(postFragment: Fragment) {
     slidingPaneController?.closePost(postFragment)
   }
 

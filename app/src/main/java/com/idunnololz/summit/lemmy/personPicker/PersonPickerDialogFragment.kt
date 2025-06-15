@@ -41,7 +41,7 @@ class PersonPickerDialogFragment :
     fun show(
       fragmentManager: FragmentManager,
       prefill: String? = null,
-      requestKey: String? = null
+      requestKey: String? = null,
     ) {
       PersonPickerDialogFragment()
         .apply {

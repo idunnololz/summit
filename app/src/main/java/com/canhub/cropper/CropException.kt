@@ -7,10 +7,12 @@ sealed class CropException(message: String) : Exception(message) {
 
   class FailedToLoadBitmap(
     uri: Uri,
-    message: String?
+    message: String?,
   ) : CropException("$EXCEPTION_PREFIX Failed to load sampled bitmap: $uri\r\n$message")
 
-  class FailedToDecodeImage(uri: Uri) : CropException("$EXCEPTION_PREFIX Failed to decode image: $uri")
+  class FailedToDecodeImage(uri: Uri) : CropException(
+    "$EXCEPTION_PREFIX Failed to decode image: $uri",
+  )
 
   internal companion object {
     const val EXCEPTION_PREFIX = "crop:"

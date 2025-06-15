@@ -188,7 +188,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
           }
 
           getSummitActivity()?.showBottomMenu(bottomMenu, expandFully = false)
-        }
+        },
       )
 
       fun markMessagesAsReadIfNeeded() {

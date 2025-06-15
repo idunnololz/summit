@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import androidx.activity.result.ActivityResultLauncher
-import androidx.annotation.Nullable
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView.Guidelines
@@ -33,7 +32,7 @@ import java.io.IOException
  */
 class CropProvider(
   activity: ImagePickerActivity,
-  private val launcher: ActivityResultLauncher<CropImageContractOptions>
+  private val launcher: ActivityResultLauncher<CropImageContractOptions>,
 ) :
   BaseProvider(activity) {
 
@@ -174,9 +173,9 @@ class CropProvider(
           uri = Uri.fromFile(selectedImgFile),
           cropImageOptions = CropImageOptions(
             guidelines = Guidelines.ON,
-            outputCompressFormat = Bitmap.CompressFormat.PNG
-          )
-        )
+            outputCompressFormat = Bitmap.CompressFormat.PNG,
+          ),
+        ),
       )
     } ?: kotlin.run {
       setError(R.string.error_failed_to_crop_image)

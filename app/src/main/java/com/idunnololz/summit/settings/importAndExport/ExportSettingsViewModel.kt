@@ -10,9 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.db.MainDatabase
 import com.idunnololz.summit.db.raw.DbHelper
 import com.idunnololz.summit.fileprovider.FileProviderHelper
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DATABASE_MAIN
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.importAndExport.export.defaultTablesToExport
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DATABASE_MAIN
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -3,14 +3,14 @@ package com.canhub.cropper
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import java.lang.ref.WeakReference
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.ref.WeakReference
-import kotlin.coroutines.CoroutineContext
 
 internal class BitmapLoadingWorkerJob internal constructor(
   private val context: Context,

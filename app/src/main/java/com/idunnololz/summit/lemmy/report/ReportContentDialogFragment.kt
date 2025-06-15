@@ -8,7 +8,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentReportContentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment

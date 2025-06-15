@@ -340,7 +340,7 @@ class MultiLemmyListSource<T, O>(
       val itemId = id(nextItem)
       Log.d(
         TAG,
-        "Adding item ${itemId} from source ${nextItem::class.java}",
+        "Adding item $itemId from source ${nextItem::class.java}",
       )
 
       if (seenIds.add(itemId)) {

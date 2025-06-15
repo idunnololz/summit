@@ -169,17 +169,17 @@ class InboxFragment :
 
     childFragmentManager.setFragmentResultListener(
       ReasonDialogFragment.REQUEST_KEY,
-      this
+      this,
     ) { key, bundle ->
       val result = bundle.getParcelableCompat<ReasonDialogFragment.Result>(
-        ReasonDialogFragment.RESULT_KEY
+        ReasonDialogFragment.RESULT_KEY,
       )
       if (result != null) {
         if (result.isOk) {
           viewModel.approveRegistrationApplication(
             applicationId = viewModel.lastApplicationId.value ?: return@setFragmentResultListener,
             approve = false,
-            denyReason = result.reason
+            denyReason = result.reason,
           )
         }
       }
@@ -401,7 +401,7 @@ class InboxFragment :
               paneLayout.closePanels()
             }
           }
-        }
+        },
       )
     }
 
@@ -556,7 +556,7 @@ class InboxFragment :
         viewModel.approveRegistrationApplication(
           applicationId = id,
           approve = true,
-          denyReason = null
+          denyReason = null,
         )
       },
       onDeclineClick = { id ->
@@ -566,7 +566,7 @@ class InboxFragment :
           getString(R.string.decline_reason),
           getString(R.string.decline),
         )
-      }
+      },
     ).apply {
       stateRestorationPolicy = Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
     }
@@ -752,7 +752,8 @@ class InboxFragment :
       }
       addItemType(
         Item.RegistrationApplicationItem::class,
-        InboxListRegistrationApplicationItemBinding::inflate) { item, b, _ ->
+        InboxListRegistrationApplicationItemBinding::inflate,
+      ) { item, b, _ ->
 
         postAndCommentViewBuilder.bindRegistrationApplication(
           b = b,
@@ -902,8 +903,8 @@ class InboxFragment :
           is InboxListItem.RegistrationApplicationInboxItem -> {
             newItems.add(
               Item.RegistrationApplicationItem(
-                item.item
-              )
+                item.item,
+              ),
             )
           }
           is InboxListItem.RegularInboxItem -> {

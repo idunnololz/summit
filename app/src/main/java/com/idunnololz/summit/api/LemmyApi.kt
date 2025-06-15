@@ -176,13 +176,11 @@ interface LemmyApi {
     @Body form: CreateCommentLike,
   ): Call<CommentResponse>
 
-
   @GET("comment/like/list")
   fun listCommentVotes(
     @Header("Authorization") authorization: String?,
     @QueryMap form: Map<String, String>,
   ): Call<ListCommentLikesResponse>
-
 
   @GET("comment/like/list")
   @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
@@ -468,7 +466,6 @@ interface LemmyApi {
     @Header("Authorization") authorization: String?,
     @Body resolvePrivateMessageReport: ResolvePrivateMessageReport,
   ): Call<PrivateMessageReportResponse>
-
 
   @GET("post/report/list")
   fun getPostReports(

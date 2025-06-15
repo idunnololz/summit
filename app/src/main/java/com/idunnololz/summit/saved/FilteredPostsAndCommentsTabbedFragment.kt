@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -14,7 +15,6 @@ import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.databinding.TabbedFragmentSavedBinding
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
-import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
@@ -167,7 +167,7 @@ class FilteredPostsAndCommentsTabbedFragment :
   override fun proceedAnyways(tag: Int) {
   }
 
-  fun closePost(postFragment: PostFragment) {
+  fun closePost(postFragment: Fragment) {
     slidingPaneController?.closePost(postFragment)
   }
 }

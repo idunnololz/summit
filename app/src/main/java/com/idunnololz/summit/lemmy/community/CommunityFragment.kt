@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -790,7 +791,7 @@ class CommunityFragment :
     }
   }
 
-  fun closePost(postFragment: PostFragment) {
+  fun closePost(postFragment: Fragment) {
     slidingPaneController?.closePost(postFragment)
   }
 

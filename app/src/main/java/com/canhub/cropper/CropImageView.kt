@@ -92,7 +92,9 @@ class CropImageView @JvmOverloads constructor(
    * If false the bitmap is not saved and if restore is required to view will be empty, storing the
    * bitmap requires saving it to file which can be expensive. default: false.
    */
-  @Deprecated("This functionality is deprecated, please remove it altogether or create an issue and explain WHY you need this.")
+  @Deprecated(
+    "This functionality is deprecated, please remove it altogether or create an issue and explain WHY you need this.",
+  )
   var isSaveBitmapToInstanceState = false
 
   /**
@@ -1087,7 +1089,9 @@ class CropImageView @JvmOverloads constructor(
     }
 
     val bundle = Bundle()
-    @Suppress("DEPRECATION") val loadedImageUri =
+
+    @Suppress("DEPRECATION")
+    val loadedImageUri =
       if (isSaveBitmapToInstanceState && imageUri == null && mImageResource < 1) {
         BitmapUtils.writeTempStateStoreBitmap(
           context = context,
@@ -1756,7 +1760,9 @@ class CropImageView @JvmOverloads constructor(
     fun getBitmap(context: Context): Bitmap? = bitmap ?: try {
       when {
         SDK_INT >= 28 -> ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uriContent!!))
-        else -> @Suppress("DEPRECATION") MediaStore.Images.Media.getBitmap(context.contentResolver, uriContent)
+        else ->
+          @Suppress("DEPRECATION")
+          MediaStore.Images.Media.getBitmap(context.contentResolver, uriContent)
       }
     } catch (e: Exception) {
       null

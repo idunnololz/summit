@@ -54,10 +54,9 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
     private val TAG = MainApplication::class.java.simpleName
     private var instance: MainApplication? = null
 
-    fun getInstance(): MainApplication =
-      instance ?: synchronized(this) {
-        instance!!
-      }
+    fun getInstance(): MainApplication = instance ?: synchronized(this) {
+      instance!!
+    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -158,6 +157,11 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
         options.isAttachViewHierarchy = false
         options.isEnableUserInteractionTracing = false
         options.isEnableUserInteractionBreadcrumbs = false
+        options.environment = if (BuildConfig.DEBUG) {
+          "debug"
+        } else {
+          "production"
+        }
       }
 
       isCrashLoggerInitialized = true

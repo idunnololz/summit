@@ -10,10 +10,10 @@ import com.idunnololz.summit.api.dto.VoteView
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ViewVotesViewModel @Inject constructor(
@@ -87,14 +87,13 @@ class ViewVotesViewModel @Inject constructor(
 
           votesModel.postValue(
             VotesModel(
-              pages
-            )
+              pages,
+            ),
           )
         }
         .onFailure {
           votesModel.postError(it)
         }
-
     }
   }
 

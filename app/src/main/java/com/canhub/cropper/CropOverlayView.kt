@@ -37,33 +37,30 @@ internal class CropOverlayView @JvmOverloads constructor(
 ) : View(context, attrs) {
   internal companion object {
     /** Creates the paint object for drawing text label over crop overlay. */
-    internal fun getTextPaint(options: CropImageOptions): Paint =
-      Paint().apply {
-        strokeWidth = 1f
-        textSize = options.cropperLabelTextSize
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        this.color = options.cropperLabelTextColor
-      }
+    internal fun getTextPaint(options: CropImageOptions): Paint = Paint().apply {
+      strokeWidth = 1f
+      textSize = options.cropperLabelTextSize
+      style = Paint.Style.FILL
+      textAlign = Paint.Align.CENTER
+      this.color = options.cropperLabelTextColor
+    }
 
     /** Creates the Paint object for drawing. */
-    internal fun getNewPaint(color: Int): Paint =
-      Paint().apply {
-        this.color = color
-      }
+    internal fun getNewPaint(color: Int): Paint = Paint().apply {
+      this.color = color
+    }
 
     /** Creates the Paint object for given thickness and color, if thickness < 0 return null. */
-    internal fun getNewPaintOrNull(thickness: Float, color: Int): Paint? =
-      if (thickness > 0) {
-        val borderPaint = Paint()
-        borderPaint.color = color
-        borderPaint.strokeWidth = thickness
-        borderPaint.style = Paint.Style.STROKE
-        borderPaint.isAntiAlias = true
-        borderPaint
-      } else {
-        null
-      }
+    internal fun getNewPaintOrNull(thickness: Float, color: Int): Paint? = if (thickness > 0) {
+      val borderPaint = Paint()
+      borderPaint.color = color
+      borderPaint.strokeWidth = thickness
+      borderPaint.style = Paint.Style.STROKE
+      borderPaint.isAntiAlias = true
+      borderPaint
+    } else {
+      null
+    }
 
     internal fun getNewPaintWithFill(color: Int): Paint {
       val borderPaint = Paint()
@@ -209,7 +206,11 @@ internal class CropOverlayView @JvmOverloads constructor(
   private var initializedCropWindow = false
 
   /** The maximum vertical gesture exclusion allowed by Android (200dp) in px. **/
-  private val maxVerticalGestureExclusion = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200f, Resources.getSystem().displayMetrics)
+  private val maxVerticalGestureExclusion = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    200f,
+    Resources.getSystem().displayMetrics,
+  )
 
   /** Set the crop window change listener. */
   fun setCropWindowChangeListener(listener: CropWindowChangeListener?) {
@@ -345,7 +346,9 @@ internal class CropOverlayView @JvmOverloads constructor(
   var aspectRatioX: Int
     get() = mAspectRatioX
     set(aspectRatioX) {
-      require(aspectRatioX > 0) { "Cannot set aspect ratio value to a number less than or equal to 0." }
+      require(
+        aspectRatioX > 0,
+      ) { "Cannot set aspect ratio value to a number less than or equal to 0." }
       if (mAspectRatioX != aspectRatioX) {
         mAspectRatioX = aspectRatioX
         mTargetAspectRatio = mAspectRatioX.toFloat() / mAspectRatioY
@@ -364,7 +367,9 @@ internal class CropOverlayView @JvmOverloads constructor(
   var aspectRatioY: Int
     get() = mAspectRatioY
     set(aspectRatioY) {
-      require(aspectRatioY > 0) { "Cannot set aspect ratio value to a number less than or equal to 0." }
+      require(
+        aspectRatioY > 0,
+      ) { "Cannot set aspect ratio value to a number less than or equal to 0." }
       if (mAspectRatioY != aspectRatioY) {
         mAspectRatioY = aspectRatioY
         mTargetAspectRatio = mAspectRatioX.toFloat() / mAspectRatioY
@@ -754,7 +759,8 @@ internal class CropOverlayView @JvmOverloads constructor(
           if (SDK_INT >= 26) {
             canvas.clipOutPath(mPath)
           } else {
-            @Suppress("DEPRECATION") canvas.clipPath(mPath, Region.Op.INTERSECT)
+            @Suppress("DEPRECATION")
+            canvas.clipPath(mPath, Region.Op.INTERSECT)
           }
 
           canvas.drawRect(left, top, right, bottom, mBackgroundPaint!!)
@@ -1052,7 +1058,12 @@ internal class CropOverlayView @JvmOverloads constructor(
       CropImageView.CropCornerShape.OVAL -> {
         drawCircleShape(canvas, rect, cornerOffset, radius)
       }
-      CropImageView.CropCornerShape.RECTANGLE -> drawLineShape(canvas, rect, cornerOffset, cornerExtension)
+      CropImageView.CropCornerShape.RECTANGLE -> drawLineShape(
+        canvas,
+        rect,
+        cornerOffset,
+        cornerExtension,
+      )
       null -> Unit
     }
   }
@@ -1060,12 +1071,7 @@ internal class CropOverlayView @JvmOverloads constructor(
   /**
    * Draws circle shape corners
    */
-  private fun drawCircleShape(
-    canvas: Canvas,
-    rect: RectF,
-    cornerExtension: Float,
-    radius: Float,
-  ) {
+  private fun drawCircleShape(canvas: Canvas, rect: RectF, cornerExtension: Float, radius: Float) {
     // Top left
     canvas.drawCircle(
       rect.left - cornerExtension,

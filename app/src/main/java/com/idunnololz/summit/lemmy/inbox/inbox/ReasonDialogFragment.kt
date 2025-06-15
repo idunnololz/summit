@@ -64,21 +64,33 @@ class ReasonDialogFragment :
       positiveButton.text = args.positiveButton
 
       positiveButton.setOnClickListener {
-        setFragmentResult(REQUEST_KEY, Bundle().apply {
-          putParcelable(RESULT_KEY, Result(
-            isOk = true,
-            reason = reasonEditText.text.toString()
-          ))
-        })
+        setFragmentResult(
+          REQUEST_KEY,
+          Bundle().apply {
+            putParcelable(
+              RESULT_KEY,
+              Result(
+                isOk = true,
+                reason = reasonEditText.text.toString(),
+              ),
+            )
+          },
+        )
         dismiss()
       }
       cancel.setOnClickListener {
-        setFragmentResult(REQUEST_KEY, Bundle().apply {
-          putParcelable(RESULT_KEY, Result(
-            isOk = false,
-            reason = null
-          ))
-        })
+        setFragmentResult(
+          REQUEST_KEY,
+          Bundle().apply {
+            putParcelable(
+              RESULT_KEY,
+              Result(
+                isOk = false,
+                reason = null,
+              ),
+            )
+          },
+        )
         dismiss()
       }
     }

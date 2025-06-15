@@ -115,7 +115,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     }
 
     childFragmentManager.setFragmentResultListener(
-      ModLogsFilterDialogFragment.REQUEST_KEY, viewLifecycleOwner
+      ModLogsFilterDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
     ) { k, bundle ->
       val result = bundle.getParcelableCompat<ModLogsFilterDialogFragment.Result>(
         ModLogsFilterDialogFragment.REQUEST_KEY_RESULT,
@@ -163,7 +164,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         },
         onFilterBannerClick = {
           showFilterDialog()
-        }
+        },
       )
       val layoutManager = LinearLayoutManager(context)
 
@@ -256,7 +257,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
       data class ModEventItem(val modEvent: ModEvent) : Item
       data object FooterItem : Item
 
-      data class LoadItem(val pageIndex: Int = 0, ) : Item
+      data class LoadItem(val pageIndex: Int = 0) : Item
       data class ErrorItem(
         val pageIndex: Int,
         val error: Throwable,
@@ -732,10 +733,14 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         }
         val modEventColor = modEvent.getColor(context)
         val containerColor = context.getColorFromAttribute(
-          com.google.android.material.R.attr.colorSurfaceContainerHigh)
+          com.google.android.material.R.attr.colorSurfaceContainerHigh,
+        )
         b.icon.imageTintList = ColorStateList.valueOf(modEventColor)
-        b.icon.backgroundTintList = ColorStateList.valueOf(ColorUtils.blendARGB(
-          modEventColor, containerColor, 0.9f))
+        b.icon.backgroundTintList = ColorStateList.valueOf(
+          ColorUtils.blendARGB(
+            modEventColor, containerColor, 0.9f,
+          ),
+        )
 
         b.overtext.text = SpannableStringBuilder().apply {
           append(

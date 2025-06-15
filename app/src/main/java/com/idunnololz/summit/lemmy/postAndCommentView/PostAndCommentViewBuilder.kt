@@ -40,7 +40,6 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import arrow.core.Either
-import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
@@ -1675,8 +1674,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     b.date.text = tsToConcise(context, item.lastUpdate)
 
     if (item.decision == RegistrationDecision.Approved ||
-      item.decision == RegistrationDecision.Declined) {
-
+      item.decision == RegistrationDecision.Declined
+    ) {
       b.author.setTextColor(faintTextColor)
       b.author.alpha = 0.5f
       b.content.setTextColor(faintTextColor)
@@ -1769,13 +1768,15 @@ class PostAndCommentViewBuilder @Inject constructor(
       }
       RegistrationDecision.NoDecision -> {
         val colorStateList = ColorStateList.valueOf(
-          context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+          context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+        )
         b.decision.setText(R.string.make_a_decision)
         b.decision.chipStrokeColor = colorStateList
       }
       RegistrationDecision.Pending -> {
         val colorStateList = ColorStateList.valueOf(
-          context.getColorCompat(R.color.colorTextFaint))
+          context.getColorCompat(R.color.colorTextFaint),
+        )
         b.decision.setText(R.string.pending)
         b.decision.chipStrokeColor = colorStateList
       }

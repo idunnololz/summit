@@ -19,8 +19,6 @@ import com.idunnololz.summit.api.dto.ModRemoveCommunityView
 import com.idunnololz.summit.api.dto.ModRemovePostView
 import com.idunnololz.summit.api.dto.ModTransferCommunityView
 import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -344,7 +342,8 @@ fun ModEvent.getColor(context: Context): Int {
     is ModEvent.AdminPurgeCommentViewEvent,
     is ModEvent.AdminPurgeCommunityViewEvent,
     is ModEvent.AdminPurgePersonViewEvent,
-    is ModEvent.AdminPurgePostViewEvent ->
+    is ModEvent.AdminPurgePostViewEvent,
+    ->
       context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
     is ModEvent.ModAddCommunityViewEvent -> {
       if (modEvent.event.mod_add_community.removed) {

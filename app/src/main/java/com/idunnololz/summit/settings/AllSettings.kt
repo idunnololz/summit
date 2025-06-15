@@ -20,10 +20,6 @@ import com.idunnololz.summit.preferences.NavigationRailModeId
 import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
-import com.idunnololz.summit.preferences.UserAgentChoiceIds
-import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
-import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.preferences.PreferenceKeys
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ANIMATION_LEVEL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD
@@ -144,6 +140,10 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTON_NA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
+import com.idunnololz.summit.preferences.UserAgentChoiceIds
+import com.idunnololz.summit.settings.SettingPath.getPageName
+import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
+import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.util.PrettyPrintUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject

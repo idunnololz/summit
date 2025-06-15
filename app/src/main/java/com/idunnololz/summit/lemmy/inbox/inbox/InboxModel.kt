@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.inbox.inbox
 
-import com.idunnololz.summit.api.dto.RegistrationApplication
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.conversation.Conversation

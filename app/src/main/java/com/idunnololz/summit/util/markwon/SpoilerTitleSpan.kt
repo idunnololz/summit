@@ -116,9 +116,16 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
           spoilerEnd = spanned.getSpanEnd(spoilerCloseSpan)
         }
 
-        Log.d("HAHA", "startSpan: ${spanned.getSpans(spoilerStart, spoilerStart + 3, Any::class.java).joinToString()}")
+        Log.d(
+          "HAHA",
+          "startSpan: ${spanned.getSpans(
+            spoilerStart,
+            spoilerStart + 3,
+            Any::class.java,
+          ).joinToString()}",
+        )
 
-        Log.d("HAHA", "Spoiler block from ${spoilerStart} - ${spoilerEnd}")
+        Log.d("HAHA", "Spoiler block from $spoilerStart - $spoilerEnd")
 
         // The space at the end is necessary for the lengths to be the same
         // This reduces complexity as else it would need complex logic to determine the replacement length

@@ -25,8 +25,8 @@ import com.idunnololz.summit.util.requireMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ModLogsViewModel @Inject constructor(
@@ -295,7 +295,7 @@ class ModLogsViewModel @Inject constructor(
           },
         ),
         sortValue = { it.ts },
-        id = { it.id.toLong() }
+        id = { it.id.toLong() },
       )
 
       val result = modSource.getPage(pageIndex, force, true)
@@ -345,7 +345,8 @@ class ModLogsViewModel @Inject constructor(
       is PersonRef.PersonRefById -> {
         viewModelScope.launch {
           apiClient.fetchPersonByIdWithRetry(
-            personRef.id, force = false
+            personRef.id,
+            force = false,
           ).onSuccess {
             setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
           }.onFailure {
@@ -356,7 +357,8 @@ class ModLogsViewModel @Inject constructor(
       is PersonRef.PersonRefByName -> {
         viewModelScope.launch {
           apiClient.fetchPersonByNameWithRetry(
-            personRef.fullName, force = false
+            personRef.fullName,
+            force = false,
           ).onSuccess {
             setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
           }.onFailure {
@@ -374,25 +376,24 @@ class ModLogsViewModel @Inject constructor(
     communityId: CommunityId?,
     clazz: KClass<*>,
     transformResult: (GetModlogResponse) -> List<ModEvent>,
-  ) =
-    LemmyListSource<ModEvent, Unit>(
-      context = context,
-      id = { this.id.toLong() },
-      defaultSortOrder = Unit,
-      fetchObjects = { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
-        apiCallConsolidator.fetchObjects(communityId, page, limit, force)
-          .fold(
-            {
-              Result.success(transformResult(it).sortedByDescending { it.ts })
-            },
-            {
-              Result.failure(it)
-            },
-          )
-      },
-      pageSize = 10,
-      source = clazz,
-    )
+  ) = LemmyListSource<ModEvent, Unit>(
+    context = context,
+    id = { this.id.toLong() },
+    defaultSortOrder = Unit,
+    fetchObjects = { page: Int, sortOrder: Unit, limit: Int, force: Boolean ->
+      apiCallConsolidator.fetchObjects(communityId, page, limit, force)
+        .fold(
+          {
+            Result.success(transformResult(it).sortedByDescending { it.ts })
+          },
+          {
+            Result.failure(it)
+          },
+        )
+    },
+    pageSize = 10,
+    source = clazz,
+  )
 
   fun setArguments(instance: String, communityRef: CommunityRef?) {
     noAuthApiClient.changeInstance(instance)
@@ -435,7 +436,7 @@ class ModLogsViewModel @Inject constructor(
       communityId: CommunityId?,
       page: Int,
       limit: Int,
-      force: Boolean
+      force: Boolean,
     ): Result<GetModlogResponse> {
       val key = "$communityId;$page;$limit;$force"
       val cachedValue = cache[key]
@@ -456,7 +457,7 @@ class ModLogsViewModel @Inject constructor(
 
       cache[key] = CacheData(
         result,
-        System.currentTimeMillis()
+        System.currentTimeMillis(),
       )
 
       return result

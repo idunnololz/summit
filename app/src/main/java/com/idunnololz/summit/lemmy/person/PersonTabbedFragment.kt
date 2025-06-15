@@ -12,6 +12,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.view.ViewCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -37,7 +38,6 @@ import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.lemmy.getAccountAgeString
-import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
@@ -631,7 +631,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     }
   }
 
-  fun closePost(postFragment: PostFragment) {
+  fun closePost(postFragment: Fragment) {
     slidingPaneController?.closePost(postFragment)
   }
 

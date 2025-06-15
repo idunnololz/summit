@@ -193,7 +193,8 @@ class NotificationsUpdater @AssistedInject constructor(
         force = true,
       ).fold(
         {
-          it.private_message_reports.map { it.toInboxItem() } },
+          it.private_message_reports.map { it.toInboxItem() }
+        },
         { listOf() },
       )
     }

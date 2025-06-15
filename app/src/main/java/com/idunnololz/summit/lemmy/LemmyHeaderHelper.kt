@@ -383,6 +383,26 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
       sb.appendNewUserWarningIfNeeded(postView.creator)
 
+      if (postView.creator.isCakeDay()) {
+        sb.appendSeparator()
+        val d = Utils.tint(
+          context = context,
+          res = R.drawable.outline_cake_24,
+          color = context.getColorCompat(R.color.style_blue),
+        )
+        val size: Int = iconSize()
+        d.setBounds(0, 0, size, size)
+        val s = sb.length
+        sb.append("  ")
+        val e = sb.length
+        sb.setSpan(
+          CenteredImageSpan(d),
+          s,
+          e,
+          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+      }
+
       val tag = userTagsManager.getUserTag(postView.creator.fullName)
       if (tag != null) {
         sb.append(" ")
@@ -638,12 +658,38 @@ class LemmyHeaderHelper @AssistedInject constructor(
       )
     }
 
-    if (insertBigSpaceAfterName && sb.isNotEmpty()) {
+    if (commentView.creator.isCakeDay()) {
+      sb.appendSeparator()
+      val d = Utils.tint(
+        context = context,
+        res = R.drawable.outline_cake_24,
+        color = context.getColorCompat(R.color.style_blue),
+      )
+      val size: Int = Utils.convertDpToPixel(16f).toInt()
+      d.setBounds(0, 0, size, size)
+      val s = sb.length
       sb.append("  ")
+      val e = sb.length
+      sb.setSpan(
+        CenteredImageSpan(d),
+        s,
+        e,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
+
+      sb.appendSeparator()
+
+      sb.append(
+        tsToConcise(context, commentView.comment.published),
+      )
+    } else {
+      if (insertBigSpaceAfterName && sb.isNotEmpty()) {
+        sb.append("  ")
+      }
+      sb.append(
+        tsToConcise(context, commentView.comment.published),
+      )
     }
-    sb.append(
-      tsToConcise(context, commentView.comment.published),
-    )
 
     if (showEditedDate && commentView.comment.updated != null) {
       tsToConcise(context, commentView.comment.updated).let {

@@ -546,11 +546,15 @@ class InboxViewModel @Inject constructor(
       apiClient.approveRegistrationApplication(applicationId, approve, denyReason)
         .onSuccess {
           updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
-            it.copy(item = it.item.copy(decision = if (approve) {
-              RegistrationDecision.Approved
-            } else {
-              RegistrationDecision.Declined
-            }))
+            it.copy(
+              item = it.item.copy(
+                decision = if (approve) {
+                  RegistrationDecision.Approved
+                } else {
+                  RegistrationDecision.Declined
+                },
+              ),
+            )
           }
           if (isLoaded) {
             publishInboxUpdate(scrollToTop = false)
@@ -560,7 +564,9 @@ class InboxViewModel @Inject constructor(
         .onFailure {
           val originalDecisionFinal = originalDecision
           if (originalDecisionFinal != null) {
-            updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
+            updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(
+              applicationId.toLong(),
+            ) {
               it.copy(item = it.item.copy(decision = originalDecisionFinal))
             }
             if (isLoaded) {
@@ -572,7 +578,7 @@ class InboxViewModel @Inject constructor(
     }
   }
 
-  private inline fun <reified T: InboxListItem> updateSingleItem(id: Long, cb: (T) -> T) {
+  private inline fun <reified T : InboxListItem> updateSingleItem(id: Long, cb: (T) -> T) {
     for ((index, data) in allInboxItems.withIndex()) {
       if (data is T) {
         if (data.id != id) {

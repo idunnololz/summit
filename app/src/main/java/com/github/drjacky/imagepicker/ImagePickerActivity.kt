@@ -60,6 +60,7 @@ class ImagePickerActivity : AppCompatActivity() {
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
       mCameraProvider?.handleResult(it)
     }
+
 //  private val cropLauncher =
 //    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
 //      mCropProvider.handleResult(it)

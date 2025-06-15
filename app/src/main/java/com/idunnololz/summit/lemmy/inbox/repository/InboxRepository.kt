@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.inbox.repository
 
 import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.account.info.isAdmin
@@ -36,15 +35,14 @@ class InboxRepository @Inject constructor(
   ) {
     fun create(
       fullAccount: FullAccount?,
-      conversationSource: InboxMultiDataSource = InboxMultiDataSource(listOf())
-    ) =
-      InboxRepository(
-        context = context,
-        apiClient = apiClient,
-        accountInfoManager = accountInfoManager,
-        fullAccount = fullAccount,
-        conversationSource = conversationSource,
-      )
+      conversationSource: InboxMultiDataSource = InboxMultiDataSource(listOf()),
+    ) = InboxRepository(
+      context = context,
+      apiClient = apiClient,
+      accountInfoManager = accountInfoManager,
+      fullAccount = fullAccount,
+      conversationSource = conversationSource,
+    )
   }
 
   companion object {
@@ -393,7 +391,9 @@ class InboxRepository @Inject constructor(
       force = force,
     ).fold(
       onSuccess = {
-        Result.success(it.registration_applications.map { InboxItem.RegistrationApplicationInboxItem(it) })
+        Result.success(
+          it.registration_applications.map { InboxItem.RegistrationApplicationInboxItem(it) },
+        )
       },
       onFailure = {
         if (it is NotAModOrAdmin) {

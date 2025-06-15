@@ -7,6 +7,7 @@ object PreferenceKeys {
   const val KEY_DEFAULT_PAGE = "KEY_DEFAULT_PAGE"
 
   const val PREFERENCE_VERSION_CODE = "PREFERENCE_VERSION_CODE"
+
   /**
    * Scheduling options
    */
@@ -223,5 +224,4 @@ object PreferenceKeys {
   /**
    * END OF UNUSED/DEAD KEYS
    */
-
 }

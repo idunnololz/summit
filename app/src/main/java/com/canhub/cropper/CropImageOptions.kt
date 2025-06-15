@@ -20,15 +20,27 @@ import kotlinx.parcelize.Parcelize
   @JvmField var imageSourceIncludeCamera: Boolean = true,
   @JvmField var cropShape: CropShape = CropShape.RECTANGLE,
   @JvmField var cornerShape: CropImageView.CropCornerShape = CropImageView.CropCornerShape.RECTANGLE,
-  @JvmField @Px var cropCornerRadius: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var cropCornerRadius: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    10f,
+    Resources.getSystem().displayMetrics,
+  ),
   /**
    * An edge of the crop window will snap to the corresponding edge of a specified bounding box when
    * the crop window edge is less than or equal to this distance away from the bounding
    * box edge.
    */
-  @JvmField @Px var snapRadius: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var snapRadius: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    3f,
+    Resources.getSystem().displayMetrics,
+  ),
   /** The radius of the touchable area around the handle. */
-  @JvmField @Px var touchRadius: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var touchRadius: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    24f,
+    Resources.getSystem().displayMetrics,
+  ),
   @JvmField var guidelines: Guidelines = Guidelines.ON,
   @JvmField var scaleType: CropImageView.ScaleType = CropImageView.ScaleType.FIT_CENTER,
   @JvmField var showCropOverlay: Boolean = true,
@@ -48,18 +60,46 @@ import kotlinx.parcelize.Parcelize
   @JvmField var fixAspectRatio: Boolean = false,
   @JvmField var aspectRatioX: Int = 1,
   @JvmField var aspectRatioY: Int = 1,
-  @JvmField @Px var borderLineThickness: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var borderLineThickness: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    3f,
+    Resources.getSystem().displayMetrics,
+  ),
   @JvmField @ColorInt var borderLineColor: Int = Color.argb(170, 255, 255, 255),
-  @JvmField @Px var borderCornerThickness: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, Resources.getSystem().displayMetrics),
-  @JvmField @Px var borderCornerOffset: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5f, Resources.getSystem().displayMetrics),
-  @JvmField @Px var borderCornerLength: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var borderCornerThickness: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    2f,
+    Resources.getSystem().displayMetrics,
+  ),
+  @JvmField @Px var borderCornerOffset: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    5f,
+    Resources.getSystem().displayMetrics,
+  ),
+  @JvmField @Px var borderCornerLength: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    14f,
+    Resources.getSystem().displayMetrics,
+  ),
   @JvmField @ColorInt var borderCornerColor: Int = Color.WHITE,
   @JvmField @ColorInt var circleCornerFillColorHexValue: Int = Color.WHITE,
-  @JvmField @Px var guidelinesThickness: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var guidelinesThickness: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    1f,
+    Resources.getSystem().displayMetrics,
+  ),
   @JvmField @ColorInt var guidelinesColor: Int = Color.argb(170, 255, 255, 255),
   @JvmField @ColorInt var backgroundColor: Int = Color.argb(119, 0, 0, 0),
-  @JvmField @Px var minCropWindowWidth: Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42f, Resources.getSystem().displayMetrics).toInt(),
-  @JvmField @Px var minCropWindowHeight: Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42f, Resources.getSystem().displayMetrics).toInt(),
+  @JvmField @Px var minCropWindowWidth: Int = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    42f,
+    Resources.getSystem().displayMetrics,
+  ).toInt(),
+  @JvmField @Px var minCropWindowHeight: Int = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    42f,
+    Resources.getSystem().displayMetrics,
+  ).toInt(),
   @JvmField @Px var minCropResultWidth: Int = 40,
   @JvmField @Px var minCropResultHeight: Int = 40,
   @JvmField @Px var maxCropResultWidth: Int = 99999,
@@ -97,7 +137,11 @@ import kotlinx.parcelize.Parcelize
   @JvmField var intentChooserTitle: String? = null,
   /** Reorders intent list displayed with the app package names passed here. */
   @JvmField var intentChooserPriorityList: List<String>? = emptyList(),
-  @JvmField @Px var cropperLabelTextSize: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, Resources.getSystem().displayMetrics),
+  @JvmField @Px var cropperLabelTextSize: Float = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_SP,
+    20f,
+    Resources.getSystem().displayMetrics,
+  ),
   @JvmField @ColorInt var cropperLabelTextColor: Int = Color.WHITE,
   @JvmField var cropperLabelText: String? = "",
   @JvmField @ColorInt var activityBackgroundColor: Int = Color.WHITE,
@@ -109,20 +153,36 @@ import kotlinx.parcelize.Parcelize
   init {
     require(maxZoom >= 0) { "Cannot set max zoom to a number < 1" }
     require(touchRadius >= 0) { "Cannot set touch radius value to a number <= 0 " }
-    require(!(initialCropWindowPaddingRatio < 0 || initialCropWindowPaddingRatio >= 0.5)) { "Cannot set initial crop window padding value to a number < 0 or >= 0.5" }
-    require(aspectRatioX > 0) { "Cannot set aspect ratio value to a number less than or equal to 0." }
-    require(aspectRatioY > 0) { "Cannot set aspect ratio value to a number less than or equal to 0." }
+    require(!(initialCropWindowPaddingRatio < 0 || initialCropWindowPaddingRatio >= 0.5)) {
+      "Cannot set initial crop window padding value to a number < 0 or >= 0.5"
+    }
+    require(
+      aspectRatioX > 0,
+    ) { "Cannot set aspect ratio value to a number less than or equal to 0." }
+    require(
+      aspectRatioY > 0,
+    ) { "Cannot set aspect ratio value to a number less than or equal to 0." }
     require(borderLineThickness >= 0) { "Cannot set line thickness value to a number less than 0." }
-    require(borderCornerThickness >= 0) { "Cannot set corner thickness value to a number less than 0." }
-    require(guidelinesThickness >= 0) { "Cannot set guidelines thickness value to a number less than 0." }
+    require(
+      borderCornerThickness >= 0,
+    ) { "Cannot set corner thickness value to a number less than 0." }
+    require(guidelinesThickness >= 0) {
+      "Cannot set guidelines thickness value to a number less than 0."
+    }
     require(minCropWindowHeight >= 0) { "Cannot set min crop window height value to a number < 0 " }
     require(minCropResultWidth >= 0) { "Cannot set min crop result width value to a number < 0 " }
     require(minCropResultHeight >= 0) { "Cannot set min crop result height value to a number < 0 " }
-    require(maxCropResultWidth >= minCropResultWidth) { "Cannot set max crop result width to smaller value than min crop result width" }
-    require(maxCropResultHeight >= minCropResultHeight) { "Cannot set max crop result height to smaller value than min crop result height" }
+    require(maxCropResultWidth >= minCropResultWidth) {
+      "Cannot set max crop result width to smaller value than min crop result width"
+    }
+    require(maxCropResultHeight >= minCropResultHeight) {
+      "Cannot set max crop result height to smaller value than min crop result height"
+    }
     require(outputRequestWidth >= 0) { "Cannot set request width value to a number < 0 " }
     require(outputRequestHeight >= 0) { "Cannot set request height value to a number < 0 " }
-    require(!(rotationDegrees < 0 || rotationDegrees > DEGREES_360)) { "Cannot set rotation degrees value to a number < 0 or > 360" }
+    require(!(rotationDegrees < 0 || rotationDegrees > DEGREES_360)) {
+      "Cannot set rotation degrees value to a number < 0 or > 360"
+    }
   }
 }
 
