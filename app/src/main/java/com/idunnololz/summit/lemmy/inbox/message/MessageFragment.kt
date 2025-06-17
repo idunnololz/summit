@@ -221,6 +221,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           binding.contextLoadingView.hideAll()
           loadRecyclerView(it.data)
         }
+        null -> {}
       }
     }
 
@@ -475,7 +476,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
   }
 
-  private fun loadRecyclerView(data: MessageViewModel.CommentContext) {
+  private fun loadRecyclerView(data: ContextFetcher.CommentContext) {
     if (!isBindingAvailable()) return
 
     val context = requireContext()

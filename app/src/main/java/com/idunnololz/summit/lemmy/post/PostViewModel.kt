@@ -271,7 +271,6 @@ class PostViewModel @Inject constructor(
       TAG,
       "fetchPostData(): fetchPostData = $fetchPostData " +
         "fetchCommentData = $fetchCommentData force = $force",
-      RuntimeException(),
     )
 
     postOrCommentRef ?: return null

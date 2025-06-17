@@ -80,9 +80,8 @@ class ViewVotesFragment :
 
     with(binding) {
       requireSummitActivity().apply {
-        setupForFragment<ViewVotesFragment>()
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-        insetViewExceptTopAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+        insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.recyclerView, applyTopInset = false)
       }
 
       setupToolbar(toolbar, getString(R.string.votes))
@@ -140,6 +139,12 @@ class ViewVotesFragment :
         }
       }
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+
+    setupForFragment<ViewVotesFragment>()
   }
 
   private class VotesAdapter(

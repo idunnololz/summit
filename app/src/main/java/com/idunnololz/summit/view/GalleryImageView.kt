@@ -430,8 +430,6 @@ class GalleryImageView : ShapeableImageView {
   }
 
   override fun setImageDrawable(drawable: Drawable?) {
-    Log.d(TAG, "setImageDrawable()", RuntimeException())
-
     val oldDrawable = this.drawable
     if (oldDrawable != null &&
       oldDrawable.intrinsicWidth > 0 && oldDrawable.intrinsicHeight > 0

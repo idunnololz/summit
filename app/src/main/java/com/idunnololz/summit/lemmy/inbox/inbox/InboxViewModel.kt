@@ -88,6 +88,7 @@ class InboxViewModel @Inject constructor(
   val lastInboxUnreadLoadTimeMs = MutableStateFlow<Long>(0)
   var clearInboxNotificationsJob: Job? = null
   var observeConversationsJob: Job? = null
+  var fetchNewInboxItemsJob: Job? = null
 
   init {
     viewModelScope.launch {
@@ -216,7 +217,7 @@ class InboxViewModel @Inject constructor(
       return
     }
 
-    viewModelScope.launch {
+    fetchNewInboxItemsJob = viewModelScope.launch {
       val result = inboxRepository.getPage(
         pageIndex = 0,
         pageType = pageType,
@@ -496,13 +497,15 @@ class InboxViewModel @Inject constructor(
   }
 
   private fun clearData() {
+    fetchInboxJob?.cancel()
+    fetchNewInboxItemsJob?.cancel()
+
     hasMore = true
     isLoaded = false
     allInboxItems.clear()
     fetchingPages.clear()
     seen.clear()
     conversations = null
-    fetchInboxJob?.cancel()
   }
 
   override fun onCleared() {

@@ -236,7 +236,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
-  ) : InboxItem {
+  ) : InboxItem, ReportItem {
 
     constructor(message: PrivateMessageReportView) : this(
       id = message.private_message_report.id,

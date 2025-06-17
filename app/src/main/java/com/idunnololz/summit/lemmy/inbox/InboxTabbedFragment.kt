@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import arrow.core.Either
+import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
@@ -31,6 +32,8 @@ import com.idunnololz.summit.lemmy.inbox.inbox.InboxFragmentArgs
 import com.idunnololz.summit.lemmy.inbox.inbox.InboxViewModel
 import com.idunnololz.summit.lemmy.inbox.message.MessageFragment
 import com.idunnololz.summit.lemmy.inbox.message.MessageFragmentArgs
+import com.idunnololz.summit.lemmy.inbox.report.ReportDetailsFragment
+import com.idunnololz.summit.lemmy.inbox.report.ReportDetailsFragmentArgs
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
@@ -54,6 +57,13 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
   lateinit var preferences: Preferences
 
   private var argsHandled: Boolean = false
+
+  private val onNavigationItemReselectedListener =
+    NavigationBarView.OnItemReselectedListener a@{
+      if (it.itemId == R.id.inboxTabbedFragment) {
+        inboxFragment?.openDefaultPage()
+      }
+    }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -207,9 +217,17 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
   override fun onResume() {
     super.onResume()
     inboxViewModel.pauseUnreadUpdates = true
+
+    requireSummitActivity().registerOnNavigationItemReselectedListener(
+      onNavigationItemReselectedListener,
+    )
   }
 
   override fun onPause() {
+    requireSummitActivity().unregisterOnNavigationItemReselectedListener(
+      onNavigationItemReselectedListener,
+    )
+
     inboxViewModel.isUserOnInboxScreen.value = false
     inboxViewModel.pauseUnreadUpdates = false
     super.onPause()
@@ -230,6 +248,14 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
             accountId = accountId,
           ).toBundle(),
         )
+      } else if (item is ReportItem) {
+        replace(
+          R.id.message_fragment_container,
+          ReportDetailsFragment::class.java,
+          ReportDetailsFragmentArgs(
+            reportItem = item,
+          ).toBundle(),
+        )
       } else {
         replace(
           R.id.message_fragment_container,
@@ -237,29 +263,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
           MessageFragmentArgs(item, instance).toBundle(),
         )
       }
-
-      // If it's already open and the detail pane is visible, crossfade
-      // between the fragments.
-      if (binding.slidingPaneLayout.isOpen) {
-        setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-      }
-    }
-    binding.slidingPaneLayout.open()
-  }
-
-  fun openReportItem(accountId: Long, item: InboxItem, instance: String) {
-    if (item !is ReportItem) {
-      return
-    }
-
-    childFragmentManager.commit {
-      setReorderingAllowed(true)
-
-      replace(
-        R.id.message_fragment_container,
-        MessageFragment::class.java,
-        MessageFragmentArgs(item, instance).toBundle(),
-      )
 
       // If it's already open and the detail pane is visible, crossfade
       // between the fragments.

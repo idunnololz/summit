@@ -15,6 +15,9 @@ import com.idunnololz.summit.lemmy.inbox.PageType
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -76,10 +79,10 @@ class InboxRepository @Inject constructor(
       pageIndex: Int,
       force: Boolean,
       retainItemsOnForce: Boolean,
-    ): Result<PageResult<LiteInboxItem>> {
+    ): Result<PageResult<LiteInboxItem>> = withContext(Dispatchers.Default) {
       Log.d(
         TAG,
-        "Index: $pageIndex. Sources: ${sources.size}. Force: $force",
+        "Index: $pageIndex. Sources: ${sources.size}. Force: $force"
       )
 
       if (force) {
@@ -97,15 +100,17 @@ class InboxRepository @Inject constructor(
       var hasMore = true
 
       while (allItems.size < endIndex) {
+        ensureActive()
+
         val sourceToResult = sources.map { it to it.peekNextItem() }
         val sourceAndError = sourceToResult.firstOrNull { (_, result) -> result.isFailure }
 
         if (sourceAndError != null) {
-          return Result.failure(requireNotNull(sourceAndError.second.exceptionOrNull()))
+          return@withContext Result.failure(requireNotNull(sourceAndError.second.exceptionOrNull()))
         }
 
         if (sourceToResult.isEmpty()) {
-          return Result.failure(RuntimeException("No sources!"))
+          return@withContext Result.failure(RuntimeException("No sources!"))
         }
 
         val nextSourceAndResult = sourceToResult.maxBy {
@@ -133,7 +138,7 @@ class InboxRepository @Inject constructor(
         nextSourceAndResult.first.next()
       }
 
-      return Result.success(
+      Result.success(
         PageResult(
           pageIndex,
           allItems

@@ -428,4 +428,12 @@ safeargs.
             android:name="filter"
             app:argType="com.idunnololz.summit.lemmy.modlogs.ModLogsFilterConfig" />
     </dialog>
+    <fragment
+        android:id="@+id/reportDetailsFragment"
+        android:name="com.idunnololz.summit.lemmy.inbox.report.ReportDetailsFragment"
+        android:label="ReportDetailsFragment" >
+        <argument
+            android:name="reportItem"
+            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem" />
+    </fragment>
 </navigation>
