@@ -595,8 +595,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           R.id.view_mod_log -> {
             val directions = CommunityInfoFragmentDirections
               .actionCommunityInfoFragmentToModLogsFragment(
-                communityView.community.instance,
-                communityView.community.toCommunityRef(),
+                instance = communityView.community.instance,
+                communityRef = communityView.community.toCommunityRef(),
               )
             findNavController().navigateSafe(directions)
           }

@@ -62,7 +62,7 @@ class InboxViewModel @Inject constructor(
     get() = accountManager.currentAccount.asAccountLiveData()
   val currentAccountView = MutableLiveData<AccountView?>()
   val currentFullAccount = MutableLiveData<FullAccount?>()
-  val markAsReadResult = StatefulLiveData<Unit>()
+  val markAsReadResult = StatefulLiveData<Boolean>()
   val approveRegistrationApplicationResult = StatefulLiveData<Unit>()
 
   val inboxUpdate = StatefulLiveData<InboxUpdate>()
@@ -339,7 +339,7 @@ class InboxViewModel @Inject constructor(
 
       inboxRepository.markAsRead(inboxItem, read)
         .onSuccess {
-          markAsReadResult.postValue(Unit)
+          markAsReadResult.postValue(read)
         }
         .onFailure {
           markAsReadResult.postError(it)
@@ -364,7 +364,7 @@ class InboxViewModel @Inject constructor(
     viewModelScope.launch {
       apiClient.markAllAsRead()
         .onSuccess {
-          markAsReadResult.postValue(Unit)
+          markAsReadResult.postValue(true)
         }
         .onFailure {
           markAsReadResult.postError(it)

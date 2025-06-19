@@ -533,6 +533,22 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
       val isPersonNew =
         System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
       body.text = buildSpannedString {
+        if (person.deleted) {
+          val s = length
+          append(context.getString(R.string.deleted_account))
+          val e = length
+          setSpan(
+            RoundedBackgroundSpan(
+              backgroundColor = context.getColorCompat(R.color.style_red),
+              textColor = context.getColorCompat(R.color.white97),
+            ),
+            s,
+            e,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+          )
+          appendLine()
+          appendLine()
+        }
         if (isPersonNew) {
           val s = length
           append(

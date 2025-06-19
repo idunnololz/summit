@@ -372,6 +372,42 @@ class ModLogsViewModel @Inject constructor(
     }
   }
 
+  fun updateFilterWithByUser(personRef: PersonRef?) {
+    personRef ?: return
+
+    modLogData.setIsLoading()
+
+    when (personRef) {
+      is PersonRef.PersonRefById -> {
+        viewModelScope.launch {
+          apiClient.fetchPersonByIdWithRetry(
+            personRef.id,
+            force = false,
+          ).onSuccess {
+            setFilter(getFilter().copy(filterByPerson = it.person_view.person.toPersonRef()))
+          }.onFailure {
+            modLogData.setError(it)
+          }
+        }
+      }
+      is PersonRef.PersonRefByName -> {
+        viewModelScope.launch {
+          apiClient.fetchPersonByNameWithRetry(
+            personRef.fullName,
+            force = false,
+          ).onSuccess {
+            setFilter(getFilter().copy(filterByPerson = it.person_view.person.toPersonRef()))
+          }.onFailure {
+            modLogData.setError(it)
+          }
+        }
+      }
+      is PersonRef.PersonRefComplete -> {
+        setFilter(getFilter().copy(filterByPerson = personRef))
+      }
+    }
+  }
+
   fun newSource(
     communityId: CommunityId?,
     clazz: KClass<*>,

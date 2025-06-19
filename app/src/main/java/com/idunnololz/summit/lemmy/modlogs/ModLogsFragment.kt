@@ -112,6 +112,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
     if (savedInstanceState == null) {
       viewModel.updateFilterWithByMod(args.filterByMod)
+      viewModel.updateFilterWithByUser(args.filterByUser)
     }
 
     childFragmentManager.setFragmentResultListener(

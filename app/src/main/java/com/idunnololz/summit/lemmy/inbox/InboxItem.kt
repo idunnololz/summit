@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.inbox
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.CommentReplyView
 import com.idunnololz.summit.api.dto.CommentReportView
+import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PersonMentionView
 import com.idunnololz.summit.api.dto.PostReportView
@@ -34,7 +35,11 @@ enum class RegistrationDecision {
   Pending,
 }
 
-sealed interface ReportItem : InboxItem
+sealed interface ReportItem : InboxItem {
+  val reportedPersonId: Long
+  val creator: Person
+  val resolver: Person?
+}
 
 @Serializable
 @JsonClassDiscriminator("t")
@@ -236,6 +241,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
+    override val reportedPersonId: Long,
+    override val creator: Person,
+    override val resolver: Person?,
   ) : InboxItem, ReportItem {
 
     constructor(message: PrivateMessageReportView) : this(
@@ -255,6 +263,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       isDeleted = false,
       isRemoved = false,
       isRead = message.private_message_report.resolved,
+      reportedPersonId = message.private_message.creator_id,
+      creator = message.creator,
+      resolver = message.resolver,
     )
 
     override fun toString(): String = "ReportInboxItem { content = $content }"
@@ -283,6 +294,10 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isRemoved: Boolean,
     override val isRead: Boolean,
     val reportedPostId: Int,
+    override val reportedPersonId: Long,
+    val communityId: Int,
+    override val creator: Person,
+    override val resolver: Person?,
   ) : InboxItem, ReportItem {
 
     constructor(reportView: PostReportView) : this(
@@ -302,6 +317,10 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       isRemoved = false,
       isRead = reportView.post_report.resolved,
       reportedPostId = reportView.post_report.post_id,
+      reportedPersonId = reportView.post.creator_id,
+      communityId = reportView.post.community_id,
+      creator = reportView.creator,
+      resolver = reportView.resolver,
     )
 
     override fun toString(): String = "ReplyInboxItem { content = $content }"
@@ -333,6 +352,10 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     val postId: Int,
     val reportedCommentId: Int,
     val reportedCommentPath: String,
+    override val reportedPersonId: Long,
+    val communityId: Int,
+    override val creator: Person,
+    override val resolver: Person?,
   ) : InboxItem, ReportItem {
 
     constructor(reportView: CommentReportView) : this(
@@ -356,6 +379,10 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       commentId = reportView.comment.id,
       reportedCommentId = reportView.comment_report.comment_id,
       reportedCommentPath = reportView.comment.path,
+      reportedPersonId = reportView.comment.creator_id,
+      communityId = reportView.post.community_id,
+      creator = reportView.creator,
+      resolver = reportView.resolver,
     )
 
     override fun toString(): String = "ReplyInboxItem { content = $content }"

@@ -782,11 +782,12 @@ class MainActivity : SummitActivity() {
     }
   }
 
-  fun launchModLogs(instance: String, filterByMod: PersonRef) {
+  fun launchModLogs(instance: String, filterByMod: PersonRef?, filterByUser: PersonRef?) {
     val direction = MainDirections.actionGlobalModLogsFragment(
       instance,
       null,
       filterByMod = filterByMod,
+      filterByUser = filterByUser,
     )
     currentNavController?.navigateSafe(direction)
   }

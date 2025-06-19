@@ -354,7 +354,11 @@ fun BaseFragment<*>.createCommentActionHandler(
       )
     }
     R.id.ca_user_moderation_history -> {
-      getMainActivity()?.launchModLogs(apiInstance, filterByMod = commentView.creator.toPersonRef())
+      getMainActivity()?.launchModLogs(
+        instance = apiInstance,
+        filterByMod = commentView.creator.toPersonRef(),
+        filterByUser = null,
+      )
     }
   }
 }

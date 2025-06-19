@@ -2234,5 +2234,16 @@
     <string name="ucrop_rotate">Rotate</string>
     <string name="ucrop_scale">Scale</string>
     <string name="ucrop_crop">Crop</string>
+    <string name="mod_history">Mod history</string>
+    <string name="view_user_profile">View user profile</string>
+    <string name="deleted_account">Deleted account</string>
+    <string name="permanently_banned">Permanently banned</string>
+    <string name="normal_account">Normal account</string>
+    <string name="reporter">Reporter</string>
+    <string name="reported_content_highlighted">Reported content (highlighted)</string>
+    <string name="author_of_reported_content">Author of reported content</string>
+    <string name="resolved_by">Resolved by</string>
+    <string name="error_unable_to_resolve_user_report">Unable to resolve user report</string>
+    <string name="resolver">Resolver</string>
     <!-- uCrop string resource end -->
 </resources>

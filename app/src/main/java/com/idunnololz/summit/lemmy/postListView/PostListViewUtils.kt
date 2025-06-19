@@ -469,8 +469,9 @@ fun BaseFragment<*>.createPostActionHandler(
     }
     R.id.pa_user_moderation_history -> {
       getMainActivity()?.launchModLogs(
-        moreActionsHelper.apiInstance,
+        instance = moreActionsHelper.apiInstance,
         filterByMod = postView.creator.toPersonRef(),
+        filterByUser = null,
       )
     }
   }

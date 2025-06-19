@@ -520,7 +520,11 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
     R.id.user_moderation_history -> {
       (advancedLink as? AdvancedLink.PageLink)?.let {
         (it.pageRef as? PersonRef)?.let { personRef ->
-          mainActivity?.launchModLogs(moreActionsHelper.apiInstance, personRef)
+          mainActivity?.launchModLogs(
+            instance = moreActionsHelper.apiInstance,
+            filterByMod = personRef,
+            filterByUser = null
+          )
         }
       }
     }

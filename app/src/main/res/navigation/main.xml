@@ -297,6 +297,11 @@
             app:argType="com.idunnololz.summit.lemmy.PersonRef"
             app:nullable="true"
             android:defaultValue="@null" />
+        <argument
+            android:name="filterByUser"
+            app:argType="com.idunnololz.summit.lemmy.PersonRef"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <action android:id="@+id/action_global_inboxTabbedFragment" app:destination="@id/inboxTabbedFragment"/>
     <fragment

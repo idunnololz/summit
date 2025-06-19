@@ -104,6 +104,21 @@ class ModActionsViewModel @Inject constructor(
       } else {
         null
       }
+      val personJob = if (personId != -1L) {
+        async {
+          apiClient
+            .fetchPersonByIdWithRetry(
+              personId = personId,
+              force = force,
+            )
+            .onFailure {
+              currentModState.postError(it)
+              cancel()
+            }
+        }
+      } else {
+        null
+      }
 
       val allModState = mutableListOf<ModState>()
 
@@ -111,6 +126,7 @@ class ModActionsViewModel @Inject constructor(
       val communityResult = communityJob.await().getOrNull()
       val postResult = postJob?.await()?.getOrNull()
       val commentResult = commentJob?.await()?.getOrNull()
+      val personResult = personJob?.await()?.getOrNull()
 
       ensureActive()
       if (postResult != null) {

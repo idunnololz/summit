@@ -1,63 +1,92 @@
 package com.idunnololz.summit.lemmy.inbox.report
 
 import android.os.Bundle
-import android.util.Log
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.buildSpannedString
 import androidx.core.view.doOnLayout
-import androidx.core.view.updatePadding
+import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentReportDetailsBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATION
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
+import com.idunnololz.summit.lemmy.appendNameWithInstance
+import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.inbox.ReportItem
+import com.idunnololz.summit.lemmy.inbox.inbox.InboxViewModel
 import com.idunnololz.summit.lemmy.inbox.message.ContextFetcher
+import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
+import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
+import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.dateStringToTs
+import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.max
+import kotlin.getValue
 
 @AndroidEntryPoint
 class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
 
   private val args: ReportDetailsFragmentArgs by navArgs()
   private val viewModel: ReportDetailsViewModel by viewModels()
+  private val inboxViewModel: InboxViewModel by activityViewModels()
+
+  @Inject
+  lateinit var avatarHelper: AvatarHelper
+
+  @Inject
+  lateinit var userTagsManager: UserTagsManager
 
   @Inject
   lateinit var moreActionsHelper: MoreActionsHelper
@@ -80,6 +109,9 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
 
+  @Inject
+  lateinit var offlineManager: OfflineManager
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -95,8 +127,13 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val inboxItem = args.reportItem
-    val reportItem = args.reportItem as ReportItem
+    val context = requireContext()
+
+    val reportItem = args.reportItem
+
+    if (savedInstanceState == null) {
+      viewModel.isResolved.value = reportItem.isRead
+    }
 
     with(binding) {
       requireSummitActivity().apply {
@@ -122,17 +159,112 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         (parentFragment as? InboxTabbedFragment)?.closeMessage()
       }
 
-      author.text = getString(R.string.from_format, inboxItem.authorName)
-      author.setOnClickListener {
-        getMainActivity()?.launchPage(
-          PersonRef.PersonRefByName(
-            name = inboxItem.authorName,
-            instance = inboxItem.authorInstance,
-          ),
-        )
+      avatarHelper.loadAvatar(
+        imageView = reporterIcon,
+        person = reportItem.creator,
+      )
+
+      val reportCreatorInstance = reportItem.creator.instance
+      val displayFullName = when (preferences.displayInstanceStyle) {
+        DisplayInstanceOptions.NeverDisplayInstance -> {
+          false
+        }
+        DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+          viewModel.apiInstance != reportCreatorInstance
+        }
+        DisplayInstanceOptions.AlwaysDisplayInstance -> {
+          true
+        }
+        else -> false
       }
 
-      content.text = inboxItem.content
+      val sb = SpannableStringBuilder()
+      if (displayFullName) {
+        sb.appendNameWithInstance(
+          context = context,
+          name = if (preferences.preferUserDisplayName) {
+            reportItem.creator.display_name
+              ?: reportItem.creator.name
+          } else {
+            reportItem.creator.name
+          },
+          instance = reportCreatorInstance,
+          url = LinkUtils.getLinkForPerson(reportItem.creator.toPersonRef()),
+        )
+      } else {
+        sb.appendLink(
+          if (preferences.preferUserDisplayName) {
+            reportItem.creator.display_name
+              ?: reportItem.creator.name
+          } else {
+            reportItem.creator.name
+          },
+          url = LinkUtils.getLinkForPerson(reportItem.creator.toPersonRef()),
+        )
+      }
+      reporterName.text = sb
+      reporterView.setOnClickListener {
+        getMainActivity()?.launchPage(reportItem.creator.toPersonRef())
+      }
+
+      val resolver = reportItem.resolver
+      if (resolver != null) {
+        resolvedByView.visibility = View.VISIBLE
+        resolvedBy.visibility = View.VISIBLE
+
+        avatarHelper.loadAvatar(
+          imageView = resolvedByIcon,
+          person = resolver,
+        )
+
+        val reportResolverInstance = resolver.instance
+        val displayFullName = when (preferences.displayInstanceStyle) {
+          DisplayInstanceOptions.NeverDisplayInstance -> {
+            false
+          }
+          DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+            viewModel.apiInstance != reportResolverInstance
+          }
+          DisplayInstanceOptions.AlwaysDisplayInstance -> {
+            true
+          }
+          else -> false
+        }
+
+        val sb = SpannableStringBuilder()
+        if (displayFullName) {
+          sb.appendNameWithInstance(
+            context = context,
+            name = if (preferences.preferUserDisplayName) {
+              resolver.display_name
+                ?: resolver.name
+            } else {
+              resolver.name
+            },
+            instance = reportResolverInstance,
+            url = LinkUtils.getLinkForPerson(resolver.toPersonRef()),
+          )
+        } else {
+          sb.appendLink(
+            if (preferences.preferUserDisplayName) {
+              resolver.display_name
+                ?: resolver.name
+            } else {
+              resolver.name
+            },
+            url = LinkUtils.getLinkForPerson(resolver.toPersonRef()),
+          )
+        }
+        resolvedByName.text = sb
+        resolvedByView.setOnClickListener {
+          getMainActivity()?.launchPage(resolver.toPersonRef())
+        }
+      } else {
+        resolvedByView.visibility = View.GONE
+        resolvedBy.visibility = View.GONE
+      }
+
+      content.text = reportItem.content
 
       fun goToPost() {
         when (reportItem) {
@@ -150,10 +282,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         }
       }
 
-      binding.goToPost.setOnClickListener {
-        goToPost()
-      }
-      binding.openContextButton.setOnClickListener {
+      openContextButton.setOnClickListener {
         goToPost()
       }
 
@@ -173,8 +302,301 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           null -> {}
         }
       }
+      viewModel.reportedPersonInfo.observe(viewLifecycleOwner) {
+        updateReportedPersonContext(it)
+      }
+
+      viewModel.fetchReportedPersonInfo(reportItem.reportedPersonId)
+      viewModel.isResolved.observe(viewLifecycleOwner) {
+
+        if (it) {
+          fab.setImageResource(R.drawable.baseline_mark_as_unread_24)
+          fab.setOnClickListener {
+            inboxViewModel.markAsRead(args.reportItem, read = false)
+          }
+        } else {
+          fab.setImageResource(R.drawable.baseline_check_24)
+          fab.setOnClickListener {
+            inboxViewModel.markAsRead(args.reportItem, read = true)
+          }
+        }
+      }
+
+      inboxViewModel.markAsReadResult.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error<*> -> {
+            ErrorDialogFragment.show(
+              context.getString(R.string.error_unable_to_resolve_user_report),
+              it.error,
+              childFragmentManager,
+            )
+          }
+          is StatefulData.Loading<*> -> {}
+          is StatefulData.NotStarted<*> -> {}
+          is StatefulData.Success -> {
+            viewModel.isResolved.value = it.data
+          }
+        }
+      }
 
       loadContext(reportItem)
+    }
+  }
+
+  private fun updateReportedPersonContext(data: StatefulData<GetPersonDetailsResponse>) {
+    val context = binding.root.context
+    val reportItem = args.reportItem
+
+    binding.reportedPersonContext.apply {
+      when (data) {
+        is StatefulData.Error -> {
+          contextLoadingView.showDefaultErrorMessageFor(data.error)
+        }
+        is StatefulData.Loading -> {
+          contextLoadingView.showProgressBar()
+        }
+        is StatefulData.NotStarted -> {}
+        is StatefulData.Success -> {
+          contextLoadingView.hideAll()
+
+          val personView = data.data.person_view
+          val person = data.data.person_view.person
+
+          if (person.banner == null) {
+            banner.visibility = View.GONE
+            profileIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              topMargin = context.resources.getDimensionPixelSize(R.dimen.padding)
+            }
+          } else {
+            banner.load(newShimmerDrawable16to9(context))
+            offlineManager.fetchImageWithError(
+              rootView = root,
+              url = person.banner,
+              listener = {
+                banner.load(it)
+              },
+              errorListener = {
+                banner.visibility = View.GONE
+              },
+            )
+            profileIcon.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              topMargin = -context.resources.getDimensionPixelSize(R.dimen.padding)
+            }
+          }
+
+          avatarHelper.loadAvatar(profileIcon, person)
+
+          val displayName = person.display_name
+            ?: person.name
+
+          name.text = displayName
+          subtitle.text = buildSpannedString {
+            append(person.fullName)
+
+            val tag = userTagsManager.getUserTag(person.fullName)
+            if (tag != null) {
+              append(" ")
+              val s = length
+              append(tag.tagName)
+              val e = length
+
+              setSpan(
+                RoundedBackgroundSpan(tag.fillColor, tag.borderColor),
+                s,
+                e,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+              )
+            }
+          }
+
+          val personCreationTs = dateStringToTs(person.published)
+          val isPersonNew =
+            System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
+
+          body.text = if (person.bio.isNullOrBlank()) {
+            context.getString(R.string.no_bio)
+          } else {
+            person.bio
+          }
+
+          underline.text = buildSpannedString {
+            append(
+              context.resources.getQuantityString(
+                R.plurals.posts_format,
+                personView.counts.post_count,
+                defaultDecimalFormat.format(personView.counts.post_count),
+              ),
+            )
+
+            appendSeparator()
+
+            append(
+              context.resources.getQuantityString(
+                R.plurals.comments_format,
+                personView.counts.comment_count,
+                defaultDecimalFormat.format(personView.counts.comment_count),
+              ),
+            )
+
+            appendSeparator()
+
+            append(
+              context.getString(
+                R.string.account_age_format,
+                person.getAccountAgeString(),
+              ),
+            )
+          }
+
+          insights.text = buildSpannedString {
+            var anyInsight = false
+            fun addInsight(builderAction: SpannableStringBuilder.() -> Unit) {
+              if (anyInsight) {
+                appendLine()
+                appendLine()
+              }
+              builderAction()
+
+              anyInsight = true
+            }
+
+            if (person.deleted) {
+              addInsight {
+                val s = length
+                append(context.getString(R.string.deleted_account))
+                val e = length
+                setSpan(
+                  RoundedBackgroundSpan(
+                    backgroundColor = context.getColorCompat(R.color.style_red),
+                    textColor = context.getColorCompat(R.color.white97),
+                  ),
+                  s,
+                  e,
+                  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+              }
+            }
+
+            if (person.banned) {
+              addInsight {
+                val s = length
+                if (personView.person.ban_expires != null) {
+                  append(
+                    context.getString(
+                      R.string.banned_until_format,
+                      tsToConcise(context, personView.person.ban_expires),
+                    )
+                  )
+                } else {
+                  append(context.getString(R.string.permanently_banned))
+                }
+                val e = length
+                setSpan(
+                  RoundedBackgroundSpan(
+                    backgroundColor = context.getColorCompat(R.color.style_red),
+                    textColor = context.getColorCompat(R.color.white97),
+                  ),
+                  s,
+                  e,
+                  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+              }
+            }
+
+            if (isPersonNew) {
+              addInsight {
+                val s = length
+                append(
+                  context.getString(
+                    R.string.new_account_desc_format, tsToConcise(context, person.published),
+                  ),
+                )
+                val e = length
+                setSpan(
+                  RoundedBackgroundSpan(
+                    backgroundColor = context.getColorCompat(R.color.style_amber),
+                    textColor = context.getColorCompat(R.color.black97),
+                  ),
+                  s,
+                  e,
+                  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+              }
+            }
+
+            if (person.bot_account) {
+              addInsight {
+                val s = length
+                append(context.getString(R.string.bot_account))
+                val e = length
+                setSpan(
+                  RoundedBackgroundSpan(
+                    backgroundColor = context.getColorCompat(R.color.style_amber),
+                    textColor = context.getColorCompat(R.color.black97),
+                  ),
+                  s,
+                  e,
+                  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+              }
+            }
+
+            if (!anyInsight) {
+              addInsight {
+                val s = length
+                append(context.getString(R.string.normal_account))
+                val e = length
+                setSpan(
+                  RoundedBackgroundSpan(
+                    backgroundColor = context.getColorCompat(R.color.style_blue),
+                    textColor = context.getColorCompat(R.color.white97),
+                  ),
+                  s,
+                  e,
+                  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+              }
+            }
+          }
+
+          modActions.setOnClickListener {
+            ModActionsDialogFragment.show(
+              communityId = when (reportItem) {
+                is InboxItem.ReportCommentInboxItem -> reportItem.communityId
+                is InboxItem.ReportMessageInboxItem -> 0
+                is InboxItem.ReportPostInboxItem -> reportItem.communityId
+              },
+              commentId = when (reportItem) {
+                is InboxItem.ReportCommentInboxItem -> reportItem.reportedCommentId
+                is InboxItem.ReportMessageInboxItem -> -1
+                is InboxItem.ReportPostInboxItem -> -1
+              },
+              postId = when (reportItem) {
+                is InboxItem.ReportCommentInboxItem -> -1
+                is InboxItem.ReportMessageInboxItem -> -1
+                is InboxItem.ReportPostInboxItem -> reportItem.reportedPostId
+              },
+              personId = reportItem.reportedPersonId,
+              communityInstance = viewModel.apiInstance,
+              fragmentManager = childFragmentManager,
+            )
+          }
+          modLogs.setOnClickListener {
+            getMainActivity()?.launchModLogs(
+              instance = viewModel.apiInstance,
+              filterByMod = null,
+              filterByUser = PersonRef.PersonRefById(
+                reportItem.reportedPersonId, viewModel.apiInstance)
+            )
+          }
+
+          openContextButton.setOnClickListener {
+            getMainActivity()?.launchPage(
+              PersonRef.PersonRefById(reportItem.reportedPersonId, viewModel.apiInstance)
+            )
+          }
+        }
+      }
     }
   }
 
