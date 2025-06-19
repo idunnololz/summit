@@ -67,9 +67,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
   companion object {
     private const val TAG = "MessageFragment"
-
-    private const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
-    private const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
   }
 
   private val args by navArgs<MessageFragmentArgs>()

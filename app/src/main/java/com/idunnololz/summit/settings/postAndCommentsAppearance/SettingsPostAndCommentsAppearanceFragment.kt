@@ -375,6 +375,7 @@ class SettingsPostAndCommentsAppearanceFragment :
           isUpdating = false,
           highlight = false,
           highlightForever = false,
+          highlightTintColor = null,
           viewLifecycleOwner = viewLifecycleOwner,
           isActionsExpanded = false,
           highlightTextData = null,
@@ -383,11 +384,11 @@ class SettingsPostAndCommentsAppearanceFragment :
           onPageClick = {},
           collapseSection = {},
           toggleActionsExpanded = {},
-          onSignInRequired = {},
-          onInstanceMismatch = { _, _ -> },
           onCommentActionClick = { _, _ -> },
           onLinkClick = { _, _, _ -> },
           onLinkLongClick = { _, _ -> },
+          onSignInRequired = {},
+          onInstanceMismatch = { _, _ -> },
         )
       }
     }

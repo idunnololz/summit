@@ -34,7 +34,7 @@ enum class RegistrationDecision {
   Pending,
 }
 
-sealed interface ReportItem
+sealed interface ReportItem : InboxItem
 
 @Serializable
 @JsonClassDiscriminator("t")
@@ -329,6 +329,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
+    override val commentId: Int,
     val postId: Int,
     val reportedCommentId: Int,
     val reportedCommentPath: String,
@@ -352,6 +353,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       isRemoved = false,
       isRead = reportView.comment_report.resolved,
       postId = reportView.post.id,
+      commentId = reportView.comment.id,
       reportedCommentId = reportView.comment_report.comment_id,
       reportedCommentPath = reportView.comment.path,
     )
@@ -420,15 +422,7 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
   }
 
   val commentId: Int?
-    get() = when (this) {
-      is MentionInboxItem -> commentId
-      is MessageInboxItem -> null
-      is ReplyInboxItem -> commentId
-      is ReportMessageInboxItem -> null
-      is ReportCommentInboxItem -> null
-      is ReportPostInboxItem -> null
-      is RegistrationApplicationInboxItem -> null
-    }
+    get() = null
 }
 
 fun CommentReplyView.toInboxItem() = InboxItem.ReplyInboxItem(this)

@@ -117,6 +117,7 @@ class PostAdapter(
       val currentMatch: QueryResult?,
       val screenshotMode: Boolean,
       val crossPosts: Int,
+      val highlight: Boolean,
     ) : Item(postView.getUniqueKey()), ScreenshotOptions
 
     data class VisibleCommentItem(
@@ -244,6 +245,18 @@ class PostAdapter(
 
   private var highlightedComment: CommentId = -1
   private var highlightedCommentForever: CommentId = -1
+  var highlightPostForever: Boolean = false
+    set(value) {
+      field = value
+
+      refreshItems(animate = false)
+    }
+  var highlightTintColor: Int? = null
+    set(value) {
+      field = value
+
+      refreshItems(animate = false)
+    }
 
   private var topLevelCommentIndices = listOf<Int>()
   private var absolutionPositionToTopLevelCommentPosition = listOf<Int>()
@@ -463,6 +476,8 @@ class PostAdapter(
             onCrossPostsClick = {
               onCrossPostsClick()
             },
+            highlight = item.highlight,
+            highlightTintColor = highlightTintColor,
           )
 
           if (item.showBottomDivider) {
@@ -560,6 +575,8 @@ class PostAdapter(
           onCrossPostsClick = {
             onCrossPostsClick()
           },
+          highlight = item.highlight,
+          highlightTintColor = highlightTintColor,
         )
 
         if (item.showBottomDivider) {
@@ -600,6 +617,7 @@ class PostAdapter(
             isUpdating = item.isUpdating,
             highlight = highlight,
             highlightForever = highlightForever,
+            highlightTintColor = highlightTintColor,
             viewLifecycleOwner = lifecycleOwner,
             isActionsExpanded = item.isActionsExpanded,
             onImageClick = onImageClick,
@@ -655,6 +673,7 @@ class PostAdapter(
             childrenCount = item.childrenCount,
             highlight = highlight,
             highlightForever = highlightForever,
+            highlightTintColor = highlightTintColor,
             isUpdating = item.isUpdating,
             commentView = item.comment,
             instance = instance,
@@ -709,6 +728,7 @@ class PostAdapter(
             author = item.author,
             highlight = highlight,
             highlightForever = highlightForever,
+            highlightTintColor = highlightTintColor,
             onImageClick = onImageClick,
             onVideoClick = onVideoClick,
             onPageClick = onPageClick,
@@ -987,6 +1007,7 @@ class PostAdapter(
           },
           screenshotMode = screenshotMode,
           crossPosts = rawData.crossPosts.size,
+          highlight = highlightPostForever,
         )
 
         absolutionPositionToTopLevelCommentPosition += -1
@@ -1150,7 +1171,7 @@ class PostAdapter(
         if (!isLoaded || !rawData.isCommentsLoaded) {
           finalItems += listOf(ProgressOrErrorItem())
         } else {
-          if (commentItems.isEmpty()) {
+          if (commentItems.isEmpty() && !isEmbedded) {
             finalItems += listOf(Item.NoCommentsItem(postView.post))
           }
         }
@@ -1175,6 +1196,7 @@ class PostAdapter(
             },
             screenshotMode = screenshotMode,
             crossPosts = rawData.crossPosts.size,
+            highlight = highlightPostForever,
           )
         }
         finalItems += ProgressOrErrorItem(error)

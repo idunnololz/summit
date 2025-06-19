@@ -301,6 +301,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     contentSpannable: Spanned?,
     crossPosts: Int,
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
+    highlight: Boolean = false,
+    highlightTintColor: Int? = null,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
@@ -334,6 +336,17 @@ class PostAndCommentViewBuilder @Inject constructor(
           this.root.setTag(R.id.view_holder, vh)
           vh
         }
+
+    if (highlightTintColor == null) {
+      this.root.backgroundTintList = null
+    } else {
+      this.root.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
+    }
+    if (highlight) {
+      this.root.setBackgroundColor(context.getColorCompat(R.color.colorHighlight))
+    } else {
+      this.root.background = null
+    }
 
     ensureBadges(viewHolder, postView, crossPosts, onCrossPostsClick)
     ensureContent(viewHolder)
@@ -717,6 +730,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     isUpdating: Boolean,
     highlight: Boolean,
     highlightForever: Boolean,
+    highlightTintColor: Int?,
     viewLifecycleOwner: LifecycleOwner,
     isActionsExpanded: Boolean,
     highlightTextData: HighlightTextData?,
@@ -1010,6 +1024,11 @@ class PostAndCommentViewBuilder @Inject constructor(
       downvoteCount?.visibility = View.GONE
     }
 
+    if (highlightTintColor == null) {
+      highlightBg.backgroundTintList = null
+    } else {
+      highlightBg.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
+    }
     highlightComment(highlight, highlightForever, highlightBg)
 
     if (tapCommentToCollapse) {
@@ -1075,6 +1094,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     childrenCount: Int,
     highlight: Boolean,
     highlightForever: Boolean,
+    highlightTintColor: Int?,
     isUpdating: Boolean,
     commentView: CommentView,
     instance: String,
@@ -1138,6 +1158,11 @@ class PostAndCommentViewBuilder @Inject constructor(
       overlay.visibility = View.GONE
     }
 
+    if (highlightTintColor == null) {
+      highlightBg.backgroundTintList = null
+    } else {
+      highlightBg.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
+    }
     highlightComment(highlight, highlightForever, highlightBg)
 
     if (isUpdating) {
@@ -1190,6 +1215,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     author: String?,
     highlight: Boolean,
     highlightForever: Boolean,
+    highlightTintColor: Int?,
     onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onPageClick: (PageRef) -> Unit,
@@ -1227,6 +1253,11 @@ class PostAndCommentViewBuilder @Inject constructor(
       collapseSection(h.bindingAdapterPosition)
     }
 
+    if (highlightTintColor == null) {
+      highlightBg.backgroundTintList = null
+    } else {
+      highlightBg.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
+    }
     highlightComment(highlight, highlightForever, highlightBg)
 
     root.tag = ThreadLinesData(

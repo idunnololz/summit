@@ -434,6 +434,6 @@ safeargs.
         android:label="ReportDetailsFragment" >
         <argument
             android:name="reportItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem" />
+            app:argType="com.idunnololz.summit.lemmy.inbox.ReportItem" />
     </fragment>
 </navigation>
