@@ -1736,7 +1736,6 @@
     <string name="offline_fetching_post_feed">Fetching post feed…</string>
     <string name="offline_fetching_posts">Fetching posts…</string>
     <string name="offline_fetching_extras">Fetching extras…</string>
-    <string name="offline_done">Done!</string>
     <string name="error_couldnt_find_object">Could not find post/comment on this instance.</string>
     <string name="draft">Draft</string>
     <string name="warn_too_many_messages">Some conversations may be missing. This account has over %1$s messages and Summit currently only fetches the most recent %1$s messages. Conversations before %2$s will not be shown.</string>

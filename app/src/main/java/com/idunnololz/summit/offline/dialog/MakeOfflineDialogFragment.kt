@@ -77,7 +77,7 @@ class MakeOfflineDialogFragment : BaseDialogFragment<DialogFragmentMakeOfflineBi
           OfflinePostFeedWork.ProgressPhase.FetchingExtras ->
             getString(R.string.offline_fetching_extras)
           OfflinePostFeedWork.ProgressPhase.Complete ->
-            getString(R.string.offline_done)
+            getString(R.string.done)
         }
         progress.progress = (it.progressPercent * 100).toInt()
         subProgress.progress = (it.subProgressPercent * 100).toInt()
