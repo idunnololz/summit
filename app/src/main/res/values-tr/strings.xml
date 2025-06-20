@@ -763,9 +763,7 @@
     <string name="removed_moderator_for_community_format">%1$s %2$s topluluğunun moderatörü olarak görevden alındı.</string>
     <string name="added_moderator_for_site_format">%2$s örneği için %1$s moderatör olarak eklendi.</string>
     <string name="removed_moderator_for_site_format">%2$s örneği için %1$s moderatör olarak kaldırıldı.</string>
-    <string name="banned_person_from_community_format">%1$s %2$s topluluğundan yasaklandı.</string>
     <string name="unbanned_person_from_community_format">%1$s %2$s topluluğundan yasağını kaldır.</string>
-    <string name="banned_person_from_site_format">%1$s %2$s örneğinden yasaklandı.</string>
     <string name="unbanned_person_from_site_format">%2$s örneğinden %1$s üzerindeki yasağı kaldır.</string>
     <string name="featured_post_in_community_format">%2$s topluluğunda %1$s öne çıkan gönderi.</string>
     <string name="unfeatured_post_in_community_format">%2$s topluluğunda öne çıkarılmamış gönderi %1$s .</string>
@@ -942,7 +940,6 @@
     <string name="offline_fetching_post_feed">Gönderi beslemesi getiriliyor…</string>
     <string name="offline_fetching_posts">Gönderiler getiriliyor…</string>
     <string name="offline_fetching_extras">Ekstralar getiriliyor…</string>
-    <string name="offline_done">Tamamlamak!</string>
     <string name="error_couldnt_find_object">Bu örnekte gönderi/yorum bulunamadı.</string>
     <plurals name="children_count_format">
         <item quantity="one">( %1$d çocuk)</item>

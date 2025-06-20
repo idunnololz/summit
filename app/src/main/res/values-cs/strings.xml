@@ -515,7 +515,6 @@
     <string name="backup_and_reset_settings_desc">Chystáte se resetovat svá nastavení. Před resetováním nastavení bude vytvořena záloha. Pokračovat?</string>
     <string name="offline_fetching_posts">Načítání příspěvků…</string>
     <string name="offline_fetching_extras">Načítání doplňků…</string>
-    <string name="offline_done">Hotovo!</string>
     <string name="non_native_post_warning_title">Neshoda instance</string>
     <string name="non_native_post_warning_desc">Prohlížíte si tento příspěvek v instanci ** %1$s **, ale aktuálně jste přihlášeni v ** %2$s **.</string>
     <string name="view_in_my_instance_format">Zobrazit v mém případě ( %1$s )</string>
@@ -841,9 +840,7 @@
     <string name="save_draft">Uložit koncept</string>
     <string name="community_actions">Komunitní akce</string>
     <string name="removed_moderator_for_site_format">Odebrán %1$s jako moderátor instance %2$s .</string>
-    <string name="banned_person_from_community_format">Uživateli %1$s byl zakázán přístup do komunity %2$s .</string>
     <string name="unbanned_person_from_community_format">Zrušit zákaz pro %1$s z komunity %2$s .</string>
-    <string name="banned_person_from_site_format">%1$s byl zakázán přístup k instanci %2$s .</string>
     <string name="unbanned_person_from_site_format">Zrušit zákaz pro %1$s z instance %2$s .</string>
     <string name="featured_post_in_community_format">Doporučený příspěvek %1$s v komunitě %2$s .</string>
     <string name="unfeatured_post_in_community_format">Nedoporučený příspěvek %1$s v komunitě %2$s .</string>

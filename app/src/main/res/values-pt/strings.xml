@@ -738,9 +738,7 @@
     <string name="removed_moderator_for_community_format">Removido %1$s como moderador da comunidade %2$s .</string>
     <string name="added_moderator_for_site_format">Adicionado %1$s como moderador para a instância %2$s .</string>
     <string name="removed_moderator_for_site_format">Removido %1$s como moderador da instância %2$s .</string>
-    <string name="banned_person_from_community_format">Baniu %1$s da comunidade %2$s .</string>
     <string name="unbanned_person_from_community_format">Desfazer banimento de %1$s da comunidade %2$s .</string>
-    <string name="banned_person_from_site_format">Banido %1$s da instância %2$s .</string>
     <string name="unbanned_person_from_site_format">Desfazer banimento de %1$s da instância %2$s .</string>
     <string name="featured_post_in_community_format">Postagem em destaque %1$s na comunidade %2$s .</string>
     <string name="unfeatured_post_in_community_format">Postagem não destacada %1$s na comunidade %2$s .</string>
@@ -1360,7 +1358,6 @@
     <string name="compact_post">Postagem compacta</string>
     <string name="purge_post_title">Limpar postagem?</string>
     <string name="key">Chave</string>
-    <string name="offline_done">Feito!</string>
     <string name="let_the_app_decide">Deixe o aplicativo decidir</string>
     <string name="warn_pii_value_date_time">O valor se assemelha a uma data ou hora. Valor: ` %1$s `</string>
     <string name="show_cross_posts_in_post_desc">Quando ativado, um emblema de \"publicação cruzada\" aparecerá na tela da publicação se a publicação tiver sido publicada em outro lugar.</string>

@@ -106,7 +106,6 @@
     <string name="update_post">Uppdatera inlägg</string>
     <string name="delete_post">Ta bort inlägg</string>
     <string name="reset_settings_prompt">Återställa inställningarna?</string>
-    <string name="offline_done">Gjort!</string>
     <string name="no_bio">Ingen bio</string>
     <string name="preview_image">Förhandsgranska bild</string>
     <string name="caused_by_format">Orsakas av %1$s</string>
@@ -338,7 +337,6 @@
     <string name="no_communities_selected">Inga grupper har valts</string>
     <string name="error_unable_to_block_community">Det gick inte att blockera gruppen</string>
     <string name="error_unable_to_block_person">Det gick inte att blockera personen</string>
-    <string name="banned_person_from_community_format">Bantade %1$s från communityn %2$s .</string>
     <string name="multi_community_icon">Multi-community ikon</string>
     <string name="no_icons">Inga ikoner hittades. Välj några grupper.</string>
     <string name="error_cannot_share_multi_community">Multi-communities kan inte delas. Multi-communities är rent kundorienterade.</string>
@@ -950,7 +948,6 @@
     <string name="removed_moderator_for_community_format">Tog bort %1$s som moderator för gruppen %2$s .</string>
     <string name="added_moderator_for_site_format">Lade till %1$s som moderator för instansen %2$s .</string>
     <string name="removed_moderator_for_site_format">Tog bort %1$s som moderator för instansen %2$s .</string>
-    <string name="banned_person_from_site_format">Bantade %1$s från instansen %2$s .</string>
     <string name="unbanned_person_from_site_format">Ångra blockering av %1$s från instansen %2$s .</string>
     <string name="featured_post_in_community_format">Utvalt inlägg %1$s i communityn %2$s .</string>
     <string name="unfeatured_post_in_community_format">Ej presenterat inlägg %1$s i communityn %2$s .</string>

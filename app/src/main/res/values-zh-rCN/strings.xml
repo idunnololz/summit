@@ -401,7 +401,6 @@
     <string name="offline_fetching_extras">正在获取额外内容…</string>
     <string name="keep_typing_to_see_suggestions">继续输入以查看建议</string>
     <string name="preview_image">预览图像</string>
-    <string name="offline_done">完毕！</string>
     <string name="text_field_toolbar_settings">文本字段工具栏设置</string>
     <string name="record">记录</string>
     <string name="recording_length_in_seconds">录音长度（秒）</string>
@@ -1028,9 +1027,7 @@
     <string name="added_moderator_for_community_format">已添加%1$s作为社区%2$s的管理员。</string>
     <string name="removed_moderator_for_community_format">已将%1$s从社区%2$s管理员中删除。</string>
     <string name="removed_moderator_for_site_format">已将%1$s从实例%2$s管理员中删除。</string>
-    <string name="banned_person_from_community_format">已禁止%1$s加入社区%2$s 。</string>
     <string name="unbanned_person_from_community_format">撤销对%1$s加入社区%2$s的禁令。</string>
-    <string name="banned_person_from_site_format">已禁止%1$s进入实例%2$s 。</string>
     <string name="unbanned_person_from_site_format">撤消对%1$s参与实例%2$s禁令。</string>
     <string name="featured_post_in_community_format">社区%2$s中的精选帖子%1$s 。</string>
     <string name="unfeatured_post_in_community_format">社区%2$s中未推荐的帖子%1$s 。</string>

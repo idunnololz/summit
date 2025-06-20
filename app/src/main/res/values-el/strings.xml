@@ -821,9 +821,7 @@
     <string name="added_moderator_for_site_format">Προστέθηκε ο χρήστης %1$s ως συντονιστής για την οντότητα %2$s.</string>
     <string name="removed_moderator_for_community_format">Αφαιρέθηκε ο χρήστης %1$s από συντονιστής για την κοινότητα %2$s.</string>
     <string name="removed_moderator_for_site_format">Αφαιρέθηκε ο χρήστης %1$s από συντονιστής για την οντότητα %2$s.</string>
-    <string name="banned_person_from_community_format">Αποκλείστηκε ο χρήστης %1$s από την κοινότητα %2$s.</string>
     <string name="unbanned_person_from_community_format">Άρση αποκλεισμού στον χρήστη %1$s από την κοινότητα %2$s.</string>
-    <string name="banned_person_from_site_format">Αποκλείστηκε ο χρήστης %1$s από την οντότητα %2$s.</string>
     <string name="unbanned_person_from_site_format">Άρση αποκλεισμού στον χρήστη %1$s από την οντότητα %2$s.</string>
     <string name="hidden_community_format">Έχει κρυφτεί %1$s ανάρτησης.</string>
     <string name="unhidden_community_format">Επανεμφάνιση %1$s κοινότητας.</string>
@@ -970,7 +968,6 @@
     <string name="offline_fetching_post_feed">Ανάκτηση ροής ανάρτησης…</string>
     <string name="offline_fetching_posts">Ανάκτηση αναρτήσεων…</string>
     <string name="offline_fetching_extras">Ανάκτηση πρόσθετων…</string>
-    <string name="offline_done">Έγινε!</string>
     <string name="error_couldnt_find_object">Δεν ήταν δυνατή η εύρεση ανάρτησης/σχολίου σε αυτήν την οντότητα.</string>
     <string name="draft">Πρόχειρο</string>
     <string name="warn_too_many_messages">Μερικές συνομιλίες μπορεί να λείπουν. Αυτός ο λογαριασμός έχει πάνω από %1$s μηνύματα και το Summit προς το παρόν ανακτά μόνο τα πιο πρόσφατα %1$s μηνύματα. Οι συνομιλίες πριν από %2$s δεν θα εμφανίζονται.</string>
