@@ -649,7 +649,7 @@
     <string name="load_more_page_format">Φόρτωση περισσότερων (σελίδα %1$s)</string>
     <string name="yes">Ναι</string>
     <string name="no">Όχι</string>
-    <string name="admin_tools">Εργαλεία διαχειριστή</string>
+    <string name="admin_tools">Εργαλεία διαχειρ/συντ</string>
     <string name="purge_user">Εκκαθάριση χρήστη</string>
     <string name="purge_post">Εκκαθάριση ανάρτησης</string>
     <string name="purge_comment">Εκκαθάριση σχολίου</string>
@@ -1380,4 +1380,14 @@
     <string name="decline_reason">Αιτία απόρριψης</string>
     <string name="view_votes">Προβολή ψήφων</string>
     <string name="votes">Ψήφοι</string>
+    <string name="view_users_moderation_history">Δες το ιστορικό συντονισμού του χρήστη</string>
+    <string name="filtering_by_format">Φιλτράρισμα κατά: %1$s</string>
+    <string name="user_format">Χρήστης (%1$s)</string>
+    <string name="mod_format">Συντ (%1$s)</string>
+    <string name="report_message">Αναφορά μηνύματος</string>
+    <string name="action_cancel">Ακύρωση</string>
+    <string name="title_gallery">Συλλογή</string>
+    <string name="title_camera">Κάμερα</string>
+    <string name="report_on_private_message">Αναφορά σε ιδιωτικό μήνυμα</string>
+    <string name="title_choose_image_provider">Επιλογή</string>
 </resources>
