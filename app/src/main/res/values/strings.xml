@@ -1482,8 +1482,6 @@
     <!-- Description of a mod action taken. -->
     <string name="removed_moderator_for_site_format">Removed %1$s as moderator for the instance %2$s.</string>
     <!-- Description of a mod action taken. -->
-    <string name="banned_person_from_community_format">Banned %1$s from the community %2$s.</string>
-    <!-- Description of a mod action taken. -->
     <string name="unbanned_person_from_community_format">Undo ban on %1$s from the community %2$s.</string>
     <!-- Description of a mod action taken. -->
     <string name="banned_person_from_site_permanently_format">Banned %1$s from the instance %2$s permanently.</string>
