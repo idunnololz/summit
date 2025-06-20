@@ -277,22 +277,22 @@
     <string name="filter_by_mod">Filtrar por moderador/administrador</string>
     <plurals name="cross_posted_times">
         <item quantity="one">Cross-posted %1$s vez</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">Publicado %1$s vezes</item>
     </plurals>
     <plurals name="point_count_format">
         <item quantity="one">%1$s ponto</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">%1$s pontos</item>
     </plurals>
     <plurals name="more_replies_format">
         <item quantity="one">%1$d mais resposta</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">%1$d mais respostas</item>
     </plurals>
     <plurals name="children_count_format">
         <item quantity="one">( %1$d criança)</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">( %1$d crianças)</item>
     </plurals>
     <string name="view_users_moderation_history">Ver histórico de moderação do usuário</string>
@@ -1369,27 +1369,27 @@
     <string name="ic_flip_24">Virar</string>
     <plurals name="posts_format">
         <item quantity="one">Postagem de %1$s</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">%1$s Postagens</item>
     </plurals>
     <plurals name="comments_format">
         <item quantity="one">Comentário de %1$s</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">Comentários de %1$s</item>
     </plurals>
     <plurals name="users_format">
         <item quantity="one">Usuário %1$s</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">Usuários %1$s</item>
     </plurals>
     <plurals name="day_format">
         <item quantity="one">dia %1$s</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">%1$s dias</item>
     </plurals>
     <plurals name="new_items_in_inbox_format">
         <item quantity="one">%1$s novo item na sua caixa de entrada</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">%1$s novos itens na sua caixa de entrada</item>
     </plurals>
     <string name="reset_hidden_posts_confirm_title">Repor publicações escondidas</string>
