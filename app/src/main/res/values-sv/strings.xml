@@ -337,7 +337,6 @@
     <string name="no_communities_selected">Inga grupper har valts</string>
     <string name="error_unable_to_block_community">Det gick inte att blockera gruppen</string>
     <string name="error_unable_to_block_person">Det gick inte att blockera personen</string>
-    <string name="banned_person_from_community_format">Bantade %1$s från communityn %2$s .</string>
     <string name="multi_community_icon">Multi-community ikon</string>
     <string name="no_icons">Inga ikoner hittades. Välj några grupper.</string>
     <string name="error_cannot_share_multi_community">Multi-communities kan inte delas. Multi-communities är rent kundorienterade.</string>
