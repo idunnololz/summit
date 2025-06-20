@@ -948,7 +948,6 @@
     <string name="offline_fetching_post_feed">पोस्ट फ़ीड प्राप्त किया जा रहा है…</string>
     <string name="offline_fetching_posts">पोस्ट लायी जा रही हैं…</string>
     <string name="offline_fetching_extras">अतिरिक्त सामग्री लायी जा रही है…</string>
-    <string name="offline_done">संपन्न!</string>
     <string name="error_couldnt_find_object">इस इंस्टैंस पर पोस्ट/टिप्पणी नहीं मिल सकी।</string>
     <string name="draft">ड्राफ्ट</string>
     <string name="loading">लोड हो रहा है…</string>

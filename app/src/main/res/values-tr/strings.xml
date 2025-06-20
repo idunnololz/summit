@@ -941,7 +941,6 @@
     <string name="offline_fetching_post_feed">Gönderi beslemesi getiriliyor…</string>
     <string name="offline_fetching_posts">Gönderiler getiriliyor…</string>
     <string name="offline_fetching_extras">Ekstralar getiriliyor…</string>
-    <string name="offline_done">Tamamlamak!</string>
     <string name="error_couldnt_find_object">Bu örnekte gönderi/yorum bulunamadı.</string>
     <plurals name="children_count_format">
         <item quantity="one">( %1$d çocuk)</item>

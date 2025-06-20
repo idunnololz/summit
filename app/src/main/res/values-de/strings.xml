@@ -176,7 +176,6 @@
     <string name="non_native_post_warning_title">Instanzkonflikt</string>
     <string name="offline_fetching_posts">Beiträge werden abgerufen…</string>
     <string name="offline_fetching_extras">Extras abrufen …</string>
-    <string name="offline_done">Erledigt!</string>
     <string name="error_couldnt_find_object">Beitrag/Kommentar zu dieser Instanz konnte nicht gefunden werden.</string>
     <string name="use_suggested_title_format">Verwenden Sie den vorgeschlagenen Titel \"** %1$s **\"</string>
     <string name="dim_read_posts">Beiträge dimmen</string>

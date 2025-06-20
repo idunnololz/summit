@@ -515,7 +515,6 @@
     <string name="backup_and_reset_settings_desc">Chystáte se resetovat svá nastavení. Před resetováním nastavení bude vytvořena záloha. Pokračovat?</string>
     <string name="offline_fetching_posts">Načítání příspěvků…</string>
     <string name="offline_fetching_extras">Načítání doplňků…</string>
-    <string name="offline_done">Hotovo!</string>
     <string name="non_native_post_warning_title">Neshoda instance</string>
     <string name="non_native_post_warning_desc">Prohlížíte si tento příspěvek v instanci ** %1$s **, ale aktuálně jste přihlášeni v ** %2$s **.</string>
     <string name="view_in_my_instance_format">Zobrazit v mém případě ( %1$s )</string>

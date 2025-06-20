@@ -969,7 +969,6 @@
     <string name="offline_fetching_post_feed">Ανάκτηση ροής ανάρτησης…</string>
     <string name="offline_fetching_posts">Ανάκτηση αναρτήσεων…</string>
     <string name="offline_fetching_extras">Ανάκτηση πρόσθετων…</string>
-    <string name="offline_done">Έγινε!</string>
     <string name="error_couldnt_find_object">Δεν ήταν δυνατή η εύρεση ανάρτησης/σχολίου σε αυτήν την οντότητα.</string>
     <string name="draft">Πρόχειρο</string>
     <string name="warn_too_many_messages">Μερικές συνομιλίες μπορεί να λείπουν. Αυτός ο λογαριασμός έχει πάνω από %1$s μηνύματα και το Summit προς το παρόν ανακτά μόνο τα πιο πρόσφατα %1$s μηνύματα. Οι συνομιλίες πριν από %2$s δεν θα εμφανίζονται.</string>

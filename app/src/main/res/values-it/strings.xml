@@ -954,7 +954,6 @@
     <string name="offline_fetching_posts">Dowload post…</string>
     <string name="offline_fetching_extras">Download dati aggiuntivi…</string>
     <string name="non_native_post_warning_title">Istanza non corrispondente</string>
-    <string name="offline_done">Terminato!</string>
     <string name="non_native_post_warning_desc">Stai visualizzando questo post dall\'istanza **%1$s** ma attualmente hai effettuato il login su **%2$s**.</string>
     <string name="error_couldnt_find_object">Non è stato possibile trovare il post/commento in questa istanza.</string>
     <string name="use_imgur">Usa Imgur</string>

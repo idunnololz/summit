@@ -106,7 +106,6 @@
     <string name="update_post">Uppdatera inlägg</string>
     <string name="delete_post">Ta bort inlägg</string>
     <string name="reset_settings_prompt">Återställa inställningarna?</string>
-    <string name="offline_done">Gjort!</string>
     <string name="no_bio">Ingen bio</string>
     <string name="preview_image">Förhandsgranska bild</string>
     <string name="caused_by_format">Orsakas av %1$s</string>
