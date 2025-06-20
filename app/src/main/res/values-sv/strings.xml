@@ -950,7 +950,6 @@
     <string name="removed_moderator_for_community_format">Tog bort %1$s som moderator för gruppen %2$s .</string>
     <string name="added_moderator_for_site_format">Lade till %1$s som moderator för instansen %2$s .</string>
     <string name="removed_moderator_for_site_format">Tog bort %1$s som moderator för instansen %2$s .</string>
-    <string name="banned_person_from_site_format">Bantade %1$s från instansen %2$s .</string>
     <string name="unbanned_person_from_site_format">Ångra blockering av %1$s från instansen %2$s .</string>
     <string name="featured_post_in_community_format">Utvalt inlägg %1$s i communityn %2$s .</string>
     <string name="unfeatured_post_in_community_format">Ej presenterat inlägg %1$s i communityn %2$s .</string>

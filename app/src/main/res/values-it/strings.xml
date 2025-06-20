@@ -793,7 +793,6 @@
     <string name="removed_moderator_for_site_format">Ha rimosso %1$s come moderatore dall\'istanza %2$s.</string>
     <string name="banned_person_from_community_format">Ha bannato %1$s dalla comunità %2$s.</string>
     <string name="unbanned_person_from_community_format">Ha rimosso il ban su %1$s dalla comunità %2$s.</string>
-    <string name="banned_person_from_site_format">Ha bannato %1$s dall\'istanza %2$s.</string>
     <string name="unbanned_person_from_site_format">Ha rimosso il ban su %1$s dall\'istanza %2$s.</string>
     <string name="unfeatured_post_in_community_format">Ha contrassegnato come non fissato il post %1$s nella comunità %2$s.</string>
     <string name="hidden_community_format">Ha nascosto la comunità %1$s.</string>

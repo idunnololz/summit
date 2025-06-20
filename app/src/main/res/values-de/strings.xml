@@ -796,7 +796,6 @@
     <string name="removed_moderator_for_site_format">%1$s als Moderator für die Instanz %2$s entfernt.</string>
     <string name="banned_person_from_community_format">%1$s aus der Community %2$s verbannt.</string>
     <string name="unbanned_person_from_community_format">Sperre von %1$s aus der Community %2$s aufheben.</string>
-    <string name="banned_person_from_site_format">%1$s von der Instanz %2$s verbannt.</string>
     <string name="unbanned_person_from_site_format">Hebt die Sperre %1$s für die Instanz %2$s auf.</string>
     <string name="error_unable_to_read_file">Fehler. Datei kann nicht gelesen werden.</string>
     <string name="featured_post_in_community_format">Hervorgehobener Beitrag %1$s in Community %2$s .</string>

@@ -743,7 +743,6 @@
     <string name="removed_moderator_for_community_format">समुदाय %2$s के लिए मॉडरेटर के रूप में %1$s को हटा दिया गया।</string>
     <string name="removed_moderator_for_site_format">%2$s उदाहरण के लिए %1$s को मॉडरेटर के रूप में हटा दिया गया।</string>
     <string name="banned_person_from_community_format">%1$s को %2$s समुदाय से प्रतिबंधित कर दिया गया।</string>
-    <string name="banned_person_from_site_format">%2$s इंस्टैंस से %1$s को प्रतिबंधित कर दिया गया।</string>
     <string name="restore_settings">आयात सेटिंग्स</string>
     <string name="error_generating_backup">सेटिंग्स निर्यात करने में त्रुटि।</string>
     <string name="key">कुंजी</string>
