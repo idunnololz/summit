@@ -35,7 +35,7 @@
             android:id="@+id/open_context_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/baseline_open_in_new_22"
+            android:src="@drawable/baseline_open_in_new_18"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -164,20 +164,6 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingHorizontal="@dimen/padding_three_quarters">
-
-                        <TextView
-                            android:id="@+id/mod_actions"
-                            android:text="@string/mod_actions"
-                            android:layout_width="wrap_content"
-                            android:layout_height="64dp"
-                            android:textAppearance="?textAppearanceTitleSmall"
-                            android:gravity="center_vertical"
-                            android:background="@drawable/secondary_chip_bg"
-                            android:paddingHorizontal="@dimen/padding_three_quarters"
-                            android:drawablePadding="@dimen/padding_half"
-                            android:layout_marginHorizontal="@dimen/padding_quarter"
-                            app:drawableStartCompat="@drawable/outline_shield_24"
-                            app:drawableTint="?colorControlNormal" />
 
                         <TextView
                             android:id="@+id/mod_logs"

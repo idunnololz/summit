@@ -9,10 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -35,6 +37,7 @@ import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActi
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommentModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.CommunityModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.PostModState
+import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.SiteModState
 import com.idunnololz.summit.lemmy.mod.ModActionsViewModel.ModState.UserModState
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
@@ -108,6 +111,12 @@ class ModActionsDialogFragment :
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
+  private val confirmModUserDialogLauncher = newAlertDialogLauncher("mod_user") {
+    if (it.isOk) {
+      actionsViewModel.mod(communityId = args.communityId, personId = args.personId, mod = true)
+    }
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -177,7 +186,15 @@ class ModActionsDialogFragment :
               )
             }
             R.id.mod -> {
-              actionsViewModel.mod(args.communityId, args.personId, true)
+              confirmModUserDialogLauncher.launchDialog {
+                message = getString(
+                  R.string.confirm_mod_user_desc,
+                  viewModel.person?.fullName ?: args.personId,
+                  viewModel.community?.fullName ?: args.communityId,
+                )
+                positionButtonResId = R.string.mod_user
+                negativeButtonResId = R.string.cancel
+              }
             }
             R.id.unmod -> {
               actionsViewModel.mod(args.communityId, args.personId, false)
@@ -348,6 +365,16 @@ class ModActionsDialogFragment :
         personId = args.personId,
         force = true,
       )
+
+      loadingView.setOnRefreshClickListener {
+        viewModel.loadModActionsState(
+          communityId = args.communityId,
+          postId = args.postId,
+          commentId = args.commentId,
+          personId = args.personId,
+          force = true,
+        )
+      }
 
       viewModel.currentModState.observe(viewLifecycleOwner) {
         when (it) {
@@ -619,15 +646,17 @@ class ModActionsDialogFragment :
           }
           adapter?.addDividerIfNeeded()
         }
+        is ModActionsViewModel.ModState.SiteModState -> {
+        }
       }
     }
 
     if (viewModel.isAdmin(args.communityInstance)) {
       adapter?.addDividerIfNeeded()
 
-      val userModState = data.modStates.filterIsInstance<UserModState>().firstOrNull()
-      if (userModState != null) {
-        if (userModState.isBannedFromSite) {
+      val siteModState = data.modStates.filterIsInstance<SiteModState>().firstOrNull()
+      if (siteModState != null) {
+        if (siteModState.isBannedFromSite) {
           adapter?.addItemWithIcon(
             id = R.id.undo_ban_from_site,
             title = R.string.unban_user_from_site,

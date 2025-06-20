@@ -71,7 +71,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/pane_item_bg"
-                    android:layout_marginTop="@dimen/padding_half"
                     app:layout_constraintTop_toBottomOf="@+id/reporter"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -143,7 +142,7 @@
                             android:id="@+id/open_context_button"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:src="@drawable/baseline_open_in_new_22"
+                            android:src="@drawable/baseline_open_in_new_18"
                             android:background="?selectableItemBackgroundBorderless"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
@@ -162,17 +161,52 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="@dimen/padding_half"
-                            android:layout_marginBottom="@dimen/padding"
                             style="@style/Widget.Material3.CardView.Outlined"
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintStart_toStartOf="parent">
 
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/recycler_view"
+                            <FrameLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                app:layout_constraintTop_toBottomOf="@+id/context"
-                                app:layout_constraintStart_toStartOf="parent"/>
+                                android:layout_height="wrap_content">
+
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/recycler_view"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    app:layout_constraintTop_toBottomOf="@+id/context"
+                                    app:layout_constraintStart_toStartOf="parent"/>
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:id="@+id/context_text_container"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@color/colorHighlight"
+                                    android:backgroundTint="@color/style_red"
+                                    android:padding="@dimen/padding">
+
+                                    <TextView
+                                        android:id="@+id/context_text"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?textAppearanceBodyMedium"
+                                        android:textIsSelectable="true"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        app:layout_constraintBottom_toTopOf="@+id/context_info"/>
+
+                                    <TextView
+                                        android:id="@+id/context_info"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textAppearance="?textAppearanceBodySmall"
+                                        android:layout_marginTop="@dimen/padding_quarter"
+                                        android:alpha="0.5"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toBottomOf="@+id/context_text"
+                                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+                            </FrameLayout>
                         </com.google.android.material.card.MaterialCardView>
 
                         <com.idunnololz.summit.view.LoadingView
@@ -200,8 +234,8 @@
 
 
                 <TextView
-                    android:id="@+id/resolved_by"
-                    android:text="@string/resolver"
+                    android:id="@+id/take_action"
+                    android:text="@string/take_action"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textAppearance="?textAppearanceTitleMedium"
@@ -215,12 +249,43 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
+                <TextView
+                    android:id="@+id/mod_actions"
+                    android:text="@string/mod_actions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="64dp"
+                    android:textAppearance="?textAppearanceTitleSmall"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/secondary_chip_bg"
+                    android:paddingHorizontal="@dimen/padding_three_quarters"
+                    android:drawablePadding="@dimen/padding_half"
+                    android:layout_marginStart="@dimen/padding"
+                    app:drawableStartCompat="@drawable/outline_shield_24"
+                    app:drawableTint="?colorControlNormal"
+                    app:layout_constraintTop_toBottomOf="@+id/take_action"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <TextView
+                    android:id="@+id/resolved_by"
+                    android:text="@string/resolver"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceTitleMedium"
+                    android:layout_marginStart="@dimen/padding"
+                    android:layout_marginEnd="@dimen/padding_half"
+                    android:layout_marginTop="@dimen/padding_two"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintTop_toBottomOf="@+id/mod_actions"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/resolved_by_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/pane_item_bg"
-                    android:layout_marginTop="@dimen/padding_half"
                     app:layout_constraintTop_toBottomOf="@+id/resolved_by"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">

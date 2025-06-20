@@ -410,7 +410,28 @@
         app:enterAnim="@animator/nav_default_enter_anim"
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim"/><action android:id="@+id/action_global_userTagsFragment" app:destination="@id/userTagsFragment"/><action android:id="@+id/action_global_createOrEditCommunityFragment" app:destination="@id/createOrEditCommunityFragment"/><action android:id="@+id/action_global_modLogsFragment" app:destination="@id/modLogsFragment"/>
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
+    <action
+        android:id="@+id/action_global_userTagsFragment"
+        app:destination="@id/userTagsFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
+    <action
+        android:id="@+id/action_global_createOrEditCommunityFragment"
+        app:destination="@id/createOrEditCommunityFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
+    <action
+        android:id="@+id/action_global_modLogsFragment"
+        app:destination="@id/modLogsFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
     <fragment
         android:id="@+id/viewVotesFragment"
         android:name="com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesFragment"

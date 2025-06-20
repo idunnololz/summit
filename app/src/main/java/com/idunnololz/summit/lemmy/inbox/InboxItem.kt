@@ -244,6 +244,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val reportedPersonId: Long,
     override val creator: Person,
     override val resolver: Person?,
+    val reportedContent: String,
+    val reportedContentLastUpdateTime: String,
   ) : InboxItem, ReportItem {
 
     constructor(message: PrivateMessageReportView) : this(
@@ -266,6 +268,9 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       reportedPersonId = message.private_message.creator_id,
       creator = message.creator,
       resolver = message.resolver,
+      reportedContent = message.private_message.content,
+      reportedContentLastUpdateTime = message.private_message.updated
+        ?: message.private_message.published,
     )
 
     override fun toString(): String = "ReportInboxItem { content = $content }"

@@ -46,6 +46,8 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.dateStringToTs
+import com.idunnololz.summit.util.durationToPretty
 import com.idunnololz.summit.util.escapeMarkdown
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
@@ -84,10 +86,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     savedInstanceState: Bundle?,
   ): View {
     super.onCreateView(inflater, container, savedInstanceState)
-
-    requireSummitActivity().apply {
-      setupForFragment<ModLogsFragment>()
-    }
 
     setBinding(FragmentModLogsBinding.inflate(inflater, container, false))
 
@@ -181,10 +179,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         val firstPos = layoutManager.findFirstVisibleItemPosition()
         val lastPos = layoutManager.findLastVisibleItemPosition()
 
-        fetchPageIfLoadItem(firstPos)
-        fetchPageIfLoadItem(firstPos - 1)
-        fetchPageIfLoadItem(lastPos)
-        fetchPageIfLoadItem(lastPos + 1)
+        for (i in (firstPos - 1)..(lastPos + 1)) {
+          fetchPageIfLoadItem(i)
+        }
       }
 
       recyclerView.setup(animationsHelper)
@@ -238,6 +235,12 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         adapter.filter = it
       }
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+
+    setupForFragment<ModLogsFragment>()
   }
 
   private class ModEventsAdapter(
@@ -436,21 +439,44 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             if (modEvent.event.mod_ban_from_community.banned) {
               b.icon.setImageResource(R.drawable.outline_person_remove_24)
 
-              description = context.getString(
-                R.string.banned_person_from_community_format,
-                "[${modEvent.event.banned_person.name}](${
-                  LinkUtils.getLinkForPerson(
-                    instance,
-                    modEvent.event.banned_person.name,
-                  )
-                })",
-                "[${modEvent.event.community.name}](${
-                  LinkUtils.getLinkForCommunity(
-                    modEvent.event.community.instance,
-                    modEvent.event.community.name,
-                  )
-                })",
-              )
+              if (modEvent.event.mod_ban_from_community.expires == null) {
+                description = context.getString(
+                  R.string.banned_person_from_community_permanently_format,
+                  "[${modEvent.event.banned_person.name}](${
+                    LinkUtils.getLinkForPerson(
+                      instance,
+                      modEvent.event.banned_person.name,
+                    )
+                  })",
+                  "[${modEvent.event.community.name}](${
+                    LinkUtils.getLinkForCommunity(
+                      modEvent.event.community.instance,
+                      modEvent.event.community.name,
+                    )
+                  })",
+                )
+              } else {
+                val banDuration =
+                  dateStringToTs(modEvent.event.mod_ban_from_community.expires) -
+                    dateStringToTs(modEvent.event.mod_ban_from_community.when_)
+
+                description = context.getString(
+                  R.string.banned_person_from_community_for_format,
+                  "[${modEvent.event.banned_person.name}](${
+                    LinkUtils.getLinkForPerson(
+                      instance,
+                      modEvent.event.banned_person.name,
+                    )
+                  })",
+                  "[${modEvent.event.community.name}](${
+                    LinkUtils.getLinkForCommunity(
+                      modEvent.event.community.instance,
+                      modEvent.event.community.name,
+                    )
+                  })",
+                  durationToPretty(banDuration),
+                )
+              }
             } else {
               b.icon.setImageResource(R.drawable.baseline_person_add_alt_24)
 
@@ -476,16 +502,34 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             if (modEvent.event.mod_ban.banned) {
               b.icon.setImageResource(R.drawable.outline_person_remove_24)
 
-              description = context.getString(
-                R.string.banned_person_from_site_format,
-                "[${modEvent.event.banned_person.name}](${
-                  LinkUtils.getLinkForPerson(
-                    instance,
-                    modEvent.event.banned_person.name,
-                  )
-                })",
-                "[$instance](${LinkUtils.getLinkForInstance(instance)})",
-              )
+              if (modEvent.event.mod_ban.expires == null) {
+                description = context.getString(
+                  R.string.banned_person_from_site_permanently_format,
+                  "[${modEvent.event.banned_person.name}](${
+                    LinkUtils.getLinkForPerson(
+                      instance,
+                      modEvent.event.banned_person.name,
+                    )
+                  })",
+                  "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                )
+              } else {
+                val banDuration =
+                  dateStringToTs(modEvent.event.mod_ban.expires) -
+                    dateStringToTs(modEvent.event.mod_ban.when_)
+
+                description = context.getString(
+                  R.string.banned_person_from_site_permanently_for_format,
+                  "[${modEvent.event.banned_person.name}](${
+                    LinkUtils.getLinkForPerson(
+                      instance,
+                      modEvent.event.banned_person.name,
+                    )
+                  })",
+                  "[$instance](${LinkUtils.getLinkForInstance(instance)})",
+                  durationToPretty(banDuration),
+                )
+              }
             } else {
               b.icon.setImageResource(R.drawable.baseline_person_add_alt_24)
 

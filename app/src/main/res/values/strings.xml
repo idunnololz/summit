@@ -1348,7 +1348,7 @@
     <!-- Keep short. Button text. -->
     <string name="purge_community">Purge community</string>
     <!-- Keep short. Button text. -->
-    <string name="unban_user_from_site">Unban user from site</string>
+    <string name="unban_user_from_site">Unban user from instance</string>
     <!-- Title text. -->
     <string name="purge_community_title">Purge community?</string>
     <!-- Body text. -->
@@ -1486,7 +1486,7 @@
     <!-- Description of a mod action taken. -->
     <string name="unbanned_person_from_community_format">Undo ban on %1$s from the community %2$s.</string>
     <!-- Description of a mod action taken. -->
-    <string name="banned_person_from_site_format">Banned %1$s from the instance %2$s.</string>
+    <string name="banned_person_from_site_permanently_format">Banned %1$s from the instance %2$s permanently.</string>
     <!-- Description of a mod action taken. -->
     <string name="unbanned_person_from_site_format">Undo ban on %1$s from the instance %2$s.</string>
     <!-- Description of a mod action taken. -->
@@ -2245,5 +2245,13 @@
     <string name="resolved_by">Resolved by</string>
     <string name="error_unable_to_resolve_user_report">Unable to resolve user report</string>
     <string name="resolver">Resolver</string>
+    <string name="take_action">Take action</string>
+    <string name="confirm_mod_user_desc">You are about to add %1$s as a mod to the community %2$s. Are you sure you want to continue?</string>
+    <string name="view_users_mod_history">View user\'s mod history</string>
+    <string name="banned_person_from_community_permanently_format">Banned %1$s from the community %2$s permanently.</string>
+    <string name="banned_person_from_community_for_format">Banned %1$s from the community %2$s for %3$s.</string>
+    <string name="banned_person_from_site_permanently_for_format">Banned %1$s from the instance %2$s for %3$s.</string>
+    <string name="video_details">Video details</string>
+
     <!-- uCrop string resource end -->
 </resources>

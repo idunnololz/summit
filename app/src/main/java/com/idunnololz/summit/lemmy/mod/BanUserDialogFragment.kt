@@ -98,28 +98,28 @@ class BanUserDialogFragment : BaseDialogFragment<DialogFragmentBanUserBinding>()
       binding.banUser.setOnClickListener {
         if (args.communityId == 0) {
           actionsViewModel.banUserFromSite(
-            args.personId,
-            true,
-            removeContent.isChecked,
-            reasonEditText.text.toString().let {
+            personId = args.personId,
+            ban = true,
+            removeData = removeContent.isChecked,
+            reason = reasonEditText.text.toString().let {
               it.ifBlank {
                 null
               }
             },
-            numberOfDaysEditText.text.toString().toIntOrNull(),
+            expiresDays = numberOfDaysEditText.text.toString().toIntOrNull(),
           )
         } else {
           actionsViewModel.banUser(
-            args.communityId,
-            args.personId,
-            true,
-            removeContent.isChecked,
-            reasonEditText.text.toString().let {
+            communityId = args.communityId,
+            personId = args.personId,
+            ban = true,
+            removeData = removeContent.isChecked,
+            reason = reasonEditText.text.toString().let {
               it.ifBlank {
                 null
               }
             },
-            numberOfDaysEditText.text.toString().toIntOrNull(),
+            expiresDays = numberOfDaysEditText.text.toString().toIntOrNull(),
           )
         }
       }

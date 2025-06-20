@@ -168,13 +168,29 @@ fun dateStringToTs(dateString: String): Long = Instant.parse(
 
 @SuppressLint("DefaultLocale")
 fun durationToPretty(durationMs: Long): String {
-  val s = durationMs / 1000
-  if (s > 3600) {
-    return String.format("%dh%02dm%02ds", s / 3600, (s % 3600) / 60, (s % 60))
-  } else if (s > 60) {
-    return String.format("%dm%02ds", (s % 3600) / 60, (s % 60))
-  } else {
-    return String.format("%ds", (s % 60))
+  var s = durationMs / 1000
+
+  return buildString {
+    if (s >= 86400) {
+      val d = s / 86400
+      s -= d * 86400
+      append(d)
+      append("d ")
+    }
+    if (s >= 3600){
+      val h = s / 3600
+      s -= h * 3600
+      append(h)
+      append("h")
+    }
+    if (s >= 60){
+      val m = s / 60
+      s -= m * 60
+      append(m)
+      append("m")
+    }
+    append(s)
+    append("s")
   }
 }
 

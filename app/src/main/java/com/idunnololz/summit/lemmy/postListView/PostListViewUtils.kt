@@ -223,9 +223,9 @@ fun BaseFragment<*>.showMorePostOptions(
       R.drawable.outline_sell_24,
     )
     addItemWithIcon(
-      R.id.pa_user_moderation_history,
-      getString(R.string.view_users_moderation_history),
-      R.drawable.outline_shield_24,
+      R.id.pa_user_mod_history,
+      getString(R.string.view_users_mod_history),
+      R.drawable.baseline_notes_24,
     )
     addItemWithIcon(R.id.pa_view_source, R.string.view_raw, R.drawable.baseline_code_24)
     addItemWithIcon(
@@ -467,11 +467,11 @@ fun BaseFragment<*>.createPostActionHandler(
         person = postView.creator,
       )
     }
-    R.id.pa_user_moderation_history -> {
+    R.id.pa_user_mod_history -> {
       getMainActivity()?.launchModLogs(
         instance = moreActionsHelper.apiInstance,
-        filterByMod = postView.creator.toPersonRef(),
-        filterByUser = null,
+        filterByMod = null,
+        filterByUser = postView.creator.toPersonRef(),
       )
     }
   }

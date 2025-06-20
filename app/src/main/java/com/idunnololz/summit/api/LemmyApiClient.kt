@@ -878,17 +878,17 @@ class LemmyApiClient @Inject constructor(
     ban: Boolean,
     removeData: Boolean,
     reason: String?,
-    expiresDays: Int?,
+    expiresTs: Long?,
     account: Account,
   ): Result<BanFromCommunityResponse> {
     val form = BanFromCommunity(
-      communityId,
-      personId,
-      ban,
-      removeData,
-      reason,
-      expiresDays,
-      account.jwt,
+      community_id = communityId,
+      person_id = personId,
+      ban = ban,
+      remove_data = removeData,
+      reason = reason,
+      expires = expiresTs,
+      auth = account.jwt,
     )
 
     return retrofitErrorHandler {
@@ -1804,7 +1804,7 @@ class LemmyApiClient @Inject constructor(
     ban: Boolean,
     removeData: Boolean,
     reason: String?,
-    expiresDays: Int?,
+    expiresTs: Long?,
     account: Account,
   ): Result<BanPersonResponse> {
     val form = BanPerson(
@@ -1812,7 +1812,7 @@ class LemmyApiClient @Inject constructor(
       ban = ban,
       remove_data = removeData,
       reason = reason,
-      expires = expiresDays,
+      expires = expiresTs,
       auth = account.jwt,
     )
 

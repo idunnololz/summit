@@ -33,7 +33,7 @@ class ImageInfoDialogFragment :
   FullscreenDialogFragment {
 
   companion object {
-    const val REQUEST_KEY = "DraftsDialogFragment_req_key"
+    const val REQUEST_KEY = "ImageInfoDialogFragment_req_key"
     const val REQUEST_KEY_RESULT = "result"
 
     fun show(fragmentManager: FragmentManager, url: String) {
@@ -80,7 +80,7 @@ class ImageInfoDialogFragment :
       val adapter = ImageInfoAdapter(context)
 
       recyclerView.layoutManager = LinearLayoutManager(context)
-      recyclerView.setHasFixedSize(true)
+      recyclerView.setHasFixedSize(false)
       recyclerView.adapter = adapter
       recyclerView.setup(animationsHelper)
       loadingView.setOnRefreshClickListener {

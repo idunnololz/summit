@@ -1439,6 +1439,24 @@ class PostAndCommentViewBuilder @Inject constructor(
       }
     }
 
+
+    when (item) {
+
+      is ReportItem -> {
+        upvoteButton.visibility = View.GONE
+        downvoteButton.visibility = View.GONE
+        reply.visibility = View.GONE
+        moreButton.visibility = View.GONE
+      }
+
+      else -> {
+        upvoteButton.visibility = View.VISIBLE
+        downvoteButton.visibility = View.VISIBLE
+        reply.visibility = View.VISIBLE
+        moreButton.visibility = View.GONE
+      }
+    }
+
     val drawable = when (item) {
       is InboxItem.MentionInboxItem -> {
         TextViewCompat.setCompoundDrawableTintList(

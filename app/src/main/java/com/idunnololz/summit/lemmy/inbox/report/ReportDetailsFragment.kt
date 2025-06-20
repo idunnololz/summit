@@ -54,11 +54,13 @@ import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.LinkUtils
+import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToTs
@@ -286,6 +288,29 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         goToPost()
       }
 
+      modActions.setOnClickListener {
+        ModActionsDialogFragment.show(
+          communityId = when (reportItem) {
+            is InboxItem.ReportCommentInboxItem -> reportItem.communityId
+            is InboxItem.ReportMessageInboxItem -> -1
+            is InboxItem.ReportPostInboxItem -> reportItem.communityId
+          },
+          commentId = when (reportItem) {
+            is InboxItem.ReportCommentInboxItem -> reportItem.reportedCommentId
+            is InboxItem.ReportMessageInboxItem -> -1
+            is InboxItem.ReportPostInboxItem -> -1
+          },
+          postId = when (reportItem) {
+            is InboxItem.ReportCommentInboxItem -> -1
+            is InboxItem.ReportMessageInboxItem -> -1
+            is InboxItem.ReportPostInboxItem -> reportItem.reportedPostId
+          },
+          personId = reportItem.reportedPersonId,
+          communityInstance = viewModel.apiInstance,
+          fragmentManager = childFragmentManager,
+        )
+      }
+
       viewModel.commentContext.observe(viewLifecycleOwner) {
         when (it) {
           is StatefulData.Error -> {
@@ -339,7 +364,44 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         }
       }
 
-      loadContext(reportItem)
+      when (reportItem) {
+        is InboxItem.ReportMessageInboxItem -> {
+          recyclerView.visibility = View.GONE
+          openContextButton.visibility = View.GONE
+
+          lemmyTextHelper.bindText(
+            textView = contextText,
+            text = reportItem.reportedContent,
+            instance = viewModel.apiInstance,
+            showMediaAsLinks = true,
+            onImageClick = {
+              getMainActivity()?.openImage(null, binding.appBar, null, it, null)
+            },
+            onVideoClick = { url ->
+              getMainActivity()?.openVideo(url, VideoType.Unknown, null)
+            },
+            onPageClick = {
+              getMainActivity()?.launchPage(it)
+            },
+            onLinkClick =  { url, text, linkType ->
+              onLinkClick(url, text, linkType)
+            },
+            onLinkLongClick = { url, text ->
+              getSummitActivity()?.showMoreLinkOptions(url, text)
+            },
+          )
+          contextInfo.text = tsToConcise(
+            context = context,
+            ts = dateStringToTs(reportItem.reportedContentLastUpdateTime),
+            style = PrettyPrintStyles.SHORT_DYNAMIC,
+          )
+        }
+        is InboxItem.ReportPostInboxItem,
+        is InboxItem.ReportCommentInboxItem -> {
+          contextTextContainer.visibility = View.GONE
+          loadContext(reportItem)
+        }
+      }
     }
   }
 
@@ -558,29 +620,6 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               }
             }
           }
-
-          modActions.setOnClickListener {
-            ModActionsDialogFragment.show(
-              communityId = when (reportItem) {
-                is InboxItem.ReportCommentInboxItem -> reportItem.communityId
-                is InboxItem.ReportMessageInboxItem -> 0
-                is InboxItem.ReportPostInboxItem -> reportItem.communityId
-              },
-              commentId = when (reportItem) {
-                is InboxItem.ReportCommentInboxItem -> reportItem.reportedCommentId
-                is InboxItem.ReportMessageInboxItem -> -1
-                is InboxItem.ReportPostInboxItem -> -1
-              },
-              postId = when (reportItem) {
-                is InboxItem.ReportCommentInboxItem -> -1
-                is InboxItem.ReportMessageInboxItem -> -1
-                is InboxItem.ReportPostInboxItem -> reportItem.reportedPostId
-              },
-              personId = reportItem.reportedPersonId,
-              communityInstance = viewModel.apiInstance,
-              fragmentManager = childFragmentManager,
-            )
-          }
           modLogs.setOnClickListener {
             getMainActivity()?.launchModLogs(
               instance = viewModel.apiInstance,
@@ -604,7 +643,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
   private fun loadContext(reportItem: ReportItem, force: Boolean = false) {
     when (val inboxItem = reportItem) {
       is InboxItem.ReportMessageInboxItem -> {
-        TODO()
+        Unit
       }
       is InboxItem.ReportCommentInboxItem -> {
         viewModel.fetchCommentContext(

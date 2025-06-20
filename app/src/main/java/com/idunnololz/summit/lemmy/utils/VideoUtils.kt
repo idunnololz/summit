@@ -15,6 +15,7 @@ import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.crashLogger.crashLogger
+import com.idunnololz.summit.video.VideoInfoDialogFragment
 import java.io.IOException
 
 fun BaseFragment<*>.showMoreVideoOptions(
@@ -31,6 +32,8 @@ fun BaseFragment<*>.showMoreVideoOptions(
     setTitle(R.string.more_actions)
 
     addItemWithIcon(R.id.download, R.string.download_video, R.drawable.baseline_download_24)
+
+    addItemWithIcon(R.id.video_details, R.string.video_details, R.drawable.outline_info_24)
 
     addDivider()
 
@@ -56,6 +59,9 @@ fun BaseFragment<*>.showMoreVideoOptions(
       when (it.id) {
         R.id.download -> {
           moreActionsHelper.downloadVideo(url)
+        }
+        R.id.video_details -> {
+          VideoInfoDialogFragment.show(fragmentManager, originalUrl)
         }
         R.id.copy_link -> {
           Utils.copyToClipboard(context, originalUrl)

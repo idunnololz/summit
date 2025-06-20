@@ -19,6 +19,9 @@ import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 @HiltViewModel
 class AdminOrModActionsViewModel @Inject constructor(
@@ -62,12 +65,14 @@ class AdminOrModActionsViewModel @Inject constructor(
     banUserResult.setIsLoading()
     viewModelScope.launch {
       apiClient.banUserFromCommunity(
-        communityId,
-        personId,
-        ban,
-        removeData,
-        reason,
-        expiresDays,
+        communityId = communityId,
+        personId = personId,
+        ban = ban,
+        removeData = removeData,
+        reason = reason,
+        expiresTs = expiresDays?.let {
+          (it.days.inWholeMilliseconds + System.currentTimeMillis()) / 1000L
+        },
       )
         .onSuccess {
           banUserResult.postValue(Unit)
@@ -190,11 +195,13 @@ class AdminOrModActionsViewModel @Inject constructor(
     viewModelScope.launch {
       ensureRightInstance {
         apiClient.banUserFromSite(
-          personId,
-          ban,
-          removeData,
-          reason,
-          expiresDays,
+          personId = personId,
+          ban = ban,
+          removeData = removeData,
+          reason = reason,
+          expiresTs = expiresDays?.let {
+            (it.days.inWholeMilliseconds + System.currentTimeMillis()) / 1000L
+          },
         )
       }
         .onSuccess {

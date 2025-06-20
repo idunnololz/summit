@@ -436,4 +436,12 @@ safeargs.
             android:name="reportItem"
             app:argType="com.idunnololz.summit.lemmy.inbox.ReportItem" />
     </fragment>
+    <dialog
+        android:id="@+id/videoInfoDialogFragment"
+        android:name="com.idunnololz.summit.video.VideoInfoDialogFragment"
+        android:label="VideoInfoDialogFragment" >
+        <argument
+            android:name="url"
+            app:argType="string" />
+    </dialog>
 </navigation>

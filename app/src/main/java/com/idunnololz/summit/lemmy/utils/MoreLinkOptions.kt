@@ -277,9 +277,9 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
                 )
               }
               addItemWithIcon(
-                id = R.id.user_moderation_history,
-                title = context.getString(R.string.view_users_moderation_history),
-                icon = R.drawable.outline_shield_24,
+                id = R.id.user_mod_history,
+                getString(R.string.view_users_mod_history),
+                R.drawable.baseline_notes_24,
               )
 
 //                            addItemWithIcon(
@@ -517,13 +517,13 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         }
       }
     }
-    R.id.user_moderation_history -> {
+    R.id.user_mod_history -> {
       (advancedLink as? AdvancedLink.PageLink)?.let {
         (it.pageRef as? PersonRef)?.let { personRef ->
           mainActivity?.launchModLogs(
             instance = moreActionsHelper.apiInstance,
-            filterByMod = personRef,
-            filterByUser = null
+            filterByMod = null,
+            filterByUser = personRef,
           )
         }
       }

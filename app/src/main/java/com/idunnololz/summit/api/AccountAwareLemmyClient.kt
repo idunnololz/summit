@@ -359,7 +359,7 @@ class AccountAwareLemmyClient @Inject constructor(
     ban: Boolean,
     removeData: Boolean,
     reason: String?,
-    expiresDays: Int?,
+    expiresTs: Long?,
     account: Account? = accountForInstance(),
   ): Result<BanFromCommunityResponse> = if (account != null) {
     apiClient
@@ -369,7 +369,7 @@ class AccountAwareLemmyClient @Inject constructor(
         ban = ban,
         removeData = removeData,
         reason = reason,
-        expiresDays = expiresDays,
+        expiresTs = expiresTs,
         account = account,
       )
       .autoSignOut(account)
@@ -902,7 +902,7 @@ class AccountAwareLemmyClient @Inject constructor(
     ban: Boolean,
     removeData: Boolean,
     reason: String?,
-    expiresDays: Int?,
+    expiresTs: Long?,
     account: Account? = accountForInstance(),
   ): Result<BanPersonResponse> = if (account != null) {
     apiClient
@@ -911,7 +911,7 @@ class AccountAwareLemmyClient @Inject constructor(
         ban = ban,
         removeData = removeData,
         reason = reason,
-        expiresDays = expiresDays,
+        expiresTs = expiresTs,
         account = account,
       )
       .autoSignOut(account)

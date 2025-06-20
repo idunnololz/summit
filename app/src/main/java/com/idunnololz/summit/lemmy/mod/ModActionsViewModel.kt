@@ -6,6 +6,8 @@ import arrow.core.Either
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.Community
+import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +42,10 @@ class ModActionsViewModel @Inject constructor(
       val isRemoved: Boolean,
       val isHidden: Boolean,
     ) : ModState
+    data class SiteModState(
+      val isAdmin: Boolean,
+      val isBannedFromSite: Boolean,
+    ) : ModState
   }
 
   data class FullModState(
@@ -49,6 +55,9 @@ class ModActionsViewModel @Inject constructor(
   val currentAccount
     get() = apiClient.accountForInstance()
   val currentModState = StatefulLiveData<FullModState>()
+
+  var person: Person? = null
+  var community: Community? = null
 
   fun isAdmin(communityInstance: String): Boolean {
     val fullAccount = accountInfoManager.currentFullAccount.value
@@ -69,12 +78,16 @@ class ModActionsViewModel @Inject constructor(
     currentModState.setIsLoading()
 
     viewModelScope.launch {
-      val communityJob = async {
-        apiClient.fetchCommunityWithRetry(Either.Left(communityId), force)
-          .onFailure {
-            currentModState.postError(it)
-            cancel()
-          }
+      val communityJob = if (communityId != -1) {
+        async {
+          apiClient.fetchCommunityWithRetry(Either.Left(communityId), force)
+            .onFailure {
+              currentModState.postError(it)
+              cancel()
+            }
+        }
+      } else {
+        null
       }
       val postJob = if (postId != -1) {
         async {
@@ -123,7 +136,7 @@ class ModActionsViewModel @Inject constructor(
       val allModState = mutableListOf<ModState>()
 
       // Do all or nothing for the API calls since it's easier to handle.
-      val communityResult = communityJob.await().getOrNull()
+      val communityResult = communityJob?.await()?.getOrNull()
       val postResult = postJob?.await()?.getOrNull()
       val commentResult = commentJob?.await()?.getOrNull()
       val personResult = personJob?.await()?.getOrNull()
@@ -141,6 +154,9 @@ class ModActionsViewModel @Inject constructor(
             isBannedFromCommunity = postResult.post_view.creator_banned_from_community,
             isBannedFromSite = postResult.post_view.creator.banned,
           )
+
+        person = postResult.post_view.creator
+        community = postResult.community_view.community
       }
       if (commentResult != null) {
         val comment = commentResult.firstOrNull { it.comment.id == commentId }
@@ -161,6 +177,9 @@ class ModActionsViewModel @Inject constructor(
               isBannedFromCommunity = comment.creator_banned_from_community,
               isBannedFromSite = comment.creator.banned,
             )
+
+          person = comment.creator
+          community = comment.community
         }
       }
 
@@ -170,6 +189,14 @@ class ModActionsViewModel @Inject constructor(
             isMod = communityResult.moderators.any { it.moderator.id == personId },
             isRemoved = communityResult.community_view.community.removed,
             isHidden = communityResult.community_view.community.hidden,
+          )
+      }
+
+      if (personResult != null) {
+        allModState +=
+          ModState.SiteModState(
+            isAdmin = personResult.person_view.person.admin,
+            isBannedFromSite = personResult.person_view.person.banned,
           )
       }
 
