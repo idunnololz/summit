@@ -18,10 +18,8 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.launch
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Instant
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AdminOrModActionsViewModel @Inject constructor(

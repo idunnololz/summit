@@ -15,11 +15,11 @@ import com.idunnololz.summit.lemmy.inbox.PageType
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
+import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import kotlin.math.min
 
 @ViewModelScoped
 class InboxRepository @Inject constructor(
@@ -82,7 +82,7 @@ class InboxRepository @Inject constructor(
     ): Result<PageResult<LiteInboxItem>> = withContext(Dispatchers.Default) {
       Log.d(
         TAG,
-        "Index: $pageIndex. Sources: ${sources.size}. Force: $force"
+        "Index: $pageIndex. Sources: ${sources.size}. Force: $force",
       )
 
       if (force) {

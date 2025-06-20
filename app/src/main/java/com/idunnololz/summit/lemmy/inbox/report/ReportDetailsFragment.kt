@@ -333,7 +333,6 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
 
       viewModel.fetchReportedPersonInfo(reportItem.reportedPersonId)
       viewModel.isResolved.observe(viewLifecycleOwner) {
-
         if (it) {
           fab.setImageResource(R.drawable.baseline_mark_as_unread_24)
           fab.setOnClickListener {
@@ -383,7 +382,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
             onPageClick = {
               getMainActivity()?.launchPage(it)
             },
-            onLinkClick =  { url, text, linkType ->
+            onLinkClick = { url, text, linkType ->
               onLinkClick(url, text, linkType)
             },
             onLinkLongClick = { url, text ->
@@ -397,7 +396,8 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           )
         }
         is InboxItem.ReportPostInboxItem,
-        is InboxItem.ReportCommentInboxItem -> {
+        is InboxItem.ReportCommentInboxItem,
+        -> {
           contextTextContainer.visibility = View.GONE
           loadContext(reportItem)
         }
@@ -547,7 +547,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
                     context.getString(
                       R.string.banned_until_format,
                       tsToConcise(context, personView.person.ban_expires),
-                    )
+                    ),
                   )
                 } else {
                   append(context.getString(R.string.permanently_banned))
@@ -625,20 +625,21 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               instance = viewModel.apiInstance,
               filterByMod = null,
               filterByUser = PersonRef.PersonRefById(
-                reportItem.reportedPersonId, viewModel.apiInstance)
+                reportItem.reportedPersonId,
+                viewModel.apiInstance,
+              ),
             )
           }
 
           openContextButton.setOnClickListener {
             getMainActivity()?.launchPage(
-              PersonRef.PersonRefById(reportItem.reportedPersonId, viewModel.apiInstance)
+              PersonRef.PersonRefById(reportItem.reportedPersonId, viewModel.apiInstance),
             )
           }
         }
       }
     }
   }
-
 
   private fun loadContext(reportItem: ReportItem, force: Boolean = false) {
     when (val inboxItem = reportItem) {
@@ -815,7 +816,6 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           }
         }
         is InboxItem.ReportMessageInboxItem -> {
-
         }
         is InboxItem.ReportPostInboxItem -> {
           adapter.highlightPostForever = true

@@ -11,7 +11,6 @@ import androidx.media3.exoplayer.source.TrackGroupArray
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
 import com.idunnololz.summit.util.StatefulLiveData
-import com.idunnololz.summit.util.guessMimeType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
@@ -24,11 +23,11 @@ class VideoInfoViewModel @Inject constructor(
 
   data class VideoInfoModel(
     val url: String,
-    val tracks: List<Track>
+    val tracks: List<Track>,
   ) {
     data class Track(
       val name: String,
-      val formats: List<Format>
+      val formats: List<Format>,
     )
     data class Format(
       val id: String?,
@@ -87,7 +86,6 @@ class VideoInfoViewModel @Inject constructor(
     )
   }
 
-
   private val executor = Executors.newSingleThreadExecutor()
   val model = StatefulLiveData<VideoInfoModel>()
 
@@ -106,7 +104,11 @@ class VideoInfoViewModel @Inject constructor(
             (0 until trackGroups.length).map { trackGroups.get(it) }.map { trackGroup ->
               VideoInfoModel.Track(
                 name = trackGroup.id,
-                formats = (0 until trackGroup.length).map { trackGroup.getFormat(it) }.map { format ->
+                formats = (0 until trackGroup.length).map {
+                  trackGroup.getFormat(
+                    it,
+                  )
+                }.map { format ->
                   VideoInfoModel.Format(
                     id = format.id,
                     label = format.label,
@@ -144,7 +146,7 @@ class VideoInfoViewModel @Inject constructor(
                     tileCountVertical = format.tileCountVertical,
                     cryptoType = format.cryptoType,
                   )
-                }
+                },
               )
             }
           } else {
@@ -155,7 +157,7 @@ class VideoInfoViewModel @Inject constructor(
             VideoInfoModel(
               url,
               tracks,
-            )
+            ),
           )
         }
 

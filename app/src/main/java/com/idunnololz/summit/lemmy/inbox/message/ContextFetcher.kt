@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.inbox.message
 
-import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -17,15 +16,14 @@ import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.StatefulData
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.CoroutineScope
+import java.lang.AutoCloseable
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.AutoCloseable
-import javax.inject.Inject
 
 @ViewModelScoped
 class ContextFetcher @Inject constructor(
@@ -35,7 +33,7 @@ class ContextFetcher @Inject constructor(
   private val pendingCommentsManager: PendingCommentsManager,
   val accountManager: AccountManager,
   coroutineScopeFactory: CoroutineScopeFactory,
-): AutoCloseable {
+) : AutoCloseable {
   private val coroutineScope = coroutineScopeFactory.create()
   private val commentsFetcher = CommentsFetcher(apiClient)
 
@@ -67,7 +65,7 @@ class ContextFetcher @Inject constructor(
   suspend fun fetchCommentContext(
     postId: Int,
     commentPath: String?,
-    force: Boolean
+    force: Boolean,
   ): Result<CommentContext> {
     currentMessageContext = CurrentMessageContext(PostRef(apiClient.instance, postId), commentPath)
 
@@ -91,7 +89,7 @@ class ContextFetcher @Inject constructor(
   private suspend fun _fetchCommentContext(
     postId: Int,
     commentPath: String?,
-    force: Boolean
+    force: Boolean,
   ): Result<CommentContext> = withContext(Dispatchers.Default) {
     val postJob = async {
       apiClient.fetchPostWithRetry(Either.Left(postId), force)
@@ -137,7 +135,10 @@ class ContextFetcher @Inject constructor(
     )
   }
 
-  private suspend fun fetchCompleteCommentPath(commentPath: String, force: Boolean): Result<List<CommentView>> {
+  private suspend fun fetchCompleteCommentPath(
+    commentPath: String,
+    force: Boolean,
+  ): Result<List<CommentView>> {
     val commentIds = commentPath.split(".").map { it.toInt() }
     val topCommentId = commentIds.firstOrNull { it != 0 }
     val result = mutableListOf<CommentView>()

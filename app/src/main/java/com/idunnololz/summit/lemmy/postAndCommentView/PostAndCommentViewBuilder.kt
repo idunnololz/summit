@@ -1439,9 +1439,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       }
     }
 
-
     when (item) {
-
       is ReportItem -> {
         upvoteButton.visibility = View.GONE
         downvoteButton.visibility = View.GONE

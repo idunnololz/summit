@@ -8,13 +8,11 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.lemmy.inbox.ReportItem
 import com.idunnololz.summit.lemmy.inbox.message.ContextFetcher
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ReportDetailsViewModel @Inject constructor(

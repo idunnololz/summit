@@ -33,7 +33,6 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
@@ -81,7 +80,11 @@ class ViewVotesFragment :
     with(binding) {
       requireSummitActivity().apply {
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-        insetViewAutomaticallyByPaddingAndNavUi(viewLifecycleOwner, binding.recyclerView, applyTopInset = false)
+        insetViewAutomaticallyByPaddingAndNavUi(
+          viewLifecycleOwner,
+          binding.recyclerView,
+          applyTopInset = false,
+        )
       }
 
       setupToolbar(toolbar, getString(R.string.votes))

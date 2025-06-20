@@ -177,13 +177,13 @@ fun durationToPretty(durationMs: Long): String {
       append(d)
       append("d ")
     }
-    if (s >= 3600){
+    if (s >= 3600) {
       val h = s / 3600
       s -= h * 3600
       append(h)
       append("h")
     }
-    if (s >= 60){
+    if (s >= 60) {
       val m = s / 60
       s -= m * 60
       append(m)
