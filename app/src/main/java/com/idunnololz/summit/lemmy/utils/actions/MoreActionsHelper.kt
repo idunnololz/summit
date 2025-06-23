@@ -44,7 +44,58 @@ import okio.sink
 import okio.source
 
 @Singleton
-class MoreActionsHelper @Inject constructor(
+class MoreActionsHelperManager @Inject constructor(
+  @ApplicationContext private val context: Context,
+  private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
+  private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
+  private val accountActionsManager: AccountActionsManager,
+  private val hiddenPostsManager: HiddenPostsManager,
+  private val savedManager: SavedManager,
+  private val videoDownloadManager: VideoDownloadManager,
+  private val fileDownloadHelper: FileDownloadHelper,
+  private val offlineManager: OfflineManager,
+  private val nsfwModeManager: NsfwModeManager,
+  private val duplicatePostsDetector: DuplicatePostsDetector,
+  private val coroutineScopeFactory: CoroutineScopeFactory,
+) {
+  private val defaultInstance = newMoreActionsHelper()
+  private val accountIdToHelper = mutableMapOf<Long?, MoreActionsHelper>()
+
+  fun getDefaultInstance() = defaultInstance
+
+  fun getAccountInstance(accountId: Long): MoreActionsHelper {
+    var helper = accountIdToHelper[accountId]
+
+    if (helper != null) {
+      helper.refresh()
+      return helper
+    }
+
+    helper = newMoreActionsHelper(accountId)
+    accountIdToHelper[accountId] = helper
+    return helper
+  }
+
+  private fun newMoreActionsHelper(selectedAccountId: Long? = null) = MoreActionsHelper(
+    context = context,
+    lemmyApiClientFactory = lemmyApiClientFactory,
+    accountManager = accountManager,
+    accountInfoManager = accountInfoManager,
+    accountActionsManager = accountActionsManager,
+    hiddenPostsManager = hiddenPostsManager,
+    savedManager = savedManager,
+    videoDownloadManager = videoDownloadManager,
+    fileDownloadHelper = fileDownloadHelper,
+    offlineManager = offlineManager,
+    nsfwModeManager = nsfwModeManager,
+    duplicatePostsDetector = duplicatePostsDetector,
+    coroutineScopeFactory = coroutineScopeFactory,
+    selectedAccountId = selectedAccountId,
+  )
+}
+
+class MoreActionsHelper(
   @ApplicationContext private val context: Context,
   private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
   val accountManager: AccountManager,
@@ -58,15 +109,24 @@ class MoreActionsHelper @Inject constructor(
   private val nsfwModeManager: NsfwModeManager,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   coroutineScopeFactory: CoroutineScopeFactory,
+  private val selectedAccountId: Long?,
 ) {
 
   private val coroutineScope = coroutineScopeFactory.create()
+
+  private var _fullAccount: FullAccount? = null
+
   val apiClient = lemmyApiClientFactory.create()
 
   val currentAccount: Account?
     get() = apiClient.accountForInstance()
   val fullAccount: FullAccount?
-    get() = accountInfoManager.currentFullAccount.value
+    get() =
+      if (selectedAccountId != null) {
+        _fullAccount
+      } else {
+        accountInfoManager.currentFullAccount.value
+      }
   val apiInstance: String
     get() = apiClient.instance
 
@@ -84,6 +144,27 @@ class MoreActionsHelper @Inject constructor(
 
   val nsfwModeEnabledFlow
     get() = nsfwModeManager.nsfwModeEnabled
+
+  init {
+    if (selectedAccountId != null) {
+      apiClient.forceUseAccount(selectedAccountId)
+
+      refresh()
+    }
+  }
+
+  fun refresh() {
+    if (selectedAccountId == null) {
+      return
+    }
+
+    coroutineScope.launch {
+      val selectedAccount = accountManager.getAccountById(selectedAccountId)
+      if (selectedAccount != null) {
+        _fullAccount = accountInfoManager.getFullAccount(selectedAccount)
+      }
+    }
+  }
 
   fun blockCommunity(communityRef: CommunityRef.CommunityRefByName, block: Boolean = true) {
     blockCommunityResult.setIsLoading()

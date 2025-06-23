@@ -732,7 +732,6 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           },
           onPostActionClick = { postView, _, actionId ->
             showMorePostOptions(
-              instance = viewModel.apiInstance,
               accountId = null,
               postView = postView,
               moreActionsHelper = moreActionsHelper,
@@ -741,7 +740,6 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           },
           onCommentActionClick = { commentView, _, actionId ->
             createCommentActionHandler(
-              apiInstance = viewModel.apiInstance,
               commentView = commentView,
               moreActionsHelper = moreActionsHelper,
               fragmentManager = childFragmentManager,

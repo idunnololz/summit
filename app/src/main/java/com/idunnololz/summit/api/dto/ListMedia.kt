@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class ListMedia(
-    val page: Long? = null,
-    val limit: Long? = null,
+  val page: Long? = null,
+  val limit: Long? = null,
 )

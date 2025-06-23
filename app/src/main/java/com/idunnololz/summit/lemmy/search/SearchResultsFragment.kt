@@ -176,7 +176,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         },
         onPostActionClick = { postView, actionId ->
           createPostActionHandler(
-            instance = parentFragment.viewModel.instance,
             accountId = null,
             postView = postView,
             moreActionsHelper = moreActionsHelper,
@@ -185,7 +184,6 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         },
         onCommentActionClick = { commentView, actionId ->
           createCommentActionHandler(
-            apiInstance = parentFragment.viewModel.instance,
             commentView = commentView,
             moreActionsHelper = moreActionsHelper,
             fragmentManager = childFragmentManager,

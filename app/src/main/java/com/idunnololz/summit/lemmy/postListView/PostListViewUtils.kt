@@ -28,7 +28,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 
 fun BaseFragment<*>.showMorePostOptions(
-  instance: String,
   accountId: Long?,
   postView: PostView,
   moreActionsHelper: MoreActionsHelper,
@@ -44,6 +43,7 @@ fun BaseFragment<*>.showMorePostOptions(
   }
 
   val context = requireContext()
+  val instance = moreActionsHelper.apiInstance
 
   val bottomMenu = BottomMenu(context).apply {
     setTitle(R.string.more_actions)
@@ -236,7 +236,6 @@ fun BaseFragment<*>.showMorePostOptions(
 
     setOnMenuItemClickListener {
       createPostActionHandler(
-        instance = instance,
         accountId = accountId,
         postView = postView,
         moreActionsHelper = moreActionsHelper,
@@ -253,7 +252,6 @@ fun BaseFragment<*>.showMorePostOptions(
 }
 
 fun BaseFragment<*>.createPostActionHandler(
-  instance: String,
   accountId: Long?,
   postView: PostView,
   moreActionsHelper: MoreActionsHelper,
@@ -264,6 +262,7 @@ fun BaseFragment<*>.createPostActionHandler(
   onScreenshotClick: (() -> Unit)? = null,
 ): (Int) -> Unit = a@{ id: Int ->
   val context = requireContext()
+  val instance = moreActionsHelper.apiInstance
 
   when (id) {
     R.id.pa_reply -> {
@@ -409,7 +408,6 @@ fun BaseFragment<*>.createPostActionHandler(
     }
     R.id.pa_more -> {
       showMorePostOptions(
-        instance = instance,
         accountId = accountId,
         postView = postView,
         moreActionsHelper = moreActionsHelper,

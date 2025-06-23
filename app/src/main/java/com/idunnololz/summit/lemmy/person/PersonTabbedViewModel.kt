@@ -85,7 +85,9 @@ class PersonTabbedViewModel @Inject constructor(
   private var _personRef = savedStateHandle.getLiveData<PersonRef>("person_ref")
   private var personRef: PersonRef?
     get() = _personRef.value
-    set(value) { _personRef.value = value }
+    set(value) {
+      _personRef.value = value
+    }
   private var fetchingPages = mutableSetOf<Int>()
   private val personIdToPersonName = mutableMapOf<String, String>()
   var showCurrentAccount = savedStateHandle.getLiveData<Boolean>("show_current_account", false)

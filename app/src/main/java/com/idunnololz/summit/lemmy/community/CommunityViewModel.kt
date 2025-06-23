@@ -440,7 +440,8 @@ class CommunityViewModel @Inject constructor(
         return
       } else {
         postsRepository.removeSeenPosts(
-          postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView })
+          postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView },
+        )
       }
     }
     if (fetchingPages.contains(pageToFetch)) {

@@ -2058,11 +2058,7 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
-  suspend fun listMedia(
-    page: Long?,
-    limit: Long?,
-    account: Account,
-  ): Result<ListMediaResponse> {
+  suspend fun listMedia(page: Long?, limit: Long?, account: Account): Result<ListMediaResponse> {
     val form = ListMedia(
       page = page,
       limit = limit,

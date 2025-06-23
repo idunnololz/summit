@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ListMediaResponse(
-    val images: List<LocalImageView>,
+  val images: List<LocalImageView>,
 )

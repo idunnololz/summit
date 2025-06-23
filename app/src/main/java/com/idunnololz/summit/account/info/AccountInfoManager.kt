@@ -136,7 +136,7 @@ class AccountInfoManager @Inject constructor(
     return accountImageGenerator.getOrGenerateImageForAccount(account)
   }
 
-  private suspend fun getFullAccount(account: Account): FullAccount? {
+  suspend fun getFullAccount(account: Account): FullAccount? {
     val fullAccount = currentFullAccount.value
     return if (fullAccount?.accountId == account.id) {
       fullAccount

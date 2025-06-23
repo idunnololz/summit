@@ -17,7 +17,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import com.idunnololz.summit.util.getParcelableCompat
 import java.io.IOException
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
@@ -310,7 +309,7 @@ fun BaseFragment<*>.installOnActionResultHandler(
               }.show()
 
               moreActionsHelper.downloadResult.postIdle()
-            } catch (e: IOException) {
+            } catch (_: IOException) {
               /* do nothing */
             }
           }

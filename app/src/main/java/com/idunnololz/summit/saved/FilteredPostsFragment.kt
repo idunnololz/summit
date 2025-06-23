@@ -144,7 +144,6 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
       },
       onShowMoreActions = { accountId, postView ->
         showMorePostOptions(
-          instance = parentFragment.viewModel.instance,
           accountId = null,
           postView = postView,
           moreActionsHelper = parentFragment.moreActionsHelper,
@@ -163,7 +162,6 @@ class FilteredPostsFragment : BaseFragment<FragmentSavedPostsBinding>(), SignInN
       },
       onPostActionClick = { postView, actionId ->
         createPostActionHandler(
-          instance = viewModel.instance,
           accountId = null,
           postView = postView,
           moreActionsHelper = moreActionsHelper,

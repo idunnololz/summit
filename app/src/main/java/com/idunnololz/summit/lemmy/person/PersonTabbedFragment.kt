@@ -51,7 +51,6 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -71,12 +70,12 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.launch
-import java.time.temporal.ChronoUnit
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
@@ -148,7 +147,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     val mainActivity = requireSummitActivity()
 
     with(binding) {
-
       requireSummitActivity().apply {
         setupToolbar(
           toolbar,

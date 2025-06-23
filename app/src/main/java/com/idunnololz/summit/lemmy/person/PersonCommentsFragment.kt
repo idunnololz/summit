@@ -93,7 +93,6 @@ class PersonCommentsFragment :
       },
       onCommentActionClick = { view, commentView, actionId ->
         createCommentActionHandler(
-          apiInstance = parentFragment.viewModel.instance,
           commentView = commentView,
           moreActionsHelper = moreActionsHelper,
           fragmentManager = childFragmentManager,

@@ -406,7 +406,6 @@ class CommunityFragment :
         },
         onShowMoreActions = { accountId, postView ->
           showMorePostOptions(
-            instance = viewModel.apiInstance,
             accountId = accountId,
             postView = postView,
             moreActionsHelper = moreActionsHelper,
@@ -432,7 +431,6 @@ class CommunityFragment :
         },
         onPostActionClick = { postView, actionId ->
           createPostActionHandler(
-            instance = viewModel.apiInstance,
             accountId = null,
             postView = postView,
             moreActionsHelper = moreActionsHelper,

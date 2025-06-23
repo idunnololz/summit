@@ -67,6 +67,7 @@ import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelperManager
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.getCommentSwipeActions
 import com.idunnololz.summit.lemmy.utils.getPostSwipeActions
@@ -132,7 +133,7 @@ class PostFragment :
   private var hasConsumedJumpToComments: Boolean = false
 
   @Inject
-  lateinit var moreActionsHelper: MoreActionsHelper
+  lateinit var moreActionsHelperManager: MoreActionsHelperManager
 
   @Inject
   lateinit var historyManager: HistoryManager
@@ -154,6 +155,8 @@ class PostFragment :
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  lateinit var moreActionsHelper: MoreActionsHelper
 
   lateinit var preferences: Preferences
 
@@ -203,6 +206,9 @@ class PostFragment :
     val accountId = accountId
     if (accountId != null) {
       viewModel.forceAccount(accountId)
+      moreActionsHelper = moreActionsHelperManager.getAccountInstance(accountId)
+    } else {
+      moreActionsHelper = moreActionsHelperManager.getDefaultInstance()
     }
 
     preferences = viewModel.preferences
@@ -402,7 +408,6 @@ class PostFragment :
 
         if (postView != null) {
           showMorePostOptions(
-            instance = viewModel.apiInstance,
             accountId = accountId,
             postView = postView,
             moreActionsHelper = moreActionsHelper,
@@ -484,7 +489,6 @@ class PostFragment :
           },
           onPostActionClick = { postView, itemId, actionId ->
             createPostActionHandler(
-              instance = viewModel.apiInstance,
               accountId = accountId,
               postView = postView,
               moreActionsHelper = moreActionsHelper,
@@ -497,7 +501,6 @@ class PostFragment :
           },
           onCommentActionClick = { commentView, itemId, actionId ->
             createCommentActionHandler(
-              apiInstance = viewModel.apiInstance,
               commentView = commentView,
               moreActionsHelper = moreActionsHelper,
               fragmentManager = childFragmentManager,

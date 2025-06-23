@@ -58,7 +58,6 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
 }
 
 fun BaseFragment<*>.showMoreCommentOptions(
-  instance: String,
   commentView: CommentView,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
@@ -68,6 +67,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
   if (!isBindingAvailable()) return null
 
   val currentAccount = moreActionsHelper.accountManager.currentAccount.asAccount
+  val instance = moreActionsHelper.apiInstance
 
   val bottomMenu = BottomMenu(requireContext()).apply {
     setTitle(R.string.more_actions)
@@ -188,7 +188,6 @@ fun BaseFragment<*>.showMoreCommentOptions(
 
     setOnMenuItemClickListener {
       createCommentActionHandler(
-        apiInstance = instance,
         commentView = commentView,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
@@ -203,7 +202,6 @@ fun BaseFragment<*>.showMoreCommentOptions(
 }
 
 fun BaseFragment<*>.createCommentActionHandler(
-  apiInstance: String,
   commentView: CommentView,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
@@ -213,6 +211,7 @@ fun BaseFragment<*>.createCommentActionHandler(
 
   val context = requireContext()
   val currentAccount = moreActionsHelper.accountManager.currentAccount.asAccount
+  val apiInstance = moreActionsHelper.apiInstance
 
   val onEditCommentClick: (CommentView) -> Unit = a@{
     if (currentAccount == null) {
@@ -312,7 +311,7 @@ fun BaseFragment<*>.createCommentActionHandler(
         instance = apiInstance,
         postOrCommentView = Either.Right(commentView),
         fragmentManager = childFragmentManager,
-        accountId = null,
+        accountId = currentAccount?.id,
       )
     }
     R.id.ca_block_user -> {
@@ -336,7 +335,6 @@ fun BaseFragment<*>.createCommentActionHandler(
     }
     R.id.ca_more -> {
       showMoreCommentOptions(
-        instance = apiInstance,
         commentView = commentView,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,

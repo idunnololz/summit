@@ -1862,7 +1862,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     b.root.setTag(R.id.swipe_enabled, false)
   }
 
-  private fun makeCommentActionButton(@IdRes idRes: Int) = ImageView(
+  private fun makeQuickActionButton(@IdRes idRes: Int) = ImageView(
     context,
   ).apply {
     id = idRes
@@ -1913,8 +1913,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     quickActionsBar?.let {
-      if (it.parent != null && it.tag == actions) {
+      if (it.parent != null && it.tag == actions && it.getTag(R.id.is_saved) == isSaved) {
         return
+      }
+
+      if (it.parent != null) {
+        root.removeView(it)
       }
     }
 
@@ -1923,6 +1927,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         quickActionsBar = it
       }
     quickActionsBarContainer.tag = actions
+    quickActionsBarContainer.setTag(R.id.is_saved, isSaved)
     val quickActionsBar = LinearLayout(context).apply {
       orientation = LinearLayout.HORIZONTAL
       setPadding(
@@ -2060,21 +2065,21 @@ class PostAndCommentViewBuilder @Inject constructor(
           }
         }
         PostQuickActionIds.Reply -> {
-          makeCommentActionButton(R.id.pa_reply).apply {
+          makeQuickActionButton(R.id.pa_reply).apply {
             setImageResource(R.drawable.outline_add_comment_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.Reply -> {
-          makeCommentActionButton(R.id.ca_reply).apply {
+          makeQuickActionButton(R.id.ca_reply).apply {
             setImageResource(R.drawable.outline_add_comment_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.Save -> {
-          makeCommentActionButton(R.id.pa_save_toggle).apply {
+          makeQuickActionButton(R.id.pa_save_toggle).apply {
             if (isSaved) {
               setImageResource(R.drawable.baseline_bookmark_24)
             } else {
@@ -2085,7 +2090,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           }
         }
         CommentQuickActionIds.Save -> {
-          makeCommentActionButton(R.id.ca_save_toggle).apply {
+          makeQuickActionButton(R.id.ca_save_toggle).apply {
             if (isSaved) {
               setImageResource(R.drawable.baseline_bookmark_24)
             } else {
@@ -2096,98 +2101,98 @@ class PostAndCommentViewBuilder @Inject constructor(
           }
         }
         CommentQuickActionIds.Share -> {
-          makeCommentActionButton(R.id.ca_share).apply {
+          makeQuickActionButton(R.id.ca_share).apply {
             setImageResource(R.drawable.baseline_share_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.TakeScreenshot -> {
-          makeCommentActionButton(R.id.ca_screenshot).apply {
+          makeQuickActionButton(R.id.ca_screenshot).apply {
             setImageResource(R.drawable.baseline_screenshot_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.ShareSource -> {
-          makeCommentActionButton(R.id.ca_share_fediverse_link).apply {
+          makeQuickActionButton(R.id.ca_share_fediverse_link).apply {
             setImageResource(R.drawable.ic_fediverse_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.OpenComment -> {
-          makeCommentActionButton(R.id.ca_open_comment_in_new_screen).apply {
+          makeQuickActionButton(R.id.ca_open_comment_in_new_screen).apply {
             setImageResource(R.drawable.baseline_open_in_new_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.ViewSource -> {
-          makeCommentActionButton(R.id.ca_view_source).apply {
+          makeQuickActionButton(R.id.ca_view_source).apply {
             setImageResource(R.drawable.baseline_code_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.DetailedView -> {
-          makeCommentActionButton(R.id.ca_detailed_view).apply {
+          makeQuickActionButton(R.id.ca_detailed_view).apply {
             setImageResource(R.drawable.baseline_open_in_full_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.More -> {
-          makeCommentActionButton(R.id.pa_more).apply {
+          makeQuickActionButton(R.id.pa_more).apply {
             setImageResource(R.drawable.baseline_more_horiz_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         CommentQuickActionIds.More -> {
-          makeCommentActionButton(R.id.ca_more).apply {
+          makeQuickActionButton(R.id.ca_more).apply {
             setImageResource(R.drawable.baseline_more_horiz_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.TakeScreenshot -> {
-          makeCommentActionButton(R.id.pa_screenshot).apply {
+          makeQuickActionButton(R.id.pa_screenshot).apply {
             setImageResource(R.drawable.baseline_screenshot_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.CrossPost -> {
-          makeCommentActionButton(R.id.pa_cross_post).apply {
+          makeQuickActionButton(R.id.pa_cross_post).apply {
             setImageResource(R.drawable.baseline_content_copy_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.ShareSourceLink -> {
-          makeCommentActionButton(R.id.pa_share_fediverse_link).apply {
+          makeQuickActionButton(R.id.pa_share_fediverse_link).apply {
             setImageResource(R.drawable.ic_fediverse_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.CommunityInfo -> {
-          makeCommentActionButton(R.id.pa_community_info).apply {
+          makeQuickActionButton(R.id.pa_community_info).apply {
             setImageResource(R.drawable.ic_community_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.ViewSource -> {
-          makeCommentActionButton(R.id.pa_view_source).apply {
+          makeQuickActionButton(R.id.pa_view_source).apply {
             setImageResource(R.drawable.baseline_code_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
           }
         }
         PostQuickActionIds.DetailedView -> {
-          makeCommentActionButton(R.id.pa_detailed_view).apply {
+          makeQuickActionButton(R.id.pa_detailed_view).apply {
             setImageResource(R.drawable.baseline_open_in_full_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)

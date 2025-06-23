@@ -141,7 +141,6 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
       },
       onShowMoreActions = { accountId, postView ->
         showMorePostOptions(
-          instance = parentFragment.viewModel.instance,
           accountId = accountId,
           postView = postView,
           moreActionsHelper = parentFragment.moreActionsHelper,
@@ -160,7 +159,6 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
       },
       onPostActionClick = { postView, actionId ->
         createPostActionHandler(
-          instance = viewModel.instance,
           accountId = null,
           postView = postView,
           moreActionsHelper = moreActionsHelper,

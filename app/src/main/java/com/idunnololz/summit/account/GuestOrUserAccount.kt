@@ -9,7 +9,7 @@ data class GuestAccount(
 ) : GuestOrUserAccount
 
 val GuestOrUserAccount.key
-  get() = when(this) {
+  get() = when (this) {
     is Account -> this.fullName
     is GuestAccount -> "guest@!$^@$instance"
   }

@@ -546,7 +546,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           },
           onPostActionClick = { postView, _, actionId ->
             showMorePostOptions(
-              instance = viewModel.apiInstance,
               accountId = null,
               postView = postView,
               moreActionsHelper = moreActionsHelper,
@@ -555,7 +554,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           },
           onCommentActionClick = { commentView, _, actionId ->
             createCommentActionHandler(
-              apiInstance = viewModel.apiInstance,
               commentView = commentView,
               moreActionsHelper = moreActionsHelper,
               fragmentManager = childFragmentManager,

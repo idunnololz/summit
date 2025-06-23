@@ -1095,19 +1095,16 @@ class AccountAwareLemmyClient @Inject constructor(
     createAccountErrorResult()
   }
 
-  suspend fun listMedia(
-    page: Long?,
-    limit: Long?,
-    account: Account? = accountForInstance(),
-  ) = if (account != null) {
-    apiClient.listMedia(
-      page = page,
-      limit = limit,
-      account = account,
-    ).autoSignOut(account)
-  } else {
-    createAccountErrorResult()
-  }
+  suspend fun listMedia(page: Long?, limit: Long?, account: Account? = accountForInstance()) =
+    if (account != null) {
+      apiClient.listMedia(
+        page = page,
+        limit = limit,
+        account = account,
+      ).autoSignOut(account)
+    } else {
+      createAccountErrorResult()
+    }
 
   fun changeInstance(site: String) = apiClient.changeInstance(site)
 
