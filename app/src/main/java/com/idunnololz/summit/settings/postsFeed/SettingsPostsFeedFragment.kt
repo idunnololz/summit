@@ -229,6 +229,10 @@ class SettingsPostsFeedFragment :
           }
         },
       ),
+      settings.restoreBrowsingSessions.asOnOffSwitch(
+        { preferences.restoreBrowsingSessions },
+        { preferences.restoreBrowsingSessions = it },
+      ),
       SettingModelItem.SubgroupItem(
         getString(R.string.posts_feed_header),
         listOf(

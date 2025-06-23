@@ -7,3 +7,9 @@ sealed interface GuestOrUserAccount {
 data class GuestAccount(
   override val instance: String,
 ) : GuestOrUserAccount
+
+val GuestOrUserAccount.key
+  get() = when(this) {
+    is Account -> this.fullName
+    is GuestAccount -> "guest@!$^@$instance"
+  }

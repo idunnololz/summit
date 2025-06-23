@@ -10,6 +10,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.key
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentSortType
@@ -229,6 +230,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             }
             postListEngine.addPage(
               LoadedPostsData(
+                accountKey = apiClient.accountForInstance()?.key,
                 allPosts = posts,
                 posts = posts,
                 instance = apiClient.instance,
@@ -249,6 +251,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
           if (postListEngine.hasMore || force) {
             postListEngine.addPage(
               LoadedPostsData(
+                accountKey = apiClient.accountForInstance()?.key,
                 allPosts = listOf(),
                 posts = listOf(),
                 instance = apiClient.instance,

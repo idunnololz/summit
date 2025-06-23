@@ -74,7 +74,6 @@
                         android:clipToPadding="false"/>
                 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
                 <com.idunnololz.summit.view.LoadingView
                     android:id="@+id/loading_view"
                     android:layout_width="wrap_content"
@@ -84,6 +83,16 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/new_items_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"
+                    android:layout_margin="@dimen/padding"
+                    style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -448,7 +448,7 @@ class CommunityFragment :
       onSelectedLayoutChanged()
     }
 
-    viewModel.changeCommunity(args.communityRef)
+    viewModel.changeCommunity(args.communityRef, restore = savedInstanceState != null)
 
     if (savedInstanceState != null) {
       restoreState(
@@ -1162,7 +1162,7 @@ class CommunityFragment :
       }
     }
 
-    viewModel.changeCommunity(args.communityRef)
+    viewModel.changeCommunity(args.communityRef, true)
 
     runOnReady {
       val customAppBarController = communityAppBarController ?: return@runOnReady

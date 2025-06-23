@@ -100,6 +100,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_COMMUNITY_DIS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_USER_DISPLAY_NAME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREVIEW_LINKS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RESTORE_BROWSING_SESSIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_DRAFTS_AUTOMATICALLY
@@ -999,6 +1000,12 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.display_deleted_posts),
     null,
     relatedKeys = listOf(KEY_DISPLAY_DELETED_POSTS),
+  )
+  val restoreBrowsingSessions = OnOffSettingItem(
+    null,
+    context.getString(R.string.restore_browsing_sessions),
+    context.getString(R.string.restore_browsing_sessions_desc),
+    relatedKeys = listOf(KEY_RESTORE_BROWSING_SESSIONS),
   )
 }
 

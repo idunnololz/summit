@@ -76,6 +76,8 @@ import com.idunnololz.summit.api.dto.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.ListCommentReports
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunities
+import com.idunnololz.summit.api.dto.ListMedia
+import com.idunnololz.summit.api.dto.ListMediaResponse
 import com.idunnololz.summit.api.dto.ListPostLikes
 import com.idunnololz.summit.api.dto.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.ListPostReports
@@ -2050,6 +2052,24 @@ class LemmyApiClient @Inject constructor(
 
     return retrofitErrorHandler {
       api.approveRegistrationApplication(authorization = account.bearer, form)
+    }.fold(
+      onSuccess = { Result.success(it) },
+      onFailure = { Result.failure(it) },
+    )
+  }
+
+  suspend fun listMedia(
+    page: Long?,
+    limit: Long?,
+    account: Account,
+  ): Result<ListMediaResponse> {
+    val form = ListMedia(
+      page = page,
+      limit = limit,
+    )
+
+    return retrofitErrorHandler {
+      api.listMedia(authorization = account.bearer, form.serializeToMap())
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },

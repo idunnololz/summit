@@ -3,11 +3,14 @@ package com.idunnololz.summit.lemmy.person
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.key
+import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.CommentView
@@ -42,6 +45,7 @@ class PersonTabbedViewModel @Inject constructor(
   private val accountInfoManager: AccountInfoManager,
   private val commentListEngineFactory: CommentListEngine.Factory,
   private val postListEngineFactory: PostListEngine.Factory,
+  private val savedStateHandle: SavedStateHandle,
 ) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
 
   companion object {
@@ -78,9 +82,13 @@ class PersonTabbedViewModel @Inject constructor(
 
   override var lastSelectedItem: Either<PostRef, CommentRef>? = null
 
-  private var personRef: PersonRef? = null
+  private var _personRef = savedStateHandle.getLiveData<PersonRef>("person_ref")
+  private var personRef: PersonRef?
+    get() = _personRef.value
+    set(value) { _personRef.value = value }
   private var fetchingPages = mutableSetOf<Int>()
   private val personIdToPersonName = mutableMapOf<String, String>()
+  var showCurrentAccount = savedStateHandle.getLiveData<Boolean>("show_current_account", false)
 
   init {
     viewModelScope.launch {
@@ -94,13 +102,26 @@ class PersonTabbedViewModel @Inject constructor(
         }
       }
     }
+    viewModelScope.launch {
+      accountInfoManager.currentFullAccountOnChange.collect {
+        if (showCurrentAccount.value == true) {
+          fetchPersonIfNotDone(it?.account?.toPersonRef())
+          fetchPage(0, isPeronInfoFetch = true, force = true)
+        }
+      }
+    }
   }
 
-  fun fetchPersonIfNotDone(personRef: PersonRef) {
+  fun fetchPersonIfNotDone(personRef: PersonRef?) {
     if (personData.valueOrNull != null && this.personRef == personRef) return
 
     this.personRef = personRef
-    fetchPage(0, isPeronInfoFetch = true)
+
+    if (personRef == null) {
+      reset()
+    } else {
+      fetchPage(0, isPeronInfoFetch = true)
+    }
   }
 
   fun fetchPage(pageIndex: Int, isPeronInfoFetch: Boolean = false, force: Boolean = false) {
@@ -212,6 +233,7 @@ class PersonTabbedViewModel @Inject constructor(
             }
             postListEngine.addPage(
               LoadedPostsData(
+                accountKey = apiClient.accountForInstance()?.key,
                 allPosts = posts,
                 posts = posts,
                 instance = apiClient.instance,
@@ -250,6 +272,7 @@ class PersonTabbedViewModel @Inject constructor(
           if (postListEngine.hasMore || force) {
             postListEngine.addPage(
               LoadedPostsData(
+                accountKey = apiClient.accountForInstance()?.key,
                 allPosts = listOf(),
                 posts = listOf(),
                 instance = apiClient.instance,

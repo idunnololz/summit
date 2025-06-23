@@ -19,6 +19,7 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.account.info.isCommunityBlocked
+import com.idunnololz.summit.account.key
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
@@ -248,38 +249,42 @@ class CommunityViewModel @Inject constructor(
 
     viewModelScope.launch {
       postReadManager.postReadChanged.collect {
-        if (duplicatePostsDetector.isEnabled) {
-          postListEngine.markDuplicatePostsAsRead()
-        }
-
-        val pagesCopy = withContext(Dispatchers.Main) {
-          ArrayList(postListEngine.pages)
-        }
-
-        val updatedPages = withContext(Dispatchers.Default) {
-          pagesCopy.map {
-            it.copy(
-              allPosts = postsRepository.update(it.allPosts),
-              posts = postsRepository.update(it.posts),
-              isReadPostUpdate = false,
-            )
-          }
-        }
-
-        postListEngine.setPersistentErrors(postsRepository.persistentErrors)
-        updatedPages.forEach {
-          postListEngine.addPage(it)
-        }
-        postListEngine.createItems()
-
-        withContext(Dispatchers.Main) {
-          loadedPostsData.setValue(PostUpdateInfo(isReadPostUpdate = true))
-        }
+        onPostReadChanged()
       }
     }
 
     if (currentCommunityRef.isInitialized) {
       registerHiddenPostObserver()
+    }
+  }
+
+  private suspend fun onPostReadChanged() {
+    if (duplicatePostsDetector.isEnabled) {
+      postListEngine.markDuplicatePostsAsRead()
+    }
+
+    val pagesCopy = withContext(Dispatchers.Main) {
+      ArrayList(postListEngine.pages)
+    }
+
+    val updatedPages = withContext(Dispatchers.Default) {
+      pagesCopy.map {
+        it.copy(
+          allPosts = postsRepository.update(it.allPosts),
+          posts = postsRepository.update(it.posts),
+          isReadPostUpdate = false,
+        )
+      }
+    }
+
+    postListEngine.setPersistentErrors(postsRepository.persistentErrors)
+    updatedPages.forEach {
+      postListEngine.addPage(it)
+    }
+    postListEngine.createItems()
+
+    withContext(Dispatchers.Main) {
+      loadedPostsData.setValue(PostUpdateInfo(isReadPostUpdate = true))
     }
   }
 
@@ -427,6 +432,17 @@ class CommunityViewModel @Inject constructor(
     scrollToTop: Boolean = false,
     includeHideReadCount: Boolean = false,
   ) {
+    if (pageToFetch < postListEngine.pages.size) {
+      if (!force) {
+        // DO NOT re-fetch a page we already have. postsRepository uses a list of seen posts to remove
+        // duplicates. If we re-fetch a page wew already have then all posts in that page will be
+        // filtered by the seen posts filter.
+        return
+      } else {
+        postsRepository.removeSeenPosts(
+          postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView })
+      }
+    }
     if (fetchingPages.contains(pageToFetch)) {
       return
     }
@@ -447,6 +463,7 @@ class CommunityViewModel @Inject constructor(
         .onSuccess {
           val pageData =
             LoadedPostsData(
+              accountKey = accountManager.currentAccount.value?.key,
               allPosts = it.posts,
               posts = it.posts,
               instance = it.instance,
@@ -482,6 +499,7 @@ class CommunityViewModel @Inject constructor(
           postListEngine.setPersistentErrors(postsRepository.persistentErrors)
           postListEngine.addPage(
             LoadedPostsData(
+              accountKey = accountManager.currentAccount.value?.key,
               allPosts = listOf(),
               posts = listOf(),
               instance = postsRepository.apiInstance,
@@ -536,13 +554,13 @@ class CommunityViewModel @Inject constructor(
     }
   }
 
-  fun changeCommunity(communityRef: CommunityRef?) {
+  fun changeCommunity(communityRef: CommunityRef?, restore: Boolean) {
     viewModelScope.launch {
-      changeCommunityInternal(communityRef)
+      changeCommunityInternal(communityRef, restore)
     }
   }
 
-  private suspend fun changeCommunityInternal(communityRef: CommunityRef?) {
+  private suspend fun changeCommunityInternal(communityRef: CommunityRef?, restore: Boolean) {
     if (communityRef == null) {
       return
     }
@@ -566,6 +584,12 @@ class CommunityViewModel @Inject constructor(
     }
     val instanceChange = newApiInstance != null && newApiInstance != apiInstance
 
+    if (restore) {
+      restorePostListEngineIfNeeded()
+    } else {
+      postListEngine.isRestored = true
+    }
+
     if (currentCommunityRef.value == communityRefSafe && !instanceChange) {
       return
     }
@@ -583,6 +607,19 @@ class CommunityViewModel @Inject constructor(
     postsRepository.setCommunity(communityRef)
     postListEngine.setSecondaryKey(communityRef.getKey())
 
+    registerHiddenPostObserver()
+  }
+
+  private fun restorePostListEngineIfNeeded() {
+    if (postListEngine.isRestored) {
+      return
+    }
+
+    if (!preferences.restoreBrowsingSessions) {
+      postListEngine.isRestored = true
+      return
+    }
+
     // The below has an issue...
     // If there are posts cached, then loading it would result in possible duplicate posts
     // Since the posts repository will not know about the cached posts
@@ -591,17 +628,29 @@ class CommunityViewModel @Inject constructor(
     // For communities with only a few posts, the post repository will incorrectly think
     // that there is no more posts since all posts have been "seen".
 
-//        postListEngine.tryRestore()
-//
-//        // After restoration, we need to sync seen posts
-//        val allPosts = postListEngine.pages.asSequence()
-//            .flatMap { it.posts }
-//            .map { it.postView }
-//            .toList()
-//
-//        postsRepository.addSeenPosts(allPosts)
+    postListEngine.tryRestore()
 
-    registerHiddenPostObserver()
+    // After restoration, we need to sync seen posts
+    val allPosts = postListEngine.pages.asSequence()
+      .flatMap { it.posts }
+      .map { it.fetchedPost.postView }
+      .toList()
+
+    postsRepository.addSeenPosts(allPosts)
+
+    postListEngine.createItems()
+
+    loadedPostsData.postValue(
+      PostUpdateInfo(
+        scrollToTop = false,
+        hideReadCount = null,
+      ),
+    )
+
+    viewModelScope.launch {
+      // restore read state
+      onPostReadChanged()
+    }
   }
 
   private fun registerHiddenPostObserver() {
@@ -734,7 +783,7 @@ class CommunityViewModel @Inject constructor(
   fun resetToAccountInstance() {
     viewModelScope.launch {
       val account = accountManager.currentAccount.value as Account? ?: return@launch
-      changeCommunityInternal(CommunityRef.All(account.instance))
+      changeCommunityInternal(CommunityRef.All(account.instance), restore = false)
 
       reset(resetScrollPosition = true)
     }
@@ -795,6 +844,7 @@ class CommunityViewModel @Inject constructor(
     postListEngine.setPersistentErrors(postsRepository.persistentErrors)
     postListEngine.addPage(
       LoadedPostsData(
+        accountKey = accountManager.currentAccount.value?.key,
         allPosts = listOf(),
         posts = listOf(),
         instance = postsRepository.apiInstance,

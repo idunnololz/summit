@@ -9,6 +9,10 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class LoadedPostsData(
+  /**
+   * Used to check if this loaded post data is usable when restored
+   */
+  val accountKey: String?,
   // Used for filtering
   val allPosts: List<LocalPostView>,
   val posts: List<LocalPostView>,

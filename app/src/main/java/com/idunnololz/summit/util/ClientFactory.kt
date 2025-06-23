@@ -31,6 +31,14 @@ class ClientFactory @Inject constructor(
   private val accountManager: AccountManager,
 ) {
 
+  companion object {
+    // https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome
+
+    private const val CHROME_VERSION = "137.0.0.0"
+    private const val SAFARI_VERSION = "537.36"
+    private const val FIREFOX_VERSION = "134.0"
+  }
+
   enum class Purpose {
     LemmyApiClient,
     SummitApiClient,
@@ -49,9 +57,9 @@ class ClientFactory @Inject constructor(
         UserAgentChoiceIds.UNSET,
         UserAgentChoiceIds.LEGACY_USER_AGENT,
         ->
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.3"
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$CHROME_VERSION Safari/$SAFARI_VERSION"
         else ->
-          "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL}; $purposeString) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.91 Mobile Safari/537.36 SummitForLemmyAndroid"
+          "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL}; $purposeString) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/$CHROME_VERSION Mobile Safari/$SAFARI_VERSION SummitForLemmyAndroid"
       }
     }
 
@@ -59,9 +67,9 @@ class ClientFactory @Inject constructor(
       UserAgentChoiceIds.UNSET,
       UserAgentChoiceIds.LEGACY_USER_AGENT,
       ->
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:$FIREFOX_VERSION) Gecko/20100101 Firefox/$FIREFOX_VERSION"
       UserAgentChoiceIds.NEW_USER_AGENT ->
-        "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL}; $purposeString) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.91 Mobile Safari/537.36 SummitForLemmyAndroid"
+        "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL}; $purposeString) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/$CHROME_VERSION Mobile Safari/$SAFARI_VERSION SummitForLemmyAndroid"
       UserAgentChoiceIds.NEW_USER_AGENT_2 ->
         "SummitForLemmyAndroid/${BuildConfig.VERSION_NAME} (${BuildConfig.APPLICATION_ID})"
       UserAgentChoiceIds.FLUTTER_USER_AGENT ->
@@ -69,7 +77,7 @@ class ClientFactory @Inject constructor(
       UserAgentChoiceIds.OKHTTP_USER_AGENT ->
         "okhttp/4.12.0"
       else ->
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:134.0) Gecko/20100101 Firefox/134.0"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:$FIREFOX_VERSION) Gecko/20100101 Firefox/$FIREFOX_VERSION"
     }
   }
 

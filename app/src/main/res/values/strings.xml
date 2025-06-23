@@ -966,7 +966,7 @@
     <!-- Button text. When tapped, all comments are shown. -->
     <string name="view_all_comments">View all comments</string>
     <!-- Text showing the "birthday" of an account. -->
-    <string name="cake_day_on_format">Cake day on %1$s</string>
+    <string name="cake_day_on_format">Cake day on %1$s (in %2$s days)</string>
     <!-- Keep short. Title text for posts made by a user. -->
     <string name="posts">Posts</string>
     <!-- Keep short. Title text for comments made by a user. -->
@@ -2249,6 +2249,8 @@
     <string name="banned_person_from_community_for_format">Banned %1$s from the community %2$s for %3$s.</string>
     <string name="banned_person_from_site_permanently_for_format">Banned %1$s from the instance %2$s for %3$s.</string>
     <string name="video_details">Video details</string>
+    <string name="restore_browsing_sessions">Restore browsing sessions</string>
+    <string name="restore_browsing_sessions_desc">When enabled, post feeds are saved and restored when the app is killed by the OS and recreated.</string>
 
     <!-- uCrop string resource end -->
 </resources>

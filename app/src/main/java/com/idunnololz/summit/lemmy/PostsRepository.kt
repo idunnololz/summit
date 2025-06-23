@@ -59,9 +59,7 @@ class PostsRepository @AssistedInject constructor(
     val postPageIndexInternal: Int,
     val filterReason: FilterReason? = null,
     val isDuplicatePost: Boolean,
-  ) {
-    val isFiltered = filterReason != null
-  }
+  )
 
   private var currentDataSource: PostsDataSource = singlePostsDataSourceFactory.create(
     communityName = null,
@@ -568,6 +566,10 @@ class PostsRepository @AssistedInject constructor(
 
   fun addSeenPosts(posts: List<PostView>) {
     seenPosts.addAll(posts.map { it.getUniqueKey() })
+  }
+
+  fun removeSeenPosts(posts: List<PostView>) {
+    seenPosts.removeAll(posts.map { it.getUniqueKey() }.toSet())
   }
 
   class PageResult(

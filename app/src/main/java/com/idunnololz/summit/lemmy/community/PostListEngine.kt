@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.util.Log
+import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.key
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.dto.PostId
@@ -76,6 +78,7 @@ class PostListEngine @AssistedInject constructor(
   private val directoryHelper: DirectoryHelper,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val postReadManager: PostReadManager,
+  private val accountManager: AccountManager,
 
   @Assisted("infinity")
   infinity: Boolean,
@@ -162,6 +165,7 @@ class PostListEngine @AssistedInject constructor(
 
   private var key: String? = null
   private var secondaryKey: String? = null
+  var isRestored: Boolean = false
 
   var isCommunityBlocked: Boolean = false
 
@@ -169,8 +173,17 @@ class PostListEngine @AssistedInject constructor(
     get() = pages.lastOrNull()?.pageIndex
 
   fun tryRestore() {
-    Log.d(TAG, "Attempting to restore. Using keys $key, $secondaryKey")
+    if (isRestored) return
+
+    isRestored = true
+
+    val currentAccountKey = accountManager.currentAccount.value?.key
+    Log.d(TAG, "Attempting to restore. Using keys $key, $secondaryKey, $currentAccountKey")
     val cachedPages = directoryHelper.getPages(key, secondaryKey)
+
+    if (currentAccountKey != cachedPages?.firstOrNull()?.accountKey) {
+      return
+    }
 
     cachedPages?.let {
       // We need to use let here because Google's lint rule doesn't support smart cast
@@ -179,6 +192,7 @@ class PostListEngine @AssistedInject constructor(
         "Restoration successful! Restored ${cachedPages.size} page(s) totalling " +
           "${it.sumOf { it.posts.size }} posts.",
       )
+
       _pages = it
     }
   }
@@ -207,6 +221,7 @@ class PostListEngine @AssistedInject constructor(
 
     coroutineScope.launch(Dispatchers.IO) {
       directoryHelper.addPage(key, secondaryKey, data, pages.size)
+      Log.d(TAG, "Added pages to directory helper! ${pages.size}")
     }
   }
 

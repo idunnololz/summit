@@ -63,7 +63,6 @@
                         android:id="@+id/collapsing_toolbar_content"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="@dimen/padding_quarter"
                         android:clipToPadding="false"
                         app:layout_collapseMode="pin">
 
@@ -137,45 +136,40 @@
                             app:constraint_referenced_ids="subtitle,profile_icon"
                             app:barrierDirection="bottom"/>
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="0dp"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/padding"
-                            android:layout_marginTop="@dimen/padding"
+                            android:paddingHorizontal="@dimen/padding"
+                            android:paddingTop="@dimen/padding"
+                            android:paddingBottom="@dimen/padding_quarter"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/heading_barrier">
 
-                            <androidx.constraintlayout.widget.ConstraintLayout
-                                android:layout_width="match_parent"
+                            <TextView
+                                android:id="@+id/body"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:padding="@dimen/padding">
+                                android:textAppearance="?textAppearanceBodyMedium"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
 
-                                <TextView
-                                    android:id="@+id/body"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:textAppearance="?textAppearanceBodySmall"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent"/>
+                            <TextView
+                                android:id="@+id/cake_date"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?textAppearanceBodySmall"
+                                android:singleLine="true"
+                                android:maxLines="1"
+                                android:layout_marginTop="@dimen/padding"
+                                android:drawablePadding="@dimen/padding_half"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/body"
+                                app:drawableTint="?colorControlNormal" />
 
-                                <TextView
-                                    android:id="@+id/cake_date"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:textAppearance="?textAppearanceBodySmall"
-                                    android:singleLine="true"
-                                    android:maxLines="1"
-                                    android:layout_marginTop="@dimen/padding"
-                                    android:drawablePadding="@dimen/padding_half"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/body"
-                                    app:drawableTint="?colorControlNormal" />
-
-                            </androidx.constraintlayout.widget.ConstraintLayout>
-                        </com.google.android.material.card.MaterialCardView>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <com.google.android.material.appbar.MaterialToolbar

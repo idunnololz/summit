@@ -53,6 +53,7 @@ import com.idunnololz.summit.api.dto.HideCommunity
 import com.idunnololz.summit.api.dto.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.ListMediaResponse
 import com.idunnololz.summit.api.dto.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
@@ -806,6 +807,21 @@ interface LemmyApi {
 
   @GET("user/get_captcha")
   fun getCaptcha(): Call<GetCaptchaResponse>
+
+  @GET("account/list_media")
+  fun listMedia(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListMediaResponse>
+
+  @GET("account/list_media")
+  @Headers("$CACHE_CONTROL_HEADER: $CACHE_CONTROL_NO_CACHE")
+  fun listMediaNoCache(
+    @Header("Authorization") authorization: String?,
+    @QueryMap form: Map<String, String>,
+  ): Call<ListMediaResponse>
+
+  // https://lemmy.world/pictrs/image/delete/b60f8360-38bd-450a-ad6c-27b0b3936a27/60ac57fb-0bdd-42af-899a-01982ad37285.jpeg
 
   companion object {
 

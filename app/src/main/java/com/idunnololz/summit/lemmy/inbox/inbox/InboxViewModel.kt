@@ -64,6 +64,7 @@ class InboxViewModel @Inject constructor(
   val currentFullAccount = MutableLiveData<FullAccount?>()
   val markAsReadResult = StatefulLiveData<Boolean>()
   val approveRegistrationApplicationResult = StatefulLiveData<Unit>()
+  val fetchNewInboxItems = StatefulLiveData<Unit>()
 
   val inboxUpdate = StatefulLiveData<InboxUpdate>()
 
@@ -217,6 +218,9 @@ class InboxViewModel @Inject constructor(
       return
     }
 
+    fetchNewInboxItems.setIsLoading()
+
+    fetchNewInboxItemsJob?.cancel()
     fetchNewInboxItemsJob = viewModelScope.launch {
       val result = inboxRepository.getPage(
         pageIndex = 0,
@@ -244,9 +248,11 @@ class InboxViewModel @Inject constructor(
           addData(pageResult.toInboxItemResult())
 
           publishInboxUpdate(scrollToTop = false)
+
+          fetchNewInboxItems.postValue(Unit)
         }
         .onFailure {
-          // silently fail
+          fetchNewInboxItems.postError(it)
         }
     }
   }
@@ -499,6 +505,7 @@ class InboxViewModel @Inject constructor(
   private fun clearData() {
     fetchInboxJob?.cancel()
     fetchNewInboxItemsJob?.cancel()
+    fetchNewInboxItems.setIdle()
 
     hasMore = true
     isLoaded = false

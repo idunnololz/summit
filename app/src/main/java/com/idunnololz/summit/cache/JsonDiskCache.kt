@@ -24,7 +24,7 @@ class JsonDiskCache(
       if (value.isNullOrBlank()) {
         null
       } else {
-        json.decodeFromString(key)
+        json.decodeFromString(value)
       }
     } catch (e: Exception) {
       Log.e(TAG, "getCachedObject()", e)

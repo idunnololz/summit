@@ -51,6 +51,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -75,6 +76,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.launch
+import java.time.temporal.ChronoUnit
 
 @AndroidEntryPoint
 class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
@@ -121,6 +123,12 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     About,
   }
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    viewModel.showCurrentAccount.value = args.personRef == null
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -139,38 +147,39 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
     val context = requireContext()
     val mainActivity = requireSummitActivity()
 
-    requireSummitActivity().apply {
-      setupToolbar(
-        binding.toolbar,
-        "",
-      )
+    with(binding) {
 
-      insetViewAutomaticallyByPaddingAndNavUi(
-        viewLifecycleOwner,
-        binding.coordinatorLayout,
-        applyTopInset = false,
-      )
-      insets.observe(viewLifecycleOwner) {
-        val newToolbarHeight =
-          context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize).toInt() +
-            it.topInset
+      requireSummitActivity().apply {
+        setupToolbar(
+          toolbar,
+          "",
+        )
 
-        binding.bannerDummy.updateLayoutParams<MarginLayoutParams> {
-          topMargin = -it.topInset
-        }
+        insetViewAutomaticallyByPaddingAndNavUi(
+          viewLifecycleOwner,
+          coordinatorLayout,
+          applyTopInset = false,
+        )
+        insets.observe(viewLifecycleOwner) {
+          val newToolbarHeight =
+            context.getDimenFromAttribute(androidx.appcompat.R.attr.actionBarSize).toInt() +
+              it.topInset
 
-        binding.coordinatorLayout.updatePadding(top = it.topInset)
-        binding.collapsingToolbarLayout.scrimVisibleHeightTrigger =
-          (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()
-        binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
-          height = newToolbarHeight
+          bannerDummy.updateLayoutParams<MarginLayoutParams> {
+            topMargin = -it.topInset
+          }
+
+          coordinatorLayout.updatePadding(top = it.topInset)
+          collapsingToolbarLayout.scrimVisibleHeightTrigger =
+            (newToolbarHeight + Utils.convertDpToPixel(16f)).toInt()
+          bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
+            height = newToolbarHeight
+          }
         }
       }
-    }
 
-    onPersonChanged()
+      onPersonChanged()
 
-    with(binding) {
       fab.hide()
       tabLayoutContainer.visibility = View.GONE
 
@@ -516,6 +525,16 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         0,
         ZoneOffset.UTC,
       )
+      val now = LocalDateTime.now()
+      val currentYear = now.year
+      var nextBirthday = dateTime.withYear(currentYear)
+      var daysBetween = now.until(nextBirthday, ChronoUnit.DAYS)
+
+      if (daysBetween < 0) {
+        nextBirthday = dateTime.withYear(currentYear + 1)
+        daysBetween = now.until(nextBirthday, ChronoUnit.DAYS)
+      }
+
       val dateStr = dateTime.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
       val cakeDrawable = context.getDrawableCompat(R.drawable.baseline_cake_24)
       val drawableSize = Utils.convertDpToPixel(13f).toInt()
@@ -526,7 +545,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         null,
         null,
       )
-      cakeDate.text = getString(R.string.cake_day_on_format, dateStr)
+      cakeDate.text =
+        getString(R.string.cake_day_on_format, dateStr, defaultDecimalFormat.format(daysBetween))
       cakeDate.visibility = View.VISIBLE
 
       val personCreationTs = dateStringToTs(person.published)

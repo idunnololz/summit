@@ -119,6 +119,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFER_USER_DISPLAY_
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREFETCH_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREF_VERSION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PREVIEW_LINKS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RESTORE_BROWSING_SESSIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_DRAFTS_AUTOMATICALLY
@@ -634,9 +635,9 @@ class Preferences(
   var hapticsOnActions: Boolean
     get() = hapticsEnabled && sharedPreferences.getBoolean(KEY_HAPTICS_ON_ACTIONS, true)
     set(value) {
-      sharedPreferences.edit()
-        .putBoolean(KEY_HAPTICS_ON_ACTIONS, value)
-        .apply()
+      sharedPreferences.edit {
+        putBoolean(KEY_HAPTICS_ON_ACTIONS, value)
+      }
     }
 
   var hideDuplicatePostsOnRead: Boolean
@@ -693,6 +694,8 @@ class Preferences(
     by booleanPreference(KEY_AUTO_FOCUS_SEARCH_BAR, false)
   var hideHeaderBannerIfNoBanner
     by booleanPreference(KEY_HIDE_HEADER_BANNER_IF_NO_BANNER, false)
+  var restoreBrowsingSessions
+    by booleanPreference(KEY_RESTORE_BROWSING_SESSIONS, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

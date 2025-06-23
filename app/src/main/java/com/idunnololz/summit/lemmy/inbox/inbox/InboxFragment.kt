@@ -441,6 +441,22 @@ class InboxFragment :
         is StatefulData.Success -> {}
       }
     }
+    viewModel.fetchNewInboxItems.observe(viewLifecycleOwner) {
+      when (it) {
+        is StatefulData.Error -> {
+          binding.newItemsProgressBar.visibility = View.GONE
+        }
+        is StatefulData.Loading -> {
+          binding.newItemsProgressBar.visibility = View.VISIBLE
+        }
+        is StatefulData.NotStarted<*> -> {
+          binding.newItemsProgressBar.visibility = View.GONE
+        }
+        is StatefulData.Success<*> -> {
+          binding.newItemsProgressBar.visibility = View.GONE
+        }
+      }
+    }
 
     binding.fab.setup(preferences)
 
