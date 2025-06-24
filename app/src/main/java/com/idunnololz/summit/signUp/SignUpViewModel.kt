@@ -187,7 +187,8 @@ class SignUpViewModel @Inject constructor(
 
     captcha
       .onSuccess {
-        if (it.ok == null) {
+        val okResponse = it.ok
+        if (okResponse == null) {
           signUpModelState.value = signUpModelState.value.copy(
             currentScene = currentScene.copy(
               captchaError = CaptchaError.NoImageError(),
@@ -199,7 +200,7 @@ class SignUpViewModel @Inject constructor(
         val bitmap = try {
           val data = Base64.Mime
             .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
-            .decode(it.ok.png)
+            .decode(okResponse.png)
           BitmapFactory.decodeByteArray(data, 0, data.size)
         } catch (e: Exception) {
           Log.e(TAG, "Unable to decode captcha image", e)
@@ -217,9 +218,9 @@ class SignUpViewModel @Inject constructor(
 
         signUpModelState.value = signUpModelState.value.copy(
           currentScene = currentScene.copy(
-            captchaUuid = it.ok.uuid,
+            captchaUuid = okResponse.uuid,
             captchaImage = bitmap,
-            captchaWav = it.ok.wav,
+            captchaWav = okResponse.wav,
             captchaError = null,
           ),
         )

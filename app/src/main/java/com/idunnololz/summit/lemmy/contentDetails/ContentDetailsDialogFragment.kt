@@ -108,10 +108,10 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             "Published on ${
               dateStringToFullDateTime(commentView.comment.published)}",
           )
-          if (commentView.comment.updated != null) {
+          commentView.comment.updated?.let { updated ->
             appendLine(
               "Updated on ${
-                dateStringToFullDateTime(commentView.comment.updated)}",
+                dateStringToFullDateTime(updated)}",
             )
           }
 
@@ -150,10 +150,10 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             "Published on ${
               dateStringToFullDateTime(postView.post.published)}",
           )
-          if (postView.post.updated != null) {
+          postView.post.updated?.let { updated ->
             appendLine(
               "Updated on ${
-                dateStringToFullDateTime(postView.post.updated)}",
+                dateStringToFullDateTime(updated)}",
             )
           }
 

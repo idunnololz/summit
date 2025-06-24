@@ -439,7 +439,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             if (modEvent.event.mod_ban_from_community.banned) {
               b.icon.setImageResource(R.drawable.outline_person_remove_24)
 
-              if (modEvent.event.mod_ban_from_community.expires == null) {
+              val banExpires = modEvent.event.mod_ban_from_community.expires
+              if (banExpires == null) {
                 description = context.getString(
                   R.string.banned_person_from_community_permanently_format,
                   "[${modEvent.event.banned_person.name}](${
@@ -457,7 +458,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 )
               } else {
                 val banDuration =
-                  dateStringToTs(modEvent.event.mod_ban_from_community.expires) -
+                  dateStringToTs(banExpires) -
                     dateStringToTs(modEvent.event.mod_ban_from_community.when_)
 
                 description = context.getString(
@@ -502,7 +503,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             if (modEvent.event.mod_ban.banned) {
               b.icon.setImageResource(R.drawable.outline_person_remove_24)
 
-              if (modEvent.event.mod_ban.expires == null) {
+              val banExpires = modEvent.event.mod_ban.expires
+              if (banExpires == null) {
                 description = context.getString(
                   R.string.banned_person_from_site_permanently_format,
                   "[${modEvent.event.banned_person.name}](${
@@ -515,7 +517,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 )
               } else {
                 val banDuration =
-                  dateStringToTs(modEvent.event.mod_ban.expires) -
+                  dateStringToTs(banExpires) -
                     dateStringToTs(modEvent.event.mod_ban.when_)
 
                 description = context.getString(

@@ -959,7 +959,7 @@ class CreateOrEditPostFragment :
   }
 
   private fun Post.getCrossPostContent(): String = buildString {
-    body ?: return@buildString
+    val body = body ?: return@buildString
 
     body.split("\n").forEach {
       appendLine("> $it")

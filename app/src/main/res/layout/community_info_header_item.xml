@@ -7,33 +7,33 @@
 
     <!-- Text is set programmatically -->
     <Button
-        android:id="@+id/subscribe"
+        android:id="@+id/button_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding"
         android:layout_marginHorizontal="@dimen/padding"
+        style="@style/Widget.Material3.Button"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
-        android:id="@+id/instance_info"
+        android:id="@+id/button_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/instance_info"
         android:layout_marginTop="@dimen/padding"
-        android:layout_marginHorizontal="@dimen/padding"
-        style="?attr/materialButtonOutlinedStyle"
+        android:layout_marginStart="@dimen/padding_half"
+        style="@style/Widget.Material3.Button.TextButton"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/subscribe"
+        app:layout_constraintStart_toEndOf="@+id/button_1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <Space
         android:layout_width="wrap_content"
         android:layout_height="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/subscribe"
+        app:layout_constraintTop_toBottomOf="@+id/button_1"
         app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

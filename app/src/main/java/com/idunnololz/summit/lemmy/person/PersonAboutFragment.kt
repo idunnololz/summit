@@ -207,12 +207,13 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
             },
           )
 
+          val banExpires = personView.person.ban_expires
           val status =
             if (personView.person.banned) {
-              if (personView.person.ban_expires != null) {
+              if (banExpires != null) {
                 context.getString(
                   R.string.banned_until_format,
-                  tsToConcise(context, personView.person.ban_expires),
+                  tsToConcise(context, banExpires),
                 )
               } else {
                 context.getString(R.string.banned)

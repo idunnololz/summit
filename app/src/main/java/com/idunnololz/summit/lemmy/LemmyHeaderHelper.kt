@@ -256,8 +256,9 @@ class LemmyHeaderHelper @AssistedInject constructor(
       sb.append(it)
     }
 
-    if (showEditedDate && postView.post.updated != null) {
-      tsToConcise(context, postView.post.updated).let {
+    val updated = postView.post.updated
+    if (showEditedDate && updated != null) {
+      tsToConcise(context, updated).let {
         sb.append(" ($it)")
       }
     }
@@ -691,8 +692,9 @@ class LemmyHeaderHelper @AssistedInject constructor(
       )
     }
 
-    if (showEditedDate && commentView.comment.updated != null) {
-      tsToConcise(context, commentView.comment.updated).let {
+    val updated = commentView.comment.updated
+    if (showEditedDate && updated != null) {
+      tsToConcise(context, updated).let {
         sb.append(" ($it)")
       }
     }

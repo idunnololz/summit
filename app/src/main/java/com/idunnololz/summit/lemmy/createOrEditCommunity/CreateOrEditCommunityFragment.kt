@@ -596,14 +596,15 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         displayNameEditText.setText(community.title)
       }
 
-      if (community.icon == null) {
+      val communityIconUrl = community.icon
+      if (communityIconUrl == null) {
         icon.load(R.drawable.ic_default_community_with_inset)
         icon.setOnClickListener(null)
       } else {
         icon.dispose()
         offlineManager.fetchImageWithError(
           rootView = root,
-          url = community.icon,
+          url = communityIconUrl,
           listener = {
             icon.load(it)
           },
@@ -614,7 +615,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         icon.setOnClickListener {
           getMainActivity()?.let {
             it.showAdvancedLinkOptions(
-              url = community.icon,
+              url = communityIconUrl,
               moreActionsHelper = it.moreActionsHelper,
               fragmentManager = childFragmentManager,
             )
@@ -636,14 +637,15 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         )
       }
 
-      if (community.banner == null) {
+      val bannerUrl = community.banner
+      if (bannerUrl == null) {
         banner.load(null)
         banner.setOnClickListener(null)
       } else {
         banner.dispose()
         offlineManager.fetchImageWithError(
           rootView = root,
-          url = community.banner,
+          url = bannerUrl,
           listener = {
             banner.load(it)
           },
@@ -654,7 +656,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
         banner.setOnClickListener {
           getMainActivity()?.let {
             it.showAdvancedLinkOptions(
-              url = community.banner,
+              url = bannerUrl,
               moreActionsHelper = it.moreActionsHelper,
               fragmentManager = childFragmentManager,
             )

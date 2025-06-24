@@ -269,14 +269,15 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
           "${context.getString(R.string.subscribers_format, subsString)}" +
           " ${context.getString(R.string.mau_format, mauString)}"
 
-        if (community.community.description == null) {
+        val description = community.community.description
+        if (description == null) {
           b.description.visibility = View.GONE
           b.descriptionFade.visibility = View.GONE
         } else {
           b.description.visibility = View.VISIBLE
 
           val lineCount = TextMeasurementUtils.getTextLines(
-            lemmyTextHelper.getSpannable(context, community.community.description),
+            lemmyTextHelper.getSpannable(context, description),
             params,
           ).size
 
@@ -288,7 +289,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
           lemmyTextHelper.bindText(
             textView = b.description,
-            text = community.community.description,
+            text = description,
             instance = instance,
             highlight = null,
             onImageClick = {},

@@ -542,11 +542,12 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
             if (person.banned) {
               addInsight {
                 val s = length
-                if (personView.person.ban_expires != null) {
+                val banExpires = personView.person.ban_expires
+                if (banExpires != null) {
                   append(
                     context.getString(
                       R.string.banned_until_format,
-                      tsToConcise(context, personView.person.ban_expires),
+                      tsToConcise(context, banExpires),
                     ),
                   )
                 } else {

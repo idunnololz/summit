@@ -494,10 +494,12 @@ class PostViewModel @Inject constructor(
         )
         .fold(
           onSuccess = {
-            val newPostOrCommentRef = if (it.post != null) {
-              Either.Left(PostRef(newInstance, it.post.post.id))
-            } else if (it.comment != null) {
-              Either.Right(CommentRef(newInstance, it.comment.comment.id))
+            val postView = it.post
+            val commentView = it.comment
+            val newPostOrCommentRef = if (postView != null) {
+              Either.Left(PostRef(newInstance, postView.post.id))
+            } else if (commentView != null) {
+              Either.Right(CommentRef(newInstance, commentView.comment.id))
             } else {
               null
             }
@@ -598,10 +600,12 @@ class PostViewModel @Inject constructor(
       )
       .fold(
         onSuccess = {
-          val newPostOrCommentRef = if (it.post != null) {
-            Either.Left(PostRef(currentAccount.instance, it.post.post.id))
-          } else if (it.comment != null) {
-            Either.Right(CommentRef(currentAccount.instance, it.comment.comment.id))
+          val postView = it.post
+          val commentView = it.comment
+          val newPostOrCommentRef = if (postView != null) {
+            Either.Left(PostRef(currentAccount.instance, postView.post.id))
+          } else if (commentView != null) {
+            Either.Right(CommentRef(currentAccount.instance, commentView.comment.id))
           } else {
             null
           }
@@ -746,12 +750,9 @@ class PostViewModel @Inject constructor(
               newlyPostedCommentId = pendingComment.commentId
             } else {
               newlyPostedCommentId = it
-                .sortedByDescending {
-                  if (it.comment.updated != null) {
-                    dateStringToTs(it.comment.updated)
-                  } else {
-                    dateStringToTs(it.comment.published)
-                  }
+                .sortedByDescending { commentView ->
+                  dateStringToTs(commentView.comment.updated
+                    ?: commentView.comment.published)
                 }
                 .firstOrNull {
                   it.comment.creator_id ==

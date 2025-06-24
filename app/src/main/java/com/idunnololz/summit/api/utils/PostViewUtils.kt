@@ -113,30 +113,34 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
 }
 
 fun PostView.getType(): PostType {
-  if (post.embed_video_url != null && isUrlVideo(post.embed_video_url)) {
+  val embedVideoUrl = post.embed_video_url
+  if (embedVideoUrl != null && isUrlVideo(embedVideoUrl)) {
     return PostType.Video
   }
-  if (post.url != null && isUrlImage(post.url)) {
+  val url = post.url
+  if (url != null && isUrlImage(url)) {
     return PostType.Image
   }
-  if (post.url != null && isUrlVideo(post.url)) {
+  if (url != null && isUrlVideo(url)) {
     return PostType.Video
   }
-  if (post.url != null) {
+  if (url != null) {
     return PostType.Link
   }
   return PostType.Text
 }
 
 fun PostView.getDominantType(): PostType {
-  if (post.embed_video_url != null && isUrlVideo(post.embed_video_url)) {
+  val embedVideoUrl = post.embed_video_url
+  if (embedVideoUrl != null && isUrlVideo(embedVideoUrl)) {
     return PostType.Video
   }
-  if (post.url != null) {
-    if (isUrlImage(post.url)) {
+  val url = post.url
+  if (url != null) {
+    if (isUrlImage(url)) {
       return PostType.Image
     }
-    if (isUrlVideo(post.url)) {
+    if (isUrlVideo(url)) {
       return PostType.Video
     }
     return PostType.Link

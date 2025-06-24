@@ -591,8 +591,9 @@ class SignUpFragment :
           placeholder(newShimmerDrawableSquare(context).asImage())
         }
 
-        if (loginResponse.jwt != null) {
-          viewModel.loginWithJwt(scene.instance, loginResponse.jwt)
+        val jwt = loginResponse.jwt
+        if (jwt != null) {
+          viewModel.loginWithJwt(scene.instance, jwt)
 
           if (scene.account != null) {
             errorMessage.visibility = View.GONE

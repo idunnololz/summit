@@ -14,8 +14,9 @@ fun PostView.getHotRank(): Double {
 
 fun PostView.getActiveRank(): Double {
   val publishTime = dateStringToTs(this.counts.published)
-  val commentTime = if (this.counts.newest_comment_time != null) {
-    dateStringToTs(this.counts.newest_comment_time)
+  val newestCommentTime = this.counts.newest_comment_time
+  val commentTime = if (newestCommentTime != null) {
+    dateStringToTs(newestCommentTime)
   } else {
     0
   }

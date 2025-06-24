@@ -1,3 +1,4 @@
+include(":api")
 include(":app")
 include(":thirdPartyModules:calligraphy")
 include(":thirdPartyModules:overlappingPane")

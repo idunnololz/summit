@@ -218,6 +218,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           )
         findNavController().navigateSafe(directions)
       },
+      onModLogsClick = { instance, communityRef ->
+        val directions = CommunityInfoFragmentDirections
+          .actionCommunityInfoFragmentToModLogsFragment(
+            instance = instance,
+            communityRef = communityRef,
+          )
+        findNavController().navigateSafe(directions)
+      }
     )
 
     binding.loadingView.setOnRefreshClickListener {
@@ -702,6 +710,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private val onSubscribeClick: (communityId: CommunityId, subscribe: Boolean) -> Unit,
     private val onInstanceInfoClick: (instance: String) -> Unit,
     private val onCommunitiesClick: (instance: String) -> Unit,
+    private val onModLogsClick: (instance: String, communityRef: CommunityRef?) -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private sealed interface Item {
@@ -788,10 +797,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         clazz = Item.MultiCommunityHeaderItem::class,
         inflateFn = CommunityInfoHeaderItemBinding::inflate,
       ) { item, b, _ ->
-        b.subscribe.visibility = View.GONE
-        b.instanceInfo.visibility = View.VISIBLE
+        b.button1.visibility = View.VISIBLE
+        b.button2.visibility = View.GONE
 
-        b.instanceInfo.setOnClickListener {
+        b.button1.setOnClickListener {
           onInstanceInfoClick(item.instance)
         }
       }
@@ -799,33 +808,37 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         clazz = Item.InstanceHeaderItem::class,
         inflateFn = CommunityInfoHeaderItemBinding::inflate,
       ) { item, b, _ ->
-        b.instanceInfo.visibility = View.GONE
-
-        b.subscribe.visibility = View.VISIBLE
-        b.subscribe.text = context.getString(R.string.communities)
-        b.subscribe.setOnClickListener {
+        b.button1.visibility = View.VISIBLE
+        b.button1.text = context.getString(R.string.communities)
+        b.button1.setOnClickListener {
           onCommunitiesClick(item.siteView.site.instance)
+        }
+
+        b.button2.visibility = View.VISIBLE
+        b.button2.text = context.getString(R.string.mod_logs)
+        b.button2.setOnClickListener {
+          onModLogsClick(item.siteView.site.instance, null)
         }
       }
       addItemType(
         clazz = Item.CommunityHeaderItem::class,
         inflateFn = CommunityInfoHeaderItemBinding::inflate,
       ) { item, b, _ ->
-        b.subscribe.visibility = View.VISIBLE
+        b.button1.visibility = View.VISIBLE
 
         when (item.subscribedStatus) {
           SubscribedType.Subscribed -> {
-            b.subscribe.text = context.getString(R.string.unsubscribe)
+            b.button1.text = context.getString(R.string.unsubscribe)
           }
           SubscribedType.NotSubscribed -> {
-            b.subscribe.text = context.getString(R.string.subscribe)
+            b.button1.text = context.getString(R.string.subscribe)
           }
           SubscribedType.Pending -> {
-            b.subscribe.text = context.getString(R.string.subscription_pending)
+            b.button1.text = context.getString(R.string.subscription_pending)
           }
         }
 
-        b.subscribe.setOnClickListener {
+        b.button1.setOnClickListener {
           onSubscribeClick(
             item.communityView.community.id,
             item.subscribedStatus == SubscribedType.NotSubscribed,
@@ -837,8 +850,9 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           }
         }
 
-        b.instanceInfo.visibility = View.VISIBLE
-        b.instanceInfo.setOnClickListener {
+        b.button2.visibility = View.VISIBLE
+        b.button2.text = context.getString(R.string.instance_info)
+        b.button2.setOnClickListener {
           onInstanceInfoClick(item.communityView.community.instance)
         }
       }

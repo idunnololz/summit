@@ -470,8 +470,9 @@ class LemmyContentHelper(
             postType == PostType.Text
           ) && showLink
       ) {
-        if (postView.post.embed_video_url != null) {
-          appendUiForExternalOrInternalUrl(postView.post.embed_video_url)
+        val embedVideoUrl = postView.post.embed_video_url
+        if (embedVideoUrl != null) {
+          appendUiForExternalOrInternalUrl(embedVideoUrl)
         } else if (postUrl != null &&
           (thumbnailUrl != postUrl || !isThumbnailUrlValid)
         ) {

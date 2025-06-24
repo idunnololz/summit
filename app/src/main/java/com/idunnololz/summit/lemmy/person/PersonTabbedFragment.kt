@@ -6,6 +6,7 @@ import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.SCROLL_CAPTURE_HINT_EXCLUDE
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.core.text.buildSpannedString
@@ -467,6 +468,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
       collapsingToolbarContent.visibility = View.VISIBLE
       viewPager.visibility = View.VISIBLE
       tabLayoutContainer.visibility = View.VISIBLE
+
+      fab.scrollCaptureHint = SCROLL_CAPTURE_HINT_EXCLUDE
       fab.show()
 
       val displayName = person.display_name
@@ -497,7 +500,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
         bannerDummy.setOnClickListener(null)
       }
       avatarHelper.loadAvatar(profileIcon, person)
-      if (person.avatar.isNullOrBlank()) {
+      val avatarUrl = person.avatar
+      if (avatarUrl.isNullOrBlank()) {
         profileIcon.setOnClickListener {
           launchAlertDialog("error_user_has_no_profile_image") {
             messageResId = R.string.error_user_has_no_profile_image
@@ -511,7 +515,7 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
             sharedElement = profileIcon,
             appBar = null,
             title = person.fullName,
-            url = person.avatar,
+            url = avatarUrl,
             mimeType = null,
           )
         }
