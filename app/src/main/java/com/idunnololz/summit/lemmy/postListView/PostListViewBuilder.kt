@@ -1023,7 +1023,7 @@ class PostListViewBuilder @Inject constructor(
           imageView.dispose()
           imageView.load(newShimmerDrawable16to9(context))
 
-          fun loadImage(useBackupUrl: Boolean = false) {
+          fun loadImage(useBackupUrl: Boolean = false, force: Boolean = false) {
             val urlToLoad = if (useBackupUrl) {
               backupImageUrl
             } else {
@@ -1041,7 +1041,7 @@ class PostListViewBuilder @Inject constructor(
               shouldBlur = !isRevealed && postView.post.nsfw,
               errorListener = {
                 if (!useBackupUrl && backupImageUrl != null) {
-                  loadImage(true)
+                  loadImage(true, force)
                 } else {
                   imageView.dispose()
                   if (isUrlVideo(urlToLoad)) {
@@ -1051,6 +1051,7 @@ class PostListViewBuilder @Inject constructor(
                   }
                 }
               },
+              force = force,
             )
           }
 
@@ -2020,6 +2021,7 @@ class PostListViewBuilder @Inject constructor(
     imageViewWidth: Int,
     shouldBlur: Boolean,
     errorListener: TaskFailedListener?,
+    force: Boolean,
   ) {
     lemmyContentHelper.loadThumbnailIntoImageView(
       imageUrl = imageUrl,
@@ -2033,6 +2035,7 @@ class PostListViewBuilder @Inject constructor(
       imageView = imageView,
       preferFullSizeImage = preferFullSizeImage,
       errorListener = errorListener,
+      force = force,
     )
   }
 }

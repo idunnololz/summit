@@ -213,8 +213,8 @@ class LoadingView : ConstraintLayout {
     bindNegativeButton(context.getString(negativeButtonText), negativeButtonListener)
   }
 
-  fun showDefaultErrorMessageFor(t: Throwable) {
-    showErrorWithRetry(t.toErrorMessage(context))
+  fun showDefaultErrorMessageFor(t: Throwable, messageOverride: String? = null) {
+    showErrorWithRetry(messageOverride ?: t.toErrorMessage(context))
 
     val activity = context.getActivity() ?: return
     show(errorText = true, positiveButton = true, negativeButton = true)

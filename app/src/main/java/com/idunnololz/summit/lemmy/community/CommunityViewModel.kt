@@ -33,10 +33,12 @@ import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityState
 import com.idunnololz.summit.lemmy.CommunityViewState
 import com.idunnololz.summit.lemmy.PersonRef
+import com.idunnololz.summit.lemmy.PostOrCommentRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
+import com.idunnololz.summit.lemmy.toEither
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -130,7 +132,20 @@ class CommunityViewModel @Inject constructor(
 
   private var initialPageFetched = state.getLiveData<Boolean>("_initialPageFetched")
 
-  override var lastSelectedItem: Either<PostRef, CommentRef>? = null
+  private var _lastSelectedItem = state.getLiveData<PostOrCommentRef?>("last_selected_item")
+
+  override var lastSelectedItem: Either<PostRef, CommentRef>?
+    get() = _lastSelectedItem.value?.toEither()
+    set(value) {
+      _lastSelectedItem.value = value?.fold(
+        {
+          PostOrCommentRef.PostRef(it)
+        },
+        {
+          PostOrCommentRef.CommentRef(it)
+        }
+      )
+    }
 
   val defaultCommunity = MutableLiveData<CommunityRef>(null)
   val currentAccount = MutableLiveData<AccountView?>(null)
@@ -585,6 +600,8 @@ class CommunityViewModel @Inject constructor(
     }
     val instanceChange = newApiInstance != null && newApiInstance != apiInstance
 
+    postListEngine.setSecondaryKey(communityRef.getKey())
+
     if (restore) {
       restorePostListEngineIfNeeded()
     } else {
@@ -606,7 +623,6 @@ class CommunityViewModel @Inject constructor(
 
     currentCommunityRef.value = communityRefSafe
     postsRepository.setCommunity(communityRef)
-    postListEngine.setSecondaryKey(communityRef.getKey())
 
     registerHiddenPostObserver()
   }

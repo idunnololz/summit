@@ -35,6 +35,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.image.ImageInfoDialogFragment
+import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
@@ -623,10 +624,6 @@ class ImageViewerActivity :
             object : Target {
               override fun onError(error: Image?) {
                 super.onError(error)
-                binding.progressBar.visibility = View.GONE
-                binding.loadingView.showErrorWithRetry(
-                  R.string.error_downloading_image,
-                )
               }
 
               override fun onSuccess(result: Image) {
@@ -693,6 +690,15 @@ class ImageViewerActivity :
             } else {
               size(coil3.size.Size.ORIGINAL)
             }
+
+            listener(
+              onError = { _, error ->
+                binding.progressBar.visibility = View.GONE
+                binding.loadingView.showDefaultErrorMessageFor(
+                  error.throwable, getString(R.string.error_downloading_image))
+                Log.d(TAG, "Coil - Failed to load icon: $url")
+              },
+            )
           }
           .build()
         binding.imageView.context.imageLoader.enqueue(request)

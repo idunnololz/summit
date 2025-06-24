@@ -800,6 +800,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           isCommentsLoaded = true,
           commentPath = null,
           crossPosts = listOf(),
+          wasUpdateForced = false,
         ),
       )
 

@@ -12,6 +12,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -176,7 +177,7 @@ class LemmyContentHelper(
           true
         }
 
-        fun fetchFullImage() = loadThumbnailIntoImageView(
+        fun fetchFullImage(force: Boolean = false) = loadThumbnailIntoImageView(
           imageUrl = imageUrl,
           imageSizeKey = imageUrl,
           fallbackUrl = null,
@@ -187,10 +188,11 @@ class LemmyContentHelper(
           loadingView = loadingView,
           imageView = fullImageView,
           preferFullSizeImage = true,
+          force = force,
         )
 
         loadingView?.setOnRefreshClickListener {
-          fetchFullImage()
+          fetchFullImage(force = true)
         }
         fetchFullImage()
       } else {
@@ -333,7 +335,7 @@ class LemmyContentHelper(
         true
       }
 
-      fun fetchFullImage() = loadThumbnailIntoImageView(
+      fun fetchFullImage(force: Boolean = false) = loadThumbnailIntoImageView(
         imageUrl = imageUrl,
         imageSizeKey = imageUrl,
         fallbackUrl = fallback,
@@ -344,10 +346,11 @@ class LemmyContentHelper(
         loadingView = loadingView,
         imageView = fullImageView,
         preferFullSizeImage = true,
+        force = force,
       )
 
       loadingView?.setOnRefreshClickListener {
-        fetchFullImage()
+        fetchFullImage(force = true)
       }
       fetchFullImage()
 
@@ -414,6 +417,7 @@ class LemmyContentHelper(
                 },
               )
             }
+            playerView.minimumHeight = (imageMaxWidth * 0.6f).toInt()
 
             playerView.setup()
 
@@ -640,6 +644,7 @@ class LemmyContentHelper(
     imageView: ImageView,
     preferFullSizeImage: Boolean,
     errorListener: TaskFailedListener? = null,
+    force: Boolean,
   ) {
     val isUrlVideo = isUrlVideo(imageUrl)
     imageView.visibility = View.VISIBLE
@@ -685,13 +690,8 @@ class LemmyContentHelper(
 
         listener(
           onError = { _, error ->
-            if (isUrlVideo) {
-              // video url loading takes a different path. It doesn't handle errors normally so we
-              // need to handle them here.
-
-              loadingView?.showDefaultErrorMessageFor(error.throwable)
-              errorListener?.invoke(error.throwable)
-            }
+            loadingView?.showDefaultErrorMessageFor(error.throwable)
+            errorListener?.invoke(error.throwable)
             Log.d(TAG, "Coil - Failed to load icon: $imageUrl")
           },
           onSuccess = { _, result ->
@@ -745,6 +745,7 @@ class LemmyContentHelper(
               imageView = imageView,
               preferFullSizeImage = preferFullSizeImage,
               errorListener = errorListener,
+              force = force,
             )
           } else {
             loadingView?.showDefaultErrorMessageFor(it)
@@ -752,6 +753,7 @@ class LemmyContentHelper(
           Log.d(TAG, "Failed to load icon: $imageUrl")
           errorListener?.invoke(it)
         },
+        force = force,
       )
     }
   }

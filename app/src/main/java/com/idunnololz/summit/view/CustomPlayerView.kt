@@ -3,14 +3,18 @@ package com.idunnololz.summit.view
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import androidx.annotation.OptIn
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.COMMAND_GET_AUDIO_ATTRIBUTES
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.ext.getActivity
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.video.getVideoState
 
@@ -29,6 +33,9 @@ class CustomPlayerView : PlayerView {
 
   @OptIn(UnstableApi::class)
   fun setPlayerWithPreferences(player: Player?, videoState: VideoState?, preferences: Preferences) {
+    val negativeButton = findViewById<Button>(R.id.exo_negative_button)
+    negativeButton.visibility = View.GONE
+
     var restoreState = true
     val customPlayerListener =
       (getTag(R.id.custom_player_listener) as? Player.Listener)
@@ -37,6 +44,8 @@ class CustomPlayerView : PlayerView {
           @OptIn(UnstableApi::class)
           override fun onIsPlayingChanged(isPlaying: Boolean) {
             if (isPlaying) {
+              negativeButton.visibility = View.GONE
+
               if (restoreState) {
                 restoreState = false
                 player?.repeatMode = videoState?.repeatMode ?: if (preferences.loopVideoByDefault) {
@@ -53,6 +62,19 @@ class CustomPlayerView : PlayerView {
               // is buffering, stopped or failed. Check player.playWhenReady,
               // player.playbackState, player.playbackSuppressionReason and
               // player.playerError for details.
+            }
+          }
+
+          override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+
+            negativeButton.text = context.getString(R.string.error_details)
+            negativeButton.visibility = View.VISIBLE
+            negativeButton.setOnClickListener {
+              context.getActivity()?.supportFragmentManager?.let { fm ->
+                ErrorDialogFragment
+                  .show(context.getString(R.string.error_unable_to_play_video), error, fm)
+              }
             }
           }
         }.also {

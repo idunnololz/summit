@@ -123,11 +123,20 @@ fun Context.getActivity(): AppCompatActivity? {
     return this
   }
 
-  if (this is ContextWrapper) {
-    val baseContext = this.baseContext
+  var curContext = this
+  var iterations = 0
+  while (curContext is ContextWrapper) {
+    if (iterations > 10) {
+      break
+    }
+
+    val baseContext = curContext.baseContext
     if (baseContext is AppCompatActivity) {
       return baseContext
     }
+
+    curContext = baseContext
+    iterations++
   }
   return null
 }

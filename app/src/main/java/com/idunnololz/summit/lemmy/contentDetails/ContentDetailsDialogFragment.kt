@@ -256,7 +256,9 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
                 preferFullSizeImage = true,
                 imageViewWidth = binding.image.width,
                 shouldBlur = false,
-              ) {}
+                errorListener = {},
+                force = false,
+              )
             }
           },
         )

@@ -303,7 +303,7 @@ class NavBarController(
         navBarContainer.animate().cancel()
         navBarContainer.animate()
           .alpha(1f)
-          .translationX(-navigationBarOffset).duration = 250
+          .translationX(navigationBarOffset).duration = 250
       } else {
         navBarContainer.animate().cancel()
         navBarContainer.translationX = navigationBarOffset

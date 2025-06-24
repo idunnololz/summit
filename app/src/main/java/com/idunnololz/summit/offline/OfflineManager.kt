@@ -87,6 +87,7 @@ class OfflineManager @Inject constructor(
     url: String?,
     listener: TaskListener,
     errorListener: TaskFailedListener?,
+    force: Boolean = false,
     registerListenersIfTaskExists: Boolean = true,
   ) {
     Log.d(TAG, "fetchImageWithError(): $url")
@@ -103,6 +104,7 @@ class OfflineManager @Inject constructor(
         url = url,
         listener = listener,
         errorListener = errorListener,
+        force = force,
         registerListenersIfTaskExists = registerListenersIfTaskExists,
       ),
     )
@@ -327,7 +329,13 @@ class OfflineManager @Inject constructor(
     val req = try {
       Request.Builder()
         .header("Accept", "*/*")
-        .url(url)
+        .url(
+          if (url.contains("img.gvid.tv/i/", ignoreCase = true)) {
+            url.replace("img.gvid.tv/i/", "img.gvid.tv/img/", ignoreCase = true)
+          } else {
+            url
+          }
+        )
         .build()
     } catch (e: Exception) {
       return Result.failure(e)

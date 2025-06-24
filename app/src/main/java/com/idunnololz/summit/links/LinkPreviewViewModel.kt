@@ -1,5 +1,6 @@
 package com.idunnololz.summit.links
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.util.StatefulLiveData
@@ -16,7 +17,11 @@ class LinkPreviewViewModel @Inject constructor(
 
   val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()
 
-  fun loadLinkMetadata(url: String) {
+  fun loadLinkMetadata(url: String, force: Boolean = false) {
+    if (linkMetadata.valueOrNull != null && !force) {
+      return
+    }
+
     linkMetadata.setIsLoading()
 
     viewModelScope.launch {

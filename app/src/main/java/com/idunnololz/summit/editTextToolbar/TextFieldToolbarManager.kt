@@ -314,34 +314,24 @@ class TextFormatToolbarViewHolder(
       )
     }
     quote?.setOnClickListener {
-      val start = editText.selectionStart.coerceAtLeast(0)
-      val end = editText.selectionEnd.coerceAtLeast(0)
-
-      val text = getSelectedText() ?: ""
-      val newText = "> " + text.split("\n").joinToString(separator = "\n>")
-
-      editText.text.replace(start, end, newText)
-
-      val finalCursorPos = Integer.min(start, end) + newText.length
-
-      editText.setSelection(finalCursorPos)
-      editText.requestFocus()
+      editText.startEachLineWith(
+        getSelectedText(),
+        "> "
+      )
     }
     link?.setOnClickListener {
       onAddLinkClick?.invoke()
     }
     bulletedList?.setOnClickListener {
-      editText.wrapTextAtCursor(
-        startText = "* ",
-        endText = "",
-        autoLineBreak = true,
+      editText.startEachLineWith(
+        getSelectedText(),
+        "* "
       )
     }
     numberedList?.setOnClickListener {
-      editText.wrapTextAtCursor(
-        startText = "1. ",
-        endText = "",
-        autoLineBreak = true,
+      editText.startEachLineWith(
+        getSelectedText(),
+        "1. "
       )
     }
     spongebob?.setOnClickListener {
@@ -433,6 +423,36 @@ class TextFormatToolbarViewHolder(
     }
 
     editText.setSelection(finalCursorPos)
+  }
+
+  private fun EditText.startEachLineWith(
+    selectedText: String?,
+    prefix: String
+  ) {
+    val start = selectionStart.coerceAtLeast(0)
+    val end = selectionEnd.coerceAtLeast(0)
+
+    val text = selectedText ?: ""
+
+    val newText = if (text.split("\n").all { it.startsWith(prefix) }) {
+      // clear formatting instead
+      text.split("\n").joinToString(separator = "\n") { it.removePrefix(prefix) }
+    } else {
+      text.split("\n").joinToString(separator = "\n") {
+        if (!it.startsWith(prefix)) {
+          "$prefix${it}"
+        } else {
+          it
+        }
+      }
+    }
+
+    this.text.replace(start, end, newText)
+
+    val finalCursorPos = Integer.min(start, end) + newText.length
+
+    setSelection(finalCursorPos)
+    requestFocus()
   }
 
   private fun generateBottomSheetFromBar(viewGroup: ViewGroup): BottomMenu {

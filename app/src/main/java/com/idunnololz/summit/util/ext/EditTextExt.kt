@@ -20,3 +20,8 @@ fun EditText.requestFocusAndShowKeyboard() {
     as InputMethodManager?
   inputMethodManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
 }
+
+fun EditText.moveCursorToEnd() {
+  this.requestFocus()
+  this.setSelection(text.length)
+}

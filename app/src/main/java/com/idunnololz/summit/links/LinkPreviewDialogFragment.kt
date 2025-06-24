@@ -74,9 +74,7 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
 
     val context = requireContext()
 
-    if (savedInstanceState == null) {
-      viewModel.loadLinkMetadata(args.url)
-    }
+    viewModel.loadLinkMetadata(args.url)
 
     with(binding) {
       toolbar.setNavigationIcon(R.drawable.baseline_close_24)
@@ -90,6 +88,10 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
       image.load(newShimmerDrawable16to9(context))
 
       url.text = args.url
+
+      loadingView.setOnRefreshClickListener {
+        viewModel.loadLinkMetadata(args.url, force = true)
+      }
 
       viewModel.linkMetadata.observe(viewLifecycleOwner) {
         when (it) {

@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -964,6 +965,7 @@ class PostAdapter(
   private fun refreshItems(
     refreshHeader: Boolean = true,
     animate: Boolean = true,
+    forceRefresh: Boolean = false,
     cb: () -> Unit = {},
   ) {
     val rawData = rawData
@@ -1235,9 +1237,15 @@ class PostAdapter(
     )
 
     this.items = newItems
-    diff.dispatchUpdatesTo(this)
-    if (refreshHeader) {
-      notifyItemChanged(0, Unit)
+
+    if (forceRefresh) {
+      @Suppress("NotifyDataSetChanged")
+      notifyDataSetChanged()
+    } else {
+      diff.dispatchUpdatesTo(this)
+      if (refreshHeader) {
+        notifyItemChanged(0, Unit)
+      }
     }
 
     this.topLevelCommentIndices = topLevelCommentIndices
@@ -1351,7 +1359,7 @@ class PostAdapter(
       hideNonNativeInstanceWarning = false
     }
 
-    refreshItems()
+    refreshItems(forceRefresh = data.wasUpdateForced)
   }
 
   fun highlightComment(commentId: CommentId) {

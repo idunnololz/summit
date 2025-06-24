@@ -1023,6 +1023,7 @@ class AddOrEditCommentFragment :
           isCommentsLoaded = true,
           commentPath = null,
           crossPosts = listOf(),
+          wasUpdateForced = false,
         ),
       )
 

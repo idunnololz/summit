@@ -331,7 +331,7 @@ class PostViewModel @Inject constructor(
       this@PostViewModel.postView?.let {
         postRef = PostRef(instance = apiInstance, id = it.post.id)
       }
-      updateData()
+      updateData(wasUpdateForced = false)
 
       val commentsResult = if (fetchCommentData) {
         postOrCommentRef
@@ -397,7 +397,7 @@ class PostViewModel @Inject constructor(
 
         if (postView != null && comments != null && !force) {
           // lets recover!
-          updateData()
+          updateData(wasUpdateForced = force)
         } else {
           postResult
             .onFailure {
@@ -412,7 +412,7 @@ class PostViewModel @Inject constructor(
             .onSuccess {}
         }
       } else {
-        updateData()
+        updateData(wasUpdateForced = force)
       }
     }
   }
@@ -645,7 +645,7 @@ class PostViewModel @Inject constructor(
         resolveCompletedPendingComments = resolveCompletedPendingComments,
       )
 
-      updateData()
+      updateData(wasUpdateForced = false)
     }
   }
 
@@ -787,7 +787,7 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  private suspend fun updateData() {
+  private suspend fun updateData(wasUpdateForced: Boolean) {
     Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
 
     val post = postView ?: return
@@ -827,6 +827,7 @@ class PostViewModel @Inject constructor(
       accountInstance = currentAccountView.value?.account?.instance,
       isCommentsLoaded = comments != null,
       commentPath = comments?.firstOrNull()?.comment?.path,
+      wasUpdateForced = wasUpdateForced,
     )
 
     postData.postValue(postDataValue)
@@ -853,7 +854,7 @@ class PostViewModel @Inject constructor(
         // TODO maybe?
       }
 
-      updateData()
+      updateData(wasUpdateForced = force)
     }
   }
 
@@ -863,7 +864,7 @@ class PostViewModel @Inject constructor(
     viewModelScope.launch {
       delay(HIGHLIGHT_COMMENT_MS)
 
-      updateData()
+      updateData(wasUpdateForced = false)
     }
   }
 
@@ -934,6 +935,7 @@ class PostViewModel @Inject constructor(
     val accountInstance: String?,
     val isCommentsLoaded: Boolean,
     val commentPath: String?,
+    val wasUpdateForced: Boolean,
   )
 
   sealed interface ListView {

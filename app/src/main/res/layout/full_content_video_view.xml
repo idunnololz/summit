@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/padding_half">
 
+    <!-- minHeight set programmatically -->
     <com.idunnololz.summit.view.CustomPlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"

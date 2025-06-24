@@ -81,7 +81,7 @@ class SlidingPaneController(
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.apply {
             lockUiOpenness = false
-            setNavUiOpenPercent(slideOffset * navBarOpenPercent)
+            setNavUiOpenPercent(slideOffset * navBarOpenPercent, force = isSlideable)
           }
 
           slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
@@ -118,7 +118,7 @@ class SlidingPaneController(
           }
         }
         if (slidingPaneLayout.isSlideable) {
-          fragment.getMainActivity()?.setNavUiOpenPercent(1f * navBarOpenPercent)
+          fragment.getMainActivity()?.setNavUiOpenPercent(1f * navBarOpenPercent, force = isSlideable)
         }
         onPageSelectedListener(false)
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED

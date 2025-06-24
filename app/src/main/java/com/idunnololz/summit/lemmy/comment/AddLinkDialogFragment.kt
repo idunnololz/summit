@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.databinding.DialogFragmentAddLinkBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.getPlainTextFromClipboard
+import com.idunnololz.summit.util.ext.moveCursorToEnd
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import kotlinx.parcelize.Parcelize
@@ -74,6 +75,7 @@ class AddLinkDialogFragment : BaseDialogFragment<DialogFragmentAddLinkBinding>()
         val pasteData: String? = context.getPlainTextFromClipboard()
         if (pasteData != null) {
           binding.linkEditText.setText(pasteData)
+          binding.linkEditText.moveCursorToEnd()
         }
       }
 

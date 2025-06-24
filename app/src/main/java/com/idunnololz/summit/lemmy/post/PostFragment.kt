@@ -1050,6 +1050,7 @@ class PostFragment :
           accountInstance = viewModel.currentAccountView.value?.account?.instance,
           isCommentsLoaded = false,
           commentPath = null,
+          wasUpdateForced = false,
         ),
       )
       onMainListingItemRetrieved(post)
