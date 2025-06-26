@@ -66,6 +66,7 @@ class AccountAwareLemmyClient @Inject constructor(
   private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
+  @Singleton
   class Factory @Inject constructor(
     @ApplicationContext private val context: Context,
     val apiClient: LemmyApiClient,

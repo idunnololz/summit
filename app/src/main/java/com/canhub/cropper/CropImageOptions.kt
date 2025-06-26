@@ -144,7 +144,7 @@ import kotlinx.parcelize.Parcelize
   ),
   @JvmField @ColorInt var cropperLabelTextColor: Int = Color.WHITE,
   @JvmField var cropperLabelText: String? = "",
-  @JvmField @ColorInt var activityBackgroundColor: Int = Color.WHITE,
+  @JvmField @ColorInt var activityBackgroundColor: Int = Color.BLACK,
   @JvmField @ColorInt var toolbarColor: Int? = null,
   @JvmField @ColorInt var toolbarTitleColor: Int? = null,
   @JvmField @ColorInt var toolbarBackButtonColor: Int? = null,

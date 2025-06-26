@@ -211,9 +211,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
 
         fun updateUi() {
           if (currentPreferences.isVideoPlayerRotationLocked) {
-            setImageResource(R.drawable.ic_baseline_screen_rotation_24)
-          } else {
             setImageResource(R.drawable.ic_baseline_screen_lock_rotation_24)
+          } else {
+            setImageResource(R.drawable.ic_baseline_screen_rotation_24)
           }
         }
 

@@ -23,8 +23,7 @@ import org.json.JSONException
 
 @Singleton
 class LinkFixer @Inject constructor(
-  private val json: Json,
-  private val linkFetcher: LinkFetcher,
+  private val siteBackendHelper: SiteBackendHelper,
 ) {
 
   companion object {
@@ -197,11 +196,11 @@ class LinkFixer @Inject constructor(
     var tokens = instance.split(".")
     while (tokens.size >= 2) {
       val possibleInstance = tokens.joinToString(separator = ".")
-      val result = fetchVersionObject(possibleInstance)
+      val result = siteBackendHelper.fetchApiInfo(possibleInstance)
 
       Log.d(TAG, "Evaluating $possibleInstance")
 
-      if (result.isSuccess) {
+      if (result.getOrNull()?.backendType != null) {
         Log.d(TAG, "$possibleInstance is a lemmy instance!")
         knownInstances = knownInstances + possibleInstance
 
@@ -238,45 +237,4 @@ class LinkFixer @Inject constructor(
     is PersonRef.PersonRefComplete -> this.copy(instance = newInstance)
     is PostRef -> this.copy(instance = newInstance)
   }
-
-  private suspend fun fetchVersionObject(instance: String): Result<VersionObject> =
-    withContext(Dispatchers.Default) {
-      try {
-        val jsonStr = linkFetcher.downloadSite("https://$instance/version", cache = true)
-        val versionObject = json.decodeFromString<VersionObject?>(jsonStr)
-
-        if (versionObject == null) {
-          Result.failure(
-            ClientApiException("API returns a different object than expected.", 0),
-          )
-        } else {
-          Result.success(versionObject)
-        }
-      } catch (e: SocketTimeoutException) {
-        Result.failure(SocketTimeoutException())
-      } catch (e: UnknownHostException) {
-        Result.failure(NoInternetException())
-      } catch (e: InterruptedIOException) {
-        throw CancellationException()
-      } catch (e: JSONException) {
-        Result.failure(
-          ClientApiException("API returns a different object than expected.", 0),
-        )
-      } catch (e: Exception) {
-        Log.e(TAG, "error", e)
-        Result.failure(e)
-      }
-    }
-
-  @Serializable
-  data class VersionObject(
-    val version: String?,
-    val software: SoftwareInfo?,
-  )
-
-  @Serializable
-  data class SoftwareInfo(
-    val name: String?,
-    val version: String?,
-  )
 }

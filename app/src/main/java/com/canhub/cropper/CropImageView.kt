@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.provider.MediaStore
 import android.util.AttributeSet
+import android.util.Log
 import android.util.Pair
 import android.util.Size
 import android.view.LayoutInflater
@@ -29,6 +30,12 @@ import androidx.exifinterface.media.ExifInterface
 import com.canhub.cropper.CropOverlayView.CropWindowChangeListener
 import com.canhub.cropper.utils.getFilePathFromUri
 import com.idunnololz.summit.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import java.util.UUID
 import kotlin.math.max
@@ -187,6 +194,9 @@ class CropImageView @JvmOverloads constructor(
 
   /** Task used to crop bitmap async from UI thread  */
   private var bitmapCroppingWorkerJob: WeakReference<BitmapCroppingWorkerJob>? = null
+
+  private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  private var analyzeBitmapColorJob: Job? = null
 
   /** Get / set the scale type of the image in the crop view. */
   var scaleType: ScaleType
@@ -988,6 +998,43 @@ class CropImageView @JvmOverloads constructor(
       if (mCropOverlayView != null) {
         mCropOverlayView.resetCropOverlayView()
         setCropOverlayVisibility()
+      }
+
+      if (bitmap != null) {
+        analyzeBitmapColorJob?.cancel()
+        analyzeBitmapColorJob = coroutineScope.launch {
+          val bitmapWidth = bitmap.width
+          val bitmapHeight = bitmap.height
+          val row = IntArray(bitmapWidth)
+          var luminosity = 0.0
+          for (r in 0 until bitmapHeight) {
+            ensureActive()
+
+            bitmap.getPixels(row, 0, bitmapWidth, 0, r, bitmapWidth, 1)
+
+            for (p in row) {
+              val r = (p shr 16) and 0xff
+              val g = (p shr 8) and 0xff
+              val b = (p) and 0xff
+
+              luminosity += (r + g + b) / 255.0
+            }
+          }
+
+          luminosity /= bitmapWidth * bitmapHeight * 3 /* 3 for RGB */
+
+          ensureActive()
+
+          Log.d("HAHA", "lum: ${luminosity}")
+
+          if (luminosity > 0.5) {
+            mCropOverlayView?.setBorderColor(Color.BLACK)
+            mCropOverlayView?.options?.borderCornerColor = Color.BLACK
+          } else {
+            mCropOverlayView?.setBorderColor(Color.WHITE)
+            mCropOverlayView?.options?.borderCornerColor = Color.WHITE
+          }
+        }
       }
     }
   }

@@ -16,8 +16,8 @@ import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.ClientApiException
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.databinding.FragmentLoginBinding
+import com.idunnololz.summit.lemmy.Consts.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData

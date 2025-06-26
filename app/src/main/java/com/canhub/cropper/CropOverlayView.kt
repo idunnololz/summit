@@ -75,6 +75,13 @@ internal class CropOverlayView @JvmOverloads constructor(
   private var mCircleCornerFillColor: Int? = null
   private var mOptions: CropImageOptions? = null
 
+  var options
+    get() = mOptions
+    set(value) {
+      mOptions = value
+      invalidate()
+    }
+
   /** Gesture detector used for multitouch box scaling. */
   private var mScaleDetector: ScaleGestureDetector? = null
 
@@ -312,6 +319,13 @@ internal class CropOverlayView @JvmOverloads constructor(
    */
   fun setCropLabelTextColor(textColor: Int) {
     this.cropLabelTextColor = textColor
+    invalidate()
+  }
+
+  fun setBorderColor(color: Int) {
+    mBorderPaint?.color = color
+    mBorderCornerPaint?.color = color
+    mGuidelinePaint?.color = color
     invalidate()
   }
 

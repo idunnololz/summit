@@ -130,8 +130,12 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.Consts
+import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import java.io.InputStream
@@ -142,7 +146,10 @@ import java.net.UnknownHostException
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -151,6 +158,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -158,47 +166,36 @@ class LemmyApiClient @Inject constructor(
   private val apiListenerManager: ApiListenerManager,
   private val preferences: Preferences,
   @LemmyApi val okHttpClient: OkHttpClient,
+  private val siteBackendHelper: SiteBackendHelper,
+  coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
   companion object {
     private const val TAG = "LemmyApiClient"
 
-    const val API_VERSION = "v3"
-    const val DEFAULT_INSTANCE = "lemmy.ml"
-    const val INSTANCE_LEMMY_WORLD = "lemmy.world"
-
-    val DEFAULT_LEMMY_INSTANCES = listOf(
-      "beehaw.org",
-      "discuss.tchncs.de",
-      "feddit.de",
-      "feddit.it",
-      "hexbear.net",
-      "lemm.ee",
-      "lemmy.blahaj.zone",
-      "lemmy.ca",
-      "lemmy.dbzer0.com",
-      "lemmy.ml",
-      "lemmy.one",
-      "lemmy.sdf.org",
-      INSTANCE_LEMMY_WORLD,
-      "lemmy.zip",
-      "lemmygrad.ml",
-      "lemmynsfw.com",
-      "midwest.social",
-      "mujico.org",
-      "programming.dev",
-      "sh.itjust.works",
-      "slrpnk.net",
-      "sopuli.xyz",
-      "szmer.info",
-    )
-
-    private val apis = mutableMapOf<String, LemmyApiWithSite>()
+    private val apis = mutableMapOf<String, LemmyApiV3WithSite>()
   }
 
-  private var api = getApiWithInstance(
+  @Singleton
+  class Factory @Inject constructor(
+    private val apiListenerManager: ApiListenerManager,
+    private val preferences: Preferences,
+    @LemmyApi private val okHttpClient: OkHttpClient,
+    private val siteBackendHelper: SiteBackendHelper,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
+  ) {
+    fun create() = LemmyApiClient(
+      apiListenerManager = apiListenerManager,
+      preferences = preferences,
+      okHttpClient = okHttpClient,
+      siteBackendHelper = siteBackendHelper,
+      coroutineScopeFactory = coroutineScopeFactory,
+    )
+  }
+
+  private var api: LemmyApiV3WithSite = getApiV3WithInstance(
     instance = preferences.guestAccountSettings?.instance
-      ?: DEFAULT_INSTANCE,
+      ?: Consts.DEFAULT_INSTANCE,
   )
 
   private val Account.bearer: String
@@ -206,21 +203,40 @@ class LemmyApiClient @Inject constructor(
 
   private fun String.toBearer(): String = "Bearer $this"
 
-  class Factory @Inject constructor(
-    private val apiListenerManager: ApiListenerManager,
-    private val preferences: Preferences,
-    @LemmyApi private val okHttpClient: OkHttpClient,
-  ) {
-    fun create() = LemmyApiClient(
-      apiListenerManager = apiListenerManager,
-      preferences = preferences,
-      okHttpClient = okHttpClient,
-    )
+  val instance: String
+    get() = instanceFlow.value
+
+  val instanceFlow = MutableStateFlow(api.instance)
+
+  private val coroutineScope = coroutineScopeFactory.create()
+
+  private val apiInfo =
+    MutableStateFlow<StatefulData<SiteBackendHelper.ApiInfo>>(StatefulData.NotStarted())
+
+  init {
+    var fetchApiInfoJob: Job? = null
+
+    coroutineScope.launch {
+      instanceFlow.collect {
+        apiInfo.value = StatefulData.Loading()
+
+        fetchApiInfoJob?.cancel()
+        fetchApiInfoJob = coroutineScope.launch {
+          apiInfo.value = siteBackendHelper.fetchApiInfo(it).fold(
+            {
+              Log.d(TAG, "Determined backend for instance $instance is ${it.backendType}.")
+              StatefulData.Success(it)
+            },
+            { StatefulData.Error(it) }
+          )
+        }
+      }
+    }
   }
 
   fun changeInstance(newInstance: String) {
     try {
-      api = getApiWithInstance(instance = newInstance)
+      api = getApiV3WithInstance(instance = newInstance)
 
       instanceFlow.value = api.instance
     } catch (e: Exception) {
@@ -229,13 +245,13 @@ class LemmyApiClient @Inject constructor(
   }
 
   fun refreshClient() {
-    api = getApiWithInstance(instance = instance)
+    api = getApiV3WithInstance(instance = instance)
   }
 
   fun defaultInstance() {
-    api = getApiWithInstance(
+    api = getApiV3WithInstance(
       instance = preferences.guestAccountSettings?.instance
-        ?: DEFAULT_INSTANCE,
+        ?: Consts.DEFAULT_INSTANCE,
     )
 
     instanceFlow.value = api.instance
@@ -2127,11 +2143,6 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
-  val instance: String
-    get() = instanceFlow.value
-
-  val instanceFlow = MutableStateFlow(api.instance)
-
   private suspend fun <T> retrofitErrorHandler(call: () -> Call<T>): Result<T> {
     val res = try {
       runInterruptible(Dispatchers.IO) {
@@ -2242,21 +2253,21 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  private fun getApiWithInstance(instance: String = DEFAULT_INSTANCE): LemmyApiWithSite {
+  private fun getApiV3WithInstance(instance: String = Consts.DEFAULT_INSTANCE): LemmyApiV3WithSite {
     return apis[instance]
-      ?: newApi(instance).also {
+      ?: newApiV3(instance).also {
         apis[instance] = it
       }
   }
 
-  private fun newApi(instance: String = DEFAULT_INSTANCE): LemmyApiWithSite {
-    return LemmyApiWithSite(
+  private fun newApiV3(instance: String = Consts.DEFAULT_INSTANCE): LemmyApiV3WithSite {
+    return LemmyApiV3WithSite(
       Retrofit.Builder()
-        .baseUrl("https://$instance/api/$API_VERSION/")
+        .baseUrl("https://$instance/api/v3/")
         .addConverterFactory(GsonConverterFactory.create())
         .client(okHttpClient)
         .build()
-        .create(com.idunnololz.summit.api.LemmyApi::class.java),
+        .create(com.idunnololz.summit.api.LemmyApiV3::class.java),
       instance,
     )
   }

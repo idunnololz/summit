@@ -428,6 +428,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
         ),
       )
     }
+    sb.appendSeparator()
 
     currentTextView.text = sb
     currentTextView.movementMethod = makeMovementMethod(

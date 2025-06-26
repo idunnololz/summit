@@ -1,0 +1,32 @@
+package com.idunnololz.summit.lemmy
+
+object Consts {
+  const val DEFAULT_INSTANCE = "lemmy.ml"
+  const val INSTANCE_LEMMY_WORLD = "lemmy.world"
+
+  val DEFAULT_LEMMY_INSTANCES = listOf(
+    "beehaw.org",
+    "discuss.tchncs.de",
+    "feddit.de",
+    "feddit.it",
+    "hexbear.net",
+    "lemm.ee",
+    "lemmy.blahaj.zone",
+    "lemmy.ca",
+    "lemmy.dbzer0.com",
+    "lemmy.ml",
+    "lemmy.one",
+    "lemmy.sdf.org",
+    INSTANCE_LEMMY_WORLD,
+    "lemmy.zip",
+    "lemmygrad.ml",
+    "lemmynsfw.com",
+    "midwest.social",
+    "mujico.org",
+    "programming.dev",
+    "sh.itjust.works",
+    "slrpnk.net",
+    "sopuli.xyz",
+    "szmer.info",
+  )
+}

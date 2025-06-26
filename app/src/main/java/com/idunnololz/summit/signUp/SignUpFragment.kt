@@ -26,8 +26,6 @@ import coil3.dispose
 import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
-import com.idunnololz.summit.api.LemmyApiClient.Companion.INSTANCE_LEMMY_WORLD
 import com.idunnololz.summit.databinding.FragmentSignUpBinding
 import com.idunnololz.summit.databinding.SignUpAnswerFormBinding
 import com.idunnololz.summit.databinding.SignUpCaptchaFormBinding
@@ -38,6 +36,8 @@ import com.idunnololz.summit.databinding.SignUpSubmitApplicationBinding
 import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragment
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
+import com.idunnololz.summit.lemmy.Consts.DEFAULT_LEMMY_INSTANCES
+import com.idunnololz.summit.lemmy.Consts.INSTANCE_LEMMY_WORLD
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment

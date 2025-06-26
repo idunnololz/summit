@@ -21,7 +21,6 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
@@ -33,6 +32,7 @@ import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.CommentsSortOrder
+import com.idunnololz.summit.lemmy.Consts.DEFAULT_INSTANCE
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toApiSortOrder

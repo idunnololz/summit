@@ -1,6 +1,6 @@
 package com.idunnololz.summit.preferences
 
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_INSTANCE
+import com.idunnololz.summit.lemmy.Consts.DEFAULT_INSTANCE
 import kotlinx.serialization.Serializable
 
 @Serializable

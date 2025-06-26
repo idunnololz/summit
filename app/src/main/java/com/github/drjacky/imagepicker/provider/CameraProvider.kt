@@ -13,6 +13,7 @@ import com.github.drjacky.imagepicker.util.FileUtil
 import com.github.drjacky.imagepicker.util.IntentUtils
 import com.github.drjacky.imagepicker.util.PermissionUtil
 import com.idunnololz.summit.R
+import com.idunnololz.summit.util.getParcelableCompat
 import java.io.File
 import java.io.IOException
 
@@ -71,7 +72,7 @@ class CameraProvider(
    */
   override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
     // Restore Camera File
-    mCameraUri = savedInstanceState?.getParcelable(STATE_CAMERA_URI) as Uri?
+    mCameraUri = savedInstanceState?.getParcelableCompat<Uri>(STATE_CAMERA_URI)
   }
 
   /**

@@ -16,6 +16,7 @@ import com.github.drjacky.imagepicker.provider.CompressionProvider
 import com.github.drjacky.imagepicker.provider.CropProvider
 import com.github.drjacky.imagepicker.provider.GalleryProvider
 import com.idunnololz.summit.R
+import com.idunnololz.summit.util.getParcelableCompat
 import java.io.File
 import java.io.IOException
 
@@ -108,7 +109,7 @@ class ImagePickerActivity : AppCompatActivity() {
    */
   private fun restoreInstanceState(savedInstanceState: Bundle?) {
     if (savedInstanceState != null) {
-      mImageUri = savedInstanceState.getParcelable(STATE_IMAGE_URI) as Uri?
+      mImageUri = savedInstanceState.getParcelableCompat<Uri>(STATE_IMAGE_URI)
     }
   }
 

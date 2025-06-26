@@ -3,7 +3,7 @@ package com.idunnololz.summit.lemmy.instancePicker
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.LemmyApiClient.Companion.DEFAULT_LEMMY_INSTANCES
+import com.idunnololz.summit.lemmy.Consts.DEFAULT_LEMMY_INSTANCES
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import info.debatty.java.stringsimilarity.NGram

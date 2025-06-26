@@ -121,7 +121,7 @@ class LemmyHeaderView : FrameLayout {
   private fun LinkifyTextView.style(): LinkifyTextView {
     maxLines = 1
     includeFontPadding = false
-//        isSingleLine = true
+    isSingleLine = true
     setTextColor(context.getColorCompat(R2.color.colorTextFaint))
     TextViewCompat.setCompoundDrawableTintList(
       this,
