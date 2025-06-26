@@ -96,6 +96,10 @@
 
     <color name="ucrop_color_widget_active">@color/md_theme_light_primary</color>
 
+    <color name="launcher_background_color">#FFFFFF</color>
+    <color name="splash_background_color">#FFFFFF</color>
+
+
     <!-- Generated -->
     <color name="seed">#3a5ba9</color>
     <color name="md_theme_light_primary">@color/orangeTheme</color>
