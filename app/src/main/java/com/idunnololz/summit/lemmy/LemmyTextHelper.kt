@@ -419,6 +419,7 @@ class LemmyTextHelper @Inject constructor(
           } else {
             Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS
           },
+          true
         ),
       )
       .usePlugin(TablePlugin.create(context))

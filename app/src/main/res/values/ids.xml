@@ -300,4 +300,5 @@
     <item name="site_ban" type="id" />
     <item name="video_details" type="id" />
     <item name="is_saved" type="id" />
+    <item name="insert_link" type="id" />
 </resources>

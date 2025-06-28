@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.Layout
 import android.view.Gravity
 import android.widget.EditText
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
@@ -19,7 +20,10 @@ import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
+import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.util.AnimationsHelper
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.view.CustomTextInputEditText
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -145,7 +149,10 @@ class MentionsController @AssistedInject constructor(
     return null
   }
 
-  private fun showPopupWindow(anchor: EditText, queryResult: QueryResult) {
+  private fun showPopupWindow(
+    anchor: EditText,
+    queryResult: QueryResult,
+  ) {
     if (queryResult.results.isEmpty()) {
       hideQueryPopup()
       return
@@ -166,20 +173,53 @@ class MentionsController @AssistedInject constructor(
     val popupMargin = 0 // margin is built into the background
     val backgroundPadding = anchor.context.resources.getDimensionPixelSize(R.dimen.padding) * 2
 
+    fun onItemSelected(text: String) {
+      val query = extractQueryIfExists(editText.text, editText.selectionStart)
+        ?: return
+      val position = editText.selectionStart
+      editText.text?.replace(
+        position - query.length,
+        position,
+        "$text ",
+      )
+    }
+
     currentQueryPopupWindow = MentionsAutoCompletePopupWindow(
       context = anchor.context,
       adapterFactory = mentionsAdapterFactory,
       animationsHelper = animationsHelper,
-      onItemSelected = a@{
-        val query = extractQueryIfExists(editText.text, editText.selectionStart)
-          ?: return@a
-        val position = editText.selectionStart
-        editText.text?.replace(
-          position - query.length,
-          position,
-          "$it ",
-        )
-      },
+      onItemSelected = { onItemSelected(it) },
+      onItemLongClick = { resultItem ->
+        PopupMenu(anchor.context, editText.rootView)
+          .apply {
+            menu.add(0, R.id.insert_link, 0, R.string.insert_link)
+
+            setOnMenuItemClickListener {
+              when (it.itemId) {
+                R.id.insert_link -> {
+                  when (resultItem) {
+                    is CommunityResultItem -> {
+                      val link = LinkUtils.getLinkForCommunity(
+                        resultItem.communityView.community.toCommunityRef())
+                      val text = "${resultItem.mentionPrefix}${resultItem.communityView.community.fullName}"
+
+                      onItemSelected("[$text]($link)")
+                    }
+                    is PersonResultItem -> {
+                      val link = LinkUtils.getLinkForPerson(
+                        resultItem.personView.person.toPersonRef())
+                      val text = "${resultItem.mentionPrefix}${resultItem.personView.person.fullName}"
+
+                      onItemSelected("[$text]($link)")
+                    }
+                  }
+                }
+              }
+              true
+            }
+          }
+          .show()
+      }
     ).apply {
       adapter.setItems(queryResult.results) {
         currentQueryPopupWindow?.binding?.recyclerView?.scrollToPosition(0)

@@ -25,6 +25,7 @@ class MentionsResultAdapter @AssistedInject constructor(
   }
 
   var onResultSelected: ((ResultItem) -> Unit)? = null
+  var onResultLongClick: ((ResultItem) -> Unit)? = null
 
   private var items: List<MentionsAutoCompleteItem> = listOf()
 
@@ -61,6 +62,10 @@ class MentionsResultAdapter @AssistedInject constructor(
       b.root.setOnClickListener {
         onResultSelected?.invoke(item)
       }
+      b.root.setOnLongClickListener {
+        onResultLongClick?.invoke(item)
+        true
+      }
     }
     addItemType(
       clazz = PersonResultItem::class,
@@ -77,6 +82,10 @@ class MentionsResultAdapter @AssistedInject constructor(
 
       b.root.setOnClickListener {
         onResultSelected?.invoke(item)
+      }
+      b.root.setOnLongClickListener {
+        onResultLongClick?.invoke(item)
+        true
       }
     }
     addItemType(

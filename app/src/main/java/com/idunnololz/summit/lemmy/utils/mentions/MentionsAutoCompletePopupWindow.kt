@@ -18,6 +18,7 @@ class MentionsAutoCompletePopupWindow(
   adapterFactory: MentionsResultAdapter.Factory,
   animationsHelper: AnimationsHelper,
   val onItemSelected: (String) -> Unit,
+  val onItemLongClick: (ResultItem) -> Unit,
 ) : PopupWindow(context) {
 
   val adapter = adapterFactory.create()
@@ -39,18 +40,19 @@ class MentionsAutoCompletePopupWindow(
     adapter.onResultSelected = {
       when (it) {
         is CommunityResultItem -> {
-          val link = LinkUtils.getLinkForCommunity(it.communityView.community.toCommunityRef())
           val text = "${it.mentionPrefix}${it.communityView.community.fullName}"
 
-          onItemSelected("[$text]($link)")
+          onItemSelected(text)
         }
         is PersonResultItem -> {
-          val link = LinkUtils.getLinkForPerson(it.personView.person.toPersonRef())
           val text = "${it.mentionPrefix}${it.personView.person.fullName}"
 
-          onItemSelected("[$text]($link)")
+          onItemSelected(text)
         }
       }
+    }
+    adapter.onResultLongClick = {
+      onItemLongClick(it)
     }
 
     setBackgroundDrawable(null)

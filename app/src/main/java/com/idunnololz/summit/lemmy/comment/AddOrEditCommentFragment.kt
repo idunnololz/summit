@@ -217,11 +217,8 @@ class AddOrEditCommentFragment :
 
   override fun onStart() {
     super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
+    dialog?.window?.let { window ->
+      WindowCompat.setDecorFitsSystemWindows(window, false)
     }
   }
 
