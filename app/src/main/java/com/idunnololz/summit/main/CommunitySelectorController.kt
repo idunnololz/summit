@@ -683,7 +683,8 @@ class CommunitySelectorController @AssistedInject constructor(
         }
 
         newItems.apply {
-          val recents = recentCommunityManager.getRecentCommunities()
+          val recents = recentCommunityManager.getRecentCommunitiesVisited()
+            .take(3)
           if (recents.isNotEmpty()) {
             add(Item.GroupHeaderItem(context.getString(R.string.recents)))
             recents.forEach {

@@ -113,7 +113,7 @@ class CommunityViewModel @Inject constructor(
   private val communityRefChangeObserver = Observer<CommunityRef?> {
     it ?: return@Observer
 
-    recentCommunityManager.addRecentCommunity(it)
+    recentCommunityManager.addRecentCommunityVisited(it)
     updateSortOrder()
     loadCommunityInfo()
   }

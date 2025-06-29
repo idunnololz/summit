@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.graphics.Point
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -23,6 +24,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -30,6 +32,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
@@ -44,6 +47,7 @@ import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -72,7 +76,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CreateOrEditPostFragment :
+class AddOrEditPostFragment :
   BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
   FullscreenDialogFragment,
   OldAlertDialogFragment.AlertDialogFragmentListener {
@@ -80,11 +84,40 @@ class CreateOrEditPostFragment :
   companion object {
     const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"
     const val REQUEST_KEY_RESULT = "result"
+
+    fun show(
+      fragmentManager: FragmentManager,
+      instance: String,
+      communityName: String?,
+      post: Post? = null,
+      draft: DraftEntry? = null,
+      crosspost: Post? = null,
+      extraText: String? = null,
+      extraStream: Uri? = null,
+    ) {
+      AddOrEditPostFragment()
+        .apply {
+          arguments =
+            AddOrEditPostFragmentArgs(
+              instance = instance,
+              communityName = communityName,
+              post = post,
+              draft = draft,
+              crosspost = crosspost,
+              extraText = extraText,
+              extraStream = extraStream,
+            ).toBundle()
+        }
+        .showAllowingStateLoss(
+          fragmentManager,
+          "CreateOrEditPostFragment",
+        )
+    }
   }
 
-  private val args by navArgs<CreateOrEditPostFragmentArgs>()
+  private val args by navArgs<AddOrEditPostFragmentArgs>()
 
-  private val viewModel: CreateOrEditPostViewModel by viewModels()
+  private val viewModel: AddOrEditPostViewModel by viewModels()
   private val uploadImageViewModel: UploadImageViewModel by viewModels()
 
   private var adapter: CommunitySearchResultsAdapter? = null
@@ -109,6 +142,9 @@ class CreateOrEditPostFragment :
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  @Inject
+  lateinit var recentCommunityManager: RecentCommunityManager
 
   private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -252,7 +288,7 @@ class CreateOrEditPostFragment :
                 .setMessage(R.string.warn_upload_in_progress)
                 .setPositiveButton(R.string.proceed_anyways)
                 .setNegativeButton(R.string.cancel)
-                .createAndShow(this@CreateOrEditPostFragment, "create_post")
+                .createAndShow(this@AddOrEditPostFragment, "create_post")
               return@a true
             }
 
@@ -271,7 +307,7 @@ class CreateOrEditPostFragment :
                 .setMessage(R.string.warn_upload_in_progress)
                 .setPositiveButton(R.string.proceed_anyways)
                 .setNegativeButton(R.string.cancel)
-                .createAndShow(this@CreateOrEditPostFragment, "update_post")
+                .createAndShow(this@AddOrEditPostFragment, "update_post")
               return@a true
             }
 
@@ -543,18 +579,16 @@ class CreateOrEditPostFragment :
         when (it) {
           is StatefulData.Error -> {
             loadingView.hideAll()
-            if (it.error is CreateOrEditPostViewModel.NoTitleError) {
+            if (it.error is AddOrEditPostViewModel.NoTitleError) {
               title.error = getString(R.string.required)
             } else {
-              OldAlertDialogFragment.Builder()
-                .setMessage(
-                  getString(
-                    R.string.error_unable_to_send_post,
-                    it.error::class.qualifiedName,
-                    it.error.message,
-                  ),
+              launchAlertDialog("error_unable_to_send_post") {
+                message = getString(
+                  R.string.error_unable_to_send_post,
+                  it.error::class.qualifiedName,
+                  it.error.message,
                 )
-                .createAndShow(childFragmentManager, "ASDS")
+              }
             }
           }
           is StatefulData.Loading -> {
@@ -663,8 +697,7 @@ class CreateOrEditPostFragment :
       }
 
       communityEditText.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
-        viewModel.showSearch.value = communityEditText.hasFocus() &&
-          !communityEditText.text.isNullOrBlank()
+        viewModel.showSearch.value = communityEditText.hasFocus()
       }
 
       adapter = CommunitySearchResultsAdapter(
@@ -672,12 +705,16 @@ class CreateOrEditPostFragment :
         offlineManager,
         avatarHelper,
         onCommunitySelected = {
-          communityEditText.setText(it.community.toCommunityRef().fullName)
+          when (it) {
+            is CommunityRef.CommunityRefByName ->
+              communityEditText.setText(it.fullName)
+            else -> null
+          }
           viewModel.showSearch.value = false
         },
       )
       communitySuggestionsRecyclerView.apply {
-        adapter = this@CreateOrEditPostFragment.adapter
+        adapter = this@AddOrEditPostFragment.adapter
         setHasFixedSize(true)
         setup(animationsHelper)
         layoutManager = LinearLayoutManager(context)
@@ -968,6 +1005,18 @@ class CreateOrEditPostFragment :
 
   private fun showSearch() {
     if (!isBindingAvailable()) return
+
+    val communityLos = IntArray(2)
+    val communitySuggestionsParentLos = IntArray(2)
+    adapter?.setRecents(recentCommunityManager.getRecentCommunitiesPostedTo())
+    binding.community.getLocationOnScreen(communityLos)
+    (binding.communitySuggestionsRecyclerView
+      .parent as View)
+      .getLocationOnScreen(communitySuggestionsParentLos)
+
+    binding.communitySuggestionsRecyclerView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      topMargin = communityLos[1] - communitySuggestionsParentLos[1] + binding.community.height
+    }
 
     binding.communitySuggestionsRecyclerView.animate().cancel()
 

@@ -9,9 +9,13 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
+import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchHeaderBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchNoResultsBinding
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.lemmy.RecentCommunityManager.CommunityHistoryEntry
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -19,7 +23,7 @@ class CommunitySearchResultsAdapter(
   private val context: Context,
   private val offlineManager: OfflineManager,
   private val avatarHelper: AvatarHelper,
-  private val onCommunitySelected: (CommunityView) -> Unit,
+  private val onCommunitySelected: (CommunityRef) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   private sealed interface Item {
@@ -38,8 +42,17 @@ class CommunitySearchResultsAdapter(
       val communityView: CommunityView,
       val monthlyActiveUsers: Int,
     ) : Item
+
+    data class RecentCommunityItem(
+      val text: String,
+      val communityRef: CommunityRef,
+      val communityIcon: String?,
+    ) : Item
+
+    data object FooterItem : Item
   }
 
+  private var recents: List<CommunityHistoryEntry>? = null
   private var serverResultsInProgress = false
   private var serverQueryResults: List<CommunityView> = listOf()
 
@@ -56,6 +69,10 @@ class CommunitySearchResultsAdapter(
           old.communityView.community.id ==
             (new as Item.SearchResultCommunityItem).communityView.community.id
         }
+        is Item.RecentCommunityItem ->
+          old.communityRef ==
+            (new as Item.RecentCommunityItem).communityRef
+        Item.FooterItem -> true
       }
     },
   ).apply {
@@ -85,7 +102,21 @@ class CommunitySearchResultsAdapter(
         "(${item.communityView.community.instance})"
 
       h.itemView.setOnClickListener {
-        onCommunitySelected(item.communityView)
+        onCommunitySelected(item.communityView.community.toCommunityRef())
+      }
+    }
+    addItemType(
+      clazz = Item.RecentCommunityItem::class,
+      inflateFn = CommunitySearchResultCommunityItemBinding::inflate,
+    ) { item, b, h ->
+      avatarHelper.loadCommunityIcon(
+        b.icon, item.communityRef, item.communityIcon)
+
+      b.title.text = item.text
+      b.monthlyActives.visibility = View.GONE
+
+      h.itemView.setOnClickListener {
+        onCommunitySelected(item.communityRef)
       }
     }
     addItemType(
@@ -94,6 +125,10 @@ class CommunitySearchResultsAdapter(
     ) { item, b, _ ->
       b.text.text = item.text
     }
+    addItemType(
+      clazz = Item.FooterItem::class,
+      inflateFn = GenericSpaceFooterItemBinding::inflate,
+    ) { item, b, _ -> }
   }
 
   override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
@@ -114,26 +149,49 @@ class CommunitySearchResultsAdapter(
 
   private fun refreshItems(cb: () -> Unit) {
     val newItems = mutableListOf<Item>()
+    val recents = recents
 
-    newItems.add(
-      Item.GroupHeaderItem(
-        context.getString(R.string.server_results),
-        serverResultsInProgress,
-      ),
-    )
-    if (serverQueryResults.isEmpty() && !serverResultsInProgress) {
-      newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
-    } else {
-      serverQueryResults.forEach {
-        newItems += Item.SearchResultCommunityItem(
-          it.community.name,
-          it,
-          it.counts.users_active_month,
+    if (query.isNullOrBlank() && !recents.isNullOrEmpty()) {
+      newItems.add(
+        Item.GroupHeaderItem(
+          context.getString(R.string.recents),
+          false,
+        ),
+      )
+      recents.mapTo(newItems) {
+        Item.RecentCommunityItem(
+          text = it.communityRef.getLocalizedFullName(context),
+          communityRef = it.communityRef,
+          communityIcon = it.iconUrl,
         )
+      }
+    } else {
+      newItems.add(
+        Item.GroupHeaderItem(
+          context.getString(R.string.server_results),
+          serverResultsInProgress,
+        ),
+      )
+      if (serverQueryResults.isEmpty() && !serverResultsInProgress) {
+        newItems.add(Item.NoResultsItem(context.getString(R.string.no_results_found)))
+      } else {
+        serverQueryResults.forEach {
+          newItems += Item.SearchResultCommunityItem(
+            it.community.name,
+            it,
+            it.counts.users_active_month,
+          )
+        }
       }
     }
 
     adapterHelper.setItems(newItems, this, cb)
+  }
+
+  fun setRecents(recents: List<CommunityHistoryEntry>) {
+    this.recents = recents
+
+    refreshItems({})
   }
 
   fun setQuery(query: String?, cb: () -> Unit) {

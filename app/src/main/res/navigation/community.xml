@@ -172,7 +172,7 @@
     </fragment>
     <dialog
         android:id="@+id/createOrEditPostFragment"
-        android:name="com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment"
+        android:name="com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment"
         android:label="CreateOrEditPostFragment" >
         <argument
             android:name="instance"

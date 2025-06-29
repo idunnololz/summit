@@ -14,8 +14,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.DialogFragmentReceiveFileBinding
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.saveForLater.SaveForLaterDialogFragment
 import com.idunnololz.summit.saveForLater.SaveForLaterDialogFragmentArgs
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -101,17 +100,12 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
           return@setOnClickListener
         }
 
-        CreateOrEditPostFragment()
-          .apply {
-            arguments = CreateOrEditPostFragmentArgs(
-              instance = account.instance,
-              communityName = null,
-              post = null,
-              crosspost = null,
-              extraStream = args.fileUri,
-            ).toBundle()
-          }
-          .show(parentFragmentManager, "CreateOrEditPostFragment")
+        AddOrEditPostFragment.show(
+          fragmentManager = parentFragmentManager,
+          instance = account.instance,
+          communityName = null,
+          extraStream = args.fileUri,
+        )
         dismiss()
       }
       saveForLater.setOnClickListener {

@@ -12,8 +12,7 @@ import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.contentDetails.ContentDetailsDialogFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
@@ -280,15 +279,12 @@ fun BaseFragment<*>.createPostActionHandler(
       )
     }
     R.id.edit_post -> {
-      CreateOrEditPostFragment()
-        .apply {
-          arguments = CreateOrEditPostFragmentArgs(
-            instance = moreActionsHelper.apiInstance,
-            post = postView.post,
-            communityName = null,
-          ).toBundle()
-        }
-        .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+      AddOrEditPostFragment.show(
+        fragmentManager = childFragmentManager,
+        instance = moreActionsHelper.apiInstance,
+        post = postView.post,
+        communityName = null,
+      )
     }
     R.id.delete -> {
       moreActionsHelper.deletePost(postView.post.id, delete = true)
@@ -331,16 +327,13 @@ fun BaseFragment<*>.createPostActionHandler(
       )
     }
     R.id.pa_cross_post -> {
-      CreateOrEditPostFragment()
-        .apply {
-          arguments = CreateOrEditPostFragmentArgs(
-            instance = moreActionsHelper.apiInstance,
-            post = null,
-            communityName = null,
-            crosspost = postView.post,
-          ).toBundle()
-        }
-        .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+      AddOrEditPostFragment.show(
+        fragmentManager = childFragmentManager,
+        instance = moreActionsHelper.apiInstance,
+        post = null,
+        communityName = null,
+        crosspost = postView.post,
+      )
     }
     R.id.pa_share_fediverse_link -> {
       Utils.shareLink(

@@ -15,8 +15,8 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentDraftsBinding
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragmentArgs
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -204,19 +204,12 @@ class DraftsFragment :
           )
       }
       is DraftData.PostDraftData -> {
-        CreateOrEditPostFragment()
-          .apply {
-            arguments =
-              CreateOrEditPostFragmentArgs(
-                instance = viewModel.apiInstance,
-                communityName = draftEntry.data.targetCommunityFullName,
-                draft = draftEntry,
-              ).toBundle()
-          }
-          .showAllowingStateLoss(
-            childFragmentManager,
-            "CreateOrEditPostFragment",
-          )
+        AddOrEditPostFragment.show(
+          fragmentManager = childFragmentManager,
+          instance = viewModel.apiInstance,
+          communityName = draftEntry.data.targetCommunityFullName,
+          draft = draftEntry,
+        )
       }
       is DraftData.MessageDraftData -> {}
       null -> {}

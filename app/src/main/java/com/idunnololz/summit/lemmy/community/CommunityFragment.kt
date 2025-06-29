@@ -55,8 +55,7 @@ import com.idunnololz.summit.lemmy.MultiCommunityException
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
@@ -460,11 +459,11 @@ class CommunityFragment :
 
     with(childFragmentManager) {
       setFragmentResultListener(
-        CreateOrEditPostFragment.REQUEST_KEY,
+        AddOrEditPostFragment.REQUEST_KEY,
         this@CommunityFragment,
       ) { _, bundle ->
         val result = bundle.getParcelableCompat<PostView>(
-          CreateOrEditPostFragment.REQUEST_KEY_RESULT,
+          AddOrEditPostFragment.REQUEST_KEY_RESULT,
         )
 
         if (result != null) {
@@ -1652,14 +1651,11 @@ class CommunityFragment :
           null -> {}
         }
 
-        CreateOrEditPostFragment()
-          .apply {
-            arguments = CreateOrEditPostFragmentArgs(
-              instance = viewModel.communityInstance,
-              communityName = communityName,
-            ).toBundle()
-          }
-          .showAllowingStateLoss(childFragmentManager, "CreateOrEditPostFragment")
+        AddOrEditPostFragment.show(
+          fragmentManager = childFragmentManager,
+          instance = viewModel.communityInstance,
+          communityName = communityName,
+        )
       }
       R.id.ca_share -> {
         try {

@@ -19,6 +19,8 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
+import com.idunnololz.summit.lemmy.RecentCommunityManager
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.links.LinkMetadataHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,12 +34,13 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class) // Flow.debounce()
 @HiltViewModel
-class CreateOrEditPostViewModel @Inject constructor(
+class AddOrEditPostViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val accountManager: AccountManager,
   private val state: SavedStateHandle,
   private val linkMetadataHelper: LinkMetadataHelper,
   val draftsManager: DraftsManager,
+  private val recentCommunityManager: RecentCommunityManager,
 ) : ViewModel() {
 
   companion object {
@@ -92,41 +95,46 @@ class CreateOrEditPostViewModel @Inject constructor(
       return
     }
 
+    if (name.isBlank()) {
+      createOrEditPostResult.postError(NoTitleError())
+      return
+    }
+
     createOrEditPostResult.setIsLoading()
     viewModelScope.launch {
-      val communityIdResult =
+      val communityResult =
         apiClient.fetchCommunityWithRetry(
           Either.Right(communityFullName),
           force = false,
         )
           .fold(
             {
-              Result.success(it.community_view.community.id)
+              Result.success(it.community_view.community)
             },
             {
               Result.failure(it)
             },
           )
 
-      if (communityIdResult.isFailure) {
+      if (communityResult.isFailure) {
         createOrEditPostResult.postError(
-          requireNotNull(communityIdResult.exceptionOrNull()),
+          requireNotNull(communityResult.exceptionOrNull()),
         )
         return@launch
       }
 
-      if (name.isBlank()) {
-        createOrEditPostResult.postError(NoTitleError())
-        return@launch
-      }
+      val community = communityResult.getOrThrow()
 
       val result = apiClient.createPost(
         name = name,
         body = body.ifBlank { null },
         url = url.ifBlank { null },
         isNsfw = isNsfw,
-        communityId = communityIdResult.getOrThrow(),
+        communityId = community.id,
       )
+
+      recentCommunityManager.addRecentCommunityPostedTo(
+        community.toCommunityRef(), community.icon)
 
       result
         .onSuccess {

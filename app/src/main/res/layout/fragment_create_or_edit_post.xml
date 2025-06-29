@@ -227,19 +227,7 @@
                             android:layout_height="@dimen/footer_spacer_height"
                             app:layout_constraintTop_toBottomOf="@+id/nsfw_switch"
                             app:layout_constraintStart_toStartOf="parent"/>
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/community_suggestions_recycler_view"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:background="?backgroundColor"
-                            android:elevation="8dp"
-                            app:layout_constraintTop_toBottomOf="@+id/community"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"/>
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
-
                 </androidx.core.widget.NestedScrollView>
 
                 <com.idunnololz.summit.view.LoadingView
@@ -262,5 +250,15 @@
             android:background="@color/colorSurface"
             android:layout_gravity="top|left">
         </HorizontalScrollView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/community_suggestions_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?backgroundColor"
+            android:elevation="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/community"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
     </FrameLayout>
 </FrameLayout>

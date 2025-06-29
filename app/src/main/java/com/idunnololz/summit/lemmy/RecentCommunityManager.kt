@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.core.content.edit
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.preferences.SharedPreferencesManager
 import com.idunnololz.summit.preferences.StateSharedPreference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,14 +19,15 @@ class RecentCommunityManager @Inject constructor(
   @StateSharedPreference private val statePreferences: SharedPreferences,
   private val lemmyApiClientFactory: LemmyApiClient.Factory,
   private val coroutineScopeFactory: CoroutineScopeFactory,
-  private val sharedPreferencesManager: SharedPreferencesManager,
   private val json: Json,
 ) {
   companion object {
     private const val TAG = "RecentCommunityManager"
 
-    private const val MAX_RECENTS = 3
+    private const val MAX_RECENTS = 10
     private const val PREF_KEY_RECENT_COMMUNITIES = "PREF_KEY_RECENT_COMMUNITIES"
+    private const val PREF_KEY_RECENT_COMMUNITIES_POSTED_TO =
+      "PREF_KEY_RECENT_COMMUNITIES_POSTED_TO"
   }
 
   private val lemmyApiClient = lemmyApiClientFactory.create()
@@ -37,26 +37,31 @@ class RecentCommunityManager @Inject constructor(
   /**
    * Priority queue where the last item is the most recent recent.
    */
-  private var _recentCommunities: LinkedHashMap<String, CommunityHistoryEntry>? = null
+  private val recentCommunities = RecentCommunityCache(PREF_KEY_RECENT_COMMUNITIES)
+
+  private val recentCommunitiesPostedTo = RecentCommunityCache(PREF_KEY_RECENT_COMMUNITIES_POSTED_TO)
 
   init {
-    val preferences = sharedPreferencesManager.currentSharedPreferences
-    if (preferences.contains(PREF_KEY_RECENT_COMMUNITIES)) {
-      val str = preferences.getString(PREF_KEY_RECENT_COMMUNITIES, "")
 
-      statePreferences.edit {
-        putString(PREF_KEY_RECENT_COMMUNITIES, str)
-      }
-      preferences.edit {
-        remove(PREF_KEY_RECENT_COMMUNITIES)
-      }
-    }
   }
 
-  fun getRecentCommunities(): List<CommunityHistoryEntry> =
-    getRecents().values.sortedByDescending { it.ts }
+  fun getRecentCommunitiesVisited(): List<CommunityHistoryEntry> =
+    recentCommunities.getRecents()
+      .values
+      .sortedByDescending { it.ts }
 
-  fun addRecentCommunity(communityRef: CommunityRef, iconUrl: String? = null) {
+  fun addRecentCommunityVisited(communityRef: CommunityRef, iconUrl: String? = null) =
+    recentCommunities.addRecent(communityRef, iconUrl)
+
+  fun getRecentCommunitiesPostedTo(): List<CommunityHistoryEntry> =
+    recentCommunitiesPostedTo.getRecents()
+      .values
+      .sortedByDescending { it.ts }
+
+  fun addRecentCommunityPostedTo(communityRef: CommunityRef, iconUrl: String? = null) =
+    recentCommunities.addRecent(communityRef, iconUrl)
+
+  private fun RecentCommunityCache.addRecent(communityRef: CommunityRef, iconUrl: String? = null) {
     if (communityRef is CommunityRef.All ||
       communityRef is CommunityRef.Subscribed ||
       communityRef is CommunityRef.Local
@@ -65,10 +70,11 @@ class RecentCommunityManager @Inject constructor(
       return
     }
 
+    val cache = this
     val key = communityRef.getKey()
-    Log.d(TAG, "Add recent community: $key")
+    Log.d(TAG, "Add recent community: $key type: ${this.prefKey}")
 
-    val recents = getRecents()
+    val recents = this.getRecents()
 
     // move item to front...
     recents.remove(key)
@@ -94,7 +100,7 @@ class RecentCommunityManager @Inject constructor(
       // serialize
       statePreferences.edit {
         putString(
-          PREF_KEY_RECENT_COMMUNITIES,
+          cache.prefKey,
           json.encodeToString(RecentCommunityData(resultsList)),
         )
       }
@@ -105,7 +111,7 @@ class RecentCommunityManager @Inject constructor(
     }
   }
 
-  private fun fetchRecentIcon(communityRef: CommunityRef.CommunityRefByName) {
+  private fun RecentCommunityCache.fetchRecentIcon(communityRef: CommunityRef.CommunityRefByName) {
     val instance = communityRef.instance
       ?: return
 
@@ -123,18 +129,19 @@ class RecentCommunityManager @Inject constructor(
 
       if (iconUrl != null) {
         withContext(Dispatchers.Main) {
-          addRecentCommunity(communityRef, iconUrl)
+          addRecent(communityRef, iconUrl)
         }
       }
     }
   }
 
-  private fun getRecents(): LinkedHashMap<String, CommunityHistoryEntry> {
-    val recentCommunities = _recentCommunities
+  private fun RecentCommunityCache.getRecents(): LinkedHashMap<String, CommunityHistoryEntry> {
+    val cache = this
+    val recentCommunities = cache.get()
     if (recentCommunities != null) {
       return recentCommunities
     }
-    val jsonStr = statePreferences.getString(PREF_KEY_RECENT_COMMUNITIES, null)
+    val jsonStr = statePreferences.getString(cache.prefKey, null)
     val data = try {
       if (jsonStr != null) {
         json.decodeFromString<RecentCommunityData?>(jsonStr)
@@ -156,7 +163,7 @@ class RecentCommunityManager @Inject constructor(
     }
 
     return map.also {
-      _recentCommunities = it
+      cache.setRecents(it)
     }
   }
 
@@ -174,4 +181,16 @@ class RecentCommunityManager @Inject constructor(
   data class RecentCommunityData(
     val entries: List<CommunityHistoryEntry>,
   )
+
+  class RecentCommunityCache(
+    val prefKey: String,
+  ) {
+    private var recents: LinkedHashMap<String, CommunityHistoryEntry>? = null
+
+    fun setRecents(recents: LinkedHashMap<String, CommunityHistoryEntry>) {
+      this.recents = recents
+    }
+
+    fun get() = recents
+  }
 }

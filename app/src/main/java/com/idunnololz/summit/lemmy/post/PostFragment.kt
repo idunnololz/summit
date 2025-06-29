@@ -51,7 +51,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
@@ -223,11 +223,11 @@ class PostFragment :
     sharedElementReturnTransition = SharedElementTransition()
 
     childFragmentManager.setFragmentResultListener(
-      CreateOrEditPostFragment.REQUEST_KEY,
+      AddOrEditPostFragment.REQUEST_KEY,
       this,
     ) { _, bundle ->
       val result = bundle.getParcelableCompat<PostView>(
-        CreateOrEditPostFragment.REQUEST_KEY_RESULT,
+        AddOrEditPostFragment.REQUEST_KEY_RESULT,
       )
 
       if (result != null) {

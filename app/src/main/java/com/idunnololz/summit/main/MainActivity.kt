@@ -60,8 +60,7 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.CreateOrEditPostFragmentArgs
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -611,17 +610,12 @@ class MainActivity : SummitActivity() {
       return
     }
 
-    CreateOrEditPostFragment()
-      .apply {
-        arguments = CreateOrEditPostFragmentArgs(
-          account.instance,
-          null,
-          null,
-          null,
-          extraText = intent.getStringExtra(Intent.EXTRA_TEXT),
-        ).toBundle()
-      }
-      .show(supportFragmentManager, "CreateOrEditPostFragment")
+    AddOrEditPostFragment.show(
+      fragmentManager = supportFragmentManager,
+      instance = account.instance,
+      communityName = null,
+      extraText = intent.getStringExtra(Intent.EXTRA_TEXT),
+    )
   }
 
   private fun handleViewIntent(intent: Intent) {
