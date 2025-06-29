@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ModBanView(
   val mod_ban: ModBan,
   val moderator: Person? = null,

@@ -4,6 +4,7 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
@@ -23,6 +24,12 @@ import org.xmlpull.v1.XmlPullParserException
 fun Context.getColorFromAttribute(attribute: Int): Int {
   val attributes = obtainStyledAttributes(intArrayOf(attribute))
   val color = attributes.getColor(0, 0)
+  attributes.recycle()
+  return color
+}
+fun Context.getColorStateListFromAttribute(attribute: Int): ColorStateList? {
+  val attributes = obtainStyledAttributes(intArrayOf(attribute))
+  val color = attributes.getColorStateList(0)
   attributes.recycle()
   return color
 }

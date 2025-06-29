@@ -444,4 +444,12 @@ safeargs.
             android:name="url"
             app:argType="string" />
     </dialog>
+    <dialog
+        android:id="@+id/modEventDialogFragment"
+        android:name="com.idunnololz.summit.lemmy.modlogs.modEvent.ModEventDialogFragment"
+        android:label="ModEventDialogFragment" >
+        <argument
+            android:name="modEventJson"
+            app:argType="string" />
+    </dialog>
 </navigation>

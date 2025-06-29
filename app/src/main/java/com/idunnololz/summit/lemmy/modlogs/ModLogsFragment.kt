@@ -32,6 +32,7 @@ import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.getName
 import com.idunnololz.summit.lemmy.modlogs.ModLogsFragment.ModEventsAdapter.Item
 import com.idunnololz.summit.lemmy.modlogs.filter.ModLogsFilterDialogFragment
+import com.idunnololz.summit.lemmy.modlogs.modEvent.ModEventDialogFragment
 import com.idunnololz.summit.lemmy.utils.ListEngine
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkContext
@@ -164,6 +165,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         onFilterBannerClick = {
           showFilterDialog()
         },
+        onModEventClick = {
+          ModEventDialogFragment.show(childFragmentManager, it)
+        },
       )
       val layoutManager = LinearLayoutManager(context)
 
@@ -253,6 +257,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
     private val onFilterBannerClick: () -> Unit,
+    private val onModEventClick: (modEvent: ModEvent) -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     sealed interface Item {
@@ -289,13 +294,13 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
       summaryCharLength = when {
         widthDp < 400f -> {
-          40
-        }
-        widthDp < 600f -> {
           60
         }
+        widthDp < 600f -> {
+          90
+        }
         else -> {
-          80
+          120
         }
       }
     }
@@ -342,8 +347,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
         when (modEvent) {
           is ModEvent.AdminPurgeCommentViewEvent -> {
-            b.icon.setImageResource(R.drawable.baseline_delete_24)
-
             description = context.getString(
               R.string.purged_comment_format,
               "[${modEvent.event.post.name.summarize()}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
@@ -351,24 +354,18 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             reason = modEvent.event.admin_purge_comment.reason
           }
           is ModEvent.AdminPurgeCommunityViewEvent -> {
-            b.icon.setImageResource(R.drawable.baseline_delete_24)
-
             description = context.getString(
               R.string.purged_community,
             )
             reason = modEvent.event.admin_purge_community.reason
           }
           is ModEvent.AdminPurgePersonViewEvent -> {
-            b.icon.setImageResource(R.drawable.baseline_delete_24)
-
             description = context.getString(
               R.string.purged_person,
             )
             reason = modEvent.event.admin_purge_person.reason
           }
           is ModEvent.AdminPurgePostViewEvent -> {
-            b.icon.setImageResource(R.drawable.baseline_delete_24)
-
             description = context.getString(
               R.string.purged_post_format,
               "[${modEvent.event.community.name}](${
@@ -381,8 +378,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModAddCommunityViewEvent -> {
             if (modEvent.event.mod_add_community.removed) {
-              b.icon.setImageResource(R.drawable.outline_remove_moderator_24)
-
               description = context.getString(
                 R.string.removed_moderator_for_community_format,
                 "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
@@ -393,8 +388,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                   )})",
               )
             } else {
-              b.icon.setImageResource(R.drawable.outline_add_moderator_24)
-
               description = context.getString(
                 R.string.added_moderator_for_community_format,
                 "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
@@ -408,8 +401,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModAddViewEvent -> {
             if (modEvent.event.mod_add.removed) {
-              b.icon.setImageResource(R.drawable.outline_remove_moderator_24)
-
               description = context.getString(
                 R.string.removed_moderator_for_site_format,
                 "[${modEvent.event.modded_person.name}](${
@@ -421,8 +412,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
               )
             } else {
-              b.icon.setImageResource(R.drawable.outline_add_moderator_24)
-
               description = context.getString(
                 R.string.added_moderator_for_site_format,
                 "[${modEvent.event.modded_person.name}](${
@@ -437,8 +426,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModBanFromCommunityViewEvent -> {
             if (modEvent.event.mod_ban_from_community.banned) {
-              b.icon.setImageResource(R.drawable.outline_person_remove_24)
-
               val banExpires = modEvent.event.mod_ban_from_community.expires
               if (banExpires == null) {
                 description = context.getString(
@@ -479,8 +466,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 )
               }
             } else {
-              b.icon.setImageResource(R.drawable.baseline_person_add_alt_24)
-
               description = context.getString(
                 R.string.unbanned_person_from_community_format,
                 "[${modEvent.event.banned_person.name}](${
@@ -501,8 +486,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModBanViewEvent -> {
             if (modEvent.event.mod_ban.banned) {
-              b.icon.setImageResource(R.drawable.outline_person_remove_24)
-
               val banExpires = modEvent.event.mod_ban.expires
               if (banExpires == null) {
                 description = context.getString(
@@ -533,8 +516,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 )
               }
             } else {
-              b.icon.setImageResource(R.drawable.baseline_person_add_alt_24)
-
               description = context.getString(
                 R.string.unbanned_person_from_site_format,
                 "[${modEvent.event.banned_person.name}](${
@@ -550,8 +531,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModFeaturePostViewEvent -> {
             if (modEvent.event.mod_feature_post.featured) {
-              b.icon.setImageResource(R.drawable.baseline_push_pin_24)
-
               description = context.getString(
                 R.string.featured_post_in_community_format,
                 "[${modEvent.event.post.name.summarize()}](${
@@ -568,8 +547,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 })",
               )
             } else {
-              b.icon.setImageResource(R.drawable.ic_unpin_24)
-
               description = context.getString(
                 R.string.unfeatured_post_in_community_format,
                 "[${modEvent.event.post.name.summarize()}](${
@@ -589,8 +566,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModHideCommunityViewEvent -> {
             if (modEvent.event.mod_hide_community.hidden) {
-              b.icon.setImageResource(R.drawable.baseline_hide_24)
-
               description = context.getString(
                 R.string.hidden_community_format,
                 "[${modEvent.event.community.name}](${
@@ -601,8 +576,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 })",
               )
             } else {
-              b.icon.setImageResource(R.drawable.baseline_expand_content_24)
-
               description = context.getString(
                 R.string.unhidden_community_format,
                 "[${modEvent.event.community.name}](${
@@ -617,8 +590,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModLockPostViewEvent -> {
             if (modEvent.event.mod_lock_post.locked) {
-              b.icon.setImageResource(R.drawable.outline_lock_24)
-
               description = context.getString(
                 R.string.locked_post_format,
                 "[${modEvent.event.post.name.summarize()}](${
@@ -635,8 +606,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 })",
               )
             } else {
-              b.icon.setImageResource(R.drawable.baseline_lock_open_24)
-
               description = context.getString(
                 R.string.unlocked_post_format,
                 "[${modEvent.event.post.name.summarize()}](${
@@ -656,8 +625,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModRemoveCommentViewEvent -> {
             if (modEvent.event.mod_remove_comment.removed) {
-              b.icon.setImageResource(R.drawable.baseline_remove_circle_outline_24)
-
               description = context.getString(
                 R.string.removed_comment_format,
                 "[${modEvent.event.comment.content.summarize()}](${
@@ -674,8 +641,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 })",
               )
             } else {
-              b.icon.setImageResource(R.drawable.baseline_undo_24)
-
               description = context.getString(
                 R.string.unremoved_comment_format,
                 "[${modEvent.event.comment.content.summarize()}](${
@@ -696,8 +661,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModRemoveCommunityViewEvent -> {
             if (modEvent.event.mod_remove_community.removed) {
-              b.icon.setImageResource(R.drawable.baseline_remove_circle_outline_24)
-
               description = context.getString(
                 R.string.removed_community_format,
                 "[${modEvent.event.community.name}](${
@@ -709,8 +672,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 "[$instance](${LinkUtils.getLinkForInstance(instance)})",
               )
             } else {
-              b.icon.setImageResource(R.drawable.baseline_undo_24)
-
               description = context.getString(
                 R.string.unremoved_community_format,
                 "[${modEvent.event.community.name}](${
@@ -726,8 +687,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           }
           is ModEvent.ModRemovePostViewEvent -> {
             if (modEvent.event.mod_remove_post.removed) {
-              b.icon.setImageResource(R.drawable.baseline_remove_circle_outline_24)
-
               description = context.getString(
                 R.string.removed_post_format,
                 "[${modEvent.event.post.name.summarize()}](${
@@ -744,8 +703,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                 })",
               )
             } else {
-              b.icon.setImageResource(R.drawable.baseline_undo_24)
-
               description = context.getString(
                 R.string.unremoved_post_format,
                 "[${modEvent.event.post.name.summarize()}](${
@@ -765,8 +722,6 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             reason = modEvent.event.mod_remove_post.reason
           }
           is ModEvent.ModTransferCommunityViewEvent -> {
-            b.icon.setImageResource(R.drawable.baseline_swap_horiz_24)
-
             description = context.getString(
               R.string.transferred_ownership_of_community_format,
               "[${modEvent.event.community.name}](${
@@ -782,6 +737,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         val containerColor = context.getColorFromAttribute(
           com.google.android.material.R.attr.colorSurfaceContainerHigh,
         )
+        b.icon.setImageResource(modEvent.getIconRes())
         b.icon.imageTintList = ColorStateList.valueOf(modEventColor)
         b.icon.backgroundTintList = ColorStateList.valueOf(
           ColorUtils.blendARGB(
@@ -793,7 +749,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           append(
             context.getString(
               R.string.mod_action_format,
-              modEvent.actionType.toString(),
+              modEvent.actionOrder.toString(),
             ),
           )
 
@@ -856,6 +812,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         } else {
           b.body.visibility = View.VISIBLE
           b.body.text = context.getString(R.string.reason_format, reason)
+        }
+
+        b.root.setOnClickListener {
+          onModEventClick(item.modEvent)
         }
       }
       addItemType(

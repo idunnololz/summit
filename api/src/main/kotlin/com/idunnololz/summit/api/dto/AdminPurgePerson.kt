@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AdminPurgePerson(
   val id: Int,
   val admin_person_id: PersonId,

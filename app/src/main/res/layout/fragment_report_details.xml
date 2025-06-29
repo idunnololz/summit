@@ -70,7 +70,7 @@
                     android:id="@+id/reporter_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/pane_item_bg"
+                    android:background="@drawable/selectable_item_bg"
                     app:layout_constraintTop_toBottomOf="@+id/reporter"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -285,7 +285,7 @@
                     android:id="@+id/resolved_by_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/pane_item_bg"
+                    android:background="@drawable/selectable_item_bg"
                     app:layout_constraintTop_toBottomOf="@+id/resolved_by"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">

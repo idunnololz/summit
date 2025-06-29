@@ -212,3 +212,75 @@ fun ModlogActionType.getName(context: Context) = when (this) {
   ModlogActionType.AdminPurgePost -> context.getString(R.string.purge_post)
   ModlogActionType.AdminPurgeComment -> context.getString(R.string.purge_comment)
 }
+
+
+fun ModlogActionType.getName2(context: Context, isUndo: Boolean) = when (this) {
+  ModlogActionType.All -> context.getString(R.string.all)
+  ModlogActionType.ModRemovePost ->
+    if (isUndo) {
+      context.getString(R.string.undo_remove_post)
+    } else {
+      context.getString(R.string.remove_post)
+    }
+  ModlogActionType.ModLockPost ->
+    if (isUndo) {
+      context.getString(R.string.unlock_post)
+    } else {
+      context.getString(R.string.lock_post)
+    }
+  ModlogActionType.ModFeaturePost ->
+    if (isUndo) {
+      context.getString(R.string.remove_feature_post)
+    } else {
+      context.getString(R.string.feature_post)
+    }
+  ModlogActionType.ModRemoveComment ->
+    if (isUndo) {
+      context.getString(R.string.undo_remove_comment)
+    } else {
+      context.getString(R.string.remove_comment)
+    }
+  ModlogActionType.ModRemoveCommunity ->
+    if (isUndo) {
+      context.getString(R.string.undo_remove_community)
+    } else {
+      context.getString(R.string.remove_community)
+    }
+  ModlogActionType.ModBanFromCommunity ->
+    if (isUndo) {
+      context.getString(R.string.unban_user)
+    } else {
+      context.getString(R.string.ban_user_from_community)
+    }
+  ModlogActionType.ModAddCommunity ->
+    if (isUndo) {
+      context.getString(R.string.unmod_user)
+    } else {
+      context.getString(R.string.add_mod)
+    }
+  ModlogActionType.ModTransferCommunity -> context.getString(
+    R.string.transferred_ownership_of_community,
+  )
+  ModlogActionType.ModAdd ->
+    if (isUndo) {
+      context.getString(R.string.remove_admin)
+    } else {
+      context.getString(R.string.add_admin)
+    }
+  ModlogActionType.ModBan ->
+    if (isUndo) {
+      context.getString(R.string.unban_user_from_site)
+    } else {
+      context.getString(R.string.ban_user_from_site)
+    }
+  ModlogActionType.ModHideCommunity ->
+    if (isUndo) {
+      context.getString(R.string.undo_hide_community)
+    } else {
+      context.getString(R.string.hide_community)
+    }
+  ModlogActionType.AdminPurgePerson -> context.getString(R.string.purge_person)
+  ModlogActionType.AdminPurgeCommunity -> context.getString(R.string.purge_community)
+  ModlogActionType.AdminPurgePost -> context.getString(R.string.purge_post)
+  ModlogActionType.AdminPurgeComment -> context.getString(R.string.purge_comment)
+}

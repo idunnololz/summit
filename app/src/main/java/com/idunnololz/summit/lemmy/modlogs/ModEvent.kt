@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.modlogs
 
 import android.content.Context
+import androidx.annotation.DrawableRes
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.AdminPurgeCommentView
 import com.idunnololz.summit.api.dto.AdminPurgeCommunityView
@@ -18,16 +19,26 @@ import com.idunnololz.summit.api.dto.ModRemoveCommentView
 import com.idunnololz.summit.api.dto.ModRemoveCommunityView
 import com.idunnololz.summit.api.dto.ModRemovePostView
 import com.idunnololz.summit.api.dto.ModTransferCommunityView
+import com.idunnololz.summit.api.dto.ModlogActionType
 import com.idunnololz.summit.api.dto.Person
+import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.dateStringToTs
+import com.idunnololz.summit.util.durationToPretty
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
+@Serializable
+@JsonClassDiscriminator("t")
 sealed interface ModEvent {
 
   val id: Int
-  val actionType: ActionType
+  val actionOrder: ActionType
   val ts: Long
+  val actionType: ModlogActionType
 
   /**
    * The person who performed the action is called the "agent".
@@ -37,155 +48,215 @@ sealed interface ModEvent {
   /**
    * When a moderator removes a post.
    */
+  @Serializable
+  @SerialName("1")
   data class ModRemovePostViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModRemovePostView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModRemovePost
+  }
 
   /**
    * When a moderator locks a post (prevents new comments being made).
    */
+  @Serializable
+  @SerialName("2")
   data class ModLockPostViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModLockPostView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModLockPost
+  }
 
   /**
    * When a moderator features a post on a community (pins it to the top).
    */
+  @Serializable
+  @SerialName("3")
   data class ModFeaturePostViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModFeaturePostView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModFeaturePost
+  }
 
   /**
    * When a moderator removes a comment.
    */
+  @Serializable
+  @SerialName("4")
   data class ModRemoveCommentViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModRemoveCommentView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModRemoveComment
+  }
 
   /**
    * When a moderator removes a community.
    */
+  @Serializable
+  @SerialName("5")
   data class ModRemoveCommunityViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModRemoveCommunityView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModRemoveCommunity
+  }
 
   /**
    * When someone is banned from a community.
    */
+  @Serializable
+  @SerialName("6")
   data class ModBanFromCommunityViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModBanFromCommunityView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModBanFromCommunity
+  }
 
   /**
    * When someone is banned from the site.
    */
+  @Serializable
+  @SerialName("7")
   data class ModBanViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModBanView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.ModBan
+  }
 
   /**
    * When someone is added as a community moderator.
    */
+  @Serializable
+  @SerialName("8")
   data class ModAddCommunityViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModAddCommunityView,
-  ) : ModEvent
+  ) : ModEvent {
+    override val actionType = ModlogActionType.ModAddCommunity
+  }
 
   /**
    * When a moderator transfers a community to a new owner.
    */
+  @Serializable
+  @SerialName("9")
   data class ModTransferCommunityViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModTransferCommunityView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.ModTransferCommunity
+  }
 
   /**
    * When someone is added as a site moderator.
    */
+  @Serializable
+  @SerialName("10")
   data class ModAddViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModAddView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.ModAdd
+  }
 
+  @Serializable
+  @SerialName("11")
   data class AdminPurgePersonViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgePersonView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.AdminPurgePerson
+  }
 
+  @Serializable
+  @SerialName("12")
   data class AdminPurgeCommunityViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgeCommunityView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.AdminPurgeCommunity
+  }
 
+  @Serializable
+  @SerialName("13")
   data class AdminPurgePostViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgePostView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.AdminPurgePost
+  }
 
+  @Serializable
+  @SerialName("14")
   data class AdminPurgeCommentViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgeCommentView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.AdminPurgeComment
+  }
 
   /**
    * When a community is hidden from public view.
    */
+  @Serializable
+  @SerialName("15")
   data class ModHideCommunityViewEvent(
     override val id: Int,
-    override val actionType: ActionType,
+    override val actionOrder: ActionType,
     override val ts: Long,
     override val agent: Person?,
     val event: ModHideCommunityView,
-  ) : ModEvent
+  ) : ModEvent{
+    override val actionType = ModlogActionType.ModHideCommunity
+  }
 }
 
 fun GetModlogResponse.toModEvents(): MutableList<ModEvent> {
@@ -418,6 +489,92 @@ fun ModEvent.getColor(context: Context): Int {
     is ModEvent.ModTransferCommunityViewEvent -> {
       context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
     }
+  }
+}
+
+@DrawableRes
+fun ModEvent.getIconRes(): Int {
+  return when (this) {
+    is ModEvent.AdminPurgeCommentViewEvent ->
+      R.drawable.baseline_delete_24
+    is ModEvent.AdminPurgeCommunityViewEvent ->
+      R.drawable.baseline_delete_24
+    is ModEvent.AdminPurgePersonViewEvent ->
+      R.drawable.baseline_delete_24
+    is ModEvent.AdminPurgePostViewEvent ->
+      R.drawable.baseline_delete_24
+    is ModEvent.ModAddCommunityViewEvent -> {
+      if (this.event.mod_add_community.removed) {
+        R.drawable.outline_remove_moderator_24
+      } else {
+        R.drawable.outline_add_moderator_24
+      }
+    }
+    is ModEvent.ModAddViewEvent -> {
+      if (this.event.mod_add.removed) {
+        R.drawable.outline_remove_moderator_24
+      } else {
+        R.drawable.outline_add_moderator_24
+      }
+    }
+    is ModEvent.ModBanFromCommunityViewEvent -> {
+      if (this.event.mod_ban_from_community.banned) {
+        R.drawable.outline_person_remove_24
+      } else {
+        R.drawable.baseline_person_add_alt_24
+      }
+    }
+    is ModEvent.ModBanViewEvent -> {
+      if (this.event.mod_ban.banned) {
+        R.drawable.outline_person_remove_24
+      } else {
+        R.drawable.baseline_person_add_alt_24
+      }
+    }
+    is ModEvent.ModFeaturePostViewEvent -> {
+      if (this.event.mod_feature_post.featured) {
+        R.drawable.baseline_push_pin_24
+      } else {
+        R.drawable.ic_unpin_24
+      }
+    }
+    is ModEvent.ModHideCommunityViewEvent -> {
+      if (this.event.mod_hide_community.hidden) {
+        R.drawable.baseline_hide_24
+      } else {
+        R.drawable.baseline_expand_content_24
+      }
+    }
+    is ModEvent.ModLockPostViewEvent -> {
+      if (this.event.mod_lock_post.locked) {
+        R.drawable.outline_lock_24
+      } else {
+        R.drawable.baseline_lock_open_24
+      }
+    }
+    is ModEvent.ModRemoveCommentViewEvent -> {
+      if (this.event.mod_remove_comment.removed) {
+        R.drawable.baseline_remove_circle_outline_24
+      } else {
+        R.drawable.baseline_undo_24
+      }
+    }
+    is ModEvent.ModRemoveCommunityViewEvent -> {
+      if (this.event.mod_remove_community.removed) {
+        R.drawable.baseline_remove_circle_outline_24
+      } else {
+        R.drawable.baseline_undo_24
+      }
+    }
+    is ModEvent.ModRemovePostViewEvent -> {
+      if (this.event.mod_remove_post.removed) {
+        R.drawable.baseline_remove_circle_outline_24
+      } else {
+        R.drawable.baseline_undo_24
+      }
+    }
+    is ModEvent.ModTransferCommunityViewEvent ->
+      R.drawable.baseline_swap_horiz_24
   }
 }
 //  when (this) {

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="@dimen/dialog_padding"
-    android:background="@drawable/pane_item_bg">
+    android:background="@drawable/selectable_item_bg">
 
     <TextView
         android:id="@+id/text"

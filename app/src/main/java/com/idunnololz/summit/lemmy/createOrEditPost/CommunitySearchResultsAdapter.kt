@@ -184,6 +184,7 @@ class CommunitySearchResultsAdapter(
         }
       }
     }
+    newItems.add(Item.FooterItem)
 
     adapterHelper.setItems(newItems, this, cb)
   }

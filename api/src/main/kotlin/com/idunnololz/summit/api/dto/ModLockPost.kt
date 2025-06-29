@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ModLockPost(
   val id: Int,
   val mod_person_id: PersonId,

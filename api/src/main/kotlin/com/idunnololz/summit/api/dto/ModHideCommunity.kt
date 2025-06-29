@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ModHideCommunity(
   val id: Int,
   val community_id: CommunityId,

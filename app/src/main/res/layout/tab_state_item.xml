@@ -37,7 +37,7 @@
         android:paddingEnd="@dimen/dialog_padding"
         android:textAppearance="?textAppearanceBodyMedium"
         android:paddingVertical="@dimen/padding_half"
-        android:background="@drawable/pane_item_bg"
+        android:background="@drawable/selectable_item_bg"
         android:minHeight="48dp"
         android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"

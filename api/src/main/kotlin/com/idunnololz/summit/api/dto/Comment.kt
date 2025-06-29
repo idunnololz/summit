@@ -2,8 +2,10 @@ package com.idunnololz.summit.api.dto
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
+@Serializable
 data class Comment(
   val id: CommentId,
   val creator_id: PersonId,

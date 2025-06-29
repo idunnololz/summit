@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ModRemovePostView(
   val mod_remove_post: ModRemovePost,
   val moderator: Person? = null,

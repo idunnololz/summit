@@ -1926,8 +1926,10 @@ class PostAndCommentViewBuilder @Inject constructor(
       .also {
         quickActionsBar = it
       }
+
     quickActionsBarContainer.tag = actions
     quickActionsBarContainer.setTag(R.id.is_saved, isSaved)
+
     val quickActionsBar = LinearLayout(context).apply {
       orientation = LinearLayout.HORIZONTAL
       setPadding(

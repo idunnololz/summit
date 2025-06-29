@@ -1,5 +1,8 @@
 package com.idunnololz.summit.api.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ModFeaturePostView(
   val mod_feature_post: ModFeaturePost,
   val moderator: Person? = null,

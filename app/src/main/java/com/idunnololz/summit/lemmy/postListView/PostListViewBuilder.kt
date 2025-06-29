@@ -65,6 +65,7 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.MarkAsRead
+import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionIds.CommunityInfo
 import com.idunnololz.summit.preferences.PostQuickActionIds.CrossPost
 import com.idunnololz.summit.preferences.PostQuickActionIds.DetailedView
@@ -1496,6 +1497,19 @@ class PostListViewBuilder @Inject constructor(
     leftHandMode: Boolean,
     isSaved: Boolean,
   ) {
+    val actionsList = if (postsInFeedQuickActions.enabled) {
+      postsInFeedQuickActions.actions
+    } else {
+      listOf(Voting)
+    }
+
+    if (root.tag == actionsList && root.getTag(R.id.is_saved) == isSaved) {
+      return
+    }
+
+    root.tag = actionsList
+    root.setTag(R.id.is_saved, isSaved)
+
     root.removeView(commentButton)
 
     quickActionViews?.forEach {

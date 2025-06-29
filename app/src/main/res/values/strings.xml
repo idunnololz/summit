@@ -2251,6 +2251,13 @@
     <string name="video_details">Video details</string>
     <string name="restore_browsing_sessions">Restore browsing sessions</string>
     <string name="restore_browsing_sessions_desc">When enabled, post feeds are saved and restored when the app is killed by the OS and recreated.</string>
+    <string name="error_invalid_arguments">Invalid arguments.</string>
+    <string name="moderator">Moderator</string>
+    <string name="hidden">Hidden</string>
+    <string name="reason">Reason</string>
+    <string name="remove_admin">Remove admin</string>
+    <string name="transferred_to">Transferred to</string>
+    <string name="duration">Duration</string>
 
     <!-- uCrop string resource end -->
 </resources>
