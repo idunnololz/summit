@@ -1503,12 +1503,21 @@ class PostListViewBuilder @Inject constructor(
       listOf(Voting)
     }
 
-    if (root.tag == actionsList && root.getTag(R.id.is_saved) == isSaved) {
+    if (root.tag == actionsList) {
+      if (root.getTag(R.id.is_saved) != isSaved) {
+        root.findViewById<ImageView>(R.id.pa_save_toggle).apply {
+          if (isSaved) {
+            setImageResource(R.drawable.baseline_bookmark_24)
+          } else {
+            setImageResource(R.drawable.outline_bookmark_border_24)
+          }
+        }
+        root.setTag(R.id.is_saved, isSaved)
+      }
       return
     }
 
     root.tag = actionsList
-    root.setTag(R.id.is_saved, isSaved)
 
     root.removeView(commentButton)
 
