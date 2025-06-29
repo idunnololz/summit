@@ -54,6 +54,7 @@ class AddOrEditPostViewModel @Inject constructor(
   val showSearchLiveData = showSearch.asLiveData()
   val query = MutableStateFlow("")
   val linkMetadata = StatefulLiveData<LinkMetadataHelper.LinkMetadata>()
+  val showMore = state.getLiveData<Boolean>("show_more")
 
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
@@ -89,6 +90,8 @@ class AddOrEditPostViewModel @Inject constructor(
     name: String,
     body: String,
     url: String,
+    thumbnailUrl: String?,
+    altText: String?,
     isNsfw: Boolean,
   ) {
     if (createOrEditPostResult.isLoading) {
@@ -131,6 +134,8 @@ class AddOrEditPostViewModel @Inject constructor(
         url = url.ifBlank { null },
         isNsfw = isNsfw,
         communityId = community.id,
+        thumbnailUrl = thumbnailUrl,
+        altText = altText,
       )
 
       recentCommunityManager.addRecentCommunityPostedTo(
@@ -151,6 +156,8 @@ class AddOrEditPostViewModel @Inject constructor(
     name: String,
     body: String,
     url: String,
+    thumbnailUrl: String?,
+    altText: String?,
     isNsfw: Boolean,
     postId: PostId,
   ) {
@@ -175,6 +182,8 @@ class AddOrEditPostViewModel @Inject constructor(
         url = url.ifBlank { null },
         isNsfw = isNsfw,
         account = account,
+        thumbnailUrl = thumbnailUrl,
+        altText = altText,
       )
 
       result

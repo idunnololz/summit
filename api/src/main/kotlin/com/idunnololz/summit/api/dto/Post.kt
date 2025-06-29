@@ -28,4 +28,6 @@ data class Post(
   val language_id: LanguageId,
   val featured_community: Boolean,
   val featured_local: Boolean,
+  val url_content_type: String? = null,
+  val alt_text: String? = null,
 ) : Parcelable

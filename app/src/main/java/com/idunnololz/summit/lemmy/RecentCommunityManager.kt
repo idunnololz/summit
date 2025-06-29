@@ -46,20 +46,26 @@ class RecentCommunityManager @Inject constructor(
   }
 
   fun getRecentCommunitiesVisited(): List<CommunityHistoryEntry> =
-    recentCommunities.getRecents()
+    recentCommunities.getRecentsOrLoad()
       .values
       .sortedByDescending { it.ts }
 
   fun addRecentCommunityVisited(communityRef: CommunityRef, iconUrl: String? = null) =
     recentCommunities.addRecent(communityRef, iconUrl)
 
+  fun removeRecentCommunityVisited(communityRef: CommunityRef) =
+    recentCommunities.removeRecent(communityRef)
+
   fun getRecentCommunitiesPostedTo(): List<CommunityHistoryEntry> =
-    recentCommunitiesPostedTo.getRecents()
+    recentCommunitiesPostedTo.getRecentsOrLoad()
       .values
       .sortedByDescending { it.ts }
 
   fun addRecentCommunityPostedTo(communityRef: CommunityRef, iconUrl: String? = null) =
-    recentCommunities.addRecent(communityRef, iconUrl)
+    recentCommunitiesPostedTo.addRecent(communityRef, iconUrl)
+
+  fun removeRecentCommunityPostedTo(communityRef: CommunityRef) =
+    recentCommunitiesPostedTo.removeRecent(communityRef)
 
   private fun RecentCommunityCache.addRecent(communityRef: CommunityRef, iconUrl: String? = null) {
     if (communityRef is CommunityRef.All ||
@@ -74,7 +80,7 @@ class RecentCommunityManager @Inject constructor(
     val key = communityRef.getKey()
     Log.d(TAG, "Add recent community: $key type: ${this.prefKey}")
 
-    val recents = this.getRecents()
+    val recents = this.getRecentsOrLoad()
 
     // move item to front...
     recents.remove(key)
@@ -94,21 +100,20 @@ class RecentCommunityManager @Inject constructor(
         if (toRemove == 0) break
       }
     }
-    val resultsList = ArrayList(recents.values)
 
-    coroutineScope.launch(Dispatchers.Default) {
-      // serialize
-      statePreferences.edit {
-        putString(
-          cache.prefKey,
-          json.encodeToString(RecentCommunityData(resultsList)),
-        )
-      }
-    }
+    saveChangedAsync()
 
     if (communityRef is CommunityRef.CommunityRefByName && iconUrl == null) {
       fetchRecentIcon(communityRef)
     }
+  }
+
+  private fun RecentCommunityCache.removeRecent(communityRef: CommunityRef) {
+    val key = communityRef.getKey()
+    val recents = this.getRecentsOrLoad()
+
+    recents.remove(key)
+    saveChangedAsync()
   }
 
   private fun RecentCommunityCache.fetchRecentIcon(communityRef: CommunityRef.CommunityRefByName) {
@@ -135,9 +140,9 @@ class RecentCommunityManager @Inject constructor(
     }
   }
 
-  private fun RecentCommunityCache.getRecents(): LinkedHashMap<String, CommunityHistoryEntry> {
+  private fun RecentCommunityCache.getRecentsOrLoad(): LinkedHashMap<String, CommunityHistoryEntry> {
     val cache = this
-    val recentCommunities = cache.get()
+    val recentCommunities = cache.recents
     if (recentCommunities != null) {
       return recentCommunities
     }
@@ -163,7 +168,22 @@ class RecentCommunityManager @Inject constructor(
     }
 
     return map.also {
-      cache.setRecents(it)
+      cache.recents = it
+    }
+  }
+
+  private fun RecentCommunityCache.saveChangedAsync() {
+    val cachedRecents = recents ?: return
+    val resultsList = ArrayList(cachedRecents.values)
+
+    coroutineScope.launch(Dispatchers.Default) {
+      // serialize
+      statePreferences.edit {
+        putString(
+          prefKey,
+          json.encodeToString(RecentCommunityData(resultsList)),
+        )
+      }
     }
   }
 
@@ -185,12 +205,6 @@ class RecentCommunityManager @Inject constructor(
   class RecentCommunityCache(
     val prefKey: String,
   ) {
-    private var recents: LinkedHashMap<String, CommunityHistoryEntry>? = null
-
-    fun setRecents(recents: LinkedHashMap<String, CommunityHistoryEntry>) {
-      this.recents = recents
-    }
-
-    fun get() = recents
+    var recents: LinkedHashMap<String, CommunityHistoryEntry>? = null
   }
 }

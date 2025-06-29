@@ -653,6 +653,10 @@ class CommunitySelectorController @AssistedInject constructor(
 
         b.title.text = item.communityRef.getName(b.title.context)
         b.subtitle.text = item.text
+        b.delete.setOnClickListener {
+          recentCommunityManager.removeRecentCommunityVisited(item.communityRef)
+          refreshItems {  }
+        }
         h.itemView.setOnClickListener {
           onCommunitySelectedListener?.invoke(
             this@CommunitySelectorController,

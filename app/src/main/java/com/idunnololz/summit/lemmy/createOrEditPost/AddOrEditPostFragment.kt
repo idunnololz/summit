@@ -29,6 +29,10 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.AutoTransition
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
 import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
@@ -234,11 +238,8 @@ class AddOrEditPostFragment :
 
   override fun onStart() {
     super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
+    dialog?.window?.let { window ->
+      WindowCompat.setDecorFitsSystemWindows(window, false)
     }
   }
 
@@ -490,89 +491,13 @@ class AddOrEditPostFragment :
 
       loadingView.hideAll()
 
-      url.setEndIconOnClickListener {
-        val bottomMenu = BottomMenu(context).apply {
-          setTitle(R.string.insert_image)
-          addItemWithIcon(
-            R.id.from_camera,
-            R.string.take_a_photo,
-            R.drawable.baseline_photo_camera_24,
-          )
-          addItemWithIcon(
-            R.id.from_gallery,
-            R.string.choose_from_gallery,
-            R.drawable.baseline_image_24,
-          )
-          addItemWithIcon(
-            R.id.from_camera_with_editor,
-            R.string.take_a_photo_with_editor,
-            R.drawable.baseline_photo_camera_24,
-          )
-          addItemWithIcon(
-            R.id.from_gallery_with_editor,
-            R.string.choose_from_gallery_with_editor,
-            R.drawable.baseline_image_24,
-          )
-          addItemWithIcon(
-            R.id.use_a_saved_image,
-            R.string.use_a_saved_image,
-            R.drawable.baseline_save_24,
-          )
-
-          setOnMenuItemClickListener {
-            when (it.id) {
-              R.id.from_camera -> {
-                val intent = ImagePicker.with(requireActivity())
-                  .cameraOnly()
-                  .createIntent()
-                launcherForUrl.launch(intent)
-              }
-              R.id.from_gallery -> {
-                val intent = ImagePicker.with(requireActivity())
-                  .galleryOnly()
-                  .createIntent()
-                launcherForUrl.launch(intent)
-              }
-              R.id.from_camera_with_editor -> {
-                val intent = ImagePicker.with(requireActivity())
-                  .cameraOnly()
-                  .crop()
-                  .cropFreeStyle()
-                  .createIntent()
-                launcherForUrl.launch(intent)
-              }
-              R.id.from_gallery_with_editor -> {
-                val intent = ImagePicker.with(requireActivity())
-                  .galleryOnly()
-                  .crop()
-                  .cropFreeStyle()
-                  .createIntent()
-                launcherForUrl.launch(intent)
-              }
-              R.id.use_a_saved_image -> {
-                ChooseSavedImageDialogFragment()
-                  .apply {
-                    arguments = ChooseSavedImageDialogFragmentArgs(
-                      "for_link",
-                    ).toBundle()
-                  }
-                  .showAllowingStateLoss(
-                    childFragmentManager,
-                    "ChooseSavedImageDialogFragment",
-                  )
-              }
-            }
-          }
-        }
-
-        bottomMenu.show(
-          bottomMenuContainer = requireMainActivity(),
-          bottomSheetContainer = root,
-          expandFully = true,
-          handleBackPress = true,
-          onBackPressedDispatcher = onBackPressedDispatcher,
-        )
+      uploadImage.setOnClickListener {
+        showUploadImageMenu()
       }
+      showMoreButton.setOnClickListener {
+        viewModel.showMore.value = true
+      }
+
       viewModel.createOrEditPostResult.observe(viewLifecycleOwner) {
         updateEnableState()
 
@@ -712,6 +637,10 @@ class AddOrEditPostFragment :
           }
           viewModel.showSearch.value = false
         },
+        onDeleteSuggestion = {
+          recentCommunityManager.removeRecentCommunityPostedTo(it)
+          adapter?.setRecents(recentCommunityManager.getRecentCommunitiesPostedTo())
+        }
       )
       communitySuggestionsRecyclerView.apply {
         adapter = this@AddOrEditPostFragment.adapter
@@ -767,9 +696,54 @@ class AddOrEditPostFragment :
           urlEditText.setText(data.url)
           nsfwSwitch.isChecked = data.isNsfw
           communityEditText.setText(data.targetCommunityFullName)
+
+          if (data.thumbnailUrl != null) {
+            thumbnailUrlEditText.setText(data.thumbnailUrl)
+            viewModel.showMore.value = true
+          }
         }
 
         viewModel.currentDraftEntry.postValue(null)
+      }
+      viewModel.showMore.observe(viewLifecycleOwner) {
+        val transitionAnimation =
+          AutoTransition()
+            .apply {
+              setDuration(200)
+              setOrdering(TransitionSet.ORDERING_TOGETHER)
+            }
+        TransitionManager.beginDelayedTransition(root, transitionAnimation)
+
+        transitionAnimation.addListener(object : Transition.TransitionListener {
+          override fun onTransitionStart(transition: Transition) {
+            postBodyToolbar.animate()
+              .alpha(0f)
+          }
+
+          override fun onTransitionEnd(transition: Transition) {
+            root.post {
+              onScrollUpdated()
+              postBodyToolbar.animate()
+                .alpha(1f)
+            }
+          }
+
+          override fun onTransitionCancel(transition: Transition) {
+          }
+
+          override fun onTransitionPause(transition: Transition) {
+          }
+
+          override fun onTransitionResume(transition: Transition) {
+          }
+        })
+
+        thumbnailUrl.visibility = View.VISIBLE
+        dividerThumbnailUrl.visibility = View.VISIBLE
+        altText.visibility = View.VISIBLE
+        dividerAltText.visibility = View.VISIBLE
+
+        showMoreButton.visibility = View.GONE
       }
 
       if (savedInstanceState == null && !viewModel.postPrefilled) {
@@ -787,19 +761,34 @@ class AddOrEditPostFragment :
         val post = args.post
         val crossPost = args.crosspost
         val draft = args.draft
+        var showMore = false
         if (crossPost != null) {
           url.editText?.setText(crossPost.url)
           title.editText?.setText(crossPost.name)
           postEditor.editText?.setText(crossPost.getCrossPostContent())
           nsfwSwitch.isChecked = crossPost.nsfw
+
+          if (crossPost.thumbnail_url != null) {
+            showMore = true
+            thumbnailUrlEditText.setText(crossPost.thumbnail_url)
+          }
         } else if (post != null) {
           url.editText?.setText(post.url)
           title.editText?.setText(post.name)
           postEditor.editText?.setText(post.body)
           nsfwSwitch.isChecked = post.nsfw
+
+          if (post.thumbnail_url != null) {
+            showMore = true
+            thumbnailUrlEditText.setText(post.thumbnail_url)
+          }
         } else if (draft != null) {
           viewModel.currentDraftEntry.value = draft
           viewModel.currentDraftId.value = draft.id
+        }
+
+        if (showMore) {
+          viewModel.showMore.value = true
         }
       }
 
@@ -828,6 +817,90 @@ class AddOrEditPostFragment :
         showSearchBackPressedHandler,
       )
     }
+  }
+
+  private fun showUploadImageMenu() {
+    val bottomMenu = BottomMenu(requireContext()).apply {
+      setTitle(R.string.insert_image)
+      addItemWithIcon(
+        R.id.from_camera,
+        R.string.take_a_photo,
+        R.drawable.baseline_photo_camera_24,
+      )
+      addItemWithIcon(
+        R.id.from_gallery,
+        R.string.choose_from_gallery,
+        R.drawable.baseline_image_24,
+      )
+      addItemWithIcon(
+        R.id.from_camera_with_editor,
+        R.string.take_a_photo_with_editor,
+        R.drawable.baseline_photo_camera_24,
+      )
+      addItemWithIcon(
+        R.id.from_gallery_with_editor,
+        R.string.choose_from_gallery_with_editor,
+        R.drawable.baseline_image_24,
+      )
+      addItemWithIcon(
+        R.id.use_a_saved_image,
+        R.string.use_a_saved_image,
+        R.drawable.baseline_save_24,
+      )
+
+      setOnMenuItemClickListener {
+        when (it.id) {
+          R.id.from_camera -> {
+            val intent = ImagePicker.with(requireActivity())
+              .cameraOnly()
+              .createIntent()
+            launcherForUrl.launch(intent)
+          }
+          R.id.from_gallery -> {
+            val intent = ImagePicker.with(requireActivity())
+              .galleryOnly()
+              .createIntent()
+            launcherForUrl.launch(intent)
+          }
+          R.id.from_camera_with_editor -> {
+            val intent = ImagePicker.with(requireActivity())
+              .cameraOnly()
+              .crop()
+              .cropFreeStyle()
+              .createIntent()
+            launcherForUrl.launch(intent)
+          }
+          R.id.from_gallery_with_editor -> {
+            val intent = ImagePicker.with(requireActivity())
+              .galleryOnly()
+              .crop()
+              .cropFreeStyle()
+              .createIntent()
+            launcherForUrl.launch(intent)
+          }
+          R.id.use_a_saved_image -> {
+            ChooseSavedImageDialogFragment()
+              .apply {
+                arguments = ChooseSavedImageDialogFragmentArgs(
+                  "for_link",
+                ).toBundle()
+              }
+              .showAllowingStateLoss(
+                childFragmentManager,
+                "ChooseSavedImageDialogFragment",
+              )
+          }
+        }
+      }
+    }
+
+    bottomMenu.show(
+      bottomMenuContainer = requireMainActivity(),
+      bottomSheetContainer = binding.root,
+      expandFully = true,
+      handleBackPress = true,
+      onBackPressedDispatcher = onBackPressedDispatcher,
+    )
   }
 
   private var isImeOpen: Boolean = false
@@ -928,6 +1001,8 @@ class AddOrEditPostFragment :
       body = binding.postEditor.editText?.text.toString(),
       url = binding.url.editText?.text.toString(),
       isNsfw = binding.nsfwSwitch.isChecked,
+      thumbnailUrl = binding.thumbnailUrlEditText.text?.toString(),
+      altText = binding.altTextEditText.text?.toString(),
     )
   }
 
@@ -939,6 +1014,8 @@ class AddOrEditPostFragment :
       url = binding.url.editText?.text.toString(),
       isNsfw = binding.nsfwSwitch.isChecked,
       postId = requireNotNull(args.post?.id) { "POST ID WAS NULL!" },
+      thumbnailUrl = binding.thumbnailUrlEditText.text?.toString(),
+      altText = binding.altTextEditText.text?.toString(),
     )
   }
 
@@ -986,12 +1063,14 @@ class AddOrEditPostFragment :
   private fun updateEnableState() {
     val isLoading = viewModel.createOrEditPostResult.isLoading
 
-    binding.community.isEnabled = !isLoading
+    binding.community.isEnabled = !isEdit() && !isLoading
     binding.url.isEnabled = !isLoading
     binding.title.isEnabled = !isLoading
     binding.postEditor.isEnabled = !isLoading
     binding.postBodyToolbar.isEnabled = !isLoading
     binding.nsfwSwitch.isEnabled = !isLoading
+    binding.altText.isEnabled = !isLoading
+    binding.thumbnailUrl.isEnabled = !isLoading
     textFormatToolbar?.isEnabled = !isLoading
   }
 

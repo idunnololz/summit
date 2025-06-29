@@ -2258,6 +2258,8 @@
     <string name="remove_admin">Remove admin</string>
     <string name="transferred_to">Transferred to</string>
     <string name="duration">Duration</string>
+    <string name="thumbnail_url_optional">Thumbnail url (optional)</string>
+    <string name="alt_text_optional">Alt. text (optional)</string>
 
     <!-- uCrop string resource end -->
 </resources>

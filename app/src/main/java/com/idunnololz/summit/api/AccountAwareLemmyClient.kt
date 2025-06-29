@@ -544,12 +544,23 @@ class AccountAwareLemmyClient @Inject constructor(
     body: String?,
     url: String?,
     isNsfw: Boolean,
+    thumbnailUrl: String?,
+    altText: String?,
     account: Account? = accountForInstance(),
     communityId: CommunityId,
   ): Result<PostView> = if (account == null) {
     createAccountErrorResult()
   } else {
-    apiClient.createPost(name, body, url, isNsfw, account, communityId)
+    apiClient.createPost(
+      name = name,
+      body = body,
+      url = url,
+      isNsfw = isNsfw,
+      account = account,
+      communityId = communityId,
+      thumbnailUrl = thumbnailUrl,
+      altText = altText,
+    )
       .autoSignOut(account)
   }
 
@@ -607,11 +618,22 @@ class AccountAwareLemmyClient @Inject constructor(
     body: String?,
     url: String?,
     isNsfw: Boolean,
+    thumbnailUrl: String?,
+    altText: String?,
     account: Account? = accountForInstance(),
   ): Result<PostView> = if (account == null) {
     createAccountErrorResult()
   } else {
-    apiClient.editPost(postId, name, body, url, isNsfw, account)
+    apiClient.editPost(
+      postId = postId,
+      name = name,
+      body = body,
+      url = url,
+      isNsfw = isNsfw,
+      account = account,
+      thumbnailUrl = thumbnailUrl,
+      altText = altText,
+    )
       .autoSignOut(account)
   }
 

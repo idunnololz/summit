@@ -9,6 +9,7 @@ import com.idunnololz.summit.api.dto.CommunityView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
+import com.idunnololz.summit.databinding.CommunitySearchResultSuggestionItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchHeaderBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchNoResultsBinding
@@ -24,6 +25,7 @@ class CommunitySearchResultsAdapter(
   private val offlineManager: OfflineManager,
   private val avatarHelper: AvatarHelper,
   private val onCommunitySelected: (CommunityRef) -> Unit,
+  private val onDeleteSuggestion: (CommunityRef) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   private sealed interface Item {
@@ -107,13 +109,16 @@ class CommunitySearchResultsAdapter(
     }
     addItemType(
       clazz = Item.RecentCommunityItem::class,
-      inflateFn = CommunitySearchResultCommunityItemBinding::inflate,
+      inflateFn = CommunitySearchResultSuggestionItemBinding::inflate,
     ) { item, b, h ->
       avatarHelper.loadCommunityIcon(
         b.icon, item.communityRef, item.communityIcon)
 
       b.title.text = item.text
-      b.monthlyActives.visibility = View.GONE
+
+      b.delete.setOnClickListener {
+        onDeleteSuggestion(item.communityRef)
+      }
 
       h.itemView.setOnClickListener {
         onCommunitySelected(item.communityRef)

@@ -83,6 +83,7 @@ sealed interface DraftData : Parcelable {
     override val accountId: Long,
     override val accountInstance: String,
     val targetCommunityFullName: String,
+    val thumbnailUrl: String? = null,
   ) : DraftData
 
   @Parcelize

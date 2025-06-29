@@ -1046,6 +1046,8 @@ class LemmyApiClient @Inject constructor(
     body: String?,
     url: String?,
     isNsfw: Boolean,
+    thumbnailUrl: String?,
+    altText: String?,
     account: Account,
     communityId: CommunityId,
   ): Result<PostView> {
@@ -1056,6 +1058,8 @@ class LemmyApiClient @Inject constructor(
       body = body,
       nsfw = isNsfw,
       auth = account.jwt,
+      custom_thumbnail = thumbnailUrl,
+      alt_text = altText,
     )
 
     return retrofitErrorHandler {
@@ -1076,6 +1080,8 @@ class LemmyApiClient @Inject constructor(
     body: String?,
     url: String?,
     isNsfw: Boolean,
+    thumbnailUrl: String?,
+    altText: String?,
     account: Account,
   ): Result<PostView> {
     val form = EditPost(
@@ -1085,6 +1091,8 @@ class LemmyApiClient @Inject constructor(
       body = body,
       nsfw = isNsfw,
       auth = account.jwt,
+      custom_thumbnail = thumbnailUrl,
+      alt_text = altText,
     )
 
     return retrofitErrorHandler {

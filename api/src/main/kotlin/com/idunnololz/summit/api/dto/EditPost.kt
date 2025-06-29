@@ -8,4 +8,6 @@ data class EditPost(
   val nsfw: Boolean? = null,
   val language_id: LanguageId? = null,
   val auth: String,
+  val alt_text: String? = null,
+  val custom_thumbnail: String? = null,
 )
