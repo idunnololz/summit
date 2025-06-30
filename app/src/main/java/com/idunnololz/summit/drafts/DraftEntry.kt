@@ -99,6 +99,7 @@ sealed interface DraftData : Parcelable {
     val content: String,
     override val accountId: Long,
     override val accountInstance: String,
+    val languageId: LanguageId? = null,
   ) : DraftData
 
   @Parcelize

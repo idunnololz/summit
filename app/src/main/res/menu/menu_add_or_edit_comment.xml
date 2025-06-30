@@ -55,4 +55,11 @@
         app:showAsAction="never"
         app:iconTint="?attr/colorControlNormal"/>
 
+    <item
+        android:id="@+id/configure_comment"
+        android:title="@string/configure_comment"
+        android:orderInCategory="600"
+        app:showAsAction="never"
+        app:iconTint="?attr/colorControlNormal"/>
+
 </menu>

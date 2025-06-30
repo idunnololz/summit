@@ -143,6 +143,7 @@ class ActionsRunnerHelper @Inject constructor(
           content = actionInfo.content,
           postId = actionInfo.postRef.id,
           parentId = actionInfo.parentId,
+          languageId = actionInfo.languageId,
         )
 
         return result.fold(
@@ -165,6 +166,7 @@ class ActionsRunnerHelper @Inject constructor(
           account = account,
           content = actionInfo.content,
           commentId = actionInfo.commentId,
+          languageId = actionInfo.languageId,
         )
 
         return result.fold(

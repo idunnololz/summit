@@ -983,12 +983,14 @@ class LemmyApiClient @Inject constructor(
     content: String,
     postId: PostId,
     parentId: CommentId?,
+    languageId: Int?,
   ): Result<CommentView> {
     val form = CreateComment(
       auth = account.jwt,
       content = content,
       post_id = postId,
       parent_id = parentId,
+      language_id = languageId,
     )
 
     return retrofitErrorHandler {
@@ -1003,11 +1005,13 @@ class LemmyApiClient @Inject constructor(
     account: Account,
     content: String,
     commentId: CommentId,
+    languageId: Int?,
   ): Result<CommentView> {
     val form = EditComment(
       auth = account.jwt,
       content = content,
       comment_id = commentId,
+      language_id = languageId,
     )
 
     return retrofitErrorHandler {

@@ -181,6 +181,7 @@ class PendingActionsManager @Inject constructor(
     postRef: PostRef,
     parentId: CommentId?,
     content: String,
+    languageId: Int?,
     accountId: Long,
     accountInstance: String,
   ): LemmyPendingAction {
@@ -191,6 +192,7 @@ class PendingActionsManager @Inject constructor(
         content = content,
         accountId = accountId,
         accountInstance = accountInstance,
+        languageId = languageId,
       )
       action.insert()
     }
@@ -207,6 +209,7 @@ class PendingActionsManager @Inject constructor(
     postRef: PostRef,
     commentId: CommentId,
     content: String,
+    languageId: Int?,
     accountId: Long,
     accountInstance: String,
   ): LemmyPendingAction {
@@ -217,6 +220,7 @@ class PendingActionsManager @Inject constructor(
         content = content,
         accountId = accountId,
         accountInstance = accountInstance,
+        languageId = languageId,
       )
       action.insert()
     }

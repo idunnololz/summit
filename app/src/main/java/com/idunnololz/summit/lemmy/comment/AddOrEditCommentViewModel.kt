@@ -15,6 +15,8 @@ import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentSortType
 import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.Language
+import com.idunnololz.summit.api.dto.LanguageId
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.dto.SortType
@@ -69,10 +71,21 @@ class AddOrEditCommentViewModel @Inject constructor(
 
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
+  val languageOptions = state.getLiveData<List<Language>>("languages")
+  val languageId = state.getLiveData<LanguageId?>("language")
 
   val messages = MutableLiveData<List<Message>>(listOf())
 
   val contextModel = StatefulLiveData<ContextModel>()
+
+  init {
+    viewModelScope.launch {
+      lemmyApiClient.fetchSiteWithRetry(force = false)
+        .onSuccess {
+          languageOptions.value = it.all_languages
+        }
+    }
+  }
 
   fun sendComment(account: Account, postRef: PostRef, parentId: CommentId?, content: String) {
     if (commentSentEvent.isLoading) {
@@ -92,10 +105,11 @@ class AddOrEditCommentViewModel @Inject constructor(
       }
 
       accountActionsManager.createComment(
-        postRef,
-        parentId,
-        content,
-        account.id,
+        postRef = postRef,
+        parentId = parentId,
+        content = content,
+        languageId = languageId.value,
+        accountId = account.id,
       )
 
       commentSentEvent.postValue(Unit)
@@ -121,10 +135,11 @@ class AddOrEditCommentViewModel @Inject constructor(
         }
 
         accountActionsManager.createComment(
-          PostRef(instance, inboxItem.postId),
-          inboxItem.commentId,
-          content,
-          account.id,
+          postRef = PostRef(instance, inboxItem.postId),
+          parentId = inboxItem.commentId,
+          content = content,
+          languageId = languageId.value,
+          accountId = account.id,
         )
 
         commentSentEvent.postValue(Unit)
@@ -159,10 +174,11 @@ class AddOrEditCommentViewModel @Inject constructor(
   fun updateComment(account: Account, postRef: PostRef, commentId: CommentId, content: String) {
     viewModelScope.launch {
       accountActionsManager.editComment(
-        postRef,
-        commentId,
-        content,
-        account.id,
+        postRef = postRef,
+        commentId = commentId,
+        content = content,
+        languageId = languageId.value,
+        accountId = account.id,
       )
 
       commentSentEvent.postValue(Unit)

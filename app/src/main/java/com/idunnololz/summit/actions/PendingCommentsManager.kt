@@ -1,6 +1,7 @@
 package com.idunnololz.summit.actions
 
 import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.LanguageId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
@@ -40,6 +41,7 @@ class PendingCommentsManager @Inject constructor() {
         parentId = action.parentId,
         content = action.content,
         accountId = action.accountId,
+        languageId = action.languageId,
       )
     addPendingComment(pendingCommentView)
   }
@@ -57,6 +59,7 @@ class PendingCommentsManager @Inject constructor() {
         parentId = null,
         content = action.content,
         accountId = action.accountId,
+        languageId = action.languageId,
       )
     addPendingComment(pendingCommentView)
   }
@@ -81,6 +84,7 @@ class PendingCommentsManager @Inject constructor() {
         commentId = action.commentId,
         parentId = null,
         content = "",
+        languageId = null,
         accountId = action.accountId,
         isActionDelete = true,
       )
@@ -112,6 +116,7 @@ data class PendingCommentView(
   val commentId: CommentId?,
   val parentId: CommentId?,
   val content: String,
+  val languageId: LanguageId?,
   val accountId: Long,
   val isActionDelete: Boolean = false,
   var error: LemmyActionFailureReason? = null,

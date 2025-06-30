@@ -428,16 +428,18 @@ class AccountActionsManager @Inject constructor(
     postRef: PostRef,
     parentId: CommentId?,
     content: String,
+    languageId: Int?,
     accountId: Long? = null,
   ) {
     val finalAccount = accountOrDefault(accountId)
       ?: return
     pendingActionsManager.comment(
-      postRef,
-      parentId,
-      content,
-      finalAccount.id,
-      finalAccount.instance,
+      postRef = postRef,
+      parentId = parentId,
+      content = content,
+      languageId = languageId,
+      accountId = finalAccount.id,
+      accountInstance = finalAccount.instance,
     )
   }
 
@@ -445,16 +447,18 @@ class AccountActionsManager @Inject constructor(
     postRef: PostRef,
     commentId: CommentId,
     content: String,
+    languageId: Int?,
     accountId: Long? = null,
   ) {
     val finalAccount = accountOrDefault(accountId)
       ?: return
     pendingActionsManager.editComment(
-      postRef,
-      commentId,
-      content,
-      finalAccount.id,
-      finalAccount.instance,
+      postRef = postRef,
+      commentId = commentId,
+      content = content,
+      languageId = languageId,
+      accountId = finalAccount.id,
+      accountInstance = finalAccount.instance,
     )
   }
 

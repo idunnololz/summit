@@ -11,6 +11,7 @@ import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.HapticFeedbackConstantsCompat
@@ -26,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
 import com.github.drjacky.imagepicker.ImagePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
@@ -33,6 +35,7 @@ import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.PersonId
 import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.databinding.ConfigureCommentBinding
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding
 import com.idunnololz.summit.drafts.DraftData
@@ -47,6 +50,7 @@ import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadImageViewModel
+import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment.LanguageOption
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
@@ -524,6 +528,10 @@ class AddOrEditCommentFragment :
             resetViewState(savedInstanceState)
             true
           }
+          R.id.configure_comment -> {
+            showConfigureCommentDialog()
+            true
+          }
           else -> false
         }
       }
@@ -587,6 +595,55 @@ class AddOrEditCommentFragment :
       }
       setup(savedInstanceState)
     }
+  }
+
+  private fun showConfigureCommentDialog() {
+    val context = requireContext()
+
+    val binding = ConfigureCommentBinding.inflate(LayoutInflater.from(context))
+
+    with(binding) {
+      viewModel.languageOptions.value?.let {
+        languagePickerText.visibility = View.VISIBLE
+
+        val options =
+          listOf(
+            LanguageOption(
+              name = context.getString(R.string.unspecified),
+              language = null,
+            )
+          ) + it.map { language ->
+            LanguageOption(
+              name = language.name,
+              language = language,
+            )
+          }
+
+        languagePickerText.setAdapter(
+          ArrayAdapter(
+            context,
+            R.layout.auto_complete_simple_item,
+            options,
+          ),
+        )
+        val languageOption = viewModel.languageId.value?.let { languageId ->
+          options.firstOrNull { it.language?.id == languageId }
+        }
+        languagePickerText.setText(languageOption?.name
+          ?: context.getString(R.string.unspecified), false)
+        languagePickerText.setOnItemClickListener { _, _, position, _ ->
+          viewModel.languageId.value = options[position].language?.id
+        }
+      } ?: run {
+        languagePickerText.visibility = View.GONE
+      }
+    }
+
+    MaterialAlertDialogBuilder(context)
+      .setTitle(R.string.configure_comment)
+      .setView(binding.root)
+      .setPositiveButton(android.R.string.ok) { dialog, which -> }
+      .show()
   }
 
   private fun showFullContext(force: Boolean = false) {
@@ -784,6 +841,7 @@ class AddOrEditCommentFragment :
 
       if (savedInstanceState == null) {
         commentEditor.setText(commentToEdit.comment.content)
+        viewModel.languageId.value = commentToEdit.comment.language_id
       }
     } else if (commentView != null) {
       binding.replyingTo.text = commentView.comment.content
@@ -892,6 +950,7 @@ class AddOrEditCommentFragment :
             content = content,
             accountId = account?.id ?: 0L,
             accountInstance = account?.instance ?: "",
+            languageId = viewModel.languageId.value,
           ),
           showToast = true,
         )

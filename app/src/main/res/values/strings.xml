@@ -2268,6 +2268,7 @@
     <string name="error_cant_change_community_when_editing_post">Can\'t change the community when editing a post.</string>
     <string name="language">Language</string>
     <string name="unspecified">Unspecified</string>
+    <string name="configure_comment">Configure comment</string>
 
     <!-- uCrop string resource end -->
 </resources>

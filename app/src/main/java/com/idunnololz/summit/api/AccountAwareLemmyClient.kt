@@ -570,6 +570,7 @@ class AccountAwareLemmyClient @Inject constructor(
     content: String,
     postId: PostId,
     parentId: CommentId?,
+    languageId: Int?,
     account: Account? = accountForInstance(),
   ): Result<CommentView> = if (account == null) {
     createAccountErrorResult()
@@ -578,6 +579,7 @@ class AccountAwareLemmyClient @Inject constructor(
       .createComment(
         account = account,
         content = content,
+        languageId = languageId,
         postId = postId,
         parentId = parentId,
       )
@@ -586,6 +588,7 @@ class AccountAwareLemmyClient @Inject constructor(
 
   suspend fun editComment(
     content: String,
+    languageId: Int?,
     commentId: CommentId,
     account: Account? = accountForInstance(),
   ): Result<CommentView> = if (account == null) {
@@ -596,6 +599,7 @@ class AccountAwareLemmyClient @Inject constructor(
         account = account,
         content = content,
         commentId = commentId,
+        languageId = languageId,
       )
       .autoSignOut(account)
   }

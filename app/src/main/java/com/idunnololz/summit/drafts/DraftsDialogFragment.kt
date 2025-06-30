@@ -149,6 +149,7 @@ class DraftsDialogFragment :
                       accountId = it.data.accountId,
                       accountInstance = it.data.accountInstance,
                       targetCommunityFullName = "",
+                      languageId = it.data.languageId,
                     ),
                   )
                 is DraftData.PostDraftData -> it
@@ -169,6 +170,7 @@ class DraftsDialogFragment :
                       content = it.data.body ?: "",
                       accountId = it.data.accountId,
                       accountInstance = it.data.accountInstance,
+                      languageId = it.data.languageId,
                     ),
                   )
                 is DraftData.MessageDraftData -> null

@@ -114,6 +114,7 @@ class PostFeedbackViewModel @Inject constructor(
         postRef = postRef,
         parentId = null,
         content = finalText,
+        languageId = null,
         accountId = account.id,
       )
       postFeedbackState.postValue(Unit)

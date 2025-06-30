@@ -142,6 +142,7 @@ sealed interface ActionInfo : Parcelable {
      * The comment to post
      */
     val content: String,
+    val languageId: Int? = null,
 
     override val accountId: Long,
     override val accountInstance: String?,
@@ -178,6 +179,7 @@ sealed interface ActionInfo : Parcelable {
      * The comment to post
      */
     val content: String,
+    val languageId: Int? = null,
 
     override val accountId: Long,
     override val accountInstance: String?,
