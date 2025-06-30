@@ -2260,6 +2260,14 @@
     <string name="duration">Duration</string>
     <string name="thumbnail_url_optional">Thumbnail url (optional)</string>
     <string name="alt_text_optional">Alt. text (optional)</string>
+    <string name="post_url_field_hint">Link to a website, image, video, etc.</string>
+    <string name="post_thumbnail_url_hint">Customize the post thumbnail</string>
+    <string name="post_alt_text_hint">For image posts. A brief description of the image.</string>
+    <string name="body_optional">Body (optional)</string>
+    <string name="post_title_hint">What is the post about?</string>
+    <string name="error_cant_change_community_when_editing_post">Can\'t change the community when editing a post.</string>
+    <string name="language">Language</string>
+    <string name="unspecified">Unspecified</string>
 
     <!-- uCrop string resource end -->
 </resources>

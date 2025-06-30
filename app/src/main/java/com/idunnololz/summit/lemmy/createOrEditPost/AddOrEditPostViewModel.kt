@@ -12,6 +12,8 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.Language
+import com.idunnololz.summit.api.dto.LanguageId
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
@@ -58,6 +60,8 @@ class AddOrEditPostViewModel @Inject constructor(
 
   val currentDraftEntry = state.getLiveData<DraftEntry>("current_draft_entry")
   val currentDraftId = state.getLiveData<Long>("current_draft_id")
+  val languageOptions = state.getLiveData<List<Language>>("languages")
+  val languageId = state.getLiveData<LanguageId?>("language")
 
   val currentAccount: Account?
     get() = accountManager.currentAccount.asAccount
@@ -81,6 +85,12 @@ class AddOrEditPostViewModel @Inject constructor(
           if (URLUtil.isValidUrl(it)) {
             loadLinkMetadata(it)
           }
+        }
+    }
+    viewModelScope.launch {
+      apiClient.fetchSiteWithRetry(force = false)
+        .onSuccess {
+          languageOptions.value = it.all_languages
         }
     }
   }
@@ -136,6 +146,7 @@ class AddOrEditPostViewModel @Inject constructor(
         communityId = community.id,
         thumbnailUrl = thumbnailUrl,
         altText = altText,
+        languageId = languageId.value,
       )
 
       recentCommunityManager.addRecentCommunityPostedTo(
@@ -184,6 +195,7 @@ class AddOrEditPostViewModel @Inject constructor(
         account = account,
         thumbnailUrl = thumbnailUrl,
         altText = altText,
+        languageId = languageId.value,
       )
 
       result

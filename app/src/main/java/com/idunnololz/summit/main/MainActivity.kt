@@ -778,8 +778,8 @@ class MainActivity : SummitActivity() {
 
   fun launchModLogs(instance: String, filterByMod: PersonRef?, filterByUser: PersonRef?) {
     val direction = MainDirections.actionGlobalModLogsFragment(
-      instance,
-      null,
+      instance = instance,
+      communityRef = null,
       filterByMod = filterByMod,
       filterByUser = filterByUser,
     )

@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.idunnololz.summit.api.dto.LanguageId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.Parcelize
@@ -84,6 +85,8 @@ sealed interface DraftData : Parcelable {
     override val accountInstance: String,
     val targetCommunityFullName: String,
     val thumbnailUrl: String? = null,
+    val altText: String? = null,
+    val languageId: LanguageId? = null,
   ) : DraftData
 
   @Parcelize

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnPreDrawListener
 import android.webkit.URLUtil
+import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
@@ -37,6 +38,7 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.api.dto.Language
 import com.idunnololz.summit.api.dto.Post
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
@@ -57,7 +59,6 @@ import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.setMarkdown
-import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
@@ -117,6 +118,13 @@ class AddOrEditPostFragment :
           "CreateOrEditPostFragment",
         )
     }
+  }
+
+  data class LanguageOption(
+    val name: String,
+    val language: Language?,
+  ) {
+    override fun toString(): String = name
   }
 
   private val args by navArgs<AddOrEditPostFragmentArgs>()
@@ -270,6 +278,8 @@ class AddOrEditPostFragment :
       if (isEdit()) {
         toolbar.title = getString(R.string.edit_post)
         toolbar.menu.findItem(R.id.create_post)?.isVisible = false
+
+        communityEditText.setHint(R.string.error_cant_change_community_when_editing_post)
       } else {
         toolbar.title = getString(R.string.create_post)
         toolbar.menu.findItem(R.id.update_post)?.isVisible = false
@@ -675,6 +685,54 @@ class AddOrEditPostFragment :
         showSearchBackPressedHandler.isEnabled = showSearch
       }
 
+      languageTitle.visibility = View.GONE
+      languagePickerText.visibility = View.GONE
+      viewModel.languageOptions.observe(viewLifecycleOwner) {
+        if (it.isNullOrEmpty()) {
+          return@observe
+        }
+
+        languageTitle.visibility = View.VISIBLE
+        languagePickerText.visibility = View.VISIBLE
+
+        val options =
+          listOf(
+            LanguageOption(
+              name = context.getString(R.string.unspecified),
+              language = null,
+            )
+          ) + it.map { language ->
+            LanguageOption(
+              name = language.name,
+              language = language,
+            )
+          }
+
+        languagePickerText.setAdapter(
+          ArrayAdapter(
+            context,
+            R.layout.auto_complete_simple_item,
+            options,
+          ),
+        )
+        val languageOption = viewModel.languageId.value?.let { languageId ->
+          options.firstOrNull { it.language?.id == languageId }
+        }
+        languagePickerText.setText(languageOption?.name
+          ?: context.getString(R.string.unspecified), false)
+        languagePickerText.setOnItemClickListener { _, _, position, _ ->
+          viewModel.languageId.value = options[position].language?.id
+        }
+      }
+      viewModel.languageId.observe(viewLifecycleOwner) {
+        val options = viewModel.languageOptions.value ?: return@observe
+        val languageOption = viewModel.languageId.value?.let { languageId ->
+          options.firstOrNull { it.id == languageId }
+        }
+        languagePickerText.setText(languageOption?.name
+          ?: context.getString(R.string.unspecified), false)
+      }
+
       communityEditText.addTextChangedListener {
         val query = it?.toString() ?: ""
         adapter?.setQuery(query) {
@@ -696,9 +754,14 @@ class AddOrEditPostFragment :
           urlEditText.setText(data.url)
           nsfwSwitch.isChecked = data.isNsfw
           communityEditText.setText(data.targetCommunityFullName)
+          viewModel.languageId.value = data.languageId
 
           if (data.thumbnailUrl != null) {
             thumbnailUrlEditText.setText(data.thumbnailUrl)
+            viewModel.showMore.value = true
+          }
+          if (data.altText != null) {
+            altTextEditText.setText(data.altText)
             viewModel.showMore.value = true
           }
         }
@@ -767,6 +830,7 @@ class AddOrEditPostFragment :
           title.editText?.setText(crossPost.name)
           postEditor.editText?.setText(crossPost.getCrossPostContent())
           nsfwSwitch.isChecked = crossPost.nsfw
+          viewModel.languageId.value = crossPost.language_id
 
           if (crossPost.thumbnail_url != null) {
             showMore = true
@@ -777,6 +841,7 @@ class AddOrEditPostFragment :
           title.editText?.setText(post.name)
           postEditor.editText?.setText(post.body)
           nsfwSwitch.isChecked = post.nsfw
+          viewModel.languageId.value = post.language_id
 
           if (post.thumbnail_url != null) {
             showMore = true
@@ -1072,6 +1137,7 @@ class AddOrEditPostFragment :
     binding.altText.isEnabled = !isLoading
     binding.thumbnailUrl.isEnabled = !isLoading
     textFormatToolbar?.isEnabled = !isLoading
+    binding.languagePicker.isEnabled = !isLoading
   }
 
   private fun Post.getCrossPostContent(): String = buildString {

@@ -546,6 +546,7 @@ class AccountAwareLemmyClient @Inject constructor(
     isNsfw: Boolean,
     thumbnailUrl: String?,
     altText: String?,
+    languageId: Int?,
     account: Account? = accountForInstance(),
     communityId: CommunityId,
   ): Result<PostView> = if (account == null) {
@@ -560,6 +561,7 @@ class AccountAwareLemmyClient @Inject constructor(
       communityId = communityId,
       thumbnailUrl = thumbnailUrl,
       altText = altText,
+      languageId = languageId,
     )
       .autoSignOut(account)
   }
@@ -620,6 +622,7 @@ class AccountAwareLemmyClient @Inject constructor(
     isNsfw: Boolean,
     thumbnailUrl: String?,
     altText: String?,
+    languageId: Int?,
     account: Account? = accountForInstance(),
   ): Result<PostView> = if (account == null) {
     createAccountErrorResult()
@@ -633,6 +636,7 @@ class AccountAwareLemmyClient @Inject constructor(
       account = account,
       thumbnailUrl = thumbnailUrl,
       altText = altText,
+      languageId = languageId,
     )
       .autoSignOut(account)
   }

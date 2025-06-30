@@ -119,12 +119,12 @@ class ModLogsViewModel @Inject constructor(
           Result.success(null)
         }
 
-      val communityId = communityIdOrNull.getOrThrow()
-
       if (communityIdOrNull.isFailure) {
         modLogData.postError(communityIdOrNull.exceptionOrNull()!!)
         return@launch
       }
+
+      val communityId = communityIdOrNull.getOrThrow()
 
       val modSource = modSource ?: MultiLemmyListSource<ModEvent, Unit>(
         listOf(

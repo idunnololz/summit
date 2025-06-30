@@ -44,12 +44,13 @@
                             android:id="@+id/community"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:hint="@string/community"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
-                            app:hintEnabled="false">
+                            app:expandedHintEnabled="false">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/community_edit_text"
@@ -76,12 +77,14 @@
                             android:id="@+id/url"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:hint="@string/url_optional"
+                            android:paddingTop="@dimen/padding"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/upload_image"
                             app:layout_constraintTop_toBottomOf="@+id/divider0"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
-                            app:hintEnabled="false">
+                            app:expandedHintEnabled="false">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/url_edit_text"
@@ -94,7 +97,7 @@
                                 android:scrollbars="vertical"
                                 android:textAppearance="?textAppearanceBodyMedium"
                                 android:inputType="textMultiLine|textUri"
-                                android:hint="@string/url_optional"/>
+                                android:hint="@string/post_url_field_hint"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
@@ -133,12 +136,14 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:visibility="gone"
+                            android:hint="@string/thumbnail_url_optional"
+                            android:paddingTop="@dimen/padding"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/divider1"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
-                            app:hintEnabled="false">
+                            app:expandedHintEnabled="false">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/thumbnail_url_edit_text"
@@ -151,7 +156,7 @@
                                 android:scrollbars="vertical"
                                 android:textAppearance="?textAppearanceBodyMedium"
                                 android:inputType="textMultiLine|textUri"
-                                android:hint="@string/thumbnail_url_optional"/>
+                                android:hint="@string/post_thumbnail_url_hint"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.divider.MaterialDivider
@@ -167,12 +172,14 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:visibility="gone"
+                            android:hint="@string/alt_text_optional"
+                            android:paddingTop="@dimen/padding"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/divider_thumbnail_url"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
-                            app:hintEnabled="false">
+                            app:expandedHintEnabled="false">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/alt_text_edit_text"
@@ -185,7 +192,7 @@
                                 android:scrollbars="vertical"
                                 android:textAppearance="?textAppearanceBodyMedium"
                                 android:inputType="textMultiLine|textUri"
-                                android:hint="@string/alt_text_optional"/>
+                                android:hint="@string/post_alt_text_hint"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.divider.MaterialDivider
@@ -200,12 +207,14 @@
                             android:id="@+id/title"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:hint="@string/title"
+                            android:paddingTop="@dimen/padding"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/divider_alt_text"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
-                            app:hintEnabled="false">
+                            app:expandedHintEnabled="false">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/title_edit_text"
@@ -218,7 +227,7 @@
                                 android:scrollbars="vertical"
                                 android:textAppearance="?textAppearanceBodyMedium"
                                 android:inputType="textMultiLine|textCapSentences"
-                                android:hint="@string/title"/>
+                                android:hint="@string/post_title_hint"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <FrameLayout
@@ -256,12 +265,14 @@
                             android:id="@+id/post_editor"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:hint="@string/body_optional"
+                            android:paddingTop="@dimen/padding"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/divider2"
                             app:boxStrokeWidth="0dp"
                             app:boxStrokeWidthFocused="0dp"
-                            app:hintEnabled="false">
+                            app:expandedHintEnabled="false">
 
                             <com.idunnololz.summit.view.CustomTextInputEditText
                                 android:id="@+id/post_edit_text"
@@ -309,6 +320,35 @@
                             app:layout_constraintTop_toTopOf="@+id/nsfw_switch"
                             app:layout_constraintBottom_toBottomOf="@+id/nsfw_switch"
                             app:layout_constraintStart_toStartOf="parent"/>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/language_picker"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/padding"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/nsfw_switch">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/language_picker_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:id="@+id/language_title"
+                            android:text="@string/language"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/padding"
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintTop_toTopOf="@+id/language_picker"
+                            app:layout_constraintBottom_toBottomOf="@+id/language_picker"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/language_picker"/>
 
                         <Space
                             android:id="@+id/bottom_spacer"
