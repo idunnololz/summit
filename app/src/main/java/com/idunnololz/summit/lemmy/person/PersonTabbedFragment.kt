@@ -469,7 +469,6 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
       viewPager.visibility = View.VISIBLE
       tabLayoutContainer.visibility = View.VISIBLE
 
-      fab.scrollCaptureHint = SCROLL_CAPTURE_HINT_EXCLUDE
       fab.show()
 
       val displayName = person.display_name
