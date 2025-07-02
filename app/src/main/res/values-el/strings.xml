@@ -1423,4 +1423,22 @@
     <string name="view_users_mod_history">Δες το ιστορικό συντ χρήστη</string>
     <string name="video_details">Λεπτομέρειες βίντεο</string>
     <string name="banned_person_from_site_permanently_format">Οριστικός αποκλεισμός %1$s από την οντότητα %2$s.</string>
+    <string name="remove_admin">Αφαίρεση διαχειριστή</string>
+    <string name="error_invalid_arguments">Μη έγκυρα ορίσματα.</string>
+    <string name="moderator">Συντονιστής</string>
+    <string name="hidden">Κρυμμένο</string>
+    <string name="reason">Αιτία</string>
+    <string name="transferred_to">Μεταφέρθηκε σε</string>
+    <string name="duration">Διάρκεια</string>
+    <string name="alt_text_optional">Εν. κείμενο (προαιρετικό)</string>
+    <string name="post_alt_text_hint">Για αναρτήσεις εικόνων. Μια σύντομη περιγραφή της εικόνας.</string>
+    <string name="body_optional">Σώμα (προαιρετικό)</string>
+    <string name="post_title_hint">Τι αφορά η ανάρτηση;</string>
+    <string name="language">Γλώσσα</string>
+    <string name="unspecified">Απροσδιόριστο</string>
+    <string name="thumbnail_url_optional">URL μικρογραφίας (προαιρετικό)</string>
+    <string name="post_url_field_hint">Σύνδεσμος σε ιστότοπο, εικόνα, βίντεο κλπ.</string>
+    <string name="error_cant_change_community_when_editing_post">Δεν είναι δυνατή η αλλαγή της κοινότητας κατά την επεξεργασία μιας ανάρτησης.</string>
+    <string name="configure_comment">Παραμετροποίηση σχολίου</string>
+    <string name="post_thumbnail_url_hint">Προσάρμοσε τη μικρογραφία της ανάρτησης</string>
 </resources>
