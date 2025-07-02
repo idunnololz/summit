@@ -48,6 +48,8 @@ class OfflineManager @Inject constructor(
     private val TAG = OfflineManager::class.java.simpleName
   }
 
+  private val cachedUrls = mutableSetOf<String>()
+
   private val coroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
   private val downloadTasks = LinkedHashMap<String, DownloadTask>()
@@ -76,6 +78,17 @@ class OfflineManager @Inject constructor(
     fun cancel(offlineManager: OfflineManager) {
       offlineManager.cancelFetch(key, listener, errorListener)
     }
+  }
+
+  fun isUrlCached(url: String): Boolean {
+    return cachedUrls.contains(url)
+  }
+
+  fun getCachedImageFile(url: String): File {
+    val fileName = getFilenameForUrl(url)
+    val downloadedFile = File(imagesDir, fileName)
+
+    return downloadedFile
   }
 
   fun fetchImage(rootView: View, url: String?, listener: TaskListener) {
@@ -308,11 +321,15 @@ class OfflineManager @Inject constructor(
       ) ?: return@launch
 
       if (Looper.myLooper() == Looper.getMainLooper()) {
+        cachedUrls.add(url)
+
         downloadTasks.remove(url)?.listeners?.forEach {
           it(file)
         }
       } else {
         withContext(Dispatchers.Main) {
+          cachedUrls.add(url)
+
           downloadTasks.remove(url)?.listeners?.forEach {
             it(file)
           }

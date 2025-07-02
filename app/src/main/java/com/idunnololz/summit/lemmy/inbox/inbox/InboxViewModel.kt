@@ -77,6 +77,8 @@ class InboxViewModel @Inject constructor(
 
   var pauseUnreadUpdates = false
 
+  var lastFetchRequestTs = 0L
+    private set
   private var isLoaded = false
   private val allInboxItems: MutableList<InboxListItem> = mutableListOf()
   private var hasMore = true
@@ -205,6 +207,7 @@ class InboxViewModel @Inject constructor(
   }
 
   fun fetchInboxAsync(pageIndex: Int) {
+    lastFetchRequestTs = System.currentTimeMillis()
     viewModelScope.launch {
       fetchInboxRequestFlow.emit(pageIndex)
     }
@@ -258,6 +261,8 @@ class InboxViewModel @Inject constructor(
   }
 
   fun fetchInbox(pageIndex: Int, force: Boolean = false, retainItemsOnForce: Boolean = false) {
+    lastFetchRequestTs = System.currentTimeMillis()
+
     val pageType = pageTypeFlow.value
 
     observeConversationsJob?.cancel()

@@ -65,7 +65,6 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.MarkAsRead
-import com.idunnololz.summit.preferences.PostQuickActionIds
 import com.idunnololz.summit.preferences.PostQuickActionIds.CommunityInfo
 import com.idunnololz.summit.preferences.PostQuickActionIds.CrossPost
 import com.idunnololz.summit.preferences.PostQuickActionIds.DetailedView
@@ -2046,7 +2045,7 @@ class PostListViewBuilder @Inject constructor(
     errorListener: TaskFailedListener?,
     force: Boolean,
   ) {
-    lemmyContentHelper.loadThumbnailIntoImageView(
+    lemmyContentHelper.loadImageIntoImageView(
       imageUrl = imageUrl,
       imageSizeKey = "postList:$imageUrl",
       fallbackUrl = null,

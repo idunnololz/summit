@@ -12,7 +12,6 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -20,9 +19,13 @@ import androidx.annotation.LayoutRes
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import arrow.core.Either
+import coil3.Image
+import coil3.imageLoader
 import coil3.load
+import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.transformations
+import coil3.target.ImageViewTarget
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.PostView
@@ -30,6 +33,7 @@ import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailPreviewInfo
+import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getVideoInfo
 import com.idunnololz.summit.api.utils.shouldHideItem
@@ -45,6 +49,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.getVideoType
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
@@ -144,7 +149,7 @@ class LemmyContentHelper(
           R.dimen.post_list_image_view_horizontal_margin,
         ) * 2
         )
-    }.toInt()
+    }
 
     fun <T : View> getAndEnsureView(@LayoutRes resId: Int): T =
       fullContentContainerView.getAndEnsureView(resId)
@@ -177,7 +182,7 @@ class LemmyContentHelper(
           true
         }
 
-        fun fetchFullImage(force: Boolean = false) = loadThumbnailIntoImageView(
+        fun fetchFullImage(force: Boolean = false) = loadImageIntoImageView(
           imageUrl = imageUrl,
           imageSizeKey = imageUrl,
           fallbackUrl = null,
@@ -189,6 +194,7 @@ class LemmyContentHelper(
           imageView = fullImageView,
           preferFullSizeImage = true,
           force = force,
+          thumbnailUrl = postView.getThumbnailUrl(reveal)
         )
 
         loadingView?.setOnRefreshClickListener {
@@ -335,7 +341,7 @@ class LemmyContentHelper(
         true
       }
 
-      fun fetchFullImage(force: Boolean = false) = loadThumbnailIntoImageView(
+      fun fetchFullImage(force: Boolean = false) = loadImageIntoImageView(
         imageUrl = imageUrl,
         imageSizeKey = imageUrl,
         fallbackUrl = fallback,
@@ -347,6 +353,7 @@ class LemmyContentHelper(
         imageView = fullImageView,
         preferFullSizeImage = true,
         force = force,
+        thumbnailUrl = postView.getThumbnailUrl(reveal),
       )
 
       loadingView?.setOnRefreshClickListener {
@@ -633,7 +640,11 @@ class LemmyContentHelper(
     }
   }
 
-  fun loadThumbnailIntoImageView(
+  /**
+   * @param thumbnailUrl If set, the thumbnail is used if it's already downloaded while waiting for
+   * the real image to load.
+   */
+  fun loadImageIntoImageView(
     imageUrl: String,
     imageSizeKey: String,
     fallbackUrl: String?,
@@ -644,8 +655,9 @@ class LemmyContentHelper(
     loadingView: LoadingView?,
     imageView: ImageView,
     preferFullSizeImage: Boolean,
-    errorListener: TaskFailedListener? = null,
     force: Boolean,
+    thumbnailUrl: String? = null,
+    errorListener: TaskFailedListener? = null,
   ) {
     val isUrlVideo = isUrlVideo(imageUrl)
     imageView.visibility = View.VISIBLE
@@ -655,16 +667,33 @@ class LemmyContentHelper(
       imageView.updateLayoutParams(contentMaxWidth, imageSizeKey, tempSize)
     }
 
-    fun onImageLoaded(urlOrFile: Either<String, File>) {
-      urlOrFile.fold(
-        { offlineManager.getImageSizeHint(it, tempSize) },
-        { offlineManager.getImageSizeHint(it, tempSize) },
-      )
+    if (thumbnailUrl != null &&
+      isUrlImage(thumbnailUrl) &&
+      offlineManager.isUrlCached(thumbnailUrl) &&
+      !offlineManager.isUrlCached(imageUrl)) {
 
+      Log.d(TAG, "thumbnail available, using thumbnail as placeholder!")
+
+      if (preferFullSizeImage) {
+        imageView.updateLayoutParams(contentMaxWidth, thumbnailUrl, tempSize)
+      }
+
+      imageView.load(offlineManager.getCachedImageFile(thumbnailUrl)) {
+        if (blur) {
+          val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+          this.transformations(BlurTransformation(context, sampling = sampling))
+        }
+
+        allowHardware(false)
+      }
+    }
+
+
+    fun onImageLoaded(urlOrFile: Either<String, File>) {
       Log.d(TAG, "image size: $tempSize")
 
-      var w: Int? = null
-      var h: Int? = null
+      var w = 0
+      var h = 0
       if (tempSize.height > 0 && tempSize.width > 0) {
         val heightToWidthRatio = tempSize.height / tempSize.width
 
@@ -675,52 +704,66 @@ class LemmyContentHelper(
         }
       }
 
-      imageView.load(urlOrFile.getOrNull() ?: urlOrFile.leftOrNull()) {
-        allowHardware(false)
-
-        if (blur) {
-          val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-          this.transformations(BlurTransformation(context, sampling = sampling))
-        }
-
-        val finalW = w
-        val finalH = h
-        if (finalW != null && finalH != null) {
-          this.size(finalW, finalH)
-        }
-
-        listener(
-          onError = { _, error ->
-            loadingView?.showDefaultErrorMessageFor(error.throwable)
-            errorListener?.invoke(error.throwable)
-            Log.d(TAG, "Coil - Failed to load icon: $imageUrl")
-          },
-          onSuccess = { _, result ->
-            loadingView?.hideAll(animate = false)
-
-            tempSize.width = result.image.width
-            tempSize.height = result.image.height
-
-            Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
-            imageView.alpha = 1f
-
-            if (preferFullSizeImage) {
-              if (tempSize.width > 0 && tempSize.height > 0) {
-                offlineManager.setImageSizeHint(
-                  imageSizeKey,
-                  tempSize.width,
-                  tempSize.height,
-                )
+      imageView.context.imageLoader
+        .enqueue(
+          ImageRequest.Builder(context)
+            .data(urlOrFile.getOrNull() ?: urlOrFile.leftOrNull())
+            .target(object : ImageViewTarget(imageView) {
+              override fun onStart(placeholder: Image?) {
+                if (thumbnailUrl != null && placeholder != null) {
+                  // Only update the image if placeholder is not null. This prevents the image view
+                  // from getting re-laid out causing the image view to shrink and then re-expand.
+                  updateImage(placeholder)
+                }
               }
-              imageView.updateLayoutParams(
-                contentMaxWidth = contentMaxWidth,
-                imageUrl = imageSizeKey,
-                tempSize = tempSize,
+            })
+            .apply {
+              allowHardware(false)
+
+              if (blur) {
+                val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+                this.transformations(BlurTransformation(context, sampling = sampling))
+              }
+
+              if (w > 0 && h > 0) {
+                Log.d(TAG, "size(${w}, ${h})")
+                this.size(w, h)
+              }
+
+              listener(
+                onError = { _, error ->
+                  loadingView?.showDefaultErrorMessageFor(error.throwable)
+                  errorListener?.invoke(error.throwable)
+                  Log.d(TAG, "Coil - Failed to load icon: $imageUrl")
+                },
+                onSuccess = { _, result ->
+                  loadingView?.hideAll(animate = false)
+
+                  tempSize.width = result.image.width
+                  tempSize.height = result.image.height
+
+                  Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
+                  imageView.alpha = 1f
+
+                  if (preferFullSizeImage) {
+                    if (tempSize.width > 0 && tempSize.height > 0) {
+                      offlineManager.setImageSizeHint(
+                        imageSizeKey,
+                        tempSize.width,
+                        tempSize.height,
+                      )
+                    }
+                    imageView.updateLayoutParams(
+                      contentMaxWidth = contentMaxWidth,
+                      imageUrl = imageSizeKey,
+                      tempSize = tempSize,
+                    )
+                  }
+                },
               )
             }
-          },
+            .build()
         )
-      }
     }
 
     if (isUrlVideo) {
@@ -734,7 +777,7 @@ class LemmyContentHelper(
         },
         errorListener = {
           if (imageUrl != fallbackUrl && fallbackUrl != null) {
-            loadThumbnailIntoImageView(
+            loadImageIntoImageView(
               imageUrl = fallbackUrl,
               imageSizeKey = imageSizeKey,
               fallbackUrl = fallbackUrl,

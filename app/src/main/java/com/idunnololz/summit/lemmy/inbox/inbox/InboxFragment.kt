@@ -126,8 +126,6 @@ class InboxFragment :
 
   private var adapter: InboxItemAdapter? = null
 
-  private var screenCreateTs = 0L
-
   private val paneOnBackPressHandler = object : OnBackPressedCallback(true) {
     override fun handleOnBackPressed() {
       if (!isBindingAvailable()) return
@@ -143,7 +141,6 @@ class InboxFragment :
       requireSummitActivity().apply {
         setupForFragment<InboxTabbedFragment>()
       }
-      screenCreateTs = System.currentTimeMillis()
     }
 
     childFragmentManager.setFragmentResultListener(
@@ -661,7 +658,7 @@ class InboxFragment :
 
     super.onResume()
 
-    if (System.currentTimeMillis() - screenCreateTs >= 5_000) {
+    if (System.currentTimeMillis() - viewModel.lastFetchRequestTs >= 5_000) {
       Log.d(TAG, "Screen resumed! Checking if there are new items!")
       viewModel.fetchNewInboxItems()
     } else {
