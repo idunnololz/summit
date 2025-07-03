@@ -16,6 +16,7 @@ sealed interface CommentItem {
 
 data class VisibleCommentItem(
   override val commentView: CommentView,
+  val commentHeaderInfo: CommentHeaderInfo,
 ) : CommentItem
 
 data class FilteredCommentItem(

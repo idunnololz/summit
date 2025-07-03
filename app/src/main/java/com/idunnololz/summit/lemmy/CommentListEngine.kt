@@ -1,12 +1,16 @@
 package com.idunnololz.summit.lemmy
 
+import android.content.Context
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 class CommentListEngine @AssistedInject constructor(
+  @ApplicationContext private val context: Context,
   private val contentFiltersManager: ContentFiltersManager,
 ) {
 
@@ -30,6 +34,7 @@ class CommentListEngine @AssistedInject constructor(
     hasMore: Boolean,
     error: Throwable?,
   ) {
+    val context = ContextCompat.getContextForLanguage(context)
     val newPages = commentPages.toMutableList()
     val existingPage = newPages.getOrNull(pageIndex)
 
@@ -37,7 +42,10 @@ class CommentListEngine @AssistedInject constructor(
 //            if (contentFiltersManager.testCommentView(it)) {
 //                FilteredCommentItem(it)
 //            } else {
-      VisibleCommentItem(it)
+      VisibleCommentItem(
+        commentView = it,
+        commentHeaderInfo = it.toCommentHeaderInfo(context),
+      )
 //            }
     }
 

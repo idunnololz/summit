@@ -15,7 +15,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
@@ -34,7 +33,6 @@ import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
-import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.spToPx
@@ -95,6 +93,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     isCurrentUser: Boolean,
     showEditedDate: Boolean,
     useCondensedTypeface: Boolean,
+    postHeaderInfo: PostHeaderInfo,
   ) {
     var currentTextView = headerContainer.textView1
 
@@ -252,15 +251,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
 
     sb.appendSeparator()
-    tsToConcise(context, postView.post.published).let {
-      sb.append(it)
-    }
+    sb.append(postHeaderInfo.publishedTsString)
 
     val updated = postView.post.updated
-    if (showEditedDate && updated != null) {
-      tsToConcise(context, updated).let {
-        sb.append(" ($it)")
-      }
+    if (showEditedDate && postHeaderInfo.editedTsString != null) {
+      sb.append(" (${postHeaderInfo.editedTsString})")
     }
 
     if (wrapHeader) {
@@ -382,9 +377,9 @@ class LemmyHeaderHelper @AssistedInject constructor(
         )
       }
 
-      sb.appendNewUserWarningIfNeeded(postView.creator)
+      sb.appendNewUserWarningIfNeeded(postHeaderInfo)
 
-      if (postView.creator.isCakeDay()) {
+      if (postHeaderInfo.isAuthorCakeDay) {
         sb.appendSeparator()
         val d = Utils.tint(
           context = context,
@@ -428,7 +423,6 @@ class LemmyHeaderHelper @AssistedInject constructor(
         ),
       )
     }
-    sb.appendSeparator()
 
     currentTextView.text = sb
     currentTextView.movementMethod = makeMovementMethod(
@@ -457,6 +451,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     childrenCount: Int? = null,
     wrapHeader: Boolean = false,
     scoreColor: Int? = null,
+    commentHeaderInfo: CommentHeaderInfo,
   ) {
     val creatorInstance = commentView.creator.instance
     val currentTextView = headerContainer.textView1
@@ -643,7 +638,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       }
     }
 
-    sb.appendNewUserWarningIfNeeded(commentView.creator)
+    sb.appendNewUserWarningIfNeeded(commentHeaderInfo)
 
     val tag = userTagsManager.getUserTag(commentView.creator.fullName)
     if (tag != null) {
@@ -660,7 +655,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       )
     }
 
-    if (commentView.creator.isCakeDay()) {
+    if (commentHeaderInfo.isAuthorCakeDay) {
       sb.appendSeparator()
       val d = Utils.tint(
         context = context,
@@ -681,23 +676,17 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
       sb.appendSeparator()
 
-      sb.append(
-        tsToConcise(context, commentView.comment.published),
-      )
+      sb.append(commentHeaderInfo.publishedTsString)
     } else {
       if (insertBigSpaceAfterName && sb.isNotEmpty()) {
         sb.append("  ")
       }
-      sb.append(
-        tsToConcise(context, commentView.comment.published),
-      )
+      sb.append(commentHeaderInfo.publishedTsString)
     }
 
-    val updated = commentView.comment.updated
+    val updated = commentHeaderInfo.editedTsString
     if (showEditedDate && updated != null) {
-      tsToConcise(context, updated).let {
-        sb.append(" ($it)")
-      }
+      sb.append(" ($updated)")
     }
     headerContainer.getFlairView().visibility = View.GONE
 
@@ -796,16 +785,14 @@ class LemmyHeaderHelper @AssistedInject constructor(
     }
   }
 
-  private fun SpannableStringBuilder.appendNewUserWarningIfNeeded(person: Person) {
+  private fun SpannableStringBuilder.appendNewUserWarningIfNeeded(headerInfo: HeaderInfo) {
     if (preferences.warnNewPerson) {
-      val personCreationTs = dateStringToTs(person.published)
-      val isPersonNew =
-        System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
+      val newUserTsString = headerInfo.newUserTsString
 
-      if (isPersonNew) {
+      if (newUserTsString != null) {
         append(" ")
         val s = length
-        append(tsToConcise(context, person.published))
+        append(newUserTsString)
         val e = length
         setSpan(
           RoundedBackgroundSpan(

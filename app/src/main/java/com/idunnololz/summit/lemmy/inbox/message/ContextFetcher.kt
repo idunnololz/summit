@@ -1,5 +1,7 @@
 package com.idunnololz.summit.lemmy.inbox.message
 
+import android.app.Application
+import androidx.core.content.ContextCompat
 import arrow.core.Either
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
@@ -27,6 +29,7 @@ import kotlinx.coroutines.withContext
 
 @ViewModelScoped
 class ContextFetcher @Inject constructor(
+  private val application: Application,
   private val apiClient: AccountAwareLemmyClient,
   private val contentFiltersManager: ContentFiltersManager,
   private val accountActionsManager: AccountActionsManager,
@@ -114,8 +117,9 @@ class ContextFetcher @Inject constructor(
     }
 
     val tree = CommentTreeBuilder(
-      accountManager,
-      contentFiltersManager,
+      context = ContextCompat.getContextForLanguage(application),
+      accountManager = accountManager,
+      contentFiltersManager = contentFiltersManager,
     ).buildCommentsTreeListView(
       post = null,
       comments = commentResult?.getOrNull(),

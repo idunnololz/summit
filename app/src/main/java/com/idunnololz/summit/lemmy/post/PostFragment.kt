@@ -65,6 +65,7 @@ import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
 import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelperManager
@@ -404,7 +405,7 @@ class PostFragment :
 
       fun onMoreClick() {
         val data = viewModel.postData.valueOrNull
-        val postView = data?.postView?.post ?: args.post
+        val postView = data?.postListView?.post ?: args.post
 
         if (postView != null) {
           showMorePostOptions(
@@ -622,7 +623,7 @@ class PostFragment :
         PostFabQuickActions.NONE -> {}
         PostFabQuickActions.ADD_COMMENT -> {
           fab.setOnLongClickListener {
-            val postView = viewModel.postData.valueOrNull?.postView?.post
+            val postView = viewModel.postData.valueOrNull?.postListView?.post
             if (postView != null) {
               onAddCommentClick(Either.Left(postView))
             }
@@ -687,7 +688,7 @@ class PostFragment :
             },
             onMoreClick = {
               val data = viewModel.postData.valueOrNull
-              val postView = data?.postView?.post ?: args.post
+              val postView = data?.postListView?.post ?: args.post
 
               if (postView != null) {
                 onMoreClick()
@@ -1040,7 +1041,10 @@ class PostFragment :
     args.post?.let { post ->
       adapter.setStartingData(
         PostViewModel.PostData(
-          postView = PostViewModel.ListView.PostListView(post),
+          postListView = PostViewModel.ListView.PostListView(
+            post = post,
+            postHeaderInfo = post.toPostHeaderInfo(context),
+          ),
           commentTree = listOf(),
           crossPosts = listOf(),
           newlyPostedCommentId = null,
@@ -1074,7 +1078,7 @@ class PostFragment :
           binding.swipeRefreshLayout.isRefreshing = false
           binding.loadingView.hideAll()
           adapter.setData(it.data)
-          onMainListingItemRetrieved(it.data.postView.post)
+          onMainListingItemRetrieved(it.data.postListView.post)
 
           val newlyPostedCommentId = it.data.newlyPostedCommentId
           if (newlyPostedCommentId != null) {
@@ -1339,7 +1343,7 @@ class PostFragment :
   override fun proceedAnyways(tag: Int) {
     when (tag) {
       R.id.action_add_comment -> {
-        val postView = viewModel.postData.valueOrNull?.postView ?: return
+        val postView = viewModel.postData.valueOrNull?.postListView ?: return
 
         AddOrEditCommentFragment.showReplyDialog(
           instance = getInstance(),
@@ -1349,7 +1353,7 @@ class PostFragment :
         )
       }
       R.id.action_edit_comment -> {
-        val postView = viewModel.postData.valueOrNull?.postView ?: return
+        val postView = viewModel.postData.valueOrNull?.postListView ?: return
 
         AddOrEditCommentFragment.showReplyDialog(
           instance = getInstance(),

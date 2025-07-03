@@ -508,6 +508,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           headerContainer = b.headerContainer,
           commentView = item.commentView,
           instance = item.instance,
+          commentHeaderInfo = item.commentHeaderInfo,
           onPageClick = onPageClick,
           onLinkClick = onLinkClick,
           onLinkLongClick = onLinkLongClick,
@@ -617,6 +618,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           highlightForever = false,
           themeColor = null,
           isDuplicatePost = false,
+          postHeaderInfo = item.postHeaderInfo,
           onRevealContentClickedFn = {
             revealedItems.add(item.fetchedPost.postView.getUniqueKey())
             notifyItemChanged(h.absoluteAdapterPosition)

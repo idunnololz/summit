@@ -1,5 +1,7 @@
 package com.idunnololz.summit.lemmy.comment
 
+import android.app.Application
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -37,6 +39,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AddOrEditCommentViewModel @Inject constructor(
+  private val application: Application,
   private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
   val accountManager: AccountManager,
   private val accountActionsManager: AccountActionsManager,
@@ -298,8 +301,9 @@ class AddOrEditCommentViewModel @Inject constructor(
       }
 
       val tree = CommentTreeBuilder(
-        accountManager,
-        contentFiltersManager,
+        context = ContextCompat.getContextForLanguage(application),
+        accountManager = accountManager,
+        contentFiltersManager = contentFiltersManager,
       ).buildCommentsTreeListView(
         post = null,
         comments = commentResult?.getOrNull(),

@@ -19,9 +19,12 @@ import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.databinding.PostAndCommentAppearanceDemoCardBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.postAndCommentView.CommentExpandedViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
+import com.idunnololz.summit.lemmy.toCommentHeaderInfo
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.BasicSettingItem
@@ -298,6 +301,8 @@ class SettingsPostAndCommentsAppearanceFragment :
     }
 
     fun refresh() {
+      val context = container.context
+
       adapterHelper.resetItemTypes()
       adapterHelper.addItemType(
         clazz = PostView::class,
@@ -316,6 +321,7 @@ class SettingsPostAndCommentsAppearanceFragment :
           highlightTextData = null,
           contentSpannable = null,
           crossPosts = 0,
+          postHeaderInfo = item.toPostHeaderInfo(context),
           onRevealContentClickedFn = {},
           onImageClick = { _, _, _ -> },
           onVideoClick = { _, _, _ -> },
@@ -379,6 +385,7 @@ class SettingsPostAndCommentsAppearanceFragment :
           viewLifecycleOwner = viewLifecycleOwner,
           isActionsExpanded = false,
           highlightTextData = null,
+          commentHeaderInfo = item.toCommentHeaderInfo(context),
           onImageClick = { _, _, _ -> },
           onVideoClick = { _, _, _ -> },
           onPageClick = {},

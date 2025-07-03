@@ -23,6 +23,7 @@ import com.idunnololz.summit.databinding.CommentListCommentItemBinding
 import com.idunnololz.summit.databinding.CommentListEndItemBinding
 import com.idunnololz.summit.databinding.LoadingViewItemBinding
 import com.idunnololz.summit.databinding.PostCommentFilteredItemBinding
+import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.CommentPage
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -66,6 +67,7 @@ class CommentListAdapter(
       val pageIndex: Int,
       val highlight: Boolean,
       val highlightForever: Boolean,
+      val commentHeaderInfo: CommentHeaderInfo,
     ) : Item
     data class FilteredCommentItem(
       val commentView: CommentView,
@@ -191,6 +193,7 @@ class CommentListAdapter(
           headerContainer = b.headerContainer,
           commentView = item.commentView,
           instance = item.instance,
+          commentHeaderInfo = item.commentHeaderInfo,
           onPageClick = onPageClick,
           onLinkClick = onLinkClick,
           onLinkLongClick = onLinkLongClick,
@@ -355,6 +358,7 @@ class CommentListAdapter(
                 pageIndex = page.pageIndex,
                 highlight = commentToHighlight?.id == comment.commentView.comment.id,
                 highlightForever = commentToHighlightForever?.id == comment.commentView.comment.id,
+                commentHeaderInfo = comment.commentHeaderInfo,
               )
           },
         )

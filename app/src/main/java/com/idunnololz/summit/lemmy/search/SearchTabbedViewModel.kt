@@ -1,5 +1,6 @@
 package com.idunnololz.summit.lemmy.search
 
+import android.content.Context
 import android.os.Parcelable
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -17,6 +18,7 @@ import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -24,6 +26,7 @@ import kotlinx.parcelize.Parcelize
 
 @HiltViewModel
 class SearchTabbedViewModel @Inject constructor(
+  @ApplicationContext private val context: Context,
   private val apiClient: AccountAwareLemmyClient,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val savedStateHandle: SavedStateHandle,
@@ -57,34 +60,40 @@ class SearchTabbedViewModel @Inject constructor(
 
   init {
     queryEnginesByType[SearchType.All] = QueryEngine(
-      coroutineScopeFactory,
-      apiClient,
-      SearchType.All,
+      context = context,
+      coroutineScopeFactory = coroutineScopeFactory,
+      apiClient = apiClient,
+      type = SearchType.All,
     )
     queryEnginesByType[SearchType.Url] = QueryEngine(
-      coroutineScopeFactory,
-      apiClient,
-      SearchType.Url,
+      context = context,
+      coroutineScopeFactory = coroutineScopeFactory,
+      apiClient = apiClient,
+      type = SearchType.Url,
     )
     queryEnginesByType[SearchType.Posts] = QueryEngine(
-      coroutineScopeFactory,
-      apiClient,
-      SearchType.Posts,
+      context = context,
+      coroutineScopeFactory = coroutineScopeFactory,
+      apiClient = apiClient,
+      type = SearchType.Posts,
     )
     queryEnginesByType[SearchType.Comments] = QueryEngine(
-      coroutineScopeFactory,
-      apiClient,
-      SearchType.Comments,
+      context = context,
+      coroutineScopeFactory = coroutineScopeFactory,
+      apiClient = apiClient,
+      type = SearchType.Comments,
     )
     queryEnginesByType[SearchType.Communities] = QueryEngine(
-      coroutineScopeFactory,
-      apiClient,
-      SearchType.Communities,
+      context = context,
+      coroutineScopeFactory = coroutineScopeFactory,
+      apiClient = apiClient,
+      type = SearchType.Communities,
     )
     queryEnginesByType[SearchType.Users] = QueryEngine(
-      coroutineScopeFactory,
-      apiClient,
-      SearchType.Users,
+      context = context,
+      coroutineScopeFactory = coroutineScopeFactory,
+      apiClient = apiClient,
+      type = SearchType.Users,
     )
 
     viewModelScope.launch {

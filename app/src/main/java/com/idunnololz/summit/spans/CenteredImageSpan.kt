@@ -4,21 +4,14 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Paint.FontMetricsInt
 import android.graphics.drawable.Drawable
-import android.text.style.DynamicDrawableSpan
 import android.text.style.ImageSpan
-import androidx.core.graphics.withTranslation
-import java.lang.ref.WeakReference
+import androidx.core.graphics.withSave
+
 
 class CenteredImageSpan @JvmOverloads constructor(
   drawable: Drawable,
-  verticalAlignment: Int = DynamicDrawableSpan.ALIGN_BOTTOM,
+  verticalAlignment: Int = ALIGN_BOTTOM,
 ) : ImageSpan(drawable, verticalAlignment) {
-
-  private var mDrawableRef: WeakReference<Drawable?>? = null
-
-  // Extra variables used to redefine the Font Metrics when an ImageSpan is added
-  private var initialDescent = 0
-  private var extraSpace = 0
 
   override fun draw(
     canvas: Canvas,
@@ -31,7 +24,13 @@ class CenteredImageSpan @JvmOverloads constructor(
     bottom: Int,
     paint: Paint,
   ) {
-    canvas.withTranslation(x, ((bottom - top) - drawable.bounds.height()) / 2f) {
+    val drawable = getDrawable()
+    canvas.withSave {
+      val fmPaint = paint.getFontMetricsInt()
+      val fontHeight = fmPaint.descent - fmPaint.ascent
+      val centerY = y + fmPaint.descent - fontHeight / 2
+      val transY = centerY - (drawable.getBounds().bottom - drawable.getBounds().top) / 2f
+      translate(x, transY)
       drawable.draw(this)
     }
   }
@@ -44,31 +43,19 @@ class CenteredImageSpan @JvmOverloads constructor(
     end: Int,
     fm: FontMetricsInt?,
   ): Int {
-    val d = cachedDrawable
-    val rect = d!!.bounds
-    val fmi = paint.fontMetricsInt
-    if (rect.bottom - (fmi.descent - fmi.ascent) >= 0) {
-      // Stores the initial descent and computes the margin available
-      initialDescent = fmi.descent
-      extraSpace = rect.bottom - (fmi.descent - fmi.ascent)
+    val drawable = getDrawable()
+    val rect = drawable.getBounds()
+    if (fm != null) {
+      val fmPaint = paint.getFontMetricsInt()
+      val fontHeight = fmPaint.descent - fmPaint.ascent
+      val drHeight = rect.bottom - rect.top
+      val centerY = fmPaint.ascent + fontHeight / 2
+
+      fm.ascent = centerY - drHeight / 2
+      fm.top = fm.ascent
+      fm.bottom = centerY + drHeight / 2
+      fm.descent = fm.bottom
     }
-    fmi.descent = extraSpace / 2 + initialDescent
-    fmi.bottom = fmi.descent
-    fmi.ascent = -rect.bottom + fmi.descent
-    fmi.top = fmi.ascent
     return rect.right
   }
-
-  // Redefined locally because it is a private member from DynamicDrawableSpan
-  private val cachedDrawable: Drawable?
-    get() {
-      val wr = mDrawableRef
-      var d: Drawable? = null
-      if (wr != null) d = wr.get()
-      if (d == null) {
-        d = drawable
-        mDrawableRef = WeakReference(d)
-      }
-      return d
-    }
 }

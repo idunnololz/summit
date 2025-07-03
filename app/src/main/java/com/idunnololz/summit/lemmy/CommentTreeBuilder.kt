@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy
 
+import android.content.Context
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.api.dto.Comment
@@ -21,6 +23,7 @@ data class CommentNodeData(
 )
 
 class CommentTreeBuilder(
+  private val context: Context,
   private val accountManager: AccountManager,
   private val contentFiltersManager: ContentFiltersManager,
 ) {
@@ -56,15 +59,17 @@ class CommentTreeBuilder(
 
       val commentView = if (contentFiltersManager.testCommentView(comment)) {
         PostViewModel.ListView.FilteredCommentItem(
-          comment,
+          comment = comment,
           pendingCommentView = idToPendingComments[comment.comment.id],
           isRemoved = removedCommentIds.contains(comment.comment.id),
+          commentHeaderInfo = comment.toCommentHeaderInfo(context),
         )
       } else {
         PostViewModel.ListView.VisibleCommentListView(
-          comment,
+          comment = comment,
           pendingCommentView = idToPendingComments[comment.comment.id],
           isRemoved = removedCommentIds.contains(comment.comment.id),
+          commentHeaderInfo = comment.toCommentHeaderInfo(context),
         )
       }
       val node =

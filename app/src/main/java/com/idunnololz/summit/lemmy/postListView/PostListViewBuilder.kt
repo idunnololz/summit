@@ -52,6 +52,7 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
@@ -255,6 +256,7 @@ class PostListViewBuilder @Inject constructor(
     highlightForever: Boolean,
     themeColor: Int?,
     isDuplicatePost: Boolean,
+    postHeaderInfo: PostHeaderInfo,
     onRevealContentClickedFn: () -> Unit,
     onImageClick: (accountId: Long?, PostView, sharedElementView: View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
@@ -755,6 +757,7 @@ class PostListViewBuilder @Inject constructor(
           },
           showEditedDate = showEditedDate,
           useCondensedTypeface = false,
+          postHeaderInfo = postHeaderInfo,
         )
 
         if (showCommunityIcon) {

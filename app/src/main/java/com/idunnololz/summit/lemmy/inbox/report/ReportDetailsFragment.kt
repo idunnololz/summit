@@ -48,6 +48,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
@@ -791,7 +792,10 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
 
       adapter.setData(
         PostViewModel.PostData(
-          postView = PostViewModel.ListView.PostListView(data.post),
+          postListView = PostViewModel.ListView.PostListView(
+            post = data.post,
+            postHeaderInfo = data.post.toPostHeaderInfo(context),
+          ),
           commentTree = listOfNotNull(data.commentTree),
           newlyPostedCommentId = null,
           selectedCommentId = null,

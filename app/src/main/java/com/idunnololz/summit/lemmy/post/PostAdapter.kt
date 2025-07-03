@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.post
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -37,9 +36,11 @@ import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.ScreenshotModeOptionsBinding
 import com.idunnololz.summit.databinding.ViewAllCommentsBinding
+import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.flatten
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.FooterItem
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.HeaderItem
@@ -119,6 +120,7 @@ class PostAdapter(
       val screenshotMode: Boolean,
       val crossPosts: Int,
       val highlight: Boolean,
+      val postHeaderInfo: PostHeaderInfo,
     ) : Item(postView.getUniqueKey()), ScreenshotOptions
 
     data class VisibleCommentItem(
@@ -140,6 +142,7 @@ class PostAdapter(
       val query: String?,
       val currentMatch: QueryResult?,
       val screenshotMode: Boolean,
+      val commentHeaderInfo: CommentHeaderInfo,
     ) : Item(
       "comment_${comment.comment.id}",
     ),
@@ -454,6 +457,7 @@ class PostAdapter(
             },
             contentSpannable = contentCache[k],
             crossPosts = item.crossPosts,
+            postHeaderInfo = item.postHeaderInfo,
             onRevealContentClickedFn = {
               revealedItems.add(postKey)
               notifyItemChanged(holder.absoluteAdapterPosition)
@@ -553,6 +557,7 @@ class PostAdapter(
           },
           contentSpannable = contentCache[k],
           crossPosts = item.crossPosts,
+          postHeaderInfo = item.postHeaderInfo,
           onRevealContentClickedFn = {
             revealedItems.add(postKey)
             notifyItemChanged(holder.absoluteAdapterPosition)
@@ -621,6 +626,7 @@ class PostAdapter(
             highlightTintColor = highlightTintColor,
             viewLifecycleOwner = lifecycleOwner,
             isActionsExpanded = item.isActionsExpanded,
+            commentHeaderInfo = item.commentHeaderInfo,
             onImageClick = onImageClick,
             onVideoClick = onVideoClick,
             onPageClick = onPageClick,
@@ -681,6 +687,7 @@ class PostAdapter(
             accountId = accountId,
             viewLifecycleOwner = lifecycleOwner,
             expandSection = ::expandSection,
+            commentHeaderInfo = item.commentHeaderInfo,
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
@@ -984,7 +991,7 @@ class PostAdapter(
 
         val changed = autoCollapseComments(rawData.commentTree)
 
-        val postView = rawData.postView
+        val postView = rawData.postListView
         val commentItems = rawData.commentTree.flatten(collapsedItemIds)
 
         if (!rawData.isNativePost &&
@@ -1010,6 +1017,7 @@ class PostAdapter(
           screenshotMode = screenshotMode,
           crossPosts = rawData.crossPosts.size,
           highlight = highlightPostForever,
+          postHeaderInfo = postView.postHeaderInfo,
         )
 
         absolutionPositionToTopLevelCommentPosition += -1
@@ -1077,7 +1085,8 @@ class PostAdapter(
                     } else {
                       null
                     },
-                    screenshotMode,
+                    screenshotMode = screenshotMode,
+                    commentHeaderInfo = commentView.commentHeaderInfo,
                   )
                 } else {
                   Item.FilteredCommentItem(
@@ -1185,7 +1194,7 @@ class PostAdapter(
         finalItems
       } else {
         val finalItems = mutableListOf<Item>()
-        rawData?.postView?.let {
+        rawData?.postListView?.let {
           finalItems += HeaderItem(
             postView = it.post,
             videoState = videoState,
@@ -1199,6 +1208,7 @@ class PostAdapter(
             screenshotMode = screenshotMode,
             crossPosts = rawData.crossPosts.size,
             highlight = highlightPostForever,
+            postHeaderInfo = it.postHeaderInfo,
           )
         }
         finalItems += ProgressOrErrorItem(error)
@@ -1343,7 +1353,7 @@ class PostAdapter(
     refreshItems()
   }
 
-  fun hasStartingData(): Boolean = rawData?.postView != null
+  fun hasStartingData(): Boolean = rawData?.postListView != null
 
   fun setData(data: PostViewModel.PostData) {
     if (!isLoaded) {
@@ -1355,7 +1365,7 @@ class PostAdapter(
     val oldData = rawData
     rawData = data
 
-    if (oldData?.postView?.post?.post?.id != data.postView.post.post.id) {
+    if (oldData?.postListView?.post?.post?.id != data.postListView.post.post.id) {
       hideNonNativeInstanceWarning = false
     }
 

@@ -1,6 +1,8 @@
 package com.idunnololz.summit.lemmy.search
 
+import android.content.Context
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.CommunityView
@@ -11,9 +13,14 @@ import com.idunnololz.summit.api.dto.SearchType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.lemmy.CommentHeaderInfo
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.lemmy.toCommentHeaderInfo
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.util.StatefulData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import info.debatty.java.stringsimilarity.NGram
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,11 +34,13 @@ sealed class Item {
     val fetchedPost: FetchedPost,
     val instance: String,
     val pageIndex: Int,
+    val postHeaderInfo: PostHeaderInfo,
   ) : Item()
   data class CommentItem(
     val commentView: CommentView,
     val instance: String,
     val pageIndex: Int,
+    val commentHeaderInfo: CommentHeaderInfo,
   ) : Item()
   data class CommunityItem(
     val communityView: CommunityView,
@@ -53,6 +62,7 @@ sealed class Item {
 }
 
 class QueryEngine(
+  @ApplicationContext private val context: Context,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val apiClient: AccountAwareLemmyClient,
   private val type: SearchType,
@@ -471,6 +481,7 @@ class QueryEngine(
       return
     }
 
+    val context = ContextCompat.getContextForLanguage(context)
     val newItems = mutableListOf<Item>()
     val pages = pages
     val instance = currentInstance
@@ -484,11 +495,21 @@ class QueryEngine(
           page.results.mapTo(newItems) {
             when (it) {
               is SearchResultView.CommentResultView ->
-                Item.CommentItem(it.commentView, instance, page.pageIndex)
+                Item.CommentItem(
+                  commentView = it.commentView,
+                  instance = instance,
+                  pageIndex = page.pageIndex,
+                  commentHeaderInfo = it.commentView.toCommentHeaderInfo(context)
+                )
               is SearchResultView.CommunityResultView ->
                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
               is SearchResultView.PostResultView ->
-                Item.PostItem(it.fetchedPost, instance, page.pageIndex)
+                Item.PostItem(
+                  fetchedPost = it.fetchedPost,
+                  instance = instance,
+                  pageIndex = page.pageIndex,
+                  postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context)
+                )
               is SearchResultView.UserResultView ->
                 Item.UserItem(it.personView, instance, page.pageIndex)
             }
@@ -498,18 +519,33 @@ class QueryEngine(
           page.results.mapTo(newItems) {
             when (it) {
               is SearchResultView.CommentResultView ->
-                Item.CommentItem(it.commentView, instance, page.pageIndex)
+                Item.CommentItem(
+                  commentView = it.commentView,
+                  instance = instance,
+                  pageIndex = page.pageIndex,
+                  commentHeaderInfo = it.commentView.toCommentHeaderInfo(context)
+                )
               is SearchResultView.CommunityResultView ->
                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
               is SearchResultView.PostResultView ->
-                Item.PostItem(it.fetchedPost, instance, page.pageIndex)
+                Item.PostItem(
+                  fetchedPost = it.fetchedPost,
+                  instance = instance,
+                  pageIndex = page.pageIndex,
+                  postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context)
+                )
               is SearchResultView.UserResultView ->
                 Item.UserItem(it.personView, instance, page.pageIndex)
             }
           }
         is QueryResultsPage.CommentResultsPage ->
           page.results.mapTo(newItems) {
-            Item.CommentItem(it, instance, page.pageIndex)
+            Item.CommentItem(
+              commentView = it,
+              instance = instance,
+              pageIndex = page.pageIndex,
+              commentHeaderInfo = it.toCommentHeaderInfo(context)
+            )
           }
         is QueryResultsPage.CommunityResultsPage ->
           page.results.mapTo(newItems) {
@@ -524,6 +560,7 @@ class QueryEngine(
               ),
               instance = instance,
               pageIndex = page.pageIndex,
+              postHeaderInfo = it.toPostHeaderInfo(context),
             )
           }
         is QueryResultsPage.UserResultsPage ->

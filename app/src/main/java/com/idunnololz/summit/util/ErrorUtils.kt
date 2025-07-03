@@ -60,11 +60,15 @@ fun Throwable.toErrorMessage(context: Context): String {
             }
 
             else -> {
-              if (t.errorCode == 404) {
-                context.getString(R.string.error_page_not_found)
-              } else {
-                crashLogger?.recordException(t)
-                context.getString(R.string.error_unknown)
+              when (t.errorCode) {
+                400 -> context.getString(R.string.error_400_bad_request)
+                403 -> context.getString(R.string.error_403_forbidden)
+                404 -> context.getString(R.string.error_page_not_found)
+                408 -> context.getString(R.string.error_server_timeout)
+                else -> {
+                  crashLogger?.recordException(t)
+                  context.getString(R.string.error_unknown)
+                }
               }
             }
           }

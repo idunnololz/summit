@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.post
 
 import android.app.Application
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
@@ -27,15 +28,18 @@ import com.idunnololz.summit.api.dto.CommentView
 import com.idunnololz.summit.api.dto.GetPostResponse
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
+import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.CommentNavControlsState
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.Consts.DEFAULT_INSTANCE
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
@@ -788,10 +792,13 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  private suspend fun updateData(wasUpdateForced: Boolean) {
+  private suspend fun updateData(
+    wasUpdateForced: Boolean
+  ) = withContext(Dispatchers.Default) {
     Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
 
-    val post = postView ?: return
+    val context = ContextCompat.getContextForLanguage(context)
+    val post = postView ?: return@withContext
     val comments = comments
     val crossPosts = getPostResponse?.cross_posts
     val pendingComments = pendingComments
@@ -801,10 +808,14 @@ class PostViewModel @Inject constructor(
     val originalPostOrCommentRef = originalPostOrCommentRef
 
     val postDataValue = PostData(
-      postView = ListView.PostListView(post),
+      postListView = ListView.PostListView(
+        post = post,
+        postHeaderInfo = post.toPostHeaderInfo(context),
+      ),
       commentTree = CommentTreeBuilder(
-        accountManager,
-        contentFiltersManager,
+        context = context,
+        accountManager = accountManager,
+        contentFiltersManager = contentFiltersManager,
       ).buildCommentsTreeListView(
         post = post,
         comments = comments,
@@ -926,7 +937,7 @@ class PostViewModel @Inject constructor(
   }
 
   data class PostData(
-    val postView: ListView.PostListView,
+    val postListView: ListView.PostListView,
     val commentTree: List<CommentNodeData>,
     val crossPosts: List<PostView>,
     val newlyPostedCommentId: CommentId?,
@@ -952,12 +963,14 @@ class PostViewModel @Inject constructor(
     data class PostListView(
       val post: PostView,
       override val id: Long = post.post.id.toLong() or POST_FLAG,
+      val postHeaderInfo: PostHeaderInfo,
     ) : ListView
 
     sealed interface CommentListView : ListView {
       val comment: CommentView
       val pendingCommentView: PendingCommentView?
       var isRemoved: Boolean
+      val commentHeaderInfo: CommentHeaderInfo
     }
 
     data class VisibleCommentListView(
@@ -965,6 +978,7 @@ class PostViewModel @Inject constructor(
       override val pendingCommentView: PendingCommentView? = null,
       override var isRemoved: Boolean = false,
       override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
+      override val commentHeaderInfo: CommentHeaderInfo,
     ) : CommentListView
 
     data class FilteredCommentItem(
@@ -972,6 +986,7 @@ class PostViewModel @Inject constructor(
       override val pendingCommentView: PendingCommentView? = null,
       override var isRemoved: Boolean = false,
       override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
+      override val commentHeaderInfo: CommentHeaderInfo,
       var show: Boolean = false,
     ) : CommentListView
 

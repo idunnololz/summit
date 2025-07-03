@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.defaultDimReadPosts
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.BasicSettingItem
 import com.idunnololz.summit.settings.LemmyFakeModels
@@ -327,9 +328,10 @@ class SettingsViewTypeFragment :
           )
       }
 
+      val fetchedPost = LemmyFakeModels.fakeFetchedPost
       postListViewBuilder.bind(
         holder = h,
-        fetchedPost = LemmyFakeModels.fakeFetchedPost,
+        fetchedPost = fetchedPost,
         instance = "https://fake.instance",
         isRevealed = true,
         contentMaxWidth = binding.demoViewContainer.width,
@@ -343,6 +345,7 @@ class SettingsViewTypeFragment :
         highlightForever = false,
         themeColor = null,
         isDuplicatePost = false,
+        postHeaderInfo = fetchedPost.postView.toPostHeaderInfo(context),
         onRevealContentClickedFn = {},
         onImageClick = { _, _, _, _ -> },
         onVideoClick = { _, _, _ -> },

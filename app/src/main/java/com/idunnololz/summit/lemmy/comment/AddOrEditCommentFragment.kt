@@ -55,6 +55,7 @@ import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.mentions.MentionsHelper
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -1069,7 +1070,10 @@ class AddOrEditCommentFragment :
 
       adapter.setData(
         PostViewModel.PostData(
-          postView = PostViewModel.ListView.PostListView(data.post),
+          postListView = PostViewModel.ListView.PostListView(
+            post = data.post,
+            postHeaderInfo = data.post.toPostHeaderInfo(context),
+          ),
           commentTree = listOfNotNull(data.commentTree),
           newlyPostedCommentId = null,
           selectedCommentId = null,

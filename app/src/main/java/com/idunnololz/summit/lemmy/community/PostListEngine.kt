@@ -1,10 +1,13 @@
 package com.idunnololz.summit.lemmy.community
 
+import android.content.Context
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.CommunityBlockedError
+import com.idunnololz.summit.api.dto.Person
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.api.dto.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
@@ -12,13 +15,20 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.FilterReason
+import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATION
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
+import com.idunnololz.summit.lemmy.isCakeDay
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
+import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.dateStringToTs
+import com.idunnololz.summit.util.tsToConcise
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -40,6 +50,7 @@ sealed interface PostListEngineItem {
     val highlightForever: Boolean,
     val pageIndex: Int,
     val isDuplicatePost: Boolean,
+    val postHeaderInfo: PostHeaderInfo,
   ) : PostItem
 
   data class FilteredPostItem(
@@ -74,6 +85,7 @@ sealed interface PostListEngineItem {
 }
 
 class PostListEngine @AssistedInject constructor(
+  @ApplicationContext private val context: Context,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val directoryHelper: DirectoryHelper,
   private val duplicatePostsDetector: DuplicatePostsDetector,
@@ -226,6 +238,8 @@ class PostListEngine @AssistedInject constructor(
   }
 
   fun createItems() {
+    val context = ContextCompat.getContextForLanguage(context)
+
     Log.d(TAG, "createItems()")
 
     if (pages.isEmpty()) {
@@ -293,6 +307,7 @@ class PostListEngine @AssistedInject constructor(
                 pageIndex = page.pageIndex,
                 isDuplicatePost = it.isDuplicatePost,
                 feed = page.feed,
+                postHeaderInfo = postView.toPostHeaderInfo(context)
               )
             }
           }

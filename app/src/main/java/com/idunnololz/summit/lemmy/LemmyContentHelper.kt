@@ -25,6 +25,7 @@ import coil3.load
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.transformations
+import coil3.request.transitionFactory
 import coil3.target.ImageViewTarget
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
@@ -41,6 +42,7 @@ import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel.PostViewType
+import com.idunnololz.summit.lemmy.utils.NoneTransitionFactory
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.offline.OfflineManager
@@ -688,7 +690,6 @@ class LemmyContentHelper(
       }
     }
 
-
     fun onImageLoaded(urlOrFile: Either<String, File>) {
       Log.d(TAG, "image size: $tempSize")
 
@@ -719,6 +720,7 @@ class LemmyContentHelper(
             })
             .apply {
               allowHardware(false)
+              transitionFactory(NoneTransitionFactory)
 
               if (blur) {
                 val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)

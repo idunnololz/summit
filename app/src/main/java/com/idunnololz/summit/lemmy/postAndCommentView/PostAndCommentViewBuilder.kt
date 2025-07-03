@@ -60,11 +60,13 @@ import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
+import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.RegistrationDecision
@@ -303,6 +305,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
     highlight: Boolean = false,
     highlightTintColor: Int? = null,
+    postHeaderInfo: PostHeaderInfo,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
@@ -394,6 +397,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       },
       showEditedDate = showEditedDate,
       useCondensedTypeface = false,
+      postHeaderInfo = postHeaderInfo,
     )
 
     if (showCommunityIcon) {
@@ -734,6 +738,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     viewLifecycleOwner: LifecycleOwner,
     isActionsExpanded: Boolean,
     highlightTextData: HighlightTextData?,
+    commentHeaderInfo: CommentHeaderInfo,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onPageClick: (PageRef) -> Unit,
@@ -827,6 +832,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         false
       },
       showEditedDate = showEditedDate,
+      commentHeaderInfo = commentHeaderInfo,
     )
 
     if (showProfileIcons) {
@@ -1100,6 +1106,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     instance: String,
     accountId: Long?,
     viewLifecycleOwner: LifecycleOwner,
+    commentHeaderInfo: CommentHeaderInfo,
     expandSection: (position: Int) -> Unit,
     onPageClick: (PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -1133,6 +1140,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
         wrapHeader = true,
         scoreColor = scoreColor,
+        commentHeaderInfo = commentHeaderInfo,
       )
     }
 
@@ -2365,6 +2373,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     headerContainer: LemmyHeaderView,
     commentView: CommentView,
     instance: String,
+    commentHeaderInfo: CommentHeaderInfo,
     onPageClick: (PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
@@ -2388,6 +2397,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         false
       },
       showEditedDate = showEditedDate,
+      commentHeaderInfo = commentHeaderInfo,
     )
   }
 
