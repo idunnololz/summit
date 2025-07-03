@@ -48,7 +48,6 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
       val spoilerTitles = spoilerTitleRegex.findAll(text)
 
       for (match in spoilerTitles) {
-        Log.d("HAHA", "Spoiler start at ${start + match.range.first}")
         val spoilerTitle = match.groups[2]!!.value
         visitor.builder().setSpan(
           DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
@@ -61,7 +60,6 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
       val spoilerCloseRegex = Regex(":::(?!\\s*spoiler)")
       val spoilerCloses = spoilerCloseRegex.findAll(text)
       for (match in spoilerCloses) {
-        Log.d("HAHA", "Spoiler end at ${start + match.range.first}")
         visitor.builder().apply {
           if (start + 4 >= this.length) {
             append(" ")

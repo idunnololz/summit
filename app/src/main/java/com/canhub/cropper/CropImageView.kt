@@ -1025,8 +1025,6 @@ class CropImageView @JvmOverloads constructor(
 
           ensureActive()
 
-          Log.d("HAHA", "lum: ${luminosity}")
-
           if (luminosity > 0.5) {
             mCropOverlayView?.setBorderColor(Color.BLACK)
             mCropOverlayView?.options?.borderCornerColor = Color.BLACK

@@ -71,8 +71,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
     super.onCreate()
 
-    val startTime = System.currentTimeMillis()
-
 //        if (BuildConfig.DEBUG) {
 //            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
 //                    .detectDiskReads()
@@ -168,8 +166,6 @@ class MainApplication : Application(), androidx.work.Configuration.Provider {
 
       isCrashLoggerInitialized = true
     }
-
-    Log.d("HAHA", "MainActivity.onCreate(): ${System.currentTimeMillis() - startTime}ms")
   }
 
   private fun correctDefaultWebApp() {
