@@ -31,6 +31,7 @@ import com.idunnololz.summit.util.coil.CoilImagesPlugin
 import com.idunnololz.summit.util.coil.CoilImagesPlugin.CoilStore
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.markwon.LemmyMentionsPlugin
 import com.idunnololz.summit.util.markwon.SpoilerPlugin
 import com.idunnololz.summit.util.markwon.SubScriptSpan
 import com.idunnololz.summit.util.markwon.SummitInlineParser
@@ -235,11 +236,10 @@ class LemmyTextHelper @Inject constructor(
     }
 
     /**
-     * 1. Matches against full community names (!a@b.com)
-     * 2. Matches against spoiler (ending) tags
+     * 1. Matches against spoiler (ending) tags
      */
     private val largeRegex = Pattern.compile(
-      """(]\()?(!|/?[cC]/|@|/?[uU]/)([^@\s]+)@([^@\s]+\.[^@\s)]*\w)|([^\n])(\n:::(?:\n|${'$'}))""",
+      """[^\n](\n:::(?:\n|${'$'}))""",
     )
 
     private fun processAll(s: String): String {
@@ -247,47 +247,13 @@ class LemmyTextHelper @Inject constructor(
       val matcher = largeRegex.matcher(s)
       val sb = StringBuffer()
       while (matcher.find()) {
-        val characterBeforeSpoilerEndTag = matcher.group(5)
-        val spoilerEndTag = matcher.group(6)
-        if (characterBeforeSpoilerEndTag != null && spoilerEndTag != null) {
+        val spoilerEndTag = matcher.group(1)
+        if (spoilerEndTag != null) {
           matcher.appendReplacement(
             sb,
-            "$characterBeforeSpoilerEndTag\n$spoilerEndTag",
+            "\n$spoilerEndTag",
           )
           continue
-        }
-
-        val linkStart = matcher.group(1)
-        val referenceTypeToken = matcher.group(2)
-        val name = matcher.group(3)
-        val instance = matcher.group(4)
-
-        if (linkStart == null &&
-          referenceTypeToken != null &&
-          name != null &&
-          instance != null &&
-          !name.contains("]") &&
-          !instance.contains("]") /* make sure we are not within a link def */
-        ) {
-          when (referenceTypeToken.lowercase(Locale.US)) {
-            "!", "c/", "/c/" -> {
-              val communityRef = CommunityRef.CommunityRefByName(name, instance)
-
-              matcher.appendReplacement(
-                sb,
-                "[${matcher.group(
-                  0,
-                )}](${LinkUtils.getLinkForCommunity(communityRef)})",
-              )
-            }
-            "@", "u/", "/u/" -> {
-              val url = LinkUtils.getLinkForPerson(instance = instance, name = name)
-              matcher.appendReplacement(
-                sb,
-                "[${matcher.group(0)}]($url)",
-              )
-            }
-          }
         }
       }
       matcher.appendTail(sb)
@@ -426,6 +392,7 @@ class LemmyTextHelper @Inject constructor(
       .usePlugin(LemmyPlugin(context))
       .usePlugin(StrikethroughPlugin.create())
       .usePlugin(SpoilerPlugin())
+      .usePlugin(LemmyMentionsPlugin())
       .usePlugin(
         object : AbstractMarkwonPlugin() {
           override fun configureParser(builder: Parser.Builder) {

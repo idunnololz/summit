@@ -15,6 +15,8 @@ import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
+import org.commonmark.parser.Parser
+import java.util.regex.Pattern
 
 abstract class DetailsClickableSpan : ClickableSpan()
 
@@ -34,44 +36,45 @@ private const val TAG = "SpoilerPlugin"
 
 class SpoilerPlugin : AbstractMarkwonPlugin() {
 
-  override fun configure(registry: MarkwonPlugin.Registry) {
-    registry.require(CorePlugin::class.java) {
-      it.addOnTextAddedListener(
-        SpoilerTextAddedListener(),
-      )
-    }
+  companion object {
+    private const val SPOILER_START_REGEX = "(:::\\s*spoiler\\s+)(.*)\n?"
+    private const val SPOILER_END_REGEX = ":::(?!\\s*spoiler)"
   }
 
-  private class SpoilerTextAddedListener : CorePlugin.OnTextAddedListener {
-    override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
-      val spoilerTitleRegex = Regex("(:::\\s*spoiler\\s+)(.*)\n?")
-      val spoilerTitles = spoilerTitleRegex.findAll(text)
+  private val spoilerStartMatcher = Pattern.compile(SPOILER_START_REGEX)
+  private val spoilerEndMatcher = Pattern.compile(SPOILER_END_REGEX)
 
-      for (match in spoilerTitles) {
-        val spoilerTitle = match.groups[2]!!.value
-        visitor.builder().setSpan(
-          DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
-          start + match.range.first,
-          start + match.groups[2]!!.range.last,
-          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
-        )
-      }
+  override fun configure(registry: MarkwonPlugin.Registry) {
+    registry.require(CorePlugin::class.java) {
+      it.addOnTextAddedListener(object : CorePlugin.OnTextAddedListener {
+        override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
+          val startMatcher = spoilerStartMatcher.matcher(text)
+          val endMatcher = spoilerEndMatcher.matcher(text)
 
-      val spoilerCloseRegex = Regex(":::(?!\\s*spoiler)")
-      val spoilerCloses = spoilerCloseRegex.findAll(text)
-      for (match in spoilerCloses) {
-        visitor.builder().apply {
-          if (start + 4 >= this.length) {
-            append(" ")
+          while (startMatcher.find()) {
+            val spoilerTitle = startMatcher.group(2)!!
+            visitor.builder().setSpan(
+              DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
+              start + startMatcher.start(),
+              start + startMatcher.end(2),
+              Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
+            )
           }
-          setSpan(
-            DetailsEndSpan(),
-            start + match.range.first,
-            start + match.range.first + 4,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
-          )
+          while (endMatcher.find()) {
+            visitor.builder().apply {
+              if (start + 4 >= this.length) {
+                append(" ")
+              }
+              setSpan(
+                DetailsEndSpan(),
+                start + endMatcher.start(),
+                start + endMatcher.end() + 1,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
+              )
+            }
+          }
         }
-      }
+      })
     }
   }
 
