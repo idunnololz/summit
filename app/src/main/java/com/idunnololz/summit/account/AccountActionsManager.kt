@@ -411,7 +411,7 @@ class AccountActionsManager @Inject constructor(
   init {
     accountManager.addOnAccountChangedListener(
       object : AccountManager.OnAccountChangedListener {
-        override suspend fun onAccountChanged(newAccount: Account?) {
+        override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
           votesManager.onAccountChanged(preferenceManager.currentPreferences)
         }
       },

@@ -14,6 +14,7 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getPlainTextFromClipboard
 import com.idunnololz.summit.util.ext.setSizeDynamically
@@ -82,7 +83,7 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
           requireMainActivity().launchPage(pageRef)
           dismiss()
         } else {
-          if (URLUtil.isValidUrl(url)) {
+          if (LinkUtils.isValidUrl(url)) {
             onLinkClick(url, null, LinkContext.Action)
             dismiss()
           } else {

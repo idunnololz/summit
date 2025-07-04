@@ -10,7 +10,6 @@ object Consts {
     "feddit.de",
     "feddit.it",
     "hexbear.net",
-    "lemm.ee",
     "lemmy.blahaj.zone",
     "lemmy.ca",
     "lemmy.dbzer0.com",

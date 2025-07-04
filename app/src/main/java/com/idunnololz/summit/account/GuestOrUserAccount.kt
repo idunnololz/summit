@@ -13,3 +13,6 @@ val GuestOrUserAccount.key
     is Account -> this.fullName
     is GuestAccount -> "guest@!$^@$instance"
   }
+
+val GuestOrUserAccount.asAccount: Account?
+  get() = this as? Account

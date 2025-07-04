@@ -7,6 +7,7 @@ import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.dto.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.BanFromCommunityResponse
@@ -87,12 +88,12 @@ class AccountAwareLemmyClient @Inject constructor(
 
   private val coroutineScope = coroutineScopeFactory.create()
   private var forcedAccountId: Long? = null
-  private var currentAccount: Account? = null
+  private var currentAccount: GuestOrUserAccount? = null
 
   init {
     accountManager.addOnAccountChangedListener(
       object : AccountManager.OnAccountChangedListener {
-        override suspend fun onAccountChanged(newAccount: Account?) {
+        override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
           if (forcedAccountId == null) {
             setAccount(newAccount, accountChanged = true)
           }
@@ -439,12 +440,12 @@ class AccountAwareLemmyClient @Inject constructor(
 
   suspend fun fetchSiteWithRetry(
     force: Boolean,
-    auth: String? = currentAccount?.jwt,
+    auth: String? = accountForInstance()?.jwt,
   ): Result<GetSiteResponse> = apiClient.fetchSiteWithRetry(auth, force)
 
   suspend fun fetchUnreadCountWithRetry(
     force: Boolean,
-    account: Account? = currentAccount,
+    account: Account? = accountForInstance(),
   ): Result<GetUnreadCountResponse> = retry {
     if (account == null) {
       createAccountErrorResult()
@@ -1162,7 +1163,7 @@ class AccountAwareLemmyClient @Inject constructor(
     val currentAccount = currentAccount ?: return null
 
     return if (currentAccount.instance == instance) {
-      currentAccount
+      currentAccount.asAccount
     } else {
       null
     }
@@ -1191,7 +1192,7 @@ class AccountAwareLemmyClient @Inject constructor(
     }
   }
 
-  fun setAccount(account: Account?, accountChanged: Boolean) {
+  fun setAccount(account: GuestOrUserAccount?, accountChanged: Boolean) {
     if (account == currentAccount) {
       return
     }

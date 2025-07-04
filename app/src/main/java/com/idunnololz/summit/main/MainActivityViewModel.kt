@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.ListingType
 import com.idunnololz.summit.api.dto.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
+import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -82,6 +83,12 @@ class MainActivityViewModel @Inject constructor(
         accountManager.currentAccount.collect {
           withContext(Dispatchers.Main) {
             loadCommunities()
+
+            val communityRef = communityRef
+            if ((communityRef is CommunityRef.All || communityRef is CommunityRef.Local) &&
+              communityRef.instance == null) {
+              onCommunityChanged(communityRef)
+            }
           }
 
           val account = it as? Account
@@ -93,9 +100,11 @@ class MainActivityViewModel @Inject constructor(
 
           currentAccount.postValue(accountView)
 
-          withContext(Dispatchers.Main) {
-            Log.d(TAG, "'accountManager' ready!")
-            readyCount.emit(readyCount.value + 1)
+          if (isReady.value != true) {
+            withContext(Dispatchers.Main) {
+              Log.d(TAG, "'accountManager' ready!")
+              readyCount.emit(readyCount.value + 1)
+            }
           }
         }
       }

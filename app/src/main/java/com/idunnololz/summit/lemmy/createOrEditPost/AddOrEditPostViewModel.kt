@@ -24,6 +24,7 @@ import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.links.LinkMetadataHelper
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class AddOrEditPostViewModel @Inject constructor(
       urlFlow
         .debounce(500)
         .collect {
-          if (URLUtil.isValidUrl(it)) {
+          if (LinkUtils.isValidUrl(it)) {
             loadLinkMetadata(it)
           }
         }

@@ -68,6 +68,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.FullscreenDialogFragment
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -862,7 +863,7 @@ class AddOrEditPostFragment :
         val extraImage = args.extraStream
 
         if (extraText != null) {
-          if (URLUtil.isValidUrl(extraText)) {
+          if (LinkUtils.isValidUrl(extraText)) {
             url.editText?.setText(extraText)
           } else {
             postEditor.editText?.setText(extraText)

@@ -18,6 +18,7 @@ import com.idunnololz.summit.api.dto.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
 import com.idunnololz.summit.api.dto.RegistrationMode
 import com.idunnololz.summit.login.LoginHelper
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.toErrorMessage
@@ -58,9 +59,9 @@ class SignUpViewModel @Inject constructor(
 
   private var siteCache = LruCache<String, GetSiteResponse>(10)
 
-  private val instanceTextState = MutableStateFlow<String>("")
+  private val instanceTextState = MutableStateFlow("")
 
-  val signUpModel = MutableLiveData<SignUpModel>(signUpModelState.value)
+  val signUpModel = MutableLiveData(signUpModelState.value)
 
   val fetchSiteLiveData = StatefulLiveData<Unit>()
 
@@ -98,8 +99,8 @@ class SignUpViewModel @Inject constructor(
   }
 
   private fun prefetchSite(instance: String) {
-    val isValidUrl = Patterns.WEB_URL.matcher("https://$instance").matches()
-    if (instance.isBlank() || !isValidUrl) {
+    val isValidUrl = LinkUtils.isValidInstance(instance)
+    if (!isValidUrl) {
       return
     }
 
@@ -114,10 +115,10 @@ class SignUpViewModel @Inject constructor(
   }
 
   private fun fetchSiteAndGoToNextStep(instance: String) {
-    val isValidUrl = Patterns.WEB_URL.matcher("https://$instance").matches()
-    if (instance.isBlank() || !isValidUrl) {
+    val isValidInstance = LinkUtils.isValidInstance(instance)
+    if (!isValidInstance) {
       fetchSiteLiveData.setIdle()
-      if (instance.isNotBlank() && !isValidUrl) {
+      if (instance.isNotBlank()) {
         instanceError = context.getString(R.string.error_invalid_instance_format)
       } else {
         instanceError = context.getString(R.string.required)

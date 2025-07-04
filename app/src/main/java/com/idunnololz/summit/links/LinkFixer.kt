@@ -115,7 +115,6 @@ class LinkFixer @Inject constructor(
     "lemmy.opensupply.space",
     "monero.im",
     "pricefield.org",
-    "lemm.ee",
     "lemmy.glasgow.social",
     "ds9.lemmy.ml",
     "voyager.lemmy.ml",

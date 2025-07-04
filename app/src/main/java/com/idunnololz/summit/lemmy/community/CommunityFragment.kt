@@ -4,11 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -96,6 +98,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
+import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
@@ -112,6 +115,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @AndroidEntryPoint
 class CommunityFragment :
@@ -490,7 +494,14 @@ class CommunityFragment :
         )
 
         if (result != null) {
-          viewModel.changeGuestAccountInstance(result.instance)
+          val instance = result.instance
+          if (LinkUtils.isValidInstance(instance)) {
+            viewModel.changeGuestAccountInstance(instance)
+          } else {
+            launchAlertDialog("error_invalid_instance") {
+              messageResId = R.string.error_invalid_instance_format
+            }
+          }
         }
       }
     }

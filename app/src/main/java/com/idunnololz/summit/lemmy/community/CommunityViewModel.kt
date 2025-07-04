@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.community
 import android.app.Application
 import android.os.Parcelable
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
@@ -15,6 +16,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.GuestAccount
 import com.idunnololz.summit.account.GuestAccountManager
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
@@ -173,7 +175,7 @@ class CommunityViewModel @Inject constructor(
   private var fetchPageJob: Job? = null
 
   private val onAccountChangeListener = object : AccountManager.OnAccountChangedListener {
-    override suspend fun onAccountChanged(newAccount: Account?) {
+    override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
       fetchPageJob?.cancel()
       fetchingPages.clear()
 

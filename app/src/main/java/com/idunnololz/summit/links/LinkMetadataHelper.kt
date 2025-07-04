@@ -5,6 +5,7 @@ import com.fleeksoft.ksoup.Ksoup
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.util.LinkFetcher
+import com.idunnololz.summit.util.LinkUtils
 import java.net.URI
 import java.net.URISyntaxException
 import javax.inject.Inject
@@ -185,8 +186,8 @@ class LinkMetadataHelper @Inject constructor(
     )
   }
 
-  private fun resolveUrl(url: String, part: String): String? {
-    return if (URLUtil.isValidUrl(part)) {
+  private fun resolveUrl(url: String, part: String): String {
+    return if (LinkUtils.isValidUrl(part)) {
       part
     } else {
       var baseUri: URI? = null

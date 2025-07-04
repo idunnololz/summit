@@ -6,6 +6,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
@@ -68,7 +69,7 @@ class AccountInfoManager @Inject constructor(
           unreadCount.emit(UnreadCount())
         }
 
-        override suspend fun onAccountChanged(newAccount: Account?) {
+        override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
           Log.d(TAG, "onAccountChanged()")
           // Don't emit null as it will trigger multiple updates
 //                    currentFullAccount.emit(null)

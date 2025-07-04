@@ -37,7 +37,7 @@ class AccountManager @Inject constructor(
 
   interface OnAccountChangedListener {
     suspend fun onAccountSigningOut(account: Account) {}
-    suspend fun onAccountChanged(newAccount: Account?)
+    suspend fun onAccountChanged(newAccount: GuestOrUserAccount?)
   }
 
   private val coroutineScope = coroutineScopeFactory.create()
@@ -122,7 +122,7 @@ class AccountManager @Inject constructor(
         val account = guestOrUserAccount as? Account
         accountDao.clearAndSetCurrent(account?.id)
 
-        doSwitchAccountWork(account)
+        doSwitchAccountWork(guestOrUserAccount)
 
         _currentAccount.emit(guestOrUserAccount)
       }
@@ -191,7 +191,7 @@ class AccountManager @Inject constructor(
     }
   }
 
-  private suspend fun doSwitchAccountWork(newAccount: Account?) {
+  private suspend fun doSwitchAccountWork(newAccount: GuestOrUserAccount?) {
     // Do pre-switch work here...
 
     preferenceManager.updateCurrentPreferences(newAccount)

@@ -1,6 +1,7 @@
 package com.idunnololz.summit.util
 
 import android.net.Uri
+import android.util.Patterns
 import com.idunnololz.summit.api.dto.CommentId
 import com.idunnololz.summit.api.dto.PostId
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -63,6 +64,12 @@ object LinkUtils {
 
   fun getLinkForCommunity(instance: String, communityName: String): String =
     "https://$instance/c/$communityName"
+
+  fun isValidUrl(url: String) =
+    Patterns.WEB_URL.matcher(url).matches()
+
+  fun isValidInstance(instance: String) =
+    isValidUrl("https://$instance") && instance.isNotBlank()
 }
 
 sealed interface AdvancedLink {

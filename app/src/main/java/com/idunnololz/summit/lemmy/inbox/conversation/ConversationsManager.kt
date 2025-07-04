@@ -4,6 +4,7 @@ import android.util.Log
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.stableId
 import com.idunnololz.summit.api.AccountAwareLemmyClient
@@ -59,7 +60,6 @@ class ConversationsManager @Inject constructor(
   private var conversationsLoadedFromDb: Boolean = false
   private var conversationEarliestMessageTs: Long? = null
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   private val conversationContext = Dispatchers.Default.limitedParallelism(1)
 
   fun init() {
@@ -67,18 +67,13 @@ class ConversationsManager @Inject constructor(
     setupForAccount()
 
     if (BuildConfig.DEBUG) {
-//            runBlocking {
-//                conversationEntriesDao.deleteAll()
-//            }
-//            stateStorage?.lastConversationRefreshTs = 0
-
       stateStorage?.conversationEarliestMessageTs = null
     }
 
     accountManager.addOnAccountChangedListener(object : AccountManager.OnAccountChangedListener {
-      override suspend fun onAccountChanged(newAccount: Account?) {
+      override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
         invalidate()
-        currentAccount = newAccount
+        currentAccount = newAccount?.asAccount
         setupForAccount()
       }
 
