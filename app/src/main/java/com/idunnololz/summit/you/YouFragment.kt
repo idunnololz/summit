@@ -194,6 +194,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
               .actionYouFragmentToDraftsTabbedFragment()
             findNavController().navigateSafe(direction)
           }
+          R.id.uploads -> {
+
+          }
           R.id.account_settings -> {
             requireSummitActivity().openAccountSettings()
           }
@@ -511,6 +514,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             R.drawable.ic_draft_24,
             R.string.drafts,
           )
+//          newItems += Item.MenuItem(
+//            R.id.uploads,
+//            R.drawable.outline_file_upload_24,
+//            R.string.uploads,
+//          )
           newItems += Item.Divider("div2")
           newItems += Item.MenuItem(
             R.id.account_settings,

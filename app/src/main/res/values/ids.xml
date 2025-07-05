@@ -301,4 +301,5 @@
     <item name="video_details" type="id" />
     <item name="is_saved" type="id" />
     <item name="insert_link" type="id" />
+    <item name="uploads" type="id" />
 </resources>

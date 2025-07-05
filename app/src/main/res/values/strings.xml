@@ -2271,6 +2271,7 @@
     <string name="configure_comment">Configure comment</string>
     <string name="error_400_bad_request">400 Bad request</string>
     <string name="error_403_forbidden">403 Forbidden</string>
+    <string name="uploads">Uploads</string>
 
     <!-- uCrop string resource end -->
 </resources>

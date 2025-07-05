@@ -145,8 +145,8 @@ class AddOrEditPostViewModel @Inject constructor(
         url = url.ifBlank { null },
         isNsfw = isNsfw,
         communityId = community.id,
-        thumbnailUrl = thumbnailUrl,
-        altText = altText,
+        thumbnailUrl = thumbnailUrl?.ifBlank { null },
+        altText = altText?.ifBlank { null },
         languageId = languageId.value,
       )
 
