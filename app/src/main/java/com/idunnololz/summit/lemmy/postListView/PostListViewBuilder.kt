@@ -1507,7 +1507,7 @@ class PostListViewBuilder @Inject constructor(
 
     if (root.tag == actionsList) {
       if (root.getTag(R.id.is_saved) != isSaved) {
-        root.findViewById<ImageView>(R.id.pa_save_toggle).apply {
+        root.findViewById<ImageView>(R.id.pa_save_toggle)?.apply {
           if (isSaved) {
             setImageResource(R.drawable.baseline_bookmark_24)
           } else {

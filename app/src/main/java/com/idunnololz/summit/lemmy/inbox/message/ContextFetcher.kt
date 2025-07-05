@@ -163,7 +163,11 @@ class ContextFetcher @Inject constructor(
         .onSuccess {
           result.addAll(it)
 
-          val furthestCommentSeen = it.maxBy { commentIds.indexOf(it.comment.id) }
+          val furthestCommentSeen = it.maxByOrNull { commentIds.indexOf(it.comment.id) }
+
+          if (furthestCommentSeen == null) {
+            return Result.failure(RuntimeException("Can't fetch comment."))
+          }
 
           if (furthestCommentSeen.comment.path == commentPath) {
             return Result.success(result)
