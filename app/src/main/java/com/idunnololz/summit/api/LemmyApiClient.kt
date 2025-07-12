@@ -173,7 +173,7 @@ class LemmyApiClient @Inject constructor(
   companion object {
     private const val TAG = "LemmyApiClient"
 
-    private val apis = mutableMapOf<String, LemmyApiV3WithSite>()
+    private val apis = mutableMapOf<String, LemmyLikeApi>()
   }
 
   @Singleton
@@ -193,7 +193,7 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
-  private var api: LemmyApiV3WithSite = getApiV3WithInstance(
+  private var api: LemmyLikeApi = getApiV3WithInstance(
     instance = preferences.guestAccountSettings?.instance
       ?: Consts.DEFAULT_INSTANCE,
   )
@@ -230,6 +230,12 @@ class LemmyApiClient @Inject constructor(
             { StatefulData.Error(it) }
           )
         }
+      }
+    }
+
+    coroutineScope.launch {
+      apiInfo.collect {
+
       }
     }
   }
@@ -276,7 +282,7 @@ class LemmyApiClient @Inject constructor(
     val communityId = communityIdOrName?.fold({ it }, { null })
     val communityName = communityIdOrName?.fold({ null }, { it })
 
-    val form = try {
+    val form =
       GetPosts(
         community_id = communityId,
         community_name = communityName,
@@ -289,17 +295,9 @@ class LemmyApiClient @Inject constructor(
         disliked_only = downvotedOnly,
         auth = account?.jwt,
       )
-    } catch (e: Exception) {
-      Log.e(TAG, "Error fetching posts", e)
-      false
-    }
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPostsNoCache(authorization = account?.bearer, form = form.serializeToMap())
-      } else {
-        api.getPosts(authorization = account?.bearer, form = form.serializeToMap())
-      }
+      api.getPosts(authorization = account?.bearer, args = form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -322,14 +320,7 @@ class LemmyApiClient @Inject constructor(
     })
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPostNoCache(
-          authorization = account?.bearer,
-          form = postForm.serializeToMap(),
-        )
-      } else {
-        api.getPost(authorization = account?.bearer, form = postForm.serializeToMap())
-      }
+      api.getPost(authorization = account?.bearer, args = postForm, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -349,7 +340,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      api.markPostAsRead(authorization = account.bearer, form = form)
+      api.markPostAsRead(authorization = account.bearer, args = form)
     }.fold(
       onSuccess = {
         Result.success(it.post_view)
@@ -366,28 +357,19 @@ class LemmyApiClient @Inject constructor(
     limit: Int? = null,
     force: Boolean,
   ): Result<List<PostView>> {
-    val form = try {
-      GetPosts(
-        community_id = null,
-        community_name = null,
-        sort = SortType.New,
-        type_ = ListingType.All,
-        page = page,
-        limit = limit,
-        saved_only = true,
-        auth = account?.jwt,
-      )
-    } catch (e: Exception) {
-      Log.e(TAG, "Error fetching posts", e)
-      false
-    }
+    val form = GetPosts(
+      community_id = null,
+      community_name = null,
+      sort = SortType.New,
+      type_ = ListingType.All,
+      page = page,
+      limit = limit,
+      saved_only = true,
+      auth = account?.jwt,
+    )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPostsNoCache(authorization = account?.bearer, form = form.serializeToMap())
-      } else {
-        api.getPosts(authorization = account?.bearer, form = form.serializeToMap())
-      }
+      api.getPosts(authorization = account?.bearer, args = form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it.posts)
@@ -419,19 +401,7 @@ class LemmyApiClient @Inject constructor(
       )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getCommentsNoCache(
-          authorization = account?.bearer,
-          commentsForm
-            .serializeToMap(),
-        )
-      } else {
-        api.getComments(
-          authorization = account?.bearer,
-          commentsForm
-            .serializeToMap(),
-        )
-      }
+      api.getComments(authorization = account?.bearer, commentsForm, force = force)
     }.fold(
       onSuccess = {
         Result.success(it.comments)
@@ -487,19 +457,7 @@ class LemmyApiClient @Inject constructor(
       )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getCommentsNoCache(
-          authorization = account?.bearer,
-          commentsForm
-            .serializeToMap(),
-        )
-      } else {
-        api.getComments(
-          authorization = account?.bearer,
-          commentsForm
-            .serializeToMap(),
-        )
-      }
+      api.getComments(authorization = account?.bearer, commentsForm, force = force)
     }.fold(
       onSuccess = {
         Result.success(it.comments)
@@ -538,14 +496,7 @@ class LemmyApiClient @Inject constructor(
     })
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getCommunityNoCache(
-          authorization = account?.bearer,
-          form = form.serializeToMap(),
-        )
-      } else {
-        api.getCommunity(authorization = account?.bearer, form = form.serializeToMap())
-      }
+      api.getCommunity(authorization = account?.bearer, args = form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -561,7 +512,7 @@ class LemmyApiClient @Inject constructor(
     createCommunity: CreateCommunity,
   ): Result<CommunityResponse> {
     return retrofitErrorHandler {
-      api.createCommunity(authorization = account?.bearer, createCommunity = createCommunity)
+      api.createCommunity(authorization = account?.bearer, args = createCommunity)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -577,7 +528,7 @@ class LemmyApiClient @Inject constructor(
     editCommunity: EditCommunity,
   ): Result<CommunityResponse> {
     return retrofitErrorHandler {
-      api.updateCommunity(authorization = account?.bearer, editCommunity = editCommunity)
+      api.updateCommunity(authorization = account?.bearer, args = editCommunity)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -593,7 +544,7 @@ class LemmyApiClient @Inject constructor(
     deleteCommunity: DeleteCommunity,
   ): Result<CommunityResponse> {
     return retrofitErrorHandler {
-      api.deleteCommunity(authorization = account?.bearer, deleteCommunity = deleteCommunity)
+      api.deleteCommunity(authorization = account?.bearer, args = deleteCommunity)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -631,11 +582,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.searchNoCache(authorization = account?.bearer, form = form.serializeToMap())
-      } else {
-        api.search(authorization = account?.bearer, form = form.serializeToMap())
-      }
+      api.search(authorization = account?.bearer, args = form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -661,7 +608,7 @@ class LemmyApiClient @Inject constructor(
       auth = account?.jwt,
     )
     return retrofitErrorHandler {
-      api.getCommunityList(authorization = account?.bearer, form = form.serializeToMap())
+      api.getCommunityList(authorization = account?.bearer, args = form, force = false)
     }.fold(
       onSuccess = {
         Result.success(it.communities)
@@ -688,7 +635,7 @@ class LemmyApiClient @Inject constructor(
 
     val form = Login(username, password, twoFactorCode)
 
-    return retrofitErrorHandler { api.login(form = form) }
+    return retrofitErrorHandler { api.login(args = form) }
       .fold(
         onSuccess = {
           Result.success(it.jwt)
@@ -704,14 +651,7 @@ class LemmyApiClient @Inject constructor(
     val form = GetSite(auth = auth)
 
     retrofitErrorHandler {
-      if (force) {
-        api.getSiteNoCache(
-          authorization = auth?.toBearer(),
-          form = form.serializeToMap(),
-        )
-      } else {
-        api.getSite(authorization = auth?.toBearer(), form = form.serializeToMap())
-      }
+      api.getSite(authorization = auth?.toBearer(), args = form, force = force)
     }
       .fold(
         onSuccess = {
@@ -727,11 +667,7 @@ class LemmyApiClient @Inject constructor(
     val form = GetUnreadCount(account.jwt)
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getUnreadCountNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getUnreadCount(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getUnreadCount(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -752,11 +688,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getReportCountNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getReportCount(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getReportCount(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -822,11 +754,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     retrofitErrorHandler {
-      if (force) {
-        api.listCommentVotesNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.listCommentVotes(authorization = account.bearer, form.serializeToMap())
-      }
+      api.listCommentVotes(authorization = account.bearer, form, force = force)
     }
       .fold(
         onSuccess = {
@@ -852,11 +780,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     retrofitErrorHandler {
-      if (force) {
-        api.listPostVotesNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.listPostVotes(authorization = account.bearer, form.serializeToMap())
-      }
+      api.listPostVotes(authorization = account.bearer, form, force = force)
     }
       .fold(
         onSuccess = {
@@ -950,7 +874,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      api.distinguishComment(authorization = account.bearer, form)
+      api.distinguishComment(authorization = account.bearer, args = form)
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },
@@ -1200,20 +1124,14 @@ class LemmyApiClient @Inject constructor(
     fileName: String,
     imageIs: InputStream,
   ): Result<UploadImageResult> {
-    val part = MultipartBody.Part.createFormData(
-      "images[]",
-      fileName,
-      imageIs.readBytes().toRequestBody(),
-    )
     val url = "https://${api.instance}/pictrs/image"
-    val cookie = "jwt=${account.jwt}"
 
     return retrofitErrorHandler {
       api.uploadImage(
         authorization = account.bearer,
-        token = cookie,
         url = url,
-        filePart = part,
+        fileName = fileName,
+        imageIs = imageIs,
       )
     }.fold(
       onSuccess = {
@@ -1316,11 +1234,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPersonDetailsNoCache(authorization = account?.bearer, form.serializeToMap())
-      } else {
-        api.getPersonDetails(authorization = account?.bearer, form.serializeToMap())
-      }
+      api.getPersonDetails(authorization = account?.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -1373,11 +1287,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getRepliesNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getReplies(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getReplies(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it.replies)
@@ -1405,11 +1315,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPersonMentionsNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getPersonMentions(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getPersonMentions(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it.mentions)
@@ -1437,14 +1343,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPrivateMessagesNoCache(
-          authorization = account.bearer,
-          form.serializeToMap(),
-        )
-      } else {
-        api.getPrivateMessages(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getPrivateMessages(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it.private_messages)
@@ -1470,11 +1369,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPrivateMessageReportsNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getPrivateMessageReports(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getPrivateMessageReports(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -1501,11 +1396,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getPostReportsNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getPostReports(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getPostReports(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -1580,11 +1471,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getCommentReportsNoCache(authorization = account.bearer, form.serializeToMap())
-      } else {
-        api.getCommentReports(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getCommentReports(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -1822,7 +1709,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      api.resolveObject(authorization = account.bearer, form.serializeToMap())
+      api.resolveObject(authorization = account.bearer, form, force = false)
     }.fold(
       onSuccess = {
         Result.success(it)
@@ -2006,11 +1893,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getModLogsNoCache(authorization = account?.bearer, form.serializeToMap())
-      } else {
-        api.getModLogs(authorization = account?.bearer, form.serializeToMap())
-      }
+      api.getModLogs(authorization = account?.bearer, form, force = force)
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },
@@ -2026,14 +1909,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.getRegistrationApplicationsCountNoCache(
-          authorization = account.bearer,
-          form.serializeToMap(),
-        )
-      } else {
-        api.getRegistrationApplicationsCount(authorization = account.bearer, form.serializeToMap())
-      }
+      api.getRegistrationApplicationsCount(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },
@@ -2055,14 +1931,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return retrofitErrorHandler {
-      if (force) {
-        api.listRegistrationApplicationsNoCache(
-          authorization = account.bearer,
-          form.serializeToMap(),
-        )
-      } else {
-        api.listRegistrationApplications(authorization = account.bearer, form.serializeToMap())
-      }
+      api.listRegistrationApplications(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },
@@ -2090,14 +1959,14 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
-  suspend fun listMedia(page: Long?, limit: Long?, account: Account): Result<ListMediaResponse> {
+  suspend fun listMedia(page: Long?, limit: Long?, account: Account, force: Boolean): Result<ListMediaResponse> {
     val form = ListMedia(
       page = page,
       limit = limit,
     )
 
     return retrofitErrorHandler {
-      api.listMedia(authorization = account.bearer, form.serializeToMap())
+      api.listMedia(authorization = account.bearer, form, force = force)
     }.fold(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },
@@ -2269,21 +2138,21 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  private fun getApiV3WithInstance(instance: String = Consts.DEFAULT_INSTANCE): LemmyApiV3WithSite {
+  private fun getApiV3WithInstance(instance: String = Consts.DEFAULT_INSTANCE): LemmyLikeApi {
     return apis[instance]
       ?: newApiV3(instance).also {
         apis[instance] = it
       }
   }
 
-  private fun newApiV3(instance: String = Consts.DEFAULT_INSTANCE): LemmyApiV3WithSite {
-    return LemmyApiV3WithSite(
+  private fun newApiV3(instance: String = Consts.DEFAULT_INSTANCE): LemmyApiV3Adapter {
+    return LemmyApiV3Adapter(
       Retrofit.Builder()
         .baseUrl("https://$instance/api/v3/")
         .addConverterFactory(GsonConverterFactory.create())
         .client(okHttpClient)
         .build()
-        .create(com.idunnololz.summit.api.LemmyApiV3::class.java),
+        .create(LemmyApiV3::class.java),
       instance,
     )
   }

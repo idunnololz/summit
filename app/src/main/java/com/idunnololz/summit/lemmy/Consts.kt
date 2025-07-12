@@ -1,7 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 object Consts {
-  const val DEFAULT_INSTANCE = "lemmy.ml"
+  const val DEFAULT_INSTANCE = "lemmy.zip"
   const val INSTANCE_LEMMY_WORLD = "lemmy.world"
 
   val DEFAULT_LEMMY_INSTANCES = listOf(

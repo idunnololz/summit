@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
+import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
@@ -41,6 +42,9 @@ class SettingsPostsFeedFragment :
 
   @Inject
   lateinit var userCommunitiesManager: UserCommunitiesManager
+
+  @Inject
+  lateinit var accountManager: AccountManager
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -77,7 +81,7 @@ class SettingsPostsFeedFragment :
   override fun generateData(): List<SettingModelItem> {
     val context = context ?: return listOf()
 
-    return listOf(
+    return listOfNotNull(
       settings.settingsPostFeedAppearance.asCustomItem {
         val direction = SettingsPostsFeedFragmentDirections
           .actionSettingsContentFragmentToSettingViewTypeFragment()
@@ -88,14 +92,22 @@ class SettingsPostsFeedFragment :
         { preferences.markPostsAsReadOnScroll },
         { preferences.markPostsAsReadOnScroll = it },
       ),
-      settings.blurNsfwPosts.asOnOffSwitch(
-        { preferences.blurNsfwPosts },
-        { preferences.blurNsfwPosts = it },
-      ),
-      settings.doNotBlurNsfwContentInNsfwCommunityFeed.asOnOffSwitch(
-        { preferences.doNotBlurNsfwContentInNsfwCommunityFeed },
-        { preferences.doNotBlurNsfwContentInNsfwCommunityFeed = it },
-      ),
+      if (accountManager.currentAccount.value != null) {
+        settings.blurNsfwPosts.asOnOffSwitch(
+          { preferences.blurNsfwPosts },
+          { preferences.blurNsfwPosts = it },
+        )
+      } else {
+        null
+      },
+      if (accountManager.currentAccount.value != null) {
+        settings.doNotBlurNsfwContentInNsfwCommunityFeed.asOnOffSwitch(
+          { preferences.doNotBlurNsfwContentInNsfwCommunityFeed },
+          { preferences.doNotBlurNsfwContentInNsfwCommunityFeed = it },
+        )
+      } else {
+        null
+      },
       settings.defaultCommunitySortOrder.asSingleChoiceSelectorItem(
         {
           preferences.defaultCommunitySortOrder?.toApiSortOrder()?.toId()
@@ -253,7 +265,7 @@ class SettingsPostsFeedFragment :
 
       SettingModelItem.SubgroupItem(
         getString(R.string.filters),
-        listOf(
+        listOfNotNull(
           *if (args.account != null) {
             arrayOf()
           } else {
@@ -330,12 +342,16 @@ class SettingsPostsFeedFragment :
               preferences.showTextPosts = it
             },
           ),
-          settings.showNsfwPosts.asOnOffSwitch(
-            { preferences.showNsfwPosts },
-            {
-              preferences.showNsfwPosts = it
-            },
-          ),
+          if (accountManager.currentAccount.value != null) {
+            settings.showNsfwPosts.asOnOffSwitch(
+              { preferences.showNsfwPosts },
+              {
+                preferences.showNsfwPosts = it
+              },
+            )
+          } else {
+            null
+          },
         ),
       ),
 

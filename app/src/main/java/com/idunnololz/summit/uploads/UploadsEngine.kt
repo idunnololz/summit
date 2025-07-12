@@ -46,7 +46,11 @@ class UploadsEngine @Inject constructor(
               limit: Int,
               force: Boolean,
             ->
-            apiClient.listMedia(pageIndex.toLong(), limit.toLong()).map { it.images }
+            apiClient.listMedia(
+              page = pageIndex.toLong(),
+              limit = limit.toLong(),
+              force = force,
+            ).map { it.images }
           },
         )
       ),

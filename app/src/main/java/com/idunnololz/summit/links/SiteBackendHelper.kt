@@ -2,6 +2,7 @@ package com.idunnololz.summit.links
 
 import android.util.Log
 import com.idunnololz.summit.api.NoInternetException
+import com.idunnololz.summit.links.SiteBackendHelper.ApiType
 import com.idunnololz.summit.util.LinkFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -29,6 +30,7 @@ class SiteBackendHelper @Inject constructor(
   enum class ApiType {
     LemmyV3,
     LemmyV4,
+    PiefedAlpha,
   }
 
   data class ApiInfo(
@@ -69,6 +71,11 @@ class SiteBackendHelper @Inject constructor(
             linkFetcher.downloadSite("https://$instance/api/v4/site", cache = true)
           }
         }
+        val alphaJob = async {
+          runCatching {
+            linkFetcher.downloadSite("https://$instance/api/alpha/site", cache = true)
+          }
+        }
         val homePageJob = async {
           runCatching {
             linkFetcher.downloadSite("https://$instance/", cache = true)
@@ -79,6 +86,8 @@ class SiteBackendHelper @Inject constructor(
           return@withContext Result.success(ApiInfo(ApiType.LemmyV4))
         } else if (v3Job.await().isSuccess) {
           return@withContext Result.success(ApiInfo(ApiType.LemmyV3))
+        } else if (alphaJob.await().isSuccess) {
+          return@withContext Result.success(ApiInfo(ApiType.PiefedAlpha))
         } else if (homePageJob.await().isSuccess) {
           return@withContext Result.success(ApiInfo(null))
         }
@@ -119,3 +128,10 @@ class SiteBackendHelper @Inject constructor(
     }
   }
 }
+
+val ApiType.isLemmy
+  get() = when (this) {
+    ApiType.LemmyV3 -> true
+    ApiType.LemmyV4 -> true
+    ApiType.PiefedAlpha -> false
+  }

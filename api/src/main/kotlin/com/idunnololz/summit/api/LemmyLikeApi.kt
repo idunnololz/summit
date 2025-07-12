@@ -36,27 +36,49 @@ import com.idunnololz.summit.api.dto.EditPost
 import com.idunnololz.summit.api.dto.FeaturePost
 import com.idunnololz.summit.api.dto.FollowCommunity
 import com.idunnololz.summit.api.dto.GetCaptchaResponse
+import com.idunnololz.summit.api.dto.GetComments
 import com.idunnololz.summit.api.dto.GetCommentsResponse
+import com.idunnololz.summit.api.dto.GetCommunity
 import com.idunnololz.summit.api.dto.GetCommunityResponse
+import com.idunnololz.summit.api.dto.GetModlog
 import com.idunnololz.summit.api.dto.GetModlogResponse
+import com.idunnololz.summit.api.dto.GetPersonDetails
 import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.GetPersonMentions
 import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
+import com.idunnololz.summit.api.dto.GetPost
 import com.idunnololz.summit.api.dto.GetPostResponse
+import com.idunnololz.summit.api.dto.GetPosts
 import com.idunnololz.summit.api.dto.GetPostsResponse
+import com.idunnololz.summit.api.dto.GetPrivateMessages
+import com.idunnololz.summit.api.dto.GetReplies
 import com.idunnololz.summit.api.dto.GetRepliesResponse
+import com.idunnololz.summit.api.dto.GetReportCount
 import com.idunnololz.summit.api.dto.GetReportCountResponse
+import com.idunnololz.summit.api.dto.GetSite
+import com.idunnololz.summit.api.dto.GetSiteMetadata
 import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.GetUnreadCount
 import com.idunnololz.summit.api.dto.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
 import com.idunnololz.summit.api.dto.HideCommunity
+import com.idunnololz.summit.api.dto.ListCommentLikes
 import com.idunnololz.summit.api.dto.ListCommentLikesResponse
+import com.idunnololz.summit.api.dto.ListCommentReports
 import com.idunnololz.summit.api.dto.ListCommentReportsResponse
+import com.idunnololz.summit.api.dto.ListCommunities
 import com.idunnololz.summit.api.dto.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.ListMedia
 import com.idunnololz.summit.api.dto.ListMediaResponse
+import com.idunnololz.summit.api.dto.ListPostLikes
 import com.idunnololz.summit.api.dto.ListPostLikesResponse
+import com.idunnololz.summit.api.dto.ListPostReports
 import com.idunnololz.summit.api.dto.ListPostReportsResponse
+import com.idunnololz.summit.api.dto.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
+import com.idunnololz.summit.api.dto.ListRegistrationApplications
 import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.LockPost
 import com.idunnololz.summit.api.dto.Login
@@ -83,12 +105,14 @@ import com.idunnololz.summit.api.dto.RemoveComment
 import com.idunnololz.summit.api.dto.RemoveCommunity
 import com.idunnololz.summit.api.dto.RemovePost
 import com.idunnololz.summit.api.dto.ResolveCommentReport
+import com.idunnololz.summit.api.dto.ResolveObject
 import com.idunnololz.summit.api.dto.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.ResolvePostReport
 import com.idunnololz.summit.api.dto.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.SaveComment
 import com.idunnololz.summit.api.dto.SavePost
 import com.idunnololz.summit.api.dto.SaveUserSettings
+import com.idunnololz.summit.api.dto.Search
 import com.idunnololz.summit.api.dto.SearchResponse
 import com.idunnololz.summit.api.dto.SuccessResponse
 import okhttp3.MultipartBody
@@ -96,7 +120,6 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.HeaderMap
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -104,583 +127,520 @@ import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.QueryMap
 import retrofit2.http.Url
+import java.io.InputStream
 
-interface LemmyApiV3 {
+interface LemmyLikeApi {
 
-  @GET("site")
+  val instance: String
+
   fun getSite(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetSite,
+    force: Boolean,
   ): Call<GetSiteResponse>
 
   /**
    * Get / fetch posts, with various filters.
    */
-  @GET("post/list")
   fun getPosts(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetPosts,
+    force: Boolean,
   ): Call<GetPostsResponse>
 
   /**
    * Get / fetch a post.
    */
-  @GET("post")
   fun getPost(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetPost,
+    force: Boolean,
   ): Call<GetPostResponse>
 
   /**
    * Log into lemmy.
    */
-  @POST("user/login")
-  fun login(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: Login
-  ): Call<LoginResponse>
+  fun login(args: Login): Call<LoginResponse>
 
   /**
    * Like / vote on a post.
    */
-  @POST("post/like")
   fun likePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreatePostLike,
+    authorization: String?,
+    args: CreatePostLike,
   ): Call<PostResponse>
 
   /**
    * Like / vote on a comment.
    */
-  @POST("comment/like")
   fun likeComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreateCommentLike,
+    authorization: String?,
+    args: CreateCommentLike,
   ): Call<CommentResponse>
 
-  @GET("comment/like/list")
   fun listCommentVotes(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListCommentLikes,
+    force: Boolean,
   ): Call<ListCommentLikesResponse>
 
-  @GET("post/like/list")
   fun listPostVotes(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListPostLikes,
+    force: Boolean,
   ): Call<ListPostLikesResponse>
 
   /**
    * Create a comment.
    */
-  @POST("comment")
   fun createComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreateComment,
+    authorization: String?,
+    args: CreateComment,
   ): Call<CommentResponse>
 
   /**
    * Edit a comment.
    */
-  @PUT("comment")
   fun editComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: EditComment,
+    authorization: String?,
+    args: EditComment,
   ): Call<CommentResponse>
 
   /**
    * Delete a comment.
    */
-  @POST("comment/delete")
   fun deleteComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: DeleteComment,
+    authorization: String?,
+    args: DeleteComment,
   ): Call<CommentResponse>
 
   /**
    * Save a post.
    */
-  @PUT("post/save")
   fun savePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: SavePost,
+    authorization: String?,
+    args: SavePost,
   ): Call<PostResponse>
 
-  @POST("post/mark_as_read")
   fun markPostAsRead(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: MarkPostAsRead,
+    authorization: String?,
+    args: MarkPostAsRead,
   ): Call<PostResponse>
 
   /**
    * Save a comment.
    */
-  @PUT("comment/save")
   fun saveComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: SaveComment,
+    authorization: String?,
+    args: SaveComment,
   ): Call<CommentResponse>
 
   /**
    * Get / fetch comments.
    */
-  @GET("comment/list")
   fun getComments(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetComments,
+    force: Boolean,
   ): Call<GetCommentsResponse>
 
-  @POST("comment/distinguish")
   fun distinguishComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: DistinguishComment,
+    authorization: String?,
+    args: DistinguishComment,
   ): Call<CommentResponse>
 
-  @POST("comment/remove")
   fun removeComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: RemoveComment,
+    authorization: String?,
+    args: RemoveComment,
   ): Call<CommentResponse>
 
   /**
    * Get / fetch a community.
    */
-  @GET("community")
   fun getCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetCommunity,
+    force: Boolean,
   ): Call<GetCommunityResponse>
 
   /**
    * Create a community.
    */
-  @POST("community")
   fun createCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body createCommunity: CreateCommunity,
+    authorization: String?,
+    args: CreateCommunity,
   ): Call<CommunityResponse>
 
   /**
    * Update a community.
    */
-  @PUT("community")
   fun updateCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body editCommunity: EditCommunity,
+    authorization: String?,
+    args: EditCommunity,
   ): Call<CommunityResponse>
 
   /**
    * Delete a community.
    */
-  @POST("community/delete")
   fun deleteCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body deleteCommunity: DeleteCommunity,
+    authorization: String?,
+    args: DeleteCommunity,
   ): Call<CommunityResponse>
 
   /**
    * Get / fetch a community.
    */
-  @GET("community/list")
   fun getCommunityList(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListCommunities,
+    force: Boolean,
   ): Call<ListCommunitiesResponse>
 
   /**
    * Get the details for a person.
    */
-  @GET("user")
   fun getPersonDetails(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetPersonDetails,
+    force: Boolean,
   ): Call<GetPersonDetailsResponse>
 
-  @PUT("user/change_password")
   fun changePassword(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: ChangePassword,
+    authorization: String?,
+    args: ChangePassword,
   ): Call<LoginResponse>
 
   /**
    * Get comment replies.
    */
-  @GET("user/replies")
   fun getReplies(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetReplies,
+    force: Boolean,
   ): Call<GetRepliesResponse>
 
   /**
    * Mark a comment as read.
    */
-  @POST("comment/mark_as_read")
   fun markCommentReplyAsRead(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: MarkCommentReplyAsRead,
+    authorization: String?,
+    args: MarkCommentReplyAsRead,
   ): Call<CommentResponse>
 
   /**
    * Mark a person mention as read.
    */
-  @POST("user/mention/mark_as_read")
   fun markPersonMentionAsRead(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: MarkPersonMentionAsRead,
+    authorization: String?,
+    args: MarkPersonMentionAsRead,
   ): Call<PersonMentionResponse>
 
   /**
    * Mark a private message as read.
    */
-  @POST("private_message/mark_as_read")
   fun markPrivateMessageAsRead(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: MarkPrivateMessageAsRead,
+    authorization: String?,
+    args: MarkPrivateMessageAsRead,
   ): Call<PrivateMessageResponse>
 
   /**
    * Mark all replies as read.
    */
-  @POST("user/mark_all_as_read")
   fun markAllAsRead(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: MarkAllAsRead,
+    authorization: String?,
+    args: MarkAllAsRead,
   ): Call<GetRepliesResponse>
 
   /**
    * Get mentions for your user.
    */
-  @GET("user/mention")
   fun getPersonMentions(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetPersonMentions,
+    force: Boolean,
   ): Call<GetPersonMentionsResponse>
 
   /**
    * Get / fetch private messages.
    */
-  @GET("private_message/list")
   fun getPrivateMessages(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetPrivateMessages,
+    force: Boolean,
   ): Call<PrivateMessagesResponse>
 
   /**
    * These are instance wide reports that are only visible for instance admins.
    */
-  @GET("private_message/report/list")
   fun getPrivateMessageReports(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListPrivateMessageReports,
+    force: Boolean,
   ): Call<ListPrivateMessageReportsResponse>
 
-  @POST("private_message/report")
   fun createPrivateMessageReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreatePrivateMessageReport,
+    authorization: String?,
+    args: CreatePrivateMessageReport,
   ): Call<PrivateMessageReportResponse>
 
-  @PUT("private_message/report/resolve")
   fun resolvePrivateMessageReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body resolvePrivateMessageReport: ResolvePrivateMessageReport,
+    authorization: String?,
+    args: ResolvePrivateMessageReport,
   ): Call<PrivateMessageReportResponse>
 
-  @GET("post/report/list")
   fun getPostReports(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListPostReports,
+    force: Boolean,
   ): Call<ListPostReportsResponse>
 
-  @PUT("post/report/resolve")
   fun resolvePostReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body resolvePostReport: ResolvePostReport,
+    authorization: String?,
+    args: ResolvePostReport,
   ): Call<PostReportResponse>
 
-  @GET("comment/report/list")
   fun getCommentReports(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListCommentReports,
+    force: Boolean,
   ): Call<ListCommentReportsResponse>
 
-  @PUT("comment/report/resolve")
   fun resolveCommentReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body resolveCommentReport: ResolveCommentReport,
+    authorization: String?,
+    args: ResolveCommentReport,
   ): Call<CommentReportResponse>
 
   /**
    * Create a private message.
    */
-  @POST("private_message")
   fun createPrivateMessage(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreatePrivateMessage,
+    authorization: String?,
+    args: CreatePrivateMessage,
   ): Call<PrivateMessageResponse>
 
   /**
    * Get your unread counts
    */
-  @GET("user/unread_count")
   fun getUnreadCount(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetUnreadCount,
+    force: Boolean,
   ): Call<GetUnreadCountResponse>
 
-  @GET("user/report_count")
   fun getReportCount(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetReportCount,
+    force: Boolean,
   ): Call<GetReportCountResponse>
 
   /**
    * Follow / subscribe to a community.
    */
-  @POST("community/follow")
   fun followCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: FollowCommunity,
+    authorization: String?,
+    args: FollowCommunity,
   ): Call<CommunityResponse>
 
-  @POST("community/ban_user")
   fun banUserFromCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body banUser: BanFromCommunity,
+    authorization: String?,
+    args: BanFromCommunity,
   ): Call<BanFromCommunityResponse>
 
-  @POST("community/mod")
   fun modUser(
-    @HeaderMap headers: Map<String, String>,
-    @Body modUser: AddModToCommunity,
+    authorization: String?,
+    args: AddModToCommunity,
   ): Call<AddModToCommunityResponse>
 
   /**
    * Create a post.
    */
-  @POST("post")
   fun createPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreatePost,
+    authorization: String?,
+    args: CreatePost,
   ): Call<PostResponse>
 
   /**
    * Edit a post.
    */
-  @PUT("post")
   fun editPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: EditPost,
+    authorization: String?,
+    args: EditPost,
   ): Call<PostResponse>
 
   /**
    * Delete a post.
    */
-  @POST("post/delete")
   fun deletePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: DeletePost,
+    authorization: String?,
+    args: DeletePost,
   ): Call<PostResponse>
 
-  @POST("post/feature")
   fun featurePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: FeaturePost,
+    authorization: String?,
+    args: FeaturePost,
   ): Call<PostResponse>
 
-  @POST("post/lock")
   fun lockPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: LockPost,
+    authorization: String?,
+    args: LockPost,
   ): Call<PostResponse>
 
-  @POST("post/remove")
   fun removePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: RemovePost,
+    authorization: String?,
+    args: RemovePost,
   ): Call<PostResponse>
 
   /**
    * Search lemmy.
    */
-  @GET("search")
   fun search(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: Search,
+    force: Boolean,
   ): Call<SearchResponse>
 
   /**
    * Fetch metadata for any given site.
    */
-  @GET("post/site_metadata")
   fun getSiteMetadata(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetSiteMetadata,
+    force: Boolean,
   ): Call<GetSiteMetadataResponse>
 
   /**
    * Report a comment.
    */
-  @POST("comment/report")
   fun createCommentReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreateCommentReport,
+    authorization: String?,
+    args: CreateCommentReport,
   ): Call<CommentReportResponse>
 
   /**
    * Report a post.
    */
-  @POST("post/report")
   fun createPostReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: CreatePostReport,
+    authorization: String?,
+    args: CreatePostReport,
   ): Call<PostReportResponse>
 
   /**
    * Block a person.
    */
-  @POST("user/block")
   fun blockPerson(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: BlockPerson,
+    authorization: String?,
+    args: BlockPerson,
   ): Call<BlockPersonResponse>
 
   /**
    * Block a community.
    */
-  @POST("community/block")
   fun blockCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: BlockCommunity,
+    authorization: String?,
+    args: BlockCommunity,
   ): Call<BlockCommunityResponse>
 
   /**
    * Block an instance.
    */
-  @POST("site/block")
   fun blockInstance(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: BlockInstance,
+    authorization: String?,
+    args: BlockInstance,
   ): Call<BlockInstanceResponse>
 
   /**
    * Save your user settings.
    */
-  @PUT("user/save_user_settings")
   fun saveUserSettings(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: SaveUserSettings,
+    authorization: String?,
+    args: SaveUserSettings,
   ): Call<LoginResponse>
 
   /**
    * Upload an image.
    */
-  @Multipart
-  @POST
   fun uploadImage(
-    @HeaderMap headers: Map<String, String>,
-    @Header("Cookie") token: String,
-    @Url url: String,
-    @Part filePart: MultipartBody.Part,
+    authorization: String?,
+    url: String,
+    fileName: String,
+    imageIs: InputStream,
   ): Call<PictrsImages>
 
-  @GET("resolve_object")
   fun resolveObject(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ResolveObject,
+    force: Boolean,
   ): Call<ResolveObjectResponse>
 
   /**
    * Admin endpoints
    */
 
-  @POST("user/ban")
   fun banUserFromSite(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: BanPerson,
+    authorization: String?,
+    args: BanPerson,
   ): Call<BanPersonResponse>
 
-  @POST("community/remove")
   fun removeCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: RemoveCommunity,
+    authorization: String?,
+    args: RemoveCommunity,
   ): Call<CommunityResponse>
 
-  @PUT("community/hide")
   fun hideCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: HideCommunity,
+    authorization: String?,
+    args: HideCommunity,
   ): Call<SuccessResponse>
 
-  /**
-   * Admin endpoints
-   */
-
-  @POST("admin/purge/person")
   fun purgePerson(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: PurgePerson,
+    authorization: String?,
+    args: PurgePerson,
   ): Call<SuccessResponse>
 
-  @POST("admin/purge/community")
   fun purgeCommunity(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: PurgeCommunity,
+    authorization: String?,
+    args: PurgeCommunity,
   ): Call<SuccessResponse>
 
-  @POST("admin/purge/post")
   fun purgePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: PurgePost,
+    authorization: String?,
+    args: PurgePost,
   ): Call<SuccessResponse>
 
-  @POST("admin/purge/comment")
   fun purgeComment(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: PurgeComment,
+    authorization: String?,
+     args: PurgeComment,
   ): Call<SuccessResponse>
 
-  @GET("admin/registration_application/count")
   fun getRegistrationApplicationsCount(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetUnreadRegistrationApplicationCount,
+    force: Boolean,
   ): Call<GetUnreadRegistrationApplicationCountResponse>
 
-  @GET("admin/registration_application/list")
   fun listRegistrationApplications(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListRegistrationApplications,
+    force: Boolean,
   ): Call<ListRegistrationApplicationsResponse>
 
-  @PUT("admin/registration_application/approve")
   fun approveRegistrationApplication(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: ApproveRegistrationApplication,
+    authorization: String?,
+     args: ApproveRegistrationApplication,
   ): Call<RegistrationApplicationResponse>
 
-  @GET("modlog")
   fun getModLogs(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: GetModlog,
+    force: Boolean,
   ): Call<GetModlogResponse>
 
-  @POST("user/register")
-  fun register(
-    @HeaderMap headers: Map<String, String>,
-    @Body register: Register
-  ): Call<LoginResponse>
+  fun register(args: Register): Call<LoginResponse>
 
-  @GET("user/get_captcha")
-  fun getCaptcha(
-    @HeaderMap headers: Map<String, String>,
-  ): Call<GetCaptchaResponse>
+  fun getCaptcha(): Call<GetCaptchaResponse>
 
-  @GET("account/list_media")
   fun listMedia(
-    @HeaderMap headers: Map<String, String>,
-    @QueryMap form: Map<String, String>,
+    authorization: String?,
+    args: ListMedia,
+    force: Boolean,
   ): Call<ListMediaResponse>
-
-  // https://lemmy.world/pictrs/image/delete/b60f8360-38bd-450a-ad6c-27b0b3936a27/60ac57fb-0bdd-42af-899a-01982ad37285.jpeg
-
 }

@@ -1530,18 +1530,20 @@ class CommunityFragment :
       }
 
       addDivider()
-      if (nsfwModeManager.nsfwModeEnabled.value) {
-        addItemWithIcon(
-          id = R.id.disable_nsfw_mode,
-          title = getString(R.string.disable_nsfw_mode),
-          icon = R.drawable.ic_no_nsfw_24,
-        )
-      } else {
-        addItemWithIcon(
-          id = R.id.enable_nsfw_mode,
-          title = getString(R.string.enable_nsfw_mode),
-          icon = R.drawable.ic_nsfw_24,
-        )
+      if (accountManager.currentAccount.value != null) {
+        if (nsfwModeManager.nsfwModeEnabled.value) {
+          addItemWithIcon(
+            id = R.id.disable_nsfw_mode,
+            title = getString(R.string.disable_nsfw_mode),
+            icon = R.drawable.ic_no_nsfw_24,
+          )
+        } else {
+          addItemWithIcon(
+            id = R.id.enable_nsfw_mode,
+            title = getString(R.string.enable_nsfw_mode),
+            icon = R.drawable.ic_nsfw_24,
+          )
+        }
       }
 
       addItemWithIcon(

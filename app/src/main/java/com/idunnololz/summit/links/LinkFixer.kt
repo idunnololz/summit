@@ -199,7 +199,7 @@ class LinkFixer @Inject constructor(
 
       Log.d(TAG, "Evaluating $possibleInstance")
 
-      if (result.getOrNull()?.backendType != null) {
+      if (result.getOrNull()?.backendType?.isLemmy == true) {
         Log.d(TAG, "$possibleInstance is a lemmy instance!")
         knownInstances = knownInstances + possibleInstance
 

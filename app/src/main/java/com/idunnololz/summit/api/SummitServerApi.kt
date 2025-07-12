@@ -1,7 +1,5 @@
 package com.idunnololz.summit.api
 
-import com.idunnololz.summit.api.LemmyApiV3.Companion.CACHE_CONTROL_HEADER
-import com.idunnololz.summit.api.LemmyApiV3.Companion.CACHE_CONTROL_NO_CACHE
 import com.idunnololz.summit.api.summit.CommunitySuggestionsDto
 import com.idunnololz.summit.api.summit.PresetDto
 import okhttp3.MultipartBody

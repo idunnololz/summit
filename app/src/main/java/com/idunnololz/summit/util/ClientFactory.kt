@@ -6,8 +6,8 @@ import android.util.Log
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.api.LemmyApiV3.Companion.CACHE_CONTROL_HEADER
-import com.idunnololz.summit.api.LemmyApiV3.Companion.CACHE_CONTROL_NO_CACHE
+import com.idunnololz.summit.api.CACHE_CONTROL_HEADER
+import com.idunnololz.summit.api.CACHE_CONTROL_NO_CACHE
 import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.cache.CachePolicyManager
 import com.idunnololz.summit.preferences.Preferences
