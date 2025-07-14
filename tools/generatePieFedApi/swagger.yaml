@@ -1,0 +1,4603 @@
+openapi: 3.0.3
+
+info:
+  title: PieFed OpenAPI Documentation
+  version: alpha
+  license:
+    name: AGPLv3
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
+  x-logo:
+    url: https://codeberg.org/rimu/pyfedi/src/branch/main/app/static/images/piefed_logo_full_t_300x300.svg
+    altText: PieFed Icon
+    href: https://github.com/freamon/piefed-api
+  contact:
+    url: https://github.com/freamon/piefed-api
+
+servers:
+  - url: https://piefed.social/api/alpha
+  - url: https://feddit.online/api/alpha
+  - url: https://preferred.social/api/alpha
+  - url: https://pythag.net/api/alpha
+
+security:
+  - bearerAuth: []
+
+paths:
+  /site:
+    get:
+      summary: Gets the site, and your user data.
+      tags:
+        - Site
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSiteResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+  /site/block:
+    post:
+      tags:
+        - Site
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockInstance'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockInstanceResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Block an instance.
+  
+  /search:
+    get:
+      tags:
+        - Miscellaneous
+      summary: Search PieFed.
+      parameters:
+        - name: Search
+          in: query
+          schema:
+            $ref: '#/components/schemas/Search'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+  /resolve_object:
+    get:
+      tags:
+        - Miscellaneous
+      parameters:
+        - name: ResolveObject
+          in: query
+          schema:
+            $ref: '#/components/schemas/ResolveObject'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveObjectResponse'
+      summary: Fetch a non-local / federated object.
+  /federated_instances:
+    get:
+      tags:
+        - Miscellaneous
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFederatedInstancesResponse'
+      summary: Fetch federated instances.
+
+  /community:
+    get:
+      tags:
+        - Community
+      parameters:
+        - name: GetCommunity
+          explode: true
+          in: query
+          schema:
+            $ref: '#/components/schemas/GetCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch a community.
+    post:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '429':
+          description: You are being rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Create a new community.
+    put:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Edit community.
+  /community/delete:
+    post:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Delete a community.
+  /community/list:
+    get:
+      tags:
+        - Community
+      parameters:
+        - name: ListCommunities
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/ListCommunities'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCommunitiesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: List communities, with various filters.
+  /community/follow:
+    post:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Follow / subscribe to a community.
+  /community/block:
+    post:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockCommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Block a community.
+  /community/mod:
+    post:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddModToCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddModToCommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Add or remove a moderator for your community..
+  /community/subscribe:
+    put:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeCommunity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Subscribe to activities in a community.
+  /community/moderate/bans:
+    get:
+      tags:
+        - Community
+      parameters:
+        - name: GetCommunityModerationBansList
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/GetCommunityModerationBansList'        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerationCommunityBansListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get the list of banned users for a community. 
+  /community/moderate/ban:
+    post:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateCommunityBan'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerateCommunityBanResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'      
+      summary: Ban a user from a community.
+  /community/moderate/unban:
+    put:
+      tags:
+        - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateCommunityUnBan'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerateCommunityUnBanResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'      
+      summary: Unban a user from a community.   
+  /community/moderate/post/nsfw:
+    post: 
+      tags:
+       - Community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerateCommunityPostNsfw'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerateCommunityPostNsfwResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'        
+      summary: Mark or unmark a post as NSFW.
+  
+  /post/list:
+    get:
+      tags:
+        - Post
+      parameters:
+        - name: GetPosts
+          explode: true
+          in: query
+          schema:
+            $ref: '#/components/schemas/GetPosts'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPostsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch posts, with various filters.
+  /post:
+    get:
+      tags:
+        - Post
+      parameters:
+        - name: GetPost
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/GetPost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch a post.
+    put:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditPost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Edit a post.
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '429':
+          description: You are being rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Create a post.
+  /post/like:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostLike'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Like / vote on a post.
+  /post/save:
+    put:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Save a post.
+  /post/subscribe:
+    put:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Subscribe to a post.
+  /post/delete:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeletePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Delete a post.
+  /post/report:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostReport'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostReportResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Report a post.
+  /post/lock:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LockPost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: A moderator can lock a post ( IE disable new comments ).
+  /post/feature:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeaturePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: A moderator can feature a community post ( IE stick it to the top of a community ).
+  /post/mark_as_read:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkPostAsRead'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/SuccessResponse'
+      summary: Mark a post as read.
+  /post/remove:
+    post:
+      tags:
+        - Post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemovePost'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: A moderator remove for a post.
+  
+  /comment:
+    post:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '429':
+          description: You are being rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Create a comment.
+    put:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Edit a comment.
+    get:
+      tags:
+        - Comment
+      parameters:
+        - in: query
+          name: GetComments
+          schema:
+            $ref: '#/components/schemas/GetComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch a comment.
+  /comment/list:
+    get:
+      tags:
+        - Comment
+      parameters:
+        - in: query
+          name: GetComments
+          schema:
+            $ref: '#/components/schemas/GetComments'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCommentsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch comments.
+  /comment/delete:
+    post:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Delete a comment.
+  /comment/mark_as_read:
+    post:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkReplyAsRead'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/CommentReplyResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Mark a comment reply as read.
+  /comment/remove:
+    post:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: A moderator remove for a comment.
+  /comment/like:
+    post:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentLike'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Like / vote on a comment.
+  /comment/save:
+    put:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Save a comment.
+  /comment/subscribe:
+    put:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeComment'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Subscribe to a comment.
+  /comment/report:
+    post:
+      tags:
+        - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentReport'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentReportResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Report a comment.
+  
+  /private_message/list:
+    get:
+      tags:
+        - PrivateMessage
+      parameters:
+        - in: query
+          name: GetPrivateMessages
+          schema:
+            $ref: '#/components/schemas/GetPrivateMessages'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateMessagesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch private messages.
+  /private_message/conversation:
+    get:
+      tags:
+        - PrivateMessage
+      parameters:
+        - in: query
+          name: GetPrivateMessagesConversation
+          schema:
+            $ref: '#/components/schemas/GetPrivateMessagesConversation'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateMessagesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get / fetch private messages.
+  /private_message:
+    post:
+      tags:
+        - PrivateMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePrivateMessage'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateMessageResponse'
+      summary: Create a private message.
+  /private_message/mark_as_read:
+    post:
+      tags:
+        - PrivateMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkPrivateMessageAsRead'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateMessageResponse'
+      summary: Mark a private message as read.
+  
+  /user:
+    get:
+      tags:
+        - User
+      parameters:
+        - name: GetPersonDetails
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/GetPersonDetails'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPersonDetailsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get the details for a person.
+  /user/replies:
+    get:
+      tags:
+        - User
+      parameters:
+        - name: GetReplies
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/GetReplies'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRepliesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get comment replies.
+  /user/mentions:
+    get:
+      tags:
+        - User
+      parameters:
+        - name: GetReplies
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/GetReplies'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRepliesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get mentions of your account made in comments.
+  /user/block:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockPerson'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockPersonResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Block a person.
+  /user/login:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseLogin'
+      summary: Log into PieFed.
+  /user/mark_all_as_read:
+    post:
+      tags:
+        - User
+      operationId: markAllAsRead
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetRepliesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Mark all replies as read.
+  /user/unread_count:
+    get:
+      tags:
+        - User
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUnreadCountResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Get your unread counts
+  /user/subscribe:
+    put:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribePerson'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Subscribe to activities from another user
+  /user/set_flair:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPersonFlair'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+      summary: Set your flair for a community
+  /user/save_user_settings:
+    put:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveUserSettings'
+      responses:
+        '200':
+          description: OK
+      summary: Save your user settings.
+  /user/notifications:
+    get:
+      tags:
+        - User
+      parameters:
+        - name: Status
+          in: query
+          explode: true
+          schema:
+            $ref: '#/components/schemas/GetNotificationStatus'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsResponse'          
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'                
+      summary: Get your user notifications
+  /user/notification_state:
+    put:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditNotificationState'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsReadStatusResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:  
+                $ref: '#/components/schemas/BadRequest'                
+      summary: Set the read status of a given notification.
+  /user/notifications_count:
+    get:
+      tags:
+        - User
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsCountResponse'    
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:  
+                $ref: '#/components/schemas/BadRequest'                
+      summary: Get user unread notifications count.
+  /user/mark_all_notifications_read:
+    put:
+      tags:
+        - User
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsMarkAllReadResponse'    
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:  
+                $ref: '#/components/schemas/BadRequest'         
+      summary: Set all unread user notifications to read.
+  /user/verify_credentials:
+    post:
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: BAD REQUEST
+      summary: Verify username / password credentials
+  
+  /upload/image:
+    post:
+      tags:
+        - Upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageUpload'
+            encoding:
+              file:
+                contentType: >-
+                  image/jpeg, image/jpg, image/gif, image/png, image/jxl,
+                  image/heic, image/heif, image/webp, image/avif
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        '400':
+          description: The uploaded image was missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '429':
+          description: You are being rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+  /upload/community_image:
+    post:
+      tags:
+        - Upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageUpload'
+            encoding:
+              file:
+                contentType: >-
+                  image/jpeg, image/jpg, image/gif, image/png, image/jxl,
+                  image/heic, image/heif, image/webp, image/avif
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        '400':
+          description: The uploaded image was missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '429':
+          description: You are being rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+  /upload/user_image:
+    post:
+      tags:
+        - Upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageUpload'
+            encoding:
+              file:
+                contentType: >-
+                  image/jpeg, image/jpg, image/gif, image/png, image/jxl,
+                  image/heic, image/heif, image/webp, image/avif
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        '400':
+          description: The uploaded image was missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '429':
+          description: You are being rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # -- GET parameters, or POST/PUT request bodies--
+    # site
+    BlockInstance:
+      properties:
+        instance_id:
+          title: BlockInstance.instance_id
+          type: integer
+        block:
+          title: BlockInstance.block
+          type: boolean
+      required:
+        - instance_id
+        - block
+      title: BlockInstance
+      type: object
+    # misc
+    Search:
+      properties:
+        q:
+          title: Search.q
+          type: string
+        type_:
+          $ref: '#/components/schemas/SearchType'
+          title: Search.type_
+        sort:
+          $ref: '#/components/schemas/SortType'
+          title: Search.sort
+        listing_type:
+          $ref: '#/components/schemas/ListingType'
+          title: Search.listing_type
+        page:
+          title: Search.page
+          type: integer
+        limit:
+          title: Search.limit
+          type: integer
+      required:
+        - q
+      additionalProperties: false
+      title: Search
+      type: object
+    ResolveObject:
+      properties:
+        q:
+          title: ResolveObject.q
+          type: string
+      required:
+        - q
+      additionalProperties: false
+      title: ResolveObject
+      type: object
+    # community
+    GetCommunity:
+      properties:
+        id:
+          title: GetCommunity.id
+          type: integer
+        name:
+          title: GetCommunity.name
+          type: string
+      additionalProperties: false
+      title: GetCommunity
+      type: object
+    CreateCommunity:
+      properties:
+        name:
+          title: CreateCommunity.name
+          type: string
+        title:
+          title: CreateCommunity.title
+          type: string
+        description:
+          title: CreateCommunity.description
+          type: string
+        rules:
+          title: CreateCommunity.rules
+          type: string
+        icon_url:
+          title: CreateCommunity.icon
+          type: string
+          format: url
+        banner_url:
+          title: CreateCommunity.banner
+          type: string
+          format: url
+        nsfw:
+          title: CreateCommunity.nsfw
+          type: boolean
+        restricted_to_mods:
+          title: CreateCommunity.restricted_to_mods
+          type: boolean
+        local_only:
+          title: CreateCommunity.local_only
+          type: boolean
+        discussion_languages:
+          items:
+            type: integer
+          title: CreateCommunity.discussion_languages
+          type: array
+      required:
+        - name
+        - title
+      additionalProperties: false
+      title: CreateCommunity
+      type: object
+    EditCommunity:
+      properties:
+        id:
+          title: CreateCommunity.id
+          type: integer
+        title:
+          title: CreateCommunity.title
+          type: string
+        description:
+          title: CreateCommunity.description
+          type: string
+        rules:
+          title: CreateCommunity.rules
+          type: string
+        icon_url:
+          title: CreateCommunity.icon
+          type: string
+          format: url
+        banner_url:
+          title: CreateCommunity.banner
+          type: string
+          format: url
+        nsfw:
+          title: CreateCommunity.nsfw
+          type: boolean
+        restricted_to_mods:
+          title: CreateCommunity.restricted_to_mods
+          type: boolean
+        local_only:
+          title: CreateCommunity.local_only
+          type: boolean
+        discussion_languages:
+          items:
+            type: integer
+          title: CreateCommunity.discussion_languages
+          type: array
+      required:
+        - id
+      additionalProperties: false
+      title: CreateCommunity
+      type: object
+    DeleteCommunity:
+      properties:
+        community_id:
+          title: DeleteCommunity.community_id
+          type: integer
+        deleted:
+          title: DeleteCommunity.deleted
+          type: boolean
+      required:
+        - community_id
+        - deleted
+      additionalProperties: false
+      title: DeleteCommunity
+      type: object
+    AddModToCommunity:
+      properties:
+        community_id:
+          title: AddModToCommunity.community_id
+          type: integer
+        person_id:
+          title: AddModToCommunity.person_id
+          type: integer
+        added:
+          title: AddModToCommunity.added
+          type: boolean
+      required:
+        - community_id
+        - person_id
+        - added
+      additionalProperties: false
+      title: AddModToCommunity
+      type: object
+    ListCommunities:
+      properties:
+        type_:
+          $ref: '#/components/schemas/ListingType'
+          title: ListCommunities.type_
+        sort:
+          $ref: '#/components/schemas/CommunitySortType'
+          title: ListCommunities.sort
+        show_nsfw:
+          title: ListCommunities.show_nsfw
+          type: boolean
+        page:
+          title: ListCommunities.page
+          type: integer
+        limit:
+          title: ListCommunities.limit
+          type: integer
+      additionalProperties: false
+      title: ListCommunities
+      type: object
+    FollowCommunity:
+      properties:
+        community_id:
+          title: FollowCommunity.community_id
+          type: integer
+        follow:
+          title: FollowCommunity.follow
+          type: boolean
+      required:
+        - community_id
+        - follow
+      additionalProperties: false
+      title: FollowCommunity
+      type: object
+    BlockCommunity:
+      properties:
+        community_id:
+          title: BlockCommunity.community_id
+          type: integer
+        block:
+          title: BlockCommunity.block
+          type: boolean
+      required:
+        - community_id
+        - block
+      additionalProperties: false
+      title: BlockCommunity
+      type: object
+    SubscribeCommunity:
+      properties:
+        community_id:
+          title: SubscribeCommunity.community_id
+          type: integer
+        subscribe:
+          title: SubscribeCommunity.subscribe
+          type: boolean
+      required:
+        - community_id
+        - subscribe
+      additionalProperties: false
+      title: SubscribeCommunity
+      type: object
+    GetCommunityModerationBansList:
+      title: GetCommunityModerationBansList
+      type: object
+      properties:
+        community_id:
+          title: GetCommunityModerationBansList.community_id
+          type: integer
+          example: 42
+        page:
+          title: GetCommunityModerationBansList.page
+          type: integer
+          example: 1
+      required:
+        - comment_id
+    ModerateCommunityBan:
+      title: ModerateCommunityBan
+      type: object 
+      properties:
+        community_id: 
+          title: PostCommunityModerateBan.community_id
+          type: integer
+          example: 42
+        user_id: 
+          title: PostCommunityModerateBan.user_id
+          type: integer
+          example: 1234
+        reason: 
+          title: PostCommunityModerateBan.reason
+          type: string
+          example: "Violation of Rule 1."
+        expiredAt: 
+          title: PostCommunityModerateBan.expiredAt
+          type: string
+          example: "2025-01-01T12:00:00"
+      required:
+        - community_id
+        - user_id
+        - reason 
+        - expiredAt
+    ModerateCommunityUnBan:
+      title: ModerateCommunityUnBan
+      type: object
+      properties:
+        community_id: 
+          title: PutCommunityModerateUnBan.community_id
+          type: integer
+          example: 42
+        user_id: 
+          title: PutCommunityModerateUnBan.user_id
+          type: integer
+          example: 1234      
+      required:
+        - community_id
+        - user_id          
+    ModerateCommunityPostNsfw:
+      title: ModerateCommunityPostNsfw
+      type: object
+      properties:
+        post_id:
+          title: PostCommunityModeratePostNsfw.post_id
+          type: integer
+          example: 123456
+        nsfw_status:
+          title: PostCommunityModeratePostNsfw.nsfw_status
+          type: boolean
+          example: true
+      required:
+        - post_id 
+        - nsfw_status
+    # post
+    GetPosts:
+      properties:
+        type_:
+          $ref: '#/components/schemas/ListingType'
+          title: GetPosts.type_
+        sort:
+          $ref: '#/components/schemas/SortType'
+          title: GetPosts.sort
+        page_cursor:
+          title: GetPosts.page_cursor
+          type: integer
+        limit:
+          title: GetPosts.limit
+          type: integer
+        community_id:
+          title: GetPosts.community_id
+          type: integer
+        person_id:
+          title: GetPosts.person_id
+          type: integer
+        community_name:
+          title: GetPosts.community_name
+          type: string
+        liked_only:
+          title: GetPosts.liked_only
+          type: boolean
+        saved_only:
+          title: GetPosts.saved_only
+          type: boolean
+      additionalProperties: false
+      title: GetPosts
+      type: object
+    GetPost:
+      properties:
+        id:
+          title: GetPost.id
+          type: integer
+        comment_id:
+          title: GetPost.comment_id
+          type: integer
+      additionalProperties: false
+      title: GetPost
+      type: object
+    EditPost:
+      properties:
+        post_id:
+          title: EditPost.post_id
+          type: integer
+        title:
+          title: EditPost.title
+          type: string
+        url:
+          title: EditPost.url
+          type: string
+          format: url
+        body:
+          title: EditPost.body
+          type: string
+        nsfw:
+          title: EditPost.nsfw
+          type: boolean
+        language_id:
+          title: EditPost.language_id
+          type: integer
+      required:
+        - post_id
+      additionalProperties: false
+      title: EditPost
+      type: object
+    CreatePost:
+      properties:
+        title:
+          title: CreatePost.title
+          type: string
+        community_id:
+          title: CreatePost.community_id
+          type: integer
+        url:
+          title: CreatePost.url
+          type: string
+          format: url
+        body:
+          title: CreatePost.body
+          type: string
+        nsfw:
+          title: CreatePost.nsfw
+          type: boolean
+        language_id:
+          title: CreatePost.language_id
+          type: integer
+      required:
+        - title
+        - community_id
+      additionalProperties: false
+      title: CreatePost
+      type: object
+    CreatePostLike:
+      properties:
+        post_id:
+          title: CreatePostLike.post_id
+          type: integer
+        score:
+          title: CreatePostLike.score
+          type: integer
+      required:
+        - post_id
+        - score
+      additionalProperties: false
+      title: CreatePostLike
+      type: object
+    SavePost:
+      properties:
+        post_id:
+          title: SavePost.post_id
+          type: integer
+        save:
+          title: SavePost.save
+          type: boolean
+      required:
+        - post_id
+        - save
+      additionalProperties: false
+      title: SavePost
+      type: object
+    SubscribePost:
+      properties:
+        post_id:
+          title: SubscribePost.post_id
+          type: integer
+        subscribe:
+          title: SubscribePost.subscribe
+          type: boolean
+      required:
+        - post_id
+        - subscribe
+      additionalProperties: false
+      title: SubscribePost
+      type: object
+    DeletePost:
+      properties:
+        post_id:
+          title: DeletePost.post_id
+          type: integer
+        deleted:
+          title: DeletePost.deleted
+          type: boolean
+      required:
+        - post_id
+        - deleted
+      additionalProperties: false
+      title: DeletePost
+      type: object
+    CreatePostReport:
+      properties:
+        post_id:
+          title: CreatePostReport.post_id
+          type: integer
+        reason:
+          title: CreatePostReport.reason
+          type: string
+      required:
+        - post_id
+        - reason
+      additionalProperties: false
+      title: CreatePostReport
+      type: object
+    LockPost:
+      properties:
+        post_id:
+          title: LockPost.post_id
+          type: integer
+        locked:
+          title: LockPost.locked
+          type: boolean
+      required:
+        - post_id
+        - locked
+      additionalProperties: false
+      title: LockPost
+      type: object
+    FeaturePost:
+      properties:
+        post_id:
+          title: FeaturePost.post_id
+          type: integer
+        featured:
+          title: FeaturePost.featured
+          type: boolean
+        feature_type:
+          $ref: '#/components/schemas/PostFeatureType'
+          title: FeaturePost.feature_type
+      required:
+        - post_id
+        - featured
+        - feature_type
+      additionalProperties: false
+      title: FeaturePost
+      type: object
+    MarkPostAsRead:
+      properties:
+        post_ids:
+          items:
+            title: Post.id
+            type: integer
+          title: MarkPostAsRead.post_ids
+          type: array
+        post_id:
+          title: MarkPostAsRead.post.id
+          type: integer
+        read:
+          title: MarkPostAsRead.read
+          type: boolean
+      required:
+        - read
+      additionalProperties: false
+      title: MarkPostAsRead
+      type: object
+    RemovePost:
+      properties:
+        post_id:
+          title: RemovePost.post_id
+          type: integer
+        removed:
+          title: RemovePost.removed
+          type: boolean
+        reason:
+          title: RemovePost.reason
+          type: string
+      required:
+        - post_id
+        - removed
+      additionalProperties: false
+      title: RemovePost
+      type: object
+    # comment
+    CreateComment:
+      properties:
+        body:
+          title: CreateComment.content
+          type: string
+        post_id:
+          title: CreateComment.post_id
+          type: integer
+        parent_id:
+          title: CreateComment.parent_id
+          type: integer
+        language_id:
+          title: CreateComment.language_id
+          type: integer
+      required:
+        - body
+        - post_id
+      additionalProperties: false
+      title: CreateComment
+      type: object
+    EditComment:
+      properties:
+        comment_id:
+          title: EditComment.comment_id
+          type: integer
+        body:
+          title: EditComment.content
+          type: string
+        language_id:
+          title: EditComment.language_id
+          type: integer
+      required:
+        - comment_id
+      additionalProperties: false
+      title: EditComment
+      type: object
+    GetComment:
+      properties:
+        id:
+          title: GetComment.id
+          type: integer
+      required:
+        - id
+      additionalProperties: false
+      title: GetComment
+      type: object
+    GetComments:
+      properties:
+        type_:
+          $ref: '#/components/schemas/ListingType'
+          title: GetComments.type_
+        sort:
+          $ref: '#/components/schemas/CommentSortType'
+          title: GetComments.sort
+        max_depth:
+          title: GetComments.max_depth
+          type: integer
+        page:
+          title: GetComments.page
+          type: integer
+        limit:
+          title: GetComments.limit
+          type: integer
+        community_id:
+          title: GetComments.community_id
+          type: integer
+        post_id:
+          title: GetComments.post_id
+          type: integer
+        parent_id:
+          title: GetComments.parent_id
+          type: integer
+        person_id:
+          title: GetComments.person_id
+          type: integer
+        liked_only:
+          title: GetComments.liked_only
+          type: boolean
+        saved_only:
+          title: GetComments.saved_only
+          type: boolean
+      additionalProperties: false
+      title: GetComments
+      type: object
+    DeleteComment:
+      properties:
+        comment_id:
+          title: DeleteComment.comment_id
+          type: integer
+        deleted:
+          title: DeleteComment.deleted
+          type: boolean
+      required:
+        - comment_id
+        - deleted
+      additionalProperties: false
+      title: DeleteComment
+      type: object
+    MarkReplyAsRead:
+      properties:
+        comment_reply_id:
+          title: MarkReplyAsRead.comment_reply_id
+          type: integer
+        read:
+          type: boolean
+      required:
+        - comment_reply_id
+        - read
+      additionalProperties: false
+      title: MarkReplyAsRead
+      type: object
+    RemoveComment:
+      properties:
+        comment_id:
+          title: RemoveComment.comment_id
+          type: integer
+        removed:
+          title: RemoveComment.removed
+          type: boolean
+        reason:
+          title: RemoveComment.reason
+          type: string
+      required:
+        - comment_id
+        - removed
+      additionalProperties: false
+      title: RemoveComment
+      type: object
+    CreateCommentLike:
+      properties:
+        comment_id:
+          title: CreateCommentLike.comment_id
+          type: integer
+        score:
+          title: CreateCommentLike.score
+          type: integer
+      required:
+        - comment_id
+        - score
+      additionalProperties: false
+      title: CreateCommentLike
+      type: object
+    SaveComment:
+      properties:
+        comment_id:
+          title: SaveComment.comment_id
+          type: integer
+        save:
+          title: SaveComment.save
+          type: boolean
+      required:
+        - comment_id
+        - save
+      additionalProperties: false
+      title: SaveComment
+      type: object
+    SubscribeComment:
+      properties:
+        comment_id:
+          title: SubscribeComment.comment_id
+          type: integer
+        subscribe:
+          title: SubscribeComment.subscribe
+          type: boolean
+      required:
+        - comment_id
+        - subscribe
+      additionalProperties: false
+      title: SubscribeComment
+      type: object
+    CreateCommentReport:
+      properties:
+        comment_id:
+          title: CreateCommentReport.comment_id
+          type: integer
+        reason:
+          title: CreateCommentReport.reason
+          type: string
+      required:
+        - comment_id
+        - reason
+      additionalProperties: false
+      title: CreateCommentReport
+      type: object
+    # private message
+    GetPrivateMessages:
+      properties:
+        unread_only:
+          title: GetPrivateMessages.unread_only
+          type: boolean
+        page:
+          title: GetPrivateMessages.page
+          type: integer
+        limit:
+          title: GetPrivateMessages.limit
+          type: integer
+      additionalProperties: false
+      title: GetPrivateMessages
+      type: object
+    GetPrivateMessagesConversation:
+      properties:
+        page:
+          title: GetPrivateMessagesConversation.page
+          type: integer
+        limit:
+          title: GetPrivateMessagesConversation.limit
+          type: integer
+        person_id:
+          title: GetPrivateMessagesConversation.person_id
+          type: integer
+      required:
+        - person_id
+      additionalProperties: false
+      title: GetPrivateMessagesConversation
+      type: object
+    CreatePrivateMessage:
+      properties:
+        content:
+          title: CreatePrivateMessage.content
+          type: string
+        recipient_id:
+          title: CreatePrivateMessage.recipient_id
+          type: integer
+      required:
+        - content
+        - recipient_id
+      additionalProperties: false
+      title: CreatePrivateMessage
+      type: object
+    MarkPrivateMessageAsRead:
+      properties:
+        private_message_id:
+          title: MarkPrivateMessageAsRead.private_message_id
+          type: integer
+        read:
+          title: MarkPrivateMessageAsRead.read
+          type: boolean
+      required:
+        - private_message_id
+        - read
+      additionalProperties: false
+      title: MarkPrivateMessageAsRead
+      type: object
+    # user
+    GetPersonDetails:
+      properties:
+        person_id:
+          title: GetPersonDetails.person_id
+          type: integer
+        username:
+          title: GetPersonDetails.username
+          type: string
+        sort:
+          $ref: '#/components/schemas/SortType'
+          title: GetPersonDetails.sort
+        page:
+          title: GetPersonDetails.page
+          type: integer
+        limit:
+          title: GetPersonDetails.limit
+          type: integer
+        community_id:
+          title: GetPersonDetails.community_id
+          type: integer
+        saved_only:
+          title: GetPersonDetails.saved_only
+          type: boolean
+        include_content:
+          title: GetPersonDetails.include_content
+          type: boolean
+      additionalProperties: false
+      title: GetPersonDetails
+      type: object
+    GetReplies:
+      properties:
+        sort:
+          $ref: '#/components/schemas/CommentSortType'
+          title: GetReplies.sort
+        page:
+          title: GetReplies.page
+          type: integer
+        limit:
+          title: GetReplies.limit
+          type: integer
+        unread_only:
+          title: GetReplies.unread_only
+          type: boolean
+      additionalProperties: false
+      title: GetReplies
+      type: object
+    BlockPerson:
+      properties:
+        person_id:
+          title: BlockPerson.person_id
+          type: integer
+        block:
+          title: BlockPerson.block
+          type: boolean
+      required:
+        - person_id
+        - block
+      additionalProperties: false
+      title: BlockPerson
+      type: object
+    Login:
+      properties:
+        username:
+          title: Login.username
+          type: string
+        password:
+          title: Login.password
+          type: string
+      required:
+        - username
+        - password
+      additionalProperties: false
+      title: Login
+      type: object
+    GetUnreadCountResponse:
+      properties:
+        replies:
+          title: GetUnreadCountResponse.replies
+          type: integer
+        mentions:
+          title: GetUnreadCountResponse.mentions
+          type: integer
+        private_messages:
+          title: GetUnreadCountResponse.private_messages
+          type: integer
+      required:
+        - replies
+        - mentions
+        - private_messages
+      additionalProperties: false
+      title: GetUnreadCountResponse
+      type: object
+    SubscribePerson:
+      properties:
+        person_id:
+          title: SubscribePerson.person_id
+          type: integer
+        subscribe:
+          title: SubscribePerson.subscribe
+          type: boolean
+      required:
+        - person_id
+        - subscribe
+      additionalProperties: false
+      title: SubscribePerson
+      type: object
+    SetPersonFlair:
+      properties:
+        community_id:
+          title: SetPersonFlair.community_id
+          type: integer
+        flair_text:
+          title: SetPersonFlair.flair_text
+          type: string
+      required:
+        - community_id
+        - flair_text
+      additionalProperties: false
+      title: SetPersonFlair
+      type: object
+    SaveUserSettings:
+      properties:
+        show_nsfw:
+          title: SaveUserSettings.show_nsfw
+          type: boolean
+        show_read_posts:
+          title: SaveUserSettings.show_read_posts
+          type: boolean
+        bio:
+          title: SaveUserSettings.bio
+          type: string
+      type: object
+      title: SaveUserSettings
+    GetNotificationStatus:
+      properties:
+        status:
+          $ref: '#/components/schemas/NotificationStatusType'
+          title: GetNotificationStatus.status
+        page:
+          title: GetNotificationStatus.page
+          type: integer
+          default: 1
+      required:
+        - status
+      additionalProperties: false
+      title: GetNotificationStatus
+      type: object
+    EditNotificationState:
+      properties:
+        notif_id:
+          title: GetNotificationStatus.notif_id
+          type: integer
+        read_state:
+          title: GetNotificationStatus.read_state
+          type: boolean
+      required:
+        - notif_id, read_state
+      additionalProperties: false
+      title: EditNotificationState
+      type: object
+    # upload
+    ImageUpload:
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+      type: object
+    
+    # -- responses --
+    SuccessResponse:
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+      title: SuccessResponse
+      type: object
+    # general error
+    BadRequest:
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: An error occurred
+      type: object
+    # site
+    GetSiteResponse:
+      properties:
+        my_user:
+          $ref: '#/components/schemas/MyUserInfo'
+          title: GetSiteResponse.my_user
+        site:
+          $ref: '#/components/schemas/Site'
+          title: GetSiteResponse.site
+        version:
+          title: GetSiteResponse.version
+          type: string
+        admins:
+          items:
+            $ref: '#/components/schemas/PersonView'
+          title: GetSiteResponse.admins
+          type: array
+      required:
+        - version
+        - site
+        - admins
+      title: GetSiteResponse
+      type: object
+    BlockInstanceResponse:
+      properties:
+        blocked:
+          title: BlockInstanceResponse.blocked
+          type: boolean
+      required:
+        - blocked
+      title: BlockInstanceResponse
+      type: object
+    # misc
+    SearchResponse:
+      properties:
+        type_:
+          $ref: '#/components/schemas/SearchType'
+          title: SearchResponse.type_
+        posts:
+          items:
+            $ref: '#/components/schemas/PostView'
+          title: SearchResponse.posts
+          type: array
+        communities:
+          items:
+            $ref: '#/components/schemas/CommunityView'
+          title: SearchResponse.communities
+          type: array
+        users:
+          items:
+            $ref: '#/components/schemas/PersonView'
+          title: SearchResponse.users
+          type: array
+      required:
+        - type_
+        - comments
+        - posts
+        - communities
+        - users
+      additionalProperties: false
+      title: SearchResponse
+      type: object
+    ResolveObjectResponse:
+      properties:
+        comment:
+          $ref: '#/components/schemas/CommentView'
+          title: ResolveObjectResponse.comment
+        post:
+          $ref: '#/components/schemas/PostView'
+          title: ResolveObjectResponse.post
+        community:
+          $ref: '#/components/schemas/CommunityView'
+          title: ResolveObjectResponse.community
+        person:
+          $ref: '#/components/schemas/PersonView'
+          title: ResolveObjectResponse.person
+      additionalProperties: false
+      title: ResolveObjectResponse
+      type: object
+    GetFederatedInstancesResponse:
+      properties:
+        federated_instances:
+          $ref: '#/components/schemas/FederatedInstancesView'
+          title: GetFederatedInstancesResponse.federated_instances
+      additionalProperties: false
+      title: GetFederatedInstancesResponse
+      type: object
+    # community
+    GetCommunityResponse:
+      properties:
+        community_view:
+          $ref: '#/components/schemas/CommunityView'
+          title: GetCommunityResponse.community_view
+        site:
+          $ref: '#/components/schemas/Site'
+          title: GetCommunityResponse.site
+        moderators:
+          items:
+            $ref: '#/components/schemas/CommunityModeratorView'
+          title: GetCommunityResponse.moderators
+          type: array
+        discussion_languages:
+          items:
+            type: integer
+          title: GetCommunityResponse.discussion_languages
+          type: array
+      required:
+        - community_view
+        - moderators
+        - discussion_languages
+      additionalProperties: false
+      title: GetCommunityResponse
+      type: object
+    CommunityResponse:
+      properties:
+        community_view:
+          $ref: '#/components/schemas/CommunityView'
+          title: CommunityResponse.community_view
+        discussion_languages:
+          items:
+            type: integer
+          title: CommunityResponse.discussion_languages
+          type: array
+      required:
+        - community_view
+        - discussion_languages
+      additionalProperties: false
+      title: CommunityResponse
+      type: object
+    ListCommunitiesResponse:
+      properties:
+        communities:
+          items:
+            $ref: '#/components/schemas/CommunityView'
+          title: ListCommunitiesResponse.communities
+          type: array
+      required:
+        - communities
+      additionalProperties: false
+      title: ListCommunitiesResponse
+      type: object
+    BlockCommunityResponse:
+      properties:
+        community_view:
+          $ref: '#/components/schemas/CommunityView'
+          title: BlockCommunityResponse.community_view
+        blocked:
+          title: BlockCommunityResponse.blocked
+          type: boolean
+      required:
+        - community_view
+        - blocked
+      additionalProperties: false
+      title: BlockCommunityResponse
+      type: object
+    AddModToCommunityResponse:
+      properties:
+        moderators:
+          items:
+            $ref: '#/components/schemas/CommunityModeratorView'
+          title: AddModToCommunityResponse.moderators
+          type: array
+      required:
+        - moderators
+      additionalProperties: false
+      title: AddModToCommunityResponse
+      type: object
+    ModerationCommunityBansListResponse:
+      title: ModerationCommunityBansListResponse
+      type: object
+      properties:
+        items:
+          title: GetCommunityModerationBansListResponse.items
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityModerationBanItem'
+        next_page:
+          title: GetCommunityModerationBansListResponse.next_page
+          type: string
+          example: "3"
+    ModerateCommunityBanResponse:
+      title: ModerateCommunityBanResponse
+      type: object 
+      $ref: '#/components/schemas/CommunityModerationBanItem'
+    ModerateCommunityUnBanResponse:
+      title: ModerateCommunityUnBanResponse
+      type: object
+      $ref: '#/components/schemas/CommunityModerationBanItem'
+    ModerateCommunityPostNsfwResponse:
+      title: ModerateCommunityPostNsfwResponse
+      type: object
+      $ref: '#/components/schemas/PostView'
+    # post
+    GetPostsResponse:
+      properties:
+        posts:
+          items:
+            $ref: '#/components/schemas/PostView'
+          title: GetPostsResponse.posts
+          type: array
+      required:
+        - posts
+      additionalProperties: false
+      title: GetPostsResponse
+      type: object
+    GetPostResponse:
+      properties:
+        post_view:
+          $ref: '#/components/schemas/PostView'
+          title: GetPostResponse.post_view
+        community_view:
+          $ref: '#/components/schemas/CommunityView'
+          title: GetPostResponse.community_view
+        moderators:
+          items:
+            $ref: '#/components/schemas/CommunityModeratorView'
+          title: GetPostResponse.moderators
+          type: array
+        cross_posts:
+          items:
+            $ref: '#/components/schemas/PostView'
+          title: GetPostResponse.cross_posts
+          type: array
+      required:
+        - post_view
+        - community_view
+        - moderators
+        - cross_posts
+      additionalProperties: false
+      title: GetPostResponse
+      type: object
+    PostResponse:
+      properties:
+        post_view:
+          $ref: '#/components/schemas/PostView'
+          title: PostResponse.post_view
+      required:
+        - post_view
+      additionalProperties: false
+      title: PostResponse
+      type: object
+    PostReportResponse:
+      properties:
+        post_report_view:
+          $ref: '#/components/schemas/PostReportView'
+          title: PostReportResponse.post_report_view
+      required:
+        - post_report_view
+      additionalProperties: false
+      title: PostReportResponse
+      type: object
+    # comment
+    CommentResponse:
+      properties:
+        comment_view:
+          $ref: '#/components/schemas/CommentView'
+          title: CommentResponse.comment_view
+      required:
+        - comment_view
+      additionalProperties: false
+      title: CommentResponse
+      type: object
+    GetCommentsResponse:
+      properties:
+        comments:
+          items:
+            $ref: '#/components/schemas/CommentView'
+          title: GetCommentsResponse.comments
+          type: array
+      required:
+        - comments
+      additionalProperties: false
+      title: GetCommentsResponse
+      type: object
+    CommentReportResponse:
+      properties:
+        comment_report_view:
+          $ref: '#/components/schemas/CommentReportView'
+          title: CommentReportResponse.comment_report_view
+      required:
+        - comment_report_view
+      additionalProperties: false
+      title: CommentReportResponse
+      type: object
+    # private message
+    PrivateMessagesResponse:
+      properties:
+        private_messages:
+          items:
+            $ref: '#/components/schemas/PrivateMessageView'
+          title: PrivateMessagesResponse.private_messages
+          type: array
+      required:
+        - private_messages
+      additionalProperties: false
+      title: PrivateMessagesResponse
+      type: object
+    PrivateMessageResponse:
+      properties:
+        private_message_view:
+          $ref: '#/components/schemas/PrivateMessageView'
+          title: PrivateMessageResponse.private_message_view
+      required:
+        - private_message_view
+      additionalProperties: false
+      title: PrivateMessageResponse
+      type: object
+    # user
+    GetPersonDetailsResponse:
+      properties:
+        person_view:
+          $ref: '#/components/schemas/PersonView'
+          title: GetPersonDetailsResponse.person_view
+        site:
+          $ref: '#/components/schemas/Site'
+          title: GetPersonDetailsResponse.site
+        comments:
+          items:
+            $ref: '#/components/schemas/CommentView'
+          title: GetPersonDetailsResponse.comments
+          type: array
+        posts:
+          items:
+            $ref: '#/components/schemas/PostView'
+          title: GetPersonDetailsResponse.posts
+          type: array
+        moderates:
+          items:
+            $ref: '#/components/schemas/CommunityModeratorView'
+          title: GetPersonDetailsResponse.moderates
+          type: array
+      required:
+        - person_view
+        - comments
+        - posts
+        - moderates
+      additionalProperties: false
+      title: GetPersonDetailsResponse
+      type: object
+    GetRepliesResponse:
+      properties:
+        replies:
+          items:
+            $ref: '#/components/schemas/CommentReplyView'
+          title: GetRepliesResponse.replies
+          type: array
+      required:
+        - replies
+      additionalProperties: false
+      title: GetRepliesResponse
+      type: object
+    PersonResponse:
+      properties:
+        person_view:
+          $ref: '#/components/schemas/PersonView'
+          title: PersonResponse.person_view
+      required:
+        - person_view
+      additionalProperties: false
+      title: PersonResponse
+      type: object
+    BlockPersonResponse:
+      properties:
+        person_view:
+          $ref: '#/components/schemas/PersonView'
+          title: BlockPersonResponse.person_view
+        blocked:
+          title: BlockPersonResponse.blocked
+          type: boolean
+      required:
+        - person_view
+        - blocked
+      additionalProperties: false
+      title: BlockPersonResponse
+      type: object
+    LoginResponse:
+      properties:
+        jwt:
+          title: LoginResponse.jwt
+          type: string
+      additionalProperties: false
+      title: LoginResponse
+      type: object
+    ErrorResponseLogin:
+      properties:
+        error:
+          type: string
+          example: incorrect_login
+      type: object
+    NotificationsResponse:
+      properties:
+        counts:
+          title: NotificationsResponse.counts
+          type: object
+          $ref: '#/components/schemas/NotificationsCountsView' 
+        items:
+          title: NotificationsResponse.items
+          type: array
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/NotificationsItemUserView'
+            - $ref: '#/components/schemas/NotificationsItemCommunityView'
+            - $ref: '#/components/schemas/NotificationsItemTopicView'
+            - $ref: '#/components/schemas/NotificationsItemPostView'
+            - $ref: '#/components/schemas/NotificationsItemReplyView'
+            - $ref: '#/components/schemas/NotificationsItemFeedView'
+            - $ref: '#/components/schemas/NotificationsItemPostMentionView'
+            - $ref: '#/components/schemas/NotificationsItemCommentMentionView' 
+        status:
+          title: NotificationsResponse.status
+          type: string
+          example: New
+        user:
+          title: NotificationsResponse.user
+          type: string
+          example: MyPieFedUserName
+      required:
+        - counts
+        - items
+        - status
+        - user
+      title: NotificationsResponse
+      type: object
+    NotificationsReadStatusResponse:
+      title: NotificationsReadStatusResponse
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/NotificationsItemUserView'
+        - $ref: '#/components/schemas/NotificationsItemCommunityView'
+        - $ref: '#/components/schemas/NotificationsItemTopicView'
+        - $ref: '#/components/schemas/NotificationsItemPostView'
+        - $ref: '#/components/schemas/NotificationsItemReplyView'
+        - $ref: '#/components/schemas/NotificationsItemFeedView'
+        - $ref: '#/components/schemas/NotificationsItemPostMentionView'
+        - $ref: '#/components/schemas/NotificationsItemCommentMentionView' 
+    NotificationsCountResponse:
+      title: NotificationsCountResponse
+      type: object
+      properties:
+        count:
+          title: NotificationsCountResponse.count
+          type: integer
+          example: 42
+    NotificationsMarkAllReadResponse:
+      title: NotificationsMarkAllReadResponse
+      type: object
+      properties:
+        mark_all_notifications_as_read:
+          title: NotificationsMarkAllReadResponse.mark_all_notifications_as_read
+          type: string
+          example: complete
+    
+    # upload
+    UploadResponse:
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          example: https://preferred.social/static/media/image.png
+      type: object
+    
+    # -- models --
+    Site:
+      properties:
+        actor_id:
+          title: Site.actor_id
+          type: string
+          format: url
+          example: https://piefed.social/
+        all_languages:
+          items:
+            $ref: '#/components/schemas/LanguageView'
+          title: Site.all_languages
+          type: array
+        description:
+          title: Site.description
+          type: string
+        enable_downvotes:
+          title: Site.enable_downvotes
+          type: boolean
+        icon:
+          title: Site.icon
+          type: string
+          format: url
+        name:
+          title: Site.name
+          type: string
+        registration_mode:
+          $ref: '#/components/schemas/RegistrationMode'
+          title: Site.registration_mode
+        sidebar:
+          title: Site.sidebar
+          type: string
+        user_count:
+          title: Site.user_count
+          type: integer
+      required:
+        - name
+        - actor_id
+      title: Site
+      type: object
+    Instance:
+      properties:
+        id:
+          title: Instance.id
+          type: integer
+        domain:
+          title: Instance.domain
+          type: string
+        published:
+          title: Instance.published
+          type: string
+          format: date-time
+        updated:
+          title: Instance.updated
+          type: string
+          format: date-time
+        software:
+          title: Instance.software
+          type: string
+        version:
+          title: Instance.version
+          type: string
+      required:
+        - id
+        - domain
+        - published
+      title: Instance
+      type: object
+    InstanceWithoutFederationState:
+      properties:
+        id:
+          title: InstanceWithoutFederationState.id
+          type: integer
+        domain:
+          title: InstanceWithoutFederationState.domain
+          type: string
+        published:
+          title: InstanceWithoutFederationState.published
+          type: string
+        updated:
+          title: InstanceWithoutFederationState.updated
+          type: string
+        software:
+          title: InstanceWithoutFederationState.software
+          type: string
+        version:
+          title: InstanceWithoutFederationState.version
+          type: string
+      required:
+        - id
+        - domain
+        - published
+      additionalProperties: false
+      title: InstanceWithoutFederationState
+      type: object
+    Community:
+      properties:
+        actor_id:
+          title: Community.actor_id
+          type: string
+          format: url
+        ap_domain:
+          title: Community.ap_domain
+          type: string
+        banned:
+          title: Community.banned
+          type: boolean
+        banner:
+          title: Community.banner
+          type: string
+          format: url
+        deleted:
+          title: Community.deleted
+          type: boolean
+        description:
+          title: Community.description
+          type: string
+        hidden:
+          title: Community.hidden
+          type: boolean
+        icon:
+          title: Community.icon
+          type: string
+          format: url
+        id:
+          title: Community.id
+          type: integer
+        instance_id:
+          title: Community.instance_id
+          type: integer
+        local:
+          title: Community.local
+          type: boolean
+        name:
+          title: Community.name
+          type: string
+        nsfw:
+          title: Community.nsfw
+          type: boolean
+        posting_warning:
+          title: Community.posting_warning
+          type: string
+        published:
+          title: Community.published
+          type: string
+          format: date-time
+        removed:
+          title: Community.removed
+          type: boolean
+        restricted_to_mods:
+          title: Community.restricted_to_mods
+          type: boolean
+        title:
+          title: Community.title
+          type: string
+        updated:
+          title: Community.updated
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - title
+        - removed
+        - published
+        - deleted
+        - nsfw
+        - actor_id
+        - local
+        - hidden
+        - restricted_to_mods
+        - instance_id
+      title: Community
+      type: object
+    Post:
+      properties:
+        id:
+          title: Post.id
+          type: integer
+        title:
+          title: Post.title
+          type: string
+        url:
+          title: Post.url
+          type: string
+          format: url
+        body:
+          title: Post.body
+          type: string
+        user_id:
+          title: Post.user_id
+          type: integer
+        community_id:
+          title: Post.community_id
+          type: integer
+        removed:
+          title: Post.removed
+          type: boolean
+        locked:
+          title: Post.locked
+          type: boolean
+        published:
+          title: Post.published
+          type: string
+          format: date-time
+        updated:
+          title: Post.updated
+          type: string
+          format: date-time
+        deleted:
+          title: Post.deleted
+          type: boolean
+        nsfw:
+          title: Post.nsfw
+          type: boolean
+        thumbnail_url:
+          title: Post.thumbnail_url
+          type: string
+          format: url
+        small_thumbnail_url:
+          title: Post.small_thumbnail_url
+          type: string
+          format: url
+        ap_id:
+          title: Post.ap_id
+          type: string
+          format: url
+        local:
+          title: Post.local
+          type: boolean
+        language_id:
+          title: Post.language_id
+          type: integer
+        sticky:
+          title: Post.sticky
+          type: boolean
+        alt_text:
+          title: Post.alt_text
+          type: string
+      required:
+        - id
+        - title
+        - user_id
+        - community_id
+        - removed
+        - locked
+        - published
+        - deleted
+        - nsfw
+        - ap_id
+        - local
+        - language_id
+        - sticky
+      additionalProperties: false
+      title: Post
+      type: object
+    PostReport:
+      properties:
+        id:
+          title: PostReport.id
+          type: integer
+        creator_id:
+          title: PostReport.creator_id
+          type: integer
+        post_id:
+          title: PostReport.post_id
+          type: integer
+        original_post_name:
+          title: PostReport.original_post_name
+          type: string
+        original_post_url:
+          title: PostReport.original_post_url
+          type: string
+        original_post_body:
+          title: PostReport.original_post_body
+          type: string
+        reason:
+          title: PostReport.reason
+          type: string
+        resolved:
+          title: PostReport.resolved
+          type: boolean
+        resolver_id:
+          title: PostReport.resolver_id
+          type: integer
+        published:
+          title: PostReport.published
+          type: string
+          format: date-time
+        updated:
+          title: PostReport.updated
+          type: string
+          format: date-time
+      required:
+        - id
+        - creator_id
+        - post_id
+        - original_post_name
+        - reason
+        - resolved
+        - published
+      additionalProperties: false
+      title: PostReport
+      type: object
+    Comment:
+      properties:
+        id:
+          title: Comment.id
+          type: integer
+        user_id:
+          title: Comment.user_id
+          type: integer
+        post_id:
+          title: Comment.post_id
+          type: integer
+        body:
+          title: Comment.body
+          type: string
+        removed:
+          title: Comment.removed
+          type: boolean
+        published:
+          title: Comment.published
+          type: string
+          format: date-time
+        updated:
+          title: Comment.updated
+          type: string
+          format: date-time
+        deleted:
+          title: Comment.deleted
+          type: boolean
+        ap_id:
+          title: Comment.ap_id
+          type: string
+          format: url
+        local:
+          title: Comment.local
+          type: boolean
+        path:
+          title: Comment.path
+          type: string
+        distinguished:
+          title: Comment.distinguished
+          type: boolean
+        language_id:
+          title: Comment.language_id
+          type: integer
+      required:
+        - id
+        - user_id
+        - post_id
+        - body
+        - removed
+        - published
+        - deleted
+        - ap_id
+        - local
+        - path
+        - language_id
+      additionalProperties: false
+      title: Comment
+      type: object
+    CommentReply:
+      properties:
+        id:
+          title: CommentReply.id
+          type: integer
+        recipient_id:
+          title: CommentReply.recipient_id
+          type: integer
+        comment_id:
+          title: CommentReply.comment_id
+          type: integer
+        read:
+          title: CommentReply.read
+          type: boolean
+        published:
+          title: CommentReply.published
+          type: string
+          format: date-time
+      required:
+        - id
+        - recipient_id
+        - comment_id
+        - read
+        - published
+      additionalProperties: false
+      title: CommentReply
+      type: object
+    CommentReport:
+      properties:
+        id:
+          title: CommentReport.id
+          type: integer
+        creator_id:
+          title: CommentReport.creator_id
+          type: integer
+        comment_id:
+          title: CommentReport.comment_id
+          type: integer
+        original_comment_text:
+          title: CommentReport.original_comment_text
+          type: string
+        reason:
+          title: CommentReport.reason
+          type: string
+        resolved:
+          title: CommentReport.resolved
+          type: boolean
+        resolver_id:
+          title: CommentReport.resolver_id
+          type: integer
+        published:
+          title: CommentReport.published
+          type: string
+          format: date-time
+        updated:
+          title: CommentReport.updated
+          type: string
+          format: date-time
+      required:
+        - id
+        - creator_id
+        - comment_id
+        - original_comment_text
+        - reason
+        - resolved
+        - published
+      additionalProperties: false
+      title: CommentReport
+      type: object
+    PrivateMessage:
+      properties:
+        id:
+          title: PrivateMessage.id
+          type: integer
+        creator_id:
+          title: PrivateMessage.creator_id
+          type: integer
+        recipient_id:
+          title: PrivateMessage.recipient_id
+          type: integer
+        content:
+          title: PrivateMessage.content
+          type: string
+        deleted:
+          title: PrivateMessage.deleted
+          type: boolean
+        read:
+          title: PrivateMessage.read
+          type: boolean
+        published:
+          title: PrivateMessage.published
+          type: string
+          format: date-time
+        updated:
+          title: PrivateMessage.updated
+          type: string
+          format: date-time
+        ap_id:
+          title: PrivateMessage.ap_id
+          type: string
+          format: url
+        local:
+          title: PrivateMessage.local
+          type: boolean
+      required:
+        - id
+        - creator_id
+        - recipient_id
+        - content
+        - deleted
+        - read
+        - published
+        - ap_id
+        - local
+      additionalProperties: false
+      title: PrivateMessage
+      type: object
+    Person:
+      properties:
+        actor_id:
+          title: Person.actor_id
+          type: string
+          format: url
+        avatar:
+          title: Person.avatar
+          type: string
+          format: url
+        banned:
+          title: Person.banned
+          type: boolean
+        banner:
+          title: Person.banner
+          type: string
+          format: url
+        about:
+          title: Person.about
+          type: string
+        bot:
+          title: Person.bot
+          type: boolean
+        deleted:
+          title: Person.deleted
+          type: boolean
+        flair:
+          title: Person.flair
+          type: string
+        id:
+          title: Person.id
+          type: integer 
+        instance_id:
+          title: Person.instance_id
+          type: integer
+        local:
+          title: Person.local
+          type: boolean
+        published:
+          title: Person.published
+          type: string
+          format: date-time
+        title:
+          title: Person.title
+          type: string
+        user_name:
+          title: Person.user_name
+          type: string
+      required:
+        - id
+        - user_name
+        - banned
+        - published
+        - actor_id
+        - local
+        - deleted
+        - bot
+        - instance_id
+      title: Person
+      type: object
+    LocalUser:
+      properties:
+        default_listing_type:
+          $ref: '#/components/schemas/ListingType'
+          title: LocalUser.default_listing_type
+        default_sort_type:
+          $ref: '#/components/schemas/SortType'
+          title: LocalUser.default_sort_type
+        show_bot_accounts:
+          title: LocalUser.show_bot_accounts
+          type: boolean
+        show_nsfw:
+          title: LocalUser.show_nsfw
+          type: boolean
+        show_read_posts:
+          title: LocalUser.show_read_posts
+          type: boolean
+        show_scores:
+          title: LocalUser.show_scores
+          type: boolean
+      required:
+        - show_nsfw
+        - default_sort_type
+        - default_listing_type
+        - show_scores
+        - show_bot_accounts
+        - show_read_posts
+      additionalProperties: false
+      title: LocalUser
+      type: object
+    MyUserInfo:
+      properties:
+        community_blocks:
+          items:
+            $ref: '#/components/schemas/CommunityBlockView'
+          title: MyUserInfo.community_blocks
+          type: array
+        discussion_languages:
+          items:
+            $ref: '#/components/schemas/LanguageView'
+          title: MyUserInfo.discussion_languages
+          type: array
+        follows:
+          items:
+            $ref: '#/components/schemas/CommunityFollowerView'
+          title: MyUserInfo.follows
+          type: array
+        instance_blocks:
+          items:
+            $ref: '#/components/schemas/InstanceBlockView'
+          title: MyUserInfo.instance_blocks
+          type: array
+        local_user_view:
+          $ref: '#/components/schemas/LocalUserView'
+          title: MyUserInfo.local_user_view
+        moderates:
+          items:
+            $ref: '#/components/schemas/CommunityModeratorView'
+          title: MyUserInfo.moderates
+          type: array
+        person_blocks:
+          items:
+            $ref: '#/components/schemas/PersonBlockView'
+          title: MyUserInfo.person_blocks
+          type: array
+      required:
+        - local_user_view
+        - follows
+        - moderates
+        - community_blocks
+        - instance_blocks
+        - person_blocks
+        - discussion_languages
+      title: MyUserInfo
+      type: object
+    
+    # -- views --
+    
+    FederatedInstancesView:
+      properties:
+        linked:
+          items:
+            $ref: '#/components/schemas/InstanceWithoutFederationState'
+          title: FederatedInstances.linked
+          type: array
+        allowed:
+          items:
+            $ref: '#/components/schemas/InstanceWithoutFederationState'
+          title: FederatedInstances.allowed
+          type: array
+        blocked:
+          items:
+            $ref: '#/components/schemas/InstanceWithoutFederationState'
+          title: FederatedInstances.blocked
+          type: array
+      required:
+        - linked
+        - allowed
+        - blocked
+      additionalProperties: false
+      title: FederatedInstancesView
+      type: object
+    CommunityBlockView:
+      properties:
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommunityBlockView.community
+        person:
+          $ref: '#/components/schemas/Person'
+          title: CommunityBlockView.person
+      required:
+        - community
+        - person
+      title: CommunityBlockView
+      type: object
+    CommunityFollowerView:
+      properties:
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommunityFollowerView.community
+        follower:
+          $ref: '#/components/schemas/Person'
+          title: CommunityFollowerView.follower
+      required:
+        - community
+        - follower
+      title: CommunityFollowerView
+      type: object    
+    LanguageView:
+      properties:
+        code:
+          title: Language.code
+          type: string
+          example: en
+        id:
+          title: Language.id
+          type: integer
+          example: 2
+        name:
+          title: Language.name
+          type: string
+          example: English
+      title: LanguageView
+      type: object
+    InstanceBlockView:
+      properties:
+        person:
+          $ref: '#/components/schemas/Person'
+          title: InstanceBlockView.person
+        instance:
+          $ref: '#/components/schemas/Instance'
+          title: InstanceBlockView.instance
+        site:
+          $ref: '#/components/schemas/Site'
+          title: InstanceBlockView.site
+      required:
+        - person
+        - instance
+      title: InstanceBlockView
+      type: object
+    LocalUserView:
+      properties:
+        counts:
+          $ref: '#/components/schemas/PersonAggregates'
+          title: LocalUserView.counts
+        local_user:
+          $ref: '#/components/schemas/LocalUser'
+          title: LocalUserView.local_user
+        person:
+          $ref: '#/components/schemas/Person'
+          title: LocalUserView.person
+      required:
+        - local_user
+        - person
+        - counts
+      additionalProperties: false
+      title: LocalUserView
+      type: object
+    CommunityModeratorView:
+      properties:
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommunityModeratorView.community
+        moderator:
+          $ref: '#/components/schemas/Person'
+          title: CommunityModeratorView.moderator
+      required:
+        - community
+        - moderator
+      title: CommunityModeratorView
+      type: object
+    PersonBlockView:
+      properties:
+        person:
+          $ref: '#/components/schemas/Person'
+          title: PersonBlockView.person
+        target:
+          $ref: '#/components/schemas/Person'
+          title: PersonBlockView.target
+      required:
+        - person
+        - target
+      additionalProperties: false
+      title: PersonBlockView
+      type: object
+    PersonView:
+      properties:
+        person:
+          $ref: '#/components/schemas/Person'
+          title: PersonView.person
+        counts:
+          $ref: '#/components/schemas/PersonAggregates'
+          title: PersonView.counts
+        is_admin:
+          title: PersonView.is_admin
+          type: boolean
+        activity_alert:
+          title: PersonView.activity_alert
+          type: boolean
+      required:
+        - person
+        - counts
+        - is_admin
+        - activity_alert
+      additionalProperties: false
+      title: PersonView
+      type: object
+    CommentView:
+      properties:
+        comment:
+          $ref: '#/components/schemas/Comment'
+          title: CommentView.comment
+        creator:
+          $ref: '#/components/schemas/Person'
+          title: CommentView.creator
+        post:
+          $ref: '#/components/schemas/Post'
+          title: CommentView.post
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommentView.community
+        counts:
+          $ref: '#/components/schemas/CommentAggregates'
+          title: CommentView.counts
+        creator_banned_from_community:
+          title: CommentView.creator_banned_from_community
+          type: boolean
+        banned_from_community:
+          title: CommentView.banned_from_community
+          type: boolean
+        creator_is_moderator:
+          title: CommentView.creator_is_moderator
+          type: boolean
+        creator_is_admin:
+          title: CommentView.creator_is_admin
+          type: boolean
+        subscribed:
+          $ref: '#/components/schemas/SubscribedType'
+          title: CommentView.subscribed
+        saved:
+          title: CommentView.saved
+          type: boolean
+        activity_alert:
+          title: CommentView.activity_alert
+          type: boolean
+        creator_blocked:
+          title: CommentView.creator_blocked
+          type: boolean
+        my_vote:
+          title: CommentView.my_vote
+          type: integer
+      required:
+        - comment
+        - creator
+        - post
+        - community
+        - counts
+        - creator_banned_from_community
+        - banned_from_community
+        - creator_is_moderator
+        - creator_is_admin
+        - subscribed
+        - saved
+        - activity_alert
+        - creator_blocked
+      additionalProperties: false
+      title: CommentView
+      type: object
+    PostView:
+      properties:
+        post:
+          $ref: '#/components/schemas/Post'
+          title: PostView.post
+        creator:
+          $ref: '#/components/schemas/Person'
+          title: PostView.creator
+        community:
+          $ref: '#/components/schemas/Community'
+          title: PostView.community
+        creator_banned_from_community:
+          title: PostView.creator_banned_from_community
+          type: boolean
+        banned_from_community:
+          title: PostView.banned_from_community
+          type: boolean
+        creator_is_moderator:
+          title: PostView.creator_is_moderator
+          type: boolean
+        creator_is_admin:
+          title: PostView.creator_is_admin
+          type: boolean
+        counts:
+          $ref: '#/components/schemas/PostAggregates'
+          title: PostView.counts
+        subscribed:
+          $ref: '#/components/schemas/SubscribedType'
+          title: PostView.subscribed
+        saved:
+          title: PostView.saved
+          type: boolean
+        activity_alert:
+          title: PostView.activity_alert
+          type: boolean
+        read:
+          title: PostView.read
+          type: boolean
+        hidden:
+          title: PostView.hidden
+          type: boolean
+        my_vote:
+          title: PostView.my_vote
+          type: integer
+        unread_comments:
+          title: PostView.unread_comments
+          type: integer
+      required:
+        - post
+        - creator
+        - community
+        - creator_banned_from_community
+        - banned_from_community
+        - creator_is_moderator
+        - creator_is_admin
+        - counts
+        - subscribed
+        - saved
+        - activityalert
+        - read
+        - hidden
+        - unread_comments
+      additionalProperties: false
+      title: PostView
+      type: object
+    CommunityView:
+      properties:
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommunityView.community
+        subscribed:
+          $ref: '#/components/schemas/SubscribedType'
+          title: CommunityView.subscribed
+        blocked:
+          title: CommunityView.blocked
+          type: boolean
+        counts:
+          $ref: '#/components/schemas/CommunityAggregates'
+          title: CommunityView.counts
+        activity_alert:
+          title: CommunityView.activity_alert
+          type: boolean
+      required:
+        - community
+        - subscribed
+        - blocked
+        - counts
+        - activity_alert
+      additionalProperties: false
+      title: CommunityView
+      type: object
+    PostReportView:
+      properties:
+        post_report:
+          $ref: '#/components/schemas/PostReport'
+          title: PostReportView.post_report
+        post:
+          $ref: '#/components/schemas/Post'
+          title: PostReportView.post
+        community:
+          $ref: '#/components/schemas/Community'
+          title: PostReportView.community
+        creator:
+          $ref: '#/components/schemas/Person'
+          title: PostReportView.creator
+        post_creator:
+          $ref: '#/components/schemas/Person'
+          title: PostReportView.post_creator
+        creator_banned_from_community:
+          title: PostReportView.creator_banned_from_community
+          type: boolean
+        creator_is_moderator:
+          title: PostReportView.creator_is_moderator
+          type: boolean
+        creator_is_admin:
+          title: PostReportView.creator_is_admin
+          type: boolean
+        subscribed:
+          $ref: '#/components/schemas/SubscribedType'
+          title: PostReportView.subscribed
+        saved:
+          title: PostReportView.saved
+          type: boolean
+        read:
+          title: PostReportView.read
+          type: boolean
+        hidden:
+          title: PostReportView.hidden
+          type: boolean
+        creator_blocked:
+          title: PostReportView.creator_blocked
+          type: boolean
+        my_vote:
+          title: PostReportView.my_vote
+          type: integer
+        unread_comments:
+          title: PostReportView.unread_comments
+          type: integer
+        counts:
+          $ref: '#/components/schemas/PostAggregates'
+          title: PostReportView.counts
+        resolver:
+          $ref: '#/components/schemas/Person'
+          title: PostReportView.resolver
+      required:
+        - post_report
+        - post
+        - community
+        - creator
+        - post_creator
+        - creator_banned_from_community
+        - creator_is_moderator
+        - creator_is_admin
+        - subscribed
+        - saved
+        - read
+        - hidden
+        - creator_blocked
+        - unread_comments
+        - counts
+      additionalProperties: false
+      title: PostReportView
+      type: object
+    CommentReportView:
+      properties:
+        comment_report:
+          $ref: '#/components/schemas/CommentReport'
+          title: CommentReportView.comment_report
+        comment:
+          $ref: '#/components/schemas/Comment'
+          title: CommentReportView.comment
+        post:
+          $ref: '#/components/schemas/Post'
+          title: CommentReportView.post
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommentReportView.community
+        creator:
+          $ref: '#/components/schemas/Person'
+          title: CommentReportView.creator
+        comment_creator:
+          $ref: '#/components/schemas/Person'
+          title: CommentReportView.comment_creator
+        counts:
+          $ref: '#/components/schemas/CommentAggregates'
+          title: CommentReportView.counts
+        creator_banned_from_community:
+          title: CommentReportView.creator_banned_from_community
+          type: boolean
+        creator_is_moderator:
+          title: CommentReportView.creator_is_moderator
+          type: boolean
+        creator_is_admin:
+          title: CommentReportView.creator_is_admin
+          type: boolean
+        creator_blocked:
+          title: CommentReportView.creator_blocked
+          type: boolean
+        subscribed:
+          $ref: '#/components/schemas/SubscribedType'
+          title: CommentReportView.subscribed
+        saved:
+          title: CommentReportView.saved
+          type: boolean
+        my_vote:
+          title: CommentReportView.my_vote
+          type: integer
+        resolver:
+          $ref: '#/components/schemas/Person'
+          title: CommentReportView.resolver
+      required:
+        - comment_report
+        - comment
+        - post
+        - community
+        - creator
+        - comment_creator
+        - counts
+        - creator_banned_from_community
+        - creator_is_moderator
+        - creator_is_admin
+        - creator_blocked
+        - subscribed
+        - saved
+      additionalProperties: false
+      title: CommentReportView
+      type: object
+    CommentReplyView:
+      properties:
+        comment_reply:
+          $ref: '#/components/schemas/CommentReply'
+          title: CommentReplyView.comment_reply
+        comment:
+          $ref: '#/components/schemas/Comment'
+          title: CommentReplyView.comment
+        creator:
+          $ref: '#/components/schemas/Person'
+          title: CommentReplyView.creator
+        post:
+          $ref: '#/components/schemas/Post'
+          title: CommentReplyView.post
+        community:
+          $ref: '#/components/schemas/Community'
+          title: CommentReplyView.community
+        recipient:
+          $ref: '#/components/schemas/Person'
+          title: CommentReplyView.recipient
+        counts:
+          $ref: '#/components/schemas/CommentAggregates'
+          title: CommentReplyView.counts
+        creator_banned_from_community:
+          title: CommentReplyView.creator_banned_from_community
+          type: boolean
+        creator_is_moderator:
+          title: CommentReplyView.creator_is_moderator
+          type: boolean
+        creator_is_admin:
+          title: CommentReplyView.creator_is_admin
+          type: boolean
+        subscribed:
+          $ref: '#/components/schemas/SubscribedType'
+          title: CommentReplyView.subscribed
+        saved:
+          title: CommentReplyView.saved
+          type: boolean
+        creator_blocked:
+          title: CommentReplyView.creator_blocked
+          type: boolean
+        my_vote:
+          title: CommentReplyView.my_vote
+          type: integer
+      required:
+        - comment_reply
+        - comment
+        - creator
+        - post
+        - community
+        - recipient
+        - counts
+        - creator_banned_from_community
+        - creator_is_moderator
+        - creator_is_admin
+        - subscribed
+        - saved
+        - creator_blocked
+      additionalProperties: false
+      title: CommentReplyView
+      type: object
+    CommentReplyResponse:
+      properties:
+        comment_reply_view:
+          $ref: '#/components/schemas/CommentReplyView'
+          title: CommentResponse.comment_reply_view
+      required:
+        - comment_reply_view
+      additionalProperties: false
+      title: CommentReplyResponse
+      type: object
+    PrivateMessageView:
+      properties:
+        private_message:
+          $ref: '#/components/schemas/PrivateMessage'
+          title: PrivateMessageView.private_message
+        creator:
+          $ref: '#/components/schemas/Person'
+          title: PrivateMessageView.creator
+        recipient:
+          $ref: '#/components/schemas/Person'
+          title: PrivateMessageView.recipient
+      required:
+        - private_message
+        - creator
+        - recipient
+      additionalProperties: false
+      title: PrivateMessageView
+      type: object
+    CommunityModerationBanItem:
+      title: CommunityModerationBanItem
+      type: object
+      properties:
+        reason:
+          title: CommunityModerationBanItem.reason
+          type: string
+          example: "Violation of Rule 4"
+        expiredAt:
+          title: CommunityModerationBanItem.expiredAt
+          type: string
+          example: "2042-01-01T12:00:00"
+        community: 
+          title: CommunityModerationBanItem.community
+          type: object
+          $ref: '#/components/schemas/CommunityView'
+        bannedUser:
+          title: CommunityModerationBanItem.bannedUser
+          type: object 
+          $ref: '#/components/schemas/Person'
+        bannedBy:
+          title: CommunityModerationBanItem.bannedBy
+          type: object 
+          $ref: '#/components/schemas/Person'
+        expired: 
+          title: CommunityModerationBanItem.expired
+          type: boolean
+          example: false
+    NotificationsCountsView:
+      properties:
+        new_notifications:
+          title: NotificationsCountsView.new_notifications
+          type: integer
+        read_notifications:
+          title: NotificationsCountsView.read_notifications
+          type: integer
+        total_notifications:
+          title: NotificationsCountsView.total_notifications
+          type: integer
+      required:
+        - new_notifications
+        - read_notifications
+        - all_notifications
+      title: NotificationsCountsView
+      type: object
+    NotificationsItemUserView:
+      properties:
+        notif_id:
+          title: NotificationsItemUserView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemUserView.notif_type
+          type: integer
+          example: 0
+        notif_subtype:
+          title: NotificationsItemUserView.notif_subtype
+          type: string
+          example: new_post_from_followed_user
+        author:
+          title: NotificationsItemUserView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemUserView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemUserView.post_id
+          type: integer
+          example: 1234
+        notif_body:
+          title: NotificationsItemUserView.notif_body
+          type: string
+          example: "This is the body of a post."
+      title: NotificationsItemUserView
+      type: object
+    NotificationsItemCommunityView:
+      properties:
+        notif_id:
+          title: NotificationsItemCommunityView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemCommunityView.notif_type
+          type: integer
+          example: 1
+        notif_subtype:
+          title: NotificationsItemCommunityView.notif_subtype
+          type: string
+          example: new_post_in_followed_community
+        author:
+          title: NotificationsItemCommunityView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemCommunityView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemCommunityView.post_id
+          type: integer
+          example: 1234
+        community:
+          title: NotificationsItemCommunityView.community
+          type: object
+          $ref: '#/components/schemas/CommunityView'
+        notif_body:
+          title: NotificationsItemCommunityView.notif_body
+          type: string
+          example: "This is the body of a post."
+      title: NotificationsItemCommunityView
+      type: object
+    NotificationsItemTopicView:
+      properties:
+        notif_id:
+          title: NotificationsItemTopicView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemTopicView.notif_type
+          type: integer
+          example: 2
+        notif_subtype:
+          title: NotificationsItemTopicView.notif_subtype
+          type: string
+          example: new_post_in_followed_topic
+        author:
+          title: NotificationsItemTopicView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemTopicView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemTopicView.post_id
+          type: integer
+          example: 1234
+        notif_body:
+          title: NotificationsItemTopicView.notif_body
+          type: string
+          example: "This is the body of a post."
+      title: NotificationsItemTopicView
+      type: object
+    NotificationsItemPostView:
+      properties:
+        notif_id:
+          title: NotificationsItemPostView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemPostView.notif_type
+          type: integer
+          example: 3
+        notif_subtype:
+          title: NotificationsItemPostView.notif_subtype
+          type: string
+          example: top_level_comment_on_followed_post
+        author:
+          title: NotificationsItemPostView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemPostView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemPostView.post_id
+          type: integer
+          example: 1234
+        comment:
+          title: NotificationsItemPostView.comment
+          type: object
+          $ref: '#/components/schemas/Comment'
+        comment_id:
+          title: NotificationsItemPostView.comment_id
+          type: integer
+          example: 1234          
+        notif_body:
+          title: NotificationsItemPostView.notif_body
+          type: string
+          example: "This is the body of a comment."
+      title: NotificationsItemPostView
+      type: object
+    NotificationsItemReplyView:
+      properties:
+        notif_id:
+          title: NotificationsItemReplyView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemReplyView.notif_type
+          type: integer
+          example: 4
+        notif_subtype:
+          title: NotificationsItemReplyView.notif_subtype
+          type: string
+          example: new_reply_on_followed_comment
+        author:
+          title: NotificationsItemReplyView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemReplyView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemReplyView.post_id
+          type: integer
+          example: 1234
+        comment:
+          title: NotificationsItemReplyView.comment
+          type: object
+          $ref: '#/components/schemas/Comment'
+        comment_id:
+          title: NotificationsItemReplyView.comment_id
+          type: integer
+          example: 1234          
+        notif_body:
+          title: NotificationsItemReplyView.notif_body
+          type: string
+          example: "This is the body of a comment."
+      title: NotificationsItemReplyView
+      type: object
+    NotificationsItemFeedView:
+      properties:
+        notif_id:
+          title: NotificationsItemFeedView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemFeedView.notif_type
+          type: integer
+          example: 5
+        notif_subtype:
+          title: NotificationsItemFeedView.notif_subtype
+          type: string
+          example: new_post_in_followed_feed
+        author:
+          title: NotificationsItemFeedView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemFeedView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemFeedView.post_id
+          type: integer
+          example: 1234
+        notif_body:
+          title: NotificationsItemFeedView.notif_body
+          type: string
+          example: "This is the body of a post."
+      title: NotificationsItemFeedView
+      type: object
+    NotificationsItemPostMentionView:
+      properties:
+        notif_id:
+          title: NotificationsItemPostMentionView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemPostMentionView.notif_type
+          type: integer
+          example: 6
+        notif_subtype:
+          title: NotificationsItemPostMentionView.notif_subtype
+          type: string
+          example: post_mention
+        author:
+          title: NotificationsItemPostMentionView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        post:
+          title: NotificationsItemPostMentionView.post
+          type: object
+          $ref: '#/components/schemas/PostView'
+        post_id:
+          title: NotificationsItemPostMentionView.post_id
+          type: integer
+          example: 1234
+        notif_body:
+          title: NotificationsItemPostMentionView.notif_body
+          type: string
+          example: "This is the body of a post."
+      title: NotificationsItemPostMentionView
+      type: object
+    NotificationsItemCommentMentionView:
+      properties:
+        notif_id:
+          title: NotificationsItemCommentMentionView.notif_id
+          type: integer
+          example: 1234
+        notif_type:
+          title: NotificationsItemCommentMentionView.notif_type
+          type: integer
+          example: 6
+        notif_subtype:
+          title: NotificationsItemCommentMentionView.notif_subtype
+          type: string
+          example: comment_mention
+        author:
+          title: NotificationsItemCommentMentionView.author
+          type: object
+          $ref: '#/components/schemas/Person'
+        comment:
+          title: NotificationsItemCommentMentionView.comment
+          type: object
+          $ref: '#/components/schemas/Comment'
+        comment_id:
+          title: NotificationsItemCommentMentionView.comment_id
+          type: integer
+          example: 1234    
+        notif_body:
+          title: NotificationsItemCommentMentionView.notif_body
+          type: string
+          example: "This is the body of a comment."
+      title: NotificationsItemCommentMentionView
+      type: object
+    
+    # -- enums --
+    RegistrationMode:
+      enum:
+        - Closed
+        - RequireApplication
+        - Open
+      title: RegistrationMode
+      type: string
+    SearchType:
+      enum:
+        - Communities
+        - Posts
+        - Users
+        - Url
+      title: SearchType
+      type: string
+    CommunitySortType:
+      enum:
+        - Active
+        - New
+      title: CommunitySortType
+      type: string
+    ListingType:
+      enum:
+        - All
+        - Local
+        - Subscribed
+        - Popular
+        - ModeratorView
+      title: ListingType
+      type: string
+    SortType:
+      enum:
+        - Active
+        - Hot
+        - New
+        - TopHour
+        - TopSixHour
+        - TopTwelveHour
+        - TopDay
+        - TopWeek
+        - TopMonth
+        - TopThreeMonths
+        - TopSixMonths
+        - TopNineMonths
+        - TopYear
+        - TopAll
+        - Scaled
+      title: SortType
+      type: string
+    SubscribedType:
+      enum:
+        - Subscribed
+        - NotSubscribed
+        - Pending
+      title: SubscribedType
+      type: string
+    PostFeatureType:
+      enum:
+        - Local
+        - Community
+      title: PostFeatureType
+      type: string
+    CommentSortType:
+      enum:
+        - Hot
+        - Top
+        - New
+        - Old
+      title: CommentSortType
+      type: string
+    NotificationStatusType:
+      type: string
+      enum: 
+        - All
+        - New
+        - Read
+      title: NotificationStatusType
+    # -- aggregates --
+    PersonAggregates:
+      properties:
+        comment_count:
+          title: PersonAggregates.comment_count
+          type: integer
+        person_id:
+          title: PersonAggregates.person_id
+          type: integer
+        post_count:
+          title: PersonAggregates.post_count
+          type: integer
+      required:
+        - person_id
+        - post_count
+        - comment_count
+      title: PersonAggregates
+      type: object
+    CommentAggregates:
+      properties:
+        comment_id:
+          title: CommentAggregates.comment_id
+          type: integer
+        score:
+          title: CommentAggregates.score
+          type: integer
+        upvotes:
+          title: CommentAggregates.upvotes
+          type: integer
+        downvotes:
+          title: CommentAggregates.downvotes
+          type: integer
+        published:
+          title: CommentAggregates.published
+          type: string
+          format: date-time
+        child_count:
+          title: CommentAggregates.child_count
+          type: integer
+      required:
+        - comment_id
+        - score
+        - upvotes
+        - downvotes
+        - published
+        - child_count
+      additionalProperties: false
+      title: CommentAggregates
+      type: object
+    PostAggregates:
+      properties:
+        post_id:
+          title: PostAggregates.post_id
+          type: integer
+        comments:
+          title: PostAggregates.comments
+          type: integer
+        score:
+          title: PostAggregates.score
+          type: integer
+        upvotes:
+          title: PostAggregates.upvotes
+          type: integer
+        downvotes:
+          title: PostAggregates.downvotes
+          type: integer
+        published:
+          title: PostAggregates.published
+          type: string
+          format: date-time
+        newest_comment_time:
+          title: PostAggregates.newest_comment_time
+          type: string
+      required:
+        - post_id
+        - comments
+        - score
+        - upvotes
+        - downvotes
+        - published
+        - newest_comment_time
+      additionalProperties: false
+      title: PostAggregates
+      type: object
+    CommunityAggregates:
+      properties:
+        active_6monthly:
+          title: CommunityAggregates.active_6monthly
+          type: integer
+        active_daily:
+          title: CommunityAggregates.active_daily
+          type: integer
+        active_monthly:
+          title: CommunityAggregates.active_monthly
+          type: integer
+        active_weekly:
+          title: CommunityAggregates.active_weekly
+          type: integer
+        id:
+          title: CommunityAggregates.community_id
+          type: integer
+        post_count:
+          title: CommunityAggregates.post_count
+          type: integer
+        post_reply_count:
+          title: CommunityAggregates.post_reply_count
+          type: integer
+        published:
+          title: CommunityAggregates.published
+          type: string
+          format: date-time
+        subscriptions_count:
+          title: CommunityAggregates.subscriptions_count
+          type: integer
+        total_subscriptions_count:
+          title: CommunityAggregates.total_subscriptions_count
+          type: integer
+      required:
+        - id
+        - subscriptions_count
+        - total_subscriptions_count
+        - post_count
+        - post_reply_count
+        - published
+        - active_6monthly
+        - active_daily
+        - active_monthly
+        - active_weekly
+      additionalProperties: false
+      title: CommunityAggregates
+      type: object
+    
+    

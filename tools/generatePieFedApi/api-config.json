@@ -1,0 +1,5 @@
+{
+    "packageName": "com.idunnololz.summit.api.dto.piefed",
+    "serializationLibrary": "gson",
+    "dateLibrary": "string"
+}
