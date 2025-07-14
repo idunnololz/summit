@@ -13,9 +13,9 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LocalPostView

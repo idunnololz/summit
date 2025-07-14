@@ -12,11 +12,11 @@ import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.idunnololz.summit.api.dto.Community
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.InstanceId
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.Community
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
+import com.idunnololz.summit.api.dto.lemmy.InstanceId
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.util.crashLogger.crashLogger

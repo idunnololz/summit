@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostId
 
 const val HIDDEN_POSTS_LIMIT = 1000
 

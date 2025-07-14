@@ -14,10 +14,10 @@ import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
-import com.idunnololz.summit.api.dto.Community
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.SiteView
+import com.idunnololz.summit.api.dto.lemmy.Community
+import com.idunnololz.summit.api.dto.lemmy.Person
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef

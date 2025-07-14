@@ -1,7 +1,7 @@
 package com.idunnololz.summit.account.info
 
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toCommunityRef

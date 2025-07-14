@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.SearchType
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.SearchType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel

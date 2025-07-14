@@ -14,8 +14,8 @@ import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.SaveUserSettings
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId

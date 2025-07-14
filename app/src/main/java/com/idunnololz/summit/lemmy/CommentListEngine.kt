@@ -2,8 +2,8 @@ package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import androidx.core.content.ContextCompat
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

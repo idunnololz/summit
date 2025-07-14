@@ -32,9 +32,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.databinding.ConfigureCommentBinding
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding

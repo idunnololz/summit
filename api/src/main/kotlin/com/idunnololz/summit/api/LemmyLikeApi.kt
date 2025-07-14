@@ -1,646 +1,635 @@
 package com.idunnololz.summit.api
 
-import com.idunnololz.summit.api.dto.AddModToCommunity
-import com.idunnololz.summit.api.dto.AddModToCommunityResponse
-import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
-import com.idunnololz.summit.api.dto.BanFromCommunity
-import com.idunnololz.summit.api.dto.BanFromCommunityResponse
-import com.idunnololz.summit.api.dto.BanPerson
-import com.idunnololz.summit.api.dto.BanPersonResponse
-import com.idunnololz.summit.api.dto.BlockCommunity
-import com.idunnololz.summit.api.dto.BlockCommunityResponse
-import com.idunnololz.summit.api.dto.BlockInstance
-import com.idunnololz.summit.api.dto.BlockInstanceResponse
-import com.idunnololz.summit.api.dto.BlockPerson
-import com.idunnololz.summit.api.dto.BlockPersonResponse
-import com.idunnololz.summit.api.dto.ChangePassword
-import com.idunnololz.summit.api.dto.CommentReportResponse
-import com.idunnololz.summit.api.dto.CommentResponse
-import com.idunnololz.summit.api.dto.CommunityResponse
-import com.idunnololz.summit.api.dto.CreateComment
-import com.idunnololz.summit.api.dto.CreateCommentLike
-import com.idunnololz.summit.api.dto.CreateCommentReport
-import com.idunnololz.summit.api.dto.CreateCommunity
-import com.idunnololz.summit.api.dto.CreatePost
-import com.idunnololz.summit.api.dto.CreatePostLike
-import com.idunnololz.summit.api.dto.CreatePostReport
-import com.idunnololz.summit.api.dto.CreatePrivateMessage
-import com.idunnololz.summit.api.dto.CreatePrivateMessageReport
-import com.idunnololz.summit.api.dto.DeleteComment
-import com.idunnololz.summit.api.dto.DeleteCommunity
-import com.idunnololz.summit.api.dto.DeletePost
-import com.idunnololz.summit.api.dto.DistinguishComment
-import com.idunnololz.summit.api.dto.EditComment
-import com.idunnololz.summit.api.dto.EditCommunity
-import com.idunnololz.summit.api.dto.EditPost
-import com.idunnololz.summit.api.dto.FeaturePost
-import com.idunnololz.summit.api.dto.FollowCommunity
-import com.idunnololz.summit.api.dto.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.GetComments
-import com.idunnololz.summit.api.dto.GetCommentsResponse
-import com.idunnololz.summit.api.dto.GetCommunity
-import com.idunnololz.summit.api.dto.GetCommunityResponse
-import com.idunnololz.summit.api.dto.GetModlog
-import com.idunnololz.summit.api.dto.GetModlogResponse
-import com.idunnololz.summit.api.dto.GetPersonDetails
-import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPersonMentions
-import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
-import com.idunnololz.summit.api.dto.GetPost
-import com.idunnololz.summit.api.dto.GetPostResponse
-import com.idunnololz.summit.api.dto.GetPosts
-import com.idunnololz.summit.api.dto.GetPostsResponse
-import com.idunnololz.summit.api.dto.GetPrivateMessages
-import com.idunnololz.summit.api.dto.GetReplies
-import com.idunnololz.summit.api.dto.GetRepliesResponse
-import com.idunnololz.summit.api.dto.GetReportCount
-import com.idunnololz.summit.api.dto.GetReportCountResponse
-import com.idunnololz.summit.api.dto.GetSite
-import com.idunnololz.summit.api.dto.GetSiteMetadata
-import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.GetUnreadCount
-import com.idunnololz.summit.api.dto.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
-import com.idunnololz.summit.api.dto.HideCommunity
-import com.idunnololz.summit.api.dto.ListCommentLikes
-import com.idunnololz.summit.api.dto.ListCommentLikesResponse
-import com.idunnololz.summit.api.dto.ListCommentReports
-import com.idunnololz.summit.api.dto.ListCommentReportsResponse
-import com.idunnololz.summit.api.dto.ListCommunities
-import com.idunnololz.summit.api.dto.ListCommunitiesResponse
-import com.idunnololz.summit.api.dto.ListMedia
-import com.idunnololz.summit.api.dto.ListMediaResponse
-import com.idunnololz.summit.api.dto.ListPostLikes
-import com.idunnololz.summit.api.dto.ListPostLikesResponse
-import com.idunnololz.summit.api.dto.ListPostReports
-import com.idunnololz.summit.api.dto.ListPostReportsResponse
-import com.idunnololz.summit.api.dto.ListPrivateMessageReports
-import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
-import com.idunnololz.summit.api.dto.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
-import com.idunnololz.summit.api.dto.LockPost
-import com.idunnololz.summit.api.dto.Login
-import com.idunnololz.summit.api.dto.LoginResponse
-import com.idunnololz.summit.api.dto.MarkAllAsRead
-import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
-import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
-import com.idunnololz.summit.api.dto.MarkPostAsRead
-import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
-import com.idunnololz.summit.api.dto.PersonMentionResponse
-import com.idunnololz.summit.api.dto.PictrsImages
-import com.idunnololz.summit.api.dto.PostReportResponse
-import com.idunnololz.summit.api.dto.PostResponse
-import com.idunnololz.summit.api.dto.PrivateMessageReportResponse
-import com.idunnololz.summit.api.dto.PrivateMessageResponse
-import com.idunnololz.summit.api.dto.PrivateMessagesResponse
-import com.idunnololz.summit.api.dto.PurgeComment
-import com.idunnololz.summit.api.dto.PurgeCommunity
-import com.idunnololz.summit.api.dto.PurgePerson
-import com.idunnololz.summit.api.dto.PurgePost
-import com.idunnololz.summit.api.dto.Register
-import com.idunnololz.summit.api.dto.RegistrationApplicationResponse
-import com.idunnololz.summit.api.dto.RemoveComment
-import com.idunnololz.summit.api.dto.RemoveCommunity
-import com.idunnololz.summit.api.dto.RemovePost
-import com.idunnololz.summit.api.dto.ResolveCommentReport
-import com.idunnololz.summit.api.dto.ResolveObject
-import com.idunnololz.summit.api.dto.ResolveObjectResponse
-import com.idunnololz.summit.api.dto.ResolvePostReport
-import com.idunnololz.summit.api.dto.ResolvePrivateMessageReport
-import com.idunnololz.summit.api.dto.SaveComment
-import com.idunnololz.summit.api.dto.SavePost
-import com.idunnololz.summit.api.dto.SaveUserSettings
-import com.idunnololz.summit.api.dto.Search
-import com.idunnololz.summit.api.dto.SearchResponse
-import com.idunnololz.summit.api.dto.SuccessResponse
-import okhttp3.MultipartBody
+import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
+import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
+import com.idunnololz.summit.api.dto.lemmy.BanFromCommunity
+import com.idunnololz.summit.api.dto.lemmy.BanFromCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.BanPerson
+import com.idunnololz.summit.api.dto.lemmy.BanPersonResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockCommunity
+import com.idunnololz.summit.api.dto.lemmy.BlockCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockInstance
+import com.idunnololz.summit.api.dto.lemmy.BlockInstanceResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockPerson
+import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
+import com.idunnololz.summit.api.dto.lemmy.ChangePassword
+import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
+import com.idunnololz.summit.api.dto.lemmy.CommentResponse
+import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.CreateComment
+import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
+import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
+import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
+import com.idunnololz.summit.api.dto.lemmy.CreatePost
+import com.idunnololz.summit.api.dto.lemmy.CreatePostLike
+import com.idunnololz.summit.api.dto.lemmy.CreatePostReport
+import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.DeleteComment
+import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeletePost
+import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
+import com.idunnololz.summit.api.dto.lemmy.EditComment
+import com.idunnololz.summit.api.dto.lemmy.EditCommunity
+import com.idunnololz.summit.api.dto.lemmy.EditPost
+import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
+import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
+import com.idunnololz.summit.api.dto.lemmy.GetComments
+import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetCommunity
+import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetModlog
+import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPost
+import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPosts
+import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
+import com.idunnololz.summit.api.dto.lemmy.GetReplies
+import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
+import com.idunnololz.summit.api.dto.lemmy.GetReportCount
+import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSite
+import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
+import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
+import com.idunnololz.summit.api.dto.lemmy.HideCommunity
+import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
+import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListCommentReports
+import com.idunnololz.summit.api.dto.lemmy.ListCommentReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListCommunities
+import com.idunnololz.summit.api.dto.lemmy.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListMedia
+import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPostLikes
+import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPostReports
+import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
+import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
+import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
+import com.idunnololz.summit.api.dto.lemmy.LockPost
+import com.idunnololz.summit.api.dto.lemmy.Login
+import com.idunnololz.summit.api.dto.lemmy.LoginResponse
+import com.idunnololz.summit.api.dto.lemmy.MarkAllAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
+import com.idunnololz.summit.api.dto.lemmy.PictrsImages
+import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
+import com.idunnololz.summit.api.dto.lemmy.PostResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
+import com.idunnololz.summit.api.dto.lemmy.PurgeComment
+import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
+import com.idunnololz.summit.api.dto.lemmy.PurgePerson
+import com.idunnololz.summit.api.dto.lemmy.PurgePost
+import com.idunnololz.summit.api.dto.lemmy.Register
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
+import com.idunnololz.summit.api.dto.lemmy.RemoveComment
+import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
+import com.idunnololz.summit.api.dto.lemmy.RemovePost
+import com.idunnololz.summit.api.dto.lemmy.ResolveCommentReport
+import com.idunnololz.summit.api.dto.lemmy.ResolveObject
+import com.idunnololz.summit.api.dto.lemmy.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.lemmy.ResolvePostReport
+import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.SaveComment
+import com.idunnololz.summit.api.dto.lemmy.SavePost
+import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
+import com.idunnololz.summit.api.dto.lemmy.Search
+import com.idunnololz.summit.api.dto.lemmy.SearchResponse
+import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
-import retrofit2.http.Multipart
-import retrofit2.http.POST
-import retrofit2.http.PUT
-import retrofit2.http.Part
-import retrofit2.http.QueryMap
-import retrofit2.http.Url
 import java.io.InputStream
 
 interface LemmyLikeApi {
 
   val instance: String
 
-  fun getSite(
+  suspend fun getSite(
     authorization: String?,
     args: GetSite,
     force: Boolean,
-  ): Call<GetSiteResponse>
+  ): Result<GetSiteResponse>
 
   /**
    * Get / fetch posts, with various filters.
    */
-  fun getPosts(
+  suspend fun getPosts(
     authorization: String?,
     args: GetPosts,
     force: Boolean,
-  ): Call<GetPostsResponse>
+  ): Result<GetPostsResponse>
 
   /**
    * Get / fetch a post.
    */
-  fun getPost(
+  suspend fun getPost(
     authorization: String?,
     args: GetPost,
     force: Boolean,
-  ): Call<GetPostResponse>
+  ): Result<GetPostResponse>
 
   /**
    * Log into lemmy.
    */
-  fun login(args: Login): Call<LoginResponse>
+  suspend fun login(args: Login): Result<LoginResponse>
 
   /**
    * Like / vote on a post.
    */
-  fun likePost(
+  suspend fun likePost(
     authorization: String?,
     args: CreatePostLike,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
   /**
    * Like / vote on a comment.
    */
-  fun likeComment(
+  suspend fun likeComment(
     authorization: String?,
     args: CreateCommentLike,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
-  fun listCommentVotes(
+  suspend fun listCommentVotes(
     authorization: String?,
     args: ListCommentLikes,
     force: Boolean,
-  ): Call<ListCommentLikesResponse>
+  ): Result<ListCommentLikesResponse>
 
-  fun listPostVotes(
+  suspend fun listPostVotes(
     authorization: String?,
     args: ListPostLikes,
     force: Boolean,
-  ): Call<ListPostLikesResponse>
+  ): Result<ListPostLikesResponse>
 
   /**
    * Create a comment.
    */
-  fun createComment(
+  suspend fun createComment(
     authorization: String?,
     args: CreateComment,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
   /**
    * Edit a comment.
    */
-  fun editComment(
+  suspend fun editComment(
     authorization: String?,
     args: EditComment,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
   /**
    * Delete a comment.
    */
-  fun deleteComment(
+  suspend fun deleteComment(
     authorization: String?,
     args: DeleteComment,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
   /**
    * Save a post.
    */
-  fun savePost(
+  suspend fun savePost(
     authorization: String?,
     args: SavePost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
-  fun markPostAsRead(
+  suspend fun markPostAsRead(
     authorization: String?,
     args: MarkPostAsRead,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
   /**
    * Save a comment.
    */
-  fun saveComment(
+  suspend fun saveComment(
     authorization: String?,
     args: SaveComment,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
   /**
    * Get / fetch comments.
    */
-  fun getComments(
+  suspend fun getComments(
     authorization: String?,
     args: GetComments,
     force: Boolean,
-  ): Call<GetCommentsResponse>
+  ): Result<GetCommentsResponse>
 
-  fun distinguishComment(
+  suspend fun distinguishComment(
     authorization: String?,
     args: DistinguishComment,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
-  fun removeComment(
+  suspend fun removeComment(
     authorization: String?,
     args: RemoveComment,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
   /**
    * Get / fetch a community.
    */
-  fun getCommunity(
+  suspend fun getCommunity(
     authorization: String?,
     args: GetCommunity,
     force: Boolean,
-  ): Call<GetCommunityResponse>
+  ): Result<GetCommunityResponse>
 
   /**
    * Create a community.
    */
-  fun createCommunity(
+  suspend fun createCommunity(
     authorization: String?,
     args: CreateCommunity,
-  ): Call<CommunityResponse>
+  ): Result<CommunityResponse>
 
   /**
    * Update a community.
    */
-  fun updateCommunity(
+  suspend fun updateCommunity(
     authorization: String?,
     args: EditCommunity,
-  ): Call<CommunityResponse>
+  ): Result<CommunityResponse>
 
   /**
    * Delete a community.
    */
-  fun deleteCommunity(
+  suspend fun deleteCommunity(
     authorization: String?,
     args: DeleteCommunity,
-  ): Call<CommunityResponse>
+  ): Result<CommunityResponse>
 
   /**
    * Get / fetch a community.
    */
-  fun getCommunityList(
+  suspend fun getCommunityList(
     authorization: String?,
     args: ListCommunities,
     force: Boolean,
-  ): Call<ListCommunitiesResponse>
+  ): Result<ListCommunitiesResponse>
 
   /**
    * Get the details for a person.
    */
-  fun getPersonDetails(
+  suspend fun getPersonDetails(
     authorization: String?,
     args: GetPersonDetails,
     force: Boolean,
-  ): Call<GetPersonDetailsResponse>
+  ): Result<GetPersonDetailsResponse>
 
-  fun changePassword(
+  suspend fun changePassword(
     authorization: String?,
     args: ChangePassword,
-  ): Call<LoginResponse>
+  ): Result<LoginResponse>
 
   /**
    * Get comment replies.
    */
-  fun getReplies(
+  suspend fun getReplies(
     authorization: String?,
     args: GetReplies,
     force: Boolean,
-  ): Call<GetRepliesResponse>
+  ): Result<GetRepliesResponse>
 
   /**
    * Mark a comment as read.
    */
-  fun markCommentReplyAsRead(
+  suspend fun markCommentReplyAsRead(
     authorization: String?,
     args: MarkCommentReplyAsRead,
-  ): Call<CommentResponse>
+  ): Result<CommentResponse>
 
   /**
    * Mark a person mention as read.
    */
-  fun markPersonMentionAsRead(
+  suspend fun markPersonMentionAsRead(
     authorization: String?,
     args: MarkPersonMentionAsRead,
-  ): Call<PersonMentionResponse>
+  ): Result<PersonMentionResponse>
 
   /**
    * Mark a private message as read.
    */
-  fun markPrivateMessageAsRead(
+  suspend fun markPrivateMessageAsRead(
     authorization: String?,
     args: MarkPrivateMessageAsRead,
-  ): Call<PrivateMessageResponse>
+  ): Result<PrivateMessageResponse>
 
   /**
    * Mark all replies as read.
    */
-  fun markAllAsRead(
+  suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Call<GetRepliesResponse>
+  ): Result<GetRepliesResponse>
 
   /**
    * Get mentions for your user.
    */
-  fun getPersonMentions(
+  suspend fun getPersonMentions(
     authorization: String?,
     args: GetPersonMentions,
     force: Boolean,
-  ): Call<GetPersonMentionsResponse>
+  ): Result<GetPersonMentionsResponse>
 
   /**
    * Get / fetch private messages.
    */
-  fun getPrivateMessages(
+  suspend fun getPrivateMessages(
     authorization: String?,
     args: GetPrivateMessages,
     force: Boolean,
-  ): Call<PrivateMessagesResponse>
+  ): Result<PrivateMessagesResponse>
 
   /**
    * These are instance wide reports that are only visible for instance admins.
    */
-  fun getPrivateMessageReports(
+  suspend fun getPrivateMessageReports(
     authorization: String?,
     args: ListPrivateMessageReports,
     force: Boolean,
-  ): Call<ListPrivateMessageReportsResponse>
+  ): Result<ListPrivateMessageReportsResponse>
 
-  fun createPrivateMessageReport(
+  suspend fun createPrivateMessageReport(
     authorization: String?,
     args: CreatePrivateMessageReport,
-  ): Call<PrivateMessageReportResponse>
+  ): Result<PrivateMessageReportResponse>
 
-  fun resolvePrivateMessageReport(
+  suspend fun resolvePrivateMessageReport(
     authorization: String?,
     args: ResolvePrivateMessageReport,
-  ): Call<PrivateMessageReportResponse>
+  ): Result<PrivateMessageReportResponse>
 
-  fun getPostReports(
+  suspend fun getPostReports(
     authorization: String?,
     args: ListPostReports,
     force: Boolean,
-  ): Call<ListPostReportsResponse>
+  ): Result<ListPostReportsResponse>
 
-  fun resolvePostReport(
+  suspend fun resolvePostReport(
     authorization: String?,
     args: ResolvePostReport,
-  ): Call<PostReportResponse>
+  ): Result<PostReportResponse>
 
-  fun getCommentReports(
+  suspend fun getCommentReports(
     authorization: String?,
     args: ListCommentReports,
     force: Boolean,
-  ): Call<ListCommentReportsResponse>
+  ): Result<ListCommentReportsResponse>
 
-  fun resolveCommentReport(
+  suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Call<CommentReportResponse>
+  ): Result<CommentReportResponse>
 
   /**
    * Create a private message.
    */
-  fun createPrivateMessage(
+  suspend fun createPrivateMessage(
     authorization: String?,
     args: CreatePrivateMessage,
-  ): Call<PrivateMessageResponse>
+  ): Result<PrivateMessageResponse>
 
   /**
    * Get your unread counts
    */
-  fun getUnreadCount(
+  suspend fun getUnreadCount(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Call<GetUnreadCountResponse>
+  ): Result<GetUnreadCountResponse>
 
-  fun getReportCount(
+  suspend fun getReportCount(
     authorization: String?,
     args: GetReportCount,
     force: Boolean,
-  ): Call<GetReportCountResponse>
+  ): Result<GetReportCountResponse>
 
   /**
    * Follow / subscribe to a community.
    */
-  fun followCommunity(
+  suspend fun followCommunity(
     authorization: String?,
     args: FollowCommunity,
-  ): Call<CommunityResponse>
+  ): Result<CommunityResponse>
 
-  fun banUserFromCommunity(
+  suspend fun banUserFromCommunity(
     authorization: String?,
     args: BanFromCommunity,
-  ): Call<BanFromCommunityResponse>
+  ): Result<BanFromCommunityResponse>
 
-  fun modUser(
+  suspend fun modUser(
     authorization: String?,
     args: AddModToCommunity,
-  ): Call<AddModToCommunityResponse>
+  ): Result<AddModToCommunityResponse>
 
   /**
    * Create a post.
    */
-  fun createPost(
+  suspend fun createPost(
     authorization: String?,
     args: CreatePost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
   /**
    * Edit a post.
    */
-  fun editPost(
+  suspend fun editPost(
     authorization: String?,
     args: EditPost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
   /**
    * Delete a post.
    */
-  fun deletePost(
+  suspend fun deletePost(
     authorization: String?,
     args: DeletePost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
-  fun featurePost(
+  suspend fun featurePost(
     authorization: String?,
     args: FeaturePost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
-  fun lockPost(
+  suspend fun lockPost(
     authorization: String?,
     args: LockPost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
-  fun removePost(
+  suspend fun removePost(
     authorization: String?,
     args: RemovePost,
-  ): Call<PostResponse>
+  ): Result<PostResponse>
 
   /**
    * Search lemmy.
    */
-  fun search(
+  suspend fun search(
     authorization: String?,
     args: Search,
     force: Boolean,
-  ): Call<SearchResponse>
+  ): Result<SearchResponse>
 
   /**
    * Fetch metadata for any given site.
    */
-  fun getSiteMetadata(
+  suspend fun getSiteMetadata(
     authorization: String?,
     args: GetSiteMetadata,
     force: Boolean,
-  ): Call<GetSiteMetadataResponse>
+  ): Result<GetSiteMetadataResponse>
 
   /**
    * Report a comment.
    */
-  fun createCommentReport(
+  suspend fun createCommentReport(
     authorization: String?,
     args: CreateCommentReport,
-  ): Call<CommentReportResponse>
+  ): Result<CommentReportResponse>
 
   /**
    * Report a post.
    */
-  fun createPostReport(
+  suspend fun createPostReport(
     authorization: String?,
     args: CreatePostReport,
-  ): Call<PostReportResponse>
+  ): Result<PostReportResponse>
 
   /**
    * Block a person.
    */
-  fun blockPerson(
+  suspend fun blockPerson(
     authorization: String?,
     args: BlockPerson,
-  ): Call<BlockPersonResponse>
+  ): Result<BlockPersonResponse>
 
   /**
    * Block a community.
    */
-  fun blockCommunity(
+  suspend fun blockCommunity(
     authorization: String?,
     args: BlockCommunity,
-  ): Call<BlockCommunityResponse>
+  ): Result<BlockCommunityResponse>
 
   /**
    * Block an instance.
    */
-  fun blockInstance(
+  suspend fun blockInstance(
     authorization: String?,
     args: BlockInstance,
-  ): Call<BlockInstanceResponse>
+  ): Result<BlockInstanceResponse>
 
   /**
    * Save your user settings.
    */
-  fun saveUserSettings(
+  suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Call<LoginResponse>
+  ): Result<LoginResponse>
 
   /**
    * Upload an image.
    */
-  fun uploadImage(
+  suspend fun uploadImage(
     authorization: String?,
     url: String,
     fileName: String,
     imageIs: InputStream,
-  ): Call<PictrsImages>
+  ): Result<PictrsImages>
 
-  fun resolveObject(
+  suspend fun resolveObject(
     authorization: String?,
     args: ResolveObject,
     force: Boolean,
-  ): Call<ResolveObjectResponse>
+  ): Result<ResolveObjectResponse>
 
   /**
    * Admin endpoints
    */
 
-  fun banUserFromSite(
+  suspend fun banUserFromSite(
     authorization: String?,
     args: BanPerson,
-  ): Call<BanPersonResponse>
+  ): Result<BanPersonResponse>
 
-  fun removeCommunity(
+  suspend fun removeCommunity(
     authorization: String?,
     args: RemoveCommunity,
-  ): Call<CommunityResponse>
+  ): Result<CommunityResponse>
 
-  fun hideCommunity(
+  suspend fun hideCommunity(
     authorization: String?,
     args: HideCommunity,
-  ): Call<SuccessResponse>
+  ): Result<SuccessResponse>
 
-  fun purgePerson(
+  suspend fun purgePerson(
     authorization: String?,
     args: PurgePerson,
-  ): Call<SuccessResponse>
+  ): Result<SuccessResponse>
 
-  fun purgeCommunity(
+  suspend fun purgeCommunity(
     authorization: String?,
     args: PurgeCommunity,
-  ): Call<SuccessResponse>
+  ): Result<SuccessResponse>
 
-  fun purgePost(
+  suspend fun purgePost(
     authorization: String?,
     args: PurgePost,
-  ): Call<SuccessResponse>
+  ): Result<SuccessResponse>
 
-  fun purgeComment(
+  suspend fun purgeComment(
     authorization: String?,
      args: PurgeComment,
-  ): Call<SuccessResponse>
+  ): Result<SuccessResponse>
 
-  fun getRegistrationApplicationsCount(
+  suspend fun getRegistrationApplicationsCount(
     authorization: String?,
     args: GetUnreadRegistrationApplicationCount,
     force: Boolean,
-  ): Call<GetUnreadRegistrationApplicationCountResponse>
+  ): Result<GetUnreadRegistrationApplicationCountResponse>
 
-  fun listRegistrationApplications(
+  suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Call<ListRegistrationApplicationsResponse>
+  ): Result<ListRegistrationApplicationsResponse>
 
-  fun approveRegistrationApplication(
+  suspend fun approveRegistrationApplication(
     authorization: String?,
      args: ApproveRegistrationApplication,
-  ): Call<RegistrationApplicationResponse>
+  ): Result<RegistrationApplicationResponse>
 
-  fun getModLogs(
+  suspend fun getModLogs(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Call<GetModlogResponse>
+  ): Result<GetModlogResponse>
 
-  fun register(args: Register): Call<LoginResponse>
+  suspend fun register(args: Register): Result<LoginResponse>
 
-  fun getCaptcha(): Call<GetCaptchaResponse>
+  suspend fun getCaptcha(): Result<GetCaptchaResponse>
 
-  fun listMedia(
+  suspend fun listMedia(
     authorization: String?,
     args: ListMedia,
     force: Boolean,
-  ): Call<ListMediaResponse>
+  ): Result<ListMediaResponse>
 }

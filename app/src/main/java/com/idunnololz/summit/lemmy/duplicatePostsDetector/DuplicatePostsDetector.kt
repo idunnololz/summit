@@ -2,7 +2,7 @@ package com.idunnololz.summit.lemmy.duplicatePostsDetector
 
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef

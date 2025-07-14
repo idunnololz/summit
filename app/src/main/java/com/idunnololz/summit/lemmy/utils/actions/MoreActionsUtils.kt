@@ -6,8 +6,8 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.mod.ModActionResult
 import com.idunnololz.summit.util.BaseFragment

@@ -1,7 +1,7 @@
 package com.idunnololz.summit.actions
 
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.LanguageId
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason

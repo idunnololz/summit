@@ -46,8 +46,8 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.alert.launchAlertDialog
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ActivityMainBinding
 import com.idunnololz.summit.error.ErrorDialogFragment

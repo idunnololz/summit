@@ -8,7 +8,7 @@ import com.idunnololz.summit.account.info.isAdmin
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAModOrAdmin
-import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
 import com.idunnololz.summit.lemmy.inbox.PageType

@@ -4,9 +4,9 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.LocalUserView
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.LocalUserView
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.PersonRef
 import kotlinx.parcelize.Parcelize
 

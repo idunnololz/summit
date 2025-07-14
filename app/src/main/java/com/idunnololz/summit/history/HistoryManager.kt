@@ -2,7 +2,7 @@ package com.idunnololz.summit.history
 
 import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunityViewState

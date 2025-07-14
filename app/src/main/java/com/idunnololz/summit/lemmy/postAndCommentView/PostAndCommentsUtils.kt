@@ -8,8 +8,8 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs

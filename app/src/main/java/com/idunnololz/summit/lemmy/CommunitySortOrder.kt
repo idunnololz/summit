@@ -2,7 +2,7 @@ package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

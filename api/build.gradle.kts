@@ -23,6 +23,9 @@ android {
       )
     }
   }
+  buildFeatures {
+    buildConfig = true
+  }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -33,6 +36,7 @@ android {
 }
 
 dependencies {
+  implementation(libs.core.ktx)
   implementation(libs.gson)
   implementation(libs.retrofit2.retrofit)
   implementation(libs.kotlinx.serialization.json)

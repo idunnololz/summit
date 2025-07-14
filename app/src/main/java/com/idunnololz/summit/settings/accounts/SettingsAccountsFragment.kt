@@ -11,7 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.GuestAccountManager
 import com.idunnololz.summit.accountUi.AccountAdapter
-import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.databinding.FragmentSettingsAccountsBinding
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper

@@ -2,8 +2,7 @@ package com.idunnololz.summit.lemmy.utils
 
 import android.content.Context
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.lemmy.idToSortOrder
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 

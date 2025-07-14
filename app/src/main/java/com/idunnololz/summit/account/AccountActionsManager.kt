@@ -16,15 +16,15 @@ import com.idunnololz.summit.actions.VotesManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.ApiListenerManager
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.GetCommentsResponse
-import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPostResponse
-import com.idunnololz.summit.api.dto.GetPostsResponse
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.SearchResponse
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
+import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PostRef
@@ -546,9 +546,8 @@ class AccountActionsManager @Inject constructor(
 
   fun getVote(ref: VotableRef) = votesManager.getVote(ref)
 
-  private fun handleApiResponse(response: Response<*>) {
-    if (!response.isSuccessful) return
-    if (response.raw().networkResponse == null) return
+  private fun handleApiResponse(response: Result<*>) {
+    if (!response.isSuccess) return
 
     fun updateScore(item: Any?) {
       when (item) {
@@ -575,7 +574,7 @@ class AccountActionsManager @Inject constructor(
       }
     }
 
-    when (val result = response.body()) {
+    when (val result = response.getOrNull()) {
       is List<*> -> {
         if (result.isNotEmpty()) {
           when (result.first()) {

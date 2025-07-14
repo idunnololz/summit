@@ -11,7 +11,7 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
-import com.idunnololz.summit.api.dto.CommunityView
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySelectorSearchResultCommunityItemBinding

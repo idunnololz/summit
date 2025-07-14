@@ -7,8 +7,8 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostsDataSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource

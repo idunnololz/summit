@@ -10,8 +10,8 @@ import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.Community
-import com.idunnololz.summit.api.dto.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.Community
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.util.StatefulData
 import java.io.File

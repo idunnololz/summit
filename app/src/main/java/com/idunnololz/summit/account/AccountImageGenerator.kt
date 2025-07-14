@@ -9,7 +9,7 @@ import android.graphics.Path
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import dagger.hilt.android.qualifiers.ApplicationContext

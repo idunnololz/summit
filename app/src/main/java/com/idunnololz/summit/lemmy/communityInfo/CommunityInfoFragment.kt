@@ -23,12 +23,12 @@ import coil3.load
 import coil3.request.allowHardware
 import coil3.svg.SvgDecoder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.SiteView
-import com.idunnololz.summit.api.dto.SubscribedType
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
+import com.idunnololz.summit.api.dto.lemmy.Person
+import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.SiteView
+import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -674,10 +674,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             Utils.shareLink(context, url)
           }
           R.id.block_instance -> {
-            moreActionsHelper.blockInstance(siteView.site.instance_id, true)
+            moreActionsHelper.blockInstance(requireNotNull(siteView.site.instance_id), true)
           }
           R.id.unblock_instance -> {
-            moreActionsHelper.blockInstance(siteView.site.instance_id, false)
+            moreActionsHelper.blockInstance(requireNotNull(siteView.site.instance_id), false)
           }
           R.id.view_mod_log -> {
             val directions = CommunityInfoFragmentDirections

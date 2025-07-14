@@ -11,8 +11,8 @@ import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.SocketTimeoutException
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason

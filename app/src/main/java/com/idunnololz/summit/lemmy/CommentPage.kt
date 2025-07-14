@@ -1,6 +1,6 @@
 package com.idunnololz.summit.lemmy
 
-import com.idunnololz.summit.api.dto.CommentView
+import com.idunnololz.summit.api.dto.lemmy.CommentView
 
 data class CommentPage(
   val comments: List<CommentItem>,

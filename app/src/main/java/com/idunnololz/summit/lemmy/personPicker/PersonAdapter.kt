@@ -11,8 +11,8 @@ import androidx.core.text.buildSpannedString
 import androidx.recyclerview.widget.RecyclerView
 import coil3.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.ItemPersonNoResultsBinding
 import com.idunnololz.summit.databinding.ItemPersonSelectorGroupHeaderBinding

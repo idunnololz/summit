@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.idunnololz.summit.api.dto.LanguageId
+import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.Parcelize

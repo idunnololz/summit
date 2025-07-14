@@ -4,6 +4,7 @@ import android.util.Log
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.links.SiteBackendHelper.ApiType
 import com.idunnololz.summit.util.LinkFetcher
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
@@ -30,7 +31,7 @@ class SiteBackendHelper @Inject constructor(
   enum class ApiType {
     LemmyV3,
     LemmyV4,
-    PiefedAlpha,
+    PieFedAlpha,
   }
 
   data class ApiInfo(
@@ -82,13 +83,13 @@ class SiteBackendHelper @Inject constructor(
           }
         }
 
-        if (v4Job.await().isSuccess) {
+        if (v4Job.isSiteView()) {
           return@withContext Result.success(ApiInfo(ApiType.LemmyV4))
-        } else if (v3Job.await().isSuccess) {
+        } else if (alphaJob.isSiteView()) {
+          return@withContext Result.success(ApiInfo(ApiType.PieFedAlpha))
+        } else if (v3Job.isSiteView()) {
           return@withContext Result.success(ApiInfo(ApiType.LemmyV3))
-        } else if (alphaJob.await().isSuccess) {
-          return@withContext Result.success(ApiInfo(ApiType.PiefedAlpha))
-        } else if (homePageJob.await().isSuccess) {
+        } else if (homePageJob.isSiteView()) {
           return@withContext Result.success(ApiInfo(null))
         }
 
@@ -97,6 +98,7 @@ class SiteBackendHelper @Inject constructor(
         val errors = listOfNotNull(
           v4Job.await().exceptionOrNull(),
           v3Job.await().exceptionOrNull(),
+          alphaJob.await().exceptionOrNull(),
           homePageJob.await().exceptionOrNull(),
         )
 
@@ -127,11 +129,19 @@ class SiteBackendHelper @Inject constructor(
       return result
     }
   }
+
+  private suspend fun Deferred<Result<String>>.isSiteView(): Boolean {
+    return this.await().fold(
+      { it.length > 100 && it.firstOrNull() == '{' },
+      { false }
+    )
+  }
+
 }
 
 val ApiType.isLemmy
   get() = when (this) {
     ApiType.LemmyV3 -> true
     ApiType.LemmyV4 -> true
-    ApiType.PiefedAlpha -> false
+    ApiType.PieFedAlpha -> false
   }

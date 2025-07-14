@@ -1,7 +1,7 @@
 package com.idunnololz.summit.actions
 
 import android.util.Log
-import com.idunnololz.summit.api.dto.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo

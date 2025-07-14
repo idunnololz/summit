@@ -1,15 +1,15 @@
 package com.idunnololz.summit.lemmy.inbox
 
 import android.os.Parcelable
-import com.idunnololz.summit.api.dto.CommentReplyView
-import com.idunnololz.summit.api.dto.CommentReportView
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PersonMentionView
-import com.idunnololz.summit.api.dto.PostReportView
-import com.idunnololz.summit.api.dto.PrivateMessageReportView
-import com.idunnololz.summit.api.dto.PrivateMessageView
-import com.idunnololz.summit.api.dto.RegistrationApplicationView
+import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
+import com.idunnololz.summit.api.dto.lemmy.CommentReportView
+import com.idunnololz.summit.api.dto.lemmy.Person
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
+import com.idunnololz.summit.api.dto.lemmy.PostReportView
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportView
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.parcelize.IgnoredOnParcel

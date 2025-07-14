@@ -4,7 +4,7 @@ import android.util.Log
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.db.PostReadDao
 import com.idunnololz.summit.actions.db.ReadPostEntry
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import javax.inject.Inject

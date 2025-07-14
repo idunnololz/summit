@@ -1,7 +1,7 @@
 package com.idunnololz.summit.lemmy.modlogs
 
 import android.os.Parcelable
-import com.idunnololz.summit.api.dto.ModlogActionType
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.lemmy.PersonRef
 import kotlinx.parcelize.Parcelize
 

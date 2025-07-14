@@ -2,12 +2,11 @@ package com.idunnololz.summit.lemmy
 
 import android.content.Context
 import android.util.Log
-import androidx.core.content.ContextCompat
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
-import com.idunnololz.summit.api.dto.Comment
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.Comment
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostViewModel

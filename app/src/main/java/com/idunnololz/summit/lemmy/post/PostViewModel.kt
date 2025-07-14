@@ -22,11 +22,11 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.GetPostResponse
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.CommentNavControlsState

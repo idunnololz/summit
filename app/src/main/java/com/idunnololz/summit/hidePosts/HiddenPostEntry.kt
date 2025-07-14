@@ -2,7 +2,7 @@ package com.idunnololz.summit.hidePosts
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostId
 
 @Entity(tableName = "hidden_posts")
 data class HiddenPostEntry(

@@ -1,6 +1,5 @@
 package com.idunnololz.summit.lemmy.createOrEditPost
 
-import android.webkit.URLUtil
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -11,14 +10,14 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.Language
-import com.idunnololz.summit.api.dto.LanguageId
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.SearchType
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
+import com.idunnololz.summit.api.dto.lemmy.Language
+import com.idunnololz.summit.api.dto.lemmy.LanguageId
+import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.SearchType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.RecentCommunityManager

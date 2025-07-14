@@ -13,8 +13,8 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import androidx.slidingpanelayout.widget.SlidingPaneLayout.PanelSlideListener
 import arrow.core.Either
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.emptyScreen.EmptyScreenFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef

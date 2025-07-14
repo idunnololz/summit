@@ -1,8 +1,7 @@
 package com.idunnololz.summit.lemmy.utils
 
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.util.dateStringToTs
-import java.lang.Math.pow
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min

@@ -1,6 +1,6 @@
 package com.idunnololz.summit.lemmy.utils
 
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 
 val PostView.upvotePercentage: Float
   get() {

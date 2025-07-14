@@ -1,14 +1,14 @@
 package com.idunnololz.summit.settings
 
-import com.idunnololz.summit.api.dto.Comment
-import com.idunnololz.summit.api.dto.CommentAggregates
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.Community
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.Post
-import com.idunnololz.summit.api.dto.PostAggregates
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.SubscribedType
+import com.idunnololz.summit.api.dto.lemmy.Comment
+import com.idunnololz.summit.api.dto.lemmy.CommentAggregates
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.Community
+import com.idunnololz.summit.api.dto.lemmy.Person
+import com.idunnololz.summit.api.dto.lemmy.Post
+import com.idunnololz.summit.api.dto.lemmy.PostAggregates
+import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 

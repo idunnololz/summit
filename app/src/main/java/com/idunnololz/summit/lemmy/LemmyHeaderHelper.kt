@@ -14,8 +14,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
@@ -36,7 +36,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.spToPx
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

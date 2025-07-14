@@ -3,7 +3,6 @@ package com.idunnololz.summit.lemmy.community
 import android.app.Application
 import android.os.Parcelable
 import android.util.Log
-import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
@@ -25,8 +24,8 @@ import com.idunnololz.summit.account.key
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
@@ -451,10 +450,14 @@ class CommunityViewModel @Inject constructor(
   ) {
     if (pageToFetch < postListEngine.pages.size) {
       if (!force) {
-        // DO NOT re-fetch a page we already have. postsRepository uses a list of seen posts to remove
-        // duplicates. If we re-fetch a page wew already have then all posts in that page will be
-        // filtered by the seen posts filter.
-        return
+        if (postListEngine.infinity) {
+          // DO NOT re-fetch a page we already have. postsRepository uses a list of seen posts to remove
+          // duplicates. If we re-fetch a page wew already have then all posts in that page will be
+          // filtered by the seen posts filter.
+          return
+        }
+
+        // If we are not using infinity, do nothing...
       } else {
         postsRepository.removeSeenPosts(
           postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView },

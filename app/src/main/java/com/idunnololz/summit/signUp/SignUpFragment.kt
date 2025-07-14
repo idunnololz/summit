@@ -404,7 +404,7 @@ class SignUpFragment :
         }
 
         val questionnaire = lemmyTextHelper
-          .getSpannable(context, localSite.application_question ?: "")
+          .getSpannable(context, localSite?.application_question ?: "")
 
         if (isInitialRender) {
           answerEditText.setText(signUpFormData.questionnaireAnswer)

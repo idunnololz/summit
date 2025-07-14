@@ -3,8 +3,8 @@ package com.idunnololz.summit.lemmy.modlogs
 import android.content.Context
 import android.util.Log
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.ModlogActionType
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

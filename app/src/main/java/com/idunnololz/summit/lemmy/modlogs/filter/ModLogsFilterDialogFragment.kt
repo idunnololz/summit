@@ -12,12 +12,11 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.ModlogActionType
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.databinding.DialogFragmentModLogsFilterBinding
 import com.idunnololz.summit.lemmy.getName
 import com.idunnololz.summit.lemmy.modlogs.ModLogsFilterConfig
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
-import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment.Result
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.getParcelableCompat

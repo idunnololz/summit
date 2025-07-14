@@ -3,7 +3,7 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.os.Parcelable
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

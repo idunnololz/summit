@@ -5,7 +5,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.toInboxItem

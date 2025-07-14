@@ -26,7 +26,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.api.dto.SearchType
+import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.community.SlidingPaneController

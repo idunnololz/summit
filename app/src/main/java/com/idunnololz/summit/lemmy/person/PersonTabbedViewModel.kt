@@ -13,11 +13,11 @@ import com.idunnololz.summit.account.key
 import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.CommunityModeratorView
-import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
+import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentListEngine
 import com.idunnololz.summit.lemmy.CommentRef

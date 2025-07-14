@@ -2,10 +2,10 @@ package com.idunnololz.summit.api
 
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PostId
 
 class CommentsFetcher(
   private val apiClient: AccountAwareLemmyClient,

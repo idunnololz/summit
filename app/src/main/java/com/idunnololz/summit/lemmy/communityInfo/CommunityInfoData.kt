@@ -1,13 +1,13 @@
 package com.idunnololz.summit.lemmy.communityInfo
 
 import arrow.core.Either
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.GetCommunityResponse
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.SiteView
-import com.idunnololz.summit.api.dto.SubscribedType
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
+import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.Person
+import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.SiteView
+import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
 
@@ -18,7 +18,6 @@ data class CommunityInfoData(
   val iconUrl: String?,
   val bannerUrl: String?,
   val instance: String,
-  val publishTs: Int,
   val subscribedStatus: SubscribedType,
   val canSubscribe: Boolean,
   val content: String?,
@@ -52,7 +51,6 @@ fun GetCommunityResponse.toPageData(): CommunityInfoData {
     iconUrl = communityView.community.icon,
     bannerUrl = communityView.community.banner,
     instance = communityView.community.instance,
-    publishTs = dateStringToTs(communityView.community.published).toInt(),
     subscribedStatus = communityView.subscribed,
     canSubscribe = true,
     content = communityView.community.description,
@@ -82,7 +80,6 @@ fun GetSiteResponse.toPageData(): CommunityInfoData {
     iconUrl = siteView.site.icon,
     bannerUrl = siteView.site.banner,
     instance = siteView.site.instance,
-    publishTs = dateStringToTs(siteView.site.published).toInt(),
     subscribedStatus = SubscribedType.NotSubscribed,
     canSubscribe = false,
     content = siteView.site.sidebar,

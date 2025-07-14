@@ -1,7 +1,7 @@
 package com.idunnololz.summit.lemmy
 
 import android.os.Parcelable
-import com.idunnololz.summit.api.dto.Person
+import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.utils.instance
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName

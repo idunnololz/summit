@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.Language
-import com.idunnololz.summit.api.dto.LanguageId
+import com.idunnololz.summit.api.dto.lemmy.Language
+import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.databinding.DialogFragmentLanguageSelectBinding
 import com.idunnololz.summit.databinding.LanguageItemBinding
 import com.idunnololz.summit.util.AnimationsHelper

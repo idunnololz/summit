@@ -18,7 +18,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.SummitServerClient
-import com.idunnololz.summit.api.dto.SortType
+import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.PersonFilter
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -29,7 +29,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.random.Random
-import kotlin.random.nextLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

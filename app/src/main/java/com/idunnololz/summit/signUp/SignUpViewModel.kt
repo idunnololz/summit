@@ -13,10 +13,10 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.CaptchaResponse
-import com.idunnololz.summit.api.dto.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.RegistrationMode
+import com.idunnololz.summit.api.dto.lemmy.CaptchaResponse
+import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.RegistrationMode
 import com.idunnololz.summit.login.LoginHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils

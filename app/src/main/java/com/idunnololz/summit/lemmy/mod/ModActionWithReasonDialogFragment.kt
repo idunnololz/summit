@@ -9,10 +9,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PostId
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.databinding.DialogFragmentRemoveCommentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.AdminOrModActionsViewModel

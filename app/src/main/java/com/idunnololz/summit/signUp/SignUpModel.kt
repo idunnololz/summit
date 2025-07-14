@@ -3,8 +3,8 @@ package com.idunnololz.summit.signUp
 import android.graphics.Bitmap
 import android.os.Parcelable
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.api.dto.LocalSite
-import com.idunnololz.summit.api.dto.LoginResponse
+import com.idunnololz.summit.api.dto.lemmy.LocalSite
+import com.idunnololz.summit.api.dto.lemmy.LoginResponse
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

@@ -5,7 +5,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
-import com.idunnololz.summit.api.dto.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef

@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
@@ -211,7 +211,7 @@ class PostAdapter(
     ),
       ScreenshotOptions
 
-    class ProgressOrErrorItem(
+    data class ProgressOrErrorItem(
       val error: Throwable? = null,
     ) : Item("wew_pls_no_progress")
 

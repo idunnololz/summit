@@ -4,9 +4,9 @@ import android.content.Context
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.VoteView
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.api.dto.lemmy.VoteView
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
 import com.idunnololz.summit.lemmy.inbox.repository.MultiLemmyListSource

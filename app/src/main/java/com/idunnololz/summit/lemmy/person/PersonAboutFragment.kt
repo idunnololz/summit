@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunityModeratorView
-import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
+import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentPersonAboutBinding

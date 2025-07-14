@@ -21,7 +21,7 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfo
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
-import com.idunnololz.summit.api.dto.PersonView
+import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentYouBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding

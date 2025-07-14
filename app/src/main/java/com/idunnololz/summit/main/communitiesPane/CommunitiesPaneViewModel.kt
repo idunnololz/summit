@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
-import com.idunnololz.summit.api.dto.Community
+import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.databinding.CommunitiesPaneBinding
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.tabs.TabsManager

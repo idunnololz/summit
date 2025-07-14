@@ -1,8 +1,8 @@
 package com.idunnololz.summit.lemmy.inbox.conversation
 
 import android.os.Parcelable
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PrivateMessageView
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
 import com.idunnololz.summit.util.dateStringToTs

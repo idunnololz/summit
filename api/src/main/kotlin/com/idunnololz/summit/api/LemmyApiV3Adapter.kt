@@ -3,121 +3,121 @@ package com.idunnololz.summit.api
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.idunnololz.summit.api.dto.AddModToCommunity
-import com.idunnololz.summit.api.dto.AddModToCommunityResponse
-import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
-import com.idunnololz.summit.api.dto.BanFromCommunity
-import com.idunnololz.summit.api.dto.BanFromCommunityResponse
-import com.idunnololz.summit.api.dto.BanPerson
-import com.idunnololz.summit.api.dto.BanPersonResponse
-import com.idunnololz.summit.api.dto.BlockCommunity
-import com.idunnololz.summit.api.dto.BlockCommunityResponse
-import com.idunnololz.summit.api.dto.BlockInstance
-import com.idunnololz.summit.api.dto.BlockInstanceResponse
-import com.idunnololz.summit.api.dto.BlockPerson
-import com.idunnololz.summit.api.dto.BlockPersonResponse
-import com.idunnololz.summit.api.dto.ChangePassword
-import com.idunnololz.summit.api.dto.CommentReportResponse
-import com.idunnololz.summit.api.dto.CommentResponse
-import com.idunnololz.summit.api.dto.CommunityResponse
-import com.idunnololz.summit.api.dto.CreateComment
-import com.idunnololz.summit.api.dto.CreateCommentLike
-import com.idunnololz.summit.api.dto.CreateCommentReport
-import com.idunnololz.summit.api.dto.CreateCommunity
-import com.idunnololz.summit.api.dto.CreatePost
-import com.idunnololz.summit.api.dto.CreatePostLike
-import com.idunnololz.summit.api.dto.CreatePostReport
-import com.idunnololz.summit.api.dto.CreatePrivateMessage
-import com.idunnololz.summit.api.dto.CreatePrivateMessageReport
-import com.idunnololz.summit.api.dto.DeleteComment
-import com.idunnololz.summit.api.dto.DeleteCommunity
-import com.idunnololz.summit.api.dto.DeletePost
-import com.idunnololz.summit.api.dto.DistinguishComment
-import com.idunnololz.summit.api.dto.EditComment
-import com.idunnololz.summit.api.dto.EditCommunity
-import com.idunnololz.summit.api.dto.EditPost
-import com.idunnololz.summit.api.dto.FeaturePost
-import com.idunnololz.summit.api.dto.FollowCommunity
-import com.idunnololz.summit.api.dto.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.GetComments
-import com.idunnololz.summit.api.dto.GetCommentsResponse
-import com.idunnololz.summit.api.dto.GetCommunity
-import com.idunnololz.summit.api.dto.GetCommunityResponse
-import com.idunnololz.summit.api.dto.GetModlog
-import com.idunnololz.summit.api.dto.GetModlogResponse
-import com.idunnololz.summit.api.dto.GetPersonDetails
-import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPersonMentions
-import com.idunnololz.summit.api.dto.GetPersonMentionsResponse
-import com.idunnololz.summit.api.dto.GetPost
-import com.idunnololz.summit.api.dto.GetPostResponse
-import com.idunnololz.summit.api.dto.GetPosts
-import com.idunnololz.summit.api.dto.GetPostsResponse
-import com.idunnololz.summit.api.dto.GetPrivateMessages
-import com.idunnololz.summit.api.dto.GetReplies
-import com.idunnololz.summit.api.dto.GetRepliesResponse
-import com.idunnololz.summit.api.dto.GetReportCount
-import com.idunnololz.summit.api.dto.GetReportCountResponse
-import com.idunnololz.summit.api.dto.GetSite
-import com.idunnololz.summit.api.dto.GetSiteMetadata
-import com.idunnololz.summit.api.dto.GetSiteMetadataResponse
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.GetUnreadCount
-import com.idunnololz.summit.api.dto.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
-import com.idunnololz.summit.api.dto.HideCommunity
-import com.idunnololz.summit.api.dto.ListCommentLikes
-import com.idunnololz.summit.api.dto.ListCommentLikesResponse
-import com.idunnololz.summit.api.dto.ListCommentReports
-import com.idunnololz.summit.api.dto.ListCommentReportsResponse
-import com.idunnololz.summit.api.dto.ListCommunities
-import com.idunnololz.summit.api.dto.ListCommunitiesResponse
-import com.idunnololz.summit.api.dto.ListMedia
-import com.idunnololz.summit.api.dto.ListMediaResponse
-import com.idunnololz.summit.api.dto.ListPostLikes
-import com.idunnololz.summit.api.dto.ListPostLikesResponse
-import com.idunnololz.summit.api.dto.ListPostReports
-import com.idunnololz.summit.api.dto.ListPostReportsResponse
-import com.idunnololz.summit.api.dto.ListPrivateMessageReports
-import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
-import com.idunnololz.summit.api.dto.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
-import com.idunnololz.summit.api.dto.LockPost
-import com.idunnololz.summit.api.dto.Login
-import com.idunnololz.summit.api.dto.LoginResponse
-import com.idunnololz.summit.api.dto.MarkAllAsRead
-import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
-import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
-import com.idunnololz.summit.api.dto.MarkPostAsRead
-import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
-import com.idunnololz.summit.api.dto.PersonMentionResponse
-import com.idunnololz.summit.api.dto.PictrsImages
-import com.idunnololz.summit.api.dto.PostReportResponse
-import com.idunnololz.summit.api.dto.PostResponse
-import com.idunnololz.summit.api.dto.PrivateMessageReportResponse
-import com.idunnololz.summit.api.dto.PrivateMessageResponse
-import com.idunnololz.summit.api.dto.PrivateMessagesResponse
-import com.idunnololz.summit.api.dto.PurgeComment
-import com.idunnololz.summit.api.dto.PurgeCommunity
-import com.idunnololz.summit.api.dto.PurgePerson
-import com.idunnololz.summit.api.dto.PurgePost
-import com.idunnololz.summit.api.dto.Register
-import com.idunnololz.summit.api.dto.RegistrationApplicationResponse
-import com.idunnololz.summit.api.dto.RemoveComment
-import com.idunnololz.summit.api.dto.RemoveCommunity
-import com.idunnololz.summit.api.dto.RemovePost
-import com.idunnololz.summit.api.dto.ResolveCommentReport
-import com.idunnololz.summit.api.dto.ResolveObject
-import com.idunnololz.summit.api.dto.ResolveObjectResponse
-import com.idunnololz.summit.api.dto.ResolvePostReport
-import com.idunnololz.summit.api.dto.ResolvePrivateMessageReport
-import com.idunnololz.summit.api.dto.SaveComment
-import com.idunnololz.summit.api.dto.SavePost
-import com.idunnololz.summit.api.dto.SaveUserSettings
-import com.idunnololz.summit.api.dto.Search
-import com.idunnololz.summit.api.dto.SearchResponse
-import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
+import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
+import com.idunnololz.summit.api.dto.lemmy.BanFromCommunity
+import com.idunnololz.summit.api.dto.lemmy.BanFromCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.BanPerson
+import com.idunnololz.summit.api.dto.lemmy.BanPersonResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockCommunity
+import com.idunnololz.summit.api.dto.lemmy.BlockCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockInstance
+import com.idunnololz.summit.api.dto.lemmy.BlockInstanceResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockPerson
+import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
+import com.idunnololz.summit.api.dto.lemmy.ChangePassword
+import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
+import com.idunnololz.summit.api.dto.lemmy.CommentResponse
+import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.CreateComment
+import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
+import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
+import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
+import com.idunnololz.summit.api.dto.lemmy.CreatePost
+import com.idunnololz.summit.api.dto.lemmy.CreatePostLike
+import com.idunnololz.summit.api.dto.lemmy.CreatePostReport
+import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.DeleteComment
+import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeletePost
+import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
+import com.idunnololz.summit.api.dto.lemmy.EditComment
+import com.idunnololz.summit.api.dto.lemmy.EditCommunity
+import com.idunnololz.summit.api.dto.lemmy.EditPost
+import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
+import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
+import com.idunnololz.summit.api.dto.lemmy.GetComments
+import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetCommunity
+import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetModlog
+import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPost
+import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPosts
+import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
+import com.idunnololz.summit.api.dto.lemmy.GetReplies
+import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
+import com.idunnololz.summit.api.dto.lemmy.GetReportCount
+import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSite
+import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadata
+import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
+import com.idunnololz.summit.api.dto.lemmy.HideCommunity
+import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
+import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListCommentReports
+import com.idunnololz.summit.api.dto.lemmy.ListCommentReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListCommunities
+import com.idunnololz.summit.api.dto.lemmy.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListMedia
+import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPostLikes
+import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPostReports
+import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
+import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
+import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
+import com.idunnololz.summit.api.dto.lemmy.LockPost
+import com.idunnololz.summit.api.dto.lemmy.Login
+import com.idunnololz.summit.api.dto.lemmy.LoginResponse
+import com.idunnololz.summit.api.dto.lemmy.MarkAllAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
+import com.idunnololz.summit.api.dto.lemmy.PictrsImages
+import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
+import com.idunnololz.summit.api.dto.lemmy.PostResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
+import com.idunnololz.summit.api.dto.lemmy.PurgeComment
+import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
+import com.idunnololz.summit.api.dto.lemmy.PurgePerson
+import com.idunnololz.summit.api.dto.lemmy.PurgePost
+import com.idunnololz.summit.api.dto.lemmy.Register
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
+import com.idunnololz.summit.api.dto.lemmy.RemoveComment
+import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
+import com.idunnololz.summit.api.dto.lemmy.RemovePost
+import com.idunnololz.summit.api.dto.lemmy.ResolveCommentReport
+import com.idunnololz.summit.api.dto.lemmy.ResolveObject
+import com.idunnololz.summit.api.dto.lemmy.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.lemmy.ResolvePostReport
+import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.SaveComment
+import com.idunnololz.summit.api.dto.lemmy.SavePost
+import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
+import com.idunnololz.summit.api.dto.lemmy.Search
+import com.idunnololz.summit.api.dto.lemmy.SearchResponse
+import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
@@ -158,471 +158,477 @@ class LemmyApiV3Adapter(
     )
   }
 
-  override fun getSite(
+  override suspend fun getSite(
     authorization: String?,
     args: GetSite,
     force: Boolean,
-  ): Call<GetSiteResponse> {
-    return api.getSite(generateHeaders(authorization, force), args.serializeToMap())
-  }
+  ): Result<GetSiteResponse> =
+    retrofitErrorHandler { api.getSite(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getPosts(
+  override suspend fun getPosts(
     authorization: String?,
     args: GetPosts,
     force: Boolean,
-  ): Call<GetPostsResponse> =
-    api.getPosts(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetPostsResponse> =
+    retrofitErrorHandler { api.getPosts(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getPost(
+  override suspend fun getPost(
     authorization: String?,
     args: GetPost,
     force: Boolean,
-  ): Call<GetPostResponse> =
-    api.getPost(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetPostResponse> =
+    retrofitErrorHandler { api.getPost(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun login(args: Login): Call<LoginResponse> =
-    api.login(generateHeaders(null, false), args)
+  override suspend fun login(args: Login): Result<LoginResponse> =
+    retrofitErrorHandler { api.login(generateHeaders(null, false), args) }
 
-  override fun likePost(
+  override suspend fun likePost(
     authorization: String?,
     args: CreatePostLike,
-  ): Call<PostResponse> =
-    api.likePost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.likePost(generateHeaders(authorization, false), args) }
 
-  override fun likeComment(
+  override suspend fun likeComment(
     authorization: String?,
     args: CreateCommentLike,
-  ): Call<CommentResponse> =
-    api.likeComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.likeComment(generateHeaders(authorization, false), args) }
 
-  override fun listCommentVotes(
+  override suspend fun listCommentVotes(
     authorization: String?,
     args: ListCommentLikes,
     force: Boolean,
-  ): Call<ListCommentLikesResponse> =
-    api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListCommentLikesResponse> =
+    retrofitErrorHandler { api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun listPostVotes(
+  override suspend fun listPostVotes(
     authorization: String?,
     args: ListPostLikes,
     force: Boolean,
-  ): Call<ListPostLikesResponse> =
-    api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListPostLikesResponse> =
+    retrofitErrorHandler { api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun createComment(
+  override suspend fun createComment(
     authorization: String?,
     args: CreateComment,
-  ): Call<CommentResponse> =
-    api.createComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.createComment(generateHeaders(authorization, false), args) }
 
-  override fun editComment(
+  override suspend fun editComment(
     authorization: String?,
     args: EditComment,
-  ): Call<CommentResponse> =
-    api.editComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.editComment(generateHeaders(authorization, false), args) }
 
-  override fun deleteComment(
+  override suspend fun deleteComment(
     authorization: String?,
     args: DeleteComment
-  ): Call<CommentResponse> =
-    api.deleteComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.deleteComment(generateHeaders(authorization, false), args) }
 
-  override fun savePost(
+  override suspend fun savePost(
     authorization: String?,
     args: SavePost,
-  ): Call<PostResponse> =
-    api.savePost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.savePost(generateHeaders(authorization, false), args) }
 
-  override fun markPostAsRead(
+  override suspend fun markPostAsRead(
     authorization: String?,
     args: MarkPostAsRead,
-  ): Call<PostResponse> =
-    api.markPostAsRead(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.markPostAsRead(generateHeaders(authorization, false), args) }
 
-  override fun saveComment(
+  override suspend fun saveComment(
     authorization: String?,
     args: SaveComment,
-  ): Call<CommentResponse> =
-    api.saveComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.saveComment(generateHeaders(authorization, false), args) }
 
-  override fun getComments(
+  override suspend fun getComments(
     authorization: String?,
     args: GetComments,
     force: Boolean,
-  ): Call<GetCommentsResponse> =
-    api.getComments(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetCommentsResponse> =
+    retrofitErrorHandler { api.getComments(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun distinguishComment(
+  override suspend fun distinguishComment(
     authorization: String?,
     args: DistinguishComment,
-  ): Call<CommentResponse> =
-    api.distinguishComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.distinguishComment(generateHeaders(authorization, false), args) }
 
-  override fun removeComment(
+  override suspend fun removeComment(
     authorization: String?,
     args: RemoveComment,
-  ): Call<CommentResponse> =
-    api.removeComment(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.removeComment(generateHeaders(authorization, false), args) }
 
-  override fun getCommunity(
+  override suspend fun getCommunity(
     authorization: String?,
     args: GetCommunity,
     force: Boolean,
-  ): Call<GetCommunityResponse> =
-    api.getCommunity(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetCommunityResponse> =
+    retrofitErrorHandler { api.getCommunity(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun createCommunity(
+  override suspend fun createCommunity(
     authorization: String?,
     args: CreateCommunity,
-  ): Call<CommunityResponse> =
-    api.createCommunity(generateHeaders(authorization, false), args)
+  ): Result<CommunityResponse> =
+    retrofitErrorHandler { api.createCommunity(generateHeaders(authorization, false), args) }
 
-  override fun updateCommunity(
+  override suspend fun updateCommunity(
     authorization: String?,
     args: EditCommunity,
-  ): Call<CommunityResponse> =
-    api.updateCommunity(generateHeaders(authorization, false), args)
+  ): Result<CommunityResponse> =
+    retrofitErrorHandler { api.updateCommunity(generateHeaders(authorization, false), args) }
 
-  override fun deleteCommunity(
+  override suspend fun deleteCommunity(
     authorization: String?,
     args: DeleteCommunity,
-  ): Call<CommunityResponse> =
-    api.deleteCommunity(generateHeaders(authorization, false), args)
+  ): Result<CommunityResponse> =
+    retrofitErrorHandler { api.deleteCommunity(generateHeaders(authorization, false), args) }
 
-  override fun getCommunityList(
+  override suspend fun getCommunityList(
     authorization: String?,
     args: ListCommunities,
     force: Boolean,
-  ): Call<ListCommunitiesResponse> =
-    api.getCommunityList(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListCommunitiesResponse> =
+    retrofitErrorHandler { api.getCommunityList(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getPersonDetails(
+  override suspend fun getPersonDetails(
     authorization: String?,
     args: GetPersonDetails,
     force: Boolean,
-  ): Call<GetPersonDetailsResponse> =
-    api.getPersonDetails(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetPersonDetailsResponse> =
+    retrofitErrorHandler { api.getPersonDetails(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun changePassword(
+  override suspend fun changePassword(
     authorization: String?,
     args: ChangePassword,
-  ): Call<LoginResponse> =
-    api.changePassword(generateHeaders(authorization, false), args)
+  ): Result<LoginResponse> =
+    retrofitErrorHandler { api.changePassword(generateHeaders(authorization, false), args) }
 
-  override fun getReplies(
+  override suspend fun getReplies(
     authorization: String?,
     args: GetReplies,
     force: Boolean,
-  ): Call<GetRepliesResponse> =
-    api.getReplies(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetRepliesResponse> =
+    retrofitErrorHandler { api.getReplies(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun markCommentReplyAsRead(
+  override suspend fun markCommentReplyAsRead(
     authorization: String?,
     args: MarkCommentReplyAsRead,
-  ): Call<CommentResponse> =
-    api.markCommentReplyAsRead(generateHeaders(authorization, false), args)
+  ): Result<CommentResponse> =
+    retrofitErrorHandler { api.markCommentReplyAsRead(generateHeaders(authorization, false), args) }
 
-  override fun markPersonMentionAsRead(
+  override suspend fun markPersonMentionAsRead(
     authorization: String?,
     args: MarkPersonMentionAsRead,
-  ): Call<PersonMentionResponse> =
-    api.markPersonMentionAsRead(generateHeaders(authorization, false), args)
+  ): Result<PersonMentionResponse> =
+    retrofitErrorHandler { api.markPersonMentionAsRead(generateHeaders(authorization, false), args) }
 
-  override fun markPrivateMessageAsRead(
+  override suspend fun markPrivateMessageAsRead(
     authorization: String?,
     args: MarkPrivateMessageAsRead,
-  ): Call<PrivateMessageResponse> =
-    api.markPrivateMessageAsRead(generateHeaders(authorization, false), args)
+  ): Result<PrivateMessageResponse> =
+    retrofitErrorHandler { api.markPrivateMessageAsRead(generateHeaders(authorization, false), args) }
 
-  override fun markAllAsRead(
+  override suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Call<GetRepliesResponse> =
-    api.markAllAsRead(generateHeaders(authorization, false), args)
+  ): Result<GetRepliesResponse> =
+    retrofitErrorHandler { api.markAllAsRead(generateHeaders(authorization, false), args) }
 
-  override fun getPersonMentions(
+  override suspend fun getPersonMentions(
     authorization: String?,
     args: GetPersonMentions,
     force: Boolean,
-  ): Call<GetPersonMentionsResponse> =
-    api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetPersonMentionsResponse> =
+    retrofitErrorHandler { api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getPrivateMessages(
+  override suspend fun getPrivateMessages(
     authorization: String?,
     args: GetPrivateMessages,
     force: Boolean,
-  ): Call<PrivateMessagesResponse> =
-    api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<PrivateMessagesResponse> =
+    retrofitErrorHandler { api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getPrivateMessageReports(
+  override suspend fun getPrivateMessageReports(
     authorization: String?,
     args: ListPrivateMessageReports,
     force: Boolean,
-  ): Call<ListPrivateMessageReportsResponse> =
-    api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListPrivateMessageReportsResponse> =
+    retrofitErrorHandler { api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun createPrivateMessageReport(
+  override suspend fun createPrivateMessageReport(
     authorization: String?,
     args: CreatePrivateMessageReport,
-  ): Call<PrivateMessageReportResponse> =
-    api.createPrivateMessageReport(generateHeaders(authorization, false), args)
+  ): Result<PrivateMessageReportResponse> =
+    retrofitErrorHandler { api.createPrivateMessageReport(generateHeaders(authorization, false), args) }
 
-  override fun resolvePrivateMessageReport(
+  override suspend fun resolvePrivateMessageReport(
     authorization: String?,
     args: ResolvePrivateMessageReport,
-  ): Call<PrivateMessageReportResponse> =
-    api.resolvePrivateMessageReport(generateHeaders(authorization, false), args)
+  ): Result<PrivateMessageReportResponse> =
+    retrofitErrorHandler { api.resolvePrivateMessageReport(generateHeaders(authorization, false), args) }
 
-  override fun getPostReports(
+  override suspend fun getPostReports(
     authorization: String?,
     args: ListPostReports,
     force: Boolean,
-  ): Call<ListPostReportsResponse> =
-    api.getPostReports(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListPostReportsResponse> =
+    retrofitErrorHandler { api.getPostReports(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun resolvePostReport(
+  override suspend fun resolvePostReport(
     authorization: String?,
     args: ResolvePostReport,
-  ): Call<PostReportResponse> =
-    api.resolvePostReport(generateHeaders(authorization, false), args)
+  ): Result<PostReportResponse> =
+    retrofitErrorHandler { api.resolvePostReport(generateHeaders(authorization, false), args) }
 
-  override fun getCommentReports(
+  override suspend fun getCommentReports(
     authorization: String?,
     args: ListCommentReports,
     force: Boolean,
-  ): Call<ListCommentReportsResponse> =
-    api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListCommentReportsResponse> =
+    retrofitErrorHandler { api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun resolveCommentReport(
+  override suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Call<CommentReportResponse> =
-    api.resolveCommentReport(generateHeaders(authorization, false), args)
+  ): Result<CommentReportResponse> =
+    retrofitErrorHandler { api.resolveCommentReport(generateHeaders(authorization, false), args) }
 
-  override fun createPrivateMessage(
+  override suspend fun createPrivateMessage(
     authorization: String?,
     args: CreatePrivateMessage,
-  ): Call<PrivateMessageResponse> =
-    api.createPrivateMessage(generateHeaders(authorization, false), args)
+  ): Result<PrivateMessageResponse> =
+    retrofitErrorHandler { api.createPrivateMessage(generateHeaders(authorization, false), args) }
 
-  override fun getUnreadCount(
+  override suspend fun getUnreadCount(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Call<GetUnreadCountResponse> =
-    api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetUnreadCountResponse> =
+    retrofitErrorHandler { api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getReportCount(
+  override suspend fun getReportCount(
     authorization: String?,
     args: GetReportCount,
     force: Boolean,
-  ): Call<GetReportCountResponse> =
-    api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetReportCountResponse> =
+    retrofitErrorHandler { api.getReportCount(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun followCommunity(
+  override suspend fun followCommunity(
     authorization: String?,
     args: FollowCommunity,
-  ): Call<CommunityResponse> =
-    api.followCommunity(generateHeaders(authorization, false), args)
+  ): Result<CommunityResponse> =
+    retrofitErrorHandler { api.followCommunity(generateHeaders(authorization, false), args) }
 
-  override fun banUserFromCommunity(
+  override suspend fun banUserFromCommunity(
     authorization: String?,
     args: BanFromCommunity,
-  ): Call<BanFromCommunityResponse> =
-    api.banUserFromCommunity(generateHeaders(authorization, false), args)
+  ): Result<BanFromCommunityResponse> =
+    retrofitErrorHandler { api.banUserFromCommunity(generateHeaders(authorization, false), args) }
 
-  override fun modUser(
+  override suspend fun modUser(
     authorization: String?,
     args: AddModToCommunity,
-  ): Call<AddModToCommunityResponse> =
-    api.modUser(generateHeaders(authorization, false), args)
+  ): Result<AddModToCommunityResponse> =
+    retrofitErrorHandler { api.modUser(generateHeaders(authorization, false), args) }
 
-  override fun createPost(
+  override suspend fun createPost(
     authorization: String?,
     args: CreatePost,
-  ): Call<PostResponse> =
-    api.createPost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.createPost(generateHeaders(authorization, false), args) }
 
-  override fun editPost(
+  override suspend fun editPost(
     authorization: String?,
     args: EditPost,
-  ): Call<PostResponse> =
-    api.editPost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.editPost(generateHeaders(authorization, false), args) }
 
-  override fun deletePost(
+  override suspend fun deletePost(
     authorization: String?,
     args: DeletePost,
-  ): Call<PostResponse> =
-    api.deletePost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.deletePost(generateHeaders(authorization, false), args) }
 
-  override fun featurePost(
+  override suspend fun featurePost(
     authorization: String?,
     args: FeaturePost,
-  ): Call<PostResponse> =
-    api.featurePost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.featurePost(generateHeaders(authorization, false), args) }
 
-  override fun lockPost(
+  override suspend fun lockPost(
     authorization: String?,
     args: LockPost,
-  ): Call<PostResponse> =
-    api.lockPost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.lockPost(generateHeaders(authorization, false), args) }
 
-  override fun removePost(
+  override suspend fun removePost(
     authorization: String?,
     args: RemovePost,
-  ): Call<PostResponse> =
-    api.removePost(generateHeaders(authorization, false), args)
+  ): Result<PostResponse> =
+    retrofitErrorHandler { api.removePost(generateHeaders(authorization, false), args) }
 
-  override fun search(
+  override suspend fun search(
     authorization: String?,
     args: Search,
     force: Boolean,
-  ): Call<SearchResponse> =
-    api.search(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<SearchResponse> =
+    retrofitErrorHandler { api.search(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun getSiteMetadata(
+  override suspend fun getSiteMetadata(
     authorization: String?,
     args: GetSiteMetadata,
     force: Boolean,
-  ): Call<GetSiteMetadataResponse> =
-    api.getSiteMetadata(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetSiteMetadataResponse> =
+    retrofitErrorHandler { api.getSiteMetadata(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun createCommentReport(
+  override suspend fun createCommentReport(
     authorization: String?,
     args: CreateCommentReport,
-  ): Call<CommentReportResponse> =
-    api.createCommentReport(generateHeaders(authorization, false), args)
+  ): Result<CommentReportResponse> =
+    retrofitErrorHandler { api.createCommentReport(generateHeaders(authorization, false), args) }
 
-  override fun createPostReport(
+  override suspend fun createPostReport(
     authorization: String?,
     args: CreatePostReport,
-  ): Call<PostReportResponse> =
-    api.createPostReport(generateHeaders(authorization, false), args)
+  ): Result<PostReportResponse> =
+    retrofitErrorHandler { api.createPostReport(generateHeaders(authorization, false), args) }
 
-  override fun blockPerson(
+  override suspend fun blockPerson(
     authorization: String?,
     args: BlockPerson,
-  ): Call<BlockPersonResponse> =
-    api.blockPerson(generateHeaders(authorization, false), args)
+  ): Result<BlockPersonResponse> =
+    retrofitErrorHandler { api.blockPerson(generateHeaders(authorization, false), args) }
 
-  override fun blockCommunity(
+  override suspend fun blockCommunity(
     authorization: String?,
     args: BlockCommunity,
-  ): Call<BlockCommunityResponse> =
-    api.blockCommunity(generateHeaders(authorization, false), args)
+  ): Result<BlockCommunityResponse> =
+    retrofitErrorHandler { api.blockCommunity(generateHeaders(authorization, false), args) }
 
-  override fun blockInstance(
+  override suspend fun blockInstance(
     authorization: String?,
     args: BlockInstance,
-  ): Call<BlockInstanceResponse> =
-    api.blockInstance(generateHeaders(authorization, false), args)
+  ): Result<BlockInstanceResponse> =
+    retrofitErrorHandler { api.blockInstance(generateHeaders(authorization, false), args) }
 
-  override fun saveUserSettings(
+  override suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Call<LoginResponse> =
-    api.saveUserSettings(generateHeaders(authorization, false), args)
+  ): Result<LoginResponse> =
+    retrofitErrorHandler { api.saveUserSettings(generateHeaders(authorization, false), args) }
 
-  override fun uploadImage(
+  override suspend fun uploadImage(
     authorization: String?,
     url: String,
     fileName: String,
     imageIs: InputStream,
-  ): Call<PictrsImages> =
-    api.uploadImage(generateHeaders(authorization, false), "jwt=${authorization}", url, MultipartBody.Part.createFormData(
-      "images[]",
-      fileName,
-      imageIs.readBytes().toRequestBody(),
-    ))
+  ): Result<PictrsImages> =
+    retrofitErrorHandler {
+      api.uploadImage(
+        headers = generateHeaders(authorization, false),
+        token = "jwt=${authorization}",
+        url = url,
+        filePart = MultipartBody.Part.createFormData(
+          "images[]",
+          fileName,
+          imageIs.readBytes().toRequestBody(),
+        )
+      )
+    }
 
-  override fun resolveObject(
+  override suspend fun resolveObject(
     authorization: String?,
     args: ResolveObject,
     force: Boolean,
-  ): Call<ResolveObjectResponse> =
-    api.resolveObject(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ResolveObjectResponse> =
+    retrofitErrorHandler { api.resolveObject(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun banUserFromSite(
+  override suspend fun banUserFromSite(
     authorization: String?,
     args: BanPerson,
-  ): Call<BanPersonResponse> =
-    api.banUserFromSite(generateHeaders(authorization, false), args)
+  ): Result<BanPersonResponse> =
+    retrofitErrorHandler { api.banUserFromSite(generateHeaders(authorization, false), args) }
 
-  override fun removeCommunity(
+  override suspend fun removeCommunity(
     authorization: String?,
     args: RemoveCommunity,
-  ): Call<CommunityResponse> =
-    api.removeCommunity(generateHeaders(authorization, false), args)
+  ): Result<CommunityResponse> =
+    retrofitErrorHandler { api.removeCommunity(generateHeaders(authorization, false), args) }
 
-  override fun hideCommunity(
+  override suspend fun hideCommunity(
     authorization: String?,
     args: HideCommunity,
-  ): Call<SuccessResponse> =
-    api.hideCommunity(generateHeaders(authorization, false), args)
+  ): Result<SuccessResponse> =
+    retrofitErrorHandler { api.hideCommunity(generateHeaders(authorization, false), args) }
 
-  override fun purgePerson(
+  override suspend fun purgePerson(
     authorization: String?,
     args: PurgePerson,
-  ): Call<SuccessResponse> =
-    api.purgePerson(generateHeaders(authorization, false), args)
+  ): Result<SuccessResponse> =
+    retrofitErrorHandler { api.purgePerson(generateHeaders(authorization, false), args) }
 
-  override fun purgeCommunity(
+  override suspend fun purgeCommunity(
     authorization: String?,
     args: PurgeCommunity,
-  ): Call<SuccessResponse> =
-    api.purgeCommunity(generateHeaders(authorization, false), args)
+  ): Result<SuccessResponse> =
+    retrofitErrorHandler { api.purgeCommunity(generateHeaders(authorization, false), args) }
 
-  override fun purgePost(
+  override suspend fun purgePost(
     authorization: String?,
     args: PurgePost,
-  ): Call<SuccessResponse> =
-    api.purgePost(generateHeaders(authorization, false), args)
+  ): Result<SuccessResponse> =
+    retrofitErrorHandler { api.purgePost(generateHeaders(authorization, false), args) }
 
-  override fun purgeComment(
+  override suspend fun purgeComment(
     authorization: String?,
     args: PurgeComment,
-  ): Call<SuccessResponse> =
-    api.purgeComment(generateHeaders(authorization, false), args)
+  ): Result<SuccessResponse> =
+    retrofitErrorHandler { api.purgeComment(generateHeaders(authorization, false), args) }
 
-  override fun getRegistrationApplicationsCount(
+  override suspend fun getRegistrationApplicationsCount(
     authorization: String?,
     args: GetUnreadRegistrationApplicationCount,
     force: Boolean,
-  ): Call<GetUnreadRegistrationApplicationCountResponse> =
-    api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetUnreadRegistrationApplicationCountResponse> =
+    retrofitErrorHandler { api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun listRegistrationApplications(
+  override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Call<ListRegistrationApplicationsResponse> =
-    api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListRegistrationApplicationsResponse> =
+    retrofitErrorHandler { api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun approveRegistrationApplication(
+  override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Call<RegistrationApplicationResponse> =
-    api.approveRegistrationApplication(generateHeaders(authorization, false), args)
+  ): Result<RegistrationApplicationResponse> =
+    retrofitErrorHandler { api.approveRegistrationApplication(generateHeaders(authorization, false), args) }
 
-  override fun getModLogs(
+  override suspend fun getModLogs(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Call<GetModlogResponse> =
-    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<GetModlogResponse> =
+    retrofitErrorHandler { api.getModLogs(generateHeaders(authorization, force), args.serializeToMap()) }
 
-  override fun register(args: Register): Call<LoginResponse> =
-    api.register(generateHeaders(null, false), args)
+  override suspend fun register(args: Register): Result<LoginResponse> =
+    retrofitErrorHandler { api.register(generateHeaders(null, false), args) }
 
-  override fun getCaptcha(): Call<GetCaptchaResponse> =
-    api.getCaptcha(generateHeaders(null, false))
+  override suspend fun getCaptcha(): Result<GetCaptchaResponse> =
+    retrofitErrorHandler { api.getCaptcha(generateHeaders(null, false)) }
 
-  override fun listMedia(
+  override suspend fun listMedia(
     authorization: String?,
     args: ListMedia,
     force: Boolean,
-  ): Call<ListMediaResponse> =
-    api.listMedia(generateHeaders(authorization, force), args.serializeToMap())
+  ): Result<ListMediaResponse> =
+    retrofitErrorHandler { api.listMedia(generateHeaders(authorization, force), args.serializeToMap()) }
 
 
 }

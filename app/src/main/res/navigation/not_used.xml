@@ -84,7 +84,7 @@ safeargs.
             android:defaultValue="false" />
         <argument
             android:name="postView"
-            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView"
             app:nullable="true"
             android:defaultValue="@null" />
     </dialog>
@@ -94,7 +94,7 @@ safeargs.
         android:label="SearchResultsFragment" >
         <argument
             android:name="searchType"
-            app:argType="com.idunnololz.summit.api.dto.SearchType" />
+            app:argType="com.idunnololz.summit.api.dto.lemmy.SearchType" />
     </fragment>
     <dialog
         android:id="@+id/banUserDialogFragment"
@@ -227,11 +227,11 @@ safeargs.
             app:argType="string" />
         <argument
             android:name="commentView"
-            app:argType="com.idunnololz.summit.api.dto.CommentView"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.CommentView"
             app:nullable="true"  />
         <argument
             android:name="postView"
-            app:argType="com.idunnololz.summit.api.dto.PostView"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView"
             app:nullable="true" />
     </dialog>
     <dialog
@@ -294,7 +294,7 @@ safeargs.
         android:label="LanguageSelectDialogFragment" >
         <argument
             android:name="languages"
-            app:argType="com.idunnololz.summit.api.dto.Language[]" />
+            app:argType="com.idunnololz.summit.api.dto.lemmy.Language[]" />
         <argument
             android:name="selected_languages"
             app:argType="integer[]" />
@@ -349,7 +349,7 @@ safeargs.
         <argument
             android:name="person"
             app:nullable="true"
-            app:argType="com.idunnololz.summit.api.dto.Person" />
+            app:argType="com.idunnololz.summit.api.dto.lemmy.Person" />
         <argument
             android:name="userTag"
             app:argType="com.idunnololz.summit.lemmy.userTags.UserTag"

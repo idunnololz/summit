@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnPreDrawListener
-import android.webkit.URLUtil
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -38,8 +37,8 @@ import com.github.drjacky.imagepicker.ImagePicker
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
-import com.idunnololz.summit.api.dto.Language
-import com.idunnololz.summit.api.dto.Post
+import com.idunnololz.summit.api.dto.lemmy.Language
+import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCreateOrEditPostBinding
 import com.idunnololz.summit.drafts.DraftData

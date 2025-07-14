@@ -10,9 +10,9 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.GetModlogResponse
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
+import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource

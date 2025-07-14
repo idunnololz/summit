@@ -15,7 +15,7 @@ import arrow.core.Either
 import coil3.dispose
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.AccountSubscription
-import com.idunnololz.summit.api.dto.Community
+import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.BookmarkHeaderItemBinding
 import com.idunnololz.summit.databinding.BookmarkedCommunityHeaderItemBinding

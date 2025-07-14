@@ -12,8 +12,8 @@ import com.google.android.material.button.MaterialButton
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.PostView
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
 import kotlinx.parcelize.Parcelize

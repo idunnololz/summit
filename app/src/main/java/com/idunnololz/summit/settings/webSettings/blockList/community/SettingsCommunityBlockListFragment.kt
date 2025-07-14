@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil3.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.CommunityId
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.BlockListCommunityItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBinding

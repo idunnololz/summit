@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.InstanceId
+import com.idunnololz.summit.api.dto.lemmy.InstanceId
 import com.idunnololz.summit.databinding.BlockListInstanceItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsCommunityBlockListBinding
 import com.idunnololz.summit.settings.SettingsFragment

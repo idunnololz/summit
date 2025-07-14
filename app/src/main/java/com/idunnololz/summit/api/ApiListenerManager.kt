@@ -4,13 +4,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import retrofit2.Response
 
-typealias ApiListener = (Response<*>) -> Unit
+typealias ApiListener = (Result<Any?>) -> Unit
 
 @Singleton
 class ApiListenerManager @Inject constructor() {
   private var listeners = listOf<ApiListener>()
 
-  fun onRequestComplete(response: Response<*>) {
+  fun onRequestComplete(response: Result<Any?>) {
     val listeners = listeners
     for (listener in listeners) {
       listener(response)

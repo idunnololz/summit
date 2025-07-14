@@ -11,9 +11,9 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.ModlogActionType
-import com.idunnololz.summit.api.dto.Person
-import com.idunnololz.summit.api.dto.SearchType
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
+import com.idunnololz.summit.api.dto.lemmy.Person
+import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils

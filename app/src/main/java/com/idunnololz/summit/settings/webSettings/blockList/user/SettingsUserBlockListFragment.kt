@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil3.load
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.databinding.BlockListUserItemBinding
 import com.idunnololz.summit.databinding.FragmentSettingsUserBlockListBinding

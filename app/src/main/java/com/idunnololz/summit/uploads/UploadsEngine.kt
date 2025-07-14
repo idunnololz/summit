@@ -2,13 +2,12 @@ package com.idunnololz.summit.uploads
 
 import android.content.Context
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.LocalImageView
+import com.idunnololz.summit.api.dto.lemmy.LocalImageView
 import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.inbox.repository.MultiLemmyListSource
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlin.text.toLong
 
 class UploadsEngine @Inject constructor(
   @ApplicationContext private val context: Context,

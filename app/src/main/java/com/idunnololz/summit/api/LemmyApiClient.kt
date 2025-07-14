@@ -4,139 +4,138 @@ import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
-import com.idunnololz.summit.api.dto.AddModToCommunity
-import com.idunnololz.summit.api.dto.AddModToCommunityResponse
-import com.idunnololz.summit.api.dto.ApproveRegistrationApplication
-import com.idunnololz.summit.api.dto.BanFromCommunity
-import com.idunnololz.summit.api.dto.BanFromCommunityResponse
-import com.idunnololz.summit.api.dto.BanPerson
-import com.idunnololz.summit.api.dto.BanPersonResponse
-import com.idunnololz.summit.api.dto.BlockCommunity
-import com.idunnololz.summit.api.dto.BlockInstance
-import com.idunnololz.summit.api.dto.BlockInstanceResponse
-import com.idunnololz.summit.api.dto.BlockPerson
-import com.idunnololz.summit.api.dto.ChangePassword
-import com.idunnololz.summit.api.dto.CommentId
-import com.idunnololz.summit.api.dto.CommentReplyId
-import com.idunnololz.summit.api.dto.CommentReplyView
-import com.idunnololz.summit.api.dto.CommentReportId
-import com.idunnololz.summit.api.dto.CommentReportResponse
-import com.idunnololz.summit.api.dto.CommentResponse
-import com.idunnololz.summit.api.dto.CommentSortType
-import com.idunnololz.summit.api.dto.CommentView
-import com.idunnololz.summit.api.dto.CommunityId
-import com.idunnololz.summit.api.dto.CommunityResponse
-import com.idunnololz.summit.api.dto.CommunityView
-import com.idunnololz.summit.api.dto.CreateComment
-import com.idunnololz.summit.api.dto.CreateCommentLike
-import com.idunnololz.summit.api.dto.CreateCommentReport
-import com.idunnololz.summit.api.dto.CreateCommunity
-import com.idunnololz.summit.api.dto.CreatePost
-import com.idunnololz.summit.api.dto.CreatePostLike
-import com.idunnololz.summit.api.dto.CreatePostReport
-import com.idunnololz.summit.api.dto.CreatePrivateMessage
-import com.idunnololz.summit.api.dto.CreatePrivateMessageReport
-import com.idunnololz.summit.api.dto.DeleteComment
-import com.idunnololz.summit.api.dto.DeleteCommunity
-import com.idunnololz.summit.api.dto.DeletePost
-import com.idunnololz.summit.api.dto.DistinguishComment
-import com.idunnololz.summit.api.dto.EditComment
-import com.idunnololz.summit.api.dto.EditCommunity
-import com.idunnololz.summit.api.dto.EditPost
-import com.idunnololz.summit.api.dto.FeaturePost
-import com.idunnololz.summit.api.dto.FollowCommunity
-import com.idunnololz.summit.api.dto.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.GetComments
-import com.idunnololz.summit.api.dto.GetCommunity
-import com.idunnololz.summit.api.dto.GetCommunityResponse
-import com.idunnololz.summit.api.dto.GetModlog
-import com.idunnololz.summit.api.dto.GetModlogResponse
-import com.idunnololz.summit.api.dto.GetPersonDetails
-import com.idunnololz.summit.api.dto.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.GetPersonMentions
-import com.idunnololz.summit.api.dto.GetPost
-import com.idunnololz.summit.api.dto.GetPostResponse
-import com.idunnololz.summit.api.dto.GetPosts
-import com.idunnololz.summit.api.dto.GetPostsResponse
-import com.idunnololz.summit.api.dto.GetPrivateMessages
-import com.idunnololz.summit.api.dto.GetReplies
-import com.idunnololz.summit.api.dto.GetRepliesResponse
-import com.idunnololz.summit.api.dto.GetReportCount
-import com.idunnololz.summit.api.dto.GetReportCountResponse
-import com.idunnololz.summit.api.dto.GetSite
-import com.idunnololz.summit.api.dto.GetSiteResponse
-import com.idunnololz.summit.api.dto.GetUnreadCount
-import com.idunnololz.summit.api.dto.GetUnreadCountResponse
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCount
-import com.idunnololz.summit.api.dto.GetUnreadRegistrationApplicationCountResponse
-import com.idunnololz.summit.api.dto.HideCommunity
-import com.idunnololz.summit.api.dto.InstanceId
-import com.idunnololz.summit.api.dto.ListCommentLikes
-import com.idunnololz.summit.api.dto.ListCommentLikesResponse
-import com.idunnololz.summit.api.dto.ListCommentReports
-import com.idunnololz.summit.api.dto.ListCommentReportsResponse
-import com.idunnololz.summit.api.dto.ListCommunities
-import com.idunnololz.summit.api.dto.ListMedia
-import com.idunnololz.summit.api.dto.ListMediaResponse
-import com.idunnololz.summit.api.dto.ListPostLikes
-import com.idunnololz.summit.api.dto.ListPostLikesResponse
-import com.idunnololz.summit.api.dto.ListPostReports
-import com.idunnololz.summit.api.dto.ListPostReportsResponse
-import com.idunnololz.summit.api.dto.ListPrivateMessageReports
-import com.idunnololz.summit.api.dto.ListPrivateMessageReportsResponse
-import com.idunnololz.summit.api.dto.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.ListRegistrationApplicationsResponse
-import com.idunnololz.summit.api.dto.ListingType
-import com.idunnololz.summit.api.dto.LockPost
-import com.idunnololz.summit.api.dto.Login
-import com.idunnololz.summit.api.dto.LoginResponse
-import com.idunnololz.summit.api.dto.MarkAllAsRead
-import com.idunnololz.summit.api.dto.MarkCommentReplyAsRead
-import com.idunnololz.summit.api.dto.MarkPersonMentionAsRead
-import com.idunnololz.summit.api.dto.MarkPostAsRead
-import com.idunnololz.summit.api.dto.MarkPrivateMessageAsRead
-import com.idunnololz.summit.api.dto.ModlogActionType
-import com.idunnololz.summit.api.dto.PersonId
-import com.idunnololz.summit.api.dto.PersonMentionId
-import com.idunnololz.summit.api.dto.PersonMentionView
-import com.idunnololz.summit.api.dto.PersonView
-import com.idunnololz.summit.api.dto.PostFeatureType
-import com.idunnololz.summit.api.dto.PostId
-import com.idunnololz.summit.api.dto.PostReportId
-import com.idunnololz.summit.api.dto.PostReportResponse
-import com.idunnololz.summit.api.dto.PostView
-import com.idunnololz.summit.api.dto.PrivateMessageId
-import com.idunnololz.summit.api.dto.PrivateMessageReportResponse
-import com.idunnololz.summit.api.dto.PrivateMessageView
-import com.idunnololz.summit.api.dto.PurgeComment
-import com.idunnololz.summit.api.dto.PurgeCommunity
-import com.idunnololz.summit.api.dto.PurgePerson
-import com.idunnololz.summit.api.dto.PurgePost
-import com.idunnololz.summit.api.dto.Register
-import com.idunnololz.summit.api.dto.RegistrationApplicationResponse
-import com.idunnololz.summit.api.dto.RemoveComment
-import com.idunnololz.summit.api.dto.RemoveCommunity
-import com.idunnololz.summit.api.dto.RemovePost
-import com.idunnololz.summit.api.dto.ResolveCommentReport
-import com.idunnololz.summit.api.dto.ResolveObject
-import com.idunnololz.summit.api.dto.ResolveObjectResponse
-import com.idunnololz.summit.api.dto.ResolvePostReport
-import com.idunnololz.summit.api.dto.ResolvePrivateMessageReport
-import com.idunnololz.summit.api.dto.SaveComment
-import com.idunnololz.summit.api.dto.SavePost
-import com.idunnololz.summit.api.dto.SaveUserSettings
-import com.idunnololz.summit.api.dto.Search
-import com.idunnololz.summit.api.dto.SearchResponse
-import com.idunnololz.summit.api.dto.SearchType
-import com.idunnololz.summit.api.dto.SortType
-import com.idunnololz.summit.api.dto.SuccessResponse
+import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
+import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
+import com.idunnololz.summit.api.dto.lemmy.BanFromCommunity
+import com.idunnololz.summit.api.dto.lemmy.BanFromCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.BanPerson
+import com.idunnololz.summit.api.dto.lemmy.BanPersonResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockCommunity
+import com.idunnololz.summit.api.dto.lemmy.BlockInstance
+import com.idunnololz.summit.api.dto.lemmy.BlockInstanceResponse
+import com.idunnololz.summit.api.dto.lemmy.BlockPerson
+import com.idunnololz.summit.api.dto.lemmy.ChangePassword
+import com.idunnololz.summit.api.dto.lemmy.CommentId
+import com.idunnololz.summit.api.dto.lemmy.CommentReplyId
+import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
+import com.idunnololz.summit.api.dto.lemmy.CommentReportId
+import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
+import com.idunnololz.summit.api.dto.lemmy.CommentResponse
+import com.idunnololz.summit.api.dto.lemmy.CommentSortType
+import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.CommunityId
+import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.CommunityView
+import com.idunnololz.summit.api.dto.lemmy.CreateComment
+import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
+import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
+import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
+import com.idunnololz.summit.api.dto.lemmy.CreatePost
+import com.idunnololz.summit.api.dto.lemmy.CreatePostLike
+import com.idunnololz.summit.api.dto.lemmy.CreatePostReport
+import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.DeleteComment
+import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeletePost
+import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
+import com.idunnololz.summit.api.dto.lemmy.EditComment
+import com.idunnololz.summit.api.dto.lemmy.EditCommunity
+import com.idunnololz.summit.api.dto.lemmy.EditPost
+import com.idunnololz.summit.api.dto.lemmy.FeaturePost
+import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
+import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
+import com.idunnololz.summit.api.dto.lemmy.GetComments
+import com.idunnololz.summit.api.dto.lemmy.GetCommunity
+import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetModlog
+import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
+import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
+import com.idunnololz.summit.api.dto.lemmy.GetPost
+import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPosts
+import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
+import com.idunnololz.summit.api.dto.lemmy.GetReplies
+import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
+import com.idunnololz.summit.api.dto.lemmy.GetReportCount
+import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetSite
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
+import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCountResponse
+import com.idunnololz.summit.api.dto.lemmy.HideCommunity
+import com.idunnololz.summit.api.dto.lemmy.InstanceId
+import com.idunnololz.summit.api.dto.lemmy.ListCommentLikes
+import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListCommentReports
+import com.idunnololz.summit.api.dto.lemmy.ListCommentReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListCommunities
+import com.idunnololz.summit.api.dto.lemmy.ListMedia
+import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPostLikes
+import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPostReports
+import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
+import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
+import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
+import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.LockPost
+import com.idunnololz.summit.api.dto.lemmy.Login
+import com.idunnololz.summit.api.dto.lemmy.LoginResponse
+import com.idunnololz.summit.api.dto.lemmy.MarkAllAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
+import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
+import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
+import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionId
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
+import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
+import com.idunnololz.summit.api.dto.lemmy.PostId
+import com.idunnololz.summit.api.dto.lemmy.PostReportId
+import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
+import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageId
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
+import com.idunnololz.summit.api.dto.lemmy.PurgeComment
+import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
+import com.idunnololz.summit.api.dto.lemmy.PurgePerson
+import com.idunnololz.summit.api.dto.lemmy.PurgePost
+import com.idunnololz.summit.api.dto.lemmy.Register
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
+import com.idunnololz.summit.api.dto.lemmy.RemoveComment
+import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
+import com.idunnololz.summit.api.dto.lemmy.RemovePost
+import com.idunnololz.summit.api.dto.lemmy.ResolveCommentReport
+import com.idunnololz.summit.api.dto.lemmy.ResolveObject
+import com.idunnololz.summit.api.dto.lemmy.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.lemmy.ResolvePostReport
+import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
+import com.idunnololz.summit.api.dto.lemmy.SaveComment
+import com.idunnololz.summit.api.dto.lemmy.SavePost
+import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
+import com.idunnololz.summit.api.dto.lemmy.Search
+import com.idunnololz.summit.api.dto.lemmy.SearchResponse
+import com.idunnololz.summit.api.dto.lemmy.SearchType
+import com.idunnololz.summit.api.dto.lemmy.SortType
+import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.Consts
 import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
-import com.idunnololz.summit.util.Utils.serializeToMap
 import com.idunnololz.summit.util.retry
 import java.io.InputStream
 import java.io.InterruptedIOException
@@ -145,19 +144,19 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
-import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.reflect.InvocationHandler
+import java.lang.reflect.Method
+import java.lang.reflect.Proxy
 import javax.inject.Singleton
 
 const val COMMENTS_DEPTH_MAX = 6
@@ -193,11 +192,6 @@ class LemmyApiClient @Inject constructor(
     )
   }
 
-  private var api: LemmyLikeApi = getApiV3WithInstance(
-    instance = preferences.guestAccountSettings?.instance
-      ?: Consts.DEFAULT_INSTANCE,
-  )
-
   private val Account.bearer: String
     get() = "Bearer $jwt"
 
@@ -206,61 +200,24 @@ class LemmyApiClient @Inject constructor(
   val instance: String
     get() = instanceFlow.value
 
-  val instanceFlow = MutableStateFlow(api.instance)
+  val instanceFlow = MutableStateFlow(preferences.guestAccountSettings?.instance
+    ?: Consts.DEFAULT_INSTANCE)
 
   private val coroutineScope = coroutineScopeFactory.create()
 
   private val apiInfo =
     MutableStateFlow<StatefulData<SiteBackendHelper.ApiInfo>>(StatefulData.NotStarted())
 
-  init {
-    var fetchApiInfoJob: Job? = null
-
-    coroutineScope.launch {
-      instanceFlow.collect {
-        apiInfo.value = StatefulData.Loading()
-
-        fetchApiInfoJob?.cancel()
-        fetchApiInfoJob = coroutineScope.launch {
-          apiInfo.value = siteBackendHelper.fetchApiInfo(it).fold(
-            {
-              Log.d(TAG, "Determined backend for instance $instance is ${it.backendType}.")
-              StatefulData.Success(it)
-            },
-            { StatefulData.Error(it) }
-          )
-        }
-      }
-    }
-
-    coroutineScope.launch {
-      apiInfo.collect {
-
-      }
-    }
-  }
+  private var fetchApiInfoInstance: String? = null
+  private var fetchApiInfoJob: Deferred<Result<SiteBackendHelper.ApiInfo>>? = null
 
   fun changeInstance(newInstance: String) {
-    try {
-      api = getApiV3WithInstance(instance = newInstance)
-
-      instanceFlow.value = api.instance
-    } catch (e: Exception) {
-      Log.w(TAG, "Invalid instance: $newInstance", e)
-    }
-  }
-
-  fun refreshClient() {
-    api = getApiV3WithInstance(instance = instance)
+    instanceFlow.value = newInstance
   }
 
   fun defaultInstance() {
-    api = getApiV3WithInstance(
-      instance = preferences.guestAccountSettings?.instance
-        ?: Consts.DEFAULT_INSTANCE,
-    )
-
-    instanceFlow.value = api.instance
+    instanceFlow.value = preferences.guestAccountSettings?.instance
+      ?: Consts.DEFAULT_INSTANCE
   }
 
   fun clearCache() {
@@ -296,16 +253,9 @@ class LemmyApiClient @Inject constructor(
         auth = account?.jwt,
       )
 
-    return retrofitErrorHandler {
-      api.getPosts(authorization = account?.bearer, args = form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPosts(authorization = account?.bearer, args = form, force = force)
+    }
   }
 
   suspend fun fetchPost(
@@ -319,16 +269,9 @@ class LemmyApiClient @Inject constructor(
       GetPost(comment_id = it, auth = account?.jwt)
     })
 
-    return retrofitErrorHandler {
-      api.getPost(authorization = account?.bearer, args = postForm, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPost(authorization = account?.bearer, args = postForm, force = force)
+    }
   }
 
   suspend fun markPostAsRead(postId: PostId, read: Boolean, account: Account): Result<PostView> {
@@ -339,16 +282,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.markPostAsRead(authorization = account.bearer, args = form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.post_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().markPostAsRead(authorization = account.bearer, args = form)
+    }.map { it.post_view }
   }
 
   suspend fun fetchSavedPosts(
@@ -368,16 +304,9 @@ class LemmyApiClient @Inject constructor(
       auth = account?.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getPosts(authorization = account?.bearer, args = form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it.posts)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPosts(authorization = account?.bearer, args = form, force = force)
+    }.map { it.posts }
   }
 
   suspend fun fetchSavedComments(
@@ -400,16 +329,9 @@ class LemmyApiClient @Inject constructor(
         limit = limit,
       )
 
-    return retrofitErrorHandler {
-      api.getComments(authorization = account?.bearer, commentsForm, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it.comments)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getComments(authorization = account?.bearer, commentsForm, force = force)
+    }.map { it.comments }
   }
 
   suspend fun fetchComments(
@@ -456,16 +378,9 @@ class LemmyApiClient @Inject constructor(
         page = page,
       )
 
-    return retrofitErrorHandler {
-      api.getComments(authorization = account?.bearer, commentsForm, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it.comments)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getComments(authorization = account?.bearer, commentsForm, force = force)
+    }.map { it.comments }
   }
 
   suspend fun getCommunity(
@@ -495,64 +410,36 @@ class LemmyApiClient @Inject constructor(
       GetCommunity(name = name, auth = account?.jwt)
     })
 
-    return retrofitErrorHandler {
-      api.getCommunity(authorization = account?.bearer, args = form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getCommunity(authorization = account?.bearer, args = form, force = force)
+    }
   }
 
   suspend fun createCommunity(
     account: Account?,
     createCommunity: CreateCommunity,
   ): Result<CommunityResponse> {
-    return retrofitErrorHandler {
-      api.createCommunity(authorization = account?.bearer, args = createCommunity)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().createCommunity(authorization = account?.bearer, args = createCommunity)
+    }
   }
 
   suspend fun updateCommunity(
     account: Account?,
     editCommunity: EditCommunity,
   ): Result<CommunityResponse> {
-    return retrofitErrorHandler {
-      api.updateCommunity(authorization = account?.bearer, args = editCommunity)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().updateCommunity(authorization = account?.bearer, args = editCommunity)
+    }
   }
 
   suspend fun deleteCommunity(
     account: Account?,
     deleteCommunity: DeleteCommunity,
   ): Result<CommunityResponse> {
-    return retrofitErrorHandler {
-      api.deleteCommunity(authorization = account?.bearer, args = deleteCommunity)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().deleteCommunity(authorization = account?.bearer, args = deleteCommunity)
+    }
   }
 
   suspend fun search(
@@ -581,16 +468,9 @@ class LemmyApiClient @Inject constructor(
       auth = account?.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.search(authorization = account?.bearer, args = form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().search(authorization = account?.bearer, args = form, force = force)
+    }
   }
 
   suspend fun fetchCommunities(
@@ -607,16 +487,9 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
       auth = account?.jwt,
     )
-    return retrofitErrorHandler {
-      api.getCommunityList(authorization = account?.bearer, args = form, force = false)
-    }.fold(
-      onSuccess = {
-        Result.success(it.communities)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getCommunityList(authorization = account?.bearer, args = form, force = false)
+    }.map { it.communities }
   }
 
   suspend fun login(
@@ -635,7 +508,7 @@ class LemmyApiClient @Inject constructor(
 
     val form = Login(username, password, twoFactorCode)
 
-    return retrofitErrorHandler { api.login(args = form) }
+    return onApiClient { getApi().login(args = form) }
       .fold(
         onSuccess = {
           Result.success(it.jwt)
@@ -650,32 +523,17 @@ class LemmyApiClient @Inject constructor(
   suspend fun fetchSiteWithRetry(auth: String?, force: Boolean): Result<GetSiteResponse> = retry {
     val form = GetSite(auth = auth)
 
-    retrofitErrorHandler {
-      api.getSite(authorization = auth?.toBearer(), args = form, force = force)
+    onApiClient {
+      getApi().getSite(authorization = auth?.toBearer(), args = form, force = force)
     }
-      .fold(
-        onSuccess = {
-          Result.success(it)
-        },
-        onFailure = {
-          Result.failure(it)
-        },
-      )
   }
 
   suspend fun fetchUnreadCount(force: Boolean, account: Account): Result<GetUnreadCountResponse> {
     val form = GetUnreadCount(account.jwt)
 
-    return retrofitErrorHandler {
-      api.getUnreadCount(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getUnreadCount(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun fetchUnresolvedReportsCount(
@@ -687,16 +545,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getReportCount(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getReportCount(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun likePostWithRetry(postId: Int, score: Int, account: Account): Result<PostView> =
@@ -707,15 +558,8 @@ class LemmyApiClient @Inject constructor(
         auth = account.jwt,
       )
 
-      retrofitErrorHandler { api.likePost(authorization = account.bearer, form) }
-        .fold(
-          onSuccess = {
-            Result.success(it.post_view)
-          },
-          onFailure = {
-            Result.failure(it)
-          },
-        )
+      onApiClient { getApi().likePost(authorization = account.bearer, form) }
+        .map { it.post_view }
     }
 
   suspend fun likeCommentWithRetry(
@@ -729,15 +573,8 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    retrofitErrorHandler { api.likeComment(authorization = account.bearer, form) }
-      .fold(
-        onSuccess = {
-          Result.success(it.comment_view)
-        },
-        onFailure = {
-          Result.failure(it)
-        },
-      )
+    onApiClient { getApi().likeComment(authorization = account.bearer, form) }
+      .map { it.comment_view }
   }
 
   suspend fun listCommentVotesWithRetry(
@@ -753,17 +590,9 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
     )
 
-    retrofitErrorHandler {
-      api.listCommentVotes(authorization = account.bearer, form, force = force)
+    onApiClient {
+      getApi().listCommentVotes(authorization = account.bearer, form, force = force)
     }
-      .fold(
-        onSuccess = {
-          Result.success(it)
-        },
-        onFailure = {
-          Result.failure(it)
-        },
-      )
   }
 
   suspend fun listPostVotesWithRetry(
@@ -779,17 +608,9 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
     )
 
-    retrofitErrorHandler {
-      api.listPostVotes(authorization = account.bearer, form, force = force)
+    onApiClient {
+      getApi().listPostVotes(authorization = account.bearer, form, force = force)
     }
-      .fold(
-        onSuccess = {
-          Result.success(it)
-        },
-        onFailure = {
-          Result.failure(it)
-        },
-      )
   }
 
   suspend fun followCommunityWithRetry(
@@ -803,15 +624,8 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    retrofitErrorHandler { api.followCommunity(authorization = account.bearer, form) }
-      .fold(
-        onSuccess = {
-          Result.success(it.community_view)
-        },
-        onFailure = {
-          Result.failure(it)
-        },
-      )
+    onApiClient { getApi().followCommunity(authorization = account.bearer, form) }
+      .map { it.community_view }
   }
 
   suspend fun banUserFromCommunity(
@@ -833,12 +647,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.banUserFromCommunity(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().banUserFromCommunity(authorization = account.bearer, form)
+    }
   }
 
   suspend fun modUser(
@@ -854,12 +665,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.modUser(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().modUser(authorization = account.bearer, form)
+    }
   }
 
   suspend fun distinguishComment(
@@ -873,12 +681,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.distinguishComment(authorization = account.bearer, args = form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().distinguishComment(authorization = account.bearer, args = form)
+    }
   }
 
   suspend fun removeComment(
@@ -894,12 +699,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.removeComment(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().removeComment(authorization = account.bearer, form)
+    }
   }
 
   suspend fun createComment(
@@ -917,12 +719,9 @@ class LemmyApiClient @Inject constructor(
       language_id = languageId,
     )
 
-    return retrofitErrorHandler {
-      api.createComment(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it.comment_view) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().createComment(authorization = account.bearer, form)
+    }.map { it.comment_view }
   }
 
   suspend fun editComment(
@@ -938,16 +737,9 @@ class LemmyApiClient @Inject constructor(
       language_id = languageId,
     )
 
-    return retrofitErrorHandler {
-      api.editComment(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.comment_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().editComment(authorization = account.bearer, form)
+    }.map { it.comment_view }
   }
 
   suspend fun deleteComment(account: Account, commentId: CommentId): Result<CommentView> {
@@ -957,16 +749,9 @@ class LemmyApiClient @Inject constructor(
       deleted = true,
     )
 
-    return retrofitErrorHandler {
-      api.deleteComment(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.comment_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().deleteComment(authorization = account.bearer, form)
+    }.map { it.comment_view }
   }
 
   suspend fun createPost(
@@ -992,16 +777,9 @@ class LemmyApiClient @Inject constructor(
       language_id = languageId,
     )
 
-    return retrofitErrorHandler {
-      api.createPost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.post_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().createPost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun editPost(
@@ -1027,16 +805,9 @@ class LemmyApiClient @Inject constructor(
       language_id = languageId,
     )
 
-    return retrofitErrorHandler {
-      api.editPost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.post_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().editPost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun deletePost(account: Account, id: PostId, delete: Boolean): Result<PostView> {
@@ -1046,16 +817,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.deletePost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.post_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().deletePost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun featurePost(
@@ -1071,16 +835,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.featurePost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.post_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().featurePost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun lockPost(account: Account, id: PostId, locked: Boolean): Result<PostView> {
@@ -1090,12 +847,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.lockPost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it.post_view) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().lockPost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun removePost(
@@ -1111,12 +865,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.removePost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it.post_view) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().removePost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun uploadImage(
@@ -1124,24 +875,19 @@ class LemmyApiClient @Inject constructor(
     fileName: String,
     imageIs: InputStream,
   ): Result<UploadImageResult> {
-    val url = "https://${api.instance}/pictrs/image"
+    val url = "https://${instance}/pictrs/image"
 
-    return retrofitErrorHandler {
-      api.uploadImage(
+    return onApiClient {
+      getApi().uploadImage(
         authorization = account.bearer,
         url = url,
         fileName = fileName,
         imageIs = imageIs,
       )
-    }.fold(
-      onSuccess = {
-        val imageUrl = "$url/${it.files?.get(0)?.file}"
-        Result.success(UploadImageResult(imageUrl))
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    }.map {
+      val imageUrl = "$url/${it.files?.get(0)?.file}"
+      UploadImageResult(imageUrl)
+    }
   }
 
   suspend fun blockCommunity(
@@ -1155,16 +901,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.blockCommunity(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.community_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().blockCommunity(authorization = account.bearer, form)
+    }.map { it.community_view }
   }
 
   suspend fun blockPerson(
@@ -1178,16 +917,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.blockPerson(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.person_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().blockPerson(authorization = account.bearer, form)
+    }.map { it.person_view }
   }
 
   suspend fun blockInstance(
@@ -1201,16 +933,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.blockInstance(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().blockInstance(authorization = account.bearer, form)
+    }
   }
 
   suspend fun fetchPerson(
@@ -1233,16 +958,9 @@ class LemmyApiClient @Inject constructor(
       saved_only = savedOnly,
     )
 
-    return retrofitErrorHandler {
-      api.getPersonDetails(authorization = account?.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPersonDetails(authorization = account?.bearer, form, force = force)
+    }
   }
 
   suspend fun changePassword(
@@ -1258,16 +976,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.changePassword(authorization = account.bearer, changePassword)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().changePassword(authorization = account.bearer, changePassword)
+    }
   }
 
   suspend fun fetchReplies(
@@ -1286,16 +997,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getReplies(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it.replies)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getReplies(authorization = account.bearer, form, force = force)
+    }.map { it.replies }
   }
 
   suspend fun fetchMentions(
@@ -1314,16 +1018,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getPersonMentions(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it.mentions)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPersonMentions(authorization = account.bearer, form, force = force)
+    }.map { it.mentions }
   }
 
   suspend fun fetchPrivateMessages(
@@ -1342,16 +1039,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getPrivateMessages(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it.private_messages)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPrivateMessages(authorization = account.bearer, form, force = force)
+    }.map { it.private_messages }
   }
 
   suspend fun fetchPrivateMessageReports(
@@ -1368,16 +1058,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getPrivateMessageReports(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPrivateMessageReports(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun fetchPostReports(
@@ -1395,16 +1078,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getPostReports(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getPostReports(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun createPrivateMessageReport(
@@ -1418,8 +1094,8 @@ class LemmyApiClient @Inject constructor(
       reason = reason,
     )
 
-    return retrofitErrorHandler {
-      api.createPrivateMessageReport(authorization = account.bearer, form)
+    return onApiClient {
+      getApi().createPrivateMessageReport(authorization = account.bearer, form)
     }
   }
 
@@ -1434,8 +1110,8 @@ class LemmyApiClient @Inject constructor(
       resolved = resolved,
     )
 
-    return retrofitErrorHandler {
-      api.resolvePrivateMessageReport(authorization = account.bearer, form)
+    return onApiClient {
+      getApi().resolvePrivateMessageReport(authorization = account.bearer, form)
     }
   }
 
@@ -1450,8 +1126,8 @@ class LemmyApiClient @Inject constructor(
       resolved = resolved,
     )
 
-    return retrofitErrorHandler {
-      api.resolvePostReport(authorization = account.bearer, form)
+    return onApiClient {
+      getApi().resolvePostReport(authorization = account.bearer, form)
     }
   }
 
@@ -1470,16 +1146,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getCommentReports(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().getCommentReports(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun resolveCommentReport(
@@ -1493,16 +1162,9 @@ class LemmyApiClient @Inject constructor(
       resolved = resolved,
     )
 
-    return retrofitErrorHandler {
-      api.resolveCommentReport(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().resolveCommentReport(authorization = account.bearer, form)
+    }
   }
 
   suspend fun markReplyAsRead(
@@ -1515,16 +1177,9 @@ class LemmyApiClient @Inject constructor(
       read,
       account.jwt,
     )
-    return retrofitErrorHandler {
-      api.markCommentReplyAsRead(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.comment_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().markCommentReplyAsRead(authorization = account.bearer, form)
+    }.map { it.comment_view }
   }
 
   suspend fun markMentionAsRead(
@@ -1537,16 +1192,9 @@ class LemmyApiClient @Inject constructor(
       read,
       account.jwt,
     )
-    return retrofitErrorHandler {
-      api.markPersonMentionAsRead(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.person_mention_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().markPersonMentionAsRead(authorization = account.bearer, form)
+    }.map { it.person_mention_view }
   }
 
   suspend fun markPrivateMessageAsRead(
@@ -1559,32 +1207,18 @@ class LemmyApiClient @Inject constructor(
       read,
       account.jwt,
     )
-    return retrofitErrorHandler {
-      api.markPrivateMessageAsRead(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.private_message_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().markPrivateMessageAsRead(authorization = account.bearer, form)
+    }.map { it.private_message_view }
   }
 
   suspend fun markAllAsRead(account: Account): Result<GetRepliesResponse> {
     val form = MarkAllAsRead(
       account.jwt,
     )
-    return retrofitErrorHandler {
-      api.markAllAsRead(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().markAllAsRead(authorization = account.bearer, form)
+    }
   }
 
   suspend fun createPrivateMessage(
@@ -1597,31 +1231,17 @@ class LemmyApiClient @Inject constructor(
       recipient_id = recipient,
       auth = account.jwt,
     )
-    return retrofitErrorHandler {
-      api.createPrivateMessage(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.private_message_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().createPrivateMessage(authorization = account.bearer, form)
+    }.map { it.private_message_view }
   }
 
   suspend fun savePost(postId: PostId, save: Boolean, account: Account): Result<PostView> {
     val form = SavePost(postId, save, account.jwt)
 
-    return retrofitErrorHandler {
-      api.savePost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.post_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().savePost(authorization = account.bearer, form)
+    }.map { it.post_view }
   }
 
   suspend fun saveComment(
@@ -1631,16 +1251,9 @@ class LemmyApiClient @Inject constructor(
   ): Result<CommentView> {
     val form = SaveComment(commentId, save, account.jwt)
 
-    return retrofitErrorHandler {
-      api.saveComment(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it.comment_view)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().saveComment(authorization = account.bearer, form)
+    }.map { it.comment_view }
   }
 
   suspend fun createPostReport(
@@ -1654,16 +1267,9 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.createPostReport(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().createPostReport(authorization = account.bearer, form)
+    }
   }
 
   suspend fun createCommentReport(
@@ -1677,29 +1283,15 @@ class LemmyApiClient @Inject constructor(
       account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.createCommentReport(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().createCommentReport(authorization = account.bearer, form)
+    }
   }
 
   suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> {
-    return retrofitErrorHandler {
-      api.saveUserSettings(authorization = settings.auth.toBearer(), settings)
-    }.fold(
-      onSuccess = {
-        Result.success(Unit)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().saveUserSettings(authorization = settings.auth.toBearer(), settings)
+    }.map { Unit }
   }
 
   suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
@@ -1708,16 +1300,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.resolveObject(authorization = account.bearer, form, force = false)
-    }.fold(
-      onSuccess = {
-        Result.success(it)
-      },
-      onFailure = {
-        Result.failure(it)
-      },
-    )
+    return onApiClient {
+      getApi().resolveObject(authorization = account.bearer, form, force = false)
+    }
   }
 
   suspend fun banUserFromSite(
@@ -1737,12 +1322,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.banUserFromSite(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().banUserFromSite(authorization = account.bearer, form)
+    }
   }
 
   suspend fun removeCommunity(
@@ -1758,12 +1340,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.removeCommunity(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().removeCommunity(authorization = account.bearer, form)
+    }
   }
 
   suspend fun hideCommunity(
@@ -1779,12 +1358,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.hideCommunity(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().hideCommunity(authorization = account.bearer, form)
+    }
   }
 
   suspend fun purgePerson(
@@ -1798,12 +1374,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.purgePerson(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().purgePerson(authorization = account.bearer, form)
+    }
   }
 
   suspend fun purgeCommunity(
@@ -1817,12 +1390,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.purgeCommunity(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().purgeCommunity(authorization = account.bearer, form)
+    }
   }
 
   suspend fun purgePost(
@@ -1836,12 +1406,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.purgePost(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().purgePost(authorization = account.bearer, form)
+    }
   }
 
   suspend fun purgeComment(
@@ -1855,12 +1422,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.purgeComment(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().purgeComment(authorization = account.bearer, form)
+    }
   }
 
   /**
@@ -1892,12 +1456,9 @@ class LemmyApiClient @Inject constructor(
       auth = account?.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getModLogs(authorization = account?.bearer, form, force = force)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().getModLogs(authorization = account?.bearer, form, force = force)
+    }
   }
 
   suspend fun getUnreadRegistrationApplicationsCount(
@@ -1908,12 +1469,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.getRegistrationApplicationsCount(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().getRegistrationApplicationsCount(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun getRegistrationApplications(
@@ -1930,12 +1488,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.listRegistrationApplications(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().listRegistrationApplications(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun approveRegistrationApplication(
@@ -1951,12 +1506,9 @@ class LemmyApiClient @Inject constructor(
       auth = account.jwt,
     )
 
-    return retrofitErrorHandler {
-      api.approveRegistrationApplication(authorization = account.bearer, form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().approveRegistrationApplication(authorization = account.bearer, form)
+    }
   }
 
   suspend fun listMedia(page: Long?, limit: Long?, account: Account, force: Boolean): Result<ListMediaResponse> {
@@ -1965,12 +1517,9 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
     )
 
-    return retrofitErrorHandler {
-      api.listMedia(authorization = account.bearer, form, force = force)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().listMedia(authorization = account.bearer, form, force = force)
+    }
   }
 
   suspend fun register(
@@ -2011,149 +1560,111 @@ class LemmyApiClient @Inject constructor(
       answer = answer,
     )
 
-    return retrofitErrorHandler {
-      api.register(form)
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().register(form)
+    }
   }
 
   suspend fun getCaptcha(): Result<GetCaptchaResponse> {
-    return retrofitErrorHandler {
-      api.getCaptcha()
-    }.fold(
-      onSuccess = { Result.success(it) },
-      onFailure = { Result.failure(it) },
-    )
+    return onApiClient {
+      getApi().getCaptcha()
+    }
   }
 
-  private suspend fun <T> retrofitErrorHandler(call: () -> Call<T>): Result<T> {
-    val res = try {
-      runInterruptible(Dispatchers.IO) {
-        call().execute()
-      }
+  private suspend fun <T> onApiClient(call: suspend () -> Result<T>): Result<T> {
+    try {
+      val result = call()
+      apiListenerManager.onRequestComplete(result)
+      return result
     } catch (e: Exception) {
-      if (e is SocketTimeoutException) {
-        return Result.failure(com.idunnololz.summit.api.SocketTimeoutException())
-      }
-      if (e is UnknownHostException) {
-        return Result.failure(NoInternetException())
-      }
-      if (e is CancellationException) {
-        throw e
-      }
-      if (e is InterruptedIOException) {
-        return Result.failure(e)
-      }
-      if (e is ConnectException) {
-        return Result.failure(ConnectionException())
-      }
-      Log.e(TAG, "Exception fetching url", e)
+      // This can happen if we are using the API is created by reflection.
       return Result.failure(e)
     }
+  }
 
-    apiListenerManager.onRequestComplete(res)
+  private suspend fun getApi(instance: String = this.instance): LemmyLikeApi {
+    val cachedApi = apis[instance]
+    if (cachedApi != null) {
+      return cachedApi
+    }
+    apiInfo.value = StatefulData.Loading()
 
-    if (res.isSuccessful) {
-      return Result.success(requireNotNull(res.body()))
+    val currentFetchApiInfoJob = fetchApiInfoJob
+    val fetchApiInfoJob = if (fetchApiInfoInstance == instance && currentFetchApiInfoJob != null) {
+      currentFetchApiInfoJob
     } else {
-      val errorCode = res.code()
-      val errorBody = res.errorBody()?.string()
+      fetchApiInfoInstance = instance
+      fetchApiInfoJob?.cancel()
+      coroutineScope.async {
+        siteBackendHelper.fetchApiInfo(instance)
+      }.also {
+        fetchApiInfoJob = it
+      }
+    }
 
-      if (errorCode >= 500) {
-        if (res.message().contains("only-if-cached", ignoreCase = true)) {
-          // for some reason okhttp returns a 504 if we force cache with no internet
-          return Result.failure(NoInternetException())
-        }
-        return Result.failure(
-          ServerApiException(
-            errorMessage = errorBody,
-            errorCode = errorCode,
-          ),
-        )
-      }
+    val result = fetchApiInfoJob.await()
 
-      if (errorCode == 429) {
-        return Result.failure(RateLimitException(0L))
+    apiInfo.value = result.fold(
+      {
+        Log.d(TAG, "Determined backend for instance $instance is ${it.backendType}.")
+        StatefulData.Success(it)
+      },
+      {
+        Log.e(TAG, "Unable to determine backend for instance $instance.")
+        StatefulData.Error(it)
       }
+    )
 
-      val errMsg = try {
-        errorBody?.let {
-          JSONObject(it).getString("error")
-        } ?: run {
-          res.code().toString()
-        }
-      } catch (e: Exception) {
-        Log.e(TAG, "Exception parsing body", e)
-        errorBody
-      }
-
-      if (errMsg?.equals("incorrect_login", ignoreCase = true) == true) {
-        return Result.failure(ClientApiException(errMsg, errorCode))
-      }
-
-      if (errorCode == 401) {
-        return Result.failure(NotAuthenticatedException())
-      }
-
-      if (errMsg?.contains("not_logged_in", ignoreCase = true) == true) {
-        return Result.failure(NotAuthenticatedException())
-      }
-      if (errMsg == "rate_limit_error") { // might be safe to delete
-        return Result.failure(RateLimitException(0L))
-      }
-      if (errMsg == "not_a_mod_or_admin") {
-        return Result.failure(NotAModOrAdmin())
-      }
-      if (errMsg == "couldnt_find_object" || errMsg == "couldnt_find_community") {
-        return Result.failure(CouldntFindObjectError())
-      }
-      // TODO: Remove these checks once v0.19 is out for everyone.
-      if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
-        return Result.failure(NewApiException("v0.19"))
-      }
-
-      if (errorCode == 403) {
-        return Result.failure(ForbiddenException())
-      }
-
-      if (BuildConfig.DEBUG) {
-        Log.e(
-          "ApiError",
-          "Code: $errorCode Error message: $errMsg Call: ${call().request().url}",
-          RuntimeException(),
-        )
-      }
-
-      if (errMsg?.contains("timeout", ignoreCase = true) == true) {
-        return Result.failure(ServerTimeoutException(errorCode))
-      }
-      if (errMsg?.contains("the database system is not yet accepting connections", ignoreCase = true) == true) {
-        // this is a 4xx error but it should be a 5xx error because it's server sided and retry-able
-        return Result.failure(ServerApiException(null, 503))
-      }
-
-      return Result.failure(ClientApiException(errorMessage = errMsg, errorCode = errorCode))
+    return newApi(instance, result).also {
+      apis[instance] = it
     }
   }
 
-  private fun getApiV3WithInstance(instance: String = Consts.DEFAULT_INSTANCE): LemmyLikeApi {
-    return apis[instance]
-      ?: newApiV3(instance).also {
-        apis[instance] = it
+  private fun newApi(
+    instance: String = Consts.DEFAULT_INSTANCE,
+    apiInfo: Result<SiteBackendHelper.ApiInfo>,
+  ): LemmyLikeApi {
+    return apiInfo.fold(
+      {
+        when (it.backendType) {
+          SiteBackendHelper.ApiType.PieFedAlpha -> PieFedApiAlphaAdapter(
+            Retrofit.Builder()
+              .baseUrl("https://$instance/api/alpha/")
+              .addConverterFactory(GsonConverterFactory.create())
+              .client(okHttpClient)
+              .build()
+              .create(PieFedApiAlpha::class.java),
+            instance,
+          )
+          SiteBackendHelper.ApiType.LemmyV4,
+          SiteBackendHelper.ApiType.LemmyV3,
+          null -> LemmyApiV3Adapter(
+            Retrofit.Builder()
+              .baseUrl("https://$instance/api/v3/")
+              .addConverterFactory(GsonConverterFactory.create())
+              .client(okHttpClient)
+              .build()
+              .create(LemmyApiV3::class.java),
+            instance,
+          )
+        }
+      },
+      { exception ->
+        val handler = object : InvocationHandler {
+          override fun invoke(
+            proxy: Any?,
+            method: Method?,
+            args: Array<out Any?>?,
+          ): Any? {
+            throw exception
+          }
+        }
+        Proxy.newProxyInstance(
+          LemmyLikeApi::class.java.classLoader,
+          arrayOf(LemmyLikeApi::class.java),
+          handler,
+        ) as LemmyLikeApi
       }
-  }
-
-  private fun newApiV3(instance: String = Consts.DEFAULT_INSTANCE): LemmyApiV3Adapter {
-    return LemmyApiV3Adapter(
-      Retrofit.Builder()
-        .baseUrl("https://$instance/api/v3/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .client(okHttpClient)
-        .build()
-        .create(LemmyApiV3::class.java),
-      instance,
     )
   }
 }
