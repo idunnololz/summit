@@ -15,13 +15,13 @@ import com.idunnololz.summit.api.dto.lemmy.BlockPerson
 import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
-import com.idunnololz.summit.api.dto.lemmy.CommentResponse
+import com.idunnololz.summit.api.dto.piefed.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
-import com.idunnololz.summit.api.dto.lemmy.CreateComment
+import com.idunnololz.summit.api.dto.piefed.CreateComment
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
 import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
-import com.idunnololz.summit.api.dto.lemmy.CreatePost
+import com.idunnololz.summit.api.dto.piefed.CreatePost
 import com.idunnololz.summit.api.dto.lemmy.CreatePostLike
 import com.idunnololz.summit.api.dto.lemmy.CreatePostReport
 import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
@@ -36,12 +36,12 @@ import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
+import com.idunnololz.summit.api.dto.piefed.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
-import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
+import com.idunnololz.summit.api.dto.piefed.GetPostResponse
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
 import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
@@ -66,7 +66,7 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
 import com.idunnololz.summit.api.dto.lemmy.PictrsImages
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
-import com.idunnololz.summit.api.dto.lemmy.PostResponse
+import com.idunnololz.summit.api.dto.piefed.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
@@ -92,6 +92,7 @@ import com.idunnololz.summit.api.dto.piefed.GetPostsResponse
 import com.idunnololz.summit.api.dto.piefed.GetSiteResponse
 import okhttp3.MultipartBody
 import com.idunnololz.summit.api.dto.piefed.Login
+import com.idunnololz.summit.api.dto.piefed.UploadResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -581,7 +582,7 @@ interface PieFedApiAlpha {
     @Header("Cookie") token: String,
     @Url url: String,
     @Part filePart: MultipartBody.Part,
-  ): Call<PictrsImages>
+  ): Call<UploadResponse>
 
   @GET("resolve_object")
   fun resolveObject(

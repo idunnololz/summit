@@ -58,7 +58,7 @@ data class CommunityAggregates (
     val postReplyCount: kotlin.Int,
 
     @SerializedName("published")
-    val published: java.time.OffsetDateTime,
+    val published: String,
 
     @SerializedName("subscriptions_count")
     val subscriptionsCount: kotlin.Int,

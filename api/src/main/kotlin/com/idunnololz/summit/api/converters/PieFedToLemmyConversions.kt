@@ -1,15 +1,18 @@
-package com.idunnololz.summit.api
+package com.idunnololz.summit.api.converters
 
+import com.idunnololz.summit.api.dto.lemmy.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentView
+import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
 import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
-import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.piefed.Comment
 import com.idunnololz.summit.api.dto.piefed.CommentAggregates
 import com.idunnololz.summit.api.dto.piefed.Community
 import com.idunnololz.summit.api.dto.piefed.CommunityBlockView
 import com.idunnololz.summit.api.dto.piefed.CommunityFollowerView
+import com.idunnololz.summit.api.dto.piefed.CommunityView
 import com.idunnololz.summit.api.dto.piefed.Instance
 import com.idunnololz.summit.api.dto.piefed.InstanceBlockView
 import com.idunnololz.summit.api.dto.piefed.ListingType
@@ -312,7 +315,7 @@ internal fun SortType.toSortType(): com.idunnololz.summit.api.dto.lemmy.SortType
     SortType.Scaled -> com.idunnololz.summit.api.dto.lemmy.SortType.Scaled
   }
 
-internal fun ListingType.toListingType(): com.idunnololz.summit.api.dto.lemmy.ListingType? =
+internal fun ListingType.toListingType(): com.idunnololz.summit.api.dto.lemmy.ListingType =
   when (this) {
     ListingType.All -> com.idunnololz.summit.api.dto.lemmy.ListingType.All
     ListingType.Local -> com.idunnololz.summit.api.dto.lemmy.ListingType.Local
@@ -320,3 +323,39 @@ internal fun ListingType.toListingType(): com.idunnololz.summit.api.dto.lemmy.Li
     ListingType.Popular -> com.idunnololz.summit.api.dto.lemmy.ListingType.All
     ListingType.ModeratorView -> com.idunnololz.summit.api.dto.lemmy.ListingType.ModeratorView
   }
+
+internal fun CommunityView.toCommunityView(): com.idunnololz.summit.api.dto.lemmy.CommunityView =
+  com.idunnololz.summit.api.dto.lemmy.CommunityView(
+    community = this.community.toCommunity(),
+    subscribed = this.subscribed.toSubscribedType(),
+    blocked = this.blocked,
+    counts = this.counts.toCommunityAggregates(),
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommunityAggregates.toCommunityAggregates(): CommunityAggregates =
+  CommunityAggregates(
+    id = this.id,
+    community_id = this.id,
+    subscribers = this.subscriptionsCount,
+    posts = this.postCount,
+    comments = this.postReplyCount,
+    published = this.published,
+    users_active_day = this.activeDaily,
+    users_active_week = this.activeWeekly,
+    users_active_month = this.activeMonthly,
+    users_active_half_year = this.active6monthly,
+  )
+
+
+internal fun com.idunnololz.summit.api.dto.piefed.PostResponse.toPostResponse() =
+  PostResponse(
+    this.postView.toPostView()
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommentResponse.toCommentResponse() =
+  CommentResponse(
+    this.commentView.toCommentView(),
+    null,
+    null,
+  )
+

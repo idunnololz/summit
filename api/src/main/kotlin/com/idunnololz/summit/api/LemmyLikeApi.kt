@@ -553,7 +553,7 @@ interface LemmyLikeApi {
     url: String,
     fileName: String,
     imageIs: InputStream,
-  ): Result<PictrsImages>
+  ): Result<UploadImageResult>
 
   suspend fun resolveObject(
     authorization: String?,

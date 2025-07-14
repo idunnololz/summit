@@ -16,7 +16,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import okhttp3.internal.toImmutableList
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -69,7 +68,7 @@ class HistoryViewModel @Inject constructor(
 
         historyData.postValue(
           HistoryEntryData(
-            entries.toImmutableList(),
+            entries.toList(),
             hasMore,
           ),
         )

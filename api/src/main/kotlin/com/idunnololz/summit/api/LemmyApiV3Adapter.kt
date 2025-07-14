@@ -527,7 +527,7 @@ class LemmyApiV3Adapter(
     url: String,
     fileName: String,
     imageIs: InputStream,
-  ): Result<PictrsImages> =
+  ): Result<UploadImageResult> =
     retrofitErrorHandler {
       api.uploadImage(
         headers = generateHeaders(authorization, false),
@@ -539,6 +539,8 @@ class LemmyApiV3Adapter(
           imageIs.readBytes().toRequestBody(),
         )
       )
+    }.map {
+      UploadImageResult("$url/${it.files?.get(0)?.file}")
     }
 
   override suspend fun resolveObject(

@@ -884,9 +884,6 @@ class LemmyApiClient @Inject constructor(
         fileName = fileName,
         imageIs = imageIs,
       )
-    }.map {
-      val imageUrl = "$url/${it.files?.get(0)?.file}"
-      UploadImageResult(imageUrl)
     }
   }
 
@@ -1668,7 +1665,3 @@ class LemmyApiClient @Inject constructor(
     )
   }
 }
-
-class UploadImageResult(
-  val url: String,
-)

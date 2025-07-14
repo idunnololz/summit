@@ -3,6 +3,17 @@ package com.idunnololz.summit.api
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.idunnololz.summit.api.converters.toCommentResponse
+import com.idunnololz.summit.api.converters.toCommentView
+import com.idunnololz.summit.api.converters.toCommunityModeratorView
+import com.idunnololz.summit.api.converters.toCommunityView
+import com.idunnololz.summit.api.converters.toCreateComment
+import com.idunnololz.summit.api.converters.toCreatePost
+import com.idunnololz.summit.api.converters.toMyUserInfo
+import com.idunnololz.summit.api.converters.toPersonView
+import com.idunnololz.summit.api.converters.toPostResponse
+import com.idunnololz.summit.api.converters.toPostView
+import com.idunnololz.summit.api.converters.toSite
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
@@ -19,7 +30,6 @@ import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
-import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.CreateComment
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
@@ -97,7 +107,6 @@ import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
 import com.idunnololz.summit.api.dto.lemmy.PictrsImages
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
-import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
@@ -123,8 +132,6 @@ import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
-import com.idunnololz.summit.api.dto.piefed.MyUserInfo
-import com.idunnololz.summit.api.dto.piefed.Site
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.InputStream
@@ -220,6 +227,15 @@ class PieFedApiAlphaAdapter(
     force: Boolean,
   ): Result<GetPostResponse> =
     retrofitErrorHandler { api.getPost(generateHeaders(authorization, force), args.serializeToMap()) }
+      .map {
+        GetPostResponse(
+          post_view = it.postView.toPostView(),
+          community_view = it.communityView.toCommunityView(),
+          moderators = it.moderators.map { it.toCommunityModeratorView() },
+          cross_posts = it.crossPosts.map { it.toPostView() },
+          online = 0,
+        )
+      }
 
   override suspend fun login(args: Login): Result<LoginResponse> =
     retrofitErrorHandler {
@@ -237,12 +253,14 @@ class PieFedApiAlphaAdapter(
     args: CreatePostLike,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.likePost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun likeComment(
     authorization: String?,
     args: CreateCommentLike,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.likeComment(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun listCommentVotes(
     authorization: String?,
@@ -262,37 +280,44 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: CreateComment,
   ): Result<CommentResponse> =
-    retrofitErrorHandler { api.createComment(generateHeaders(authorization, false), args) }
+    retrofitErrorHandler {
+      api.createComment(generateHeaders(authorization, false), args.toCreateComment())
+    }.map { it.toCommentResponse() }
 
   override suspend fun editComment(
     authorization: String?,
     args: EditComment,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.editComment(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun deleteComment(
     authorization: String?,
     args: DeleteComment
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.deleteComment(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun savePost(
     authorization: String?,
     args: SavePost,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.savePost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun markPostAsRead(
     authorization: String?,
     args: MarkPostAsRead,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.markPostAsRead(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun saveComment(
     authorization: String?,
     args: SaveComment,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.saveComment(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun getComments(
     authorization: String?,
@@ -300,18 +325,25 @@ class PieFedApiAlphaAdapter(
     force: Boolean,
   ): Result<GetCommentsResponse> =
     retrofitErrorHandler { api.getComments(generateHeaders(authorization, force), args.serializeToMap()) }
+      .map {
+        GetCommentsResponse(
+          it.comments.map { it.toCommentView() }
+        )
+      }
 
   override suspend fun distinguishComment(
     authorization: String?,
     args: DistinguishComment,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.distinguishComment(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun removeComment(
     authorization: String?,
     args: RemoveComment,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.removeComment(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun getCommunity(
     authorization: String?,
@@ -382,6 +414,7 @@ class PieFedApiAlphaAdapter(
     args: MarkCommentReplyAsRead,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.markCommentReplyAsRead(generateHeaders(authorization, false), args) }
+      .map { it.toCommentResponse() }
 
   override suspend fun markPersonMentionAsRead(
     authorization: String?,
@@ -502,37 +535,44 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: CreatePost,
   ): Result<PostResponse> =
-    retrofitErrorHandler { api.createPost(generateHeaders(authorization, false), args) }
+    retrofitErrorHandler {
+      api.createPost(generateHeaders(authorization, false), args.toCreatePost())
+    }.map { it.toPostResponse() }
 
   override suspend fun editPost(
     authorization: String?,
     args: EditPost,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.editPost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun deletePost(
     authorization: String?,
     args: DeletePost,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.deletePost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun featurePost(
     authorization: String?,
     args: FeaturePost,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.featurePost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun lockPost(
     authorization: String?,
     args: LockPost,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.lockPost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun removePost(
     authorization: String?,
     args: RemovePost,
   ): Result<PostResponse> =
     retrofitErrorHandler { api.removePost(generateHeaders(authorization, false), args) }
+      .map { it.toPostResponse() }
 
   override suspend fun search(
     authorization: String?,
@@ -589,18 +629,20 @@ class PieFedApiAlphaAdapter(
     url: String,
     fileName: String,
     imageIs: InputStream,
-  ): Result<PictrsImages> =
+  ): Result<UploadImageResult> =
     retrofitErrorHandler {
       api.uploadImage(
         headers = generateHeaders(authorization = authorization, force = false),
         token = "jwt=${authorization}",
-        url = url,
+        url = "https://${instance}/upload/image",
         filePart = MultipartBody.Part.createFormData(
-          "images[]",
+          "file",
           fileName,
           imageIs.readBytes().toRequestBody(),
         ),
       )
+    }.map {
+      UploadImageResult(it.url)
     }
 
   override suspend fun resolveObject(
@@ -694,6 +736,4 @@ class PieFedApiAlphaAdapter(
 
 
 }
-
-
 
