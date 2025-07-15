@@ -156,6 +156,7 @@ class PersonTabbedViewModel @Inject constructor(
             limit = PAGE_SIZE,
             force = force,
             sortType = sortType,
+            includeContent = true,
           )
         }
         is PersonRef.PersonRefByName -> {
@@ -165,6 +166,7 @@ class PersonTabbedViewModel @Inject constructor(
             limit = PAGE_SIZE,
             force = force,
             sortType = sortType,
+            includeContent = true,
           )
         }
         is PersonRef.PersonRefById -> {
@@ -202,6 +204,7 @@ class PersonTabbedViewModel @Inject constructor(
                   limit = PAGE_SIZE,
                   force = force,
                   sortType = sortType,
+                  includeContent = true,
                 )
               },
               {

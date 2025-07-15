@@ -965,6 +965,7 @@ class LemmyApiClient @Inject constructor(
     account: Account?,
     force: Boolean,
     savedOnly: Boolean = false,
+    includeContent: Boolean? = null,
   ): Result<GetPersonDetailsResponse> {
     val form = GetPersonDetails(
       person_id = personId,
@@ -974,6 +975,7 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
       sort = sort,
       saved_only = savedOnly,
+      include_content = includeContent,
     )
 
     return onApiClient {

@@ -276,6 +276,7 @@ class AccountAwareLemmyClient @Inject constructor(
     sortType: SortType = SortType.New,
     page: Int = 1,
     limit: Int = 1,
+    includeContent: Boolean? = null,
     account: Account? = accountForInstance(),
     force: Boolean,
   ): Result<GetPersonDetailsResponse> = retry {
@@ -288,6 +289,7 @@ class AccountAwareLemmyClient @Inject constructor(
         page = page,
         limit = limit,
         force = force,
+        includeContent = includeContent,
       )
       .autoSignOut(account)
   }

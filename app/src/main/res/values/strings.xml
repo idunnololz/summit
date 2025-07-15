@@ -2272,6 +2272,8 @@
     <string name="error_400_bad_request">400 Bad request</string>
     <string name="error_403_forbidden">403 Forbidden</string>
     <string name="uploads">Uploads</string>
+    <string name="instance_info_format">Instance info (%1$s)</string>
+    <string name="error_not_yet_implemented">This feature is not yet supported by the server.</string>
 
     <!-- uCrop string resource end -->
 </resources>

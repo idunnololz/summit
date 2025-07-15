@@ -26,6 +26,9 @@ import com.google.gson.annotations.SerializedName
 
 enum class SearchType(val value: kotlin.String) {
 
+    @SerializedName(value = "All")
+    All("All"),
+
     @SerializedName(value = "Communities")
     Communities("Communities"),
 

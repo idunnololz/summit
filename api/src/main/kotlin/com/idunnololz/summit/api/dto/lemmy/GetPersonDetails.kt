@@ -10,4 +10,5 @@ data class GetPersonDetails(
   val community_id: CommunityId? = null,
   val saved_only: Boolean? = null,
   val auth: String? = null,
+  val include_content: Boolean? = null
 )

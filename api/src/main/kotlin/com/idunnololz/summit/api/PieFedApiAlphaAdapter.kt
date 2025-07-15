@@ -17,7 +17,9 @@ import com.idunnololz.summit.api.converters.toMyUserInfo
 import com.idunnololz.summit.api.converters.toPersonView
 import com.idunnololz.summit.api.converters.toPostResponse
 import com.idunnololz.summit.api.converters.toPostView
+import com.idunnololz.summit.api.converters.toSearchType
 import com.idunnololz.summit.api.converters.toSite
+import com.idunnololz.summit.api.converters.toSortType
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
@@ -133,6 +135,7 @@ import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
+import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
@@ -471,7 +474,16 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler {
       api.getPersonDetails(
         generateHeaders(authorization = authorization, force = force),
-        args.serializeToMap(),
+        com.idunnololz.summit.api.dto.piefed.GetPersonDetails(
+          personId = args.person_id?.toInt(),
+          username = args.username,
+          sort = args.sort?.toSortType(),
+          page = args.page,
+          limit = args.limit,
+          communityId = args.community_id,
+          savedOnly = args.saved_only,
+          includeContent = args.include_content,
+        ).serializeToMap()
       )
     }.map {
       GetPersonDetailsResponse(
@@ -678,6 +690,15 @@ class PieFedApiAlphaAdapter(
     force: Boolean,
   ): Result<SearchResponse> =
     retrofitErrorHandler { api.search(generateHeaders(authorization, force), args.serializeToMap()) }
+      .map {
+        SearchResponse(
+          type_ = it.type?.toSearchType() ?: SearchType.All,
+          comments = listOf(),
+          posts = it.posts.map { it.toPostView() },
+          communities = it.communities.map { it.toCommunityView() },
+          users = it.users.map { it.toPersonView() },
+        )
+      }
 
   override suspend fun getSiteMetadata(
     authorization: String?,

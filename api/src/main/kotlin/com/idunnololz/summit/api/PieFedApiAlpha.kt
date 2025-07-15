@@ -39,7 +39,6 @@ import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.piefed.GetCommentsResponse
 import com.idunnololz.summit.api.dto.piefed.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
-import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.piefed.GetRepliesResponse
 import com.idunnololz.summit.api.dto.piefed.GetPostResponse
 import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
@@ -85,8 +84,9 @@ import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.SaveComment
 import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
-import com.idunnololz.summit.api.dto.lemmy.SearchResponse
+import com.idunnololz.summit.api.dto.piefed.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.piefed.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.piefed.GetPostsResponse
 import com.idunnololz.summit.api.dto.piefed.GetSiteResponse
 import okhttp3.MultipartBody
@@ -293,7 +293,7 @@ interface PieFedApiAlpha {
   fun getPersonDetails(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<com.idunnololz.summit.api.dto.piefed.GetPersonDetailsResponse>
+  ): Call<GetPersonDetailsResponse>
 
   @PUT("user/change_password")
   fun changePassword(

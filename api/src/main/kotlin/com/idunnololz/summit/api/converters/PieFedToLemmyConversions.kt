@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.lemmy.PersonMention
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
+import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.piefed.CommentReply
 import com.idunnololz.summit.api.dto.piefed.Community
 import com.idunnololz.summit.api.dto.piefed.CommunityBlockView
@@ -439,3 +440,12 @@ internal fun CommentReply.toPersonMention(): PersonMention =
     read = this.read,
     published = this.published,
   )
+
+internal fun com.idunnololz.summit.api.dto.piefed.SearchType.toSearchType(): SearchType =
+  when (this) {
+    com.idunnololz.summit.api.dto.piefed.SearchType.Communities -> SearchType.Communities
+    com.idunnololz.summit.api.dto.piefed.SearchType.Posts -> SearchType.Posts
+    com.idunnololz.summit.api.dto.piefed.SearchType.Users -> SearchType.Users
+    com.idunnololz.summit.api.dto.piefed.SearchType.Url -> SearchType.Url
+    com.idunnololz.summit.api.dto.piefed.SearchType.All -> SearchType.All
+  }

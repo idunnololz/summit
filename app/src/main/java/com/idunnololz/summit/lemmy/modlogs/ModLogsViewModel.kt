@@ -324,7 +324,7 @@ class ModLogsViewModel @Inject constructor(
             it.items.isNotEmpty()
           },
           onFailure = {
-            true
+            false
           },
         ),
       )

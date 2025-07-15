@@ -35,7 +35,7 @@ import com.google.gson.annotations.SerializedName
 data class SearchResponse (
 
     @SerializedName("type_")
-    val type: SearchType,
+    val type: SearchType?,
 
     @SerializedName("posts")
     val posts: kotlin.collections.List<PostView>,

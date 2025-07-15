@@ -14,6 +14,7 @@ import com.idunnololz.summit.api.NetworkException
 import com.idunnololz.summit.api.NewApiException
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.NotAuthenticatedException
+import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.api.RateLimitException
 import com.idunnololz.summit.api.ServerApiException
 import com.idunnololz.summit.api.ServerTimeoutException
@@ -73,6 +74,8 @@ fun Throwable.toErrorMessage(context: Context): String {
             }
           }
         }
+        is NotYetImplemented ->
+          context.getString(R.string.error_not_yet_implemented)
         is ServerApiException ->
           context.getString(R.string.error_server, t.errorCode.toString())
       }

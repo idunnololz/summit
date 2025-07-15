@@ -145,7 +145,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
               addDivider()
               addItemWithIcon(
                 id = R.id.instance_info,
-                getString(R.string.instance_info),
+                getString(R.string.instance_info_format, pageRef.instance),
                 R.drawable.baseline_web_24,
               )
               addDivider()
@@ -297,7 +297,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
               addDivider()
               addItemWithIcon(
                 id = R.id.instance_info,
-                getString(R.string.instance_info),
+                getString(R.string.instance_info_format, pageRef.instance),
                 R.drawable.baseline_web_24,
               )
               addDivider()
