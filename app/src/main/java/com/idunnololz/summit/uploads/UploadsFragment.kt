@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentUploadsBinding
 import com.idunnololz.summit.util.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +29,6 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
     val context = requireContext()
 
     with(binding) {
-
     }
   }
 }

@@ -7,10 +7,9 @@ import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.SpannableBuilder
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.CoreProps
-import io.noties.markwon.image.ImageProps
-import org.commonmark.node.Link
 import java.util.Locale
 import java.util.regex.Pattern
+import org.commonmark.node.Link
 
 class LemmyMentionsPlugin : AbstractMarkwonPlugin() {
 
@@ -43,25 +42,31 @@ class LemmyMentionsPlugin : AbstractMarkwonPlugin() {
                 "!", "c/", "/c/" -> {
                   val communityRef = CommunityRef.CommunityRefByName(name, instance)
 
-                  CoreProps.LINK_DESTINATION.set(visitor.renderProps(), LinkUtils.getLinkForCommunity(communityRef))
+                  CoreProps.LINK_DESTINATION.set(
+                    visitor.renderProps(),
+                    LinkUtils.getLinkForCommunity(communityRef),
+                  )
 
                   val spanFactory = visitor.configuration().spansFactory().require(Link::class.java)
                   SpannableBuilder.setSpans(
                     visitor.builder(),
                     spanFactory.getSpans(visitor.configuration(), visitor.renderProps()),
                     start + matcher.start(),
-                    start + matcher.end()
+                    start + matcher.end(),
                   )
                 }
                 "@", "u/", "/u/" -> {
-                  CoreProps.LINK_DESTINATION.set(visitor.renderProps(), LinkUtils.getLinkForPerson(instance = instance, name = name))
+                  CoreProps.LINK_DESTINATION.set(
+                    visitor.renderProps(),
+                    LinkUtils.getLinkForPerson(instance = instance, name = name),
+                  )
 
                   val spanFactory = visitor.configuration().spansFactory().require(Link::class.java)
                   SpannableBuilder.setSpans(
                     visitor.builder(),
                     spanFactory.getSpans(visitor.configuration(), visitor.renderProps()),
                     start + matcher.start(),
-                    start + matcher.end()
+                    start + matcher.end(),
                   )
                 }
               }

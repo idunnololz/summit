@@ -207,7 +207,7 @@ class InboxRepository @Inject constructor(
         add(postReportsStatelessSource)
         add(commentReportsStatelessSource)
       }
-    }
+    },
   )
   private val unreadSources = InboxMultiDataSource(
     mutableListOf<InboxSource<*>>().apply {

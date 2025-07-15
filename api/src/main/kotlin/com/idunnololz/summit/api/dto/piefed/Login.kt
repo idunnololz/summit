@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param username 
- * @param password 
+ *
+ * @param username
+ * @param password
  */
 
+data class Login(
 
-data class Login (
+  @SerializedName("username")
+  val username: kotlin.String,
 
-    @SerializedName("username")
-    val username: kotlin.String,
+  @SerializedName("password")
+  val password: kotlin.String,
 
-    @SerializedName("password")
-    val password: kotlin.String
-
-) {
-
-
-}
-
+)

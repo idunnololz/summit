@@ -7,37 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.Community
-import com.idunnololz.summit.api.dto.piefed.Person
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param community 
- * @param follower 
+ *
+ * @param community
+ * @param follower
  */
 
+data class CommunityFollowerView(
 
-data class CommunityFollowerView (
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("follower")
+  val follower: Person,
 
-    @SerializedName("follower")
-    val follower: Person
-
-) {
-
-
-}
-
+)

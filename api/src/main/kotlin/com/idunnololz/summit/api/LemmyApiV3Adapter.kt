@@ -92,7 +92,6 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
-import com.idunnololz.summit.api.dto.lemmy.PictrsImages
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
@@ -118,11 +117,10 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Call
-import java.io.InputStream
 
 class LemmyApiV3Adapter(
   private val api: LemmyApiV3,
@@ -165,22 +163,34 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetSite,
     force: Boolean,
-  ): Result<GetSiteResponse> =
-    retrofitErrorHandler { api.getSite(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetSiteResponse> = retrofitErrorHandler {
+    api.getSite(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 
   override suspend fun getPosts(
     authorization: String?,
     args: GetPosts,
     force: Boolean,
-  ): Result<GetPostsResponse> =
-    retrofitErrorHandler { api.getPosts(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetPostsResponse> = retrofitErrorHandler {
+    api.getPosts(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 
   override suspend fun getPost(
     authorization: String?,
     args: GetPost,
     force: Boolean,
-  ): Result<GetPostResponse> =
-    retrofitErrorHandler { api.getPost(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetPostResponse> = retrofitErrorHandler {
+    api.getPost(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 
   override suspend fun login(args: Login): Result<LoginResponse> =
     retrofitErrorHandler { api.login(generateHeaders(null, false), args) }
@@ -201,15 +211,17 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: ListCommentLikes,
     force: Boolean,
-  ): Result<ListCommentLikesResponse> =
-    retrofitErrorHandler { api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListCommentLikesResponse> = retrofitErrorHandler {
+    api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun listPostVotes(
     authorization: String?,
     args: ListPostLikes,
     force: Boolean,
-  ): Result<ListPostLikesResponse> =
-    retrofitErrorHandler { api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListPostLikesResponse> = retrofitErrorHandler {
+    api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createComment(
     authorization: String?,
@@ -225,14 +237,11 @@ class LemmyApiV3Adapter(
 
   override suspend fun deleteComment(
     authorization: String?,
-    args: DeleteComment
+    args: DeleteComment,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.deleteComment(generateHeaders(authorization, false), args) }
 
-  override suspend fun savePost(
-    authorization: String?,
-    args: SavePost,
-  ): Result<PostResponse> =
+  override suspend fun savePost(authorization: String?, args: SavePost): Result<PostResponse> =
     retrofitErrorHandler { api.savePost(generateHeaders(authorization, false), args) }
 
   override suspend fun markPostAsRead(
@@ -252,8 +261,9 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetComments,
     force: Boolean,
-  ): Result<GetCommentsResponse> =
-    retrofitErrorHandler { api.getComments(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetCommentsResponse> = retrofitErrorHandler {
+    api.getComments(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun distinguishComment(
     authorization: String?,
@@ -271,8 +281,9 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetCommunity,
     force: Boolean,
-  ): Result<GetCommunityResponse> =
-    retrofitErrorHandler { api.getCommunity(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetCommunityResponse> = retrofitErrorHandler {
+    api.getCommunity(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createCommunity(
     authorization: String?,
@@ -296,15 +307,17 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: ListCommunities,
     force: Boolean,
-  ): Result<ListCommunitiesResponse> =
-    retrofitErrorHandler { api.getCommunityList(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListCommunitiesResponse> = retrofitErrorHandler {
+    api.getCommunityList(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun getPersonDetails(
     authorization: String?,
     args: GetPersonDetails,
     force: Boolean,
-  ): Result<GetPersonDetailsResponse> =
-    retrofitErrorHandler { api.getPersonDetails(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetPersonDetailsResponse> = retrofitErrorHandler {
+    api.getPersonDetails(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun changePassword(
     authorization: String?,
@@ -316,8 +329,9 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetReplies,
     force: Boolean,
-  ): Result<GetRepliesResponse> =
-    retrofitErrorHandler { api.getReplies(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetRepliesResponse> = retrofitErrorHandler {
+    api.getReplies(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun markCommentReplyAsRead(
     authorization: String?,
@@ -328,14 +342,22 @@ class LemmyApiV3Adapter(
   override suspend fun markPersonMentionAsRead(
     authorization: String?,
     args: MarkPersonMentionAsRead,
-  ): Result<PersonMentionResponse> =
-    retrofitErrorHandler { api.markPersonMentionAsRead(generateHeaders(authorization, false), args) }
+  ): Result<PersonMentionResponse> = retrofitErrorHandler {
+    api.markPersonMentionAsRead(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }
 
   override suspend fun markPrivateMessageAsRead(
     authorization: String?,
     args: MarkPrivateMessageAsRead,
-  ): Result<PrivateMessageResponse> =
-    retrofitErrorHandler { api.markPrivateMessageAsRead(generateHeaders(authorization, false), args) }
+  ): Result<PrivateMessageResponse> = retrofitErrorHandler {
+    api.markPrivateMessageAsRead(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }
 
   override suspend fun markAllAsRead(
     authorization: String?,
@@ -347,41 +369,50 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetPersonMentions,
     force: Boolean,
-  ): Result<GetPersonMentionsResponse> =
-    retrofitErrorHandler { api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetPersonMentionsResponse> = retrofitErrorHandler {
+    api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun getPrivateMessages(
     authorization: String?,
     args: GetPrivateMessages,
     force: Boolean,
-  ): Result<PrivateMessagesResponse> =
-    retrofitErrorHandler { api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
+    api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun getPrivateMessageReports(
     authorization: String?,
     args: ListPrivateMessageReports,
     force: Boolean,
-  ): Result<ListPrivateMessageReportsResponse> =
-    retrofitErrorHandler { api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListPrivateMessageReportsResponse> = retrofitErrorHandler {
+    api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createPrivateMessageReport(
     authorization: String?,
     args: CreatePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> =
-    retrofitErrorHandler { api.createPrivateMessageReport(generateHeaders(authorization, false), args) }
+  ): Result<PrivateMessageReportResponse> = retrofitErrorHandler {
+    api.createPrivateMessageReport(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }
 
   override suspend fun resolvePrivateMessageReport(
     authorization: String?,
     args: ResolvePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> =
-    retrofitErrorHandler { api.resolvePrivateMessageReport(generateHeaders(authorization, false), args) }
+  ): Result<PrivateMessageReportResponse> = retrofitErrorHandler {
+    api.resolvePrivateMessageReport(generateHeaders(authorization, false), args)
+  }
 
   override suspend fun getPostReports(
     authorization: String?,
     args: ListPostReports,
     force: Boolean,
-  ): Result<ListPostReportsResponse> =
-    retrofitErrorHandler { api.getPostReports(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListPostReportsResponse> = retrofitErrorHandler {
+    api.getPostReports(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun resolvePostReport(
     authorization: String?,
@@ -393,8 +424,9 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: ListCommentReports,
     force: Boolean,
-  ): Result<ListCommentReportsResponse> =
-    retrofitErrorHandler { api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
+    api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun resolveCommentReport(
     authorization: String?,
@@ -412,15 +444,17 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse> =
-    retrofitErrorHandler { api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetUnreadCountResponse> = retrofitErrorHandler {
+    api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun getReportCount(
     authorization: String?,
     args: GetReportCount,
     force: Boolean,
-  ): Result<GetReportCountResponse> =
-    retrofitErrorHandler { api.getReportCount(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetReportCountResponse> = retrofitErrorHandler {
+    api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun followCommunity(
     authorization: String?,
@@ -440,22 +474,13 @@ class LemmyApiV3Adapter(
   ): Result<AddModToCommunityResponse> =
     retrofitErrorHandler { api.modUser(generateHeaders(authorization, false), args) }
 
-  override suspend fun createPost(
-    authorization: String?,
-    args: CreatePost,
-  ): Result<PostResponse> =
+  override suspend fun createPost(authorization: String?, args: CreatePost): Result<PostResponse> =
     retrofitErrorHandler { api.createPost(generateHeaders(authorization, false), args) }
 
-  override suspend fun editPost(
-    authorization: String?,
-    args: EditPost,
-  ): Result<PostResponse> =
+  override suspend fun editPost(authorization: String?, args: EditPost): Result<PostResponse> =
     retrofitErrorHandler { api.editPost(generateHeaders(authorization, false), args) }
 
-  override suspend fun deletePost(
-    authorization: String?,
-    args: DeletePost,
-  ): Result<PostResponse> =
+  override suspend fun deletePost(authorization: String?, args: DeletePost): Result<PostResponse> =
     retrofitErrorHandler { api.deletePost(generateHeaders(authorization, false), args) }
 
   override suspend fun featurePost(
@@ -464,31 +489,30 @@ class LemmyApiV3Adapter(
   ): Result<PostResponse> =
     retrofitErrorHandler { api.featurePost(generateHeaders(authorization, false), args) }
 
-  override suspend fun lockPost(
-    authorization: String?,
-    args: LockPost,
-  ): Result<PostResponse> =
+  override suspend fun lockPost(authorization: String?, args: LockPost): Result<PostResponse> =
     retrofitErrorHandler { api.lockPost(generateHeaders(authorization, false), args) }
 
-  override suspend fun removePost(
-    authorization: String?,
-    args: RemovePost,
-  ): Result<PostResponse> =
+  override suspend fun removePost(authorization: String?, args: RemovePost): Result<PostResponse> =
     retrofitErrorHandler { api.removePost(generateHeaders(authorization, false), args) }
 
   override suspend fun search(
     authorization: String?,
     args: Search,
     force: Boolean,
-  ): Result<SearchResponse> =
-    retrofitErrorHandler { api.search(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<SearchResponse> = retrofitErrorHandler {
+    api.search(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 
   override suspend fun getSiteMetadata(
     authorization: String?,
     args: GetSiteMetadata,
     force: Boolean,
-  ): Result<GetSiteMetadataResponse> =
-    retrofitErrorHandler { api.getSiteMetadata(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetSiteMetadataResponse> = retrofitErrorHandler {
+    api.getSiteMetadata(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createCommentReport(
     authorization: String?,
@@ -532,28 +556,28 @@ class LemmyApiV3Adapter(
     fileName: String,
     imageIs: InputStream,
     mimeType: String?,
-  ): Result<UploadImageResult> =
-    retrofitErrorHandler {
-      api.uploadImage(
-        headers = generateHeaders(authorization, false),
-        token = "jwt=${authorization}",
-        url = url,
-        filePart = MultipartBody.Part.createFormData(
-          name = "images[]",
-          filename = fileName,
-          body = imageIs.readBytes().toRequestBody(contentType = mimeType?.toMediaType()),
-        )
-      )
-    }.map {
-      UploadImageResult("$url/${it.files?.get(0)?.file}")
-    }
+  ): Result<UploadImageResult> = retrofitErrorHandler {
+    api.uploadImage(
+      headers = generateHeaders(authorization, false),
+      token = "jwt=$authorization",
+      url = url,
+      filePart = MultipartBody.Part.createFormData(
+        name = "images[]",
+        filename = fileName,
+        body = imageIs.readBytes().toRequestBody(contentType = mimeType?.toMediaType()),
+      ),
+    )
+  }.map {
+    UploadImageResult("$url/${it.files?.get(0)?.file}")
+  }
 
   override suspend fun resolveObject(
     authorization: String?,
     args: ResolveObject,
     force: Boolean,
-  ): Result<ResolveObjectResponse> =
-    retrofitErrorHandler { api.resolveObject(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ResolveObjectResponse> = retrofitErrorHandler {
+    api.resolveObject(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun banUserFromSite(
     authorization: String?,
@@ -601,28 +625,35 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: GetUnreadRegistrationApplicationCount,
     force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> =
-    retrofitErrorHandler { api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetUnreadRegistrationApplicationCountResponse> = retrofitErrorHandler {
+    api.getRegistrationApplicationsCount(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 
   override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> =
-    retrofitErrorHandler { api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListRegistrationApplicationsResponse> = retrofitErrorHandler {
+    api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse> =
-    retrofitErrorHandler { api.approveRegistrationApplication(generateHeaders(authorization, false), args) }
+  ): Result<RegistrationApplicationResponse> = retrofitErrorHandler {
+    api.approveRegistrationApplication(generateHeaders(authorization, false), args)
+  }
 
   override suspend fun getModLogs(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> =
-    retrofitErrorHandler { api.getModLogs(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetModlogResponse> = retrofitErrorHandler {
+    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
     retrofitErrorHandler { api.register(generateHeaders(null, false), args) }
@@ -634,8 +665,10 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: ListMedia,
     force: Boolean,
-  ): Result<ListMediaResponse> =
-    retrofitErrorHandler { api.listMedia(generateHeaders(authorization, force), args.serializeToMap()) }
-
-
+  ): Result<ListMediaResponse> = retrofitErrorHandler {
+    api.listMedia(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 }

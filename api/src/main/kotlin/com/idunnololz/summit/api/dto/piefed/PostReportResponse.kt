@@ -7,32 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.PostReportView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param postReportView 
+ *
+ * @param postReportView
  */
 
+data class PostReportResponse(
 
-data class PostReportResponse (
+  @SerializedName("post_report_view")
+  val postReportView: PostReportView,
 
-    @SerializedName("post_report_view")
-    val postReportView: PostReportView
-
-) {
-
-
-}
-
+)

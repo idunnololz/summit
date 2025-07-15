@@ -7,73 +7,65 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.CommentSortType
-import com.idunnololz.summit.api.dto.piefed.ListingType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param type 
- * @param sort 
- * @param maxDepth 
- * @param page 
- * @param limit 
- * @param communityId 
- * @param postId 
- * @param parentId 
- * @param personId 
- * @param likedOnly 
- * @param savedOnly 
+ *
+ * @param type
+ * @param sort
+ * @param maxDepth
+ * @param page
+ * @param limit
+ * @param communityId
+ * @param postId
+ * @param parentId
+ * @param personId
+ * @param likedOnly
+ * @param savedOnly
  */
 
+data class GetComments(
 
-data class GetComments (
+  @SerializedName("type_")
+  val type: ListingType? = null,
 
-    @SerializedName("type_")
-    val type: ListingType? = null,
+  @SerializedName("sort")
+  val sort: CommentSortType? = null,
 
-    @SerializedName("sort")
-    val sort: CommentSortType? = null,
+  @SerializedName("max_depth")
+  val maxDepth: kotlin.Int? = null,
 
-    @SerializedName("max_depth")
-    val maxDepth: kotlin.Int? = null,
+  @SerializedName("page")
+  val page: kotlin.Int? = null,
 
-    @SerializedName("page")
-    val page: kotlin.Int? = null,
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  @SerializedName("community_id")
+  val communityId: kotlin.Int? = null,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int? = null,
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+  @SerializedName("parent_id")
+  val parentId: kotlin.Int? = null,
 
-    @SerializedName("parent_id")
-    val parentId: kotlin.Int? = null,
+  @SerializedName("person_id")
+  val personId: kotlin.Int? = null,
 
-    @SerializedName("person_id")
-    val personId: kotlin.Int? = null,
+  @SerializedName("liked_only")
+  val likedOnly: kotlin.Boolean? = null,
 
-    @SerializedName("liked_only")
-    val likedOnly: kotlin.Boolean? = null,
+  @SerializedName("saved_only")
+  val savedOnly: kotlin.Boolean? = null,
 
-    @SerializedName("saved_only")
-    val savedOnly: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

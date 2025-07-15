@@ -612,7 +612,7 @@ class AddOrEditCommentFragment :
             LanguageOption(
               name = context.getString(R.string.unspecified),
               language = null,
-            )
+            ),
           ) + it.map { language ->
             LanguageOption(
               name = language.name,
@@ -630,8 +630,11 @@ class AddOrEditCommentFragment :
         val languageOption = viewModel.languageId.value?.let { languageId ->
           options.firstOrNull { it.language?.id == languageId }
         }
-        languagePickerText.setText(languageOption?.name
-          ?: context.getString(R.string.unspecified), false)
+        languagePickerText.setText(
+          languageOption?.name
+            ?: context.getString(R.string.unspecified),
+          false,
+        )
         languagePickerText.setOnItemClickListener { _, _, position, _ ->
           viewModel.languageId.value = options[position].language?.id
         }

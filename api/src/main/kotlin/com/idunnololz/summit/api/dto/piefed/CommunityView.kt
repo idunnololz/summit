@@ -7,50 +7,41 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.Community
-import com.idunnololz.summit.api.dto.piefed.CommunityAggregates
-import com.idunnololz.summit.api.dto.piefed.SubscribedType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param community 
- * @param subscribed 
- * @param blocked 
- * @param counts 
- * @param activityAlert 
+ *
+ * @param community
+ * @param subscribed
+ * @param blocked
+ * @param counts
+ * @param activityAlert
  */
 
+data class CommunityView(
 
-data class CommunityView (
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("subscribed")
+  val subscribed: SubscribedType,
 
-    @SerializedName("subscribed")
-    val subscribed: SubscribedType,
+  @SerializedName("blocked")
+  val blocked: kotlin.Boolean,
 
-    @SerializedName("blocked")
-    val blocked: kotlin.Boolean,
+  @SerializedName("counts")
+  val counts: CommunityAggregates,
 
-    @SerializedName("counts")
-    val counts: CommunityAggregates,
+  @SerializedName("activity_alert")
+  val activityAlert: kotlin.Boolean,
 
-    @SerializedName("activity_alert")
-    val activityAlert: kotlin.Boolean
-
-) {
-
-
-}
-
+)

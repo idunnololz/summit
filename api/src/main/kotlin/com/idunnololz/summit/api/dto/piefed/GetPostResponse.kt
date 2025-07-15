@@ -7,46 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.CommunityModeratorView
-import com.idunnololz.summit.api.dto.piefed.CommunityView
-import com.idunnololz.summit.api.dto.piefed.PostView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param postView 
- * @param communityView 
- * @param moderators 
- * @param crossPosts 
+ *
+ * @param postView
+ * @param communityView
+ * @param moderators
+ * @param crossPosts
  */
 
+data class GetPostResponse(
 
-data class GetPostResponse (
+  @SerializedName("post_view")
+  val postView: PostView,
 
-    @SerializedName("post_view")
-    val postView: PostView,
+  @SerializedName("community_view")
+  val communityView: CommunityView,
 
-    @SerializedName("community_view")
-    val communityView: CommunityView,
+  @SerializedName("moderators")
+  val moderators: kotlin.collections.List<CommunityModeratorView>,
 
-    @SerializedName("moderators")
-    val moderators: kotlin.collections.List<CommunityModeratorView>,
+  @SerializedName("cross_posts")
+  val crossPosts: kotlin.collections.List<PostView>,
 
-    @SerializedName("cross_posts")
-    val crossPosts: kotlin.collections.List<PostView>
-
-) {
-
-
-}
-
+)

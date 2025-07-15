@@ -316,7 +316,7 @@ class TextFormatToolbarViewHolder(
     quote?.setOnClickListener {
       editText.startEachLineWith(
         getSelectedText(),
-        "> "
+        "> ",
       )
     }
     link?.setOnClickListener {
@@ -325,13 +325,13 @@ class TextFormatToolbarViewHolder(
     bulletedList?.setOnClickListener {
       editText.startEachLineWith(
         getSelectedText(),
-        "* "
+        "* ",
       )
     }
     numberedList?.setOnClickListener {
       editText.startEachLineWith(
         getSelectedText(),
-        "1. "
+        "1. ",
       )
     }
     spongebob?.setOnClickListener {
@@ -425,10 +425,7 @@ class TextFormatToolbarViewHolder(
     editText.setSelection(finalCursorPos)
   }
 
-  private fun EditText.startEachLineWith(
-    selectedText: String?,
-    prefix: String
-  ) {
+  private fun EditText.startEachLineWith(selectedText: String?, prefix: String) {
     val start = selectionStart.coerceAtLeast(0)
     val end = selectionEnd.coerceAtLeast(0)
 
@@ -440,7 +437,7 @@ class TextFormatToolbarViewHolder(
     } else {
       text.split("\n").joinToString(separator = "\n") {
         if (!it.startsWith(prefix)) {
-          "$prefix${it}"
+          "$prefix$it"
         } else {
           it
         }

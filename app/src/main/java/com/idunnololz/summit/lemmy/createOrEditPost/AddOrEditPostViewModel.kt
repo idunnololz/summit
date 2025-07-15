@@ -150,7 +150,9 @@ class AddOrEditPostViewModel @Inject constructor(
       )
 
       recentCommunityManager.addRecentCommunityPostedTo(
-        community.toCommunityRef(), community.icon)
+        community.toCommunityRef(),
+        community.icon,
+      )
 
       result
         .onSuccess {

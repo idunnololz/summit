@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param q 
+ *
+ * @param q
  */
 
+data class ResolveObject(
 
-data class ResolveObject (
+  @SerializedName("q")
+  val q: kotlin.String,
 
-    @SerializedName("q")
-    val q: kotlin.String
-
-) {
-
-
-}
-
+)

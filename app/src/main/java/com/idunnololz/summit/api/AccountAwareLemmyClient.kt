@@ -109,8 +109,7 @@ class AccountAwareLemmyClient @Inject constructor(
     }
   }
 
-  suspend fun apiSupportsReports(): Boolean =
-    apiClient.apiSupportsReports()
+  suspend fun apiSupportsReports(): Boolean = apiClient.apiSupportsReports()
 
   suspend fun fetchSavedPostsWithRetry(
     page: Int,
@@ -1137,17 +1136,16 @@ class AccountAwareLemmyClient @Inject constructor(
     limit: Long?,
     force: Boolean,
     account: Account? = accountForInstance(),
-  ) =
-    if (account != null) {
-      apiClient.listMedia(
-        page = page,
-        limit = limit,
-        account = account,
-        force = force,
-      ).autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+  ) = if (account != null) {
+    apiClient.listMedia(
+      page = page,
+      limit = limit,
+      account = account,
+      force = force,
+    ).autoSignOut(account)
+  } else {
+    createAccountErrorResult()
+  }
 
   fun changeInstance(site: String) = apiClient.changeInstance(site)
 

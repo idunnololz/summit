@@ -7,55 +7,49 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param postId 
- * @param comments 
- * @param score 
- * @param upvotes 
- * @param downvotes 
- * @param published 
- * @param newestCommentTime 
+ *
+ * @param postId
+ * @param comments
+ * @param score
+ * @param upvotes
+ * @param downvotes
+ * @param published
+ * @param newestCommentTime
  */
 
+data class PostAggregates(
 
-data class PostAggregates (
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("comments")
+  val comments: kotlin.Int,
 
-    @SerializedName("comments")
-    val comments: kotlin.Int,
+  @SerializedName("score")
+  val score: kotlin.Int,
 
-    @SerializedName("score")
-    val score: kotlin.Int,
+  @SerializedName("upvotes")
+  val upvotes: kotlin.Int,
 
-    @SerializedName("upvotes")
-    val upvotes: kotlin.Int,
+  @SerializedName("downvotes")
+  val downvotes: kotlin.Int,
 
-    @SerializedName("downvotes")
-    val downvotes: kotlin.Int,
+  @SerializedName("published")
+  val published: String,
 
-    @SerializedName("published")
-    val published: String,
+  @SerializedName("newest_comment_time")
+  val newestCommentTime: kotlin.String,
 
-    @SerializedName("newest_comment_time")
-    val newestCommentTime: kotlin.String
-
-) {
-
-
-}
-
+)

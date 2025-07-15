@@ -7,27 +7,17 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
-import com.google.gson.annotations.SerializedName
-
 /**
- * 
+ *
  *
  */
 
-
-class ModerateCommunityPostNsfwResponse (
-
-) {
-
-
-}
-
+class ModerateCommunityPostNsfwResponse()

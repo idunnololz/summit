@@ -33,9 +33,9 @@ import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.json.Json
 import java.lang.Exception
 import javax.inject.Inject
+import kotlinx.serialization.json.Json
 
 @AndroidEntryPoint
 class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>() {
@@ -45,7 +45,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
       ModEventDialogFragment()
         .apply {
           arguments = ModEventDialogFragmentArgs(
-            modEventJson = Json.encodeToString(modEvent)
+            modEventJson = Json.encodeToString(modEvent),
           ).toBundle()
         }
         .show(fragmentManager, "ModEventDialogFragment")
@@ -66,7 +66,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
     setSizeDynamically(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
   }
 
@@ -103,19 +103,15 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
       var lastViewId = R.id.title
 
-      fun addField(
-        fieldName: String,
-        fieldValue: String,
-        onClick: (() -> Unit)? = null,
-      ) {
+      fun addField(fieldName: String, fieldValue: String, onClick: (() -> Unit)? = null) {
         val titleView = TextView(
           context,
           null,
-          com.google.android.material.R.attr.textAppearanceLabelSmall
+          com.google.android.material.R.attr.textAppearanceLabelSmall,
         ).apply {
           id = View.generateViewId()
           layoutParams = ConstraintLayout.LayoutParams(
-            0, ConstraintLayout.LayoutParams.WRAP_CONTENT
+            0, ConstraintLayout.LayoutParams.WRAP_CONTENT,
           ).apply {
             startToStart = R.id.title
             endToEnd = R.id.title
@@ -131,11 +127,11 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
         val valueView = TextView(
           context,
           null,
-          com.google.android.material.R.attr.textAppearanceBodyMedium
+          com.google.android.material.R.attr.textAppearanceBodyMedium,
         ).apply {
           id = View.generateViewId()
           layoutParams = ConstraintLayout.LayoutParams(
-            0, ConstraintLayout.LayoutParams.WRAP_CONTENT
+            0, ConstraintLayout.LayoutParams.WRAP_CONTENT,
           ).apply {
             startToStart = R.id.title
             endToEnd = R.id.title
@@ -144,7 +140,8 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
           text = fieldValue
           if (onClick != null) {
             context.getColorStateListFromAttribute(
-              com.google.android.material.R.attr.colorPrimary)?.let {
+              com.google.android.material.R.attr.colorPrimary,
+            )?.let {
               setTextColor(it)
             }
 
@@ -164,7 +161,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
             admin.fullName,
           ) {
             getMainActivity()?.launchPage(
-              admin.toPersonRef()
+              admin.toPersonRef(),
             )
             dismiss()
           }
@@ -182,7 +179,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
             moderator.fullName,
           ) {
             getMainActivity()?.launchPage(
-              moderator.toPersonRef()
+              moderator.toPersonRef(),
             )
             dismiss()
           }
@@ -207,24 +204,23 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
           ),
         )
 
-
         when (modEvent) {
           is ModEvent.AdminPurgeCommentViewEvent -> {
             addAdminField(modEvent.event.admin)
 
             addField(
               context.getString(R.string.post),
-              modEvent.event.post.name
+              modEvent.event.post.name,
             ) {
               getMainActivity()?.launchPage(
-                PostRef(apiClient.instance, modEvent.event.post.id)
+                PostRef(apiClient.instance, modEvent.event.post.id),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.admin_purge_comment.reason ?: ""
+              modEvent.event.admin_purge_comment.reason ?: "",
             )
           }
           is ModEvent.AdminPurgeCommunityViewEvent -> {
@@ -232,7 +228,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.admin_purge_community.reason ?: ""
+              modEvent.event.admin_purge_community.reason ?: "",
             )
           }
           is ModEvent.AdminPurgePersonViewEvent -> {
@@ -240,7 +236,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.admin_purge_person.reason ?: ""
+              modEvent.event.admin_purge_person.reason ?: "",
             )
           }
           is ModEvent.AdminPurgePostViewEvent -> {
@@ -248,17 +244,17 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.admin_purge_post.reason ?: ""
+              modEvent.event.admin_purge_post.reason ?: "",
             )
           }
           is ModEvent.ModAddCommunityViewEvent -> {
@@ -266,10 +262,10 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.user),
-              modEvent.event.modded_person.fullName
+              modEvent.event.modded_person.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.modded_person.toPersonRef()
+                modEvent.event.modded_person.toPersonRef(),
               )
               dismiss()
             }
@@ -279,10 +275,10 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.user),
-              modEvent.event.modded_person.fullName
+              modEvent.event.modded_person.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.modded_person.toPersonRef()
+                modEvent.event.modded_person.toPersonRef(),
               )
               dismiss()
             }
@@ -292,17 +288,19 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.user),
-              modEvent.event.banned_person.fullName
+              modEvent.event.banned_person.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.banned_person.toPersonRef()
+                modEvent.event.banned_person.toPersonRef(),
               )
               dismiss()
             }
             val banExpires = modEvent.event.mod_ban_from_community.expires
             val banDuration = if (banExpires != null) {
-              durationToPretty(dateStringToTs(banExpires) -
-                dateStringToTs(modEvent.event.mod_ban_from_community.when_))
+              durationToPretty(
+                dateStringToTs(banExpires) -
+                  dateStringToTs(modEvent.event.mod_ban_from_community.when_),
+              )
             } else {
               getString(R.string.permanently_banned)
             }
@@ -313,17 +311,17 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.mod_ban_from_community.reason ?: ""
+              modEvent.event.mod_ban_from_community.reason ?: "",
             )
           }
           is ModEvent.ModBanViewEvent -> {
@@ -331,18 +329,20 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.user),
-              modEvent.event.banned_person.fullName
+              modEvent.event.banned_person.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.banned_person.toPersonRef()
+                modEvent.event.banned_person.toPersonRef(),
               )
               dismiss()
             }
 
             val banExpires = modEvent.event.mod_ban.expires
             val banDuration = if (banExpires != null) {
-              durationToPretty(dateStringToTs(banExpires) -
-                dateStringToTs(modEvent.event.mod_ban.when_))
+              durationToPretty(
+                dateStringToTs(banExpires) -
+                  dateStringToTs(modEvent.event.mod_ban.when_),
+              )
             } else {
               getString(R.string.permanently_banned)
             }
@@ -353,7 +353,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.mod_ban.reason ?: ""
+              modEvent.event.mod_ban.reason ?: "",
             )
           }
           is ModEvent.ModFeaturePostViewEvent -> {
@@ -361,23 +361,23 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.post),
-              modEvent.event.post.name
+              modEvent.event.post.name,
             ) {
               getMainActivity()?.launchPage(
                 PostRef(
                   apiClient.instance,
-                  modEvent.event.post.id
-                )
+                  modEvent.event.post.id,
+                ),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
@@ -387,10 +387,10 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
@@ -408,7 +408,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
             ) {
               if (admin?.fullName != null) {
                 getMainActivity()?.launchPage(
-                  admin.toPersonRef()
+                  admin.toPersonRef(),
                 )
                 dismiss()
               }
@@ -416,23 +416,23 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.post),
-              modEvent.event.post.name
+              modEvent.event.post.name,
             ) {
               getMainActivity()?.launchPage(
                 PostRef(
                   apiClient.instance,
                   modEvent.event.post.id,
-                )
+                ),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
@@ -442,53 +442,53 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.comment),
-              modEvent.event.comment.content
+              modEvent.event.comment.content,
             ) {
               getMainActivity()?.launchPage(
                 CommentRef(
                   apiClient.instance,
                   modEvent.event.comment.id,
-                )
+                ),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.user),
-              modEvent.event.commenter.fullName
+              modEvent.event.commenter.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.commenter.toPersonRef()
+                modEvent.event.commenter.toPersonRef(),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.post),
-              modEvent.event.post.name
+              modEvent.event.post.name,
             ) {
               getMainActivity()?.launchPage(
                 PostRef(
                   apiClient.instance,
                   modEvent.event.post.id,
-                )
+                ),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.mod_remove_comment.reason ?: ""
+              modEvent.event.mod_remove_comment.reason ?: "",
             )
           }
           is ModEvent.ModRemoveCommunityViewEvent -> {
@@ -496,17 +496,19 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
             val banExpires = modEvent.event.mod_remove_community.expires
             val banDuration = if (banExpires != null) {
-              durationToPretty(dateStringToTs(banExpires) -
-                dateStringToTs(modEvent.event.mod_remove_community.when_))
+              durationToPretty(
+                dateStringToTs(banExpires) -
+                  dateStringToTs(modEvent.event.mod_remove_community.when_),
+              )
             } else {
               getString(R.string.permanently_banned)
             }
@@ -517,7 +519,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.mod_remove_community.reason ?: ""
+              modEvent.event.mod_remove_community.reason ?: "",
             )
           }
           is ModEvent.ModRemovePostViewEvent -> {
@@ -525,30 +527,30 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.post),
-              modEvent.event.post.name
+              modEvent.event.post.name,
             ) {
               getMainActivity()?.launchPage(
                 PostRef(
                   apiClient.instance,
                   modEvent.event.post.id,
-                )
+                ),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.reason),
-              modEvent.event.mod_remove_post.reason ?: ""
+              modEvent.event.mod_remove_post.reason ?: "",
             )
           }
           is ModEvent.ModTransferCommunityViewEvent -> {
@@ -556,20 +558,20 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
 
             addField(
               context.getString(R.string.transferred_to),
-              modEvent.event.modded_person.fullName
+              modEvent.event.modded_person.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.modded_person.toPersonRef()
+                modEvent.event.modded_person.toPersonRef(),
               )
               dismiss()
             }
 
             addField(
               context.getString(R.string.community),
-              modEvent.event.community.fullName
+              modEvent.event.community.fullName,
             ) {
               getMainActivity()?.launchPage(
-                modEvent.event.community.toCommunityRef()
+                modEvent.event.community.toCommunityRef(),
               )
               dismiss()
             }
@@ -601,5 +603,4 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
       }
     }
   }
-
 }

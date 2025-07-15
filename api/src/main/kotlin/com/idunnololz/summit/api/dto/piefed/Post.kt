@@ -7,103 +7,97 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param title 
- * @param userId 
- * @param communityId 
- * @param removed 
- * @param locked 
- * @param published 
- * @param deleted 
- * @param nsfw 
- * @param apId 
- * @param local 
- * @param languageId 
- * @param sticky 
- * @param url 
- * @param body 
- * @param updated 
- * @param thumbnailUrl 
- * @param smallThumbnailUrl 
- * @param altText 
+ *
+ * @param id
+ * @param title
+ * @param userId
+ * @param communityId
+ * @param removed
+ * @param locked
+ * @param published
+ * @param deleted
+ * @param nsfw
+ * @param apId
+ * @param local
+ * @param languageId
+ * @param sticky
+ * @param url
+ * @param body
+ * @param updated
+ * @param thumbnailUrl
+ * @param smallThumbnailUrl
+ * @param altText
  */
 
+data class Post(
 
-data class Post (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("title")
+  val title: kotlin.String,
 
-    @SerializedName("title")
-    val title: kotlin.String,
+  @SerializedName("user_id")
+  val userId: kotlin.Int,
 
-    @SerializedName("user_id")
-    val userId: kotlin.Int,
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  @SerializedName("removed")
+  val removed: kotlin.Boolean,
 
-    @SerializedName("removed")
-    val removed: kotlin.Boolean,
+  @SerializedName("locked")
+  val locked: kotlin.Boolean,
 
-    @SerializedName("locked")
-    val locked: kotlin.Boolean,
+  @SerializedName("published")
+  val published: String,
 
-    @SerializedName("published")
-    val published: String,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean,
+  @SerializedName("ap_id")
+  val apId: kotlin.String,
 
-    @SerializedName("ap_id")
-    val apId: kotlin.String,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("language_id")
+  val languageId: kotlin.Int,
 
-    @SerializedName("language_id")
-    val languageId: kotlin.Int,
+  @SerializedName("sticky")
+  val sticky: kotlin.Boolean,
 
-    @SerializedName("sticky")
-    val sticky: kotlin.Boolean,
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    @SerializedName("url")
-    val url: kotlin.String? = null,
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  @SerializedName("updated")
+  val updated: String? = null,
 
-    @SerializedName("updated")
-    val updated: String? = null,
+  @SerializedName("thumbnail_url")
+  val thumbnailUrl: kotlin.String? = null,
 
-    @SerializedName("thumbnail_url")
-    val thumbnailUrl: kotlin.String? = null,
+  @SerializedName("small_thumbnail_url")
+  val smallThumbnailUrl: kotlin.String? = null,
 
-    @SerializedName("small_thumbnail_url")
-    val smallThumbnailUrl: kotlin.String? = null,
+  @SerializedName("alt_text")
+  val altText: kotlin.String? = null,
 
-    @SerializedName("alt_text")
-    val altText: kotlin.String? = null
-
-) {
-
-
-}
-
+)

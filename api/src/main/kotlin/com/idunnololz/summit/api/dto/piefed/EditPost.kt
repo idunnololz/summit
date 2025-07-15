@@ -7,51 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param postId 
- * @param title 
- * @param url 
- * @param body 
- * @param nsfw 
- * @param languageId 
+ *
+ * @param postId
+ * @param title
+ * @param url
+ * @param body
+ * @param nsfw
+ * @param languageId
  */
 
+data class EditPost(
 
-data class EditPost (
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    @SerializedName("title")
-    val title: kotlin.String? = null,
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    @SerializedName("url")
-    val url: kotlin.String? = null,
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

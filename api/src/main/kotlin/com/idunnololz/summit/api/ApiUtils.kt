@@ -1,15 +1,15 @@
 package com.idunnololz.summit.api
 
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runInterruptible
-import org.json.JSONObject
-import retrofit2.Call
 import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
+import org.json.JSONObject
+import retrofit2.Call
 
 private const val TAG = "ApiUtils"
 

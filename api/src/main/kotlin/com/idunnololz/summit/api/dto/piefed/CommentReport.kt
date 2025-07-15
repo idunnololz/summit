@@ -7,63 +7,57 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param creatorId 
- * @param commentId 
- * @param originalCommentText 
- * @param reason 
- * @param resolved 
- * @param published 
- * @param resolverId 
- * @param updated 
+ *
+ * @param id
+ * @param creatorId
+ * @param commentId
+ * @param originalCommentText
+ * @param reason
+ * @param resolved
+ * @param published
+ * @param resolverId
+ * @param updated
  */
 
+data class CommentReport(
 
-data class CommentReport (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  @SerializedName("original_comment_text")
+  val originalCommentText: kotlin.String,
 
-    @SerializedName("original_comment_text")
-    val originalCommentText: kotlin.String,
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  @SerializedName("published")
+  val published: java.time.OffsetDateTime,
 
-    @SerializedName("published")
-    val published: java.time.OffsetDateTime,
+  @SerializedName("resolver_id")
+  val resolverId: kotlin.Int? = null,
 
-    @SerializedName("resolver_id")
-    val resolverId: kotlin.Int? = null,
+  @SerializedName("updated")
+  val updated: java.time.OffsetDateTime? = null,
 
-    @SerializedName("updated")
-    val updated: java.time.OffsetDateTime? = null
-
-) {
-
-
-}
-
+)

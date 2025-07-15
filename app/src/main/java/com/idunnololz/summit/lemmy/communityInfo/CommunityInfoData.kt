@@ -9,7 +9,6 @@ import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.util.dateStringToTs
 
 data class CommunityInfoData(
   val backingObject: Either<CommunityView, SiteView>,

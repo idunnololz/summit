@@ -112,7 +112,10 @@ class CommunitySearchResultsAdapter(
       inflateFn = CommunitySearchResultSuggestionItemBinding::inflate,
     ) { item, b, h ->
       avatarHelper.loadCommunityIcon(
-        b.icon, item.communityRef, item.communityIcon)
+        b.icon,
+        item.communityRef,
+        item.communityIcon,
+      )
 
       b.title.text = item.text
 

@@ -213,7 +213,6 @@ fun ModlogActionType.getName(context: Context) = when (this) {
   ModlogActionType.AdminPurgeComment -> context.getString(R.string.purge_comment)
 }
 
-
 fun ModlogActionType.getName2(context: Context, isUndo: Boolean) = when (this) {
   ModlogActionType.All -> context.getString(R.string.all)
   ModlogActionType.ModRemovePost ->

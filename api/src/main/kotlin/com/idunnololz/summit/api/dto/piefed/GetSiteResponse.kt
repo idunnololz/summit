@@ -7,46 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.MyUserInfo
-import com.idunnololz.summit.api.dto.piefed.PersonView
-import com.idunnololz.summit.api.dto.piefed.Site
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param site 
- * @param version 
- * @param admins 
- * @param myUser 
+ *
+ * @param site
+ * @param version
+ * @param admins
+ * @param myUser
  */
 
+data class GetSiteResponse(
 
-data class GetSiteResponse (
+  @SerializedName("site")
+  val site: Site,
 
-    @SerializedName("site")
-    val site: Site,
+  @SerializedName("version")
+  val version: kotlin.String,
 
-    @SerializedName("version")
-    val version: kotlin.String,
+  @SerializedName("admins")
+  val admins: kotlin.collections.List<PersonView>,
 
-    @SerializedName("admins")
-    val admins: kotlin.collections.List<PersonView>,
+  @SerializedName("my_user")
+  val myUser: MyUserInfo? = null,
 
-    @SerializedName("my_user")
-    val myUser: MyUserInfo? = null
-
-) {
-
-
-}
-
+)

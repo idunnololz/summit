@@ -15,13 +15,9 @@ import com.idunnololz.summit.api.dto.lemmy.BlockPerson
 import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
-import com.idunnololz.summit.api.dto.piefed.CommentResponse
-import com.idunnololz.summit.api.dto.piefed.CommunityResponse
-import com.idunnololz.summit.api.dto.piefed.CreateComment
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
 import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
-import com.idunnololz.summit.api.dto.piefed.CreatePost
 import com.idunnololz.summit.api.dto.lemmy.CreatePostLike
 import com.idunnololz.summit.api.dto.lemmy.CreatePostReport
 import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
@@ -36,11 +32,7 @@ import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.piefed.GetCommentsResponse
-import com.idunnololz.summit.api.dto.piefed.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
-import com.idunnololz.summit.api.dto.piefed.GetRepliesResponse
-import com.idunnololz.summit.api.dto.piefed.GetPostResponse
 import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
@@ -48,23 +40,19 @@ import com.idunnololz.summit.api.dto.lemmy.GetUnreadRegistrationApplicationCount
 import com.idunnololz.summit.api.dto.lemmy.HideCommunity
 import com.idunnololz.summit.api.dto.lemmy.ListCommentLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListCommentReportsResponse
-import com.idunnololz.summit.api.dto.piefed.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListMediaResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostLikesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.lemmy.LockPost
-import com.idunnololz.summit.api.dto.piefed.LoginResponse
 import com.idunnololz.summit.api.dto.lemmy.MarkAllAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkCommentReplyAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
-import com.idunnololz.summit.api.dto.lemmy.PictrsImages
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
-import com.idunnololz.summit.api.dto.piefed.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
@@ -84,14 +72,25 @@ import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.SaveComment
 import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
-import com.idunnololz.summit.api.dto.piefed.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.dto.piefed.CommentResponse
+import com.idunnololz.summit.api.dto.piefed.CommunityResponse
+import com.idunnololz.summit.api.dto.piefed.CreateComment
+import com.idunnololz.summit.api.dto.piefed.CreatePost
+import com.idunnololz.summit.api.dto.piefed.GetCommentsResponse
+import com.idunnololz.summit.api.dto.piefed.GetCommunityResponse
 import com.idunnololz.summit.api.dto.piefed.GetPersonDetailsResponse
+import com.idunnololz.summit.api.dto.piefed.GetPostResponse
 import com.idunnololz.summit.api.dto.piefed.GetPostsResponse
+import com.idunnololz.summit.api.dto.piefed.GetRepliesResponse
 import com.idunnololz.summit.api.dto.piefed.GetSiteResponse
-import okhttp3.MultipartBody
+import com.idunnololz.summit.api.dto.piefed.ListCommunitiesResponse
 import com.idunnololz.summit.api.dto.piefed.Login
+import com.idunnololz.summit.api.dto.piefed.LoginResponse
+import com.idunnololz.summit.api.dto.piefed.PostResponse
+import com.idunnololz.summit.api.dto.piefed.SearchResponse
 import com.idunnololz.summit.api.dto.piefed.UploadResponse
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -102,7 +101,6 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.QueryMap
-import retrofit2.http.Url
 
 interface PieFedApiAlpha {
 
@@ -134,10 +132,7 @@ interface PieFedApiAlpha {
    * Log into lemmy.
    */
   @POST("user/login")
-  fun login(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: Login
-  ): Call<LoginResponse>
+  fun login(@HeaderMap headers: Map<String, String>, @Body form: Login): Call<LoginResponse>
 
   /**
    * Like / vote on a post.
@@ -200,10 +195,7 @@ interface PieFedApiAlpha {
    * Save a post.
    */
   @PUT("post/save")
-  fun savePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: SavePost,
-  ): Call<PostResponse>
+  fun savePost(@HeaderMap headers: Map<String, String>, @Body form: SavePost): Call<PostResponse>
 
   @POST("post/mark_as_read")
   fun markPostAsRead(
@@ -467,10 +459,7 @@ interface PieFedApiAlpha {
    * Edit a post.
    */
   @PUT("post")
-  fun editPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: EditPost,
-  ): Call<PostResponse>
+  fun editPost(@HeaderMap headers: Map<String, String>, @Body form: EditPost): Call<PostResponse>
 
   /**
    * Delete a post.
@@ -488,10 +477,7 @@ interface PieFedApiAlpha {
   ): Call<PostResponse>
 
   @POST("post/lock")
-  fun lockPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: LockPost,
-  ): Call<PostResponse>
+  fun lockPost(@HeaderMap headers: Map<String, String>, @Body form: LockPost): Call<PostResponse>
 
   @POST("post/remove")
   fun removePost(
@@ -665,13 +651,11 @@ interface PieFedApiAlpha {
   @POST("user/register")
   fun register(
     @HeaderMap headers: Map<String, String>,
-    @Body register: Register
+    @Body register: Register,
   ): Call<LoginResponse>
 
   @GET("user/get_captcha")
-  fun getCaptcha(
-    @HeaderMap headers: Map<String, String>,
-  ): Call<GetCaptchaResponse>
+  fun getCaptcha(@HeaderMap headers: Map<String, String>): Call<GetCaptchaResponse>
 
   @GET("account/list_media")
   fun listMedia(
@@ -680,5 +664,4 @@ interface PieFedApiAlpha {
   ): Call<ListMediaResponse>
 
   // https://lemmy.world/pictrs/image/delete/b60f8360-38bd-450a-ad6c-27b0b3936a27/60ac57fb-0bdd-42af-899a-01982ad37285.jpeg
-
 }

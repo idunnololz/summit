@@ -7,32 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.CommentView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param comments 
+ *
+ * @param comments
  */
 
+data class GetCommentsResponse(
 
-data class GetCommentsResponse (
+  @SerializedName("comments")
+  val comments: kotlin.collections.List<CommentView>,
 
-    @SerializedName("comments")
-    val comments: kotlin.collections.List<CommentView>
-
-) {
-
-
-}
-
+)

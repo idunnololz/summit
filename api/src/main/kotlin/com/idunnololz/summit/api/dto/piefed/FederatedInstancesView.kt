@@ -7,40 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.InstanceWithoutFederationState
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param linked 
- * @param allowed 
- * @param blocked 
+ *
+ * @param linked
+ * @param allowed
+ * @param blocked
  */
 
+data class FederatedInstancesView(
 
-data class FederatedInstancesView (
+  @SerializedName("linked")
+  val linked: kotlin.collections.List<InstanceWithoutFederationState>,
 
-    @SerializedName("linked")
-    val linked: kotlin.collections.List<InstanceWithoutFederationState>,
+  @SerializedName("allowed")
+  val allowed: kotlin.collections.List<InstanceWithoutFederationState>,
 
-    @SerializedName("allowed")
-    val allowed: kotlin.collections.List<InstanceWithoutFederationState>,
+  @SerializedName("blocked")
+  val blocked: kotlin.collections.List<InstanceWithoutFederationState>,
 
-    @SerializedName("blocked")
-    val blocked: kotlin.collections.List<InstanceWithoutFederationState>
-
-) {
-
-
-}
-
+)

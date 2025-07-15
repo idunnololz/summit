@@ -7,39 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param showNsfw 
- * @param showReadPosts 
- * @param bio 
+ *
+ * @param showNsfw
+ * @param showReadPosts
+ * @param bio
  */
 
+data class SaveUserSettings(
 
-data class SaveUserSettings (
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean? = null,
 
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean? = null,
+  @SerializedName("show_read_posts")
+  val showReadPosts: kotlin.Boolean? = null,
 
-    @SerializedName("show_read_posts")
-    val showReadPosts: kotlin.Boolean? = null,
+  @SerializedName("bio")
+  val bio: kotlin.String? = null,
 
-    @SerializedName("bio")
-    val bio: kotlin.String? = null
-
-) {
-
-
-}
-
+)

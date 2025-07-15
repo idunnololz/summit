@@ -7,54 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.ListingType
-import com.idunnololz.summit.api.dto.piefed.SearchType
-import com.idunnololz.summit.api.dto.piefed.SortType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param q 
- * @param type 
- * @param sort 
- * @param listingType 
- * @param page 
- * @param limit 
+ *
+ * @param q
+ * @param type
+ * @param sort
+ * @param listingType
+ * @param page
+ * @param limit
  */
 
+data class Search(
 
-data class Search (
+  @SerializedName("q")
+  val q: kotlin.String,
 
-    @SerializedName("q")
-    val q: kotlin.String,
+  @SerializedName("type_")
+  val type: SearchType? = null,
 
-    @SerializedName("type_")
-    val type: SearchType? = null,
+  @SerializedName("sort")
+  val sort: SortType? = null,
 
-    @SerializedName("sort")
-    val sort: SortType? = null,
+  @SerializedName("listing_type")
+  val listingType: ListingType? = null,
 
-    @SerializedName("listing_type")
-    val listingType: ListingType? = null,
+  @SerializedName("page")
+  val page: kotlin.Int? = null,
 
-    @SerializedName("page")
-    val page: kotlin.Int? = null,
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

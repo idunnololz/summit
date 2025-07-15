@@ -86,7 +86,8 @@ class MainActivityViewModel @Inject constructor(
 
             val communityRef = communityRef
             if ((communityRef is CommunityRef.All || communityRef is CommunityRef.Local) &&
-              communityRef.instance == null) {
+              communityRef.instance == null
+            ) {
               onCommunityChanged(communityRef)
             }
           }

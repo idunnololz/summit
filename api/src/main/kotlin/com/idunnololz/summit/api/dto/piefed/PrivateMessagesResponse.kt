@@ -7,32 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.PrivateMessageView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param privateMessages 
+ *
+ * @param privateMessages
  */
 
+data class PrivateMessagesResponse(
 
-data class PrivateMessagesResponse (
+  @SerializedName("private_messages")
+  val privateMessages: kotlin.collections.List<PrivateMessageView>,
 
-    @SerializedName("private_messages")
-    val privateMessages: kotlin.collections.List<PrivateMessageView>
-
-) {
-
-
-}
-
+)

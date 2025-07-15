@@ -65,10 +65,14 @@ class FileDownloadHelper @Inject constructor(
 
       val outputUri = try {
         DocumentsContract.createDocument(
-          /* content = */ c.contentResolver,
-          /* parentDocumentUri = */ parentFolderUri,
-          /* mimeType = */ mimeType ?: "*/*",
-          /* displayName = */ tokens[0] + "." + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+          /* content = */
+          c.contentResolver,
+          /* parentDocumentUri = */
+          parentFolderUri,
+          /* mimeType = */
+          mimeType ?: "*/*",
+          /* displayName = */
+          tokens[0] + "." + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
         )
       } catch (e: Exception) {
         return Result.failure(CustomDownloadLocationException("Create document failed", e))
@@ -82,7 +86,10 @@ class FileDownloadHelper @Inject constructor(
       val tokens = destFileName.split('.', limit = 2)
       val contentValues = ContentValues().apply {
         put(MediaStore.Downloads.TITLE, destFileName)
-        put(MediaStore.Downloads.DISPLAY_NAME, tokens[0] + "." + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+        put(
+          MediaStore.Downloads.DISPLAY_NAME,
+          tokens[0] + "." + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+        )
         put(MediaStore.Downloads.MIME_TYPE, mimeType)
         put(MediaStore.Downloads.IS_PENDING, 1)
       }

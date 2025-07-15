@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable
 import android.text.style.ImageSpan
 import androidx.core.graphics.withSave
 
-
 class CenteredImageSpan @JvmOverloads constructor(
   drawable: Drawable,
   verticalAlignment: Int = ALIGN_BOTTOM,

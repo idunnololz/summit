@@ -143,7 +143,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: ModBanView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.ModBan
   }
 
@@ -173,7 +173,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: ModTransferCommunityView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.ModTransferCommunity
   }
 
@@ -188,7 +188,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: ModAddView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.ModAdd
   }
 
@@ -200,7 +200,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgePersonView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.AdminPurgePerson
   }
 
@@ -212,7 +212,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgeCommunityView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.AdminPurgeCommunity
   }
 
@@ -224,7 +224,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgePostView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.AdminPurgePost
   }
 
@@ -236,7 +236,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: AdminPurgeCommentView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.AdminPurgeComment
   }
 
@@ -251,7 +251,7 @@ sealed interface ModEvent {
     override val ts: Long,
     override val agent: Person?,
     val event: ModHideCommunityView,
-  ) : ModEvent{
+  ) : ModEvent {
     override val actionType = ModlogActionType.ModHideCommunity
   }
 }

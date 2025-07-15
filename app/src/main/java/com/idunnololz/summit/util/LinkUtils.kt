@@ -65,11 +65,9 @@ object LinkUtils {
   fun getLinkForCommunity(instance: String, communityName: String): String =
     "https://$instance/c/$communityName"
 
-  fun isValidUrl(url: String) =
-    Patterns.WEB_URL.matcher(url).matches()
+  fun isValidUrl(url: String) = Patterns.WEB_URL.matcher(url).matches()
 
-  fun isValidInstance(instance: String) =
-    isValidUrl("https://$instance") && instance.isNotBlank()
+  fun isValidInstance(instance: String) = isValidUrl("https://$instance") && instance.isNotBlank()
 }
 
 sealed interface AdvancedLink {

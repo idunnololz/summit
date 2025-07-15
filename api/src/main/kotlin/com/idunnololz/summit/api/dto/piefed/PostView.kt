@@ -7,92 +7,81 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.Community
-import com.idunnololz.summit.api.dto.piefed.Person
-import com.idunnololz.summit.api.dto.piefed.Post
-import com.idunnololz.summit.api.dto.piefed.PostAggregates
-import com.idunnololz.summit.api.dto.piefed.SubscribedType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param post 
- * @param creator 
- * @param community 
- * @param creatorBannedFromCommunity 
- * @param bannedFromCommunity 
- * @param creatorIsModerator 
- * @param creatorIsAdmin 
- * @param counts 
- * @param subscribed 
- * @param saved 
- * @param read 
- * @param hidden 
- * @param unreadComments 
- * @param activityAlert 
- * @param myVote 
+ *
+ * @param post
+ * @param creator
+ * @param community
+ * @param creatorBannedFromCommunity
+ * @param bannedFromCommunity
+ * @param creatorIsModerator
+ * @param creatorIsAdmin
+ * @param counts
+ * @param subscribed
+ * @param saved
+ * @param read
+ * @param hidden
+ * @param unreadComments
+ * @param activityAlert
+ * @param myVote
  */
 
+data class PostView(
 
-data class PostView (
+  @SerializedName("post")
+  val post: Post,
 
-    @SerializedName("post")
-    val post: Post,
+  @SerializedName("creator")
+  val creator: Person,
 
-    @SerializedName("creator")
-    val creator: Person,
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("creator_banned_from_community")
+  val creatorBannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("creator_banned_from_community")
-    val creatorBannedFromCommunity: kotlin.Boolean,
+  @SerializedName("banned_from_community")
+  val bannedFromCommunity: kotlin.Boolean,
 
-    @SerializedName("banned_from_community")
-    val bannedFromCommunity: kotlin.Boolean,
+  @SerializedName("creator_is_moderator")
+  val creatorIsModerator: kotlin.Boolean,
 
-    @SerializedName("creator_is_moderator")
-    val creatorIsModerator: kotlin.Boolean,
+  @SerializedName("creator_is_admin")
+  val creatorIsAdmin: kotlin.Boolean,
 
-    @SerializedName("creator_is_admin")
-    val creatorIsAdmin: kotlin.Boolean,
+  @SerializedName("counts")
+  val counts: PostAggregates,
 
-    @SerializedName("counts")
-    val counts: PostAggregates,
+  @SerializedName("subscribed")
+  val subscribed: SubscribedType,
 
-    @SerializedName("subscribed")
-    val subscribed: SubscribedType,
+  @SerializedName("saved")
+  val saved: kotlin.Boolean,
 
-    @SerializedName("saved")
-    val saved: kotlin.Boolean,
+  @SerializedName("read")
+  val read: kotlin.Boolean,
 
-    @SerializedName("read")
-    val read: kotlin.Boolean,
+  @SerializedName("hidden")
+  val hidden: kotlin.Boolean,
 
-    @SerializedName("hidden")
-    val hidden: kotlin.Boolean,
+  @SerializedName("unread_comments")
+  val unreadComments: kotlin.Int,
 
-    @SerializedName("unread_comments")
-    val unreadComments: kotlin.Int,
+  @SerializedName("activity_alert")
+  val activityAlert: kotlin.Boolean? = null,
 
-    @SerializedName("activity_alert")
-    val activityAlert: kotlin.Boolean? = null,
+  @SerializedName("my_vote")
+  val myVote: kotlin.Int? = null,
 
-    @SerializedName("my_vote")
-    val myVote: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

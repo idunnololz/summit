@@ -149,10 +149,7 @@ class MentionsController @AssistedInject constructor(
     return null
   }
 
-  private fun showPopupWindow(
-    anchor: EditText,
-    queryResult: QueryResult,
-  ) {
+  private fun showPopupWindow(anchor: EditText, queryResult: QueryResult) {
     if (queryResult.results.isEmpty()) {
       hideQueryPopup()
       return
@@ -200,14 +197,16 @@ class MentionsController @AssistedInject constructor(
                   when (resultItem) {
                     is CommunityResultItem -> {
                       val link = LinkUtils.getLinkForCommunity(
-                        resultItem.communityView.community.toCommunityRef())
+                        resultItem.communityView.community.toCommunityRef(),
+                      )
                       val text = "${resultItem.mentionPrefix}${resultItem.communityView.community.fullName}"
 
                       onItemSelected("[$text]($link)")
                     }
                     is PersonResultItem -> {
                       val link = LinkUtils.getLinkForPerson(
-                        resultItem.personView.person.toPersonRef())
+                        resultItem.personView.person.toPersonRef(),
+                      )
                       val text = "${resultItem.mentionPrefix}${resultItem.personView.person.fullName}"
 
                       onItemSelected("[$text]($link)")
@@ -219,7 +218,7 @@ class MentionsController @AssistedInject constructor(
             }
           }
           .show()
-      }
+      },
     ).apply {
       adapter.setItems(queryResult.results) {
         currentQueryPopupWindow?.binding?.recyclerView?.scrollToPosition(0)

@@ -7,36 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.PersonView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param personView 
- * @param blocked 
+ *
+ * @param personView
+ * @param blocked
  */
 
+data class BlockPersonResponse(
 
-data class BlockPersonResponse (
+  @SerializedName("person_view")
+  val personView: PersonView,
 
-    @SerializedName("person_view")
-    val personView: PersonView,
+  @SerializedName("blocked")
+  val blocked: kotlin.Boolean,
 
-    @SerializedName("blocked")
-    val blocked: kotlin.Boolean
-
-) {
-
-
-}
-
+)

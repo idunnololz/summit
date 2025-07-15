@@ -7,32 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.FederatedInstancesView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param federatedInstances 
+ *
+ * @param federatedInstances
  */
 
+data class GetFederatedInstancesResponse(
 
-data class GetFederatedInstancesResponse (
+  @SerializedName("federated_instances")
+  val federatedInstances: FederatedInstancesView? = null,
 
-    @SerializedName("federated_instances")
-    val federatedInstances: FederatedInstancesView? = null
-
-) {
-
-
-}
-
+)

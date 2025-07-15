@@ -6,7 +6,6 @@ import android.text.style.URLSpan
 import android.text.util.Linkify
 import androidx.annotation.IntDef
 import androidx.core.text.util.LinkifyCompat
-import androidx.core.util.PatternsCompat
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.MarkwonVisitor
@@ -64,8 +63,8 @@ class LinkifyPlugin internal constructor(
       if (addLinks(builder, mask)) {
         // target URL span specifically
         val spans = builder.getSpans<URLSpan?>(0, builder.length, URLSpan::class.java)
-        if (spans != null
-          && spans.size > 0
+        if (spans != null &&
+          spans.size > 0
         ) {
           val renderProps = visitor.renderProps()
           val spannableBuilder = visitor.builder()

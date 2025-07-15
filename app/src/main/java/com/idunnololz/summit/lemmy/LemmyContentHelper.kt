@@ -196,7 +196,7 @@ class LemmyContentHelper(
           imageView = fullImageView,
           preferFullSizeImage = true,
           force = force,
-          thumbnailUrl = postView.getThumbnailUrl(reveal)
+          thumbnailUrl = postView.getThumbnailUrl(reveal),
         )
 
         loadingView?.setOnRefreshClickListener {
@@ -672,8 +672,8 @@ class LemmyContentHelper(
     if (thumbnailUrl != null &&
       isUrlImage(thumbnailUrl) &&
       offlineManager.isUrlCached(thumbnailUrl) &&
-      !offlineManager.isUrlCached(imageUrl)) {
-
+      !offlineManager.isUrlCached(imageUrl)
+    ) {
       Log.d(TAG, "thumbnail available, using thumbnail as placeholder!")
 
       if (preferFullSizeImage) {
@@ -728,7 +728,7 @@ class LemmyContentHelper(
               }
 
               if (w > 0 && h > 0) {
-                Log.d(TAG, "size(${w}, ${h})")
+                Log.d(TAG, "size($w, $h)")
                 this.size(w, h)
               }
 
@@ -764,7 +764,7 @@ class LemmyContentHelper(
                 },
               )
             }
-            .build()
+            .build(),
         )
     }
 

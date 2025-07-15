@@ -39,10 +39,10 @@ class RecentCommunityManager @Inject constructor(
    */
   private val recentCommunities = RecentCommunityCache(PREF_KEY_RECENT_COMMUNITIES)
 
-  private val recentCommunitiesPostedTo = RecentCommunityCache(PREF_KEY_RECENT_COMMUNITIES_POSTED_TO)
+  private val recentCommunitiesPostedTo =
+    RecentCommunityCache(PREF_KEY_RECENT_COMMUNITIES_POSTED_TO)
 
   init {
-
   }
 
   fun getRecentCommunitiesVisited(): List<CommunityHistoryEntry> =

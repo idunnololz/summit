@@ -6,7 +6,6 @@ import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.SCROLL_CAPTURE_HINT_EXCLUDE
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.core.text.buildSpannedString

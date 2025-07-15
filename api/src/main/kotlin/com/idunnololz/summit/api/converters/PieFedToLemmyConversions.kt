@@ -1,22 +1,22 @@
 package com.idunnololz.summit.api.converters
 
+import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
 import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
+import com.idunnololz.summit.api.dto.lemmy.PersonMention
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.piefed.Comment
 import com.idunnololz.summit.api.dto.piefed.CommentAggregates
-import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
-import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
-import com.idunnololz.summit.api.dto.lemmy.PersonMention
-import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
-import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.piefed.CommentReply
 import com.idunnololz.summit.api.dto.piefed.Community
 import com.idunnololz.summit.api.dto.piefed.CommunityBlockView
@@ -125,12 +125,11 @@ internal fun Community.toCommunity(): com.idunnololz.summit.api.dto.lemmy.Commun
     instance_id = this.instanceId,
   )
 
-internal fun SubscribedType.toSubscribedType() =
-  when (this) {
-    SubscribedType.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
-    SubscribedType.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
-    SubscribedType.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
-  }
+internal fun SubscribedType.toSubscribedType() = when (this) {
+  SubscribedType.Subscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Subscribed
+  SubscribedType.NotSubscribed -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.NotSubscribed
+  SubscribedType.Pending -> com.idunnololz.summit.api.dto.lemmy.SubscribedType.Pending
+}
 
 internal fun Post.toPost(): com.idunnololz.summit.api.dto.lemmy.Post =
   com.idunnololz.summit.api.dto.lemmy.Post(
@@ -170,22 +169,21 @@ internal fun CommentAggregates.toCommentAggregates(): com.idunnololz.summit.api.
     child_count = this.childCount,
   )
 
-internal fun com.idunnololz.summit.api.dto.piefed.PostView.toPostView(): PostView =
-  PostView(
-    post = this.post.toPost(),
-    creator = this.creator.toPerson(),
-    community = this.community.toCommunity(),
-    creator_banned_from_community = this.creatorBannedFromCommunity,
-    creator_is_moderator = this.creatorIsModerator,
-    creator_is_admin = this.creatorIsAdmin,
-    counts = this.counts.toPostAggregates(),
-    subscribed = this.subscribed.toSubscribedType(),
-    saved = this.saved,
-    read = this.read,
-    creator_blocked = false,
-    my_vote = this.myVote,
-    unread_comments = this.unreadComments,
-  )
+internal fun com.idunnololz.summit.api.dto.piefed.PostView.toPostView(): PostView = PostView(
+  post = this.post.toPost(),
+  creator = this.creator.toPerson(),
+  community = this.community.toCommunity(),
+  creator_banned_from_community = this.creatorBannedFromCommunity,
+  creator_is_moderator = this.creatorIsModerator,
+  creator_is_admin = this.creatorIsAdmin,
+  counts = this.counts.toPostAggregates(),
+  subscribed = this.subscribed.toSubscribedType(),
+  saved = this.saved,
+  read = this.read,
+  creator_blocked = false,
+  my_vote = this.myVote,
+  unread_comments = this.unreadComments,
+)
 
 internal fun PostAggregates.toPostAggregates(): com.idunnololz.summit.api.dto.lemmy.PostAggregates =
   com.idunnololz.summit.api.dto.lemmy.PostAggregates(
@@ -305,24 +303,23 @@ internal fun LocalUser.toLocalUser(): com.idunnololz.summit.api.dto.lemmy.LocalU
     totp_2fa_url = null,
   )
 
-internal fun SortType.toSortType(): com.idunnololz.summit.api.dto.lemmy.SortType? =
-  when (this) {
-    SortType.Active -> com.idunnololz.summit.api.dto.lemmy.SortType.Active
-    SortType.Hot -> com.idunnololz.summit.api.dto.lemmy.SortType.Hot
-    SortType.New -> com.idunnololz.summit.api.dto.lemmy.SortType.New
-    SortType.TopHour -> com.idunnololz.summit.api.dto.lemmy.SortType.TopHour
-    SortType.TopSixHour -> com.idunnololz.summit.api.dto.lemmy.SortType.TopSixHour
-    SortType.TopTwelveHour -> com.idunnololz.summit.api.dto.lemmy.SortType.TopTwelveHour
-    SortType.TopDay -> com.idunnololz.summit.api.dto.lemmy.SortType.TopDay
-    SortType.TopWeek -> com.idunnololz.summit.api.dto.lemmy.SortType.TopWeek
-    SortType.TopMonth -> com.idunnololz.summit.api.dto.lemmy.SortType.TopMonth
-    SortType.TopThreeMonths -> com.idunnololz.summit.api.dto.lemmy.SortType.TopThreeMonths
-    SortType.TopSixMonths -> com.idunnololz.summit.api.dto.lemmy.SortType.TopSixMonths
-    SortType.TopNineMonths -> com.idunnololz.summit.api.dto.lemmy.SortType.TopNineMonths
-    SortType.TopYear -> com.idunnololz.summit.api.dto.lemmy.SortType.TopYear
-    SortType.TopAll -> com.idunnololz.summit.api.dto.lemmy.SortType.TopAll
-    SortType.Scaled -> com.idunnololz.summit.api.dto.lemmy.SortType.Scaled
-  }
+internal fun SortType.toSortType(): com.idunnololz.summit.api.dto.lemmy.SortType? = when (this) {
+  SortType.Active -> com.idunnololz.summit.api.dto.lemmy.SortType.Active
+  SortType.Hot -> com.idunnololz.summit.api.dto.lemmy.SortType.Hot
+  SortType.New -> com.idunnololz.summit.api.dto.lemmy.SortType.New
+  SortType.TopHour -> com.idunnololz.summit.api.dto.lemmy.SortType.TopHour
+  SortType.TopSixHour -> com.idunnololz.summit.api.dto.lemmy.SortType.TopSixHour
+  SortType.TopTwelveHour -> com.idunnololz.summit.api.dto.lemmy.SortType.TopTwelveHour
+  SortType.TopDay -> com.idunnololz.summit.api.dto.lemmy.SortType.TopDay
+  SortType.TopWeek -> com.idunnololz.summit.api.dto.lemmy.SortType.TopWeek
+  SortType.TopMonth -> com.idunnololz.summit.api.dto.lemmy.SortType.TopMonth
+  SortType.TopThreeMonths -> com.idunnololz.summit.api.dto.lemmy.SortType.TopThreeMonths
+  SortType.TopSixMonths -> com.idunnololz.summit.api.dto.lemmy.SortType.TopSixMonths
+  SortType.TopNineMonths -> com.idunnololz.summit.api.dto.lemmy.SortType.TopNineMonths
+  SortType.TopYear -> com.idunnololz.summit.api.dto.lemmy.SortType.TopYear
+  SortType.TopAll -> com.idunnololz.summit.api.dto.lemmy.SortType.TopAll
+  SortType.Scaled -> com.idunnololz.summit.api.dto.lemmy.SortType.Scaled
+}
 
 internal fun ListingType.toListingType(): com.idunnololz.summit.api.dto.lemmy.ListingType =
   when (this) {
@@ -355,11 +352,9 @@ internal fun com.idunnololz.summit.api.dto.piefed.CommunityAggregates.toCommunit
     users_active_half_year = this.active6monthly,
   )
 
-
-internal fun com.idunnololz.summit.api.dto.piefed.PostResponse.toPostResponse() =
-  PostResponse(
-    this.postView.toPostView()
-  )
+internal fun com.idunnololz.summit.api.dto.piefed.PostResponse.toPostResponse() = PostResponse(
+  this.postView.toPostView(),
+)
 
 internal fun com.idunnololz.summit.api.dto.piefed.CommentResponse.toCommentResponse() =
   CommentResponse(
@@ -383,12 +378,12 @@ internal fun com.idunnololz.summit.api.dto.piefed.CommunityResponse.toCommunityR
 
 internal fun com.idunnololz.summit.api.dto.piefed.GetRepliesResponse.toGetRepliesResponse(): GetRepliesResponse =
   GetRepliesResponse(
-    replies = this.replies.map { it.toCommentReplyView() }
+    replies = this.replies.map { it.toCommentReplyView() },
   )
 
 internal fun com.idunnololz.summit.api.dto.piefed.GetRepliesResponse.toGetPersonMentionsResponse(): GetPersonMentionsResponse =
   GetPersonMentionsResponse(
-    mentions = this.replies.map { it.toPersonMentionView() }
+    mentions = this.replies.map { it.toPersonMentionView() },
   )
 
 internal fun com.idunnololz.summit.api.dto.piefed.CommentReplyView.toCommentReplyView(): CommentReplyView =
@@ -432,14 +427,13 @@ internal fun com.idunnololz.summit.api.dto.piefed.CommentReplyView.toPersonMenti
     my_vote = this.myVote,
   )
 
-internal fun CommentReply.toPersonMention(): PersonMention =
-  PersonMention(
-    id = this.id,
-    recipient_id = this.recipientId.toLong(),
-    comment_id = this.commentId,
-    read = this.read,
-    published = this.published,
-  )
+internal fun CommentReply.toPersonMention(): PersonMention = PersonMention(
+  id = this.id,
+  recipient_id = this.recipientId.toLong(),
+  comment_id = this.commentId,
+  read = this.read,
+  published = this.published,
+)
 
 internal fun com.idunnololz.summit.api.dto.piefed.SearchType.toSearchType(): SearchType =
   when (this) {

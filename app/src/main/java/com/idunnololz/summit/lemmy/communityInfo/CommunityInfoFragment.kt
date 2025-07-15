@@ -225,7 +225,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             communityRef = communityRef,
           )
         findNavController().navigateSafe(directions)
-      }
+      },
     )
 
     binding.loadingView.setOnRefreshClickListener {

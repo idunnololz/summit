@@ -144,7 +144,7 @@ class CommunityViewModel @Inject constructor(
         },
         {
           PostOrCommentRef.CommentRef(it)
-        }
+        },
       )
     }
 

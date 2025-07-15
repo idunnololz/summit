@@ -7,33 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.CommentReplyView
-
 import com.google.gson.annotations.SerializedName
-import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 
 /**
- * 
  *
- * @param replies 
+ *
+ * @param replies
  */
 
+data class GetRepliesResponse(
 
-data class GetRepliesResponse (
+  @SerializedName("replies")
+  val replies: kotlin.collections.List<CommentReplyView>,
 
-    @SerializedName("replies")
-    val replies: kotlin.collections.List<CommentReplyView>
-
-) {
-
-
-}
-
+)

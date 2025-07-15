@@ -7,53 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.CommunityView
-import com.idunnololz.summit.api.dto.piefed.Person
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param reason 
- * @param expiredAt 
- * @param community 
- * @param bannedUser 
- * @param bannedBy 
- * @param expired 
+ *
+ * @param reason
+ * @param expiredAt
+ * @param community
+ * @param bannedUser
+ * @param bannedBy
+ * @param expired
  */
 
+data class CommunityModerationBanItem(
 
-data class CommunityModerationBanItem (
+  @SerializedName("reason")
+  val reason: kotlin.String? = null,
 
-    @SerializedName("reason")
-    val reason: kotlin.String? = null,
+  @SerializedName("expiredAt")
+  val expiredAt: kotlin.String? = null,
 
-    @SerializedName("expiredAt")
-    val expiredAt: kotlin.String? = null,
+  @SerializedName("community")
+  val community: CommunityView? = null,
 
-    @SerializedName("community")
-    val community: CommunityView? = null,
+  @SerializedName("bannedUser")
+  val bannedUser: Person? = null,
 
-    @SerializedName("bannedUser")
-    val bannedUser: Person? = null,
+  @SerializedName("bannedBy")
+  val bannedBy: Person? = null,
 
-    @SerializedName("bannedBy")
-    val bannedBy: Person? = null,
+  @SerializedName("expired")
+  val expired: kotlin.Boolean? = null,
 
-    @SerializedName("expired")
-    val expired: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

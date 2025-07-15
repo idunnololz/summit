@@ -134,10 +134,7 @@ interface LemmyApiV3 {
    * Log into lemmy.
    */
   @POST("user/login")
-  fun login(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: Login
-  ): Call<LoginResponse>
+  fun login(@HeaderMap headers: Map<String, String>, @Body form: Login): Call<LoginResponse>
 
   /**
    * Like / vote on a post.
@@ -200,10 +197,7 @@ interface LemmyApiV3 {
    * Save a post.
    */
   @PUT("post/save")
-  fun savePost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: SavePost,
-  ): Call<PostResponse>
+  fun savePost(@HeaderMap headers: Map<String, String>, @Body form: SavePost): Call<PostResponse>
 
   @POST("post/mark_as_read")
   fun markPostAsRead(
@@ -467,10 +461,7 @@ interface LemmyApiV3 {
    * Edit a post.
    */
   @PUT("post")
-  fun editPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: EditPost,
-  ): Call<PostResponse>
+  fun editPost(@HeaderMap headers: Map<String, String>, @Body form: EditPost): Call<PostResponse>
 
   /**
    * Delete a post.
@@ -488,10 +479,7 @@ interface LemmyApiV3 {
   ): Call<PostResponse>
 
   @POST("post/lock")
-  fun lockPost(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: LockPost,
-  ): Call<PostResponse>
+  fun lockPost(@HeaderMap headers: Map<String, String>, @Body form: LockPost): Call<PostResponse>
 
   @POST("post/remove")
   fun removePost(
@@ -666,13 +654,11 @@ interface LemmyApiV3 {
   @POST("user/register")
   fun register(
     @HeaderMap headers: Map<String, String>,
-    @Body register: Register
+    @Body register: Register,
   ): Call<LoginResponse>
 
   @GET("user/get_captcha")
-  fun getCaptcha(
-    @HeaderMap headers: Map<String, String>,
-  ): Call<GetCaptchaResponse>
+  fun getCaptcha(@HeaderMap headers: Map<String, String>): Call<GetCaptchaResponse>
 
   @GET("account/list_media")
   fun listMedia(
@@ -681,5 +667,4 @@ interface LemmyApiV3 {
   ): Call<ListMediaResponse>
 
   // https://lemmy.world/pictrs/image/delete/b60f8360-38bd-450a-ad6c-27b0b3936a27/60ac57fb-0bdd-42af-899a-01982ad37285.jpeg
-
 }

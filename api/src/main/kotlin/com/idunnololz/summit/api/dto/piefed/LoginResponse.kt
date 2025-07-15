@@ -7,31 +7,25 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param jwt 
+ *
+ * @param jwt
  */
 
+data class LoginResponse(
 
-data class LoginResponse (
+  @SerializedName("jwt")
+  val jwt: kotlin.String? = null,
 
-    @SerializedName("jwt")
-    val jwt: kotlin.String? = null
-
-) {
-
-
-}
-
+)

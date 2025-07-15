@@ -7,39 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param unreadOnly 
- * @param page 
- * @param limit 
+ *
+ * @param unreadOnly
+ * @param page
+ * @param limit
  */
 
+data class GetPrivateMessages(
 
-data class GetPrivateMessages (
+  @SerializedName("unread_only")
+  val unreadOnly: kotlin.Boolean? = null,
 
-    @SerializedName("unread_only")
-    val unreadOnly: kotlin.Boolean? = null,
+  @SerializedName("page")
+  val page: kotlin.Int? = null,
 
-    @SerializedName("page")
-    val page: kotlin.Int? = null,
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

@@ -499,7 +499,7 @@ class QueryEngine(
                   commentView = it.commentView,
                   instance = instance,
                   pageIndex = page.pageIndex,
-                  commentHeaderInfo = it.commentView.toCommentHeaderInfo(context)
+                  commentHeaderInfo = it.commentView.toCommentHeaderInfo(context),
                 )
               is SearchResultView.CommunityResultView ->
                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
@@ -508,7 +508,7 @@ class QueryEngine(
                   fetchedPost = it.fetchedPost,
                   instance = instance,
                   pageIndex = page.pageIndex,
-                  postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context)
+                  postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context),
                 )
               is SearchResultView.UserResultView ->
                 Item.UserItem(it.personView, instance, page.pageIndex)
@@ -523,7 +523,7 @@ class QueryEngine(
                   commentView = it.commentView,
                   instance = instance,
                   pageIndex = page.pageIndex,
-                  commentHeaderInfo = it.commentView.toCommentHeaderInfo(context)
+                  commentHeaderInfo = it.commentView.toCommentHeaderInfo(context),
                 )
               is SearchResultView.CommunityResultView ->
                 Item.CommunityItem(it.communityView, instance, page.pageIndex)
@@ -532,7 +532,7 @@ class QueryEngine(
                   fetchedPost = it.fetchedPost,
                   instance = instance,
                   pageIndex = page.pageIndex,
-                  postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context)
+                  postHeaderInfo = it.fetchedPost.postView.toPostHeaderInfo(context),
                 )
               is SearchResultView.UserResultView ->
                 Item.UserItem(it.personView, instance, page.pageIndex)
@@ -544,7 +544,7 @@ class QueryEngine(
               commentView = it,
               instance = instance,
               pageIndex = page.pageIndex,
-              commentHeaderInfo = it.toCommentHeaderInfo(context)
+              commentHeaderInfo = it.toCommentHeaderInfo(context),
             )
           }
         is QueryResultsPage.CommunityResultsPage ->

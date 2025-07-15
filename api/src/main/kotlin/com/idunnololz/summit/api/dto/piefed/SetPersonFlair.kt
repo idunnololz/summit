@@ -7,35 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param communityId 
- * @param flairText 
+ *
+ * @param communityId
+ * @param flairText
  */
 
+data class SetPersonFlair(
 
-data class SetPersonFlair (
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  @SerializedName("flair_text")
+  val flairText: kotlin.String,
 
-    @SerializedName("flair_text")
-    val flairText: kotlin.String
-
-) {
-
-
-}
-
+)

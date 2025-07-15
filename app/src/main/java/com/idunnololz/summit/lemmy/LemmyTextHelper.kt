@@ -26,7 +26,6 @@ import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.ImagesAsLinksPlugin
-import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.coil.CoilImagesPlugin
 import com.idunnololz.summit.util.coil.CoilImagesPlugin.CoilStore
 import com.idunnololz.summit.util.ext.getColorCompat
@@ -44,7 +43,6 @@ import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
-import java.util.Locale
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -385,7 +383,7 @@ class LemmyTextHelper @Inject constructor(
           } else {
             Linkify.EMAIL_ADDRESSES or Linkify.WEB_URLS
           },
-          true
+          true,
         ),
       )
       .usePlugin(TablePlugin.create(context))

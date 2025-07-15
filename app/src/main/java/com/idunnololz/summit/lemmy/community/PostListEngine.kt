@@ -228,7 +228,10 @@ class PostListEngine @AssistedInject constructor(
 
     coroutineScope.launch(Dispatchers.IO) {
       directoryHelper.addPage(key, secondaryKey, data, pages.size)
-      Log.d(TAG, "Added pages to directory helper! ${pages.size}. Using keys $key, $secondaryKey, ${data.accountKey}")
+      Log.d(
+        TAG,
+        "Added pages to directory helper! ${pages.size}. Using keys $key, $secondaryKey, ${data.accountKey}",
+      )
     }
   }
 
@@ -302,7 +305,7 @@ class PostListEngine @AssistedInject constructor(
                 pageIndex = page.pageIndex,
                 isDuplicatePost = it.isDuplicatePost,
                 feed = page.feed,
-                postHeaderInfo = postView.toPostHeaderInfo(context)
+                postHeaderInfo = postView.toPostHeaderInfo(context),
               )
             }
           }

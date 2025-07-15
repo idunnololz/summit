@@ -89,7 +89,6 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
-import com.idunnololz.summit.api.dto.lemmy.PictrsImages
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
@@ -115,7 +114,6 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
-import retrofit2.Call
 import java.io.InputStream
 
 interface LemmyLikeApi : ApiCompat {
@@ -154,18 +152,12 @@ interface LemmyLikeApi : ApiCompat {
   /**
    * Like / vote on a post.
    */
-  suspend fun likePost(
-    authorization: String?,
-    args: CreatePostLike,
-  ): Result<PostResponse>
+  suspend fun likePost(authorization: String?, args: CreatePostLike): Result<PostResponse>
 
   /**
    * Like / vote on a comment.
    */
-  suspend fun likeComment(
-    authorization: String?,
-    args: CreateCommentLike,
-  ): Result<CommentResponse>
+  suspend fun likeComment(authorization: String?, args: CreateCommentLike): Result<CommentResponse>
 
   suspend fun listCommentVotes(
     authorization: String?,
@@ -182,47 +174,29 @@ interface LemmyLikeApi : ApiCompat {
   /**
    * Create a comment.
    */
-  suspend fun createComment(
-    authorization: String?,
-    args: CreateComment,
-  ): Result<CommentResponse>
+  suspend fun createComment(authorization: String?, args: CreateComment): Result<CommentResponse>
 
   /**
    * Edit a comment.
    */
-  suspend fun editComment(
-    authorization: String?,
-    args: EditComment,
-  ): Result<CommentResponse>
+  suspend fun editComment(authorization: String?, args: EditComment): Result<CommentResponse>
 
   /**
    * Delete a comment.
    */
-  suspend fun deleteComment(
-    authorization: String?,
-    args: DeleteComment,
-  ): Result<CommentResponse>
+  suspend fun deleteComment(authorization: String?, args: DeleteComment): Result<CommentResponse>
 
   /**
    * Save a post.
    */
-  suspend fun savePost(
-    authorization: String?,
-    args: SavePost,
-  ): Result<PostResponse>
+  suspend fun savePost(authorization: String?, args: SavePost): Result<PostResponse>
 
-  suspend fun markPostAsRead(
-    authorization: String?,
-    args: MarkPostAsRead,
-  ): Result<SuccessResponse>
+  suspend fun markPostAsRead(authorization: String?, args: MarkPostAsRead): Result<SuccessResponse>
 
   /**
    * Save a comment.
    */
-  suspend fun saveComment(
-    authorization: String?,
-    args: SaveComment,
-  ): Result<CommentResponse>
+  suspend fun saveComment(authorization: String?, args: SaveComment): Result<CommentResponse>
 
   /**
    * Get / fetch comments.
@@ -238,10 +212,7 @@ interface LemmyLikeApi : ApiCompat {
     args: DistinguishComment,
   ): Result<CommentResponse>
 
-  suspend fun removeComment(
-    authorization: String?,
-    args: RemoveComment,
-  ): Result<CommentResponse>
+  suspend fun removeComment(authorization: String?, args: RemoveComment): Result<CommentResponse>
 
   /**
    * Get / fetch a community.
@@ -294,10 +265,7 @@ interface LemmyLikeApi : ApiCompat {
     force: Boolean,
   ): Result<GetPersonDetailsResponse>
 
-  suspend fun changePassword(
-    authorization: String?,
-    args: ChangePassword,
-  ): Result<LoginResponse>
+  suspend fun changePassword(authorization: String?, args: ChangePassword): Result<LoginResponse>
 
   /**
    * Get comment replies.
@@ -443,50 +411,28 @@ interface LemmyLikeApi : ApiCompat {
   /**
    * Create a post.
    */
-  suspend fun createPost(
-    authorization: String?,
-    args: CreatePost,
-  ): Result<PostResponse>
+  suspend fun createPost(authorization: String?, args: CreatePost): Result<PostResponse>
 
   /**
    * Edit a post.
    */
-  suspend fun editPost(
-    authorization: String?,
-    args: EditPost,
-  ): Result<PostResponse>
+  suspend fun editPost(authorization: String?, args: EditPost): Result<PostResponse>
 
   /**
    * Delete a post.
    */
-  suspend fun deletePost(
-    authorization: String?,
-    args: DeletePost,
-  ): Result<PostResponse>
+  suspend fun deletePost(authorization: String?, args: DeletePost): Result<PostResponse>
 
-  suspend fun featurePost(
-    authorization: String?,
-    args: FeaturePost,
-  ): Result<PostResponse>
+  suspend fun featurePost(authorization: String?, args: FeaturePost): Result<PostResponse>
 
-  suspend fun lockPost(
-    authorization: String?,
-    args: LockPost,
-  ): Result<PostResponse>
+  suspend fun lockPost(authorization: String?, args: LockPost): Result<PostResponse>
 
-  suspend fun removePost(
-    authorization: String?,
-    args: RemovePost,
-  ): Result<PostResponse>
+  suspend fun removePost(authorization: String?, args: RemovePost): Result<PostResponse>
 
   /**
    * Search lemmy.
    */
-  suspend fun search(
-    authorization: String?,
-    args: Search,
-    force: Boolean,
-  ): Result<SearchResponse>
+  suspend fun search(authorization: String?, args: Search, force: Boolean): Result<SearchResponse>
 
   /**
    * Fetch metadata for any given site.
@@ -516,10 +462,7 @@ interface LemmyLikeApi : ApiCompat {
   /**
    * Block a person.
    */
-  suspend fun blockPerson(
-    authorization: String?,
-    args: BlockPerson,
-  ): Result<BlockPersonResponse>
+  suspend fun blockPerson(authorization: String?, args: BlockPerson): Result<BlockPersonResponse>
 
   /**
    * Block a community.
@@ -566,40 +509,22 @@ interface LemmyLikeApi : ApiCompat {
    * Admin endpoints
    */
 
-  suspend fun banUserFromSite(
-    authorization: String?,
-    args: BanPerson,
-  ): Result<BanPersonResponse>
+  suspend fun banUserFromSite(authorization: String?, args: BanPerson): Result<BanPersonResponse>
 
   suspend fun removeCommunity(
     authorization: String?,
     args: RemoveCommunity,
   ): Result<CommunityResponse>
 
-  suspend fun hideCommunity(
-    authorization: String?,
-    args: HideCommunity,
-  ): Result<SuccessResponse>
+  suspend fun hideCommunity(authorization: String?, args: HideCommunity): Result<SuccessResponse>
 
-  suspend fun purgePerson(
-    authorization: String?,
-    args: PurgePerson,
-  ): Result<SuccessResponse>
+  suspend fun purgePerson(authorization: String?, args: PurgePerson): Result<SuccessResponse>
 
-  suspend fun purgeCommunity(
-    authorization: String?,
-    args: PurgeCommunity,
-  ): Result<SuccessResponse>
+  suspend fun purgeCommunity(authorization: String?, args: PurgeCommunity): Result<SuccessResponse>
 
-  suspend fun purgePost(
-    authorization: String?,
-    args: PurgePost,
-  ): Result<SuccessResponse>
+  suspend fun purgePost(authorization: String?, args: PurgePost): Result<SuccessResponse>
 
-  suspend fun purgeComment(
-    authorization: String?,
-     args: PurgeComment,
-  ): Result<SuccessResponse>
+  suspend fun purgeComment(authorization: String?, args: PurgeComment): Result<SuccessResponse>
 
   suspend fun getRegistrationApplicationsCount(
     authorization: String?,
@@ -615,7 +540,7 @@ interface LemmyLikeApi : ApiCompat {
 
   suspend fun approveRegistrationApplication(
     authorization: String?,
-     args: ApproveRegistrationApplication,
+    args: ApproveRegistrationApplication,
   ): Result<RegistrationApplicationResponse>
 
   suspend fun getModLogs(

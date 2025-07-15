@@ -1,6 +1,5 @@
 package com.idunnololz.summit.links
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.util.StatefulLiveData

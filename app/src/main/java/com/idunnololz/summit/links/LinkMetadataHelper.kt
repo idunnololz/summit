@@ -1,6 +1,5 @@
 package com.idunnololz.summit.links
 
-import android.webkit.URLUtil
 import com.fleeksoft.ksoup.Ksoup
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.PageRef

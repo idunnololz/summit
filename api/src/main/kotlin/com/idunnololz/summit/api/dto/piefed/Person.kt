@@ -7,83 +7,77 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param actorId 
- * @param banned 
- * @param bot 
- * @param deleted 
- * @param id 
- * @param instanceId 
- * @param local 
- * @param published 
- * @param userName 
- * @param avatar 
- * @param banner 
- * @param about 
- * @param flair 
- * @param title 
+ *
+ * @param actorId
+ * @param banned
+ * @param bot
+ * @param deleted
+ * @param id
+ * @param instanceId
+ * @param local
+ * @param published
+ * @param userName
+ * @param avatar
+ * @param banner
+ * @param about
+ * @param flair
+ * @param title
  */
 
+data class Person(
 
-data class Person (
+  @SerializedName("actor_id")
+  val actorId: kotlin.String,
 
-    @SerializedName("actor_id")
-    val actorId: kotlin.String,
+  @SerializedName("banned")
+  val banned: kotlin.Boolean,
 
-    @SerializedName("banned")
-    val banned: kotlin.Boolean,
+  @SerializedName("bot")
+  val bot: kotlin.Boolean,
 
-    @SerializedName("bot")
-    val bot: kotlin.Boolean,
+  @SerializedName("deleted")
+  val deleted: kotlin.Boolean,
 
-    @SerializedName("deleted")
-    val deleted: kotlin.Boolean,
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("instance_id")
+  val instanceId: kotlin.Int,
 
-    @SerializedName("instance_id")
-    val instanceId: kotlin.Int,
+  @SerializedName("local")
+  val local: kotlin.Boolean,
 
-    @SerializedName("local")
-    val local: kotlin.Boolean,
+  @SerializedName("published")
+  val published: String,
 
-    @SerializedName("published")
-    val published: String,
+  @SerializedName("user_name")
+  val userName: kotlin.String,
 
-    @SerializedName("user_name")
-    val userName: kotlin.String,
+  @SerializedName("avatar")
+  val avatar: kotlin.String? = null,
 
-    @SerializedName("avatar")
-    val avatar: kotlin.String? = null,
+  @SerializedName("banner")
+  val banner: kotlin.String? = null,
 
-    @SerializedName("banner")
-    val banner: kotlin.String? = null,
+  @SerializedName("about")
+  val about: kotlin.String? = null,
 
-    @SerializedName("about")
-    val about: kotlin.String? = null,
+  @SerializedName("flair")
+  val flair: kotlin.String? = null,
 
-    @SerializedName("flair")
-    val flair: kotlin.String? = null,
+  @SerializedName("title")
+  val title: kotlin.String? = null,
 
-    @SerializedName("title")
-    val title: kotlin.String? = null
-
-) {
-
-
-}
-
+)

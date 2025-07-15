@@ -7,71 +7,65 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param creatorId 
- * @param postId 
- * @param originalPostName 
- * @param reason 
- * @param resolved 
- * @param published 
- * @param originalPostUrl 
- * @param originalPostBody 
- * @param resolverId 
- * @param updated 
+ *
+ * @param id
+ * @param creatorId
+ * @param postId
+ * @param originalPostName
+ * @param reason
+ * @param resolved
+ * @param published
+ * @param originalPostUrl
+ * @param originalPostBody
+ * @param resolverId
+ * @param updated
  */
 
+data class PostReport(
 
-data class PostReport (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("creator_id")
+  val creatorId: kotlin.Int,
 
-    @SerializedName("creator_id")
-    val creatorId: kotlin.Int,
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("original_post_name")
+  val originalPostName: kotlin.String,
 
-    @SerializedName("original_post_name")
-    val originalPostName: kotlin.String,
+  @SerializedName("reason")
+  val reason: kotlin.String,
 
-    @SerializedName("reason")
-    val reason: kotlin.String,
+  @SerializedName("resolved")
+  val resolved: kotlin.Boolean,
 
-    @SerializedName("resolved")
-    val resolved: kotlin.Boolean,
+  @SerializedName("published")
+  val published: java.time.OffsetDateTime,
 
-    @SerializedName("published")
-    val published: java.time.OffsetDateTime,
+  @SerializedName("original_post_url")
+  val originalPostUrl: kotlin.String? = null,
 
-    @SerializedName("original_post_url")
-    val originalPostUrl: kotlin.String? = null,
+  @SerializedName("original_post_body")
+  val originalPostBody: kotlin.String? = null,
 
-    @SerializedName("original_post_body")
-    val originalPostBody: kotlin.String? = null,
+  @SerializedName("resolver_id")
+  val resolverId: kotlin.Int? = null,
 
-    @SerializedName("resolver_id")
-    val resolverId: kotlin.Int? = null,
+  @SerializedName("updated")
+  val updated: java.time.OffsetDateTime? = null,
 
-    @SerializedName("updated")
-    val updated: java.time.OffsetDateTime? = null
-
-) {
-
-
-}
-
+)

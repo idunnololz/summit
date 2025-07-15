@@ -7,37 +7,29 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.Community
-import com.idunnololz.summit.api.dto.piefed.Person
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param community 
- * @param moderator 
+ *
+ * @param community
+ * @param moderator
  */
 
+data class CommunityModeratorView(
 
-data class CommunityModeratorView (
+  @SerializedName("community")
+  val community: Community,
 
-    @SerializedName("community")
-    val community: Community,
+  @SerializedName("moderator")
+  val moderator: Person,
 
-    @SerializedName("moderator")
-    val moderator: Person
-
-) {
-
-
-}
-
+)

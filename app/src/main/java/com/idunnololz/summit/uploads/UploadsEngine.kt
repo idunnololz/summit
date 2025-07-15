@@ -51,7 +51,7 @@ class UploadsEngine @Inject constructor(
               force = force,
             ).map { it.images }
           },
-        )
+        ),
       ),
       sortValue = { dateStringToTs(it.local_image.published) },
       id = { aliasToIdTranslator.getIdForAlias(it.local_image.pictrs_alias) },

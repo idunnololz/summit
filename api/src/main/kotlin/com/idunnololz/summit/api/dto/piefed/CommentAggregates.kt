@@ -7,51 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param commentId 
- * @param score 
- * @param upvotes 
- * @param downvotes 
- * @param published 
- * @param childCount 
+ *
+ * @param commentId
+ * @param score
+ * @param upvotes
+ * @param downvotes
+ * @param published
+ * @param childCount
  */
 
+data class CommentAggregates(
 
-data class CommentAggregates (
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  @SerializedName("score")
+  val score: kotlin.Int,
 
-    @SerializedName("score")
-    val score: kotlin.Int,
+  @SerializedName("upvotes")
+  val upvotes: kotlin.Int,
 
-    @SerializedName("upvotes")
-    val upvotes: kotlin.Int,
+  @SerializedName("downvotes")
+  val downvotes: kotlin.Int,
 
-    @SerializedName("downvotes")
-    val downvotes: kotlin.Int,
+  @SerializedName("published")
+  val published: String,
 
-    @SerializedName("published")
-    val published: String,
+  @SerializedName("child_count")
+  val childCount: kotlin.Int,
 
-    @SerializedName("child_count")
-    val childCount: kotlin.Int
-
-) {
-
-
-}
-
+)

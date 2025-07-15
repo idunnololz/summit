@@ -7,51 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param id 
- * @param domain 
- * @param published 
- * @param updated 
- * @param software 
- * @param version 
+ *
+ * @param id
+ * @param domain
+ * @param published
+ * @param updated
+ * @param software
+ * @param version
  */
 
+data class Instance(
 
-data class Instance (
+  @SerializedName("id")
+  val id: kotlin.Int,
 
-    @SerializedName("id")
-    val id: kotlin.Int,
+  @SerializedName("domain")
+  val domain: kotlin.String,
 
-    @SerializedName("domain")
-    val domain: kotlin.String,
+  @SerializedName("published")
+  val published: String,
 
-    @SerializedName("published")
-    val published: String,
+  @SerializedName("updated")
+  val updated: String? = null,
 
-    @SerializedName("updated")
-    val updated: String? = null,
+  @SerializedName("software")
+  val software: kotlin.String? = null,
 
-    @SerializedName("software")
-    val software: kotlin.String? = null,
+  @SerializedName("version")
+  val version: kotlin.String? = null,
 
-    @SerializedName("version")
-    val version: kotlin.String? = null
-
-) {
-
-
-}
-
+)

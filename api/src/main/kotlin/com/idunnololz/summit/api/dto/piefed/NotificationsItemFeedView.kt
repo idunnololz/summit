@@ -7,57 +7,49 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.Person
-import com.idunnololz.summit.api.dto.piefed.PostView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param notifId 
- * @param notifType 
- * @param notifSubtype 
- * @param author 
- * @param post 
- * @param postId 
- * @param notifBody 
+ *
+ * @param notifId
+ * @param notifType
+ * @param notifSubtype
+ * @param author
+ * @param post
+ * @param postId
+ * @param notifBody
  */
 
+data class NotificationsItemFeedView(
 
-data class NotificationsItemFeedView (
+  @SerializedName("notif_id")
+  val notifId: kotlin.Int? = null,
 
-    @SerializedName("notif_id")
-    val notifId: kotlin.Int? = null,
+  @SerializedName("notif_type")
+  val notifType: kotlin.Int? = null,
 
-    @SerializedName("notif_type")
-    val notifType: kotlin.Int? = null,
+  @SerializedName("notif_subtype")
+  val notifSubtype: kotlin.String? = null,
 
-    @SerializedName("notif_subtype")
-    val notifSubtype: kotlin.String? = null,
+  @SerializedName("author")
+  val author: Person? = null,
 
-    @SerializedName("author")
-    val author: Person? = null,
+  @SerializedName("post")
+  val post: PostView? = null,
 
-    @SerializedName("post")
-    val post: PostView? = null,
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+  @SerializedName("notif_body")
+  val notifBody: kotlin.String? = null,
 
-    @SerializedName("notif_body")
-    val notifBody: kotlin.String? = null
-
-) {
-
-
-}
-
+)

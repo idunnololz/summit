@@ -110,7 +110,6 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
-import com.idunnololz.summit.api.dto.lemmy.PictrsImages
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
@@ -140,10 +139,10 @@ import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.piefed.CommentView
+import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.InputStream
 
 class PieFedApiAlphaAdapter(
   private val api: PieFedApiAlpha,
@@ -186,78 +185,84 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetSite,
     force: Boolean,
-  ): Result<GetSiteResponse> =
-    retrofitErrorHandler {
-      api.getSite(generateHeaders(authorization, force), args.serializeToMap())
-    }.map {
-      GetSiteResponse(
-        site_view = SiteView(
-          site = it.site.toSite(),
-          local_site = LocalSite(),
-          local_site_rate_limit = null,
-          counts = SiteAggregates(
-            id = 0,
-            site_id = 0,
-            users = 0,
-            posts = 0,
-            comments = 0,
-            communities = 0,
-            users_active_day = 0,
-            users_active_week = 0,
-            users_active_month = 0,
-            users_active_half_year = 0,
-          ),
+  ): Result<GetSiteResponse> = retrofitErrorHandler {
+    api.getSite(generateHeaders(authorization, force), args.serializeToMap())
+  }.map {
+    GetSiteResponse(
+      site_view = SiteView(
+        site = it.site.toSite(),
+        local_site = LocalSite(),
+        local_site_rate_limit = null,
+        counts = SiteAggregates(
+          id = 0,
+          site_id = 0,
+          users = 0,
+          posts = 0,
+          comments = 0,
+          communities = 0,
+          users_active_day = 0,
+          users_active_week = 0,
+          users_active_month = 0,
+          users_active_half_year = 0,
         ),
-        admins = it.admins.map { it.toPersonView() },
-        online = null,
-        version = it.version,
-        my_user = it.myUser?.toMyUserInfo(),
-        all_languages = listOf(),
-        discussion_languages = listOf(),
-        taglines = listOf(),
-        custom_emojis = listOf(),
-      )
-    }
+      ),
+      admins = it.admins.map { it.toPersonView() },
+      online = null,
+      version = it.version,
+      my_user = it.myUser?.toMyUserInfo(),
+      all_languages = listOf(),
+      discussion_languages = listOf(),
+      taglines = listOf(),
+      custom_emojis = listOf(),
+    )
+  }
 
   override suspend fun getPosts(
     authorization: String?,
     args: GetPosts,
     force: Boolean,
-  ): Result<GetPostsResponse> =
-    retrofitErrorHandler { api.getPosts(generateHeaders(authorization, force), args.serializeToMap()) }
-      .map {
-        GetPostsResponse(
-          posts = it.posts.map { it.toPostView() },
-          next_page = null,
-        )
-      }
+  ): Result<GetPostsResponse> = retrofitErrorHandler {
+    api.getPosts(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
+    .map {
+      GetPostsResponse(
+        posts = it.posts.map { it.toPostView() },
+        next_page = null,
+      )
+    }
 
   override suspend fun getPost(
     authorization: String?,
     args: GetPost,
     force: Boolean,
-  ): Result<GetPostResponse> =
-    retrofitErrorHandler { api.getPost(generateHeaders(authorization, force), args.serializeToMap()) }
-      .map {
-        GetPostResponse(
-          post_view = it.postView.toPostView(),
-          community_view = it.communityView.toCommunityView(),
-          moderators = it.moderators.map { it.toCommunityModeratorView() },
-          cross_posts = it.crossPosts.map { it.toPostView() },
-          online = 0,
-        )
-      }
-
-  override suspend fun login(args: Login): Result<LoginResponse> =
-    retrofitErrorHandler {
-      api.login(
-        headers = generateHeaders(null, false),
-        form = com.idunnololz.summit.api.dto.piefed.Login(
-          args.username_or_email,
-          args.password,
-        )
+  ): Result<GetPostResponse> = retrofitErrorHandler {
+    api.getPost(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
+    .map {
+      GetPostResponse(
+        post_view = it.postView.toPostView(),
+        community_view = it.communityView.toCommunityView(),
+        moderators = it.moderators.map { it.toCommunityModeratorView() },
+        cross_posts = it.crossPosts.map { it.toPostView() },
+        online = 0,
       )
-    }.map { it.toLoginResponse() }
+    }
+
+  override suspend fun login(args: Login): Result<LoginResponse> = retrofitErrorHandler {
+    api.login(
+      headers = generateHeaders(null, false),
+      form = com.idunnololz.summit.api.dto.piefed.Login(
+        args.username_or_email,
+        args.password,
+      ),
+    )
+  }.map { it.toLoginResponse() }
 
   override suspend fun likePost(
     authorization: String?,
@@ -277,23 +282,24 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: ListCommentLikes,
     force: Boolean,
-  ): Result<ListCommentLikesResponse> =
-    retrofitErrorHandler { api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListCommentLikesResponse> = retrofitErrorHandler {
+    api.listCommentVotes(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun listPostVotes(
     authorization: String?,
     args: ListPostLikes,
     force: Boolean,
-  ): Result<ListPostLikesResponse> =
-    retrofitErrorHandler { api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListPostLikesResponse> = retrofitErrorHandler {
+    api.listPostVotes(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createComment(
     authorization: String?,
     args: CreateComment,
-  ): Result<CommentResponse> =
-    retrofitErrorHandler {
-      api.createComment(generateHeaders(authorization, false), args.toCreateComment())
-    }.map { it.toCommentResponse() }
+  ): Result<CommentResponse> = retrofitErrorHandler {
+    api.createComment(generateHeaders(authorization, false), args.toCreateComment())
+  }.map { it.toCommentResponse() }
 
   override suspend fun editComment(
     authorization: String?,
@@ -304,15 +310,12 @@ class PieFedApiAlphaAdapter(
 
   override suspend fun deleteComment(
     authorization: String?,
-    args: DeleteComment
+    args: DeleteComment,
   ): Result<CommentResponse> =
     retrofitErrorHandler { api.deleteComment(generateHeaders(authorization, false), args) }
       .map { it.toCommentResponse() }
 
-  override suspend fun savePost(
-    authorization: String?,
-    args: SavePost,
-  ): Result<PostResponse> =
+  override suspend fun savePost(authorization: String?, args: SavePost): Result<PostResponse> =
     retrofitErrorHandler { api.savePost(generateHeaders(authorization, false), args) }
       .map { it.toPostResponse() }
 
@@ -342,7 +345,7 @@ class PieFedApiAlphaAdapter(
         return retrofitErrorHandler {
           api.getComments(
             headers = headers,
-            form = args.serializeToMap()
+            form = args.serializeToMap(),
           )
         }
       }
@@ -354,7 +357,7 @@ class PieFedApiAlphaAdapter(
         val result = retrofitErrorHandler {
           api.getComments(
             headers = headers,
-            form = args.copy(page = page, limit = limit).serializeToMap()
+            form = args.copy(page = page, limit = limit).serializeToMap(),
           )
         }
 
@@ -377,7 +380,7 @@ class PieFedApiAlphaAdapter(
 
     return result.map {
       GetCommentsResponse(
-        it.comments.map { it.toCommentView() }
+        it.comments.map { it.toCommentView() },
       )
     }
   }
@@ -400,99 +403,93 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetCommunity,
     force: Boolean,
-  ): Result<GetCommunityResponse> =
-    retrofitErrorHandler {
-      api.getCommunity(
-        headers = generateHeaders(authorization, force),
-        form = args.serializeToMap()
-      )
-    }.map {
-      GetCommunityResponse(
-        community_view = it.communityView.toCommunityView(),
-        site = it.site?.toSite(),
-        moderators = it.moderators.map { it.toCommunityModeratorView() },
-        online = null,
-        discussion_languages = it.discussionLanguages,
-        default_post_language = null,
-      )
-    }
+  ): Result<GetCommunityResponse> = retrofitErrorHandler {
+    api.getCommunity(
+      headers = generateHeaders(authorization, force),
+      form = args.serializeToMap(),
+    )
+  }.map {
+    GetCommunityResponse(
+      community_view = it.communityView.toCommunityView(),
+      site = it.site?.toSite(),
+      moderators = it.moderators.map { it.toCommunityModeratorView() },
+      online = null,
+      discussion_languages = it.discussionLanguages,
+      default_post_language = null,
+    )
+  }
 
   override suspend fun createCommunity(
     authorization: String?,
     args: CreateCommunity,
-  ): Result<CommunityResponse> =
-    retrofitErrorHandler {
-      api.createCommunity(
-        headers = generateHeaders(authorization = authorization, force = false),
-        createCommunity = args,
-      )
-    }.map { it.toCommunityResponse() }
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.createCommunity(
+      headers = generateHeaders(authorization = authorization, force = false),
+      createCommunity = args,
+    )
+  }.map { it.toCommunityResponse() }
 
   override suspend fun updateCommunity(
     authorization: String?,
     args: EditCommunity,
-  ): Result<CommunityResponse> =
-    retrofitErrorHandler {
-      api.updateCommunity(
-        headers = generateHeaders(authorization = authorization, force = false),
-        editCommunity = args
-      )
-    }.map { it.toCommunityResponse() }
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.updateCommunity(
+      headers = generateHeaders(authorization = authorization, force = false),
+      editCommunity = args,
+    )
+  }.map { it.toCommunityResponse() }
 
   override suspend fun deleteCommunity(
     authorization: String?,
     args: DeleteCommunity,
-  ): Result<CommunityResponse> =
-    retrofitErrorHandler {
-      api.deleteCommunity(
-        headers = generateHeaders(authorization, false),
-        deleteCommunity = args
-      )
-    }.map { it.toCommunityResponse() }
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.deleteCommunity(
+      headers = generateHeaders(authorization, false),
+      deleteCommunity = args,
+    )
+  }.map { it.toCommunityResponse() }
 
   override suspend fun getCommunityList(
     authorization: String?,
     args: ListCommunities,
     force: Boolean,
-  ): Result<ListCommunitiesResponse> =
-    retrofitErrorHandler {
-      api.getCommunityList(
-        headers = generateHeaders(authorization, force),
-        form = args.serializeToMap()
-      )
-    }.map {
-      ListCommunitiesResponse(
-        it.communities.map { it.toCommunityView() }
-      )
-    }
+  ): Result<ListCommunitiesResponse> = retrofitErrorHandler {
+    api.getCommunityList(
+      headers = generateHeaders(authorization, force),
+      form = args.serializeToMap(),
+    )
+  }.map {
+    ListCommunitiesResponse(
+      it.communities.map { it.toCommunityView() },
+    )
+  }
 
   override suspend fun getPersonDetails(
     authorization: String?,
     args: GetPersonDetails,
     force: Boolean,
-  ): Result<GetPersonDetailsResponse> =
-    retrofitErrorHandler {
-      api.getPersonDetails(
-        generateHeaders(authorization = authorization, force = force),
-        com.idunnololz.summit.api.dto.piefed.GetPersonDetails(
-          personId = args.person_id?.toInt(),
-          username = args.username,
-          sort = args.sort?.toSortType(),
-          page = args.page,
-          limit = args.limit,
-          communityId = args.community_id,
-          savedOnly = args.saved_only,
-          includeContent = args.include_content,
-        ).serializeToMap()
-      )
-    }.map {
-      GetPersonDetailsResponse(
-        person_view = it.personView.toPersonView(),
-        comments = it.comments.map { it.toCommentView() },
-        posts = it.posts.map { it.toPostView() },
-        moderates = it.moderates.map { it.toCommunityModeratorView() },
-      )
-    }
+  ): Result<GetPersonDetailsResponse> = retrofitErrorHandler {
+    api.getPersonDetails(
+      generateHeaders(authorization = authorization, force = force),
+      com.idunnololz.summit.api.dto.piefed.GetPersonDetails(
+        personId = args.person_id?.toInt(),
+        username = args.username,
+        sort = args.sort?.toSortType(),
+        page = args.page,
+        limit = args.limit,
+        communityId = args.community_id,
+        savedOnly = args.saved_only,
+        includeContent = args.include_content,
+      ).serializeToMap(),
+    )
+  }.map {
+    GetPersonDetailsResponse(
+      person_view = it.personView.toPersonView(),
+      comments = it.comments.map { it.toCommentView() },
+      posts = it.posts.map { it.toPostView() },
+      moderates = it.moderates.map { it.toCommunityModeratorView() },
+    )
+  }
 
   override suspend fun changePassword(
     authorization: String?,
@@ -505,12 +502,12 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetReplies,
     force: Boolean,
-  ): Result<GetRepliesResponse> =
-    retrofitErrorHandler {
-      api.getReplies(
-        headers = generateHeaders(authorization, force),
-        form = args.serializeToMap())
-    }.map { it.toGetRepliesResponse() }
+  ): Result<GetRepliesResponse> = retrofitErrorHandler {
+    api.getReplies(
+      headers = generateHeaders(authorization, force),
+      form = args.serializeToMap(),
+    )
+  }.map { it.toGetRepliesResponse() }
 
   override suspend fun markCommentReplyAsRead(
     authorization: String?,
@@ -522,14 +519,22 @@ class PieFedApiAlphaAdapter(
   override suspend fun markPersonMentionAsRead(
     authorization: String?,
     args: MarkPersonMentionAsRead,
-  ): Result<PersonMentionResponse> =
-    retrofitErrorHandler { api.markPersonMentionAsRead(generateHeaders(authorization, false), args) }
+  ): Result<PersonMentionResponse> = retrofitErrorHandler {
+    api.markPersonMentionAsRead(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }
 
   override suspend fun markPrivateMessageAsRead(
     authorization: String?,
     args: MarkPrivateMessageAsRead,
-  ): Result<PrivateMessageResponse> =
-    retrofitErrorHandler { api.markPrivateMessageAsRead(generateHeaders(authorization, false), args) }
+  ): Result<PrivateMessageResponse> = retrofitErrorHandler {
+    api.markPrivateMessageAsRead(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }
 
   override suspend fun markAllAsRead(
     authorization: String?,
@@ -542,42 +547,51 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetPersonMentions,
     force: Boolean,
-  ): Result<GetPersonMentionsResponse> =
-    retrofitErrorHandler { api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap()) }
-      .map { it.toGetPersonMentionsResponse() }
+  ): Result<GetPersonMentionsResponse> = retrofitErrorHandler {
+    api.getPersonMentions(generateHeaders(authorization, force), args.serializeToMap())
+  }
+    .map { it.toGetPersonMentionsResponse() }
 
   override suspend fun getPrivateMessages(
     authorization: String?,
     args: GetPrivateMessages,
     force: Boolean,
-  ): Result<PrivateMessagesResponse> =
-    retrofitErrorHandler { api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<PrivateMessagesResponse> = retrofitErrorHandler {
+    api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun getPrivateMessageReports(
     authorization: String?,
     args: ListPrivateMessageReports,
     force: Boolean,
-  ): Result<ListPrivateMessageReportsResponse> =
-    retrofitErrorHandler { api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListPrivateMessageReportsResponse> = retrofitErrorHandler {
+    api.getPrivateMessageReports(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createPrivateMessageReport(
     authorization: String?,
     args: CreatePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> =
-    retrofitErrorHandler { api.createPrivateMessageReport(generateHeaders(authorization, false), args) }
+  ): Result<PrivateMessageReportResponse> = retrofitErrorHandler {
+    api.createPrivateMessageReport(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }
 
   override suspend fun resolvePrivateMessageReport(
     authorization: String?,
     args: ResolvePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> =
-    retrofitErrorHandler { api.resolvePrivateMessageReport(generateHeaders(authorization, false), args) }
+  ): Result<PrivateMessageReportResponse> = retrofitErrorHandler {
+    api.resolvePrivateMessageReport(generateHeaders(authorization, false), args)
+  }
 
   override suspend fun getPostReports(
     authorization: String?,
     args: ListPostReports,
     force: Boolean,
-  ): Result<ListPostReportsResponse> =
-    retrofitErrorHandler { api.getPostReports(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListPostReportsResponse> = retrofitErrorHandler {
+    api.getPostReports(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun resolvePostReport(
     authorization: String?,
@@ -589,8 +603,9 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: ListCommentReports,
     force: Boolean,
-  ): Result<ListCommentReportsResponse> =
-    retrofitErrorHandler { api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListCommentReportsResponse> = retrofitErrorHandler {
+    api.getCommentReports(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun resolveCommentReport(
     authorization: String?,
@@ -608,26 +623,27 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse> =
-    retrofitErrorHandler { api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetUnreadCountResponse> = retrofitErrorHandler {
+    api.getUnreadCount(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun getReportCount(
     authorization: String?,
     args: GetReportCount,
     force: Boolean,
-  ): Result<GetReportCountResponse> =
-    retrofitErrorHandler { api.getReportCount(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetReportCountResponse> = retrofitErrorHandler {
+    api.getReportCount(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun followCommunity(
     authorization: String?,
     args: FollowCommunity,
-  ): Result<CommunityResponse> =
-    retrofitErrorHandler {
-      api.followCommunity(
-        headers = generateHeaders(authorization, false),
-        form = args
-      )
-    }.map { it.toCommunityResponse() }
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.followCommunity(
+      headers = generateHeaders(authorization, false),
+      form = args,
+    )
+  }.map { it.toCommunityResponse() }
 
   override suspend fun banUserFromCommunity(
     authorization: String?,
@@ -641,25 +657,16 @@ class PieFedApiAlphaAdapter(
   ): Result<AddModToCommunityResponse> =
     retrofitErrorHandler { api.modUser(generateHeaders(authorization, false), args) }
 
-  override suspend fun createPost(
-    authorization: String?,
-    args: CreatePost,
-  ): Result<PostResponse> =
+  override suspend fun createPost(authorization: String?, args: CreatePost): Result<PostResponse> =
     retrofitErrorHandler {
       api.createPost(generateHeaders(authorization, false), args.toCreatePost())
     }.map { it.toPostResponse() }
 
-  override suspend fun editPost(
-    authorization: String?,
-    args: EditPost,
-  ): Result<PostResponse> =
+  override suspend fun editPost(authorization: String?, args: EditPost): Result<PostResponse> =
     retrofitErrorHandler { api.editPost(generateHeaders(authorization, false), args) }
       .map { it.toPostResponse() }
 
-  override suspend fun deletePost(
-    authorization: String?,
-    args: DeletePost,
-  ): Result<PostResponse> =
+  override suspend fun deletePost(authorization: String?, args: DeletePost): Result<PostResponse> =
     retrofitErrorHandler { api.deletePost(generateHeaders(authorization, false), args) }
       .map { it.toPostResponse() }
 
@@ -670,17 +677,11 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler { api.featurePost(generateHeaders(authorization, false), args) }
       .map { it.toPostResponse() }
 
-  override suspend fun lockPost(
-    authorization: String?,
-    args: LockPost,
-  ): Result<PostResponse> =
+  override suspend fun lockPost(authorization: String?, args: LockPost): Result<PostResponse> =
     retrofitErrorHandler { api.lockPost(generateHeaders(authorization, false), args) }
       .map { it.toPostResponse() }
 
-  override suspend fun removePost(
-    authorization: String?,
-    args: RemovePost,
-  ): Result<PostResponse> =
+  override suspend fun removePost(authorization: String?, args: RemovePost): Result<PostResponse> =
     retrofitErrorHandler { api.removePost(generateHeaders(authorization, false), args) }
       .map { it.toPostResponse() }
 
@@ -688,24 +689,29 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: Search,
     force: Boolean,
-  ): Result<SearchResponse> =
-    retrofitErrorHandler { api.search(generateHeaders(authorization, force), args.serializeToMap()) }
-      .map {
-        SearchResponse(
-          type_ = it.type?.toSearchType() ?: SearchType.All,
-          comments = listOf(),
-          posts = it.posts.map { it.toPostView() },
-          communities = it.communities.map { it.toCommunityView() },
-          users = it.users.map { it.toPersonView() },
-        )
-      }
+  ): Result<SearchResponse> = retrofitErrorHandler {
+    api.search(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
+    .map {
+      SearchResponse(
+        type_ = it.type?.toSearchType() ?: SearchType.All,
+        comments = listOf(),
+        posts = it.posts.map { it.toPostView() },
+        communities = it.communities.map { it.toCommunityView() },
+        users = it.users.map { it.toPersonView() },
+      )
+    }
 
   override suspend fun getSiteMetadata(
     authorization: String?,
     args: GetSiteMetadata,
     force: Boolean,
-  ): Result<GetSiteMetadataResponse> =
-    retrofitErrorHandler { api.getSiteMetadata(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetSiteMetadataResponse> = retrofitErrorHandler {
+    api.getSiteMetadata(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun createCommentReport(
     authorization: String?,
@@ -750,27 +756,27 @@ class PieFedApiAlphaAdapter(
     fileName: String,
     imageIs: InputStream,
     mimeType: String?,
-  ): Result<UploadImageResult> =
-    retrofitErrorHandler {
-      api.uploadImage(
-        headers = generateHeaders(authorization = authorization, force = false),
-        token = "jwt=${authorization}",
-        filePart = MultipartBody.Part.createFormData(
-          name = "file",
-          filename = fileName,
-          body = imageIs.readBytes().toRequestBody(contentType = mimeType?.toMediaType()),
-        ),
-      )
-    }.map {
-      UploadImageResult(it.url)
-    }
+  ): Result<UploadImageResult> = retrofitErrorHandler {
+    api.uploadImage(
+      headers = generateHeaders(authorization = authorization, force = false),
+      token = "jwt=$authorization",
+      filePart = MultipartBody.Part.createFormData(
+        name = "file",
+        filename = fileName,
+        body = imageIs.readBytes().toRequestBody(contentType = mimeType?.toMediaType()),
+      ),
+    )
+  }.map {
+    UploadImageResult(it.url)
+  }
 
   override suspend fun resolveObject(
     authorization: String?,
     args: ResolveObject,
     force: Boolean,
-  ): Result<ResolveObjectResponse> =
-    retrofitErrorHandler { api.resolveObject(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ResolveObjectResponse> = retrofitErrorHandler {
+    api.resolveObject(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun banUserFromSite(
     authorization: String?,
@@ -781,13 +787,12 @@ class PieFedApiAlphaAdapter(
   override suspend fun removeCommunity(
     authorization: String?,
     args: RemoveCommunity,
-  ): Result<CommunityResponse> =
-    retrofitErrorHandler {
-      api.removeCommunity(
-        headers = generateHeaders(authorization, false),
-        form = args
-      )
-    }.map { it.toCommunityResponse() }
+  ): Result<CommunityResponse> = retrofitErrorHandler {
+    api.removeCommunity(
+      headers = generateHeaders(authorization, false),
+      form = args,
+    )
+  }.map { it.toCommunityResponse() }
 
   override suspend fun hideCommunity(
     authorization: String?,
@@ -823,28 +828,35 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetUnreadRegistrationApplicationCount,
     force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> =
-    retrofitErrorHandler { api.getRegistrationApplicationsCount(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetUnreadRegistrationApplicationCountResponse> = retrofitErrorHandler {
+    api.getRegistrationApplicationsCount(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 
   override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> =
-    retrofitErrorHandler { api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<ListRegistrationApplicationsResponse> = retrofitErrorHandler {
+    api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse> =
-    retrofitErrorHandler { api.approveRegistrationApplication(generateHeaders(authorization, false), args) }
+  ): Result<RegistrationApplicationResponse> = retrofitErrorHandler {
+    api.approveRegistrationApplication(generateHeaders(authorization, false), args)
+  }
 
   override suspend fun getModLogs(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> =
-    retrofitErrorHandler { api.getModLogs(generateHeaders(authorization, force), args.serializeToMap()) }
+  ): Result<GetModlogResponse> = retrofitErrorHandler {
+    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+  }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
     retrofitErrorHandler { api.register(generateHeaders(null, false), args) }
@@ -857,9 +869,10 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: ListMedia,
     force: Boolean,
-  ): Result<ListMediaResponse> =
-    retrofitErrorHandler { api.listMedia(generateHeaders(authorization, force), args.serializeToMap()) }
-
-
-
+  ): Result<ListMediaResponse> = retrofitErrorHandler {
+    api.listMedia(
+      generateHeaders(authorization, force),
+      args.serializeToMap(),
+    )
+  }
 }

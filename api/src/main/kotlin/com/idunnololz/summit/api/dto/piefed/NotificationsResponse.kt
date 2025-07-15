@@ -7,45 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.NotificationsCountsView
-import com.idunnololz.summit.api.dto.piefed.NotificationsResponseItemsInner
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param counts 
- * @param items 
- * @param status 
- * @param user 
+ *
+ * @param counts
+ * @param items
+ * @param status
+ * @param user
  */
 
+data class NotificationsResponse(
 
-data class NotificationsResponse (
+  @SerializedName("counts")
+  val counts: NotificationsCountsView,
 
-    @SerializedName("counts")
-    val counts: NotificationsCountsView,
+  @SerializedName("items")
+  val items: kotlin.collections.List<NotificationsResponseItemsInner>,
 
-    @SerializedName("items")
-    val items: kotlin.collections.List<NotificationsResponseItemsInner>,
+  @SerializedName("status")
+  val status: kotlin.String,
 
-    @SerializedName("status")
-    val status: kotlin.String,
+  @SerializedName("user")
+  val user: kotlin.String,
 
-    @SerializedName("user")
-    val user: kotlin.String
-
-) {
-
-
-}
-
+)

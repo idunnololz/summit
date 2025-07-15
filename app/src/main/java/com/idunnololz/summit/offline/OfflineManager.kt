@@ -351,7 +351,7 @@ class OfflineManager @Inject constructor(
             url.replace("img.gvid.tv/i/", "img.gvid.tv/img/", ignoreCase = true)
           } else {
             url
-          }
+          },
         )
         .build()
     } catch (e: Exception) {

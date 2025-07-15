@@ -1,4 +1,3 @@
 package com.idunnololz.summit.api
 
-interface LemmyApiV4 {
-}
+interface LemmyApiV4

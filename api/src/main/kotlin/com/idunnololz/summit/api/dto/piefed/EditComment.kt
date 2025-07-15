@@ -7,39 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param commentId 
- * @param body 
- * @param languageId 
+ *
+ * @param commentId
+ * @param body
+ * @param languageId
  */
 
+data class EditComment(
 
-data class EditComment (
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int,
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

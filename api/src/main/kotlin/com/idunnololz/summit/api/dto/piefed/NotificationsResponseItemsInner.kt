@@ -7,79 +7,61 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.Comment
-import com.idunnololz.summit.api.dto.piefed.CommunityView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemCommentMentionView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemCommunityView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemFeedView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemPostMentionView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemPostView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemReplyView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemTopicView
-import com.idunnololz.summit.api.dto.piefed.NotificationsItemUserView
-import com.idunnololz.summit.api.dto.piefed.Person
-import com.idunnololz.summit.api.dto.piefed.PostView
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param notifId 
- * @param notifType 
- * @param notifSubtype 
- * @param author 
- * @param post 
- * @param postId 
- * @param notifBody 
- * @param community 
- * @param comment 
- * @param commentId 
+ *
+ * @param notifId
+ * @param notifType
+ * @param notifSubtype
+ * @param author
+ * @param post
+ * @param postId
+ * @param notifBody
+ * @param community
+ * @param comment
+ * @param commentId
  */
 
+data class NotificationsResponseItemsInner(
 
-data class NotificationsResponseItemsInner (
+  @SerializedName("notif_id")
+  val notifId: kotlin.Int? = null,
 
-    @SerializedName("notif_id")
-    val notifId: kotlin.Int? = null,
+  @SerializedName("notif_type")
+  val notifType: kotlin.Int? = null,
 
-    @SerializedName("notif_type")
-    val notifType: kotlin.Int? = null,
+  @SerializedName("notif_subtype")
+  val notifSubtype: kotlin.String? = null,
 
-    @SerializedName("notif_subtype")
-    val notifSubtype: kotlin.String? = null,
+  @SerializedName("author")
+  val author: Person? = null,
 
-    @SerializedName("author")
-    val author: Person? = null,
+  @SerializedName("post")
+  val post: PostView? = null,
 
-    @SerializedName("post")
-    val post: PostView? = null,
+  @SerializedName("post_id")
+  val postId: kotlin.Int? = null,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int? = null,
+  @SerializedName("notif_body")
+  val notifBody: kotlin.String? = null,
 
-    @SerializedName("notif_body")
-    val notifBody: kotlin.String? = null,
+  @SerializedName("community")
+  val community: CommunityView? = null,
 
-    @SerializedName("community")
-    val community: CommunityView? = null,
+  @SerializedName("comment")
+  val comment: Comment? = null,
 
-    @SerializedName("comment")
-    val comment: Comment? = null,
+  @SerializedName("comment_id")
+  val commentId: kotlin.Int? = null,
 
-    @SerializedName("comment_id")
-    val commentId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

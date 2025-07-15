@@ -16,7 +16,6 @@ import com.idunnololz.summit.databinding.FragmentDraftsBinding
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
-import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragmentArgs
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment

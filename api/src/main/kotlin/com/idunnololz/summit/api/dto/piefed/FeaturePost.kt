@@ -7,40 +7,33 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.PostFeatureType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param postId 
- * @param featured 
- * @param featureType 
+ *
+ * @param postId
+ * @param featured
+ * @param featureType
  */
 
+data class FeaturePost(
 
-data class FeaturePost (
+  @SerializedName("post_id")
+  val postId: kotlin.Int,
 
-    @SerializedName("post_id")
-    val postId: kotlin.Int,
+  @SerializedName("featured")
+  val featured: kotlin.Boolean,
 
-    @SerializedName("featured")
-    val featured: kotlin.Boolean,
+  @SerializedName("feature_type")
+  val featureType: PostFeatureType,
 
-    @SerializedName("feature_type")
-    val featureType: PostFeatureType
-
-) {
-
-
-}
-
+)

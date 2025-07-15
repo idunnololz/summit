@@ -7,44 +7,37 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.CommentSortType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param sort 
- * @param page 
- * @param limit 
- * @param unreadOnly 
+ *
+ * @param sort
+ * @param page
+ * @param limit
+ * @param unreadOnly
  */
 
+data class GetReplies(
 
-data class GetReplies (
+  @SerializedName("sort")
+  val sort: CommentSortType? = null,
 
-    @SerializedName("sort")
-    val sort: CommentSortType? = null,
+  @SerializedName("page")
+  val page: kotlin.Int? = null,
 
-    @SerializedName("page")
-    val page: kotlin.Int? = null,
+  @SerializedName("limit")
+  val limit: kotlin.Int? = null,
 
-    @SerializedName("limit")
-    val limit: kotlin.Int? = null,
+  @SerializedName("unread_only")
+  val unreadOnly: kotlin.Boolean? = null,
 
-    @SerializedName("unread_only")
-    val unreadOnly: kotlin.Boolean? = null
-
-) {
-
-
-}
-
+)

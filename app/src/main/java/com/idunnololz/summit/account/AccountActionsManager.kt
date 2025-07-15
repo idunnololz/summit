@@ -45,7 +45,6 @@ import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import retrofit2.Response
 
 @Singleton
 class AccountActionsManager @Inject constructor(

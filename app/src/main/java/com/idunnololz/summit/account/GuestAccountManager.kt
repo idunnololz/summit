@@ -1,7 +1,6 @@
 package com.idunnololz.summit.account
 
 import android.content.Context
-import androidx.core.net.toUri
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.GuestAccountSettings
 import com.idunnololz.summit.preferences.Preferences

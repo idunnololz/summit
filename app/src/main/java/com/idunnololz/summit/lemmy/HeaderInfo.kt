@@ -22,15 +22,14 @@ data class CommentHeaderInfo(
   override val newUserTsString: String?,
 ) : HeaderInfo
 
-fun CommentView.toCommentHeaderInfo(context: Context) =
-  CommentHeaderInfo(
-    publishedTsString = tsToConcise(context, this.comment.published),
-    editedTsString = this.comment.updated?.let { updated ->
-      tsToConcise(context, updated)
-    },
-    isAuthorCakeDay = this.creator.isCakeDay(),
-    newUserTsString = getNewUserTsString(context,this.creator),
-  )
+fun CommentView.toCommentHeaderInfo(context: Context) = CommentHeaderInfo(
+  publishedTsString = tsToConcise(context, this.comment.published),
+  editedTsString = this.comment.updated?.let { updated ->
+    tsToConcise(context, updated)
+  },
+  isAuthorCakeDay = this.creator.isCakeDay(),
+  newUserTsString = getNewUserTsString(context, this.creator),
+)
 
 /**
  * Information used to bind to the header UI of a post.
@@ -42,15 +41,14 @@ data class PostHeaderInfo(
   override val newUserTsString: String?,
 ) : HeaderInfo
 
-fun PostView.toPostHeaderInfo(context: Context) =
-  PostHeaderInfo(
-    publishedTsString = tsToConcise(context, this.post.published),
-    editedTsString = this.post.updated?.let { updated ->
-      tsToConcise(context, updated)
-    },
-    isAuthorCakeDay = this.creator.isCakeDay(),
-    newUserTsString = getNewUserTsString(context,this.creator),
-  )
+fun PostView.toPostHeaderInfo(context: Context) = PostHeaderInfo(
+  publishedTsString = tsToConcise(context, this.post.published),
+  editedTsString = this.post.updated?.let { updated ->
+    tsToConcise(context, updated)
+  },
+  isAuthorCakeDay = this.creator.isCakeDay(),
+  newUserTsString = getNewUserTsString(context, this.creator),
+)
 
 private fun getNewUserTsString(context: Context, person: Person): String? {
   val personCreationTs = dateStringToTs(person.published)

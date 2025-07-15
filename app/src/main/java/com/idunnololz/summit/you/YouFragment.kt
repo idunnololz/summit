@@ -195,7 +195,6 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             findNavController().navigateSafe(direction)
           }
           R.id.uploads -> {
-
           }
           R.id.account_settings -> {
             requireSummitActivity().openAccountSettings()

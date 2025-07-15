@@ -4,6 +4,12 @@ import android.util.Log
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.links.SiteBackendHelper.ApiType
 import com.idunnololz.summit.util.LinkFetcher
+import java.io.InterruptedIOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import java.util.concurrent.CancellationException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -11,12 +17,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import java.io.InterruptedIOException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-import java.util.concurrent.CancellationException
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class SiteBackendHelper @Inject constructor(
@@ -41,9 +41,7 @@ class SiteBackendHelper @Inject constructor(
   private val mutex = Mutex()
   private val instanceApiInfoCache = mutableMapOf<String, ApiInfo>()
 
-  suspend fun fetchApiInfo(
-    instance: String
-  ): Result<ApiInfo> {
+  suspend fun fetchApiInfo(instance: String): Result<ApiInfo> {
     withContext(Dispatchers.Main) {
       instanceApiInfoCache[instance]?.let {
         return@withContext it
@@ -133,10 +131,9 @@ class SiteBackendHelper @Inject constructor(
   private suspend fun Deferred<Result<String>>.isSiteView(): Boolean {
     return this.await().fold(
       { it.length > 100 && it.firstOrNull() == '{' },
-      { false }
+      { false },
     )
   }
-
 }
 
 val ApiType.isLemmy

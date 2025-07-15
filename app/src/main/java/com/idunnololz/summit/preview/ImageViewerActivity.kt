@@ -35,7 +35,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.image.ImageInfoDialogFragment
-import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
@@ -695,7 +694,9 @@ class ImageViewerActivity :
               onError = { _, error ->
                 binding.progressBar.visibility = View.GONE
                 binding.loadingView.showDefaultErrorMessageFor(
-                  error.throwable, getString(R.string.error_downloading_image))
+                  error.throwable,
+                  getString(R.string.error_downloading_image),
+                )
                 Log.d(TAG, "Coil - Failed to load icon: $url")
               },
             )

@@ -2,7 +2,6 @@ package com.idunnololz.summit.util
 
 import java.io.BufferedInputStream
 import java.io.File
-import java.io.IOException
 import java.io.InputStream
 
 fun guessMimeType(file: File?): String? = file?.inputStream()?.use {
@@ -20,8 +19,7 @@ fun guessMimeType(inputStream: InputStream): String? {
   }
 }
 
-fun extensionForMimeType(mimeType: String) =
-  mimeTypeToExtension[mimeType]
+fun extensionForMimeType(mimeType: String) = mimeTypeToExtension[mimeType]
 
 private fun guessContentTypeFromStream(inputStream: InputStream): String? {
   // If we can't read ahead safely, just give up on guessing
@@ -316,4 +314,3 @@ private val mimeTypeToExtension = buildMap {
   put("video/x-msvideo", "avi")
   put("video/x-sgi-movie", "movie")
 }
-

@@ -7,94 +7,93 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
+ *
  *
  * Values: Active,Hot,New,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled
  */
 
 enum class SortType(val value: kotlin.String) {
 
-    @SerializedName(value = "Active")
-    Active("Active"),
+  @SerializedName(value = "Active")
+  Active("Active"),
 
-    @SerializedName(value = "Hot")
-    Hot("Hot"),
+  @SerializedName(value = "Hot")
+  Hot("Hot"),
 
-    @SerializedName(value = "New")
-    New("New"),
+  @SerializedName(value = "New")
+  New("New"),
 
-    @SerializedName(value = "TopHour")
-    TopHour("TopHour"),
+  @SerializedName(value = "TopHour")
+  TopHour("TopHour"),
 
-    @SerializedName(value = "TopSixHour")
-    TopSixHour("TopSixHour"),
+  @SerializedName(value = "TopSixHour")
+  TopSixHour("TopSixHour"),
 
-    @SerializedName(value = "TopTwelveHour")
-    TopTwelveHour("TopTwelveHour"),
+  @SerializedName(value = "TopTwelveHour")
+  TopTwelveHour("TopTwelveHour"),
 
-    @SerializedName(value = "TopDay")
-    TopDay("TopDay"),
+  @SerializedName(value = "TopDay")
+  TopDay("TopDay"),
 
-    @SerializedName(value = "TopWeek")
-    TopWeek("TopWeek"),
+  @SerializedName(value = "TopWeek")
+  TopWeek("TopWeek"),
 
-    @SerializedName(value = "TopMonth")
-    TopMonth("TopMonth"),
+  @SerializedName(value = "TopMonth")
+  TopMonth("TopMonth"),
 
-    @SerializedName(value = "TopThreeMonths")
-    TopThreeMonths("TopThreeMonths"),
+  @SerializedName(value = "TopThreeMonths")
+  TopThreeMonths("TopThreeMonths"),
 
-    @SerializedName(value = "TopSixMonths")
-    TopSixMonths("TopSixMonths"),
+  @SerializedName(value = "TopSixMonths")
+  TopSixMonths("TopSixMonths"),
 
-    @SerializedName(value = "TopNineMonths")
-    TopNineMonths("TopNineMonths"),
+  @SerializedName(value = "TopNineMonths")
+  TopNineMonths("TopNineMonths"),
 
-    @SerializedName(value = "TopYear")
-    TopYear("TopYear"),
+  @SerializedName(value = "TopYear")
+  TopYear("TopYear"),
 
-    @SerializedName(value = "TopAll")
-    TopAll("TopAll"),
+  @SerializedName(value = "TopAll")
+  TopAll("TopAll"),
 
-    @SerializedName(value = "Scaled")
-    Scaled("Scaled");
+  @SerializedName(value = "Scaled")
+  Scaled("Scaled"),
+  ;
+
+  /**
+   * Override [toString()] to avoid using the enum variable name as the value, and instead use
+   * the actual value defined in the API spec file.
+   *
+   * This solves a problem when the variable name and its value are different, and ensures that
+   * the client sends the correct enum values to the server always.
+   */
+  override fun toString(): kotlin.String = value
+
+  companion object {
+    /**
+     * Converts the provided [data] to a [String] on success, null otherwise.
+     */
+    fun encode(data: kotlin.Any?): kotlin.String? = if (data is SortType) "$data" else null
 
     /**
-     * Override [toString()] to avoid using the enum variable name as the value, and instead use
-     * the actual value defined in the API spec file.
-     *
-     * This solves a problem when the variable name and its value are different, and ensures that
-     * the client sends the correct enum values to the server always.
+     * Returns a valid [SortType] for [data], null otherwise.
      */
-    override fun toString(): kotlin.String = value
-
-    companion object {
-        /**
-         * Converts the provided [data] to a [String] on success, null otherwise.
-         */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is SortType) "$data" else null
-
-        /**
-         * Returns a valid [SortType] for [data], null otherwise.
-         */
-        fun decode(data: kotlin.Any?): SortType? = data?.let {
-          val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
-        }
+    fun decode(data: kotlin.Any?): SortType? = data?.let {
+      val normalizedData = "$it".lowercase()
+      values().firstOrNull { value ->
+        it == value || normalizedData == "$value".lowercase()
+      }
     }
+  }
 }
-

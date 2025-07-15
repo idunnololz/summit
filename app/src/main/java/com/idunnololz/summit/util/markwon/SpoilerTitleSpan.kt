@@ -15,7 +15,6 @@ import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
-import org.commonmark.parser.Parser
 import java.util.regex.Pattern
 
 abstract class DetailsClickableSpan : ClickableSpan()

@@ -7,53 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-import com.idunnololz.summit.api.dto.piefed.ListingType
-import com.idunnololz.summit.api.dto.piefed.SortType
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param defaultListingType 
- * @param defaultSortType 
- * @param showBotAccounts 
- * @param showNsfw 
- * @param showReadPosts 
- * @param showScores 
+ *
+ * @param defaultListingType
+ * @param defaultSortType
+ * @param showBotAccounts
+ * @param showNsfw
+ * @param showReadPosts
+ * @param showScores
  */
 
+data class LocalUser(
 
-data class LocalUser (
+  @SerializedName("default_listing_type")
+  val defaultListingType: ListingType,
 
-    @SerializedName("default_listing_type")
-    val defaultListingType: ListingType,
+  @SerializedName("default_sort_type")
+  val defaultSortType: SortType,
 
-    @SerializedName("default_sort_type")
-    val defaultSortType: SortType,
+  @SerializedName("show_bot_accounts")
+  val showBotAccounts: kotlin.Boolean,
 
-    @SerializedName("show_bot_accounts")
-    val showBotAccounts: kotlin.Boolean,
+  @SerializedName("show_nsfw")
+  val showNsfw: kotlin.Boolean,
 
-    @SerializedName("show_nsfw")
-    val showNsfw: kotlin.Boolean,
+  @SerializedName("show_read_posts")
+  val showReadPosts: kotlin.Boolean,
 
-    @SerializedName("show_read_posts")
-    val showReadPosts: kotlin.Boolean,
+  @SerializedName("show_scores")
+  val showScores: kotlin.Boolean,
 
-    @SerializedName("show_scores")
-    val showScores: kotlin.Boolean
-
-) {
-
-
-}
-
+)

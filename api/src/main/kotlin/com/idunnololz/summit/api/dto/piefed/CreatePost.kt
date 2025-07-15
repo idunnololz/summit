@@ -7,51 +7,45 @@
  */
 
 @file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport"
+  "ArrayInDataClass",
+  "EnumEntryName",
+  "RemoveRedundantQualifierName",
+  "UnusedImport",
 )
 
 package com.idunnololz.summit.api.dto.piefed
 
-
 import com.google.gson.annotations.SerializedName
 
 /**
- * 
  *
- * @param title 
- * @param communityId 
- * @param url 
- * @param body 
- * @param nsfw 
- * @param languageId 
+ *
+ * @param title
+ * @param communityId
+ * @param url
+ * @param body
+ * @param nsfw
+ * @param languageId
  */
 
+data class CreatePost(
 
-data class CreatePost (
+  @SerializedName("title")
+  val title: kotlin.String,
 
-    @SerializedName("title")
-    val title: kotlin.String,
+  @SerializedName("community_id")
+  val communityId: kotlin.Int,
 
-    @SerializedName("community_id")
-    val communityId: kotlin.Int,
+  @SerializedName("url")
+  val url: kotlin.String? = null,
 
-    @SerializedName("url")
-    val url: kotlin.String? = null,
+  @SerializedName("body")
+  val body: kotlin.String? = null,
 
-    @SerializedName("body")
-    val body: kotlin.String? = null,
+  @SerializedName("nsfw")
+  val nsfw: kotlin.Boolean? = null,
 
-    @SerializedName("nsfw")
-    val nsfw: kotlin.Boolean? = null,
+  @SerializedName("language_id")
+  val languageId: kotlin.Int? = null,
 
-    @SerializedName("language_id")
-    val languageId: kotlin.Int? = null
-
-) {
-
-
-}
-
+)

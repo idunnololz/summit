@@ -650,7 +650,7 @@ class AddOrEditPostFragment :
         onDeleteSuggestion = {
           recentCommunityManager.removeRecentCommunityPostedTo(it)
           adapter?.setRecents(recentCommunityManager.getRecentCommunitiesPostedTo())
-        }
+        },
       )
       communitySuggestionsRecyclerView.apply {
         adapter = this@AddOrEditPostFragment.adapter
@@ -700,7 +700,7 @@ class AddOrEditPostFragment :
             LanguageOption(
               name = context.getString(R.string.unspecified),
               language = null,
-            )
+            ),
           ) + it.map { language ->
             LanguageOption(
               name = language.name,
@@ -718,8 +718,11 @@ class AddOrEditPostFragment :
         val languageOption = viewModel.languageId.value?.let { languageId ->
           options.firstOrNull { it.language?.id == languageId }
         }
-        languagePickerText.setText(languageOption?.name
-          ?: context.getString(R.string.unspecified), false)
+        languagePickerText.setText(
+          languageOption?.name
+            ?: context.getString(R.string.unspecified),
+          false,
+        )
         languagePickerText.setOnItemClickListener { _, _, position, _ ->
           viewModel.languageId.value = options[position].language?.id
         }
@@ -729,8 +732,11 @@ class AddOrEditPostFragment :
         val languageOption = viewModel.languageId.value?.let { languageId ->
           options.firstOrNull { it.id == languageId }
         }
-        languagePickerText.setText(languageOption?.name
-          ?: context.getString(R.string.unspecified), false)
+        languagePickerText.setText(
+          languageOption?.name
+            ?: context.getString(R.string.unspecified),
+          false,
+        )
       }
 
       communityEditText.addTextChangedListener {
@@ -1155,8 +1161,10 @@ class AddOrEditPostFragment :
     val communitySuggestionsParentLos = IntArray(2)
     adapter?.setRecents(recentCommunityManager.getRecentCommunitiesPostedTo())
     binding.community.getLocationOnScreen(communityLos)
-    (binding.communitySuggestionsRecyclerView
-      .parent as View)
+    (
+      binding.communitySuggestionsRecyclerView
+        .parent as View
+      )
       .getLocationOnScreen(communitySuggestionsParentLos)
 
     binding.communitySuggestionsRecyclerView.updateLayoutParams<ViewGroup.MarginLayoutParams> {

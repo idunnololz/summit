@@ -2,8 +2,6 @@ package com.idunnololz.summit.api
 
 import android.util.Log
 import arrow.core.Either
-import coil3.util.MimeTypeMap
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
@@ -141,27 +139,17 @@ import com.idunnololz.summit.util.extensionForMimeType
 import com.idunnololz.summit.util.guessMimeType
 import com.idunnololz.summit.util.retry
 import java.io.InputStream
-import java.io.InterruptedIOException
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.runInterruptible
-import okhttp3.OkHttpClient
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.max
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -204,8 +192,10 @@ class LemmyApiClient @Inject constructor(
   val instance: String
     get() = instanceFlow.value
 
-  val instanceFlow = MutableStateFlow(preferences.guestAccountSettings?.instance
-    ?: Consts.DEFAULT_INSTANCE)
+  val instanceFlow = MutableStateFlow(
+    preferences.guestAccountSettings?.instance
+      ?: Consts.DEFAULT_INSTANCE,
+  )
 
   private val coroutineScope = coroutineScopeFactory.create()
 
@@ -228,8 +218,7 @@ class LemmyApiClient @Inject constructor(
     okHttpClient.cache?.evictAll()
   }
 
-  suspend fun apiSupportsReports(): Boolean =
-    getApi().apiSupportsReports
+  suspend fun apiSupportsReports(): Boolean = getApi().apiSupportsReports
 
   suspend fun fetchPosts(
     account: Account?,
@@ -281,7 +270,11 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun markPostAsRead(postId: PostId, read: Boolean, account: Account): Result<SuccessResponse> {
+  suspend fun markPostAsRead(
+    postId: PostId,
+    read: Boolean,
+    account: Account,
+  ): Result<SuccessResponse> {
     val form = MarkPostAsRead(
       post_id = postId,
       post_ids = listOf(postId),
@@ -352,7 +345,7 @@ class LemmyApiClient @Inject constructor(
     downvotedOnly: Boolean? = null,
     force: Boolean = false,
   ): Result<List<CommentView>> {
-    Log.d("HAHA", "maxDepth: ${maxDepth}", RuntimeException())
+    Log.d("HAHA", "maxDepth: $maxDepth", RuntimeException())
     val commentsForm = id?.fold({
       GetComments(
         max_depth = maxDepth,
@@ -884,7 +877,7 @@ class LemmyApiClient @Inject constructor(
     fileName: String,
     imageIs: InputStream,
   ): Result<UploadImageResult> {
-    val url = "https://${instance}/pictrs/image"
+    val url = "https://$instance/pictrs/image"
     val mimeType = guessMimeType(imageIs)
     val fileNameWithExtension = if (mimeType == null || fileName.contains(".")) {
       fileName
@@ -1531,7 +1524,12 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun listMedia(page: Long?, limit: Long?, account: Account, force: Boolean): Result<ListMediaResponse> {
+  suspend fun listMedia(
+    page: Long?,
+    limit: Long?,
+    account: Account,
+    force: Boolean,
+  ): Result<ListMediaResponse> {
     val form = ListMedia(
       page = page,
       limit = limit,
@@ -1632,7 +1630,7 @@ class LemmyApiClient @Inject constructor(
       {
         Log.e(TAG, "Unable to determine backend for instance $instance.")
         StatefulData.Error(it)
-      }
+      },
     )
 
     return newApi(instance, result).also {
@@ -1658,7 +1656,8 @@ class LemmyApiClient @Inject constructor(
           )
           SiteBackendHelper.ApiType.LemmyV4,
           SiteBackendHelper.ApiType.LemmyV3,
-          null -> LemmyApiV3Adapter(
+          null,
+          -> LemmyApiV3Adapter(
             Retrofit.Builder()
               .baseUrl("https://$instance/api/v3/")
               .addConverterFactory(GsonConverterFactory.create())
@@ -1671,11 +1670,7 @@ class LemmyApiClient @Inject constructor(
       },
       { exception ->
         val handler = object : InvocationHandler {
-          override fun invoke(
-            proxy: Any?,
-            method: Method?,
-            args: Array<out Any?>?,
-          ): Any? {
+          override fun invoke(proxy: Any?, method: Method?, args: Array<out Any?>?): Any? {
             throw exception
           }
         }
@@ -1684,7 +1679,7 @@ class LemmyApiClient @Inject constructor(
           arrayOf(LemmyLikeApi::class.java),
           handler,
         ) as LemmyLikeApi
-      }
+      },
     )
   }
 }

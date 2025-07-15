@@ -372,7 +372,7 @@ class PostViewModel @Inject constructor(
             parentId = it,
             sortOrder = sortOrder,
             maxDepth = null,
-            force = force
+            force = force,
           )
         }
       }
@@ -749,7 +749,7 @@ class PostViewModel @Inject constructor(
             fetchMoreCommentsInternal(
               parentId = pendingComment.parentId,
               sortOrder = sortOrder,
-              force = true
+              force = true,
             )
           }
 
@@ -765,8 +765,10 @@ class PostViewModel @Inject constructor(
             } else {
               newlyPostedCommentId = it
                 .sortedByDescending { commentView ->
-                  dateStringToTs(commentView.comment.updated
-                    ?: commentView.comment.published)
+                  dateStringToTs(
+                    commentView.comment.updated
+                      ?: commentView.comment.published,
+                  )
                 }
                 .firstOrNull {
                   it.comment.creator_id ==
@@ -802,9 +804,7 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  private suspend fun updateData(
-    wasUpdateForced: Boolean
-  ) = withContext(Dispatchers.Default) {
+  private suspend fun updateData(wasUpdateForced: Boolean) = withContext(Dispatchers.Default) {
     Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
 
     val context = ContextCompat.getContextForLanguage(context)
@@ -875,7 +875,7 @@ class PostViewModel @Inject constructor(
           parentId = parentId,
           sortOrder = sortOrder,
           maxDepth = maxDepth,
-          force = force
+          force = force,
         )
       } else {
         // TODO maybe?
