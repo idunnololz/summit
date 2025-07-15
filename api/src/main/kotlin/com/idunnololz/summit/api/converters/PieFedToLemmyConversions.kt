@@ -4,11 +4,19 @@ import com.idunnololz.summit.api.dto.lemmy.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
 import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
+import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
+import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
+import com.idunnololz.summit.api.dto.lemmy.LoginResponse
 import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.piefed.Comment
 import com.idunnololz.summit.api.dto.piefed.CommentAggregates
+import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
+import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
+import com.idunnololz.summit.api.dto.lemmy.PersonMention
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
+import com.idunnololz.summit.api.dto.piefed.CommentReply
 import com.idunnololz.summit.api.dto.piefed.Community
 import com.idunnololz.summit.api.dto.piefed.CommunityBlockView
 import com.idunnololz.summit.api.dto.piefed.CommunityFollowerView
@@ -359,3 +367,75 @@ internal fun com.idunnololz.summit.api.dto.piefed.CommentResponse.toCommentRespo
     null,
   )
 
+internal fun com.idunnololz.summit.api.dto.piefed.LoginResponse.toLoginResponse(): LoginResponse =
+  LoginResponse(
+    jwt = this.jwt,
+    registration_created = false,
+    verify_email_sent = false,
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommunityResponse.toCommunityResponse(): CommunityResponse =
+  CommunityResponse(
+    community_view = this.communityView.toCommunityView(),
+    discussion_languages = this.discussionLanguages,
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.GetRepliesResponse.toGetRepliesResponse(): GetRepliesResponse =
+  GetRepliesResponse(
+    replies = this.replies.map { it.toCommentReplyView() }
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.GetRepliesResponse.toGetPersonMentionsResponse(): GetPersonMentionsResponse =
+  GetPersonMentionsResponse(
+    mentions = this.replies.map { it.toPersonMentionView() }
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommentReplyView.toCommentReplyView(): CommentReplyView =
+  CommentReplyView(
+    comment_reply = this.commentReply.toCommentReply(),
+    comment = this.comment.toComment(),
+    creator = this.creator.toPerson(),
+    post = this.post.toPost(),
+    community = this.community.toCommunity(),
+    recipient = this.recipient.toPerson(),
+    counts = this.counts.toCommentAggregates(),
+    creator_banned_from_community = this.creatorBannedFromCommunity,
+    subscribed = this.subscribed.toSubscribedType(),
+    saved = this.saved,
+    creator_blocked = this.creatorBlocked,
+    my_vote = this.myVote,
+  )
+
+internal fun CommentReply.toCommentReply(): com.idunnololz.summit.api.dto.lemmy.CommentReply =
+  com.idunnololz.summit.api.dto.lemmy.CommentReply(
+    id = this.id,
+    recipient_id = this.recipientId.toLong(),
+    comment_id = this.commentId,
+    read = this.read,
+    published = this.published,
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommentReplyView.toPersonMentionView(): PersonMentionView =
+  PersonMentionView(
+    person_mention = this.commentReply.toPersonMention(),
+    comment = this.comment.toComment(),
+    creator = this.creator.toPerson(),
+    post = this.post.toPost(),
+    community = this.community.toCommunity(),
+    recipient = this.recipient.toPerson(),
+    counts = this.counts.toCommentAggregates(),
+    creator_banned_from_community = this.creatorBannedFromCommunity,
+    subscribed = this.subscribed.toSubscribedType(),
+    saved = this.saved,
+    creator_blocked = this.creatorBlocked,
+    my_vote = this.myVote,
+  )
+
+internal fun CommentReply.toPersonMention(): PersonMention =
+  PersonMention(
+    id = this.id,
+    recipient_id = this.recipientId.toLong(),
+    comment_id = this.commentId,
+    read = this.read,
+    published = this.published,
+  )

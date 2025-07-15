@@ -118,7 +118,7 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import retrofit2.Call
 import java.io.InputStream
 
-interface LemmyLikeApi {
+interface LemmyLikeApi : ApiCompat {
 
   val instance: String
 
@@ -214,7 +214,7 @@ interface LemmyLikeApi {
   suspend fun markPostAsRead(
     authorization: String?,
     args: MarkPostAsRead,
-  ): Result<PostResponse>
+  ): Result<SuccessResponse>
 
   /**
    * Save a comment.
@@ -553,6 +553,7 @@ interface LemmyLikeApi {
     url: String,
     fileName: String,
     imageIs: InputStream,
+    mimeType: String?,
   ): Result<UploadImageResult>
 
   suspend fun resolveObject(

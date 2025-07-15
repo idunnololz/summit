@@ -3,7 +3,7 @@ package com.idunnololz.summit.api.dto.lemmy
 data class GetSiteResponse(
   val site_view: SiteView,
   val admins: List<PersonView>,
-  val online: Int,
+  val online: Int? = null,
   val version: String,
   val my_user: MyUserInfo? = null,
   val all_languages: List<Language>,

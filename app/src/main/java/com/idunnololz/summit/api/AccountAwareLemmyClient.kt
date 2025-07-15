@@ -109,6 +109,9 @@ class AccountAwareLemmyClient @Inject constructor(
     }
   }
 
+  suspend fun apiSupportsReports(): Boolean =
+    apiClient.apiSupportsReports()
+
   suspend fun fetchSavedPostsWithRetry(
     page: Int,
     limit: Int? = null,
@@ -164,13 +167,13 @@ class AccountAwareLemmyClient @Inject constructor(
         ?: if (account == null) {
           SortType.Active
         } else {
-          SortType.values()[account.defaultSortType]
+          SortType.entries[account.defaultSortType]
         },
       listingType = listingType
         ?: if (account == null) {
           ListingType.All
         } else {
-          ListingType.values()[account.defaultListingType]
+          ListingType.entries[account.defaultListingType]
         },
       limit = limit,
       page = page,
@@ -192,7 +195,7 @@ class AccountAwareLemmyClient @Inject constructor(
     postId: PostId,
     read: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<PostView> {
+  ): Result<SuccessResponse> {
     return if (account != null) {
       apiClient.markPostAsRead(postId, read, account)
         .autoSignOut(account)

@@ -19,6 +19,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.COMMENTS_DEPTH_MAX
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.LemmyApiClient
@@ -208,10 +209,10 @@ class PostViewModel @Inject constructor(
   val apiInstance: String
     get() = lemmyApiClient.instance
 
-  var maxDepth: Int? = if (preferences.collapseChildCommentsByDefault) {
+  var initialMaxDepth: Int? = if (preferences.collapseChildCommentsByDefault) {
     1
   } else {
-    null
+    COMMENTS_DEPTH_MAX
   }
 
   fun forceAccount(accountId: Long) {
@@ -344,7 +345,7 @@ class PostViewModel @Inject constructor(
               commentsFetcher.fetchCommentsWithRetry(
                 id = Either.Left(it.id),
                 sort = sortOrder,
-                maxDepth = maxDepth,
+                maxDepth = initialMaxDepth,
                 force = force,
               )
             },
@@ -352,7 +353,7 @@ class PostViewModel @Inject constructor(
               commentsFetcher.fetchCommentsWithRetry(
                 id = Either.Right(it.id),
                 sort = sortOrder,
-                maxDepth = maxDepth,
+                maxDepth = initialMaxDepth,
                 force = force,
               )
             },
@@ -367,7 +368,12 @@ class PostViewModel @Inject constructor(
 
       if (force) {
         additionalLoadedCommentIds.forEach {
-          fetchMoreCommentsInternal(it, sortOrder, null, force)
+          fetchMoreCommentsInternal(
+            parentId = it,
+            sortOrder = sortOrder,
+            maxDepth = null,
+            force = force
+          )
         }
       }
 
@@ -740,7 +746,11 @@ class PostViewModel @Inject constructor(
           val commentsResult = if (pendingComment.parentId == null) {
             result
           } else {
-            fetchMoreCommentsInternal(pendingComment.parentId, sortOrder, force = true)
+            fetchMoreCommentsInternal(
+              parentId = pendingComment.parentId,
+              sortOrder = sortOrder,
+              force = true
+            )
           }
 
           commentsResult.onSuccess {
@@ -856,12 +866,17 @@ class PostViewModel @Inject constructor(
     return instance.equals(currentAccount.account.instance, ignoreCase = true)
   }
 
-  fun fetchMoreComments(parentId: CommentId?, depth: Int? = null, force: Boolean = false) {
+  fun fetchMoreComments(parentId: CommentId?, maxDepth: Int? = null, force: Boolean = false) {
     val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
 
     viewModelScope.launch {
       if (parentId != null) {
-        fetchMoreCommentsInternal(parentId, sortOrder, depth, force)
+        fetchMoreCommentsInternal(
+          parentId = parentId,
+          sortOrder = sortOrder,
+          maxDepth = maxDepth,
+          force = force
+        )
       } else {
         // TODO maybe?
       }
@@ -883,15 +898,15 @@ class PostViewModel @Inject constructor(
   private suspend fun fetchMoreCommentsInternal(
     parentId: CommentId,
     sortOrder: CommentSortType,
-    depth: Int? = null,
+    maxDepth: Int? = null,
     force: Boolean = false,
   ): Result<List<CommentView>> {
     Log.d(TAG, "fetchMoreCommentsInternal(): parentId = $parentId")
     val result = commentsFetcher.fetchCommentsWithRetry(
-      Either.Right(parentId),
-      sortOrder,
-      maxDepth = depth,
-      force,
+      id = Either.Right(parentId),
+      sort = sortOrder,
+      maxDepth = maxDepth,
+      force = force,
     )
 
     additionalLoadedCommentIds.add(parentId)
@@ -909,7 +924,7 @@ class PostViewModel @Inject constructor(
           removedCommentIds.remove(parentId)
         }
 
-        val depthIsMoreThanOne = depth == null || depth > 1
+        val depthIsMoreThanOne = maxDepth == null || maxDepth > 1
         if (thisComment != null && depthIsMoreThanOne) {
           fullyLoadedCommentIds.add(thisComment.comment.id)
         }

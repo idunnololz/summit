@@ -118,6 +118,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
@@ -133,6 +134,8 @@ class LemmyApiV3Adapter(
       .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
       .create()
   }
+
+  override val apiSupportsReports: Boolean = true
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
     val headers = mutableMapOf<String, String>()
@@ -235,8 +238,9 @@ class LemmyApiV3Adapter(
   override suspend fun markPostAsRead(
     authorization: String?,
     args: MarkPostAsRead,
-  ): Result<PostResponse> =
+  ): Result<SuccessResponse> =
     retrofitErrorHandler { api.markPostAsRead(generateHeaders(authorization, false), args) }
+      .map { SuccessResponse(it.post_view.read == args.read) }
 
   override suspend fun saveComment(
     authorization: String?,
@@ -527,6 +531,7 @@ class LemmyApiV3Adapter(
     url: String,
     fileName: String,
     imageIs: InputStream,
+    mimeType: String?,
   ): Result<UploadImageResult> =
     retrofitErrorHandler {
       api.uploadImage(
@@ -534,9 +539,9 @@ class LemmyApiV3Adapter(
         token = "jwt=${authorization}",
         url = url,
         filePart = MultipartBody.Part.createFormData(
-          "images[]",
-          fileName,
-          imageIs.readBytes().toRequestBody(),
+          name = "images[]",
+          filename = fileName,
+          body = imageIs.readBytes().toRequestBody(contentType = mimeType?.toMediaType()),
         )
       )
     }.map {

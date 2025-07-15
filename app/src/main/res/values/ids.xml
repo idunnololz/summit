@@ -302,4 +302,5 @@
     <item name="is_saved" type="id" />
     <item name="insert_link" type="id" />
     <item name="uploads" type="id" />
+    <item name="instance_info" type="id" />
 </resources>

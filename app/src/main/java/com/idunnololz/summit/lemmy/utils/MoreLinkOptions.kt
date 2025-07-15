@@ -143,6 +143,12 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
               }
 
               addDivider()
+              addItemWithIcon(
+                id = R.id.instance_info,
+                getString(R.string.instance_info),
+                R.drawable.baseline_web_24,
+              )
+              addDivider()
             }
           }
           is CommunityRef.Local,
@@ -288,6 +294,12 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
 //                                icon = R.drawable.baseline_more_horiz_24
 //                            )
 
+              addDivider()
+              addItemWithIcon(
+                id = R.id.instance_info,
+                getString(R.string.instance_info),
+                R.drawable.baseline_web_24,
+              )
               addDivider()
             }
           }
@@ -445,6 +457,24 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
       (advancedLink as? AdvancedLink.PageLink)?.let {
         (it.pageRef as? CommunityRef)?.let {
           mainActivity?.showCommunityInfo(it)
+        }
+      }
+    }
+    R.id.instance_info -> {
+      (advancedLink as? AdvancedLink.PageLink)?.let {
+        when (it.pageRef) {
+          is CommentRef -> TODO()
+          is CommunityRef.All -> TODO()
+          is CommunityRef.AllSubscribed -> TODO()
+          is CommunityRef.CommunityRefByName ->
+            mainActivity?.showCommunityInfo(CommunityRef.Local(it.pageRef.instance))
+          is CommunityRef.Local -> TODO()
+          is CommunityRef.ModeratedCommunities -> TODO()
+          is CommunityRef.MultiCommunity -> TODO()
+          is CommunityRef.Subscribed -> TODO()
+          is PersonRef ->
+            mainActivity?.showCommunityInfo(CommunityRef.Local(it.pageRef.instance))
+          is PostRef -> TODO()
         }
       }
     }

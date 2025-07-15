@@ -24,6 +24,7 @@ import com.idunnololz.summit.api.dto.piefed.Post
 import com.idunnololz.summit.api.dto.piefed.SubscribedType
 
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.PersonMention
 
 /**
  * 
@@ -93,4 +94,3 @@ data class CommentReplyView (
 
 
 }
-

@@ -18,6 +18,7 @@ package com.idunnololz.summit.api.dto.piefed
 import com.idunnololz.summit.api.dto.piefed.CommentReplyView
 
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 
 /**
  * 

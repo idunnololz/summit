@@ -1,4 +1,5 @@
 package com.idunnololz.summit.api
 
-class ApiCompat {
+interface ApiCompat {
+  val apiSupportsReports: Boolean
 }

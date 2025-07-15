@@ -2,6 +2,7 @@ package com.idunnololz.summit.api
 
 import android.util.Log
 import arrow.core.Either
+import coil3.util.MimeTypeMap
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
@@ -136,6 +137,8 @@ import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.extensionForMimeType
+import com.idunnololz.summit.util.guessMimeType
 import com.idunnololz.summit.util.retry
 import java.io.InputStream
 import java.io.InterruptedIOException
@@ -158,6 +161,7 @@ import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import javax.inject.Singleton
+import kotlin.math.max
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -224,6 +228,9 @@ class LemmyApiClient @Inject constructor(
     okHttpClient.cache?.evictAll()
   }
 
+  suspend fun apiSupportsReports(): Boolean =
+    getApi().apiSupportsReports
+
   suspend fun fetchPosts(
     account: Account?,
     communityIdOrName: Either<Int, String>? = null,
@@ -274,7 +281,7 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun markPostAsRead(postId: PostId, read: Boolean, account: Account): Result<PostView> {
+  suspend fun markPostAsRead(postId: PostId, read: Boolean, account: Account): Result<SuccessResponse> {
     val form = MarkPostAsRead(
       post_id = postId,
       post_ids = listOf(postId),
@@ -284,7 +291,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().markPostAsRead(authorization = account.bearer, args = form)
-    }.map { it.post_view }
+    }
   }
 
   suspend fun fetchSavedPosts(
@@ -345,9 +352,10 @@ class LemmyApiClient @Inject constructor(
     downvotedOnly: Boolean? = null,
     force: Boolean = false,
   ): Result<List<CommentView>> {
+    Log.d("HAHA", "maxDepth: ${maxDepth}", RuntimeException())
     val commentsForm = id?.fold({
       GetComments(
-        max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
+        max_depth = maxDepth,
         type_ = ListingType.All,
         post_id = it,
         sort = sort,
@@ -357,7 +365,7 @@ class LemmyApiClient @Inject constructor(
       )
     }, {
       GetComments(
-        max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
+        max_depth = maxDepth,
         type_ = ListingType.All,
         parent_id = it,
         sort = sort,
@@ -367,7 +375,7 @@ class LemmyApiClient @Inject constructor(
       )
     })
       ?: GetComments(
-        max_depth = maxDepth ?: COMMENTS_DEPTH_MAX,
+        max_depth = maxDepth,
         type_ = ListingType.All,
         post_id = null,
         sort = sort,
@@ -540,6 +548,7 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
     account: Account,
   ): Result<GetReportCountResponse> {
+    Log.d("HAHA", "fetchUnresolvedReportsCount()", RuntimeException())
     val form = GetReportCount(
       null,
       account.jwt,
@@ -876,13 +885,25 @@ class LemmyApiClient @Inject constructor(
     imageIs: InputStream,
   ): Result<UploadImageResult> {
     val url = "https://${instance}/pictrs/image"
+    val mimeType = guessMimeType(imageIs)
+    val fileNameWithExtension = if (mimeType == null || fileName.contains(".")) {
+      fileName
+    } else {
+      val extension = extensionForMimeType(mimeType)
+      if (extension != null) {
+        "$fileName.$extension"
+      } else {
+        fileName
+      }
+    }
 
     return onApiClient {
       getApi().uploadImage(
         authorization = account.bearer,
         url = url,
-        fileName = fileName,
+        fileName = fileNameWithExtension,
         imageIs = imageIs,
+        mimeType = mimeType,
       )
     }
   }

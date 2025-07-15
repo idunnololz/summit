@@ -516,7 +516,7 @@ class PostFragment :
             )(actionId)
           },
           onFetchComments = {
-            viewModel.fetchMoreComments(it)
+            viewModel.fetchMoreComments(it, force = true)
           },
           onLoadPost = { post, force ->
             viewModel.updatePostOrCommentRef(Either.Left(PostRef(getInstance(), post)))
@@ -600,7 +600,7 @@ class PostFragment :
           )
         },
         onCommentUpdated = {
-          viewModel.fetchMoreComments(it, 1, true)
+          viewModel.fetchMoreComments(parentId = it, maxDepth = 1, force = true)
         },
       )
 
@@ -632,10 +632,10 @@ class PostFragment :
         }
         PostFabQuickActions.COLLAPSE_ALL_COMMENTS -> {
           fab.setOnLongClickListener {
-            if (viewModel.maxDepth == 1) {
-              viewModel.maxDepth = null
+            if (viewModel.initialMaxDepth == 1) {
+              viewModel.initialMaxDepth = null
             } else {
-              viewModel.maxDepth = 1
+              viewModel.initialMaxDepth = 1
             }
             forceRefresh()
             true

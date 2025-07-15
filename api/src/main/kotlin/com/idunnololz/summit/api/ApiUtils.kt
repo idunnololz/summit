@@ -93,6 +93,9 @@ internal suspend fun <T> retrofitErrorHandler(call: suspend () -> Call<T>): Resu
     if (errMsg == "couldnt_find_object" || errMsg == "couldnt_find_community") {
       return Result.failure(CouldntFindObjectError())
     }
+    if (errMsg == "not_yet_implemented") {
+      return Result.failure(NotYetImplemented())
+    }
     // TODO: Remove these checks once v0.19 is out for everyone.
     if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
       return Result.failure(NewApiException("v0.19"))

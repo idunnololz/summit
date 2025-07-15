@@ -2,7 +2,7 @@ package com.idunnololz.summit.api
 
 import kotlin.RuntimeException
 
-class ServerApiException(val errorMessage: String?, val errorCode: Int) : ApiException(
+open class ServerApiException(val errorMessage: String?, val errorCode: Int) : ApiException(
   "Server error. Code: $errorCode. Message: $errorMessage.",
 )
 open class ClientApiException(val errorMessage: String?, val errorCode: Int) : ApiException(
@@ -53,6 +53,8 @@ sealed class NetworkException(msg: String) : RuntimeException(msg)
 class GetNetworkException(msg: String) : NetworkException(msg)
 
 class NotAModOrAdmin() : ClientApiException("Not a mod or admin", 400)
+
+class NotYetImplemented() : ServerApiException("Server has not implemented this API yet.", 400)
 
 class CouldntFindObjectError() : ClientApiException("Couldn't find object", 400)
 

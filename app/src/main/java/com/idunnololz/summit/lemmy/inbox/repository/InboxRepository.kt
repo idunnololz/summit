@@ -8,6 +8,7 @@ import com.idunnololz.summit.account.info.isAdmin
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.NotAModOrAdmin
+import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
@@ -197,13 +198,16 @@ class InboxRepository @Inject constructor(
       },
     )
   private val allSources = InboxMultiDataSource(
-    listOf(
-      repliesStatelessSource,
-      mentionsStatelessSource,
-      messagesStatelessSource,
-      postReportsStatelessSource,
-      commentReportsStatelessSource,
-    ),
+    mutableListOf<InboxSource<*>>().apply {
+      add(repliesStatelessSource)
+      add(mentionsStatelessSource)
+      add(messagesStatelessSource)
+
+      if (fullAccount?.isMod() == true) {
+        add(postReportsStatelessSource)
+        add(commentReportsStatelessSource)
+      }
+    }
   )
   private val unreadSources = InboxMultiDataSource(
     mutableListOf<InboxSource<*>>().apply {
@@ -330,7 +334,7 @@ class InboxRepository @Inject constructor(
         Result.success(it.post_reports.map { InboxItem.ReportPostInboxItem(it) })
       },
       onFailure = {
-        if (it is NotAModOrAdmin) {
+        if (it is NotAModOrAdmin || it is NotYetImplemented) {
           Result.success(listOf())
         } else {
           Result.failure(it)
@@ -353,7 +357,7 @@ class InboxRepository @Inject constructor(
         Result.success(it.comment_reports.map { InboxItem.ReportCommentInboxItem(it) })
       },
       onFailure = {
-        if (it is NotAModOrAdmin) {
+        if (it is NotAModOrAdmin || it is NotYetImplemented) {
           Result.success(listOf())
         } else {
           Result.failure(it)

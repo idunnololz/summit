@@ -44,7 +44,7 @@ data class CommentReply (
     val read: kotlin.Boolean,
 
     @SerializedName("published")
-    val published: java.time.OffsetDateTime
+    val published: String
 
 ) {
 

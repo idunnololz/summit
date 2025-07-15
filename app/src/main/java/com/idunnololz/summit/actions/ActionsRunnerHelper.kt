@@ -219,6 +219,7 @@ class ActionsRunnerHelper @Inject constructor(
             )
           },
           onFailure = {
+            Log.d(TAG, "Action failed: ${it}")
             getResultForError(it)
           },
         )

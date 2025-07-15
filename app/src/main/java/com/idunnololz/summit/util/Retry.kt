@@ -2,6 +2,7 @@ package com.idunnololz.summit.util
 
 import com.idunnololz.summit.api.ApiException
 import com.idunnololz.summit.api.ClientApiException
+import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.api.RateLimitException
 import com.idunnololz.summit.api.ServerApiException
 import kotlinx.coroutines.delay
@@ -18,6 +19,7 @@ suspend fun <T> retry(
     if (it is ApiException) {
       when (it) {
         is ClientApiException -> false
+        is NotYetImplemented -> false
         is ServerApiException -> true
       }
     } else {
