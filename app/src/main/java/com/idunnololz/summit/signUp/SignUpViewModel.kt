@@ -11,8 +11,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.api.dto.lemmy.CaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
@@ -152,16 +154,22 @@ class SignUpViewModel @Inject constructor(
             instanceError = context.getString(R.string.error_unable_to_resolve_instance)
           }
           .onSuccess {
-            site = it
-            fetchSiteLiveData.setValue(Unit)
-            instanceError = null
-
-            siteCache.put(instance, it)
-
-            if (it.site_view.local_site.registration_mode == RegistrationMode.Closed) {
-              instanceError = context.getString(R.string.error_instance_closed_registrations)
+            if (!lemmyApiClient.supportsFeature(ApiFeature.Register)) {
+              site = it
+              fetchSiteLiveData.setError(NotYetImplemented())
+              instanceError = context.getString(R.string.error_instance_does_not_support_registration)
             } else {
-              onSiteLoadedAndConfirmed(instance, it.toSiteModel())
+              site = it
+              fetchSiteLiveData.setValue(Unit)
+              instanceError = null
+
+              siteCache.put(instance, it)
+
+              if (it.site_view.local_site.registration_mode == RegistrationMode.Closed) {
+                instanceError = context.getString(R.string.error_instance_closed_registrations)
+              } else {
+                onSiteLoadedAndConfirmed(instance, it.toSiteModel())
+              }
             }
           }
 

@@ -414,12 +414,14 @@ class InboxFragment :
 
     viewModel.markAsReadResult.observe(viewLifecycleOwner) {
       when (it) {
-        is StatefulData.Error ->
+        is StatefulData.Error -> {
           ErrorDialogFragment.show(
             message = getString(R.string.error_unable_to_mark_message_as_read),
             error = it.error,
             fm = childFragmentManager,
           )
+          viewModel.markAsReadResult.postIdle()
+        }
         is StatefulData.Loading -> {}
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {}

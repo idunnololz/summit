@@ -732,14 +732,14 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         val message: String,
       ) : Item
       data class StatsItem(
-        val postCount: Int,
-        val commentCount: Int,
-        val userCount: Int,
+        val postCount: Int?,
+        val commentCount: Int?,
+        val userCount: Int?,
 
-        val usersPerDay: Int,
-        val usersPerWeek: Int,
-        val usersPerMonth: Int,
-        val usersPerSixMonth: Int,
+        val usersPerDay: Int?,
+        val usersPerWeek: Int?,
+        val usersPerMonth: Int?,
+        val usersPerSixMonth: Int?,
       ) : Item
       data class DescriptionItem(
         val content: String,
@@ -885,13 +885,20 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         Item.StatsItem::class,
         PageDataStatsItemBinding::inflate,
       ) { item, b, _ ->
-        b.posts.text = nf.format(item.postCount)
-        b.comments.text = nf.format(item.commentCount)
-        b.users.text = nf.format(item.userCount)
-        b.usersPerDay.text = nf.format(item.usersPerDay)
-        b.usersPerWeek.text = nf.format(item.usersPerWeek)
-        b.usersPerMonth.text = nf.format(item.usersPerMonth)
-        b.usersPerSixMonth.text = nf.format(item.usersPerSixMonth)
+        fun Int?.format() =
+          if (this == null) {
+            "-"
+          } else {
+            nf.format(this)
+          }
+
+        b.posts.text = item.postCount.format()
+        b.comments.text = item.commentCount.format()
+        b.users.text = item.userCount.format()
+        b.usersPerDay.text = item.usersPerDay.format()
+        b.usersPerWeek.text = item.usersPerWeek.format()
+        b.usersPerMonth.text = item.usersPerMonth.format()
+        b.usersPerSixMonth.text = item.usersPerSixMonth.format()
       }
       addItemType(
         Item.AdminItem::class,

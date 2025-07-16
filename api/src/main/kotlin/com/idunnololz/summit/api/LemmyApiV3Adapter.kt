@@ -133,7 +133,12 @@ class LemmyApiV3Adapter(
       .create()
   }
 
-  override val apiSupportsReports: Boolean = true
+  override fun supportsFeature(apiFeature: ApiFeature): Boolean =
+    when (apiFeature) {
+      ApiFeature.Reports -> true
+      ApiFeature.Register -> true
+      ApiFeature.Downvoted -> true
+    }
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
     val headers = mutableMapOf<String, String>()
@@ -249,7 +254,6 @@ class LemmyApiV3Adapter(
     args: MarkPostAsRead,
   ): Result<SuccessResponse> =
     retrofitErrorHandler { api.markPostAsRead(generateHeaders(authorization, false), args) }
-      .map { SuccessResponse(it.post_view.read == args.read) }
 
   override suspend fun saveComment(
     authorization: String?,
@@ -336,7 +340,7 @@ class LemmyApiV3Adapter(
   override suspend fun markCommentReplyAsRead(
     authorization: String?,
     args: MarkCommentReplyAsRead,
-  ): Result<CommentResponse> =
+  ): Result<SuccessResponse> =
     retrofitErrorHandler { api.markCommentReplyAsRead(generateHeaders(authorization, false), args) }
 
   override suspend fun markPersonMentionAsRead(

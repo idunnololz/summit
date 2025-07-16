@@ -203,7 +203,7 @@ interface LemmyApiV3 {
   fun markPostAsRead(
     @HeaderMap headers: Map<String, String>,
     @Body form: MarkPostAsRead,
-  ): Call<PostResponse>
+  ): Call<SuccessResponse>
 
   /**
    * Save a comment.
@@ -311,7 +311,7 @@ interface LemmyApiV3 {
   fun markCommentReplyAsRead(
     @HeaderMap headers: Map<String, String>,
     @Body form: MarkCommentReplyAsRead,
-  ): Call<CommentResponse>
+  ): Call<SuccessResponse>
 
   /**
    * Mark a person mention as read.

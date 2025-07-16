@@ -219,7 +219,7 @@ class ActionsRunnerHelper @Inject constructor(
             )
           },
           onFailure = {
-            Log.d(TAG, "Action failed: $it")
+            Log.w(TAG, "Action failed: $it", it)
             getResultForError(it)
           },
         )

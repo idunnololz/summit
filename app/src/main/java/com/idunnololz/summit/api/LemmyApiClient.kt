@@ -218,7 +218,8 @@ class LemmyApiClient @Inject constructor(
     okHttpClient.cache?.evictAll()
   }
 
-  suspend fun apiSupportsReports(): Boolean = getApi().apiSupportsReports
+  suspend fun supportsFeature(apiFeature: ApiFeature): Boolean =
+    getApi().supportsFeature(apiFeature)
 
   suspend fun fetchPosts(
     account: Account?,
@@ -345,7 +346,6 @@ class LemmyApiClient @Inject constructor(
     downvotedOnly: Boolean? = null,
     force: Boolean = false,
   ): Result<List<CommentView>> {
-    Log.d("HAHA", "maxDepth: $maxDepth", RuntimeException())
     val commentsForm = id?.fold({
       GetComments(
         max_depth = maxDepth,
@@ -541,7 +541,6 @@ class LemmyApiClient @Inject constructor(
     force: Boolean,
     account: Account,
   ): Result<GetReportCountResponse> {
-    Log.d("HAHA", "fetchUnresolvedReportsCount()", RuntimeException())
     val form = GetReportCount(
       null,
       account.jwt,
@@ -1184,7 +1183,7 @@ class LemmyApiClient @Inject constructor(
     id: CommentReplyId,
     read: Boolean,
     account: Account,
-  ): Result<CommentView> {
+  ): Result<SuccessResponse> {
     val form = MarkCommentReplyAsRead(
       id,
       read,
@@ -1192,7 +1191,7 @@ class LemmyApiClient @Inject constructor(
     )
     return onApiClient {
       getApi().markCommentReplyAsRead(authorization = account.bearer, form)
-    }.map { it.comment_view }
+    }
   }
 
   suspend fun markMentionAsRead(

@@ -13,6 +13,8 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ApiFeature
+import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
@@ -205,20 +207,24 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             }
         }
         FilteredPostAndCommentsType.Downvoted -> {
-          apiClient
-            .fetchPosts(
-              communityIdOrName = null,
-              sortType = SortType.New,
-              listingType = ListingType.All,
-              page = pageIndex.toLemmyPageIndex(),
-              cursor = null,
-              limit = pageSize,
-              force = force,
-              downvotedOnly = true,
-            )
-            .map {
-              it.posts
-            }
+          if (apiClient.supportsFeature(ApiFeature.Downvoted)) {
+            apiClient
+              .fetchPosts(
+                communityIdOrName = null,
+                sortType = SortType.New,
+                listingType = ListingType.All,
+                page = pageIndex.toLemmyPageIndex(),
+                cursor = null,
+                limit = pageSize,
+                force = force,
+                downvotedOnly = true,
+              )
+              .map {
+                it.posts
+              }
+          } else {
+            Result.failure(NotYetImplemented())
+          }
         }
       }
 

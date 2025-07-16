@@ -139,6 +139,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
               message = it.error.message ?: getString(R.string.error_unknown)
             }
           }
+          viewModel.accountLiveData.postIdle()
         }
         is StatefulData.Loading -> {
           disableAllFields()

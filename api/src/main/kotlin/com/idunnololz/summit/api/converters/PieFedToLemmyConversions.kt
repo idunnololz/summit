@@ -1,6 +1,7 @@
 package com.idunnololz.summit.api.converters
 
 import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
+import com.idunnololz.summit.api.dto.lemmy.CommentReportView
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityAggregates
@@ -14,10 +15,15 @@ import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
+import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.piefed.Comment
 import com.idunnololz.summit.api.dto.piefed.CommentAggregates
 import com.idunnololz.summit.api.dto.piefed.CommentReply
+import com.idunnololz.summit.api.dto.lemmy.CommentReport
+import com.idunnololz.summit.api.dto.lemmy.PostReport
+import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.piefed.Community
 import com.idunnololz.summit.api.dto.piefed.CommunityBlockView
 import com.idunnololz.summit.api.dto.piefed.CommunityFollowerView
@@ -276,7 +282,10 @@ internal fun Instance.toInstance(): com.idunnololz.summit.api.dto.lemmy.Instance
 
 internal fun LocalUserView.toLocalUserView(): com.idunnololz.summit.api.dto.lemmy.LocalUserView =
   com.idunnololz.summit.api.dto.lemmy.LocalUserView(
-    this.localUser.toLocalUser(),
+    this.localUser.toLocalUser().copy(
+      id = this.person.id,
+      person_id = this.person.id.toLong(),
+    ),
     this.person.toPerson(),
     this.counts.toPersonAggregates(),
   )
@@ -443,3 +452,80 @@ internal fun com.idunnololz.summit.api.dto.piefed.SearchType.toSearchType(): Sea
     com.idunnololz.summit.api.dto.piefed.SearchType.Url -> SearchType.Url
     com.idunnololz.summit.api.dto.piefed.SearchType.All -> SearchType.All
   }
+
+
+internal fun com.idunnololz.summit.api.dto.piefed.PrivateMessageView.toPrivateMessageView(): PrivateMessageView =
+  PrivateMessageView(
+    this.privateMessage.toPrivateMessage(),
+    this.creator.toPerson(),
+    this.recipient.toPerson()
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.PrivateMessage.toPrivateMessage(): PrivateMessage =
+  PrivateMessage(
+    id = this.id,
+    creator_id = this.creatorId.toLong(),
+    recipient_id = this.recipientId.toLong(),
+    content = this.content,
+    deleted = this.deleted,
+    read = this.read,
+    published = this.published,
+    updated = this.updated,
+    ap_id = this.apId,
+    local = this.local,
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommentReportView.toCommentReportView(): CommentReportView =
+  CommentReportView(
+    comment_report = this.commentReport.toCommentReport(),
+    comment = this.comment.toComment(),
+    post = this.post.toPost(),
+    community = this.community.toCommunity(),
+    creator = this.creator.toPerson(),
+    comment_creator = this.commentCreator.toPerson(),
+    counts = this.counts.toCommentAggregates(),
+    creator_banned_from_community = this.creatorBannedFromCommunity,
+    my_vote = this.myVote,
+    resolver = this.resolver?.toPerson(),
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.CommentReport.toCommentReport(): CommentReport =
+  CommentReport(
+    id = this.id,
+    creator_id = this.creatorId.toLong(),
+    comment_id = this.commentId,
+    original_comment_text = this.originalCommentText,
+    reason = this.reason,
+    resolved = this.resolved,
+    resolver_id = this.resolverId?.toLong(),
+    published = this.published,
+    updated = this.updated,
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.PostReportView.toPostReportView(): PostReportView =
+  PostReportView(
+    post_report = this.postReport.toPostReport(),
+    post = this.post.toPost(),
+    community = this.community.toCommunity(),
+    creator = this.creator.toPerson(),
+    post_creator = this.postCreator.toPerson(),
+    creator_banned_from_community = this.creatorBannedFromCommunity,
+    my_vote = this.myVote,
+    counts = this.counts.toPostAggregates(),
+    resolver = this.resolver?.toPerson(),
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.PostReport.toPostReport(): PostReport =
+  PostReport(
+    id = this.id,
+    creator_id = this.creatorId.toLong(),
+    post_id = this.postId,
+    original_post_name = this.originalPostName,
+    original_post_url = this.originalPostUrl,
+    original_post_body = this.originalPostBody,
+    reason = this.reason,
+    resolved = this.resolved,
+    resolver_id = this.resolverId?.toLong(),
+    published = this.published,
+    updated = this.updated,
+  )

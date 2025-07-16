@@ -111,7 +111,7 @@ class UserCommunitiesManager @Inject constructor(
     removeCommunityInternal(tab)
   }
 
-  fun getAllUserCommunities(): List<UserCommunityItem> = userCommunityItems
+  fun getAllUserCommunities(): List<UserCommunityItem> = userCommunityItems.toList()
 
   suspend fun setDefaultPage(currentCommunityRef: CommunityRef) {
     preferences.defaultPage = currentCommunityRef

@@ -52,12 +52,12 @@ data class CommentReport(
   val resolved: kotlin.Boolean,
 
   @SerializedName("published")
-  val published: java.time.OffsetDateTime,
+  val published: String,
 
   @SerializedName("resolver_id")
   val resolverId: kotlin.Int? = null,
 
   @SerializedName("updated")
-  val updated: java.time.OffsetDateTime? = null,
+  val updated: String? = null,
 
 )

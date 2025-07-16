@@ -25,7 +25,10 @@ import coil3.asImage
 import coil3.dispose
 import coil3.load
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
+import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.databinding.FragmentSignUpBinding
 import com.idunnololz.summit.databinding.SignUpAnswerFormBinding
 import com.idunnololz.summit.databinding.SignUpCaptchaFormBinding
@@ -49,6 +52,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.CustomLinkMovementMethod
 import com.idunnololz.summit.util.DefaultLinkLongClickListener
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.requestFocusAndShowKeyboard
@@ -98,6 +102,20 @@ class SignUpFragment :
       viewModel.goBack()
     }
   }
+
+  private val createAccountNotSupportedLauncher =
+    newAlertDialogLauncher("create_account_not_supported") {
+      when (it) {
+        is AlertDialogFragment.Result.Negative -> {}
+        is AlertDialogFragment.Result.Neutral -> {
+          val instance = viewModel.signUpModel.value?.currentScene?.instance
+          if (instance != null) {
+            onLinkClick("https://$instance", null, LinkContext.Force)
+          }
+        }
+        is AlertDialogFragment.Result.Positive -> {}
+      }
+    }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -199,6 +217,23 @@ class SignUpFragment :
       }
       viewModel.signUpModel.value?.let {
         onModelChanged(it)
+      }
+      viewModel.fetchSiteLiveData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error<*> -> {
+            if (it.error is NotYetImplemented) {
+              createAccountNotSupportedLauncher.launchDialog {
+                titleResId = R.string.error_sign_up_not_supported
+                messageResId = R.string.error_instance_does_not_support_registration
+                positionButtonResId = android.R.string.ok
+                neutralButtonResId = R.string.open_in_browser
+              }
+            }
+          }
+          is StatefulData.Loading<*> -> {}
+          is StatefulData.NotStarted<*> -> {}
+          is StatefulData.Success<*> -> {}
+        }
       }
     }
   }

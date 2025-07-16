@@ -109,7 +109,8 @@ class AccountAwareLemmyClient @Inject constructor(
     }
   }
 
-  suspend fun apiSupportsReports(): Boolean = apiClient.apiSupportsReports()
+  suspend fun supportsFeature(apiFeature: ApiFeature): Boolean =
+    apiClient.supportsFeature(apiFeature)
 
   suspend fun fetchSavedPostsWithRetry(
     page: Int,
@@ -833,7 +834,7 @@ class AccountAwareLemmyClient @Inject constructor(
     id: CommentReplyId,
     read: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<CommentView> = if (account == null) {
+  ): Result<SuccessResponse> = if (account == null) {
     createAccountErrorResult()
   } else {
     apiClient.markReplyAsRead(id, read, account)

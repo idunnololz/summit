@@ -465,53 +465,75 @@ class CommunityAppBarController(
           }
         }
 
-        vh.feedInfoText.visibility = View.VISIBLE
-        vh.feedInfoText.text = buildSpannedString {
-          val mau = value.data.response.fold(
-            { it.site_view.counts.users_active_month },
-            { it.community_view.counts.users_active_month },
-          )
-          val totalUsers = value.data.response.fold(
-            { it.site_view.counts.users },
-            { it.community_view.counts.subscribers },
-          )
-          val posts = value.data.response.fold(
-            { it.site_view.counts.posts },
-            { it.community_view.counts.posts },
-          )
-          val comments = value.data.response.fold(
-            { it.site_view.counts.comments },
-            { it.community_view.counts.comments },
-          )
-          append(
-            context.resources.getQuantityString(
-              R.plurals.users_format,
-              totalUsers,
-              LemmyUtils.abbrevNumber(totalUsers.toLong()),
-            ),
-          )
-          appendSeparator()
-          append(
-            context.getString(
-              R.string.mau_format, LemmyUtils.abbrevNumber(mau.toLong()),
-            ),
-          )
-          appendSeparator()
-          append(
-            context.resources.getQuantityString(
-              R.plurals.posts_format,
-              posts,
-              LemmyUtils.abbrevNumber(posts.toLong()),
-            ),
-          )
-          appendSeparator()
-          append(
-            context.resources.getQuantityString(
-              R.plurals.comments_format,
-              comments,
-              LemmyUtils.abbrevNumber(comments.toLong()),
-            ),
-          )
+        val mau = value.data.response.fold(
+          { it.site_view.counts.users_active_month },
+          { it.community_view.counts.users_active_month },
+        )
+        val totalUsers = value.data.response.fold(
+          { it.site_view.counts.users },
+          { it.community_view.counts.subscribers },
+        )
+        val posts = value.data.response.fold(
+          { it.site_view.counts.posts },
+          { it.community_view.counts.posts },
+        )
+        val comments = value.data.response.fold(
+          { it.site_view.counts.comments },
+          { it.community_view.counts.comments },
+        )
+
+        if (mau == null && totalUsers == null && posts == null && comments == null) {
+          vh.feedInfoText.visibility = View.GONE
+        } else {
+          vh.feedInfoText.visibility = View.VISIBLE
+          vh.feedInfoText.text = buildSpannedString {
+            append(
+              context.resources.getQuantityString(
+                R.plurals.users_format,
+                totalUsers ?: 0,
+                if (totalUsers == null) {
+                  "-"
+                } else {
+                  LemmyUtils.abbrevNumber(totalUsers.toLong())
+                },
+              ),
+            )
+            appendSeparator()
+            append(
+              context.getString(
+                R.string.mau_format,
+                if (mau == null) {
+                  "-"
+                } else {
+                  LemmyUtils.abbrevNumber(mau.toLong())
+                },
+              ),
+            )
+            appendSeparator()
+            append(
+              context.resources.getQuantityString(
+                R.plurals.posts_format,
+                posts ?: 0,
+                if (posts == null) {
+                  "-"
+                } else {
+                  LemmyUtils.abbrevNumber(posts.toLong())
+                },
+              ),
+            )
+            appendSeparator()
+            append(
+              context.resources.getQuantityString(
+                R.plurals.comments_format,
+                comments ?: 0,
+                if (comments == null) {
+                  "-"
+                } else {
+                  LemmyUtils.abbrevNumber(comments.toLong())
+                },
+              ),
+            )
+          }
         }
       }
     }

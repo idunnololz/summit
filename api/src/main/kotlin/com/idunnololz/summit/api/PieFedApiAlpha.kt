@@ -1,20 +1,20 @@
 package com.idunnololz.summit.api
 
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
-import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
+import com.idunnololz.summit.api.dto.piefed.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
 import com.idunnololz.summit.api.dto.lemmy.BanFromCommunity
 import com.idunnololz.summit.api.dto.lemmy.BanFromCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.BanPerson
 import com.idunnololz.summit.api.dto.lemmy.BanPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.BlockCommunity
-import com.idunnololz.summit.api.dto.lemmy.BlockCommunityResponse
+import com.idunnololz.summit.api.dto.piefed.BlockCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.BlockInstance
-import com.idunnololz.summit.api.dto.lemmy.BlockInstanceResponse
+import com.idunnololz.summit.api.dto.piefed.BlockInstanceResponse
 import com.idunnololz.summit.api.dto.lemmy.BlockPerson
-import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
+import com.idunnololz.summit.api.dto.piefed.BlockPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
-import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
+import com.idunnololz.summit.api.dto.piefed.CommentReportResponse
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
 import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
@@ -52,10 +52,10 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPersonMentionAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
-import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
+import com.idunnololz.summit.api.dto.piefed.PostReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
-import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
-import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
+import com.idunnololz.summit.api.dto.piefed.PrivateMessageResponse
+import com.idunnololz.summit.api.dto.piefed.PrivateMessagesResponse
 import com.idunnololz.summit.api.dto.lemmy.PurgeComment
 import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
@@ -66,7 +66,7 @@ import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
 import com.idunnololz.summit.api.dto.lemmy.ResolveCommentReport
-import com.idunnololz.summit.api.dto.lemmy.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.piefed.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.lemmy.ResolvePostReport
 import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.SaveComment
@@ -309,7 +309,7 @@ interface PieFedApiAlpha {
   fun markCommentReplyAsRead(
     @HeaderMap headers: Map<String, String>,
     @Body form: MarkCommentReplyAsRead,
-  ): Call<CommentResponse>
+  ): Call<SuccessResponse>
 
   /**
    * Mark a person mention as read.

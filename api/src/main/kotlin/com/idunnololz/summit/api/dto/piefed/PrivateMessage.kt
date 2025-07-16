@@ -53,7 +53,7 @@ data class PrivateMessage(
   val read: kotlin.Boolean,
 
   @SerializedName("published")
-  val published: java.time.OffsetDateTime,
+  val published: String,
 
   @SerializedName("ap_id")
   val apId: kotlin.String,
@@ -62,6 +62,6 @@ data class PrivateMessage(
   val local: kotlin.Boolean,
 
   @SerializedName("updated")
-  val updated: java.time.OffsetDateTime? = null,
+  val updated: String? = null,
 
 )

@@ -54,7 +54,7 @@ data class PostReport(
   val resolved: kotlin.Boolean,
 
   @SerializedName("published")
-  val published: java.time.OffsetDateTime,
+  val published: String,
 
   @SerializedName("original_post_url")
   val originalPostUrl: kotlin.String? = null,
@@ -66,6 +66,6 @@ data class PostReport(
   val resolverId: kotlin.Int? = null,
 
   @SerializedName("updated")
-  val updated: java.time.OffsetDateTime? = null,
+  val updated: String? = null,
 
 )

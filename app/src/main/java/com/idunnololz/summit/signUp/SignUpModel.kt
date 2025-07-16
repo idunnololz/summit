@@ -28,13 +28,14 @@ sealed interface SignUpScene : Parcelable {
   val previousScene: SignUpScene?
   val isLoading: Boolean
   val hasNext: Boolean
+  val instance: String?
 
   @Parcelize
   data class InstanceForm(
     override val hasNext: Boolean = true,
     override val previousScene: SignUpScene? = null,
     override val isLoading: Boolean = false,
-    val instance: String? = null,
+    override val instance: String? = null,
     val site: SiteModel? = null,
     val instanceError: String? = null,
     val continueClicked: Boolean = false,
@@ -42,7 +43,7 @@ sealed interface SignUpScene : Parcelable {
 
   @Parcelize
   data class CredentialsForm(
-    val instance: String,
+    override val instance: String,
     val site: SiteModel,
     val isEmailRequired: Boolean,
     override val hasNext: Boolean,
@@ -55,7 +56,7 @@ sealed interface SignUpScene : Parcelable {
 
   @Parcelize
   data class AnswerForm(
-    val instance: String,
+    override val instance: String,
     val site: SiteModel,
     override val hasNext: Boolean,
     override val previousScene: SignUpScene? = null,
@@ -67,7 +68,7 @@ sealed interface SignUpScene : Parcelable {
 
   @Parcelize
   data class CaptchaForm(
-    val instance: String,
+    override val instance: String,
     val site: SiteModel,
     override val hasNext: Boolean,
     override val previousScene: SignUpScene? = null,
@@ -81,7 +82,7 @@ sealed interface SignUpScene : Parcelable {
 
   @Parcelize
   data class SubmitApplication(
-    val instance: String,
+    override val instance: String,
     val site: SiteModel,
     override val hasNext: Boolean,
     override val previousScene: SignUpScene? = null,
@@ -91,7 +92,7 @@ sealed interface SignUpScene : Parcelable {
 
   @Parcelize
   data class NextSteps(
-    val instance: String,
+    override val instance: String,
     val site: SiteModel,
     override val hasNext: Boolean,
     override val previousScene: SignUpScene? = null,

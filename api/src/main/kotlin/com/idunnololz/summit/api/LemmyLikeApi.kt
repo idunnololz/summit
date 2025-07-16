@@ -282,7 +282,7 @@ interface LemmyLikeApi : ApiCompat {
   suspend fun markCommentReplyAsRead(
     authorization: String?,
     args: MarkCommentReplyAsRead,
-  ): Result<CommentResponse>
+  ): Result<SuccessResponse>
 
   /**
    * Mark a person mention as read.
