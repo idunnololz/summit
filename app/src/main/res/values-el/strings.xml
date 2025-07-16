@@ -767,7 +767,7 @@
 \n [Δεν ξέρεις ποια να διαλέξεις; Χρησιμοποίησε τη μεγαλύτερη οντότητα.](α)</string>
     <string name="reset_emojis">Επαναφορά emoji</string>
     <string name="go_to_desc">Μετάβαση απευθείας σε μια σελίδα Lemmy επικολλώντας τον σύνδεσμό της εδώ. Εάν δεν είναι δυνατή η ανάλυση της σελίδας, θα ανοίξει στο πρόγραμμα περιήγησης.</string>
-    <string name="error_community_blocked">Η κοινότητα έχει αποκλειστεί από σένα. Κατάργησε τον αποκλεισμό αυτής της κοινότητας για να δεις τις αναρτήσεις της.</string>
+    <string name="error_community_blocked">Η κοινότητα έχει αποκλειστεί από σένα. Κατάργησε τον αποκλεισμό για να δεις τις αναρτήσεις της.</string>
     <string name="error_switch_instance_failed_format">Η αλλαγή οντότητας απέτυχε. Αιτία: %1$s.</string>
     <string name="set_default_sort_order_for_this_feed">Όρισε προεπιλ. σειρά ταξιν. για τη ροή</string>
     <string name="error_account_token_expired_format">Το διακριτικό λογαριασμού έχει λήξει για τον λογαριασμό %1$s. Παρακαλώ συνδέσου ξανά.</string>
@@ -1444,4 +1444,8 @@
     <string name="error_400_bad_request">400 Λάθος αίτημα</string>
     <string name="error_403_forbidden">403 Απαγορεύεται</string>
     <string name="uploads">Μεταφορτώσεις</string>
+    <string name="error_sign_up_not_supported">Η εγγραφή δεν υποστηρίζεται</string>
+    <string name="instance_info_format">Πληροφορίες οντότητας (%1$s)</string>
+    <string name="error_not_yet_implemented">Αυτή η λειτουργία δεν υποστηρίζεται ακόμη από τον διακομιστή.</string>
+    <string name="error_instance_does_not_support_registration">Δεν μπορείς να δημιουργήσεις νέο λογαριασμό με την εφαρμογή, επειδή αυτή η οντότητα δεν το υποστηρίζει. Πρέπει να επισκεφθείς τον ιστότοπο για να δημιουργήσεις έναν λογαριασμό.</string>
 </resources>
