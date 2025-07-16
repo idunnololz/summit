@@ -1,6 +1,7 @@
 package com.idunnololz.summit.api.converters
 
 import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
+import com.idunnololz.summit.api.dto.lemmy.CommentReport
 import com.idunnololz.summit.api.dto.lemmy.CommentReportView
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -13,6 +14,8 @@ import com.idunnololz.summit.api.dto.lemmy.LoginResponse
 import com.idunnololz.summit.api.dto.lemmy.PersonMention
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
+import com.idunnololz.summit.api.dto.lemmy.PostReport
+import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
@@ -21,9 +24,6 @@ import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.piefed.Comment
 import com.idunnololz.summit.api.dto.piefed.CommentAggregates
 import com.idunnololz.summit.api.dto.piefed.CommentReply
-import com.idunnololz.summit.api.dto.lemmy.CommentReport
-import com.idunnololz.summit.api.dto.lemmy.PostReport
-import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.piefed.Community
 import com.idunnololz.summit.api.dto.piefed.CommunityBlockView
 import com.idunnololz.summit.api.dto.piefed.CommunityFollowerView
@@ -453,12 +453,11 @@ internal fun com.idunnololz.summit.api.dto.piefed.SearchType.toSearchType(): Sea
     com.idunnololz.summit.api.dto.piefed.SearchType.All -> SearchType.All
   }
 
-
 internal fun com.idunnololz.summit.api.dto.piefed.PrivateMessageView.toPrivateMessageView(): PrivateMessageView =
   PrivateMessageView(
     this.privateMessage.toPrivateMessage(),
     this.creator.toPerson(),
-    this.recipient.toPerson()
+    this.recipient.toPerson(),
   )
 
 internal fun com.idunnololz.summit.api.dto.piefed.PrivateMessage.toPrivateMessage(): PrivateMessage =

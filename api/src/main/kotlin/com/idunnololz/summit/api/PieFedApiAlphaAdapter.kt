@@ -38,7 +38,6 @@ import com.idunnololz.summit.api.dto.lemmy.BlockPerson
 import com.idunnololz.summit.api.dto.lemmy.BlockPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CommentReportResponse
-import com.idunnololz.summit.api.dto.lemmy.CommentReportView
 import com.idunnololz.summit.api.dto.lemmy.CommentResponse
 import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.CreateComment
@@ -115,11 +114,9 @@ import com.idunnololz.summit.api.dto.lemmy.MarkPostAsRead
 import com.idunnololz.summit.api.dto.lemmy.MarkPrivateMessageAsRead
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionResponse
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
-import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageResponse
-import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessagesResponse
 import com.idunnololz.summit.api.dto.lemmy.PurgeComment
 import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
@@ -161,12 +158,11 @@ class PieFedApiAlphaAdapter(
       .create()
   }
 
-  override fun supportsFeature(apiFeature: ApiFeature): Boolean =
-    when (apiFeature) {
-      ApiFeature.Reports -> false
-      ApiFeature.Register -> false
-      ApiFeature.Downvoted -> false
-    }
+  override fun supportsFeature(apiFeature: ApiFeature): Boolean = when (apiFeature) {
+    ApiFeature.Reports -> false
+    ApiFeature.Register -> false
+    ApiFeature.Downvoted -> false
+  }
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
     val headers = mutableMapOf<String, String>()
@@ -539,17 +535,16 @@ class PieFedApiAlphaAdapter(
   override suspend fun markPrivateMessageAsRead(
     authorization: String?,
     args: MarkPrivateMessageAsRead,
-  ): Result<PrivateMessageResponse> =
-    retrofitErrorHandler {
-      api.markPrivateMessageAsRead(
-        generateHeaders(authorization, false),
-        args,
-      )
-    }.map {
-      PrivateMessageResponse(
-        it.privateMessageView.toPrivateMessageView()
-      )
-    }
+  ): Result<PrivateMessageResponse> = retrofitErrorHandler {
+    api.markPrivateMessageAsRead(
+      generateHeaders(authorization, false),
+      args,
+    )
+  }.map {
+    PrivateMessageResponse(
+      it.privateMessageView.toPrivateMessageView(),
+    )
+  }
 
   override suspend fun markAllAsRead(
     authorization: String?,
@@ -575,7 +570,7 @@ class PieFedApiAlphaAdapter(
     api.getPrivateMessages(generateHeaders(authorization, force), args.serializeToMap())
   }.map {
     PrivateMessagesResponse(
-      private_messages = it.privateMessages.map { it.toPrivateMessageView() }
+      private_messages = it.privateMessages.map { it.toPrivateMessageView() },
     )
   }
 
@@ -619,7 +614,7 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler { api.resolvePostReport(generateHeaders(authorization, false), args) }
       .map {
         PostReportResponse(
-          post_report_view = it.postReportView.toPostReportView()
+          post_report_view = it.postReportView.toPostReportView(),
         )
       }
 
@@ -638,7 +633,7 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler { api.resolveCommentReport(generateHeaders(authorization, false), args) }
       .map {
         CommentReportResponse(
-          comment_report_view = it.commentReportView.toCommentReportView()
+          comment_report_view = it.commentReportView.toCommentReportView(),
         )
       }
 
@@ -649,7 +644,7 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler { api.createPrivateMessage(generateHeaders(authorization, false), args) }
       .map {
         PrivateMessageResponse(
-          private_message_view = it.privateMessageView.toPrivateMessageView()
+          private_message_view = it.privateMessageView.toPrivateMessageView(),
         )
       }
 
@@ -692,7 +687,7 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler { api.modUser(generateHeaders(authorization, false), args) }
       .map {
         AddModToCommunityResponse(
-          moderators = it.moderators.map { it.toCommunityModeratorView() }
+          moderators = it.moderators.map { it.toCommunityModeratorView() },
         )
       }
 
@@ -770,47 +765,44 @@ class PieFedApiAlphaAdapter(
     retrofitErrorHandler { api.createPostReport(generateHeaders(authorization, false), args) }
       .map {
         PostReportResponse(
-          post_report_view = it.postReportView.toPostReportView()
+          post_report_view = it.postReportView.toPostReportView(),
         )
       }
 
   override suspend fun blockPerson(
     authorization: String?,
     args: BlockPerson,
-  ): Result<BlockPersonResponse> =
-    retrofitErrorHandler {
-      api.blockPerson(generateHeaders(authorization, false), args)
-    }.map {
-      BlockPersonResponse(
-        person_view = it.personView.toPersonView(),
-        blocked = it.blocked,
-      )
-    }
+  ): Result<BlockPersonResponse> = retrofitErrorHandler {
+    api.blockPerson(generateHeaders(authorization, false), args)
+  }.map {
+    BlockPersonResponse(
+      person_view = it.personView.toPersonView(),
+      blocked = it.blocked,
+    )
+  }
 
   override suspend fun blockCommunity(
     authorization: String?,
     args: BlockCommunity,
-  ): Result<BlockCommunityResponse> =
-    retrofitErrorHandler {
-      api.blockCommunity(generateHeaders(authorization, false), args)
-    }.map {
-      BlockCommunityResponse(
-        community_view = it.communityView.toCommunityView(),
-        blocked = it.blocked,
-      )
-    }
+  ): Result<BlockCommunityResponse> = retrofitErrorHandler {
+    api.blockCommunity(generateHeaders(authorization, false), args)
+  }.map {
+    BlockCommunityResponse(
+      community_view = it.communityView.toCommunityView(),
+      blocked = it.blocked,
+    )
+  }
 
   override suspend fun blockInstance(
     authorization: String?,
     args: BlockInstance,
-  ): Result<BlockInstanceResponse> =
-    retrofitErrorHandler {
-      api.blockInstance(generateHeaders(authorization, false), args)
-    }.map {
-      BlockInstanceResponse(
-        blocked = it.blocked,
-      )
-    }
+  ): Result<BlockInstanceResponse> = retrofitErrorHandler {
+    api.blockInstance(generateHeaders(authorization, false), args)
+  }.map {
+    BlockInstanceResponse(
+      blocked = it.blocked,
+    )
+  }
 
   override suspend fun saveUserSettings(
     authorization: String?,

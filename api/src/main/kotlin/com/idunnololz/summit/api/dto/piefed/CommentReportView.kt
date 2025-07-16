@@ -85,4 +85,3 @@ data class CommentReportView(
   val resolver: Person? = null,
 
 )
-

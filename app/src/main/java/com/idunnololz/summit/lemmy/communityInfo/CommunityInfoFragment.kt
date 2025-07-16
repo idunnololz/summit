@@ -885,12 +885,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         Item.StatsItem::class,
         PageDataStatsItemBinding::inflate,
       ) { item, b, _ ->
-        fun Int?.format() =
-          if (this == null) {
-            "-"
-          } else {
-            nf.format(this)
-          }
+        fun Int?.format() = if (this == null) {
+          "-"
+        } else {
+          nf.format(this)
+        }
 
         b.posts.text = item.postCount.format()
         b.comments.text = item.commentCount.format()

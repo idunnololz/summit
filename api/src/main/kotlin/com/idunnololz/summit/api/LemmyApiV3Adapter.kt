@@ -133,12 +133,11 @@ class LemmyApiV3Adapter(
       .create()
   }
 
-  override fun supportsFeature(apiFeature: ApiFeature): Boolean =
-    when (apiFeature) {
-      ApiFeature.Reports -> true
-      ApiFeature.Register -> true
-      ApiFeature.Downvoted -> true
-    }
+  override fun supportsFeature(apiFeature: ApiFeature): Boolean = when (apiFeature) {
+    ApiFeature.Reports -> true
+    ApiFeature.Register -> true
+    ApiFeature.Downvoted -> true
+  }
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
     val headers = mutableMapOf<String, String>()

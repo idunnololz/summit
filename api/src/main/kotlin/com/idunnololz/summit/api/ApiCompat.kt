@@ -12,6 +12,7 @@ enum class ApiFeature {
   // Eg. user/post reports
   Reports,
   Register,
+
   // Whether the server supports listing all posts/comments downvoted by this user.
   Downvoted,
 }
