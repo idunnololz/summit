@@ -27,5 +27,13 @@ object Consts {
     "slrpnk.net",
     "sopuli.xyz",
     "szmer.info",
+
+    // piefed
+    "piefed.social",
+    "piefed.world",
+    "piefed.blahaj.zone",
+    "piefed.ca",
+    "piefed.zip",
+    "feddit.online",
   )
 }

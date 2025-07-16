@@ -36,12 +36,10 @@ class LoginViewModel @Inject constructor(
 
     viewModelScope.launch {
       val result = apiClient.login(
-        instanceFormatted,
-        usernameFormatted,
-
-        // From jerboa https://github.com/dessalines/jerboa/blob/main/app/src/main/java/com/jerboa/ui/components/login/Login.kt
-        password.take(60),
-        twoFactorCode,
+        instance = instanceFormatted,
+        username = usernameFormatted,
+        password = password,
+        twoFactorCode = twoFactorCode,
       )
 
       if (result.exceptionOrNull()?.message?.contains("totp", ignoreCase = true) ==

@@ -203,6 +203,12 @@
                 <data android:host="programming.dev"/>
                 <data android:host="sh.itjust.works"/>
                 <data android:host="feddit.de"/>
+                <data android:host="piefed.social"/>
+                <data android:host="piefed.world"/>
+                <data android:host="piefed.blahaj.zone"/>
+                <data android:host="piefed.ca"/>
+                <data android:host="piefed.zip"/>
+                <data android:host="feddit.online"/>
             </intent-filter>
 
             <intent-filter>

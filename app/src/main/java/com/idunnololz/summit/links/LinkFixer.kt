@@ -127,6 +127,14 @@ class LinkFixer @Inject constructor(
     "lululemmy.com",
     "programming.dev",
     "sh.itjust.works",
+
+    // piefed
+    "piefed.social",
+    "piefed.world",
+    "piefed.blahaj.zone",
+    "piefed.ca",
+    "piefed.zip",
+    "feddit.online",
   )
   private var notAnInstance: Set<String> = setOf()
   private var hostToInstance: Map<String, String> = mapOf()
