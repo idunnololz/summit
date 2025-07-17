@@ -358,12 +358,6 @@
                             app:layout_constraintStart_toStartOf="parent"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.core.widget.NestedScrollView>
-
-                <com.idunnololz.summit.view.LoadingView
-                    android:id="@+id/loading_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"/>
             </FrameLayout>
 
             <Space
@@ -389,5 +383,11 @@
             app:layout_constraintTop_toBottomOf="@+id/community"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
+
+        <com.idunnololz.summit.view.LoadingView
+            android:id="@+id/loading_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
     </FrameLayout>
 </FrameLayout>

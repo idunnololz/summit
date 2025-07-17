@@ -21,9 +21,9 @@ import com.idunnololz.summit.api.dto.lemmy.DeleteComment
 import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
 import com.idunnololz.summit.api.dto.lemmy.DeletePost
 import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
-import com.idunnololz.summit.api.dto.lemmy.EditComment
+import com.idunnololz.summit.api.dto.piefed.EditComment
 import com.idunnololz.summit.api.dto.lemmy.EditCommunity
-import com.idunnololz.summit.api.dto.lemmy.EditPost
+import com.idunnololz.summit.api.dto.piefed.EditPost
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
@@ -180,6 +180,15 @@ interface PieFedApiAlpha {
   fun editComment(
     @HeaderMap headers: Map<String, String>,
     @Body form: EditComment,
+  ): Call<CommentResponse>
+
+  /**
+   * Edit a comment.
+   */
+  @GET("comment")
+  fun getComment(
+    @HeaderMap headers: Map<String, String>,
+    @QueryMap form: Map<String, String>,
   ): Call<CommentResponse>
 
   /**

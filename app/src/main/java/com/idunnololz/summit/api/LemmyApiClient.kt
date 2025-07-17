@@ -150,6 +150,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.BufferedInputStream
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -877,7 +878,8 @@ class LemmyApiClient @Inject constructor(
     imageIs: InputStream,
   ): Result<UploadImageResult> {
     val url = "https://$instance/pictrs/image"
-    val mimeType = guessMimeType(imageIs)
+    val bufferedInputStream = BufferedInputStream(imageIs)
+    val mimeType = guessMimeType(bufferedInputStream)
     val fileNameWithExtension = if (mimeType == null || fileName.contains(".")) {
       fileName
     } else {
@@ -894,7 +896,7 @@ class LemmyApiClient @Inject constructor(
         authorization = account.bearer,
         url = url,
         fileName = fileNameWithExtension,
-        imageIs = imageIs,
+        imageIs = bufferedInputStream,
         mimeType = mimeType,
       )
     }

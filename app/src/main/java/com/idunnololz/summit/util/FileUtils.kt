@@ -5,15 +5,14 @@ import java.io.File
 import java.io.InputStream
 
 fun guessMimeType(file: File?): String? = file?.inputStream()?.use {
-  guessMimeType(it)
+  BufferedInputStream(it).use {
+    guessMimeType(it)
+  }
 }
 
 fun guessMimeType(inputStream: InputStream): String? {
-  val bufferedStream = inputStream as? BufferedInputStream
-    ?: BufferedInputStream(inputStream)
-
   return try {
-    guessContentTypeFromStream(bufferedStream)
+    guessContentTypeFromStream(inputStream)
   } catch (_: Exception) {
     null
   }
@@ -48,6 +47,12 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
   if (c1 == 0xAC && c2 == 0xED) {
     // next two bytes are version number, currently 0x00 0x05
     return "application/x-java-serialized-object"
+  }
+  if (
+    c1 == 'R'.code && c2 == 'I'.code && c3 == 'F'.code && c4 == 'F'.code &&
+    c9 == 'W'.code && c10 == 'E'.code && c11 == 'B'.code && c12 == 'P'.code
+  ) {
+    return "image/webp"
   }
   if (c1 == '<'.code) {
     if ((

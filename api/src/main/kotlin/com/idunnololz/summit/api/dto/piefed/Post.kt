@@ -91,6 +91,9 @@ data class Post(
   @SerializedName("updated")
   val updated: String? = null,
 
+  @SerializedName("edited_at")
+  val editedAt: String? = null,
+
   @SerializedName("thumbnail_url")
   val thumbnailUrl: kotlin.String? = null,
 

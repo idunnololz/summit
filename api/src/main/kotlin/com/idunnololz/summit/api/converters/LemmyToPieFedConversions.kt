@@ -1,5 +1,7 @@
 package com.idunnololz.summit.api.converters
 
+import com.idunnololz.summit.api.dto.lemmy.EditComment
+import com.idunnololz.summit.api.dto.lemmy.EditPost
 import com.idunnololz.summit.api.dto.piefed.CreateComment
 import com.idunnololz.summit.api.dto.piefed.CreatePost
 import com.idunnololz.summit.api.dto.piefed.SortType
@@ -41,3 +43,20 @@ fun com.idunnololz.summit.api.dto.lemmy.SortType.toSortType() = when (this) {
   com.idunnololz.summit.api.dto.lemmy.SortType.Controversial -> SortType.Hot
   com.idunnololz.summit.api.dto.lemmy.SortType.Scaled -> SortType.Scaled
 }
+
+internal fun EditComment.toEditComment(): com.idunnololz.summit.api.dto.piefed.EditComment =
+  com.idunnololz.summit.api.dto.piefed.EditComment(
+    commentId = this.comment_id,
+    body = this.content,
+    languageId = this.language_id,
+  )
+
+internal fun EditPost.toEditPost(): com.idunnololz.summit.api.dto.piefed.EditPost =
+  com.idunnololz.summit.api.dto.piefed.EditPost(
+    postId = this.post_id,
+    title = this.name,
+    url = this.url,
+    body = this.body,
+    nsfw = this.nsfw,
+    languageId = this.language_id,
+  )

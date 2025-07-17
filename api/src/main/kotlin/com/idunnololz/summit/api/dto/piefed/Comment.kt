@@ -73,6 +73,9 @@ data class Comment(
   @SerializedName("updated")
   val updated: String? = null,
 
+  @SerializedName("edited_at")
+  val editedAt: String? = null,
+
   @SerializedName("distinguished")
   val distinguished: kotlin.Boolean? = null,
 

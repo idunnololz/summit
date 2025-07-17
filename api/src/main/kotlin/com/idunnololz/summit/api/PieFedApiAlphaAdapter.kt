@@ -11,6 +11,8 @@ import com.idunnololz.summit.api.converters.toCommunityResponse
 import com.idunnololz.summit.api.converters.toCommunityView
 import com.idunnololz.summit.api.converters.toCreateComment
 import com.idunnololz.summit.api.converters.toCreatePost
+import com.idunnololz.summit.api.converters.toEditComment
+import com.idunnololz.summit.api.converters.toEditPost
 import com.idunnololz.summit.api.converters.toGetPersonMentionsResponse
 import com.idunnololz.summit.api.converters.toGetRepliesResponse
 import com.idunnololz.summit.api.converters.toLoginResponse
@@ -142,6 +144,7 @@ import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.piefed.CommentView
+import com.idunnololz.summit.api.dto.piefed.GetComment
 import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -245,21 +248,42 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetPost,
     force: Boolean,
-  ): Result<GetPostResponse> = retrofitErrorHandler {
-    api.getPost(
-      generateHeaders(authorization, force),
-      args.serializeToMap(),
-    )
-  }
-    .map {
-      GetPostResponse(
-        post_view = it.postView.toPostView(),
-        community_view = it.communityView.toCommunityView(),
-        moderators = it.moderators.map { it.toCommunityModeratorView() },
-        cross_posts = it.crossPosts.map { it.toPostView() },
-        online = 0,
+  ): Result<GetPostResponse> {
+    val headers = generateHeaders(authorization, force)
+
+    if (args.id == null && args.comment_id != null) {
+      return retrofitErrorHandler {
+        api.getComment(headers, GetComment(args.comment_id).serializeToMap())
+      }.fold(
+        onSuccess = {
+          getPost(
+            authorization,
+            args.copy(id = it.commentView.post.id),
+            force,
+          )
+        },
+        onFailure = {
+          Result.failure(it)
+        }
       )
     }
+
+    return retrofitErrorHandler {
+      api.getPost(
+        headers,
+        args.serializeToMap(),
+      )
+    }
+      .map {
+        GetPostResponse(
+          post_view = it.postView.toPostView(),
+          community_view = it.communityView.toCommunityView(),
+          moderators = it.moderators.map { it.toCommunityModeratorView() },
+          cross_posts = it.crossPosts.map { it.toPostView() },
+          online = 0,
+        )
+      }
+  }
 
   override suspend fun login(args: Login): Result<LoginResponse> = retrofitErrorHandler {
     api.login(
@@ -312,8 +336,9 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: EditComment,
   ): Result<CommentResponse> =
-    retrofitErrorHandler { api.editComment(generateHeaders(authorization, false), args) }
-      .map { it.toCommentResponse() }
+    retrofitErrorHandler {
+      api.editComment(generateHeaders(authorization, false), args.toEditComment())
+    }.map { it.toCommentResponse() }
 
   override suspend fun deleteComment(
     authorization: String?,
@@ -697,8 +722,9 @@ class PieFedApiAlphaAdapter(
     }.map { it.toPostResponse() }
 
   override suspend fun editPost(authorization: String?, args: EditPost): Result<PostResponse> =
-    retrofitErrorHandler { api.editPost(generateHeaders(authorization, false), args) }
-      .map { it.toPostResponse() }
+    retrofitErrorHandler {
+      api.editPost(generateHeaders(authorization, false), args.toEditPost())
+    }.map { it.toPostResponse() }
 
   override suspend fun deletePost(authorization: String?, args: DeletePost): Result<PostResponse> =
     retrofitErrorHandler { api.deletePost(generateHeaders(authorization, false), args) }
