@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlin.collections.ifEmpty
 
 @OptIn(FlowPreview::class) // Flow.debounce()
 @HiltViewModel
@@ -89,8 +90,13 @@ class AddOrEditPostViewModel @Inject constructor(
     }
     viewModelScope.launch {
       apiClient.fetchSiteWithRetry(force = false)
-        .onSuccess {
-          languageOptions.value = it.all_languages
+        .onSuccess { site ->
+          val discussionLanguages = site.all_languages
+            .filter { site.discussion_languages.contains(it.id) }
+
+          languageOptions.value = discussionLanguages.ifEmpty {
+            site.all_languages
+          }
         }
     }
   }

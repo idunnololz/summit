@@ -20,6 +20,7 @@ import com.idunnololz.summit.databinding.ActionDetailsItemHeaderBinding
 import com.idunnololz.summit.databinding.ActionDetailsItemRichTextFieldBinding
 import com.idunnololz.summit.databinding.ActionDetailsItemTextFieldBinding
 import com.idunnololz.summit.databinding.DialogFragmentActionDetailsBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
@@ -158,6 +159,12 @@ class ActionDetailsFragment :
           is StatefulData.Error -> {
             loadingView.hideAll()
             adapter.disableActions = false
+
+            ErrorDialogFragment.show(
+              message = context.getString(R.string.retry_action_failed),
+              error = it.error,
+              fm = childFragmentManager,
+            )
           }
           is StatefulData.Loading -> {
             loadingView.showProgressBar()

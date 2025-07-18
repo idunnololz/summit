@@ -84,8 +84,13 @@ class AddOrEditCommentViewModel @Inject constructor(
   init {
     viewModelScope.launch {
       lemmyApiClient.fetchSiteWithRetry(force = false)
-        .onSuccess {
-          languageOptions.value = it.all_languages
+        .onSuccess { site ->
+          val discussionLanguages = site.all_languages
+            .filter { site.discussion_languages.contains(it.id) }
+
+          languageOptions.value = discussionLanguages.ifEmpty {
+            site.all_languages
+          }
         }
     }
   }

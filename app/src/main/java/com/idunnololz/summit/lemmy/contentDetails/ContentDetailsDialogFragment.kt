@@ -182,6 +182,9 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
             appendLine()
             appendLine(postView.post.url)
           }
+
+          appendLine()
+          appendLine("Language id ${postView.post.language_id}")
         },
       )
 

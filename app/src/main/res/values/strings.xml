@@ -2276,6 +2276,7 @@
     <string name="error_not_yet_implemented">This feature is not yet supported by the server.</string>
     <string name="error_instance_does_not_support_registration">You cannot create a new account with the app because this instance does not support it. You must visit the website to create an account.</string>
     <string name="error_sign_up_not_supported">Sign up not supported</string>
+    <string name="retry_action_failed">Retry action failed.</string>
 
     <!-- uCrop string resource end -->
 </resources>

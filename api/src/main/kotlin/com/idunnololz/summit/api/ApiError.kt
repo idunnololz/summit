@@ -64,3 +64,8 @@ class CommunityBlockedError() : ClientApiException(
   "The community you are trying to access is blocked",
   400,
 )
+
+class LanguageNotAllowed() : ClientApiException(
+  "The language of the content you submitted is not allowed",
+  400,
+)
