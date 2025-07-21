@@ -87,7 +87,7 @@ class SiteBackendHelper @Inject constructor(
           return@withContext Result.success(ApiInfo(ApiType.PieFedAlpha))
         } else if (v3Job.isSiteView()) {
           return@withContext Result.success(ApiInfo(ApiType.LemmyV3))
-        } else if (homePageJob.isSiteView()) {
+        } else if (homePageJob.await().isSuccess) {
           return@withContext Result.success(ApiInfo(null))
         }
 

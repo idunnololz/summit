@@ -236,13 +236,13 @@ internal fun Site.toSite(): com.idunnololz.summit.api.dto.lemmy.Site =
 
 internal fun MyUserInfo.toMyUserInfo(): com.idunnololz.summit.api.dto.lemmy.MyUserInfo =
   com.idunnololz.summit.api.dto.lemmy.MyUserInfo(
-    this.localUserView.toLocalUserView(),
-    this.follows.map { it.toCommunityFollowerView() },
-    this.moderates.map { it.toCommunityModeratorView() },
-    this.communityBlocks.map { it.toCommunityBlockView() },
-    this.personBlocks.map { it.toPersonBlockView() },
-    this.instanceBlocks.map { it.toInstanceBlockView() },
-    this.discussionLanguages.mapNotNull { it.id },
+    local_user_view = this.localUserView.toLocalUserView(),
+    follows = this.follows.map { it.toCommunityFollowerView() },
+    moderates = this.moderates.map { it.toCommunityModeratorView() },
+    community_blocks = this.communityBlocks.map { it.toCommunityBlockView() },
+    person_blocks = this.personBlocks.map { it.toPersonBlockView() },
+    instance_blocks = this.instanceBlocks.map { it.toInstanceBlockView() },
+    discussion_languages = this.discussionLanguages.mapNotNull { it.id },
   )
 
 internal fun CommunityFollowerView.toCommunityFollowerView(): com.idunnololz.summit.api.dto.lemmy.CommunityFollowerView =
@@ -282,12 +282,12 @@ internal fun Instance.toInstance(): com.idunnololz.summit.api.dto.lemmy.Instance
 
 internal fun LocalUserView.toLocalUserView(): com.idunnololz.summit.api.dto.lemmy.LocalUserView =
   com.idunnololz.summit.api.dto.lemmy.LocalUserView(
-    this.localUser.toLocalUser().copy(
+    local_user = this.localUser.toLocalUser().copy(
       id = this.person.id,
       person_id = this.person.id.toLong(),
     ),
-    this.person.toPerson(),
-    this.counts.toPersonAggregates(),
+    person = this.person.toPerson(),
+    counts = this.counts.toPersonAggregates(),
   )
 
 internal fun LocalUser.toLocalUser(): com.idunnololz.summit.api.dto.lemmy.LocalUser =

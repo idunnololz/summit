@@ -382,7 +382,7 @@ class PieFedApiAlphaAdapter(
         }
       }
 
-      val limit = 20
+      val limit = 100
       val comments = mutableListOf<CommentView>()
       var page = 0
       while (true) {

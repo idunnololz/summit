@@ -687,9 +687,9 @@ class PostViewModel @Inject constructor(
           // after we post it may not get us the latest value.
 
           result = commentsFetcher.fetchCommentsWithRetry(
-            Either.Left(postRef.id),
-            sortOrder,
-            maxDepth = null,
+            id = Either.Left(postRef.id),
+            sort = sortOrder,
+            maxDepth = COMMENTS_DEPTH_MAX,
             force = true,
           )
 
@@ -727,10 +727,11 @@ class PostViewModel @Inject constructor(
             }
           }
 
-          // If a user sends a new comment, we update that comment as a supplementary
-          // comment. If we then update that comment, our new comment data can be
-          // overridden by supplementary comments. So invalidate those...
-          invalidateSupplementaryComments(newComments)
+          // Set the comments we fetched as supplementary comments since the comments we fetch
+          // might be considered incomplete.
+          newComments?.forEach {
+            supplementaryComments[it.comment.id] = it
+          }
 
           if (allCommentsUpdated) {
             delay(600)
@@ -740,7 +741,7 @@ class PostViewModel @Inject constructor(
 
         requireNotNull(result)
 
-        this@PostViewModel.comments = result.getOrNull()
+//        this@PostViewModel.comments = result.getOrNull()
 
         completedPendingComments.forEach { pendingComment ->
           val commentsResult = if (pendingComment.parentId == null) {
