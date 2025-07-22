@@ -34,6 +34,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
+import com.idunnololz.summit.uploads.UploadsFragmentDirections
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -195,6 +196,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             findNavController().navigateSafe(direction)
           }
           R.id.uploads -> {
+            val direction = YouFragmentDirections
+              .actionYouFragmentToUploadsFragment()
+            findNavController().navigateSafe(direction)
           }
           R.id.account_settings -> {
             requireSummitActivity().openAccountSettings()
@@ -513,11 +517,13 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             R.drawable.ic_draft_24,
             R.string.drafts,
           )
-//          newItems += Item.MenuItem(
-//            R.id.uploads,
-//            R.drawable.outline_file_upload_24,
-//            R.string.uploads,
-//          )
+          if (model.supportsUploads) {
+            newItems += Item.MenuItem(
+              R.id.uploads,
+              R.drawable.outline_file_upload_24,
+              R.string.uploads,
+            )
+          }
           newItems += Item.Divider("div2")
           newItems += Item.MenuItem(
             R.id.account_settings,

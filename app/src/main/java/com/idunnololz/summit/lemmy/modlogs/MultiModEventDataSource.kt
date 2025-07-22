@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 
 class MultiModEventDataSource(
   private val instance: String,
-  private val sources: List<LemmyListSource<ModEvent, Unit>>,
+  private val sources: List<LemmyListSource<ModEvent, Unit, Long>>,
   private val pageSize: Int,
 ) {
   companion object {
@@ -46,7 +46,7 @@ class MultiModEventDataSource(
       )
 
       val sources = types.map { type ->
-        LemmyListSource<ModEvent, Unit>(
+        LemmyListSource<ModEvent, Unit, Long>(
           context,
           { this.id.toLong() },
           Unit,

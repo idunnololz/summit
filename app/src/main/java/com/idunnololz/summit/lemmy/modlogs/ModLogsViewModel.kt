@@ -53,7 +53,7 @@ class ModLogsViewModel @Inject constructor(
 
   val modLogData = StatefulLiveData<ModLogData>()
 
-  private var modSource: MultiLemmyListSource<ModEvent, Unit>? = null
+  private var modSource: MultiLemmyListSource<ModEvent, Unit, Long>? = null
 
   var resetScrollPosition: Boolean = false
 
@@ -126,7 +126,7 @@ class ModLogsViewModel @Inject constructor(
 
       val communityId = communityIdOrNull.getOrThrow()
 
-      val modSource = modSource ?: MultiLemmyListSource<ModEvent, Unit>(
+      val modSource = modSource ?: MultiLemmyListSource<ModEvent, Unit, Long>(
         listOf(
           newSource(communityId, ModEvent.ModRemovePostViewEvent::class) {
             it.removed_posts.map {
@@ -412,7 +412,7 @@ class ModLogsViewModel @Inject constructor(
     communityId: CommunityId?,
     clazz: KClass<*>,
     transformResult: (GetModlogResponse) -> List<ModEvent>,
-  ) = LemmyListSource<ModEvent, Unit>(
+  ) = LemmyListSource<ModEvent, Unit, Long>(
     context = context,
     id = { this.id.toLong() },
     defaultSortOrder = Unit,

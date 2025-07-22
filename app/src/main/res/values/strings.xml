@@ -2277,6 +2277,8 @@
     <string name="error_instance_does_not_support_registration">You cannot create a new account with the app because this instance does not support it. You must visit the website to create an account.</string>
     <string name="error_sign_up_not_supported">Sign up not supported</string>
     <string name="retry_action_failed">Retry action failed.</string>
+    <string name="atkinson_hyperlegible_next">Atkinson Hyperlegible Next™</string>
+    <string name="atkinson_hyperlegible_next_desc">\"For low-vision readers, certain letters and numbers can be hard to distinguish from one another. The Atkinson Hyperlegible™ font uses special design principles to differentiate characters and make each one unique.\"</string>
 
     <!-- uCrop string resource end -->
 </resources>

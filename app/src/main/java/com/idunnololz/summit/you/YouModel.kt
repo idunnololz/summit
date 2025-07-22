@@ -9,5 +9,6 @@ data class YouModel(
   val account: Account?,
   val accountInfo: AccountInfo?,
   val personResult: Result<GetPersonDetailsResponse>?,
+  val supportsUploads: Boolean,
   val isLoading: Boolean,
 )

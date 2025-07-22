@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 
 class MultiCommunityDataSource(
   private val instance: String,
-  private val sources: List<LemmyListSource<FetchedPost, SortType>>,
+  private val sources: List<LemmyListSource<FetchedPost, SortType, Long>>,
   private val apiClient: AccountAwareLemmyClient,
 ) : PostsDataSource {
 

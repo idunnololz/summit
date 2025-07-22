@@ -1538,6 +1538,12 @@ class ThemeSettings @Inject constructor(
         null,
         null,
       ),
+      RadioGroupSettingItem.RadioGroupOption(
+        id = FontIds.ATKINSON_HYPERLEGIBLE_NEXT,
+        title = context.getString(R.string.atkinson_hyperlegible_next),
+        description = context.getString(R.string.atkinson_hyperlegible_next_desc),
+        icon = null,
+      )
     ),
     relatedKeys = listOf(KEY_GLOBAL_FONT),
   )

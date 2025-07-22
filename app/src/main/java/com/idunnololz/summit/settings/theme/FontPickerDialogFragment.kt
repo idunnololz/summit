@@ -19,6 +19,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.toFontAsset
 import com.idunnololz.summit.settings.PreferencesViewModel
+import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -181,6 +182,10 @@ class FontPickerDialogFragment :
         Item.FontItem(
           FontIds.OPEN_SANS,
           context.getString(R.string.open_sans),
+        ),
+        Item.FontItem(
+          FontIds.ATKINSON_HYPERLEGIBLE_NEXT,
+          context.getString(R.string.atkinson_hyperlegible_next),
         ),
       )
 

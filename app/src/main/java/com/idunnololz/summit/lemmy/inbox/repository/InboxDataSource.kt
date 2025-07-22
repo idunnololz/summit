@@ -21,7 +21,7 @@ class InboxSource<O>(
     limit: Int,
     force: Boolean,
   ) -> Result<List<LiteInboxItem>>,
-) : LemmyListSource<LiteInboxItem, O>(
+) : LemmyListSource<LiteInboxItem, O, Long>(
   context,
   {
     id.toLong()
@@ -62,9 +62,9 @@ class InboxSource<O>(
  * @param T the type of the list.
  * @param O the type of the sort order.
  */
-open class LemmyListSource<T, O>(
+open class LemmyListSource<T, O, Key>(
   @ApplicationContext private val context: Context,
-  private val id: T.() -> Long,
+  private val id: T.() -> Key,
   defaultSortOrder: O,
   private val fetchObjects: suspend (
     pageIndex: Int,
@@ -98,7 +98,7 @@ open class LemmyListSource<T, O>(
   )
 
   protected val allObjects = mutableListOf<ObjectData<T>>()
-  private val seenObjects = mutableSetOf<Long>()
+  private val seenObjects = mutableSetOf<Key>()
   private val invalidatedPages = mutableSetOf<Int>()
 
   private var currentPageInternal = 1
@@ -278,18 +278,18 @@ open class LemmyListSource<T, O>(
   }
 }
 
-class MultiLemmyListSource<T, O>(
-  private val sources: List<LemmyListSource<T, O>>,
+class MultiLemmyListSource<T, O, Key>(
+  private val sources: List<LemmyListSource<T, O, Key>>,
   private val pageSize: Int = DEFAULT_PAGE_SIZE,
   private val sortValue: (T) -> Long,
-  private val id: (T) -> Long,
+  private val id: (T) -> Key,
 ) {
 
   companion object {
     private const val TAG = "MultiLemmyListSource"
   }
 
-  val seenIds = mutableSetOf<Long>()
+  val seenIds = mutableSetOf<Key>()
   val allItems = mutableListOf<T>()
 
   suspend fun getPage(

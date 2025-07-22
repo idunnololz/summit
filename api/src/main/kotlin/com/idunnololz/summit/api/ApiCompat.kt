@@ -15,4 +15,5 @@ enum class ApiFeature {
 
   // Whether the server supports listing all posts/comments downvoted by this user.
   Downvoted,
+  UploadsList,
 }

@@ -35,7 +35,7 @@ class VotesRepository @AssistedInject constructor(
   private val dataSource =
     MultiLemmyListSource(
       listOf(
-        LemmyListSource<VoteView, Unit>(
+        LemmyListSource<VoteView, Unit, Long>(
           context,
           { this.creator.id },
           defaultSortOrder = Unit,

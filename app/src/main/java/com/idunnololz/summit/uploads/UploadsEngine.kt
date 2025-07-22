@@ -14,30 +14,12 @@ class UploadsEngine @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
 ) {
 
-  class AliasToIdTranslator {
-    var nextId = 1L
-
-    private val aliasToId = mutableMapOf<String, Long>()
-
-    fun getIdForAlias(alias: String): Long {
-      val id = aliasToId[alias]
-      if (id != null) {
-        return id
-      }
-      val nextId = nextId++
-      aliasToId[alias] = nextId
-      return nextId
-    }
-  }
-
-  private val aliasToIdTranslator = AliasToIdTranslator()
-
   private val source =
     MultiLemmyListSource(
       listOf(
-        LemmyListSource<LocalImageView, Unit>(
+        LemmyListSource<LocalImageView, Unit, String>(
           context = context,
-          id = { aliasToIdTranslator.getIdForAlias(this.local_image.pictrs_alias) },
+          id = { this.local_image.pictrs_alias },
           defaultSortOrder = Unit,
           fetchObjects = {
               pageIndex: Int,
@@ -54,7 +36,7 @@ class UploadsEngine @Inject constructor(
         ),
       ),
       sortValue = { dateStringToTs(it.local_image.published) },
-      id = { aliasToIdTranslator.getIdForAlias(it.local_image.pictrs_alias) },
+      id = { it.local_image.pictrs_alias },
 
     )
 

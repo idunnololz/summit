@@ -10,6 +10,7 @@ import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,6 +72,7 @@ class YouViewModel @Inject constructor(
               accountInfo = account.accountInfo,
               personResult = null,
               isLoading = true,
+              supportsUploads = apiClient.supportsFeature(ApiFeature.UploadsList),
             ),
           )
         }
@@ -91,6 +93,7 @@ class YouViewModel @Inject constructor(
             accountInfo = account?.accountInfo,
             personResult = personResult,
             isLoading = false,
+            supportsUploads = apiClient.supportsFeature(ApiFeature.UploadsList),
           ),
         )
       }

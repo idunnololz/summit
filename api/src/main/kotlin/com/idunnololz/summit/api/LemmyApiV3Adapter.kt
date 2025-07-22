@@ -137,6 +137,7 @@ class LemmyApiV3Adapter(
     ApiFeature.Reports -> true
     ApiFeature.Register -> true
     ApiFeature.Downvoted -> true
+    ApiFeature.UploadsList -> true
   }
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {

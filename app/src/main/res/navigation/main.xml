@@ -382,6 +382,9 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim"  />
+        <action
+            android:id="@+id/action_youFragment_to_uploadsFragment"
+            app:destination="@id/uploadsFragment" />
     </fragment>
     <fragment
         android:id="@+id/hiddenPostsFragment2"
@@ -452,4 +455,8 @@
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
+    <fragment
+        android:id="@+id/uploadsFragment"
+        android:name="com.idunnololz.summit.uploads.UploadsFragment"
+        android:label="UploadsFragment" />
 </navigation>

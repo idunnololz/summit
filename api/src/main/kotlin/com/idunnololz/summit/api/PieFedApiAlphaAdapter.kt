@@ -165,6 +165,7 @@ class PieFedApiAlphaAdapter(
     ApiFeature.Reports -> false
     ApiFeature.Register -> false
     ApiFeature.Downvoted -> false
+    ApiFeature.UploadsList -> false
   }
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
