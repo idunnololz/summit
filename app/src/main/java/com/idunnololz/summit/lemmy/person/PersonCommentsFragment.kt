@@ -103,7 +103,13 @@ class PersonCommentsFragment :
         }
       },
       onImageClick = { view, url ->
-        getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
+        getMainActivity()?.openImage(
+          sharedElement = view,
+          appBar = parentFragment.binding.appBar,
+          title = null,
+          url = url,
+          mimeType = null
+        )
       },
       onVideoClick = { url, videoType, state ->
         getMainActivity()?.openVideo(url, videoType, state)

@@ -1022,7 +1022,7 @@ class PostAdapter(
 
         absolutionPositionToTopLevelCommentPosition += -1
 
-        if (rawData.isSingleComment) {
+        if (rawData.isSingleCommentChain) {
           finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
 
           if (rawData.commentPath != null && rawData.commentPath.count(".") > 1) {
@@ -1042,7 +1042,7 @@ class PostAdapter(
 
           when (val commentView = commentItem.listView) {
             is PostViewModel.ListView.CommentListView -> {
-              val commentId = commentView.comment.comment.id
+              val commentId = commentView.commentView.comment.id
               val isCurrentMatchThisComment = currentMatch?.targetId == commentId
               val isDeleting =
                 commentView.pendingCommentView?.isActionDelete == true
@@ -1062,8 +1062,8 @@ class PostAdapter(
                   Item.VisibleCommentItem(
                     commentId = commentId,
                     content = commentView.pendingCommentView?.content
-                      ?: commentView.comment.comment.content,
-                    comment = commentView.comment,
+                      ?: commentView.commentView.comment.content,
+                    comment = commentView.commentView,
                     depth = commentItem.depth,
                     baseDepth = 0,
                     isExpanded = !collapsedItemIds.contains(commentView.id) ||
@@ -1071,7 +1071,7 @@ class PostAdapter(
                     isPending = false,
                     view = commentView,
                     childrenCount = commentItem.children.size,
-                    isPostLocked = commentView.comment.post.locked,
+                    isPostLocked = commentView.commentView.post.locked,
                     isUpdating = commentView.pendingCommentView != null,
                     isDeleting = isDeleting,
                     isRemoved = commentView.isRemoved,
@@ -1093,14 +1093,14 @@ class PostAdapter(
                     commentId = commentId,
                     content =
                     commentView.pendingCommentView?.content
-                      ?: commentView.comment.comment.content,
-                    comment = commentView.comment,
+                      ?: commentView.commentView.comment.content,
+                    comment = commentView.commentView,
                     depth = commentItem.depth,
                     baseDepth = 0,
                     isPending = false,
                     view = commentView,
                     childrenCount = commentItem.children.size,
-                    isPostLocked = commentView.comment.post.locked,
+                    isPostLocked = commentView.commentView.post.locked,
                     isUpdating = commentView.pendingCommentView != null,
                     isDeleting = isDeleting,
                     isRemoved = commentView.isRemoved,
@@ -1276,10 +1276,10 @@ class PostAdapter(
 
       when (val commentView = node.listView) {
         is PostViewModel.ListView.VisibleCommentListView -> {
-          val commentId = commentView.comment.comment.id
+          val commentId = commentView.commentView.comment.id
           if (seenCommentIds.add(commentId)) {
-            val upvotes = commentView.comment.counts.upvotes
-            val downvotes = commentView.comment.counts.downvotes
+            val upvotes = commentView.commentView.counts.upvotes
+            val downvotes = commentView.commentView.counts.downvotes
             val totalVotes = upvotes + downvotes
             val upvoteRate = upvotes.toFloat() / totalVotes
             val autoCollapse =

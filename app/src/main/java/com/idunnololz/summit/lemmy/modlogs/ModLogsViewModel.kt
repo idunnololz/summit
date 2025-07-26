@@ -15,10 +15,10 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
-import com.idunnololz.summit.lemmy.inbox.repository.MultiLemmyListSource
 import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.ListEngine
+import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.requireMainThread

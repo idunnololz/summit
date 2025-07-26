@@ -11,12 +11,12 @@ import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PostsDataSource
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.getActiveRank
 import com.idunnololz.summit.lemmy.utils.getControversialRank
 import com.idunnololz.summit.lemmy.utils.getHotRank
 import com.idunnololz.summit.lemmy.utils.getScaledRank
+import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -60,7 +60,7 @@ class MultiCommunityDataSource(
             apiClient
               .fetchPosts(
                 communityIdOrName =
-                Either.Right(communityRef.getServerId(apiClient.instance)),
+                  Either.Right(communityRef.getServerId(apiClient.instance)),
                 sortType = sortOrder,
                 listingType = ListingType.All,
                 page = page,

@@ -53,6 +53,7 @@ import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.DeleteComment
 import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeleteImage
 import com.idunnololz.summit.api.dto.lemmy.DeletePost
 import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
 import com.idunnololz.summit.api.dto.lemmy.EditComment
@@ -970,4 +971,10 @@ class PieFedApiAlphaAdapter(
       args.serializeToMap(),
     )
   }
+
+  override suspend fun deleteMedia(
+    authorization: String?,
+    args: DeleteImage,
+  ): Result<Unit> =
+    Result.failure(NotYetImplemented())
 }

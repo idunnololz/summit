@@ -279,7 +279,7 @@ class Preferences(
   }
 
   var isUseMaterialYou: Boolean
-    by booleanPreference(KEY_USE_MATERIAL_YOU, false)
+    by booleanPreference(KEY_USE_MATERIAL_YOU, true)
 
   var isBlackTheme: Boolean
     by booleanPreference(KEY_USE_BLACK_THEME, false)
@@ -651,7 +651,7 @@ class Preferences(
   var postFabQuickAction: Int
     by intPreference(KEY_POST_FAB_QUICK_ACTION, PostFabQuickActions.NONE)
   var shakeToSendFeedback: Boolean
-    by booleanPreference(KEY_SHAKE_TO_SEND_FEEDBACK, true)
+    by booleanPreference(KEY_SHAKE_TO_SEND_FEEDBACK, false)
   var showLabelsInNavBar: Boolean
     by booleanPreference(KEY_SHOW_LABELS_IN_NAV_BAR, true)
   var warnNewPerson: Boolean

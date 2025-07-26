@@ -7,7 +7,9 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.VoteView
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.PageResult
+import com.idunnololz.summit.lemmy.utils.listSource.onFailure
+import com.idunnololz.summit.lemmy.utils.listSource.onSuccess
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -29,7 +31,7 @@ class ViewVotesViewModel @Inject constructor(
 
   val votesModel = StatefulLiveData<VotesModel>()
 
-  private val pages = mutableListOf<LemmyListSource.PageResult<VoteView>>()
+  private val pages = mutableListOf<PageResult.SuccessPageResult<VoteView>>()
   private var loadingJob: Job? = null
 
   fun loadVotes(postId: PostId, commentId: CommentId) {

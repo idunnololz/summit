@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.updatePadding
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -778,6 +779,9 @@ class AddOrEditCommentFragment :
 
     if (messageView != null) {
       binding.messageContainer.addView(messageView)
+      binding.messageContainer.updatePadding(
+        bottom = context.resources.getDimensionPixelOffset(R.dimen.padding_quarter)
+      )
     }
   }
 
@@ -1079,7 +1083,7 @@ class AddOrEditCommentFragment :
           commentTree = listOfNotNull(data.commentTree),
           newlyPostedCommentId = null,
           selectedCommentId = null,
-          isSingleComment = false,
+          isSingleCommentChain = false,
           isNativePost = true,
           accountInstance = viewModel.apiInstance,
           isCommentsLoaded = true,

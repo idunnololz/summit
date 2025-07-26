@@ -1049,7 +1049,7 @@ class PostFragment :
           crossPosts = listOf(),
           newlyPostedCommentId = null,
           selectedCommentId = null,
-          isSingleComment = false,
+          isSingleCommentChain = false,
           isNativePost = viewModel.isNativePost(),
           accountInstance = viewModel.currentAccountView.value?.account?.instance,
           isCommentsLoaded = false,

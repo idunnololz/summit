@@ -1,6 +1,6 @@
 package com.idunnololz.summit.util.imgur
 
-import com.idunnololz.summit.network.BrowserLike
+import com.idunnololz.summit.network.BrowserLikeAuthed
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +16,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 class ImgurModule {
 
   @Provides
-  fun provideImgurApi(json: Json, @BrowserLike okHttpClient: OkHttpClient): ImgurApi =
+  fun provideImgurApi(json: Json, @BrowserLikeAuthed okHttpClient: OkHttpClient): ImgurApi =
     Retrofit.Builder()
       .baseUrl("https://api.imgur.com")
       .client(okHttpClient)

@@ -11,7 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.ServerApiException
-import com.idunnololz.summit.network.BrowserLike
+import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
@@ -41,7 +41,7 @@ class OfflineManager @Inject constructor(
   @ApplicationContext private val context: Context,
   private val directoryHelper: DirectoryHelper,
   private val lemmyApiClient: LemmyApiClient,
-  @BrowserLike private val okHttpClient: OkHttpClient,
+  @BrowserLikeAuthed private val okHttpClient: OkHttpClient,
 ) {
 
   companion object {

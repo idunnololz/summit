@@ -28,6 +28,7 @@ import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.DeleteComment
 import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeleteImage
 import com.idunnololz.summit.api.dto.lemmy.DeletePost
 import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
 import com.idunnololz.summit.api.dto.lemmy.EditComment
@@ -558,4 +559,9 @@ interface LemmyLikeApi : ApiCompat {
     args: ListMedia,
     force: Boolean,
   ): Result<ListMediaResponse>
+
+  suspend fun deleteMedia(
+    authorization: String?,
+    args: DeleteImage,
+  ): Result<Unit>
 }

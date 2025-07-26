@@ -934,6 +934,18 @@ class AccountAwareLemmyClient @Inject constructor(
         .autoSignOut(account)
     }
 
+  suspend fun deleteMediaItem(
+    deleteToken: String,
+    filename: String,
+    account: Account? = accountForInstance()
+  ) =
+    if (account == null) {
+      createAccountErrorResult()
+    } else {
+      apiClient.deleteMediaItem(deleteToken, filename, account)
+        .autoSignOut(account)
+    }
+
   suspend fun banUserFromSite(
     personId: PersonId,
     ban: Boolean,

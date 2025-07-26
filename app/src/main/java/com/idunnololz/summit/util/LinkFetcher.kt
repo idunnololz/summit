@@ -1,7 +1,7 @@
 package com.idunnololz.summit.util
 
 import com.idunnololz.summit.api.GetNetworkException
-import com.idunnololz.summit.network.BrowserLike
+import com.idunnololz.summit.network.BrowserLikeAuthed
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -13,24 +13,29 @@ import okhttp3.Response
 
 @Singleton
 class LinkFetcher @Inject constructor(
-  @BrowserLike private val okHttpClient: OkHttpClient,
+  @param:BrowserLikeAuthed private val okHttpClient: OkHttpClient,
 ) {
 
-  suspend fun downloadSite(url: String, cache: Boolean = false): String =
+  suspend fun downloadSite(
+    url: String,
+    cache: Boolean = false,
+    client: OkHttpClient = okHttpClient,
+  ): String =
     runInterruptible(Dispatchers.IO) {
-      val response = doRequest(url, cache)
+      val response = doRequest(url, cache, client)
       val responseCode = response.code
       if (response.isSuccessful) {
-        return@runInterruptible response.body?.string() ?: ""
+        return@runInterruptible response.body.string()
       } else {
-        response.body?.close()
+        val err = response.body.string()
+        response.body.close()
         throw GetNetworkException(
-          "Response was not 200. Response code: $responseCode. Url: $url",
+          "Response was not 200. Response code: $responseCode. Response: $err Url: $url. req-headers: ${response.request.headers}",
         )
       }
     }
 
-  private fun doRequest(url: String, cache: Boolean): Response {
+  private fun doRequest(url: String, cache: Boolean, client: OkHttpClient): Response {
     val builder = Request.Builder()
       .url(url)
     if (!cache) {
@@ -38,6 +43,6 @@ class LinkFetcher @Inject constructor(
         .header("Cache-Control", "no-cache, no-store")
     }
     val request = builder.build()
-    return okHttpClient.newCall(request).execute()
+    return client.newCall(request).execute()
   }
 }

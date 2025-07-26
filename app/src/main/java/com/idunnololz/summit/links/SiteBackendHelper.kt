@@ -3,6 +3,8 @@ package com.idunnololz.summit.links
 import android.util.Log
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.links.SiteBackendHelper.ApiType
+import com.idunnololz.summit.network.BrowserLikeAuthed
+import com.idunnololz.summit.network.BrowserLikeUnauthed
 import com.idunnololz.summit.util.LinkFetcher
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
@@ -17,11 +19,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import okhttp3.OkHttpClient
 
 @Singleton
 class SiteBackendHelper @Inject constructor(
   private val json: Json,
   private val linkFetcher: LinkFetcher,
+  @param:BrowserLikeUnauthed private val okHttpClient: OkHttpClient,
 ) {
 
   companion object {
@@ -30,7 +34,7 @@ class SiteBackendHelper @Inject constructor(
 
   enum class ApiType {
     LemmyV3,
-    LemmyV4,
+//    LemmyV4,
     PieFedAlpha,
   }
 
@@ -62,39 +66,60 @@ class SiteBackendHelper @Inject constructor(
       val result = withContext(Dispatchers.Default) {
         val v3Job = async {
           runCatching {
-            linkFetcher.downloadSite("https://$instance/api/v3/site", cache = true)
+            linkFetcher.downloadSite(
+              url = "https://$instance/api/v3/site",
+              cache = true,
+              client = okHttpClient
+            )
           }
         }
-        val v4Job = async {
-          runCatching {
-            linkFetcher.downloadSite("https://$instance/api/v4/site", cache = true)
-          }
-        }
+//        val v4Job = async {
+//          runCatching {
+//            linkFetcher.downloadSite(
+//              url = "https://$instance/api/v4/site",
+//              cache = true,
+//              client = okHttpClient
+//            )
+//          }
+//        }
         val alphaJob = async {
           runCatching {
-            linkFetcher.downloadSite("https://$instance/api/alpha/site", cache = true)
+            linkFetcher.downloadSite(
+              url = "https://$instance/api/alpha/site",
+              cache = true,
+              client = okHttpClient
+            )
           }
         }
         val homePageJob = async {
           runCatching {
-            linkFetcher.downloadSite("https://$instance/", cache = true)
+            linkFetcher.downloadSite(
+              url = "https://$instance/",
+              cache = true,
+              client = okHttpClient
+            )
           }
         }
 
-        if (v4Job.isSiteView()) {
-          return@withContext Result.success(ApiInfo(ApiType.LemmyV4))
-        } else if (alphaJob.isSiteView()) {
+//        if (v4Job.isSiteView()) {
+//          Log.d(TAG, "instance: ${instance} is type V4")
+//          return@withContext Result.success(ApiInfo(ApiType.LemmyV4))
+//        } else
+        if (alphaJob.isSiteView()) {
+          Log.d(TAG, "instance: ${instance} is type alpha")
           return@withContext Result.success(ApiInfo(ApiType.PieFedAlpha))
         } else if (v3Job.isSiteView()) {
+          Log.d(TAG, "instance: ${instance} is type V3")
           return@withContext Result.success(ApiInfo(ApiType.LemmyV3))
         } else if (homePageJob.await().isSuccess) {
+          Log.d(TAG, "instance: ${instance} is not a lemmy site")
           return@withContext Result.success(ApiInfo(null))
         }
 
         // All 3 network calls failed. This likely means either the site is down or we are down.
 
         val errors = listOfNotNull(
-          v4Job.await().exceptionOrNull(),
+//          v4Job.await().exceptionOrNull(),
           v3Job.await().exceptionOrNull(),
           alphaJob.await().exceptionOrNull(),
           homePageJob.await().exceptionOrNull(),
@@ -130,8 +155,14 @@ class SiteBackendHelper @Inject constructor(
 
   private suspend fun Deferred<Result<String>>.isSiteView(): Boolean {
     return this.await().fold(
-      { it.length > 100 && it.firstOrNull() == '{' },
-      { false },
+      onSuccess = {
+        Log.d(TAG, "onSuccess")
+        it.length > 100 && it.firstOrNull() == '{'
+      },
+      onFailure = {
+        Log.d(TAG, "onFailure", it)
+        false
+      },
     )
   }
 }
@@ -139,6 +170,6 @@ class SiteBackendHelper @Inject constructor(
 val ApiType.isLemmy
   get() = when (this) {
     ApiType.LemmyV3 -> true
-    ApiType.LemmyV4 -> true
+//    ApiType.LemmyV4 -> true
     ApiType.PieFedAlpha -> false
   }

@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient
 class NetworkModule {
   @Provides
   @Singleton
-  @BrowserLike
+  @BrowserLikeAuthed
   fun provideBrowserLikeOkHttpClient(
     clientFactory: ClientFactory,
     directoryHelper: DirectoryHelper,
@@ -24,6 +24,17 @@ class NetworkModule {
     debugName = "BrowserLike",
     cacheDir = directoryHelper.okHttpCacheDir,
     purpose = ClientFactory.Purpose.BrowserLike,
+  )
+  @Provides
+  @Singleton
+  @BrowserLikeUnauthed
+  fun provideBrowserLikeUnauthedOkHttpClient(
+    clientFactory: ClientFactory,
+    directoryHelper: DirectoryHelper,
+  ): OkHttpClient = clientFactory.newClient(
+    debugName = "BrowserLike",
+    cacheDir = directoryHelper.okHttpCacheDir,
+    purpose = ClientFactory.Purpose.BrowserLikeUnauthed,
   )
 
   @Provides
@@ -67,7 +78,11 @@ class NetworkModule {
  */
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class BrowserLike
+annotation class BrowserLikeAuthed
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class BrowserLikeUnauthed
 
 /**
  * Used to make API calls.

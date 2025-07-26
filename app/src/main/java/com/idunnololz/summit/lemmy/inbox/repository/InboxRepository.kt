@@ -13,14 +13,14 @@ import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.lemmy.inbox.InboxItem
 import com.idunnololz.summit.lemmy.inbox.LiteInboxItem
 import com.idunnololz.summit.lemmy.inbox.PageType
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
+import com.idunnololz.summit.lemmy.utils.listSource.PageResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
-import javax.inject.Inject
-import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import kotlin.math.min
 
 @ViewModelScoped
 class InboxRepository @Inject constructor(
@@ -77,6 +77,24 @@ class InboxRepository @Inject constructor(
     val allItems = mutableListOf<LiteInboxItem>()
 
     suspend fun getPage(
+      pageIndex: Int,
+      force: Boolean,
+      retainItemsOnForce: Boolean,
+    ) =
+      _getPage(
+        pageIndex = pageIndex,
+        force = force,
+        retainItemsOnForce = retainItemsOnForce,
+      ).fold(
+        {
+          it
+        },
+        {
+          PageResult.ErrorPageResult(pageIndex, it)
+        }
+      )
+
+    private suspend fun _getPage(
       pageIndex: Int,
       force: Boolean,
       retainItemsOnForce: Boolean,
@@ -140,7 +158,7 @@ class InboxRepository @Inject constructor(
       }
 
       Result.success(
-        PageResult(
+        PageResult.SuccessPageResult(
           pageIndex,
           allItems
             .slice(startIndex until min(endIndex, allItems.size)),
@@ -245,7 +263,7 @@ class InboxRepository @Inject constructor(
     pageType: PageType,
     force: Boolean,
     retainItemsOnForce: Boolean = false,
-  ): Result<PageResult<LiteInboxItem>> {
+  ): PageResult<LiteInboxItem> {
     val source = getSource(pageType)
 
     val result = source.getPage(pageIndex, force, retainItemsOnForce)

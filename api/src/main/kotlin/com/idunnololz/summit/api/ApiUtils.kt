@@ -13,7 +13,7 @@ import retrofit2.Call
 
 private const val TAG = "ApiUtils"
 
-internal suspend fun <T> retrofitErrorHandler(call: suspend () -> Call<T>): Result<T> {
+internal suspend inline fun <reified T> retrofitErrorHandler(call: suspend () -> Call<T>): Result<T> {
   val res = try {
     val call = call()
     runInterruptible(Dispatchers.IO) {
@@ -40,7 +40,11 @@ internal suspend fun <T> retrofitErrorHandler(call: suspend () -> Call<T>): Resu
   }
 
   if (res.isSuccessful) {
-    return Result.success(requireNotNull(res.body()))
+    if (T::class == Unit::class) {
+      return Result.success(Unit as T)
+    } else {
+      return Result.success(requireNotNull(res.body()))
+    }
   } else {
     val errorCode = res.code()
     val errorBody = res.errorBody()?.string()

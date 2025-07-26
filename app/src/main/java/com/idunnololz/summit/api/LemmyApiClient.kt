@@ -37,6 +37,7 @@ import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.DeleteComment
 import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeleteImage
 import com.idunnololz.summit.api.dto.lemmy.DeletePost
 import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
 import com.idunnololz.summit.api.dto.lemmy.EditComment
@@ -1541,6 +1542,21 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
+  suspend fun deleteMediaItem(
+    deleteToken: String,
+    filename: String,
+    account: Account
+  ): Result<Unit> {
+    val form = DeleteImage(
+      delete_token = deleteToken,
+      filename = filename,
+    )
+
+    return onApiClient {
+      getApi().deleteMedia(authorization = account.bearer, form)
+    }
+  }
+
   suspend fun register(
     username: String,
     password: String,
@@ -1655,7 +1671,7 @@ class LemmyApiClient @Inject constructor(
               .create(PieFedApiAlpha::class.java),
             instance,
           )
-          SiteBackendHelper.ApiType.LemmyV4,
+//          SiteBackendHelper.ApiType.LemmyV4,
           SiteBackendHelper.ApiType.LemmyV3,
           null,
           -> LemmyApiV3Adapter(

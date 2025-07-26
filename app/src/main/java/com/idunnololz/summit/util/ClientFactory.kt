@@ -43,13 +43,15 @@ class ClientFactory @Inject constructor(
     LemmyApiClient,
     SummitApiClient,
     BrowserLike,
+    BrowserLikeUnauthed,
   }
 
   private fun getUserAgent(purpose: Purpose): String {
     val purposeString = when (purpose) {
       Purpose.LemmyApiClient -> "lac"
       Purpose.SummitApiClient -> "sac"
-      Purpose.BrowserLike -> "bl"
+      Purpose.BrowserLike,
+      Purpose.BrowserLikeUnauthed, -> "bl"
     }
 
     if (purpose == Purpose.BrowserLike) {
@@ -180,22 +182,24 @@ class ClientFactory @Inject constructor(
           loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
           addInterceptor(loggingInterceptor)
         }
-      }
-      .addNetworkInterceptor {
-        val requestBuilder = it.request().newBuilder()
-        val account = accountManager.currentAccount.asAccount
+        if (purpose != Purpose.BrowserLikeUnauthed) {
+          addNetworkInterceptor {
+            val requestBuilder = it.request().newBuilder()
+            val account = accountManager.currentAccount.asAccount
 
-        if (account != null &&
-          it.request().header("Authorization") == null &&
-          it.request().url.host == account.instance
-        ) {
-          requestBuilder.header(
-            "Authorization",
-            "Bearer ${account.jwt}",
-          )
+            if (account != null &&
+              it.request().header("Authorization") == null &&
+              it.request().url.host == account.instance
+            ) {
+              requestBuilder.header(
+                "Authorization",
+                "Bearer ${account.jwt}",
+              )
+            }
+
+            it.proceed(requestBuilder.build())
+          }
         }
-
-        it.proceed(requestBuilder.build())
       }
       .connectTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)

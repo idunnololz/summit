@@ -24,7 +24,8 @@
             android:id="@+id/message_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/padding"/>
+            android:clipToPadding="false"
+            android:paddingHorizontal="@dimen/padding"/>
 
         <FrameLayout
             android:layout_width="match_parent"

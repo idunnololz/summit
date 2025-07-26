@@ -22,11 +22,12 @@ import com.idunnololz.summit.lemmy.inbox.RegistrationDecision
 import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsModel
 import com.idunnololz.summit.lemmy.inbox.repository.InboxRepository
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.PageResult
+import com.idunnololz.summit.lemmy.utils.listSource.onFailure
+import com.idunnololz.summit.lemmy.utils.listSource.onSuccess
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -478,7 +480,7 @@ class InboxViewModel @Inject constructor(
     }
   }
 
-  private fun addData(data: LemmyListSource.PageResult<InboxItem>) {
+  private fun addData(data: PageResult.SuccessPageResult<InboxItem>) {
     hasMore = data.hasMore
 
     allInboxItems.addAll(
@@ -606,8 +608,9 @@ class InboxViewModel @Inject constructor(
   }
 }
 
-private fun LemmyListSource.PageResult<LiteInboxItem>.toInboxItemResult(): LemmyListSource.PageResult<InboxItem> =
-  LemmyListSource.PageResult(
+private fun PageResult.SuccessPageResult<LiteInboxItem>.toInboxItemResult(
+): PageResult.SuccessPageResult<InboxItem> =
+  PageResult.SuccessPageResult(
     pageIndex = pageIndex,
     items = items.filterIsInstance<InboxItem>(),
     hasMore = hasMore,

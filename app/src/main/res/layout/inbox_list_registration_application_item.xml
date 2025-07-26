@@ -50,8 +50,6 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
-        android:maxLines="1"
-        android:singleLine="true"
         android:ellipsize="end"
         android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintStart_toStartOf="parent"

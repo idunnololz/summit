@@ -616,7 +616,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           commentTree = listOfNotNull(data.commentTree),
           newlyPostedCommentId = null,
           selectedCommentId = null,
-          isSingleComment = false,
+          isSingleCommentChain = false,
           isNativePost = true,
           accountInstance = viewModel.apiInstance,
           isCommentsLoaded = true,

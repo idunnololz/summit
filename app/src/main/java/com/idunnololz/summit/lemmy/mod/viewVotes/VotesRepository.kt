@@ -7,9 +7,9 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.VoteView
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource
-import com.idunnololz.summit.lemmy.inbox.repository.LemmyListSource.PageResult
-import com.idunnololz.summit.lemmy.inbox.repository.MultiLemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
+import com.idunnololz.summit.lemmy.utils.listSource.PageResult
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -39,10 +39,11 @@ class VotesRepository @AssistedInject constructor(
           context,
           { this.creator.id },
           defaultSortOrder = Unit,
-          { pageIndex: Int,
-            sortOrder: Unit,
-            limit: Int,
-            force: Boolean,
+          {
+              pageIndex: Int,
+              sortOrder: Unit,
+              limit: Int,
+              force: Boolean,
             ->
 
             postOrCommentId.fold(
@@ -74,7 +75,7 @@ class VotesRepository @AssistedInject constructor(
     pageIndex: Int,
     force: Boolean,
     retainItemsOnForce: Boolean = false,
-  ): Result<PageResult<VoteView>> {
+  ): PageResult<VoteView> {
     val result = dataSource.getPage(pageIndex, force, retainItemsOnForce)
 
     Log.d(TAG, "Got ${result.getOrNull()?.items?.size} items")

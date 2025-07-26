@@ -31,6 +31,7 @@ import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.CreatePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.DeleteComment
 import com.idunnololz.summit.api.dto.lemmy.DeleteCommunity
+import com.idunnololz.summit.api.dto.lemmy.DeleteImage
 import com.idunnololz.summit.api.dto.lemmy.DeletePost
 import com.idunnololz.summit.api.dto.lemmy.DistinguishComment
 import com.idunnololz.summit.api.dto.lemmy.EditComment
@@ -673,6 +674,18 @@ class LemmyApiV3Adapter(
     api.listMedia(
       generateHeaders(authorization, force),
       args.serializeToMap(),
+    )
+  }
+
+  override suspend fun deleteMedia(
+    authorization: String?,
+    args: DeleteImage,
+  ): Result<Unit> = retrofitErrorHandler {
+    // https://lemmy.world/pictrs/image/delete/b60f8360-38bd-450a-ad6c-27b0b3936a27/60ac57fb-0bdd-42af-899a-01982ad37285.jpeg
+
+    api.deleteMedia(
+      url = "https://${instance}/pictrs/image/delete/${args.delete_token}/${args.filename}",
+      headers = generateHeaders(authorization, force = false),
     )
   }
 }

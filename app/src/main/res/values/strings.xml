@@ -2279,6 +2279,9 @@
     <string name="retry_action_failed">Retry action failed.</string>
     <string name="atkinson_hyperlegible_next">Atkinson Hyperlegible Next™</string>
     <string name="atkinson_hyperlegible_next_desc">\"For low-vision readers, certain letters and numbers can be hard to distinguish from one another. The Atkinson Hyperlegible™ font uses special design principles to differentiate characters and make each one unique.\"</string>
+    <string name="delete_item">Delete item</string>
+    <string name="delete_item_desc">This action cannot be undone.</string>
+    <string name="error_delete_item_failed">Delete item failed.</string>
 
     <!-- uCrop string resource end -->
 </resources>

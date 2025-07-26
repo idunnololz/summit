@@ -781,7 +781,6 @@ class InboxFragment :
         Item.RegistrationApplicationItem::class,
         InboxListRegistrationApplicationItemBinding::inflate,
       ) { item, b, _ ->
-
         postAndCommentViewBuilder.bindRegistrationApplication(
           b = b,
           instance = instance,

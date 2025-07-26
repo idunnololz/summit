@@ -11,7 +11,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.idunnololz.summit.R
-import com.idunnololz.summit.network.BrowserLike
+import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.preferences.Preferences
 import java.io.File
 import java.io.OutputStream
@@ -30,7 +30,7 @@ import okio.source
 @Singleton
 class FileDownloadHelper @Inject constructor(
   private val preferences: Preferences,
-  @BrowserLike
+  @BrowserLikeAuthed
   private val okHttpClient: OkHttpClient,
 ) {
 

@@ -123,12 +123,12 @@ class ContextFetcher @Inject constructor(
     ).buildCommentsTreeListView(
       post = null,
       comments = commentResult?.getOrNull(),
-      parentComment = true,
       pendingComments = null,
       supplementaryComments = mapOf(),
       removedCommentIds = setOf(),
       fullyLoadedCommentIds = setOf(),
       targetCommentRef = null,
+      singleCommentChain = null,
     )
 
     Result.success(

@@ -2,7 +2,7 @@ package com.idunnololz.summit
 
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
-import com.idunnololz.summit.network.BrowserLike
+import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.Preferences
@@ -22,6 +22,6 @@ interface AppEntryPoint {
   fun conversationsManager(): ConversationsManager
   fun accountInfoManager(): AccountInfoManager
 
-  @BrowserLike
+  @BrowserLikeAuthed
   fun browserLikeOkHttpClient(): OkHttpClient
 }

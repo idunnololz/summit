@@ -817,6 +817,7 @@ class PostViewModel @Inject constructor(
     val postOrCommentRef = postOrCommentRef
     val commentRef: CommentRef? = postOrCommentRef?.getOrNull()
     val originalPostOrCommentRef = originalPostOrCommentRef
+    val isSingleCommentChain = commentRef != null
 
     val postDataValue = PostData(
       postListView = ListView.PostListView(
@@ -830,7 +831,6 @@ class PostViewModel @Inject constructor(
       ).buildCommentsTreeListView(
         post = post,
         comments = comments,
-        parentComment = true,
         pendingComments = pendingComments,
         supplementaryComments = supplementaryComments,
         removedCommentIds = removedCommentIds,
@@ -840,12 +840,13 @@ class PostViewModel @Inject constructor(
             { null },
             { it },
           ),
+        singleCommentChain = commentRef,
       ),
       crossPosts = crossPosts ?: listOf(),
       newlyPostedCommentId = newlyPostedCommentId,
       selectedCommentId = originalPostOrCommentRef?.getOrNull()?.id
         ?: commentRef?.id,
-      isSingleComment = commentRef != null,
+      isSingleCommentChain = isSingleCommentChain,
       isNativePost = isNativePost(),
       accountInstance = currentAccountView.value?.account?.instance,
       isCommentsLoaded = comments != null,
@@ -958,7 +959,7 @@ class PostViewModel @Inject constructor(
     val crossPosts: List<PostView>,
     val newlyPostedCommentId: CommentId?,
     val selectedCommentId: CommentId?,
-    val isSingleComment: Boolean,
+    val isSingleCommentChain: Boolean,
     val isNativePost: Boolean,
     val accountInstance: String?,
     val isCommentsLoaded: Boolean,
@@ -983,25 +984,25 @@ class PostViewModel @Inject constructor(
     ) : ListView
 
     sealed interface CommentListView : ListView {
-      val comment: CommentView
+      val commentView: CommentView
       val pendingCommentView: PendingCommentView?
       var isRemoved: Boolean
       val commentHeaderInfo: CommentHeaderInfo
     }
 
     data class VisibleCommentListView(
-      override val comment: CommentView,
+      override val commentView: CommentView,
       override val pendingCommentView: PendingCommentView? = null,
       override var isRemoved: Boolean = false,
-      override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
+      override val id: Long = commentView.comment.id.toLong() or COMMENT_FLAG,
       override val commentHeaderInfo: CommentHeaderInfo,
     ) : CommentListView
 
     data class FilteredCommentItem(
-      override val comment: CommentView,
+      override val commentView: CommentView,
       override val pendingCommentView: PendingCommentView? = null,
       override var isRemoved: Boolean = false,
-      override val id: Long = comment.comment.id.toLong() or COMMENT_FLAG,
+      override val id: Long = commentView.comment.id.toLong() or COMMENT_FLAG,
       override val commentHeaderInfo: CommentHeaderInfo,
       var show: Boolean = false,
     ) : CommentListView
