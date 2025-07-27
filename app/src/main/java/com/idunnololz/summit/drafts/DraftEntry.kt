@@ -12,6 +12,7 @@ import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -66,6 +67,7 @@ object DraftTypes {
   const val Message = 3
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("t")
 sealed interface DraftData : Parcelable {

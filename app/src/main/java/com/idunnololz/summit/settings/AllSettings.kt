@@ -269,7 +269,7 @@ object SettingPath {
 }
 
 class AccountBlockListSettings @Inject constructor(
-  @ActivityContext context: Context,
+  @param:ActivityContext context: Context,
 ) : BaseSettings {
   val blockedUsersSetting = BasicSettingItem(
     R.drawable.baseline_person_24,
@@ -289,7 +289,7 @@ class AccountBlockListSettings @Inject constructor(
 }
 
 class MainSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf()
 
@@ -413,7 +413,7 @@ class MainSettings @Inject constructor(
 }
 
 class LemmyWebSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -514,7 +514,7 @@ class LemmyWebSettings @Inject constructor(
 }
 
 class GestureSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -732,7 +732,7 @@ class GestureSettings @Inject constructor(
 }
 
 class PostsFeedSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1010,7 +1010,7 @@ class PostsFeedSettings @Inject constructor(
 }
 
 class PostAndCommentsSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1277,7 +1277,7 @@ class PostAndCommentsSettings @Inject constructor(
 }
 
 class PostAndCommentsAppearanceSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1390,7 +1390,7 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
 }
 
 class ThemeSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val baseTheme = RadioGroupSettingItem(
@@ -1602,7 +1602,7 @@ class ThemeSettings @Inject constructor(
 }
 
 class PostsFeedAppearanceSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val baseViewType = RadioGroupSettingItem(
@@ -1716,7 +1716,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
 }
 
 class AboutSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1749,7 +1749,7 @@ class AboutSettings @Inject constructor(
 }
 
 class CacheSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1796,7 +1796,7 @@ class CacheSettings @Inject constructor(
 }
 
 class HiddenPostsSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1825,7 +1825,7 @@ class HiddenPostsSettings @Inject constructor(
 }
 
 class HapticSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -1845,7 +1845,7 @@ class HapticSettings @Inject constructor(
 }
 
 class MiscSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -2200,7 +2200,7 @@ class MiscSettings @Inject constructor(
  * User actions.
  */
 class ActionsSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
@@ -2208,7 +2208,7 @@ class ActionsSettings @Inject constructor(
 }
 
 class LoggingSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val useFirebase = OnOffSettingItem(
@@ -2224,7 +2224,7 @@ class LoggingSettings @Inject constructor(
 }
 
 class HistorySettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val viewHistory = BasicSettingItem(
@@ -2246,7 +2246,7 @@ class HistorySettings @Inject constructor(
 }
 
 class NavigationSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   private val navBarDestOptions =
@@ -2402,7 +2402,7 @@ class NavigationSettings @Inject constructor(
 }
 
 class ImportAndExportSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val importSettings = BasicSettingItem(
@@ -2441,7 +2441,7 @@ class ImportAndExportSettings @Inject constructor(
 }
 
 class PerAccountSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val settingTheme = BasicSettingItem(
@@ -2553,7 +2553,7 @@ class PerAccountSettings @Inject constructor(
 }
 
 class DownloadSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val downloadDirectory = TextValueSettingItem(
@@ -2576,7 +2576,7 @@ class DownloadSettings @Inject constructor(
 }
 
 class PerCommunitySettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val usePerCommunitySettings = OnOffSettingItem(
@@ -2599,7 +2599,7 @@ class PerCommunitySettings @Inject constructor(
 }
 
 class NotificationSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   private val refreshIntervalOptions =
@@ -2663,7 +2663,7 @@ class NotificationSettings @Inject constructor(
 }
 
 class SearchHomeSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val searchSuggestions = OnOffSettingItem(
@@ -2707,7 +2707,7 @@ class SearchHomeSettings @Inject constructor(
 }
 
 class VideoPlayerSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val inlineVideoVolume = SliderSettingItem(
@@ -2747,7 +2747,7 @@ class VideoPlayerSettings @Inject constructor(
 }
 
 class DefaultAppsSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
 ) : SearchableSettings {
 
   val defaultWebApp = BasicSettingItem(
@@ -2762,7 +2762,7 @@ class DefaultAppsSettings @Inject constructor(
 }
 
 class AllSettings @Inject constructor(
-  @ActivityContext private val context: Context,
+  @param:ActivityContext private val context: Context,
   mainSettings: MainSettings,
   lemmyWebSettings: LemmyWebSettings,
   gestureSettings: GestureSettings,

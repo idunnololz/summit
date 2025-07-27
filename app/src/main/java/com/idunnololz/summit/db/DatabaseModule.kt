@@ -15,6 +15,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
 import com.idunnololz.summit.lemmy.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
+import com.idunnololz.summit.templates.db.TemplatesDao
 import com.idunnololz.summit.user.UserCommunitiesDao
 import dagger.Module
 import dagger.Provides
@@ -74,6 +75,9 @@ class DatabaseModule {
 
   @Provides
   fun provideUserTagsDao(db: MainDatabase): UserTagsDao = db.userTagsDao()
+
+  @Provides
+  fun provideTemplatesDao(db: MainDatabase): TemplatesDao = db.templatesDao()
 
   @Provides
   @Singleton

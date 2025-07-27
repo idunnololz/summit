@@ -44,6 +44,9 @@ import com.idunnololz.summit.lemmy.inbox.db.ConversationEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagConverters
 import com.idunnololz.summit.lemmy.userTags.UserTagEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
+import com.idunnololz.summit.templates.db.TemplateConverters
+import com.idunnololz.summit.templates.db.TemplateEntry
+import com.idunnololz.summit.templates.db.TemplatesDao
 import com.idunnololz.summit.user.UserCommunitiesConverters
 import com.idunnololz.summit.user.UserCommunitiesDao
 import com.idunnololz.summit.user.UserCommunityEntry
@@ -70,6 +73,7 @@ import kotlinx.serialization.json.Json
     ReadPostEntry::class,
     TextEmojiEntry::class,
     UserTagEntry::class,
+    TemplateEntry::class,
   ],
   autoMigrations = [
     AutoMigration(from = 20, to = 21),
@@ -81,11 +85,12 @@ import kotlinx.serialization.json.Json
     AutoMigration(from = 41, to = 42),
     AutoMigration(from = 42, to = 43),
     AutoMigration(from = 43, to = 44),
+    AutoMigration(from = 45, to = 46),
   ],
-  version = 45,
+  version = 46,
   exportSchema = true,
 )
-@TypeConverters(HistoryConverters::class, DraftConverters::class)
+@TypeConverters(HistoryConverters::class, DraftConverters::class, TemplateConverters::class)
 abstract class MainDatabase : RoomDatabase() {
 
   abstract fun lemmyActionsDao(): LemmyActionsDao
@@ -103,6 +108,7 @@ abstract class MainDatabase : RoomDatabase() {
   abstract fun postReadDao(): PostReadDao
   abstract fun textEmojiDao(): TextEmojiDao
   abstract fun userTagsDao(): UserTagsDao
+  abstract fun templatesDao(): TemplatesDao
 
   companion object {
 
@@ -128,17 +134,18 @@ abstract class MainDatabase : RoomDatabase() {
           MainDatabase::class.java,
           dbName,
         )
-        .apply {
-          if (!BuildConfig.DEBUG) {
-            fallbackToDestructiveMigration()
-          }
-        }
+//        .apply {
+//          if (!BuildConfig.DEBUG) {
+//            fallbackToDestructiveMigration()
+//          }
+//        }
         .addTypeConverter(LemmyActionConverters(json))
         .addTypeConverter(UserCommunitiesConverters(json))
         .addTypeConverter(AccountInfoConverters(json))
         .addTypeConverter(DraftConverters(json))
         .addTypeConverter(InboxEntryConverters(json))
         .addTypeConverter(UserTagConverters(json))
+        .addTypeConverter(TemplateConverters(json))
         .addMigrations(MIGRATION_19_20)
         .addMigrations(MIGRATION_21_22)
         .addMigrations(MIGRATION_22_24)

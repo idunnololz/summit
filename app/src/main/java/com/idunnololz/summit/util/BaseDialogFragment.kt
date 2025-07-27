@@ -12,12 +12,18 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.annotation.CallSuper
 import androidx.core.view.MenuProvider
+import androidx.core.view.WindowCompat
 import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
+import com.idunnololz.summit.drafts.DraftEntry
+import com.idunnololz.summit.drafts.DraftsDialogFragment
+import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.main.MainActivity
+import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
+import com.idunnololz.summit.util.ext.setSizeDynamically
 
 open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
 
@@ -47,6 +53,7 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     _binding = binding
   }
 
+  @CallSuper
   override fun onStart() {
     MyLog.d(logTag, "Lifecycle: onStart()")
     super.onStart()
@@ -55,11 +62,16 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
     val window = checkNotNull(dialog.window)
 
     if (isFullscreen) {
+      dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+      }
     } else {
       window.setBackgroundDrawableResource(R.drawable.dialog_background)
+      setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
   }
 
+  @CallSuper
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     return super.onCreateDialog(savedInstanceState).also {
       _onBackPressedDispatcher = (it as ComponentDialog).onBackPressedDispatcher
@@ -69,8 +81,13 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
   @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    if (isFullscreen) {
+      setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
+    }
   }
 
+  @CallSuper
   override fun onResume() {
     MyLog.d(logTag, "Lifecycle: onResume()")
     super.onResume()

@@ -2282,6 +2282,8 @@
     <string name="delete_item">Delete item</string>
     <string name="delete_item_desc">This action cannot be undone.</string>
     <string name="error_delete_item_failed">Delete item failed.</string>
+    <string name="version_code_copied_to_clipboard">Version code copied to clipboard</string>
+    <string name="template_saved">Template saved</string>
 
     <!-- uCrop string resource end -->
 </resources>

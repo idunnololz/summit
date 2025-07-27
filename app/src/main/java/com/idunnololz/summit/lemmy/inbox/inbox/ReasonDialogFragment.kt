@@ -10,11 +10,16 @@ import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.databinding.DialogFragmentReasonBinding
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
+import com.idunnololz.summit.util.insetViewStartAndEndByPadding
+import com.idunnololz.summit.util.setupToolbar
 import kotlinx.parcelize.Parcelize
 
 class ReasonDialogFragment :
-  BaseDialogFragment<DialogFragmentReasonBinding>() {
+  BaseDialogFragment<DialogFragmentReasonBinding>(),
+  FullscreenDialogFragment {
 
   companion object {
     fun show(fragmentManager: FragmentManager, title: String, positiveButton: String) =
@@ -39,11 +44,6 @@ class ReasonDialogFragment :
     val reason: String?,
   ) : Parcelable
 
-  override fun onStart() {
-    super.onStart()
-    setSizeDynamically(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-  }
-
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -60,7 +60,12 @@ class ReasonDialogFragment :
     super.onViewCreated(view, savedInstanceState)
 
     with(binding) {
-      title.text = args.title
+      requireMainActivity().apply {
+        insetViewAutomaticallyByPadding(viewLifecycleOwner, root)
+      }
+
+      setupToolbar(toolbar, args.title)
+
       positiveButton.text = args.positiveButton
 
       positiveButton.setOnClickListener {

@@ -80,6 +80,7 @@ sealed interface SettingModelItem {
     val clickable: Boolean,
     val getCurrentValue: () -> String?,
     val onValueChanged: SettingsAdapter.() -> Unit,
+    val onLongClick: (() -> Unit)? = null,
   ) : SettingModelItem
 
   data class CustomViewItem<T, VB : ViewBinding>(
@@ -174,6 +175,7 @@ class SettingsAdapter(
       val description: String?,
       val currentValue: String?,
       val clickable: Boolean,
+      val longClickable: Boolean,
     ) : Item
 
     data class CustomViewItem<T>(
@@ -563,6 +565,14 @@ class SettingsAdapter(
 
             onValueChanged()
           }
+          if (item.longClickable != null) {
+            b.root.setOnLongClickListener {
+              findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
+                ?.onLongClick
+                ?.invoke()
+              true
+            }
+          }
         } else {
           b.root.isClickable = false
           b.root.setOnClickListener(null)
@@ -729,6 +739,7 @@ class SettingsAdapter(
             description = item.description,
             currentValue = item.getCurrentValue(),
             clickable = item.clickable,
+            longClickable = item.clickable && item.onLongClick != null,
           )
         }
         is SettingModelItem.CustomViewItem<*, *> -> {

@@ -4,20 +4,20 @@ arrowCore = "2.1.2"
 datastorePreferences = "1.1.7"
 desugar_jdk_libs = "2.1.5"
 exifinterface = "1.4.1"
-hilt = "2.56.2"
+hilt = "2.57"
 javaStringSimilarity = "2.0.0"
 kotlin = "2.2.0"
 kotlinxSerializationJson = "1.9.0"
 ksp = "2.2.0-2.0.2"
 kotlinx = "1.10.2"
-navigation = "2.9.1"
+navigation = "2.9.2"
 room = "2.7.2"
-lifecycle = "2.9.1"
+lifecycle = "2.9.2"
 media3 = "1.7.1"
 transformations = "3.0.7"
 viewpump = "2.1.1"
 work = "2.10.2"
-coil = "3.2.0"
+coil = "3.3.0"
 retrofit = "3.0.0"
 jetbrainsKotlinJvm = "2.2.0"
 commonmark = "0.13.0" # DO NOT BUMP THIS PAST 0.13.0
@@ -118,6 +118,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android-extensions = { id = "org.jetbrains.kotlin.android.extensions", version.ref = "kotlin" }
 navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.3.0" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "13.0.0" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
