@@ -2284,6 +2284,10 @@
     <string name="error_delete_item_failed">Delete item failed.</string>
     <string name="version_code_copied_to_clipboard">Version code copied to clipboard</string>
     <string name="template_saved">Template saved</string>
+    <string name="templates">Templates</string>
+    <string name="add_template">Add template</string>
+    <string name="content">Content</string>
+    <string name="edit_template">Edit template</string>
 
     <!-- uCrop string resource end -->
 </resources>

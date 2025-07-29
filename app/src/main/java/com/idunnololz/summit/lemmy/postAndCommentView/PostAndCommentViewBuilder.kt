@@ -67,10 +67,10 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
-import com.idunnololz.summit.lemmy.inbox.CommentBackedItem
-import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.lemmy.inbox.RegistrationDecision
-import com.idunnololz.summit.lemmy.inbox.ReportItem
+import com.idunnololz.summit.inbox.CommentBackedItem
+import com.idunnololz.summit.inbox.InboxItem
+import com.idunnololz.summit.inbox.RegistrationDecision
+import com.idunnololz.summit.inbox.ReportItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig

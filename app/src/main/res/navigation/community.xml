@@ -142,7 +142,7 @@
         <argument
             android:name="inboxItem"
             android:defaultValue="@null"
-            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem"
+            app:argType="com.idunnololz.summit.inbox.InboxItem"
             app:nullable="true" />
         <argument
             android:name="person_id"

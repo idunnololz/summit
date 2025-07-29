@@ -13,7 +13,7 @@ import com.idunnololz.summit.databinding.DialogFragmentReportContentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.inbox.conversation.MessageItem
+import com.idunnololz.summit.inbox.conversation.MessageItem
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setSizeDynamically

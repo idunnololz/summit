@@ -78,6 +78,7 @@ class PostAdapter(
   private val videoState: VideoState?,
   private var autoCollapseCommentThreshold: Float,
   private val lemmyTextHelper: LemmyTextHelper,
+  private val autoCollapseComments: Boolean = true,
   private val onRefreshClickCb: () -> Unit,
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
@@ -989,7 +990,11 @@ class PostAdapter(
 
         val finalItems = mutableListOf<Item>()
 
-        val changed = autoCollapseComments(rawData.commentTree)
+        val changed = if (autoCollapseComments) {
+          autoCollapseComments(rawData.commentTree)
+        } else {
+          false
+        }
 
         val postView = rawData.postListView
         val commentItems = rawData.commentTree.flatten(collapsedItemIds)

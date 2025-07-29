@@ -1,7 +1,7 @@
 package com.idunnololz.summit.lemmy.utils.listSource
 
 import android.util.Log
-import com.idunnololz.summit.lemmy.inbox.repository.DEFAULT_PAGE_SIZE
+import com.idunnololz.summit.inbox.repository.DEFAULT_PAGE_SIZE
 import kotlin.math.min
 
 class MultiLemmyListSource<T, O, Key>(

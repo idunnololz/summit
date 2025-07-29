@@ -7,8 +7,8 @@ import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.inbox.InboxItem
-import com.idunnololz.summit.lemmy.inbox.toInboxItem
+import com.idunnololz.summit.inbox.InboxItem
+import com.idunnololz.summit.inbox.toInboxItem
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Deferred

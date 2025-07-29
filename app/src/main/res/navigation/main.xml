@@ -105,7 +105,7 @@
     <action android:id="@+id/action_global_videoViewerFragment" app:destination="@id/videoViewerFragment"/>
     <fragment
         android:id="@+id/inboxTabbedFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.InboxTabbedFragment"
+        android:name="com.idunnololz.summit.inbox.InboxTabbedFragment"
         android:label="InboxFragment">
         <argument
             android:name="notificationId"
@@ -118,11 +118,11 @@
     </fragment>
     <fragment
         android:id="@+id/inboxFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.inbox.InboxFragment"
+        android:name="com.idunnololz.summit.inbox.inbox.InboxFragment"
         android:label="InboxFragment" >
         <argument
             android:name="pageType"
-            app:argType="com.idunnololz.summit.lemmy.inbox.PageType" />
+            app:argType="com.idunnololz.summit.inbox.PageType" />
     </fragment>
     <activity
         android:id="@+id/imageViewerActivity"

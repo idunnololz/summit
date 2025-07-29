@@ -23,9 +23,9 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
-import com.idunnololz.summit.lemmy.inbox.InboxEntry
-import com.idunnololz.summit.lemmy.inbox.InboxItem
+import com.idunnololz.summit.inbox.InboxEntriesDao
+import com.idunnololz.summit.inbox.InboxEntry
+import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.preferences.NotificationsSharedPreference
 import com.idunnololz.summit.preferences.Preferences

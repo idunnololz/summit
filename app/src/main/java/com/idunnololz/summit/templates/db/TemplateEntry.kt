@@ -78,6 +78,7 @@ val TemplateData.type
 sealed interface TemplateData : Parcelable {
   val accountId: Long
   val accountInstance: String
+  val title: String
   val content: String
 
   @Parcelize
@@ -86,6 +87,7 @@ sealed interface TemplateData : Parcelable {
   data class RegistrationApplicationRejectionTemplateData(
     override val content: String,
     override val accountId: Long,
+    override val title: String,
     override val accountInstance: String,
   ) : TemplateData
 }

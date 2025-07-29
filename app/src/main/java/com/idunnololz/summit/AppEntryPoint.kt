@@ -1,7 +1,7 @@
 package com.idunnololz.summit
 
 import com.idunnololz.summit.account.info.AccountInfoManager
-import com.idunnololz.summit.lemmy.inbox.conversation.ConversationsManager
+import com.idunnololz.summit.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.notifications.NotificationsUpdater

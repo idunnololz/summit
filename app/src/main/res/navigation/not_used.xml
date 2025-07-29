@@ -12,11 +12,11 @@ safeargs.
 
     <fragment
         android:id="@+id/messageFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.message.MessageFragment"
+        android:name="com.idunnololz.summit.inbox.message.MessageFragment"
         android:label="MessageFragment" >
         <argument
             android:name="inboxItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem" />
+            app:argType="com.idunnololz.summit.inbox.InboxItem" />
         <argument
             android:name="instance"
             app:argType="string" />
@@ -24,15 +24,15 @@ safeargs.
 
     <fragment
         android:id="@+id/conversationFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.conversation.ConversationFragment"
+        android:name="com.idunnololz.summit.inbox.conversation.ConversationFragment"
         android:label="ConversationFragment" >
         <argument
             android:name="inboxItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.InboxItem.MessageInboxItem"
+            app:argType="com.idunnololz.summit.inbox.InboxItem.MessageInboxItem"
             app:nullable="true" />
         <argument
             android:name="conversationItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.conversation.Conversation"
+            app:argType="com.idunnololz.summit.inbox.conversation.Conversation"
             app:nullable="true" />
         <argument
             android:name="instance"
@@ -42,7 +42,7 @@ safeargs.
             app:argType="long" />
         <argument
             android:name="newConversation"
-            app:argType="com.idunnololz.summit.lemmy.inbox.conversation.NewConversation"
+            app:argType="com.idunnololz.summit.inbox.conversation.NewConversation"
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
@@ -159,7 +159,7 @@ safeargs.
             app:nullable="true" />
         <argument
             android:name="messageItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.conversation.MessageItem"
+            app:argType="com.idunnololz.summit.inbox.conversation.MessageItem"
             app:nullable="true" />
     </dialog>
     <dialog
@@ -411,7 +411,7 @@ safeargs.
     </dialog>
     <dialog
         android:id="@+id/reasonDialogFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.inbox.ReasonDialogFragment"
+        android:name="com.idunnololz.summit.reason.ReasonDialogFragment"
         android:label="ReasonDialogFragment" >
         <argument
             android:name="title"
@@ -430,11 +430,11 @@ safeargs.
     </dialog>
     <fragment
         android:id="@+id/reportDetailsFragment"
-        android:name="com.idunnololz.summit.lemmy.inbox.report.ReportDetailsFragment"
+        android:name="com.idunnololz.summit.inbox.report.ReportDetailsFragment"
         android:label="ReportDetailsFragment" >
         <argument
             android:name="reportItem"
-            app:argType="com.idunnololz.summit.lemmy.inbox.ReportItem" />
+            app:argType="com.idunnololz.summit.inbox.ReportItem" />
     </fragment>
     <dialog
         android:id="@+id/videoInfoDialogFragment"
@@ -451,5 +451,14 @@ safeargs.
         <argument
             android:name="modEventJson"
             app:argType="string" />
+    </dialog>
+    <dialog
+        android:id="@+id/addOrEditTemplateFragmentDialog"
+        android:name="com.idunnololz.summit.templates.AddOrEditTemplateFragmentDialog"
+        android:label="AddOrEditTemplateFragmentDialog" >
+        <argument
+            android:name="template"
+            app:argType="com.idunnololz.summit.templates.db.TemplateEntry"
+            app:nullable="true" />
     </dialog>
 </navigation>

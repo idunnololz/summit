@@ -8,7 +8,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
@@ -29,6 +28,11 @@ import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryConverters
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.history.HistoryEntry
+import com.idunnololz.summit.inbox.InboxEntriesDao
+import com.idunnololz.summit.inbox.InboxEntry
+import com.idunnololz.summit.inbox.InboxEntryConverters
+import com.idunnololz.summit.inbox.db.ConversationEntriesDao
+import com.idunnololz.summit.inbox.db.ConversationEntry
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
@@ -36,11 +40,6 @@ import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
-import com.idunnololz.summit.lemmy.inbox.InboxEntriesDao
-import com.idunnololz.summit.lemmy.inbox.InboxEntry
-import com.idunnololz.summit.lemmy.inbox.InboxEntryConverters
-import com.idunnololz.summit.lemmy.inbox.db.ConversationEntriesDao
-import com.idunnololz.summit.lemmy.inbox.db.ConversationEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagConverters
 import com.idunnololz.summit.lemmy.userTags.UserTagEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
