@@ -6,7 +6,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.preferences.AccountIdsSharedPreference
+import com.idunnololz.summit.preferences.GuestAccountSettings
 import com.idunnololz.summit.preferences.PreferenceManager
+import com.idunnololz.summit.preferences.Preferences
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import androidx.core.content.edit
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -27,7 +30,7 @@ class AccountManager @Inject constructor(
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val preferenceManager: PreferenceManager,
   @AccountIdsSharedPreference private val accountIdsSharedPreference: SharedPreferences,
-
+  private val preferences: Preferences,
 ) {
 
   companion object {
@@ -44,12 +47,12 @@ class AccountManager @Inject constructor(
 
   private val onAccountChangeListeners = mutableListOf<OnAccountChangedListener>()
 
-  private val _currentAccount = MutableStateFlow<GuestOrUserAccount?>(null)
+  private val _currentAccount = MutableStateFlow<GuestOrUserAccount>(getGuestAccount())
   private val _numAccounts = MutableStateFlow<Int>(0)
 
   private val accountByIdCache = mutableMapOf<Long, Account?>()
 
-  val currentAccount: StateFlow<GuestOrUserAccount?> = _currentAccount
+  val currentAccount: StateFlow<GuestOrUserAccount> = _currentAccount
   val currentAccountOnChange = _currentAccount.asSharedFlow().drop(1)
 
   val numAccounts: StateFlow<Int> = _numAccounts
@@ -60,7 +63,9 @@ class AccountManager @Inject constructor(
     runBlocking {
       val curAccount = accountDao.getCurrentAccount()?.fix()
       preferenceManager.updateCurrentPreferences(curAccount)
-      _currentAccount.emit(curAccount)
+      curAccount?.let {
+        _currentAccount.emit(it)
+      }
       updateNumAccounts()
     }
     coroutineScope.launch {
@@ -101,9 +106,9 @@ class AccountManager @Inject constructor(
           accountDao.clearAndSetCurrent(firstAccount.id)
         }
       }
-      accountIdsSharedPreference.edit()
-        .remove(account.fullName)
-        .apply()
+      accountIdsSharedPreference.edit {
+        remove(account.fullName)
+      }
 
       updateCurrentAccount()
       updateNumAccounts()
@@ -119,8 +124,10 @@ class AccountManager @Inject constructor(
           return@async
         }
 
-        val account = guestOrUserAccount as? Account
-        accountDao.clearAndSetCurrent(account?.id)
+        val guestOrUserAccount = guestOrUserAccount as? Account
+          ?: getGuestAccount()
+
+        accountDao.clearAndSetCurrent(guestOrUserAccount.id)
 
         doSwitchAccountWork(guestOrUserAccount)
 
@@ -132,6 +139,8 @@ class AccountManager @Inject constructor(
 
   private suspend fun updateCurrentAccount() {
     val currentAccount = accountDao.getCurrentAccount()
+      ?: getGuestAccount()
+
     if (this._currentAccount.value != currentAccount) {
       doSwitchAccountWork(currentAccount)
     }
@@ -219,6 +228,11 @@ class AccountManager @Inject constructor(
 
   private suspend fun updateNumAccounts() {
     _numAccounts.value = accountDao.count()
+  }
+
+  fun getGuestAccount(): GuestAccount {
+    val guestAccountSettings = preferences.guestAccountSettings ?: GuestAccountSettings()
+    return GuestAccount(guestAccountSettings.instance)
   }
 }
 

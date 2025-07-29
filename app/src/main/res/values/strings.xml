@@ -2288,6 +2288,7 @@
     <string name="add_template">Add template</string>
     <string name="content">Content</string>
     <string name="edit_template">Edit template</string>
+    <string name="template_empty_desc">Save common rejection reasons as a template to speed up your review process.</string>
 
     <!-- uCrop string resource end -->
 </resources>

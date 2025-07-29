@@ -2,30 +2,41 @@ package com.idunnololz.summit.reason
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.templates.TemplatesManager
 import com.idunnololz.summit.templates.db.TemplateEntry
 import com.idunnololz.summit.templates.db.TemplateTypes
 import com.idunnololz.summit.templates.db.TemplatesDao
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ReasonViewModel @Inject constructor(
-  private val templatesDao: TemplatesDao,
+  private val templatesManager: TemplatesManager,
 ) : ViewModel() {
 
   val templates = StatefulLiveData<List<TemplateEntry>>()
 
   init {
     loadTemplates()
+
+    viewModelScope.launch {
+      templatesManager.onTemplateChanged.collect {
+        withContext(Dispatchers.Main) {
+          loadTemplates()
+        }
+      }
+    }
   }
 
   private fun loadTemplates() {
     templates.setIsLoading()
 
     viewModelScope.launch {
-      templatesDao.getTemplatesByType(TemplateTypes.RegistrationApplicationRejection)
+      templatesManager.getTemplatesByType(TemplateTypes.RegistrationApplicationRejection)
         .let {
           templates.postValue(it)
         }

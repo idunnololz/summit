@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:autofillHints="no"
-                    android:hint="@string/reason"
+                    android:hint="@string/reason_optional"
                     android:background="@null"
                     android:gravity="start|top"
                     android:inputType="textMultiLine|textCapSentences"

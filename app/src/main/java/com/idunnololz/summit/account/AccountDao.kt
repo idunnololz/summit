@@ -46,7 +46,7 @@ abstract class AccountDao {
   @Transaction
   open suspend fun clearAndSetCurrent(accountId: Long?) {
     removeCurrent()
-    if (accountId != null) {
+    if (accountId != null && accountId != GUEST_ACCOUNT_ID) {
       setCurrent(accountId)
     }
   }

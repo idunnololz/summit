@@ -21,6 +21,8 @@ import com.idunnololz.summit.templates.TemplatesAdapter
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.VerticalSpaceItemDecoration
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -70,6 +72,8 @@ class ReasonDialogFragment :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
 
     with(binding) {
       requireMainActivity().apply {
@@ -123,7 +127,6 @@ class ReasonDialogFragment :
 
           return true
         }
-
       })
 
       val adapter = TemplatesAdapter(
@@ -149,6 +152,12 @@ class ReasonDialogFragment :
       recyclerView.setHasFixedSize(false)
       recyclerView.layoutManager = LinearLayoutManager(context)
       recyclerView.adapter = adapter
+      recyclerView.addItemDecoration(
+        VerticalSpaceItemDecoration(
+          verticalSpaceHeight = context.getDimen(R.dimen.padding_half),
+          hasStartAndEndSpace = false,
+        ),
+      )
 
       viewModel.templates.observe(viewLifecycleOwner) {
         when (it) {

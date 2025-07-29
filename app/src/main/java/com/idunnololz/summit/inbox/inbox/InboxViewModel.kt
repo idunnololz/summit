@@ -570,6 +570,11 @@ class InboxViewModel @Inject constructor(
                 } else {
                   RegistrationDecision.Declined
                 },
+                denyReason = if (approve) {
+                  null
+                } else {
+                  denyReason
+                },
               ),
             )
           }

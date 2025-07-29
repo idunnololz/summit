@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TemplateItemAddTemplateItemBinding
+import com.idunnololz.summit.databinding.TemplateItemEmptyTemplateItemBinding
 import com.idunnololz.summit.databinding.TemplateItemTemplateItemBinding
 import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.templates.db.TemplateEntry
@@ -21,6 +22,7 @@ class TemplatesAdapter(
       val data: TemplateData,
     ) : Item
 
+    data object EmptyTemplateItem: Item
     data object AddTemplateItem: Item
   }
 
@@ -29,6 +31,7 @@ class TemplatesAdapter(
       is Item.TemplateItem ->
         old.template.id == (new as Item.TemplateItem).template.id
       Item.AddTemplateItem -> true
+      Item.EmptyTemplateItem -> true
     }
   }).apply {
     addItemType(
@@ -45,6 +48,10 @@ class TemplatesAdapter(
         onEditTemplateClick(item.template)
       }
     }
+    addItemType(
+      clazz = Item.EmptyTemplateItem::class,
+      inflateFn = TemplateItemEmptyTemplateItemBinding::inflate
+    ) { item, b, h -> }
     addItemType(
       clazz = Item.AddTemplateItem::class,
       inflateFn = TemplateItemAddTemplateItemBinding::inflate,
@@ -89,6 +96,10 @@ class TemplatesAdapter(
       if (it.data != null) {
         newItems += Item.TemplateItem(it, it.data)
       }
+    }
+
+    if (data.isEmpty()) {
+      newItems += Item.EmptyTemplateItem
     }
 
     newItems += Item.AddTemplateItem

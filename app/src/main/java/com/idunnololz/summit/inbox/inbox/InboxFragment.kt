@@ -779,8 +779,8 @@ class InboxFragment :
         )
       }
       addItemType(
-        Item.RegistrationApplicationItem::class,
-        InboxListRegistrationApplicationItemBinding::inflate,
+        clazz = Item.RegistrationApplicationItem::class,
+        inflateFn = InboxListRegistrationApplicationItemBinding::inflate,
       ) { item, b, _ ->
         postAndCommentViewBuilder.bindRegistrationApplication(
           b = b,
@@ -796,8 +796,8 @@ class InboxFragment :
         )
       }
       addItemType(
-        Item.ConversationItem::class,
-        ItemConversationBinding::inflate,
+        clazz = Item.ConversationItem::class,
+        inflateFn = ItemConversationBinding::inflate,
       ) { item, b, _ ->
         val conversation = item.conversation
         val draftContent = item.draftMessage?.content?.let {
@@ -860,7 +860,10 @@ class InboxFragment :
         }
         b.root.setTag(R.id.swipe_enabled, false)
       }
-      addItemType(Item.LoaderItem::class, InboxListLoaderItemBinding::inflate) { item, b, _ ->
+      addItemType(
+        clazz = Item.LoaderItem::class,
+        inflateFn = InboxListLoaderItemBinding::inflate
+      ) { item, b, _ ->
         when (val state = item.state) {
           is StatefulData.Error -> {
             b.loadingView.showDefaultErrorMessageFor(state.error)

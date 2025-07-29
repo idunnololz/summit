@@ -1,9 +1,13 @@
-package com.idunnololz.summit.templates.db
+package com.idunnololz.summit.templates
 
 import android.content.Context
 import android.widget.Toast
 import com.idunnololz.summit.R
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.templates.db.TemplateData
+import com.idunnololz.summit.templates.db.TemplateEntry
+import com.idunnololz.summit.templates.db.TemplatesDao
+import com.idunnololz.summit.templates.db.type
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,9 +19,9 @@ import javax.inject.Singleton
 
 @Singleton
 class TemplatesManager @Inject constructor(
-  @ApplicationContext private val context: Context,
-  private val templatesDao: TemplatesDao,
-  private val coroutineScopeFactory: CoroutineScopeFactory,
+    @ApplicationContext private val context: Context,
+    private val templatesDao: TemplatesDao,
+    private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
   private val coroutineScope = coroutineScopeFactory.create()
@@ -38,23 +42,23 @@ class TemplatesManager @Inject constructor(
 
   suspend fun saveTemplate(templateData: TemplateData, showToast: Boolean): Long {
     val id = withContext(dbContext) {
-      templatesDao.insert(
-        TemplateEntry(
-          id = 0,
-          creationTs = System.currentTimeMillis(),
-          updatedTs = System.currentTimeMillis(),
-          templateType = templateData.type,
-          data = templateData,
-          accountId = templateData.accountId,
-          accountInstance = templateData.accountInstance,
-        ),
-      )
+        templatesDao.insert(
+            TemplateEntry(
+                id = 0,
+                creationTs = System.currentTimeMillis(),
+                updatedTs = System.currentTimeMillis(),
+                templateType = templateData.type,
+                data = templateData,
+                accountId = templateData.accountId,
+                accountInstance = templateData.accountInstance,
+            ),
+        )
     }
     if (showToast) {
-      withContext(Dispatchers.Main) {
-        Toast.makeText(context, context.getString(R.string.template_saved), Toast.LENGTH_LONG)
-          .show()
-      }
+        withContext(Dispatchers.Main) {
+            Toast.makeText(context, context.getString(R.string.template_saved), Toast.LENGTH_LONG)
+                .show()
+        }
     }
 
     coroutineScope.launch {
@@ -80,23 +84,23 @@ class TemplatesManager @Inject constructor(
       return
     }
 
-    withContext(dbContext) {
-      templatesDao.update(
-        entryId,
-        System.currentTimeMillis(),
-        templateData.type,
-        templateData,
-      )
-    }
-    if (showToast) {
-      withContext(Dispatchers.Main) {
-        Toast.makeText(
-          context,
-          context.getString(R.string.template_saved),
-          Toast.LENGTH_LONG,
-        )
-          .show()
+      withContext(dbContext) {
+          templatesDao.update(
+              entryId,
+              System.currentTimeMillis(),
+              templateData.type,
+              templateData,
+          )
       }
+    if (showToast) {
+        withContext(Dispatchers.Main) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.template_saved),
+                Toast.LENGTH_LONG,
+            )
+                .show()
+        }
     }
 
     coroutineScope.launch {
@@ -107,12 +111,18 @@ class TemplatesManager @Inject constructor(
   suspend fun getTemplatesByType(templateType: Int) =
     templatesDao.getTemplatesByType(templateType)
 
+  fun deleteTemplateWithIdAsync(id: Long?) {
+    id ?: return
+    coroutineScope.launch {
+      deleteTemplateWithId(id)
+    }
+  }
 
   suspend fun deleteTemplateWithId(entryId: Long) = withContext(dbContext) {
     templatesDao.deleteWithId(entryId)
 
     coroutineScope.launch {
-      _onTemplateChanged.emit(Unit)
+        _onTemplateChanged.emit(Unit)
     }
   }
 }

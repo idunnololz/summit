@@ -22,6 +22,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?textAppearanceTitleSmall"
+                android:layout_marginStart="@dimen/padding"
+                android:layout_marginTop="@dimen/padding"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/edit"/>
@@ -34,16 +36,19 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:ellipsize="end"
+                android:layout_marginStart="@dimen/padding"
+                android:layout_marginBottom="@dimen/padding"
                 app:layout_constraintTop_toBottomOf="@+id/title"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/edit"/>
+                app:layout_constraintEnd_toStartOf="@+id/edit"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <ImageView
                 android:id="@+id/edit"
                 android:layout_width="48dp"
                 android:layout_height="0dp"
                 android:src="@drawable/baseline_edit_24"
-                android:padding="12dp"
+                android:padding="14dp"
                 android:background="?selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

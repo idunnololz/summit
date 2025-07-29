@@ -519,6 +519,8 @@ class CommunitySelectorController @AssistedInject constructor(
         } else {
           if (item.isLoading) {
             b.progressBar.visibility = View.VISIBLE
+            b.actionButton.visibility = View.GONE
+            b.instance.visibility = View.GONE
           } else {
             b.progressBar.visibility = View.GONE
           }
@@ -1004,11 +1006,7 @@ class CommunitySelectorController @AssistedInject constructor(
       cb: () -> Unit,
     ) {
       if (this.currentCommunityRef == currentCommunityRef) {
-        if (currentCommunityData !is StatefulData.Success) {
-          this.currentCommunityData = data
-        } else if (data is StatefulData.Success) {
-          this.currentCommunityData = data
-        }
+        this.currentCommunityData = data
       } else {
         this.currentCommunityRef = currentCommunityRef
         this.currentCommunityData = data

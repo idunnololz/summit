@@ -30,8 +30,6 @@ class GuestAccountManager @Inject constructor(
     }
   }
 
-  fun getGuestAccount(): GuestAccount {
-    val guestAccountSettings = preferences.guestAccountSettings ?: GuestAccountSettings()
-    return GuestAccount(guestAccountSettings.instance)
-  }
+  fun getGuestAccount(): GuestAccount =
+    accountManager.getGuestAccount()
 }
