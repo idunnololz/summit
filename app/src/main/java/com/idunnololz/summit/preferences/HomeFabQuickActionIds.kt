@@ -7,4 +7,5 @@ object HomeFabQuickActionIds {
   const val CreatePost: HomeFabQuickActionId = 1
   const val HideRead: HomeFabQuickActionId = 2
   const val ToggleNsfwMode: HomeFabQuickActionId = 3
+  const val ToggleHideReadMode: HomeFabQuickActionId = 4
 }

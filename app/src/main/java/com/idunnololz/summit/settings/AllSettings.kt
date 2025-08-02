@@ -618,20 +618,14 @@ class GestureSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         GestureSwipeDirectionIds.LEFT,
         context.getString(R.string.right_to_left),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         GestureSwipeDirectionIds.RIGHT,
         context.getString(R.string.left_to_right),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         GestureSwipeDirectionIds.ANY,
         context.getString(R.string.any_direction),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_GESTURE_SWIPE_DIRECTION),
@@ -796,20 +790,14 @@ class PostsFeedSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         R.id.show_scores,
         context.getString(R.string.show_scores),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.show_up_and_down_votes,
         context.getString(R.string.show_up_and_down_votes),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.hide_scores,
         context.getString(R.string.hide_scores),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_HIDE_POST_SCORES, KEY_POST_SHOW_UP_AND_DOWN_VOTES),
@@ -912,35 +900,16 @@ class PostsFeedSettings @Inject constructor(
     relatedKeys = listOf(KEY_PREFETCH_POSTS),
   )
   val homeFabQuickAction = RadioGroupSettingItem(
-    null,
-    context.getString(R.string.home_fab_quick_action),
-    context.getString(R.string.home_fab_quick_action_desc),
-    listOf(
-      RadioGroupSettingItem.RadioGroupOption(
-        HomeFabQuickActionIds.None,
-        context.getString(R.string.no_action),
-        null,
-        null,
-      ),
-      RadioGroupSettingItem.RadioGroupOption(
-        HomeFabQuickActionIds.CreatePost,
-        context.getString(R.string.create_post),
-        null,
-        null,
-      ),
-      RadioGroupSettingItem.RadioGroupOption(
-        HomeFabQuickActionIds.HideRead,
-        context.getString(R.string.hide_read),
-        null,
-        null,
-      ),
-      RadioGroupSettingItem.RadioGroupOption(
-        HomeFabQuickActionIds.ToggleNsfwMode,
-        context.getString(R.string.toggle_nsfw),
-        null,
-        null,
-      ),
-    ),
+    icon = null,
+    title = context.getString(R.string.home_fab_quick_action),
+    description = context.getString(R.string.home_fab_quick_action_desc),
+    options = mapOf(
+      HomeFabQuickActionIds.None to context.getString(R.string.no_action),
+      HomeFabQuickActionIds.CreatePost to context.getString(R.string.create_post),
+      HomeFabQuickActionIds.HideRead to context.getString(R.string.hide_read),
+      HomeFabQuickActionIds.ToggleNsfwMode to context.getString(R.string.toggle_nsfw),
+      HomeFabQuickActionIds.ToggleHideReadMode to context.getString(R.string.toggle_nsfw),
+    ).toOptions(default = HomeFabQuickActionIds.None),
     relatedKeys = listOf(KEY_HOME_FAB_QUICK_ACTION),
   )
   val parseMarkdownInPostTitles = OnOffSettingItem(
@@ -1033,32 +1002,22 @@ class PostAndCommentsSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_hot,
         context.getString(R.string.sort_order_hot),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_top,
         context.getString(R.string.sort_order_top),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_new,
         context.getString(R.string.sort_order_new),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.sort_order_old,
         context.getString(R.string.sort_order_old),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.comments_sort_order_default,
         context.getString(R.string._default),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_DEFAULT_COMMENTS_SORT_ORDER),
@@ -1089,38 +1048,26 @@ class PostAndCommentsSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         R.id.auto_collapse_comment_threshold_50,
         PrettyPrintUtils.defaultPercentFormat.format(0.5f),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.auto_collapse_comment_threshold_40,
         PrettyPrintUtils.defaultPercentFormat.format(0.4f),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.auto_collapse_comment_threshold_30,
         PrettyPrintUtils.defaultPercentFormat.format(0.3f),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.auto_collapse_comment_threshold_20,
         PrettyPrintUtils.defaultPercentFormat.format(0.2f),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.auto_collapse_comment_threshold_10,
         PrettyPrintUtils.defaultPercentFormat.format(0.1f),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.auto_collapse_comment_threshold_never_collapse,
         context.getString(R.string.never_auto_collapse_comments),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_AUTO_COLLAPSE_COMMENT_THRESHOLD),
@@ -1151,8 +1098,6 @@ class PostAndCommentsSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         CommentHeaderLayoutId.SingleLine,
         context.getString(R.string.single_line),
-        null,
-        null,
       ),
 //            RadioGroupSettingItem.RadioGroupOption(
 //                CommentHeaderLayoutId.Wrap,
@@ -1163,8 +1108,6 @@ class PostAndCommentsSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         CommentHeaderLayoutId.Multiline,
         context.getString(R.string.multiline),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
@@ -1202,20 +1145,14 @@ class PostAndCommentsSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         R.id.show_scores,
         context.getString(R.string.show_scores),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.show_up_and_down_votes,
         context.getString(R.string.show_up_and_down_votes),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         R.id.hide_scores,
         context.getString(R.string.hide_scores),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_HIDE_COMMENT_SCORES, KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES),
@@ -1233,26 +1170,18 @@ class PostAndCommentsSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         PostFabQuickActions.NONE,
         context.getString(R.string.no_action),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         PostFabQuickActions.ADD_COMMENT,
         context.getString(R.string.add_comment),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         PostFabQuickActions.COLLAPSE_ALL_COMMENTS,
         context.getString(R.string.collapse_all_comments),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         PostFabQuickActions.SCROLL_TO_TOP,
         context.getString(R.string.scroll_to_top),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_POST_FAB_QUICK_ACTION),
@@ -1342,26 +1271,18 @@ class PostAndCommentsAppearanceSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         CommentsThreadStyle.MODERN,
         context.getString(R.string.modern),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         CommentsThreadStyle.LEGACY,
         context.getString(R.string.classic),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         CommentsThreadStyle.LEGACY_WITH_COLORS,
         context.getString(R.string.classic_but_with_colors),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         CommentsThreadStyle.LEGACY_WITH_COLORS_AND_DIVIDERS,
         context.getString(R.string.classic_but_with_colors_and_dividers),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
@@ -1435,62 +1356,42 @@ class ThemeSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Default,
         context.getString(R.string._default),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Blue,
         context.getString(R.string.blue),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Red,
         context.getString(R.string.red),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Blue,
         context.getString(R.string.blue),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.TalhaPurple,
         context.getString(R.string.talha_e_purple),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.TalhaGreen,
         context.getString(R.string.talha_e_green),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.TalhaPink,
         context.getString(R.string.talha_e_pink),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Peachie,
         context.getString(R.string.peachie),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Fuchsia,
         context.getString(R.string.fuchsia),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         ColorSchemes.Minty,
         context.getString(R.string.minty),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_COLOR_SCHEME),
@@ -1517,42 +1418,33 @@ class ThemeSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         FontIds.DEFAULT,
         context.getString(R.string._default),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         FontIds.ROBOTO,
         context.getString(R.string.roboto),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         FontIds.ROBOTO_SERIF,
         context.getString(R.string.roboto_serif),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         FontIds.OPEN_SANS,
         context.getString(R.string.open_sans),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         id = FontIds.ATKINSON_HYPERLEGIBLE_NEXT,
         title = context.getString(R.string.atkinson_hyperlegible_next),
         description = context.getString(R.string.atkinson_hyperlegible_next_desc),
-        icon = null,
       )
     ),
     relatedKeys = listOf(KEY_GLOBAL_FONT),
   )
 
   val fontSize = RadioGroupSettingItem(
-    null,
-    context.getString(R.string.font_size),
-    "",
-    mapOf(
+    icon = null,
+    title = context.getString(R.string.font_size),
+    description = "",
+    options = mapOf(
       GlobalFontSizeId.Small to context.getString(R.string.small),
       GlobalFontSizeId.MediumSmall to context.getString(R.string.medium_small),
       GlobalFontSizeId.Normal to context.getString(R.string.normal),
@@ -1768,27 +1660,19 @@ class CacheSettings @Inject constructor(
       RadioGroupSettingItem.RadioGroupOption(
         CachePolicy.Aggressive.value,
         context.getString(R.string.aggressive),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         CachePolicy.Moderate.value,
         context.getString(R.string.moderate),
-        null,
-        null,
         isDefault = true,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         CachePolicy.Lite.value,
         context.getString(R.string.lite),
-        null,
-        null,
       ),
       RadioGroupSettingItem.RadioGroupOption(
         CachePolicy.Minimum.value,
         context.getString(R.string.minimum),
-        null,
-        null,
       ),
     ),
     relatedKeys = listOf(KEY_CACHE_POLICY),
@@ -2835,50 +2719,6 @@ class AllSettings @Inject constructor(
     }
   }
 
-  fun getAllSettings(): MutableList<SettingItem> {
-    val results = mutableListOf<SettingItem>()
-
-    fun recursiveSearch(
-      settingItem: SettingItem,
-      settingPage: SearchableSettings,
-      result: MutableList<SettingItem>,
-    ) {
-      when (settingItem) {
-        is BasicSettingItem,
-        is ImageValueSettingItem,
-        is OnOffSettingItem,
-        is RadioGroupSettingItem,
-        is SliderSettingItem,
-        is TextOnlySettingItem,
-        is TextValueSettingItem,
-        is ColorSettingItem,
-        is DescriptionSettingItem,
-        -> {
-          result += settingItem
-        }
-        is SubgroupItem -> {
-          result += settingItem
-
-          settingItem.settings.forEach {
-            recursiveSearch(it, settingPage, result)
-          }
-        }
-      }
-    }
-
-    val allSettings = allSearchableSettings
-    allSettings.forEach { page ->
-      for (member in page.javaClass.kotlin.memberProperties) {
-        if (member.visibility == KVisibility.PUBLIC) {
-          val setting = member.getter.call(page) as? SettingItem
-            ?: continue
-          recursiveSearch(setting, page, results)
-        }
-      }
-    }
-    return results
-  }
-
   fun generateMapFromKeysToRelatedSettingItems(): MutableMap<String, MutableList<SettingItem>> {
     val keyToSettingItems = mutableMapOf<String, MutableList<SettingItem>>()
 
@@ -2898,50 +2738,34 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_active,
     context.getString(R.string.sort_order_active),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_hot,
     context.getString(R.string.sort_order_hot),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_new,
     context.getString(R.string.sort_order_new),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_old,
     context.getString(R.string.sort_order_old),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_most_comments,
     context.getString(R.string.sort_order_most_comments),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_new_comments,
     context.getString(R.string.sort_order_new_comments),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_controversial,
     context.getString(R.string.sort_order_controversial),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_scaled,
     context.getString(R.string.sort_order_scaled),
-    null,
-    null,
   ),
 
   RadioGroupSettingItem.RadioGroupOption(
@@ -2950,8 +2774,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_last_hour),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_last_six_hour,
@@ -2959,8 +2781,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_last_hours_format, "6"),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_last_twelve_hour,
@@ -2968,8 +2788,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_last_hours_format, "12"),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_day,
@@ -2977,8 +2795,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_today),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_week,
@@ -2986,8 +2802,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_this_week),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_month,
@@ -2995,8 +2809,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_this_month),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_last_three_month,
@@ -3004,8 +2816,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_last_months_format, "3"),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_last_six_month,
@@ -3013,8 +2823,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_last_months_format, "6"),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_last_nine_month,
@@ -3022,8 +2830,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_last_months_format, "9"),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_year,
@@ -3031,8 +2837,6 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_this_year),
     ),
-    null,
-    null,
   ),
   RadioGroupSettingItem.RadioGroupOption(
     R.id.sort_order_top_all_time,
@@ -3040,17 +2844,13 @@ fun makeCommunitySortOrderChoices(context: Context) = listOf(
       R.string.sort_order_top_format,
       context.getString(R.string.time_frame_all_time),
     ),
-    null,
-    null,
   ),
 )
 
 private fun Map<Int, String>.toOptions(default: Int) = entries.map { (key, value) ->
   RadioGroupSettingItem.RadioGroupOption(
-    key,
-    value,
-    null,
-    null,
+    id = key,
+    title = value,
     isDefault = key == default,
   )
 }

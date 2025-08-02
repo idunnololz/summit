@@ -687,6 +687,18 @@ class CommunityFragment :
             true
           }
 
+          HomeFabQuickActionIds.ToggleHideReadMode -> {
+            createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+              if (viewModel.hideReadMode.value != HideReadMode.Off) {
+                R.id.hide_read_on
+              } else {
+                R.id.hide_read_off
+              },
+            )
+            true
+
+          }
+
           else -> false
         }
       }
@@ -1362,7 +1374,14 @@ class CommunityFragment :
       addItemWithIcon(R.id.create_post, R.string.create_post, R.drawable.baseline_add_24)
 
       addItemWithIcon(R.id.ca_share, R.string.share, R.drawable.baseline_share_24)
-      addItemWithIcon(R.id.hide_read, R.string.hide_read, R.drawable.baseline_clear_all_24)
+      addItemWithSwitch(
+        id = R.id.hide_read,
+        idSwitchOn = R.id.hide_read_on,
+        idSwitchOff = R.id.hide_read_off,
+        title = getString(R.string.hide_read),
+        icon = R.drawable.baseline_clear_all_24,
+        isOn = viewModel.hideReadMode.value == HideReadMode.On,
+      )
 
       addItemWithIcon(R.id.sort, R.string.sort, R.drawable.baseline_sort_24)
 
@@ -1686,6 +1705,8 @@ class CommunityFragment :
           }
         }
       }
+      R.id.hide_read_on,
+      R.id.hide_read_off,
       R.id.hide_read -> {
         val anchors = mutableSetOf<Int>()
         val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
@@ -1695,7 +1716,16 @@ class CommunityFragment :
           (adapter?.items?.getOrNull(it) as? PostListEngineItem.VisiblePostItem)
             ?.fetchedPost?.postView?.post?.id
         }
-        viewModel.onHideRead(anchors)
+        viewModel.onHideRead(
+          hideReadMode = if (actionId == R.id.hide_read_on) {
+            HideReadMode.On
+          } else if (actionId == R.id.hide_read_off) {
+            HideReadMode.Off
+          } else {
+            HideReadMode.OnUntilRefresh
+          },
+          anchors = anchors
+        )
       }
 
       R.id.sort -> {

@@ -28,8 +28,10 @@ import com.idunnololz.summit.databinding.MenuItemBinding
 import com.idunnololz.summit.databinding.MenuItemDividerBinding
 import com.idunnololz.summit.databinding.MenuItemFooterBinding
 import com.idunnololz.summit.databinding.MenuItemTitleBinding
+import com.idunnololz.summit.databinding.MenuItemWithSwitchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.main.ActivityInsets
+import com.idunnololz.summit.util.BottomMenu.Item.*
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 
@@ -123,6 +125,27 @@ class BottomMenu(
         null,
         icon = MenuIcon.ResourceIcon(icon),
         modifier = ModifierIds.DANGER,
+      ),
+    )
+  }
+
+  fun addItemWithSwitch(
+    @IdRes id: Int,
+    @IdRes idSwitchOn: Int,
+    @IdRes idSwitchOff: Int,
+    title: String,
+    @DrawableRes icon: Int,
+    isOn: Boolean,
+  ) {
+    adapter.menuItems.add(
+      MenuItem.ActionWithSwitchItem(
+        id = id,
+        switchOnId = idSwitchOn,
+        switchOffId = idSwitchOff,
+        title = title,
+        description = null,
+        icon = MenuIcon.ResourceIcon(icon),
+        isOn = isOn,
       ),
     )
   }
@@ -278,6 +301,10 @@ class BottomMenu(
       val menuItem: MenuItem.ActionItem,
     ) : Item
 
+    data class MenuItemWithSwitchItem(
+      val menuItem: MenuItem.ActionWithSwitchItem,
+    ) : Item
+
     data object DividerItem : Item
 
     data object FooterItem : Item
@@ -304,24 +331,25 @@ class BottomMenu(
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
         old::class == new::class && when (old) {
-          Item.FooterItem -> true
-          is Item.MenuItemItem ->
-            old.menuItem.id == (new as Item.MenuItemItem).menuItem.id
-          is Item.TitleItem -> true
-          Item.DividerItem -> true
+          FooterItem -> true
+          is MenuItemItem ->
+            old.menuItem.id == (new as MenuItemItem).menuItem.id
+          is TitleItem -> true
+          DividerItem -> true
+          is MenuItemWithSwitchItem ->
+            old.menuItem.id == (new as MenuItemWithSwitchItem).menuItem.id
         }
       },
     ).apply {
-      addItemType(Item.TitleItem::class, MenuItemTitleBinding::inflate) { item, b, _ ->
+      addItemType(TitleItem::class, MenuItemTitleBinding::inflate) { item, b, _ ->
         b.title.text = item.title
         if (item.title == null) {
           b.title.visibility = View.GONE
         }
       }
-      addItemType(Item.DividerItem::class, MenuItemDividerBinding::inflate) { item, b, _ ->
-      }
+      addItemType(DividerItem::class, MenuItemDividerBinding::inflate) { item, b, _ -> }
       addItemType(
-        clazz = Item.MenuItemItem::class,
+        clazz = MenuItemItem::class,
         inflateFn = MenuItemBinding::inflate,
         onViewCreated = {
           it.icon.setTag(R.id.icon_tint, ImageViewCompat.getImageTintList(it.icon))
@@ -420,7 +448,103 @@ class BottomMenu(
           }
         }
       }
-      addItemType(Item.FooterItem::class, MenuItemFooterBinding::inflate) { _, _, _ -> }
+      addItemType(
+        clazz = MenuItemWithSwitchItem::class,
+        inflateFn = MenuItemWithSwitchBinding::inflate,
+        onViewCreated = {
+          it.icon.setTag(R.id.icon_tint, ImageViewCompat.getImageTintList(it.icon))
+        },
+      ) { item, b, _ ->
+        val menuItem = item.menuItem
+
+        b.title.text = menuItem.title
+
+        if (menuItem.id == checked) {
+          b.title.setTextColor(checkedTextColor)
+          b.title.setTypeface(b.title.typeface, Typeface.BOLD)
+        } else {
+          b.title.setTextColor(defaultTextColor)
+          b.title.setTypeface(b.title.typeface, Typeface.NORMAL)
+        }
+
+        ImageViewCompat.setImageTintList(
+          b.icon,
+          b.icon.getTag(R.id.icon_tint) as? ColorStateList,
+        )
+
+        val icon = menuItem.icon
+        if (icon != null) {
+          when (icon) {
+            is MenuIcon.ResourceIcon -> {
+              b.iconSpace.visibility = View.VISIBLE
+              b.icon.visibility = View.VISIBLE
+              b.richImage.visibility = View.GONE
+
+              b.icon.setImageResource(icon.customIcon)
+            }
+            is MenuIcon.DrawableIcon -> {
+              b.iconSpace.visibility = View.VISIBLE
+              b.icon.visibility = View.VISIBLE
+              b.richImage.visibility = View.GONE
+
+              b.icon.setImageDrawable(icon.customIcon)
+            }
+            is MenuIcon.CommunityIcon -> {
+              b.iconSpace.visibility = View.VISIBLE
+              b.icon.visibility = View.GONE
+              b.richImage.visibility = View.VISIBLE
+
+              avatarHelper?.loadCommunityIcon(b.richImage, icon.communityRef, icon.url)
+            }
+          }
+        } else {
+          b.icon.visibility = View.GONE
+          b.richImage.visibility = View.GONE
+          b.iconSpace.visibility = View.GONE
+        }
+
+        if (menuItem.description == null) {
+          b.description.visibility = View.GONE
+        } else {
+          b.description.visibility = View.VISIBLE
+          b.description.text = menuItem.description
+        }
+
+        // prevent the listener from being called
+        b.onOffSwitch.setOnCheckedChangeListener(null)
+        b.onOffSwitch.isChecked = menuItem.isOn
+
+        if (onMenuItemClickListener != null) {
+          b.root.setOnClickListener {
+            onMenuItemClickListener?.invoke(
+              MenuItem.ActionItem(
+                id = menuItem.id,
+                title = menuItem.title,
+                description = menuItem.description,
+                icon = menuItem.icon,
+              )
+            )
+            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+          }
+
+          b.onOffSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            onMenuItemClickListener?.invoke(
+              MenuItem.ActionItem(
+                id = if (isChecked) {
+                  menuItem.switchOnId
+                } else {
+                  menuItem.switchOffId
+                },
+                title = menuItem.title,
+                description = menuItem.description,
+                icon = menuItem.icon,
+              )
+            )
+            bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+          }
+        }
+      }
+      addItemType(FooterItem::class, MenuItemFooterBinding::inflate) { _, _, _ -> }
     }
 
     fun addItemWithIcon(
@@ -458,17 +582,20 @@ class BottomMenu(
     fun refreshItems(cb: () -> Unit = {}) {
       val newItems = mutableListOf<Item>()
 
-      newItems.add(Item.TitleItem(title))
+      newItems.add(TitleItem(title))
       menuItems.forEach {
         when (it) {
           is MenuItem.ActionItem ->
-            newItems.add(Item.MenuItemItem(it))
+            newItems.add(MenuItemItem(it))
 
           MenuItem.DividerItem ->
-            newItems.add(Item.DividerItem)
+            newItems.add(DividerItem)
+
+          is MenuItem.ActionWithSwitchItem ->
+            newItems.add(MenuItemWithSwitchItem(it))
         }
       }
-      newItems.add(Item.FooterItem)
+      newItems.add(FooterItem)
 
       adapterHelper.setItems(newItems, this, cb)
     }
@@ -498,6 +625,17 @@ class BottomMenu(
       @DrawableRes val checkIcon: Int = 0,
       val modifier: Int = ModifierIds.NONE,
     ) : MenuItem
+
+    class ActionWithSwitchItem(
+      @IdRes val id: Int,
+      @IdRes val switchOnId: Int,
+      @IdRes val switchOffId: Int,
+      val title: CharSequence,
+      val description: CharSequence?,
+      val icon: MenuIcon? = null,
+      val isOn: Boolean,
+    ) : MenuItem
+
     data object DividerItem : MenuItem
   }
 

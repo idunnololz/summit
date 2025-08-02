@@ -9,6 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.filterLists.ContentTypes
 import com.idunnololz.summit.filterLists.FilterTypes
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
@@ -92,7 +93,7 @@ class SettingsPostsFeedFragment :
         { preferences.markPostsAsReadOnScroll },
         { preferences.markPostsAsReadOnScroll = it },
       ),
-      if (accountManager.currentAccount.value != null) {
+      if (accountManager.currentAccount.value.asAccount != null) {
         settings.blurNsfwPosts.asOnOffSwitch(
           { preferences.blurNsfwPosts },
           { preferences.blurNsfwPosts = it },
@@ -100,7 +101,7 @@ class SettingsPostsFeedFragment :
       } else {
         null
       },
-      if (accountManager.currentAccount.value != null) {
+      if (accountManager.currentAccount.value.asAccount != null) {
         settings.doNotBlurNsfwContentInNsfwCommunityFeed.asOnOffSwitch(
           { preferences.doNotBlurNsfwContentInNsfwCommunityFeed },
           { preferences.doNotBlurNsfwContentInNsfwCommunityFeed = it },
@@ -342,7 +343,7 @@ class SettingsPostsFeedFragment :
               preferences.showTextPosts = it
             },
           ),
-          if (accountManager.currentAccount.value != null) {
+          if (accountManager.currentAccount.value.asAccount != null) {
             settings.showNsfwPosts.asOnOffSwitch(
               { preferences.showNsfwPosts },
               {

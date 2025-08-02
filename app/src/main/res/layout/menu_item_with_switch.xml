@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/dialog_padding"
+    android:background="?selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginVertical="@dimen/padding"
+        app:tint="?colorControlNormal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/rich_image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginVertical="@dimen/padding"
+        android:padding="1dp"
+        app:strokeColor="?colorOnSurface"
+        app:strokeWidth="1dp"
+        style="@style/RoundImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/icon_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="icon,rich_image"
+        app:barrierDirection="end"/>
+
+    <Space
+        android:id="@+id/icon_space"
+        android:layout_width="@dimen/padding"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/icon_barrier"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextTitle"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:includeFontPadding="false"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/description"
+        app:layout_constraintStart_toEndOf="@+id/icon_space"
+        app:layout_constraintEnd_toStartOf="@+id/divider"/>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:includeFontPadding="false"
+        android:layout_marginTop="@dimen/padding_quarter"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/icon_space"
+        app:layout_constraintEnd_toStartOf="@+id/divider"/>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginVertical="@dimen/padding_half"
+        android:layout_marginEnd="@dimen/padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/on_off_switch"/>
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/on_off_switch"
+        android:layout_gravity="center_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingEnd="@dimen/padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

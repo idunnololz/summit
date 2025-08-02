@@ -303,4 +303,6 @@
     <item name="insert_link" type="id" />
     <item name="uploads" type="id" />
     <item name="instance_info" type="id" />
+    <item name="hide_read_on" type="id" />
+    <item name="hide_read_off" type="id" />
 </resources>

@@ -152,7 +152,7 @@ class CommunityViewModel @Inject constructor(
   val currentAccount = MutableLiveData<AccountView?>(null)
   val onHidePost = MutableLiveData<HiddenPostEntry>(null)
 
-  private var isHideReadEnabled = state.getLiveData("_isHideReadEnabled", false)
+  val hideReadMode = state.getLiveData("_isHideReadEnabled", HideReadMode.Off)
 
   var preferences: Preferences = preferenceManager.currentPreferences
 
@@ -192,8 +192,8 @@ class CommunityViewModel @Inject constructor(
   }
 
   init {
-    isHideReadEnabled.value?.let {
-      postsRepository.hideRead = it
+    hideReadMode.value?.let {
+      postsRepository.hideRead = hideReadMode.value != HideReadMode.Off
     }
     postsRepository.showNsfwPosts = preferences.showNsfwPosts
     postsRepository.nsfwMode = nsfwModeManager.nsfwModeEnabled.value
@@ -405,8 +405,10 @@ class CommunityViewModel @Inject constructor(
     scrollToTop: Boolean = false,
   ) {
     if (resetHideRead) {
-      isHideReadEnabled.value = false
-      postsRepository.clearHideRead()
+      if (hideReadMode.value == HideReadMode.OnUntilRefresh) {
+        hideReadMode.value = HideReadMode.Off
+      }
+      postsRepository.updateHideRead(hideRead = hideReadMode.value != HideReadMode.Off)
     }
 
     val pages = if (postListEngine.infinity) {
@@ -886,16 +888,16 @@ class CommunityViewModel @Inject constructor(
     )
   }
 
-  fun onHideRead(anchors: Set<Int>) {
-    isHideReadEnabled.value = true
+  fun onHideRead(hideReadMode: HideReadMode, anchors: Set<Int>) {
+    this.hideReadMode.value = hideReadMode
+    val hideRead = hideReadMode != HideReadMode.Off
 
     updateStateMaintainingPosition(
-      {
-        this.hideRead = true
-        this.hideReadCount = 0
+      changeState = {
+        updateHideRead(hideRead = hideRead)
       },
-      anchors,
-      includeHideReadCount = true,
+      anchors = anchors,
+      includeHideReadCount = hideRead,
     )
   }
 

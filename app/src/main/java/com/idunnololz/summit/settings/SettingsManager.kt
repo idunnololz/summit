@@ -107,8 +107,8 @@ data class RadioGroupSettingItem(
   data class RadioGroupOption(
     @IdRes val id: Int,
     val title: String,
-    val description: String?,
-    @DrawableRes val icon: Int?,
+    val description: String? = null,
+    @DrawableRes val icon: Int? = null,
     val isDefault: Boolean = false,
   ) : Parcelable
 }

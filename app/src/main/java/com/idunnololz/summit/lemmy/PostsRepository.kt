@@ -558,8 +558,8 @@ class PostsRepository @AssistedInject constructor(
     }
   }
 
-  fun clearHideRead() {
-    hideRead = false
+  fun updateHideRead(hideRead: Boolean) {
+    this.hideRead = hideRead
     hideReadCount = 0
   }
 
