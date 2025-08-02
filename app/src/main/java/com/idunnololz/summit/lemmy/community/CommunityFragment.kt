@@ -28,6 +28,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
@@ -690,13 +691,12 @@ class CommunityFragment :
           HomeFabQuickActionIds.ToggleHideReadMode -> {
             createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
               if (viewModel.hideReadMode.value != HideReadMode.Off) {
-                R.id.hide_read_on
-              } else {
                 R.id.hide_read_off
+              } else {
+                R.id.hide_read_on
               },
             )
             true
-
           }
 
           else -> false
@@ -1546,7 +1546,7 @@ class CommunityFragment :
       }
 
       addDivider()
-      if (accountManager.currentAccount.value != null) {
+      if (accountManager.isSignedIntoAnyAccount()) {
         if (nsfwModeManager.nsfwModeEnabled.value) {
           addItemWithIcon(
             id = R.id.disable_nsfw_mode,
@@ -1699,7 +1699,7 @@ class CommunityFragment :
 
           val shareIntent = Intent.createChooser(sendIntent, null)
           startActivity(shareIntent)
-        } catch (e: MultiCommunityException) {
+        } catch (_: MultiCommunityException) {
           launchAlertDialog("sdafx") {
             messageResId = R.string.error_cannot_share_multi_community
           }

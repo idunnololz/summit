@@ -908,7 +908,7 @@ class PostsFeedSettings @Inject constructor(
       HomeFabQuickActionIds.CreatePost to context.getString(R.string.create_post),
       HomeFabQuickActionIds.HideRead to context.getString(R.string.hide_read),
       HomeFabQuickActionIds.ToggleNsfwMode to context.getString(R.string.toggle_nsfw),
-      HomeFabQuickActionIds.ToggleHideReadMode to context.getString(R.string.toggle_nsfw),
+      HomeFabQuickActionIds.ToggleHideReadMode to context.getString(R.string.toggle_hide_read_mode),
     ).toOptions(default = HomeFabQuickActionIds.None),
     relatedKeys = listOf(KEY_HOME_FAB_QUICK_ACTION),
   )

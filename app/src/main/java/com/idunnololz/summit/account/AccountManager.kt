@@ -234,6 +234,9 @@ class AccountManager @Inject constructor(
     val guestAccountSettings = preferences.guestAccountSettings ?: GuestAccountSettings()
     return GuestAccount(guestAccountSettings.instance)
   }
+
+  fun isSignedIntoAnyAccount(): Boolean =
+    _numAccounts.value > 0
 }
 
 val StateFlow<GuestOrUserAccount?>.asAccount

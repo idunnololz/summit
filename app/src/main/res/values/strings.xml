@@ -2289,6 +2289,7 @@
     <string name="content">Content</string>
     <string name="edit_template">Edit template</string>
     <string name="template_empty_desc">Save common rejection reasons as a template to speed up your review process.</string>
+    <string name="toggle_hide_read_mode">Toggle hide read</string>
 
     <!-- uCrop string resource end -->
 </resources>
