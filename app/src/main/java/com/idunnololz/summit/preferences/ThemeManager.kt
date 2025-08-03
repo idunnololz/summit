@@ -13,11 +13,13 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.presets.PreviewPresetActivity
 import com.idunnololz.summit.util.BaseActivity
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.color.ColorManager
 import com.idunnololz.summit.util.isLightTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
+import io.github.inflationx.calligraphy3.TypefaceUtils
 import io.github.inflationx.viewpump.ViewPump
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -108,16 +110,22 @@ class ThemeManager @Inject constructor(
 
   private fun applyThemeFromPreferences(currentConfig: ThemeOverlayConfig) {
     val fontAsset = currentConfig.globalFont.toFontAsset()
-    viewPump = fontAsset?.let {
-      ViewPump.builder()
+    if (fontAsset != null) {
+      viewPump = ViewPump.builder()
         .addInterceptor(
           CalligraphyInterceptor(
             CalligraphyConfig.Builder()
-              .setDefaultFontPath(it)
+              .setDefaultFontPath(fontAsset)
               .build(),
           ),
         )
         .build()
+
+      val typeface = TypefaceUtils.load(context.assets, fontAsset)
+      Utils.defaultTypeface = typeface
+    } else {
+      viewPump = null
+      Utils.defaultTypeface = null
     }
 
     val themeValue = when (currentConfig.baseTheme) {

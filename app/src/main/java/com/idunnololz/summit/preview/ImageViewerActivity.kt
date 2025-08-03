@@ -241,7 +241,7 @@ class ImageViewerActivity :
     if (args.transitionName == null) {
       binding.dummyImageView.post {
         binding.dummyImageView.transitionName = null
-        binding.imageView.transitionName = args.transitionName
+        binding.imageView.transitionName = null
 
         binding.dummyImageView.visibility = View.GONE
         binding.imageView.visibility = View.VISIBLE
@@ -442,7 +442,6 @@ class ImageViewerActivity :
   }
 
   override fun onDestroy() {
-    offlineManager.cancelFetch(binding.root)
     showSystemUI()
     super.onDestroy()
   }
@@ -610,7 +609,7 @@ class ImageViewerActivity :
     }
 
     offlineManager.fetchImageWithError(
-      rootView = binding.root,
+      imageView = binding.imageView,
       url = url,
       listener = {
         val tempSize = Size()
@@ -621,10 +620,6 @@ class ImageViewerActivity :
           .allowHardware(false)
           .target(
             object : Target {
-              override fun onError(error: Image?) {
-                super.onError(error)
-              }
-
               override fun onSuccess(result: Image) {
                 super.onSuccess(result)
 

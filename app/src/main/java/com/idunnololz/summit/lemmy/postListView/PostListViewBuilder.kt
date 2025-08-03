@@ -61,6 +61,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
+import com.idunnololz.summit.lemmy.utils.setTextAppearanceCompat
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
@@ -456,54 +457,48 @@ class PostListViewBuilder @Inject constructor(
         if (postUiConfig.preferTitleText) {
           when (val rb = rawBinding) {
             is ListingItemListBinding -> {
-              TextViewCompat.setTextAppearance(
-                rb.title,
+              rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceTitleMedium,
-                ),
+                )
               )
             }
             is ListingItemListWithCardsBinding -> {
-              TextViewCompat.setTextAppearance(
-                rb.title,
+              rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceTitleMedium,
-                ),
+                )
               )
             }
             is ListingItemCompactBinding -> {
-              TextViewCompat.setTextAppearance(
-                rb.title,
+              rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceTitleMedium,
-                ),
+                )
               )
             }
           }
         } else {
           when (val rb = rawBinding) {
             is ListingItemListBinding -> {
-              TextViewCompat.setTextAppearance(
-                rb.title,
+              rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceBodyMedium,
-                ),
+                )
               )
             }
             is ListingItemListWithCardsBinding -> {
-              TextViewCompat.setTextAppearance(
-                rb.title,
+              rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceBodyMedium,
-                ),
+                )
               )
             }
             is ListingItemCompactBinding -> {
-              TextViewCompat.setTextAppearance(
-                rb.title,
+              rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceBodyMedium,
-                ),
+                )
               )
             }
           }
@@ -785,9 +780,13 @@ class PostListViewBuilder @Inject constructor(
 
         fun showDefaultImage() {
           if (iconImage != null) {
-            imageView?.visibility = View.VISIBLE
-            imageView?.dispose()
-            imageView?.setImageDrawable(null)
+            imageView?.let { imageView ->
+              imageView.visibility = View.VISIBLE
+              imageView.dispose()
+              imageView.setImageDrawable(null)
+              offlineManager.cancelFetch(imageView)
+            }
+
             iconImage.visibility = View.VISIBLE
             iconImage.setImageResource(R.drawable.baseline_article_24)
           } else {
@@ -1013,7 +1012,7 @@ class PostListViewBuilder @Inject constructor(
             return
           }
 
-          val urlVideo = ContentUtils.isUrlVideo(imageUrl)
+          val urlVideo = isUrlVideo(imageUrl)
 
           if (!ContentUtils.isUrlImage(imageUrl) && !urlVideo) {
             imageView.visibility = View.GONE
@@ -1485,9 +1484,6 @@ class PostListViewBuilder @Inject constructor(
   fun recycle(holder: ListingItemViewHolder, cancelFetch: Boolean = true) {
     if (holder.fullContentContainerView != null) {
       lemmyContentHelper.recycleFullContent(holder.fullContentContainerView)
-    }
-    if (cancelFetch) {
-      offlineManager.cancelFetch(holder.itemView)
     }
     holder.upvoteCount?.let {
       voteUiHandler.unbindVoteUi(it)

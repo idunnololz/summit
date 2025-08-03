@@ -151,11 +151,6 @@ class InstanceAdapter(
     adapterHelper.onBindViewHolder(holder, position)
   }
 
-  override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-    super.onViewRecycled(holder)
-    offlineManager.cancelFetch(holder.itemView)
-  }
-
   override fun getItemCount(): Int = adapterHelper.itemCount
 
   private fun refreshItems(cb: () -> Unit) {

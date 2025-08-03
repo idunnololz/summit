@@ -28,7 +28,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
-import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
@@ -555,6 +554,7 @@ class CommunityFragment :
         state = communityAppBarController?.state,
         lemmyTextHelper = lemmyTextHelper,
         preferences = preferences,
+        viewModel = viewModel,
       )
 
       // Prevent flickers by setting the app bar here first
@@ -648,6 +648,17 @@ class CommunityFragment :
             false
           }
         },
+        onHideReadOnClick = {
+          createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+            R.id.hide_read_off
+          )
+        },
+        onHideReadOnLongClick = {
+          launchAlertDialog("hide_read_on") {
+            titleResId = R.string.hide_read_on
+            messageResId = R.string.hide_read_on_desc
+          }
+        }
       )
 
       runAfterLayout {
@@ -802,6 +813,10 @@ class CommunityFragment :
               ),
             )
           }
+        }
+
+        viewModel.hideReadMode.observe(viewLifecycleOwner) {
+          communityAppBarController?.onHideReadModeChange(it)
         }
 
         init()
@@ -1161,7 +1176,7 @@ class CommunityFragment :
 
     requireSummitActivity().apply {
       if (!args.isPreview) {
-        if (navBarController.useNavigationRail) {
+        if (navBarController.useNavigationRail && !slidingPaneLayout.isSwipeEnabled) {
           navBarController.showBottomNav()
         } else {
           if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {

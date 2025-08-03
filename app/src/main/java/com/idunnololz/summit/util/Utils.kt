@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Point
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -179,6 +180,7 @@ object Utils {
 
   var openExternalLinksInBrowser = false
   var defaultWebApp: DefaultAppPreference? = null
+  var defaultTypeface: Typeface? = null
   fun openExternalLink(context: Context, url: String, openNewIncognitoTab: Boolean = false) {
     val defaultAppPackage = defaultWebApp?.packageName
     if (defaultAppPackage != null) {

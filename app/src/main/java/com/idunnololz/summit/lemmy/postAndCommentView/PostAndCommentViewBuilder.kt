@@ -2349,7 +2349,6 @@ class PostAndCommentViewBuilder @Inject constructor(
 
   fun recycle(b: PostHeaderItemBinding): RecycledState {
     val recycledState = lemmyContentHelper.recycleFullContent(b.fullContent)
-    offlineManager.cancelFetch(b.root)
     (b.root.getTag(R.id.view_holder) as? PostViewHolder)?.qaUpvoteCount?.let {
       voteUiHandler.unbindVoteUi(it)
     }

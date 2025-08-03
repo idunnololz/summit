@@ -433,7 +433,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           } else {
             banner.load(newShimmerDrawable16to9(context))
             offlineManager.fetchImageWithError(
-              rootView = root,
+              imageView = banner,
               url = person.banner,
               listener = {
                 banner.load(it)

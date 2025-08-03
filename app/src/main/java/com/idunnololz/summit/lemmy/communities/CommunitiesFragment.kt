@@ -305,7 +305,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
         } else {
           b.banner.load(newShimmerDrawable16to9(context))
           offlineManager.fetchImageWithError(
-            rootView = rootView,
+            imageView = b.banner,
             url = community.community.banner,
             listener = {
               b.banner.load(it)

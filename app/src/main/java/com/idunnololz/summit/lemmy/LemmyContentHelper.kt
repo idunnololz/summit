@@ -242,7 +242,7 @@ class LemmyContentHelper(
 
       if (!previewInfo?.getUrl().isNullOrBlank()) {
         val url = checkNotNull(previewInfo).getUrl()
-        offlineManager.fetchImage(rootView, url) {
+        offlineManager.fetchImage(imageView, url) {
           offlineManager.getImageSizeHint(it, tempSize)
 
           imageView.load(it) {
@@ -772,7 +772,7 @@ class LemmyContentHelper(
       onImageLoaded(Either.Left(imageUrl))
     } else {
       offlineManager.fetchImageWithError(
-        rootView = rootView,
+        imageView = imageView,
         url = imageUrl,
         listener = b@{
           onImageLoaded(Either.Right(it))

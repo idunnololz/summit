@@ -801,7 +801,12 @@ class PostViewModel @Inject constructor(
     newComments ?: return
 
     for (comment in newComments) {
-      supplementaryComments.remove(comment.comment.id)
+      val supComment = supplementaryComments[comment.comment.id] ?: continue
+      val supTs = dateStringToTs(supComment.comment.updated ?: supComment.comment.published)
+      val newTs = dateStringToTs(comment.comment.updated ?: comment.comment.published)
+      if (newTs > supTs) {
+        supplementaryComments.remove(comment.comment.id)
+      }
     }
   }
 

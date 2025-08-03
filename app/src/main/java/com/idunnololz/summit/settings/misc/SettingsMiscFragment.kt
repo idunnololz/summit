@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
@@ -15,6 +16,7 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingModelItem
+import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
 import com.idunnololz.summit.settings.util.asCustomItem
@@ -24,8 +26,11 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.isPredictiveBackSupported
+import com.idunnololz.summit.util.setupForFragment
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -157,6 +162,11 @@ class SettingsMiscFragment :
             preferences.globalLayoutMode = GlobalLayoutModes.SmallScreen
           }
           getMainActivity()?.onPreferencesChanged()
+
+          viewLifecycleOwner.lifecycleScope.launch {
+            delay(300)
+            getMainActivity()?.navBarController?.hideNavBar()
+          }
         },
       ),
       settings.showEditedDate.asOnOffSwitch(

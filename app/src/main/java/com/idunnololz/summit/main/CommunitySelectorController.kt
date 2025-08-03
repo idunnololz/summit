@@ -960,12 +960,6 @@ class CommunitySelectorController @AssistedInject constructor(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
       adapterHelper.onBindViewHolder(holder, position)
     }
-
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-      super.onViewRecycled(holder)
-      offlineManager.cancelFetch(holder.itemView)
-    }
-
     override fun getItemCount(): Int = adapterHelper.itemCount
 
     fun refreshItems(cb: () -> Unit) {

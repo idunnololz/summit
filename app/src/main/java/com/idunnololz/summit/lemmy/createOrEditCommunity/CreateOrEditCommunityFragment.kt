@@ -603,7 +603,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
       } else {
         icon.dispose()
         offlineManager.fetchImageWithError(
-          rootView = root,
+          imageView = icon,
           url = communityIconUrl,
           listener = {
             icon.load(it)
@@ -644,7 +644,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
       } else {
         banner.dispose()
         offlineManager.fetchImageWithError(
-          rootView = root,
+          imageView = banner,
           url = bannerUrl,
           listener = {
             banner.load(it)
