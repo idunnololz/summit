@@ -4,8 +4,10 @@ import android.content.res.ColorStateList
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.widget.TextView
+import androidx.annotation.StyleRes
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.TextViewCompat
+import com.idunnololz.summit.util.ext.getResIdFromAttribute
 
 /**
  * From https://stackoverflow.com/a/73911699/1299750
@@ -29,6 +31,12 @@ fun TextView.addEllipsizeToSpannedOnLayout() {
       }
     }
   }
+}
+
+fun TextView.setTextAppearanceCompat(@StyleRes resId: Int) {
+  val typeFace = typeface
+  TextViewCompat.setTextAppearance(this, resId)
+  this.typeface = typeFace
 }
 
 var TextView.compoundDrawableTintListCompat: ColorStateList?

@@ -1805,7 +1805,7 @@
     <string name="sign_up_success">Sign up success</string>
     <string name="email_verification_required">Email verification required. Please look for the verification email and click on the link within. \n\nIf you do not see the email within 10 minutes, check your spam or trash folders.</string>
     <string name="finish">Finish</string>
-    <string name="registration_created">Your application as been submitted. You must wait for a site admin will need to approve your application before you can use your account.</string>
+    <string name="registration_created">Your application has been submitted. Wait for a site admin to approve your application before you can use your account.</string>
     <string name="error_unknown_sign_up_error">An unexpected error has occurred during registration.</string>
     <string name="solve_captcha_desc">You must solve a captcha to sign up. Please enter the code from the image below.</string>
     <string name="configure">Configure</string>
@@ -2290,6 +2290,8 @@
     <string name="edit_template">Edit template</string>
     <string name="template_empty_desc">Save common rejection reasons as a template to speed up your review process.</string>
     <string name="toggle_hide_read_mode">Toggle hide read</string>
+    <string name="hide_read_on">Hide read is on</string>
+    <string name="hide_read_on_desc">This button indicates that \"hide read\" is on.\n\nWhen \"hide read\" is on, refreshing the post feed will only show unread posts.\n\nTap this button to turn off \"hide read\".</string>
 
     <!-- uCrop string resource end -->
 </resources>

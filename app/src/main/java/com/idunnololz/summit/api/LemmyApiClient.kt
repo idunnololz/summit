@@ -1619,7 +1619,7 @@ class LemmyApiClient @Inject constructor(
 
   private suspend fun getApi(instance: String = this.instance): LemmyLikeApi {
     val cachedApi = apis[instance]
-    if (cachedApi != null) {
+    if (cachedApi != null && cachedApi !is Proxy) {
       return cachedApi
     }
     apiInfo.value = StatefulData.Loading()

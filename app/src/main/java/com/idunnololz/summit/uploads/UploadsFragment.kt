@@ -11,10 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import coil3.asImage
 import coil3.dispose
 import coil3.load
-import coil3.request.allowHardware
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.LocalImage
@@ -22,19 +20,16 @@ import com.idunnololz.summit.databinding.FragmentUploadsBinding
 import com.idunnololz.summit.databinding.UploadItemErrorItemBinding
 import com.idunnololz.summit.databinding.UploadItemLoadingItemBinding
 import com.idunnololz.summit.databinding.UploadItemMediaItemBinding
-import com.idunnololz.summit.drafts.DraftsViewModel
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.dateStringToFullDateTime
-import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.getImageErrorDrawable
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupToolbar
-import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -230,7 +225,7 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
         b.imageView.load(newShimmerDrawableSquare(context))
 
         offlineManager.fetchImageWithError(
-          rootView = b.root,
+          imageView = b.imageView,
           url = url,
           listener = {
             b.imageView.load(it)

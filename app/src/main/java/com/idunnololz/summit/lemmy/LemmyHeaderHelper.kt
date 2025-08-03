@@ -105,7 +105,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     if (useCondensedTypeface) {
       headerContainer.setTypeface(condensedTypeface)
     } else {
-      headerContainer.setTypeface(null)
+      headerContainer.setTypeface(Utils.defaultTypeface)
     }
 
     if (isCurrentUser) {

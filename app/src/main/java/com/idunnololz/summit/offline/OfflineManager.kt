@@ -71,12 +71,18 @@ class OfflineManager @Inject constructor(
   )
 
   class Registration(
-    private val key: String,
-    private val listener: TaskListener,
-    private val errorListener: TaskFailedListener?,
+    internal val url: String,
+    internal val destDir: File,
+    internal val force: Boolean,
+    internal val listener: TaskListener,
+    internal val errorListener: TaskFailedListener?,
+    internal val registerListenersIfTaskExists: Boolean,
   ) {
+
+    var registered: Boolean = true
+
     fun cancel(offlineManager: OfflineManager) {
-      offlineManager.cancelFetch(key, listener, errorListener)
+      offlineManager.cancelFetch(url, listener, errorListener)
     }
   }
 
@@ -91,12 +97,12 @@ class OfflineManager @Inject constructor(
     return downloadedFile
   }
 
-  fun fetchImage(rootView: View, url: String?, listener: TaskListener) {
-    fetchImageWithError(rootView, url, listener, null)
+  fun fetchImage(imageView: View, url: String?, listener: TaskListener) {
+    fetchImageWithError(imageView, url, listener, null)
   }
 
   fun fetchImageWithError(
-    rootView: View,
+    imageView: View,
     url: String?,
     listener: TaskListener,
     errorListener: TaskFailedListener?,
@@ -105,22 +111,15 @@ class OfflineManager @Inject constructor(
   ) {
     Log.d(TAG, "fetchImageWithError(): $url")
     url ?: return
-    val registrations: MutableList<Registration> = (
-      rootView.getTag(
-        R.id.offline_manager_registrations,
-      ) as? MutableList<Registration>
-      ) ?: arrayListOf<Registration>().also {
-      rootView.setTag(R.id.offline_manager_registrations, it)
-    }
-    registrations.add(
-      fetchImage(
-        url = url,
-        listener = listener,
-        errorListener = errorListener,
-        force = force,
-        registerListenersIfTaskExists = registerListenersIfTaskExists,
-      ),
+
+    val registration = fetchImage(
+      url = url,
+      listener = listener,
+      errorListener = errorListener,
+      force = force,
+      registerListenersIfTaskExists = registerListenersIfTaskExists,
     )
+    imageView.registrationManager.currentRequest = registration
   }
 
   fun cancelFetch(url: String, listener: TaskListener, errorListener: TaskFailedListener? = null) {
@@ -142,14 +141,8 @@ class OfflineManager @Inject constructor(
     }
   }
 
-  fun cancelFetch(rootView: View) {
-    (
-      rootView.getTag(
-        R.id.offline_manager_registrations,
-      ) as? MutableList<Registration>
-      )?.forEach {
-      it.cancel(this)
-    }
+  fun cancelFetch(imageView: View) {
+    imageView.registrationManager.cancelRequest()
   }
 
   fun setImageSizeHint(url: String, w: Int, h: Int) {
@@ -243,6 +236,16 @@ class OfflineManager @Inject constructor(
     return Utils.hashSha256(url) + extension
   }
 
+  fun fetch(registration: Registration) =
+    fetchGeneric(
+      url = registration.url,
+      destDir = registration.destDir,
+      force = registration.force,
+      listener = registration.listener,
+      errorListener = registration.errorListener,
+      registerListenersIfTaskExists = registration.registerListenersIfTaskExists,
+    )
+
   private fun fetchGeneric(
     url: String,
     destDir: File,
@@ -264,7 +267,14 @@ class OfflineManager @Inject constructor(
           task.errorListeners += errorListener
         }
       }
-      return Registration(url, listener, errorListener)
+      return Registration(
+        url = url,
+        destDir = destDir,
+        force = force,
+        listener = listener,
+        errorListener = errorListener,
+        registerListenersIfTaskExists = registerListenersIfTaskExists
+      )
     }
 
     downloadTasks[url] = DownloadTask(url).apply {
@@ -339,7 +349,14 @@ class OfflineManager @Inject constructor(
 
     jobMap.getOrPut(url) { arrayListOf() }.add(job)
 
-    return Registration(url, listener, errorListener)
+    return Registration(
+      url = url,
+      destDir = destDir,
+      force = force,
+      listener = listener,
+      errorListener = errorListener,
+      registerListenersIfTaskExists = registerListenersIfTaskExists
+    )
   }
 
   private suspend fun downloadUrlToFile(url: String, destFile: File): Result<Unit> {
@@ -388,4 +405,19 @@ class OfflineManager @Inject constructor(
       Result.failure(e)
     }
   }
+
+  private val View.registrationManager: OfflineViewTargetRegistrationManager
+    get() {
+      val m = getTag(R.id.offline_manager_registration_manager) as?
+        OfflineViewTargetRegistrationManager
+      if (m != null) {
+        return m
+      } else {
+        return OfflineViewTargetRegistrationManager(this@OfflineManager)
+          .apply {
+            addOnAttachStateChangeListener(this)
+          }
+          .also { setTag(R.id.offline_manager_registration_manager, it) }
+      }
+    }
 }

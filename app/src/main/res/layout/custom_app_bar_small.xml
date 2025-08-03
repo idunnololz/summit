@@ -41,7 +41,7 @@
                 <TextView
                     android:id="@+id/community_text_view"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
+                    android:layout_height="56dp"
                     android:minWidth="0dp"
                     android:paddingHorizontal="@dimen/padding_three_quarters"
                     android:gravity="center"
@@ -55,32 +55,25 @@
                     android:drawablePadding="@dimen/padding_half"
                     app:drawableTint="?colorOnPrimaryContainer"
                     app:layout_constrainedWidth="true"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/start_barrier"
+                    app:layout_constraintEnd_toStartOf="@+id/community_sort_order"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/guideline" />
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/start_barrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="start"
-                    app:constraint_referenced_ids="community_sort_order,page_text_view"/>
 
                 <TextView
                     android:id="@+id/community_sort_order"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
+                    android:layout_height="56dp"
                     android:textAppearance="?textAppearanceLabelLarge"
                     android:gravity="center_vertical"
                     android:background="@drawable/secondary_chip_bg"
                     android:paddingHorizontal="@dimen/padding_three_quarters"
                     android:drawablePadding="@dimen/padding_half"
-                    android:layout_marginEnd="@dimen/padding"
-                    app:layout_constraintHorizontal_bias="0"
+                    android:layout_marginEnd="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/community_text_view"
-                    app:layout_constraintEnd_toStartOf="@+id/account_image_view"
+                    app:layout_constraintEnd_toStartOf="@+id/page_text_view"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/guideline"
                     app:drawableStartCompat="@drawable/baseline_sort_18"
@@ -89,19 +82,33 @@
                 <TextView
                     android:id="@+id/page_text_view"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
+                    android:layout_height="56dp"
                     android:textAppearance="?textAppearanceLabelLarge"
                     android:gravity="center_vertical"
                     android:background="@drawable/secondary_chip_bg"
                     android:paddingHorizontal="@dimen/padding_three_quarters"
                     android:drawablePadding="@dimen/padding_half"
-                    android:layout_marginEnd="@dimen/padding"
-                    app:layout_constraintHorizontal_bias="0"
+                    android:layout_marginEnd="@dimen/padding_half"
                     app:layout_constraintStart_toEndOf="@+id/community_sort_order"
-                    app:layout_constraintEnd_toStartOf="@+id/account_image_view"
+                    app:layout_constraintEnd_toStartOf="@+id/hide_read_on"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="@+id/guideline" />
 
+                <TextView
+                    android:id="@+id/hide_read_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/tertiary_chip_bg"
+                    android:paddingHorizontal="@dimen/padding_three_quarters"
+                    android:layout_marginEnd="@dimen/padding_half"
+                    android:textColor="?colorOnTertiaryContainer"
+                    app:layout_constraintStart_toEndOf="@+id/page_text_view"
+                    app:layout_constraintEnd_toStartOf="@+id/account_image_view"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/guideline"
+                    app:drawableStartCompat="@drawable/outline_visibility_18"
+                    app:drawableTint="?colorOnTertiaryContainer" />
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/account_image_view"

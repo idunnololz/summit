@@ -425,7 +425,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         icon.setOnClickListener(null)
       }
 
-      offlineManager.fetchImage(root, data.bannerUrl) {
+      offlineManager.fetchImage(banner, data.bannerUrl) {
         banner.load(it) {
           allowHardware(false)
         }

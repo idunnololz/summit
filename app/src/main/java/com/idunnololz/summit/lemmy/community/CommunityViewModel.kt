@@ -362,11 +362,18 @@ class CommunityViewModel @Inject constructor(
     force: Boolean = false,
     clearPagesOnSuccess: Boolean = false,
     scrollToTop: Boolean = false,
+    includeHideReadCount: Boolean = false,
   ) {
     if (!postListEngine.infinity) {
       currentPageIndex.value = pageIndex
     }
-    fetchPageInternal(pageIndex, force = force, clearPagesOnSuccess, scrollToTop)
+    fetchPageInternal(
+      pageToFetch = pageIndex,
+      force = force,
+      clearPagesOnSuccess = clearPagesOnSuccess,
+      scrollToTop = scrollToTop,
+      includeHideReadCount = includeHideReadCount,
+    )
   }
 
   fun fetchInitialPage(
@@ -432,6 +439,7 @@ class CommunityViewModel @Inject constructor(
           force = true,
           clearPagesOnSuccess = clearPages,
           scrollToTop = scrollToTop,
+          includeHideReadCount = hideReadMode.value != HideReadMode.Off,
         )
       } else {
         fetchCurrentPage()
@@ -439,7 +447,11 @@ class CommunityViewModel @Inject constructor(
       return
     }
     pages.forEach {
-      fetchPageInternal(it, force, scrollToTop = scrollToTop)
+      fetchPageInternal(
+        pageToFetch = it,
+        force = force,
+        scrollToTop = scrollToTop,
+      )
     }
   }
 
@@ -549,9 +561,9 @@ class CommunityViewModel @Inject constructor(
       result.onSuccess {
         if (preferences.prefetchPosts) {
           postFeedPrefetcher.prefetchPage(
-            pageToFetch + 1,
-            postsRepository,
-            viewModelScope,
+            pageIndex = pageToFetch + 1,
+            postsRepository = postsRepository,
+            coroutineScope = viewModelScope,
           )
         }
 

@@ -11,6 +11,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.text.buildSpannedString
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
@@ -39,6 +40,8 @@ import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.appendSeparator
+import com.idunnololz.summit.lemmy.community.CommunityViewModel
+import com.idunnololz.summit.lemmy.community.HideReadMode
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -76,6 +79,7 @@ class CommunityAppBarController(
   private val preferences: Preferences,
   useHeader: Boolean,
   state: State? = null,
+  private val viewModel: CommunityViewModel,
 ) {
 
   companion object {
@@ -126,6 +130,7 @@ class CommunityAppBarController(
     val communitySortOrder: TextView
     val collapsingToolbarLayout: CollapsingToolbarLayout
     val toolbar: MaterialToolbar
+    val hideReadOn: TextView
 
     fun setSortOrderText(text: String)
     fun setToolbarTopPadding(padding: Int)
@@ -140,6 +145,7 @@ class CommunityAppBarController(
       override val communitySortOrder: TextView,
       override val collapsingToolbarLayout: CollapsingToolbarLayout,
       override val toolbar: MaterialToolbar,
+      override val hideReadOn: TextView,
       val title: TextView,
       val subtitle: TextView,
       val body: TextView,
@@ -154,6 +160,7 @@ class CommunityAppBarController(
       val communities: TextView,
       val scrollView: View,
       val headerBg: View,
+      val hideReadOn2: TextView,
     ) : ViewHolder {
       override fun setSortOrderText(text: String) {
         communitySortOrder.text = text
@@ -178,6 +185,7 @@ class CommunityAppBarController(
       override val communitySortOrder: TextView,
       override val collapsingToolbarLayout: CollapsingToolbarLayout,
       override val toolbar: MaterialToolbar,
+      override val hideReadOn: TextView,
     ) : ViewHolder {
       override fun setSortOrderText(text: String) {
         communitySortOrder.text = text
@@ -231,6 +239,8 @@ class CommunityAppBarController(
     onSortOrderClick: () -> Unit,
     onChangeInstanceClick: () -> Unit,
     onCommunityLongClick: (currentCommunity: CommunityRef?, text: String?) -> Boolean,
+    onHideReadOnClick: () -> Unit,
+    onHideReadOnLongClick: () -> Unit,
   ) {
     val vh = vh
     fun showCommunitySelectorInternal() {
@@ -250,6 +260,13 @@ class CommunityAppBarController(
     vh.communityTextView.setOnLongClickListener {
       onCommunityLongClick(state.currentCommunity, vh.communityTextView.text?.toString())
     }
+    vh.hideReadOn.setOnClickListener {
+      onHideReadOnClick()
+    }
+    vh.hideReadOn.setOnLongClickListener {
+      onHideReadOnLongClick()
+      true
+    }
 
     if (vh is ViewHolder.LargeAppBarViewHolder) {
       vh.titleHotspot.setOnClickListener {
@@ -266,6 +283,13 @@ class CommunityAppBarController(
       }
       vh.communitySortOrder2.setOnClickListener {
         onSortOrderClick()
+      }
+      vh.hideReadOn2.setOnClickListener {
+        onHideReadOnClick()
+      }
+      vh.hideReadOn2.setOnLongClickListener {
+        onHideReadOnLongClick()
+        true
       }
       registerOverlappingPanelsRegionIfNeeded()
     }
@@ -884,6 +908,10 @@ class CommunityAppBarController(
     vh.customAppBar.setExpanded(b)
   }
 
+  fun onHideReadModeChange(hideReadMode: HideReadMode) {
+    updateHideReadOnVisibility(animate = true)
+  }
+
   private fun updateToolbarVisibility(animate: Boolean) {
     val vh = vh
 
@@ -908,20 +936,25 @@ class CommunityAppBarController(
 
   private fun View.hide(animate: Boolean) {
     if (animate) {
-      this.animate()
-        .alpha(0f)
-        .withEndAction {
-          this.visibility = View.INVISIBLE
-        }
+      if (this.isVisible) {
+        this.animate()
+          .alpha(0f)
+          .withEndAction {
+            this.visibility = View.GONE
+          }
+      }
     } else {
       this.alpha = 0f
-      this.visibility = View.INVISIBLE
+      this.visibility = View.GONE
     }
   }
 
   private fun View.show(animate: Boolean) {
     if (animate) {
-      this.visibility = View.VISIBLE
+      if (!this.isVisible) {
+        this.visibility = View.VISIBLE
+        this.alpha = 0f
+      }
       this.animate()
         .alpha(1f)
     } else {
@@ -938,6 +971,7 @@ class CommunityAppBarController(
 
     var isSortOrderVisible = visible
     var isPageVisible = visible
+    val vh = vh
 
     if (isInfinity) {
       isPageVisible = false
@@ -961,6 +995,29 @@ class CommunityAppBarController(
       vh.pageTextView.show(animate = animate)
     } else {
       vh.pageTextView.hide(animate = animate)
+    }
+
+    updateHideReadOnVisibility(animate = animate)
+  }
+
+  private fun updateHideReadOnVisibility(animate: Boolean) {
+    val visible = isToolbarElementsVisible ?: return
+    val hideReadMode = viewModel.hideReadMode.value
+    val hideReadModeVisible = visible && hideReadMode == HideReadMode.On
+    val vh = vh
+
+    if (hideReadMode == HideReadMode.On) {
+      vh.hideReadOn.show(animate = animate)
+    } else {
+      vh.hideReadOn.hide(animate = animate)
+    }
+
+    if (vh is ViewHolder.LargeAppBarViewHolder) {
+      if (hideReadModeVisible) {
+        vh.hideReadOn2.show(animate = animate)
+      } else {
+        vh.hideReadOn2.hide(animate = animate)
+      }
     }
   }
 
@@ -1003,6 +1060,7 @@ class CommunityAppBarController(
         communitySortOrder = b.communitySortOrder,
         collapsingToolbarLayout = b.collapsingToolbarLayout,
         toolbar = b.toolbar,
+        hideReadOn = b.hideReadOn,
         title = b.title,
         subtitle = b.subtitle,
         body = b.body,
@@ -1017,19 +1075,21 @@ class CommunityAppBarController(
         communities = b.communities,
         scrollView = b.scrollView,
         headerBg = b.headerBg,
+        hideReadOn2 = b.hideReadOn2,
       )
     } else {
       val b = CustomAppBarSmallBinding.inflate(inflater, parentContainer, false)
       ViewHolder.SmallAppBarViewHolder(
-        b.root,
-        b.customActionBar,
-        b.communityTextView,
-        b.pageTextView,
-        b.customAppBar,
-        b.accountImageView,
-        b.communitySortOrder,
-        b.collapsingToolbarLayout,
-        b.toolbar,
+        root = b.root,
+        customActionBar = b.customActionBar,
+        communityTextView = b.communityTextView,
+        pageTextView = b.pageTextView,
+        customAppBar = b.customAppBar,
+        accountImageView = b.accountImageView,
+        communitySortOrder = b.communitySortOrder,
+        collapsingToolbarLayout = b.collapsingToolbarLayout,
+        toolbar = b.toolbar,
+        hideReadOn = b.hideReadOn,
       )
     }
   }
