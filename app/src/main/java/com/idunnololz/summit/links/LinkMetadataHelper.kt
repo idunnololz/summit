@@ -19,8 +19,12 @@ class LinkMetadataHelper @Inject constructor(
   private val linkFetcher: LinkFetcher,
 ) {
 
-  suspend fun loadLinkMetadata(url: String): LinkMetadata {
-    val html = linkFetcher.downloadSite(url)
+  suspend fun loadLinkMetadata(url: String): Result<LinkMetadata> {
+    val htmlResult = linkFetcher.downloadSite(url)
+
+    val html = htmlResult.getOrNull()
+      ?: return Result.failure(htmlResult.exceptionOrNull()!!)
+
     val doc = withContext(Dispatchers.Default) {
       Ksoup.parse(html)
     }
@@ -170,18 +174,20 @@ class LinkMetadataHelper @Inject constructor(
       null
     }
 
-    return LinkMetadata(
-      url = url,
-      title = title,
-      description = description,
-      mediaType = type,
-      favIcon = favIcon,
-      ogUrl = ogUrl,
-      host = host,
-      siteName = siteName,
-      imageUrl = imageUrls.firstOrNull(),
-      pageRef = fixedPageRef,
-      publishedTs = 0,
+    return Result.success(
+      LinkMetadata(
+        url = url,
+        title = title,
+        description = description,
+        mediaType = type,
+        favIcon = favIcon,
+        ogUrl = ogUrl,
+        host = host,
+        siteName = siteName,
+        imageUrl = imageUrls.firstOrNull(),
+        pageRef = fixedPageRef,
+        publishedTs = 0,
+      )
     )
   }
 

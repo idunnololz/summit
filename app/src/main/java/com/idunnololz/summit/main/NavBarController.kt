@@ -580,7 +580,7 @@ class NavBarController(
     navController: NavController,
     args: Bundle? = null,
   ) {
-    val menuItem = navBar.menu.findItem(menuItemId)
+    val menuItem = navBar.menu.findItem(menuItemId) ?: return
 
     onNavDestinationSelected(
       menuItem.itemId,

@@ -36,7 +36,7 @@ class SettingsDefaultAppsFragment :
       if (result != null) {
         if (result.selectedApp != null) {
           preferences.defaultWebApp = DefaultAppPreference(
-            appName = result.selectedApp.name,
+            appName = result.selectedApp.name ?: getString(R.string.unknown),
             packageName = result.selectedApp.packageName,
             componentName = result.componentName,
           )

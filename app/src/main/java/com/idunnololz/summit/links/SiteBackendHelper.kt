@@ -65,13 +65,11 @@ class SiteBackendHelper @Inject constructor(
 
       val result = withContext(Dispatchers.Default) {
         val v3Job = async {
-          runCatching {
-            linkFetcher.downloadSite(
-              url = "https://$instance/api/v3/site",
-              cache = true,
-              client = okHttpClient
-            )
-          }
+          linkFetcher.downloadSite(
+            url = "https://$instance/api/v3/site",
+            cache = true,
+            client = okHttpClient
+          )
         }
 //        val v4Job = async {
 //          runCatching {
@@ -83,22 +81,18 @@ class SiteBackendHelper @Inject constructor(
 //          }
 //        }
         val alphaJob = async {
-          runCatching {
-            linkFetcher.downloadSite(
-              url = "https://$instance/api/alpha/site",
-              cache = true,
-              client = okHttpClient
-            )
-          }
+          linkFetcher.downloadSite(
+            url = "https://$instance/api/alpha/site",
+            cache = true,
+            client = okHttpClient
+          )
         }
         val homePageJob = async {
-          runCatching {
-            linkFetcher.downloadSite(
-              url = "https://$instance/",
-              cache = true,
-              client = okHttpClient
-            )
-          }
+          linkFetcher.downloadSite(
+            url = "https://$instance/",
+            cache = true,
+            client = okHttpClient
+          )
         }
 
 //        if (v4Job.isSiteView()) {

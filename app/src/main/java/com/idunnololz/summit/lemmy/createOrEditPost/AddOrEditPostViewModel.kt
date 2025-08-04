@@ -221,7 +221,13 @@ class AddOrEditPostViewModel @Inject constructor(
 
     viewModelScope.launch {
       try {
-        linkMetadata.setValue(linkMetadataHelper.loadLinkMetadata(url))
+        linkMetadataHelper.loadLinkMetadata(url)
+          .onSuccess {
+            linkMetadata.setValue(it)
+          }
+          .onFailure {
+            linkMetadata.setError(it)
+          }
       } catch (e: Exception) {
         linkMetadata.setError(e)
       }

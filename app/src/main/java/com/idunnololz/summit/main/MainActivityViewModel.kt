@@ -79,19 +79,21 @@ class MainActivityViewModel @Inject constructor(
         isReady.postValue(true)
       }
 
+      withContext(Dispatchers.Main) {
+        val communityRef = communityRef
+        if ((communityRef is CommunityRef.All || communityRef is CommunityRef.Local) &&
+          communityRef.instance == null
+        ) {
+          onCommunityChanged(communityRef)
+        }
+      }
+
+      withContext(Dispatchers.Main) {
+        loadCommunities()
+      }
+
       launch {
         accountManager.currentAccount.collect {
-          withContext(Dispatchers.Main) {
-            loadCommunities()
-
-            val communityRef = communityRef
-            if ((communityRef is CommunityRef.All || communityRef is CommunityRef.Local) &&
-              communityRef.instance == null
-            ) {
-              onCommunityChanged(communityRef)
-            }
-          }
-
           val account = it as? Account
           val accountView = if (account != null) {
             accountInfoManager.getAccountViewForAccount(account)
@@ -101,11 +103,9 @@ class MainActivityViewModel @Inject constructor(
 
           currentAccount.postValue(accountView)
 
-          if (isReady.value != true) {
-            withContext(Dispatchers.Main) {
-              Log.d(TAG, "'accountManager' ready!")
-              readyCount.emit(readyCount.value + 1)
-            }
+          withContext(Dispatchers.Main) {
+            Log.d(TAG, "'accountManager' ready!")
+            readyCount.emit(readyCount.value + 1)
           }
         }
       }

@@ -531,6 +531,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
   }
 
   private fun onPanelStateChange() {
+    if (!isBindingAvailable()) {
+      return
+    }
+
     updateNavUiOpenPercent()
     when (binding.root.startPanelState) {
       PanelState.Closed -> {

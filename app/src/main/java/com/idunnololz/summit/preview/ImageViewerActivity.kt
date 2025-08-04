@@ -460,26 +460,33 @@ class ImageViewerActivity :
       binding.progressBar.visibility = View.VISIBLE
 
       lifecycleScope.launch {
-        val html = linkFetcher.downloadSite(url)
-        val previewInfo = ImgurPageParser().parsePage(url, html)
+        linkFetcher.downloadSite(url)
+          .fold(
+            onSuccess = { html ->
+              val previewInfo = ImgurPageParser().parsePage(url, html)
 
-        val rootView = binding.root
+              val rootView = binding.root
 
-        rootView.post {
-          binding.progressBar.visibility = View.GONE
+              rootView.post {
+                binding.progressBar.visibility = View.GONE
 
-          if (previewInfo == null) {
-            binding.loadingView.showDefaultErrorMessageFor(RuntimeException())
+                if (previewInfo == null) {
+                  binding.loadingView.showDefaultErrorMessageFor(RuntimeException())
 
-            showUi()
-          } else {
-            if (previewInfo.wasUrlRawGif) {
-              loadImage(url, forceLoadAsImage = true)
-            } else {
-              loadImage(previewInfo.url)
+                  showUi()
+                } else {
+                  if (previewInfo.wasUrlRawGif) {
+                    loadImage(url, forceLoadAsImage = true)
+                  } else {
+                    loadImage(previewInfo.url)
+                  }
+                }
+              }
+            },
+            onFailure = {
+              binding.loadingView.showDefaultErrorMessageFor(it)
             }
-          }
-        }
+          )
       }
 
       return
