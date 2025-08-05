@@ -53,7 +53,7 @@ private fun Person.toPerson(): com.idunnololz.summit.api.dto.lemmy.Person =
   com.idunnololz.summit.api.dto.lemmy.Person(
     id = this.id.toLong(),
     name = this.userName,
-    display_name = null,
+    display_name = this.title,
     avatar = this.avatar,
     banned = this.banned,
     published = this.published,

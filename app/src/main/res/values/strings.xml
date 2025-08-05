@@ -2292,6 +2292,8 @@
     <string name="toggle_hide_read_mode">Toggle hide read</string>
     <string name="hide_read_on">Hide read is on</string>
     <string name="hide_read_on_desc">This button indicates that \"hide read\" is on.\n\nWhen \"hide read\" is on, refreshing the post feed will only show unread posts.\n\nTap this button to turn off \"hide read\".</string>
+    <string name="no_watermark">No watermark</string>
+
 
     <!-- uCrop string resource end -->
 </resources>

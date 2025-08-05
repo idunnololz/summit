@@ -783,8 +783,8 @@ class PostListViewBuilder @Inject constructor(
             imageView?.let { imageView ->
               imageView.visibility = View.VISIBLE
               imageView.dispose()
-              imageView.setImageDrawable(null)
               offlineManager.cancelFetch(imageView)
+              imageView.setImageDrawable(null)
             }
 
             iconImage.visibility = View.VISIBLE
@@ -979,11 +979,13 @@ class PostListViewBuilder @Inject constructor(
         val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
 
         fun loadAndShowImage() {
+          val imageView = imageView ?: return
+
           if (postView.post.removed) {
             // Do not show the image if the post is removed.
+            imageView.visibility = View.GONE
             return
           }
-          val imageView = imageView ?: return
 
           val thumbnailImageUrl = if (hasThumbnail) {
             thumbnailUrl
@@ -1023,6 +1025,7 @@ class PostListViewBuilder @Inject constructor(
           iconImage?.visibility = View.GONE
 
           imageView.dispose()
+          offlineManager.cancelFetch(imageView)
           imageView.load(newShimmerDrawable16to9(context))
 
           fun loadImage(useBackupUrl: Boolean = false, force: Boolean = false) {
@@ -1057,8 +1060,6 @@ class PostListViewBuilder @Inject constructor(
             )
           }
 
-          loadImage()
-
           fun showImageOrVideo() {
             if (urlVideo) {
               onVideoClick(imageUrl, VideoType.Mp4, null)
@@ -1066,6 +1067,8 @@ class PostListViewBuilder @Inject constructor(
               onImageClick(accountId, postView, imageView, imageUrl)
             }
           }
+
+          loadImage()
 
           imageView.transitionName = "image_$absoluteAdapterPosition"
 

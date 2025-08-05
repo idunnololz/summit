@@ -536,6 +536,9 @@ class ScreenshotModeDialogFragment :
           ScreenshotWatermarkId.SUMMIT -> {
             watermark.setImageResource(R.drawable.ic_logo_mono_24)
           }
+          ScreenshotWatermarkId.PIEFED -> {
+            watermark.setImageResource(R.drawable.ic_piefed_24)
+          }
           else -> {
             watermark.visibility = View.GONE
           }

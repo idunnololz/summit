@@ -1,6 +1,5 @@
 package com.idunnololz.summit.offline
 
-import android.util.Log
 import android.view.View
 
 class OfflineViewTargetRegistrationManager(
@@ -29,6 +28,5 @@ class OfflineViewTargetRegistrationManager(
     val currentRequest = currentRequest ?: return
 
     currentRequest.cancel(offlineManager)
-    currentRequest.registered = false
   }
 }

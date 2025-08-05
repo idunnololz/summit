@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dialog_padding"
-            android:layout_marginHorizontal="@dimen/dialog_padding"
             android:layout_marginBottom="@dimen/padding">
 
             <TextView
@@ -26,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?textAppearanceTitleLarge"
                 android:text="@string/screenshot_settings"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -36,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/screenshot_width"
                 android:layout_marginTop="@dimen/padding"
+                android:layout_marginHorizontal="@dimen/dialog_padding"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title">
@@ -54,19 +55,36 @@
                 android:layout_height="wrap_content"
                 android:text="@string/cb_date"
                 android:layout_marginTop="@dimen/padding"
+                android:layout_marginStart="@dimen/padding"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/screenshot_width_input_layout"/>
 
-            <com.google.android.material.checkbox.MaterialCheckBox
+            <TextView
                 android:id="@+id/watermark_screenshots"
                 android:layout_gravity="center_horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/cb_watermark"
+                android:textAppearance="?textAppearanceBodyMedium"
+                android:layout_marginStart="@dimen/dialog_padding"
+                android:layout_marginTop="@dimen/padding"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/watermark_choice"
                 app:layout_constraintTop_toBottomOf="@+id/date_screenshots"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/watermark_choice"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?colorSurfaceContainerHigh"
+                android:layout_marginEnd="@dimen/dialog_padding"
+                style="@style/RoundImageView"
+                app:contentPadding="8dp"
+                app:tint="?colorOnSurface"
+                app:layout_constraintTop_toTopOf="@+id/watermark_screenshots"
+                app:layout_constraintBottom_toBottomOf="@+id/watermark_screenshots"
+                app:layout_constraintEnd_toEndOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

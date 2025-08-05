@@ -79,10 +79,13 @@ class OfflineManager @Inject constructor(
     internal val registerListenersIfTaskExists: Boolean,
   ) {
 
-    var registered: Boolean = true
+    private var _registered: Boolean = true
+    val registered
+      get() = _registered
 
     fun cancel(offlineManager: OfflineManager) {
       offlineManager.cancelFetch(url, listener, errorListener)
+      _registered = false
     }
   }
 
