@@ -8,6 +8,8 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Log
+import androidx.collection.LruCache
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.util.DirectoryHelper
@@ -17,6 +19,8 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 
 @Singleton
 class AccountImageGenerator @Inject constructor(
@@ -24,7 +28,30 @@ class AccountImageGenerator @Inject constructor(
   private val directoryHelper: DirectoryHelper,
 ) {
   companion object {
+    private const val TAG = "AccountImageGenerator"
+
     private const val IMAGE_DIR = "image"
+  }
+
+  private val memoryCache: LruCache<String, Bitmap>? = newLruCache()
+
+  private fun newLruCache(): LruCache<String, Bitmap>? {
+    val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
+    val cacheSize = maxMemory / 32
+
+    Log.d(TAG, "cache size: $cacheSize kb")
+
+    if (cacheSize < 500) {
+      return null
+    }
+
+    return object : LruCache<String, Bitmap>(cacheSize) {
+      override fun sizeOf(key: String, value: Bitmap): Int {
+        // The cache size will be measured in kilobytes rather than
+        // number of items.
+        return value.byteCount / 1024
+      }
+    }
   }
 
   fun getOrGenerateImageForAccount(account: Account): File {
@@ -34,9 +61,9 @@ class AccountImageGenerator @Inject constructor(
     }
 
     val bitmap = generateDrawableForPerson(
-      account.name,
-      account.id,
-      account.instance,
+      personName = account.name,
+      personId = account.id,
+      personInstance = account.instance,
     ).bitmap
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, imageFile.outputStream())
 
@@ -55,22 +82,50 @@ class AccountImageGenerator @Inject constructor(
     personId: PersonId,
     personInstance: String,
     circleClip: Boolean = false,
-  ): BitmapDrawable {
-    val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
-    val bitmap = Bitmap.createBitmap(
-      accountImageSize,
-      accountImageSize,
-      Bitmap.Config.ARGB_8888,
+  ): BitmapDrawable =
+    generateDrawableForGeneric(
+      key = personKey(personName, personId, personInstance),
+      circleClip = circleClip,
     )
-    val personDrawable = context.getDrawableCompat(R.drawable.lemmy_profile_4)
+
+  fun generateDrawableForKey(key: String): Drawable {
+    return generateDrawableForGeneric(key)
+  }
+
+  fun generateDrawableForGeneric(
+    key: String,
+    drawable: Drawable? = context.getDrawableCompat(
+      R.drawable.lemmy_profile_4,
+    ),
+    circleClip: Boolean = false,
+  ): BitmapDrawable {
+    val cacheKey = "$key|${circleClip}"
+    val bitmap = if (memoryCache != null) {
+      memoryCache[cacheKey]
+        ?: generateBitmapForGeneric(key, drawable, circleClip).also {
+          memoryCache.put(cacheKey, it)
+        }
+    } else {
+      generateBitmapForGeneric(key, drawable, circleClip)
+    }
+    return bitmap.toDrawable(context.resources)
+  }
+
+  fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int {
+    return getColorForKey(personKey(personName, personId, personInstance))
+  }
+
+  private fun generateBitmapForGeneric(
+    key: String,
+    drawable: Drawable?,
+    circleClip: Boolean,
+  ): Bitmap {
+    val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
+    val bitmap = createBitmap(width = accountImageSize, height = accountImageSize)
 
     with(Canvas(bitmap)) {
       val bgPaint = Paint().apply {
-        color = getColorForPerson(
-          personName,
-          personId,
-          personInstance,
-        )
+        color = getColorForKey(key)
       }
 
       if (circleClip) {
@@ -88,44 +143,10 @@ class AccountImageGenerator @Inject constructor(
 
       drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
 
-      personDrawable?.setBounds(0, 0, accountImageSize, accountImageSize)
-      personDrawable?.draw(this)
-    }
-    return BitmapDrawable(context.resources, bitmap)
-  }
-
-  fun generateDrawableForKey(key: String): Drawable {
-    return generateDrawableForGeneric(key)
-  }
-
-  fun generateDrawableForGeneric(
-    key: String,
-    drawable: Drawable? = context.getDrawableCompat(
-      R.drawable.lemmy_profile_4,
-    ),
-  ): Drawable {
-    val accountImageSize = context.resources.getDimensionPixelSize(R.dimen.account_image_size)
-    val bitmap = Bitmap.createBitmap(
-      accountImageSize,
-      accountImageSize,
-      Bitmap.Config.ARGB_8888,
-    )
-
-    with(Canvas(bitmap)) {
-      val bgPaint = Paint().apply {
-        color = getColorForKey(key)
-      }
-
-      drawRect(0f, 0f, accountImageSize.toFloat(), accountImageSize.toFloat(), bgPaint)
-
       drawable?.setBounds(0, 0, accountImageSize, accountImageSize)
       drawable?.draw(this)
     }
-    return BitmapDrawable(context.resources, bitmap)
-  }
-
-  fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int {
-    return getColorForKey("$personName@$personId@$personInstance")
+    return bitmap
   }
 
   private fun getColorForKey(key: String): Int {
@@ -157,4 +178,12 @@ class AccountImageGenerator @Inject constructor(
       ),
     )
   }
+
+  @Suppress("NOTHING_TO_INLINE")
+  private inline fun personKey(
+    personName: String,
+    personId: PersonId,
+    personInstance: String,
+  ) =
+    "$personName@$personId@$personInstance"
 }
