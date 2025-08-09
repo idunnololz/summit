@@ -816,7 +816,7 @@ class CommunityFragment :
         }
 
         viewModel.hideReadMode.observe(viewLifecycleOwner) {
-          communityAppBarController?.onHideReadModeChange(it)
+          communityAppBarController?.onHideReadModeChange()
         }
 
         init()
@@ -853,6 +853,7 @@ class CommunityFragment :
     if (!isBindingAvailable()) return
 
     binding.recyclerView.scrollToPosition(0)
+    communityAppBarController?.setExpanded(true)
   }
 
   private fun onReady() {

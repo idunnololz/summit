@@ -908,7 +908,7 @@ class CommunityAppBarController(
     vh.customAppBar.setExpanded(b)
   }
 
-  fun onHideReadModeChange(hideReadMode: HideReadMode) {
+  fun onHideReadModeChange() {
     updateHideReadOnVisibility(animate = true)
   }
 
