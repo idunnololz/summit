@@ -849,6 +849,12 @@ class CommunityFragment :
     communityAppBarController?.percentShown?.value ?: 1f
   }
 
+  fun scrollToTop() {
+    if (!isBindingAvailable()) return
+
+    binding.recyclerView.scrollToPosition(0)
+  }
+
   private fun onReady() {
     if (!isBindingAvailable()) return
 
@@ -1839,7 +1845,7 @@ class CommunityFragment :
         getMainActivity()?.navigateTopLevel(actionId)
       }
       R.id.back_to_the_beginning -> {
-        binding.recyclerView.scrollToPosition(0)
+        scrollToTop()
       }
       R.id.per_community_settings -> {
         currentCommunityRef ?: return@a

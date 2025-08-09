@@ -188,6 +188,8 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
           currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()
         ) {
           changeCommunity(tabsManager.getHomeTab())
+        } else if (currentFragment is CommunityFragment) {
+          currentFragment.scrollToTop()
         } else {
           resetCurrentTab(tab)
         }
