@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
 import androidx.window.layout.WindowMetricsCalculator
 import coil3.Image
 import coil3.asDrawable

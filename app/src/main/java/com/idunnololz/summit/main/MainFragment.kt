@@ -127,7 +127,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     }
   }
 
-  private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+  private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
     override fun handleOnBackPressed() {
       if (!isBindingAvailable()) return
 
@@ -143,7 +143,9 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
           }
 
           if (doubleBackToExitPressedOnce) {
-            getMainActivity()?.finish()
+            onBackPressedCallback.isEnabled = false
+            getMainActivity()?.onBackPressedDispatcher?.onBackPressed()
+//            getMainActivity()?.finish()
             return
           }
 
