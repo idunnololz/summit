@@ -115,7 +115,7 @@ class SettingsWebFragment :
         is StatefulData.Success -> {
           binding.loadingView.hideAll()
           refresh()
-          backPressHandler.isEnabled = viewModel.updatedSettingValues.isNotEmpty()
+          updateBackPressHandler()
         }
       }
     }
@@ -134,7 +134,7 @@ class SettingsWebFragment :
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {
           binding.loadingView.hideAll()
-          viewModel.updatedSettingValues.clear()
+          updateBackPressHandler()
 
           Snackbar.make(binding.root, R.string.settings_saved, Snackbar.LENGTH_LONG)
             .show()
@@ -230,6 +230,10 @@ class SettingsWebFragment :
           .show(childFragmentManager)
       },
     )
+  }
+
+  private fun updateBackPressHandler() {
+    backPressHandler.isEnabled = viewModel.updatedSettingValues.isNotEmpty()
   }
 
   private fun openImagePicker(

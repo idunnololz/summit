@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -20,6 +21,7 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
 import com.canhub.cropper.CropImageView.CropResult
 import com.canhub.cropper.CropImageView.OnCropImageCompleteListener
 import com.canhub.cropper.CropImageView.OnSetImageUriCompleteListener
@@ -27,12 +29,16 @@ import com.canhub.cropper.utils.getUriForFile
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.CropImageActivityBinding
 import com.idunnololz.summit.util.BaseActivity
+import com.idunnololz.summit.util.InsetsHelper
+import com.idunnololz.summit.util.InsetsProvider
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import java.io.File
 
 open class CropImageActivity :
   BaseActivity(),
   OnSetImageUriCompleteListener,
-  OnCropImageCompleteListener {
+  OnCropImageCompleteListener,
+  InsetsProvider by InsetsHelper(consumeInsets = false) {
 
   /** Persist URI image to crop URI if specific permissions are required. */
   private var cropImageUri: Uri? = null
@@ -58,15 +64,22 @@ open class CropImageActivity :
   }
 
   public override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
+
     super.onCreate(savedInstanceState)
 
     binding = CropImageActivityBinding.inflate(layoutInflater)
+
     setContentView(binding.root)
+    registerInsetsHandler(binding.root)
     setCropImageView(binding.cropImageView)
+
     val bundle = intent.getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE)
     cropImageUri = bundle?.parcelable(CropImage.CROP_IMAGE_EXTRA_SOURCE)
     cropImageOptions =
       bundle?.parcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS) ?: CropImageOptions()
+
+    insetViewAutomaticallyByPadding(this, binding.root)
 
     if (savedInstanceState == null) {
       if (cropImageUri == null || cropImageUri == Uri.EMPTY) {

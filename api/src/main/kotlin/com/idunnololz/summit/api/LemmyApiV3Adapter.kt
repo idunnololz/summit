@@ -199,7 +199,10 @@ class LemmyApiV3Adapter(
   }
 
   override suspend fun login(args: Login): Result<LoginResponse> =
-    retrofitErrorHandler { api.login(generateHeaders(null, false), args) }
+    retrofitErrorHandler {
+      // Lemmy has a password limit of 60 characters.
+      api.login(generateHeaders(null, false), args.copy(password = args.password.take(60)))
+    }
 
   override suspend fun likePost(
     authorization: String?,

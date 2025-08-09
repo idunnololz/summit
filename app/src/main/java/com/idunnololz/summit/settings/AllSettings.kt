@@ -52,6 +52,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ENABLE_HIDDEN_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_FINISH_APP_ON_BACK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT_COLOR
@@ -2077,6 +2078,12 @@ class MiscSettings @Inject constructor(
     context.getString(R.string.auto_focus_search_bar),
     context.getString(R.string.auto_focus_search_bar_desc),
     relatedKeys = listOf(KEY_AUTO_FOCUS_SEARCH_BAR),
+  )
+  val finishAppOnBack = OnOffSettingItem(
+    null,
+    context.getString(R.string.finish_app_on_back),
+    context.getString(R.string.finish_app_on_back_desc),
+    relatedKeys = listOf(KEY_FINISH_APP_ON_BACK),
   )
 }
 

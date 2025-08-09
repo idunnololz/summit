@@ -2293,6 +2293,8 @@
     <string name="hide_read_on">Hide read is on</string>
     <string name="hide_read_on_desc">This button indicates that \"hide read\" is on.\n\nWhen \"hide read\" is on, refreshing the post feed will only show unread posts.\n\nTap this button to turn off \"hide read\".</string>
     <string name="no_watermark">No watermark</string>
+    <string name="finish_app_on_back">Finish app on back</string>
+    <string name="finish_app_on_back_desc">By default, apps will retain their state when they are closed. If the app is relaunched via the recents screen, the app state will be restored. If this setting is enabled, then the app will discard its state on close and the state will not be restored even if launched via recents.</string>
 
 
     <!-- uCrop string resource end -->

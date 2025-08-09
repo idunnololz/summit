@@ -63,6 +63,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNLOAD_DIRECTORY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DOWNVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DO_NOT_BLUR_NSFW_CONTENT_IN_NSFW_COMMUNITY_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ENABLE_HIDDEN_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_FINISH_APP_ON_BACK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GESTURE_SWIPE_DIRECTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_GLOBAL_FONT_COLOR
@@ -696,6 +697,9 @@ class Preferences(
     by booleanPreference(KEY_HIDE_HEADER_BANNER_IF_NO_BANNER, false)
   var restoreBrowsingSessions
     by booleanPreference(KEY_RESTORE_BROWSING_SESSIONS, true)
+  var finishAppOnBack
+    by booleanPreference(KEY_FINISH_APP_ON_BACK, false)
+
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

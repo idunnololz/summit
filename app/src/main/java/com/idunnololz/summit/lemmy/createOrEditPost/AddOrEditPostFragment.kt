@@ -21,6 +21,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
@@ -34,6 +35,7 @@ import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.github.drjacky.imagepicker.ImagePicker
+import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
@@ -363,6 +365,14 @@ class AddOrEditPostFragment :
           },
           10,
         )
+
+        if ((it?.length ?: 0) > 200) {
+          title.isCounterEnabled = true
+          title.updatePadding(bottom = Utils.convertDpToPixel(16f).toInt())
+        } else {
+          title.isCounterEnabled = false
+          title.updatePadding(bottom = 0)
+        }
       }
       urlEditText.addTextChangedListener {
         root.postDelayed(
@@ -759,9 +769,10 @@ class AddOrEditPostFragment :
           postEditText.setText(data.body)
           urlEditText.setText(data.url)
           nsfwSwitch.isChecked = data.isNsfw
-          communityEditText.setText(data.targetCommunityFullName)
+          if (data.targetCommunityFullName.isNotBlank()) {
+            communityEditText.setText(data.targetCommunityFullName)
+          }
           viewModel.languageId.value = data.languageId
-
           if (data.thumbnailUrl != null) {
             thumbnailUrlEditText.setText(data.thumbnailUrl)
             viewModel.showMore.value = true
@@ -1065,6 +1076,12 @@ class AddOrEditPostFragment :
   }
 
   private fun createPost() {
+    val fieldsValid = validateFields()
+
+    if (!fieldsValid) {
+      return
+    }
+
     viewModel.createPost(
       communityFullName = binding.communityEditText.text.toString(),
       name = binding.title.editText?.text.toString(),
@@ -1077,6 +1094,12 @@ class AddOrEditPostFragment :
   }
 
   private fun updatePost() {
+    val fieldsValid = validateFields()
+
+    if (!fieldsValid) {
+      return
+    }
+
     viewModel.updatePost(
       instance = args.instance,
       name = binding.title.editText?.text.toString(),
@@ -1087,6 +1110,37 @@ class AddOrEditPostFragment :
       thumbnailUrl = binding.thumbnailUrlEditText.text?.toString(),
       altText = binding.altTextEditText.text?.toString(),
     )
+  }
+
+  private fun validateFields(): Boolean {
+    var anyError = false
+
+    fun TextInputLayout.updateError(error: String?) {
+      if (error != null) {
+        this.error = getString(R.string.required)
+        this.updatePadding(bottom = Utils.convertDpToPixel(16f).toInt())
+        anyError = true
+      } else {
+        this.isErrorEnabled = false
+        this.updatePadding(bottom = Utils.convertDpToPixel(0f).toInt())
+      }
+    }
+
+    with(binding) {
+      if (!isEdit() && binding.communityEditText.text.isNullOrBlank()) {
+        community.updateError(getString(R.string.required))
+      } else {
+        community.updateError(null)
+      }
+
+      if (titleEditText.text.isNullOrBlank()) {
+        title.updateError(getString(R.string.required))
+      } else {
+        title.updateError(null)
+      }
+    }
+
+    return !anyError
   }
 
   private fun onLinkMetadataChanged() {

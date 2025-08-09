@@ -510,7 +510,6 @@ class LemmyApiClient @Inject constructor(
     }
 
     val form = Login(username, password, twoFactorCode)
-
     return onApiClient { getApi().login(args = form) }
       .fold(
         onSuccess = {

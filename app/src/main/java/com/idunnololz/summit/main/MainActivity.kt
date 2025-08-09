@@ -517,6 +517,12 @@ class MainActivity : SummitActivity() {
     }
   }
 
+  override fun onStop() {
+    super.onStop()
+
+    Log.d("HAHA", "finishing: ${isFinishing}")
+  }
+
   fun showNotificationBarBg() {
     showNotificationBarBg = true
     showNotificationBarBgIfNeeded()

@@ -143,9 +143,12 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
           }
 
           if (doubleBackToExitPressedOnce) {
-            onBackPressedCallback.isEnabled = false
-            getMainActivity()?.onBackPressedDispatcher?.onBackPressed()
-//            getMainActivity()?.finish()
+            if (preferences.finishAppOnBack) {
+              getMainActivity()?.finish()
+            } else {
+              onBackPressedCallback.isEnabled = false
+              getMainActivity()?.onBackPressedDispatcher?.onBackPressed()
+            }
             return
           }
 
@@ -162,6 +165,13 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
           }
         }
       }
+    }
+  }
+
+  private val closeOnSingleBackPressCallback = object : OnBackPressedCallback(true) {
+    override fun handleOnBackPressed() {
+      if (!isBindingAvailable()) return
+      getMainActivity()?.finish()
     }
   }
 
@@ -196,10 +206,10 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     }
 
     if (!args.isPreview) {
-      requireActivity().onBackPressedDispatcher.addCallback(
-        this,
-        onBackPressedCallback,
-      )
+      requireActivity().onBackPressedDispatcher.apply {
+        addCallback(this@MainFragment, closeOnSingleBackPressCallback)
+        addCallback(this@MainFragment, onBackPressedCallback)
+      }
     }
     childFragmentManager.setFragmentResultListener(
       CommunityPickerDialogFragment.REQUEST_KEY,
@@ -505,6 +515,7 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
     }
 
     onBackPressedCallback.isEnabled = false
+    closeOnSingleBackPressCallback.isEnabled = preferences.finishAppOnBack
   }
 
   fun updateNavUiOpenPercent() {

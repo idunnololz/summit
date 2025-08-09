@@ -172,6 +172,8 @@ class SettingsWebViewModel @Inject constructor(
       lemmyApiClient.changeInstance(accountData.account.instance)
       lemmyApiClient.saveUserSettings(settings)
         .onSuccess {
+          defaultSettingValues = defaultSettingValues + updatedSettingValues
+          updatedSettingValues.clear()
           saveUserSettings.postValue(Unit)
         }
         .onFailure {

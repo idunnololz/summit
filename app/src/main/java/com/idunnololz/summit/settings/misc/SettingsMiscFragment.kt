@@ -247,6 +247,10 @@ class SettingsMiscFragment :
         { preferences.autoFocusSearchBar },
         { preferences.autoFocusSearchBar = it },
       ),
+      settings.finishAppOnBack.asOnOffSwitch(
+        { preferences.finishAppOnBack },
+        { preferences.finishAppOnBack = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(
