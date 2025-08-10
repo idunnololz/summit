@@ -603,10 +603,9 @@ class CommunityFragment :
             }
 
             if (!navBarController.useNavigationRail && slidingPaneController?.isOpen != true) {
-//              setNavUiOpenPercent(it)
               (parentFragment?.parentFragment as? MainFragment)?.updateNavUiOpenPercent()
             }
-            slidingPaneController?.navBarOpenPercent = it
+            slidingPaneController?.panelClosedNavBarOpenPercent = it
 
             isCustomAppBarExpandedPercent = it
 
@@ -733,31 +732,17 @@ class CommunityFragment :
           if (!isBindingAvailable()) {
             return@a
           }
-
-          if (!isOpen) {
-            val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
-            if (lastSelectedPost != null) {
-              // We came from a post...
-              adapter?.highlightPost(lastSelectedPost)
-              viewModel.lastSelectedItem = null
-            }
-          } else {
-            val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
-            if (lastSelectedPost != null) {
-              adapter?.highlightPostForever(lastSelectedPost)
+          if (!args.isPreview) {
+            requireSummitActivity().apply {
+              setupForFragment<CommunityFragment>()
             }
           }
 
+          val lastSelectedPost = viewModel.lastSelectedItem?.leftOrNull()
+
           if (isOpen) {
-            if (!args.isPreview) {
-              requireSummitActivity().apply {
-                setupForFragment<PostFragment>()
-                if (isSlideable && !args.isPreview) {
-                  hideNavBar()
-                  setNavUiOpenPercent(0f, force = isSlideable)
-                  lockUiOpenness = true
-                }
-              }
+            if (lastSelectedPost != null) {
+              adapter?.highlightPostForever(lastSelectedPost)
             }
 
             if (isSlideable) {
@@ -765,22 +750,12 @@ class CommunityFragment :
               mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
             }
           } else {
-            if (!args.isPreview) {
-              requireSummitActivity().apply {
-                setupForFragment<CommunityFragment>()
-
-                lockUiOpenness = false
-                if (isSlideable && !args.isPreview) {
-                  if (navBarController.useNavigationRail) {
-                    navBarController.showBottomNav()
-                  } else {
-                    if (!viewModel.lockBottomBar) {
-                      setNavUiOpenPercent(1f * navBarPercentShown(), force = isSlideable)
-                    }
-                  }
-                }
-              }
+            if (lastSelectedPost != null) {
+              // We came from a post...
+              adapter?.highlightPost(lastSelectedPost)
+              viewModel.lastSelectedItem = null
             }
+
             if (isSlideable) {
               val mainFragment = parentFragment?.parentFragment as? MainFragment
               if (!lockPanes) {
@@ -1178,26 +1153,27 @@ class CommunityFragment :
   override fun onResume() {
     super.onResume()
 
+    slidingPaneController?.panelOpenNavBarOpenPercent = if (preferences.showNavigationBarOnPost) {
+      1f
+    } else {
+      0f
+    }
+
     val mainFragment = parentFragment?.parentFragment as? MainFragment
     val slidingPaneLayout = binding.slidingPaneLayout
 
     requireSummitActivity().apply {
       if (!args.isPreview) {
-        if (navBarController.useNavigationRail && !slidingPaneLayout.isSwipeEnabled) {
-          navBarController.showBottomNav()
-        } else {
           if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
             // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
           } else {
-            if (!viewModel.lockBottomBar) {
-              setNavUiOpenPercent(communityAppBarController?.percentShown?.value ?: 1f)
-            } else {
-              if (!slidingPaneLayout.isOpen && mainFragment?.isPaneOpen() != true) {
-                showNavBar()
-              }
+            if (viewModel.lockBottomBar &&
+              !slidingPaneLayout.isOpen &&
+              mainFragment?.isPaneOpen() != true
+            ) {
+              showNavBar()
             }
           }
-        }
         setupForFragment<CommunityFragment>()
       }
     }
@@ -1364,6 +1340,8 @@ class CommunityFragment :
         _layoutSelectorMenu.setChecked(R.id.layout_list_with_card)
       CommunityLayout.FullWithCards ->
         _layoutSelectorMenu.setChecked(R.id.layout_full_with_card)
+      CommunityLayout.SmartList ->
+        _layoutSelectorMenu.setChecked(R.id.layout_smart_list)
     }
 
     return _layoutSelectorMenu
@@ -2048,6 +2026,11 @@ class CommunityFragment :
         R.string.full_with_cards,
         R.drawable.outline_cards_24,
       )
+      addItemWithIcon(
+        R.id.layout_smart_list,
+        R.string.smart_list,
+        R.drawable.baseline_view_list_24,
+      )
       setTitle(R.string.layout)
 
       setOnMenuItemClickListener { menuItem ->
@@ -2070,6 +2053,8 @@ class CommunityFragment :
             onLayoutSelected(CommunityLayout.ListWithCards)
           R.id.layout_full_with_card ->
             onLayoutSelected(CommunityLayout.FullWithCards)
+          R.id.layout_smart_list ->
+            onLayoutSelected(CommunityLayout.SmartList)
         }
       }
     }

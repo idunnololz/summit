@@ -115,6 +115,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NAVIGATION_BAR_ON_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PERCENTAGE
@@ -1204,6 +1205,12 @@ class PostAndCommentsSettings @Inject constructor(
     ).toOptions(OpTagStyleIds.MIC),
     relatedKeys = listOf(KEY_OP_TAG_STYLE),
   )
+  val showNavigationBarOnPost = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_navigation_bar_on_post),
+    null,
+    relatedKeys = listOf(KEY_SHOW_NAVIGATION_BAR_ON_POST),
+  )
 }
 
 class PostAndCommentsAppearanceSettings @Inject constructor(
@@ -1512,6 +1519,7 @@ class PostsFeedAppearanceSettings @Inject constructor(
       CommunityLayout.Full.ordinal to context.getString(R.string.full),
       CommunityLayout.ListWithCards.ordinal to context.getString(R.string.list_with_cards),
       CommunityLayout.FullWithCards.ordinal to context.getString(R.string.full_with_cards),
+      CommunityLayout.SmartList.ordinal to context.getString(R.string.smart_list),
     ).toOptions(CommunityLayout.List.ordinal),
   )
 

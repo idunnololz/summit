@@ -136,6 +136,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_FILTERED_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_IMAGE_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LABELS_IN_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_LINK_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NAVIGATION_BAR_ON_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_NSFW_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_TYPE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PERCENTAGE
@@ -277,6 +278,8 @@ class Preferences(
       PreferenceKeys.KEY_POST_UI_CONFIG_LIST_WITH_CARDS
     CommunityLayout.FullWithCards ->
       PreferenceKeys.KEY_POST_UI_CONFIG_FULL_WITH_CARDS
+    CommunityLayout.SmartList ->
+      PreferenceKeys.KEY_POST_UI_CONFIG_SMART_LIST
   }
 
   var isUseMaterialYou: Boolean
@@ -699,6 +702,8 @@ class Preferences(
     by booleanPreference(KEY_RESTORE_BROWSING_SESSIONS, true)
   var finishAppOnBack
     by booleanPreference(KEY_FINISH_APP_ON_BACK, false)
+  var showNavigationBarOnPost
+    by booleanPreference(KEY_SHOW_NAVIGATION_BAR_ON_POST, false)
 
 
   suspend fun getOfflinePostCount(): Int =

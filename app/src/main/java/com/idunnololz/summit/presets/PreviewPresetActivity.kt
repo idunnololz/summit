@@ -104,9 +104,6 @@ class PreviewPresetActivity : SummitActivity() {
   override var moreActionsHelper: MoreActionsHelper
     get() = TODO("Not yet implemented")
     set(value) {}
-  override var lockUiOpenness: Boolean
-    get() = TODO("Not yet implemented")
-    set(value) {}
   override var currentNavController: NavController?
     get() = TODO("Not yet implemented")
     set(value) {}

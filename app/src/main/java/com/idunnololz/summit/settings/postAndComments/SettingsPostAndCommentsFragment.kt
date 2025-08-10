@@ -57,6 +57,10 @@ class SettingsPostAndCommentsFragment :
         { preferences.showCrossPostsInPost },
         { preferences.showCrossPostsInPost = it },
       ),
+      settings.showNavigationBarOnPost.asOnOffSwitch(
+        { preferences.showNavigationBarOnPost },
+        { preferences.showNavigationBarOnPost = it },
+      ),
       SettingModelItem.SubgroupItem(
         getString(R.string.comments),
         listOf(

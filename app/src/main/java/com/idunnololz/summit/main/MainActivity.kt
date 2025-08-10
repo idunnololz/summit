@@ -143,8 +143,6 @@ class MainActivity : SummitActivity() {
 
   private var currentBottomMenu: BottomMenu? = null
 
-  override var lockUiOpenness = false
-
   val useBottomNavBar: Boolean
     get() = navBarController.useBottomNavBar
 

@@ -2,8 +2,10 @@ package com.idunnololz.summit.lemmy
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
@@ -13,6 +15,7 @@ import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
+import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
@@ -41,6 +44,7 @@ class PostsRepository @AssistedInject constructor(
   private val accountManager: AccountManager,
   private val preferences: Preferences,
   private val duplicatePostsDetector: DuplicatePostsDetector,
+  private val accountActionsManager: AccountActionsManager,
 ) {
   companion object {
     private val TAG = PostsRepository::class.simpleName
@@ -415,7 +419,12 @@ class PostsRepository @AssistedInject constructor(
         }
 
         Log.d(TAG, "Fetched ${newPosts.size} posts.")
-        addPosts(newPosts, pageIndex, hiddenPosts, duplicatePostsDetector, force)
+        addPosts(
+          newPosts = newPosts,
+          pageIndex = pageIndex,
+          hiddenPosts = hiddenPosts,
+          duplicatePostsDetector = duplicatePostsDetector
+        )
 
         if (consecutiveFilteredPostsByFilter > 20) {
           Result.failure(FilterTooAggressiveException())
@@ -432,12 +441,11 @@ class PostsRepository @AssistedInject constructor(
     )
   }
 
-  private fun addPosts(
+  private suspend fun addPosts(
     newPosts: List<FetchedPost>,
     pageIndex: Int,
     hiddenPosts: Set<PostId>,
     duplicatePostsDetector: DuplicatePostsDetector?,
-    force: Boolean,
   ) {
     val mutableAllPosts = allPosts.toMutableList()
     for (fetchedPost in newPosts) {
@@ -449,6 +457,15 @@ class PostsRepository @AssistedInject constructor(
 
       if (duplicatePostsDetector?.isPostDuplicateOfRead(post) == true) {
         isDuplicatePost = true
+
+        if (!post.read) {
+          accountActionsManager.markPostAsRead(
+            instance = post.instance,
+            id = post.post.id,
+            read = true,
+            accountId = null,
+          )
+        }
       }
 
       if (hideRead &&

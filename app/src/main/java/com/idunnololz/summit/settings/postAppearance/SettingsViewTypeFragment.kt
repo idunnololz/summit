@@ -326,6 +326,10 @@ class SettingsViewTypeFragment :
               false,
             ),
           )
+        CommunityLayout.SmartList ->
+          ListingItemViewHolder.fromBinding(
+            ListingItemListBinding.inflate(inflater, binding.demoViewContainer, false),
+          )
       }
 
       val fetchedPost = LemmyFakeModels.fakeFetchedPost

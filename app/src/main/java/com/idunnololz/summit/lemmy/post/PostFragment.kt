@@ -992,16 +992,34 @@ class PostFragment :
     val context = requireContext()
 
     requireSummitActivity().apply {
-      insetViewExceptTopAutomaticallyByPadding(
-        lifecycleOwner = viewLifecycleOwner,
-        rootView = binding.recyclerView,
-        additionalPaddingBottom = context.getDimen(R.dimen.footer_spacer_height),
-      )
-      insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-      insetViewAutomaticallyByPadding(
-        viewLifecycleOwner,
-        binding.fabSnackbarCoordinatorLayout,
-      )
+
+      if (preferences.showNavigationBarOnPost) {
+        insetViewAutomaticallyByPaddingAndNavUi(
+          lifecycleOwner = viewLifecycleOwner,
+          rootView = binding.recyclerView,
+          applyTopInset = false,
+        )
+        insetViewAutomaticallyByMarginsAndNavUi(
+          lifecycleOwner = viewLifecycleOwner,
+          view = binding.toolbar,
+          applyBottomInset = false,
+        )
+        insetViewAutomaticallyByPaddingAndNavUi(
+          lifecycleOwner = viewLifecycleOwner,
+          rootView = binding.fabSnackbarCoordinatorLayout,
+        )
+      } else {
+        insetViewExceptTopAutomaticallyByPadding(
+          lifecycleOwner = viewLifecycleOwner,
+          rootView = binding.recyclerView,
+          additionalPaddingBottom = context.getDimen(R.dimen.footer_spacer_height),
+        )
+        insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+        insetViewAutomaticallyByPadding(
+          viewLifecycleOwner,
+          binding.fabSnackbarCoordinatorLayout,
+        )
+      }
     }
 
     with(binding.toolbar) {
@@ -1303,9 +1321,12 @@ class PostFragment :
     if (args.isSinglePage) {
       requireSummitActivity().apply {
         if (!navBarController.useNavigationRail) {
-          hideNavBar()
+          if (preferences.showNavigationBarOnPost) {
+            showNavBar()
+          } else {
+            hideNavBar()
+          }
         }
-        lockUiOpenness = true
       }
     }
 
@@ -1319,16 +1340,6 @@ class PostFragment :
     }
 
     postAndCommentViewBuilder.onPreferencesChanged()
-  }
-
-  override fun onPause() {
-    if (args.isSinglePage) {
-      requireSummitActivity().apply {
-        lockUiOpenness = false
-      }
-    }
-
-    super.onPause()
   }
 
   override fun navigateToSignInScreen() {

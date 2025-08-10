@@ -127,7 +127,6 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
         } else {
           requireSummitActivity().apply {
             setupForFragment<CommunityFragment>()
-            lockUiOpenness = false
             if (isSlideable) {
               setNavUiOpenPercent(1f, force = isSlideable)
             }

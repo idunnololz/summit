@@ -39,6 +39,11 @@ class ListingItemViewHolder(
   val layoutShowsFullContent: Boolean,
   val themeColorBar: View,
   val createCommentButton: View?,
+  /**
+   * True if this layout shows content (eg. image thumbnails) using the entire width of the screen.
+   * Eg. card layouts are typically full width layouts whereas compact is not.
+   */
+  val fullWidthContent: Boolean,
   val moreButton: View? = null,
   val linkText: TextView? = null,
   val linkIcon: View? = null,
@@ -78,6 +83,7 @@ class ListingItemViewHolder(
       layoutShowsFullContent = false,
       createCommentButton = null,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = false,
     )
 
     fun fromBinding(binding: SearchResultPostItemBinding) = ListingItemViewHolder(
@@ -100,6 +106,7 @@ class ListingItemViewHolder(
       layoutShowsFullContent = false,
       createCommentButton = null,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = false,
     )
 
     fun fromBinding(binding: ListingItemLargeListBinding) = ListingItemViewHolder(
@@ -126,6 +133,7 @@ class ListingItemViewHolder(
       linkIcon = binding.linkIcon,
       linkOverlay = binding.linkOverlay,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = true,
     )
 
     fun fromBinding(binding: ListingItemCardBinding) = ListingItemViewHolder(
@@ -152,6 +160,7 @@ class ListingItemViewHolder(
       linkIcon = binding.linkIcon,
       linkOverlay = binding.linkOverlay,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = true,
     )
 
     fun fromBinding(binding: ListingItemCard2Binding) = ListingItemViewHolder(
@@ -178,6 +187,7 @@ class ListingItemViewHolder(
       linkIcon = binding.linkIcon,
       linkOverlay = binding.linkOverlay,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = true,
     )
 
     fun fromBinding(binding: ListingItemCard3Binding) = ListingItemViewHolder(
@@ -204,6 +214,7 @@ class ListingItemViewHolder(
       linkIcon = binding.linkIcon,
       linkOverlay = binding.linkOverlay,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = true,
     )
 
     fun fromBinding(binding: ListingItemFullBinding) = ListingItemViewHolder(
@@ -226,6 +237,7 @@ class ListingItemViewHolder(
       layoutShowsFullContent = true,
       createCommentButton = null,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = true,
     )
 
     fun fromBinding(binding: ListingItemFullWithCardsBinding) = ListingItemViewHolder(
@@ -248,6 +260,7 @@ class ListingItemViewHolder(
       layoutShowsFullContent = true,
       createCommentButton = null,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = true,
     )
 
     fun fromBinding(binding: ListingItemCompactBinding) = ListingItemViewHolder(
@@ -271,6 +284,7 @@ class ListingItemViewHolder(
       createCommentButton = null,
       moreButton = binding.moreButton,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = false,
     )
 
     fun fromBinding(binding: ListingItemListWithCardsBinding) = ListingItemViewHolder(
@@ -293,6 +307,7 @@ class ListingItemViewHolder(
       layoutShowsFullContent = false,
       createCommentButton = null,
       themeColorBar = binding.themeColorBar,
+      fullWidthContent = false,
     )
   }
 }

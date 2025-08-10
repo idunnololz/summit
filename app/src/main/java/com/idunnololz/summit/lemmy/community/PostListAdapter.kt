@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.utils.PostType
+import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.databinding.AutoLoadItemBinding
 import com.idunnololz.summit.databinding.FilteredPostItemBinding
@@ -127,7 +129,7 @@ class PostListAdapter(
 
   private val seenItemPositions = mutableSetOf<Int>()
 
-  override fun getItemViewType(position: Int): Int = when (items[position]) {
+  override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
     is PostListEngineItem.VisiblePostItem -> when (layout) {
       CommunityLayout.Compact -> R.layout.listing_item_compact
       CommunityLayout.List -> R.layout.listing_item_list
@@ -138,6 +140,14 @@ class PostListAdapter(
       CommunityLayout.Full -> R.layout.listing_item_full
       CommunityLayout.ListWithCards -> R.layout.listing_item_list_with_cards
       CommunityLayout.FullWithCards -> R.layout.listing_item_full_with_cards
+      CommunityLayout.SmartList -> {
+        when (item.fetchedPost.postView.getType()) {
+          PostType.Image -> R.layout.listing_item_large_list
+          PostType.Video -> R.layout.listing_item_large_list
+          PostType.Text -> R.layout.listing_item_list
+          PostType.Link -> R.layout.listing_item_list
+        }
+      }
     }
     is PostListEngineItem.FilteredPostItem -> R.layout.filtered_post_item
     is PostListEngineItem.FooterItem -> R.layout.main_footer_item

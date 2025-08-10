@@ -976,7 +976,12 @@ class PostListViewBuilder @Inject constructor(
             }
             else -> contentMaxWidth
           }
-        val postImageWidth = (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
+        val postImageWidth =
+          if (postUiConfig.fullImageWidthWhenFullWidthLayout == true && holder.fullWidthContent) {
+            finalContentMaxWidth
+          } else {
+            (postUiConfig.imageWidthPercent * finalContentMaxWidth).toInt()
+          }
 
         fun loadAndShowImage() {
           val imageView = imageView ?: return

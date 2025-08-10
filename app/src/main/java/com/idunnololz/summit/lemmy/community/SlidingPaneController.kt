@@ -71,7 +71,8 @@ class SlidingPaneController(
   val isOpen: Boolean
     get() = slidingPaneLayout.isOpen
 
-  var navBarOpenPercent: Float = 1f
+  var panelClosedNavBarOpenPercent: Float = 1f
+  var panelOpenNavBarOpenPercent: Float = 0f
 
   private val panelSlideListener =
     object : PanelSlideListener {
@@ -80,8 +81,8 @@ class SlidingPaneController(
 
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.apply {
-            lockUiOpenness = false
-            setNavUiOpenPercent(slideOffset * navBarOpenPercent, force = isSlideable)
+            val delta = panelOpenNavBarOpenPercent - panelClosedNavBarOpenPercent
+            setNavUiOpenPercent(panelClosedNavBarOpenPercent + delta * (1f - slideOffset), force = isSlideable)
           }
 
           slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
@@ -91,15 +92,20 @@ class SlidingPaneController(
       override fun onPanelOpened(panel: View) {
         Log.d(TAG, "onPanelOpened()")
 
-        fragment.requireSummitActivity().apply {
-          lockUiOpenness = false
+        fragment.getMainActivity()?.apply {
+          setNavUiOpenPercent(panelOpenNavBarOpenPercent, force = isSlideable)
         }
+
         onPageSelectedListener(true)
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
       }
 
       override fun onPanelClosed(panel: View) {
         Log.d(TAG, "onPanelClosed()")
+
+        fragment.getMainActivity()?.apply {
+          setNavUiOpenPercent(panelClosedNavBarOpenPercent, force = isSlideable)
+        }
 
         // close post fragment
         val postFragment = childFragmentManager
@@ -119,7 +125,7 @@ class SlidingPaneController(
         }
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.setNavUiOpenPercent(
-            1f * navBarOpenPercent,
+            1f * panelClosedNavBarOpenPercent,
             force = isSlideable,
           )
         }

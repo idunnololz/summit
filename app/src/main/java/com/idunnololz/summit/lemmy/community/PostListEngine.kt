@@ -3,6 +3,7 @@ package com.idunnololz.summit.lemmy.community
 import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.actions.PostReadManager
@@ -84,8 +85,8 @@ class PostListEngine @AssistedInject constructor(
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val directoryHelper: DirectoryHelper,
   private val duplicatePostsDetector: DuplicatePostsDetector,
-  private val postReadManager: PostReadManager,
   private val accountManager: AccountManager,
+  private val accountActionsManager: AccountActionsManager,
 
   @Assisted("infinity")
   infinity: Boolean,
@@ -516,18 +517,21 @@ class PostListEngine @AssistedInject constructor(
     _pages = pages
   }
 
-  fun markDuplicatePostsAsRead() {
+  suspend fun markDuplicatePostsAsRead() {
     val pages = _pages.toMutableList()
     for ((index, page) in pages.withIndex()) {
       pages[index] = page.copy(
         posts = page.posts.map {
           val postView = it.fetchedPost.postView
           if (duplicatePostsDetector.isPostDuplicateOfRead(postView)) {
-            postReadManager.markPostAsReadLocal(
-              instance = postView.instance,
-              postId = postView.post.id,
-              read = true,
-            )
+            if (!postView.read) {
+              accountActionsManager.markPostAsRead(
+                instance = postView.instance,
+                id = postView.post.id,
+                read = true,
+                accountId = null,
+              )
+            }
             it.copy(
               fetchedPost = it.fetchedPost.copy(
                 postView = postView.copy(

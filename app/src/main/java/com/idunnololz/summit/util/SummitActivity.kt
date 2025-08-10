@@ -101,7 +101,6 @@ abstract class SummitActivity :
 
   abstract var navBarController: NavBarController
   abstract var moreActionsHelper: MoreActionsHelper
-  abstract var lockUiOpenness: Boolean
   protected abstract var currentNavController: NavController?
 
   abstract fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit)

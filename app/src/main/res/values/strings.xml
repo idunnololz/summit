@@ -2295,6 +2295,8 @@
     <string name="no_watermark">No watermark</string>
     <string name="finish_app_on_back">Finish app on back</string>
     <string name="finish_app_on_back_desc">By default, apps will retain their state when they are closed. If the app is relaunched via the recents screen, the app state will be restored. If this setting is enabled, then the app will discard its state on close and the state will not be restored even if launched via recents.</string>
+    <string name="show_navigation_bar_on_post">Show navigation bar on post</string>
+    <string name="smart_list">Smart list</string>
 
 
     <!-- uCrop string resource end -->

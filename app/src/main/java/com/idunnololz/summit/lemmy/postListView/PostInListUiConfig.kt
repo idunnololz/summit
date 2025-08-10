@@ -22,6 +22,12 @@ data class PostInListUiConfig(
   val showCommunityIcon: Boolean = true,
   val dimReadPosts: Boolean? = null,
   val showTextPreviewIcon: Boolean? = null,
+  /**
+   * This is a special setting for "smart" layouts. Eg. layouts that combine multiple other layouts.
+   * For smart layouts, we don't want to use the [imageWidthPercent] fields for all layouts so we
+   * have this special field to tell us not to do that.
+   */
+  val fullImageWidthWhenFullWidthLayout: Boolean? = null,
 ) {
   fun updateTextSizeMultiplier(it: Float): PostInListUiConfig = this.copy(
     textSizeMultiplier = it,
@@ -124,6 +130,12 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig = when (this) {
       imageWidthPercent = 0.2f,
       dimReadPosts = true,
     )
+  CommunityLayout.SmartList ->
+    PostInListUiConfig(
+      imageWidthPercent = 0.2f,
+      dimReadPosts = false,
+      fullImageWidthWhenFullWidthLayout = true,
+    )
 }
 
 val CommunityLayout.defaultDimReadPosts
@@ -133,6 +145,7 @@ val CommunityLayout.defaultDimReadPosts
       CommunityLayout.List,
       CommunityLayout.ListWithCards,
       CommunityLayout.FullWithCards,
+      CommunityLayout.SmartList,
       -> false
       CommunityLayout.LargeList,
       CommunityLayout.Card,
