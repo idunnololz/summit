@@ -22,7 +22,12 @@ class LinkFetcher @Inject constructor(
     client: OkHttpClient = okHttpClient,
   ): Result<String> =
     runInterruptible(Dispatchers.IO) {
-      val response = doRequest(url, cache, client)
+      val response = try {
+        doRequest(url, cache, client)
+      } catch (e: Exception) {
+        return@runInterruptible Result.failure(e)
+      }
+
       val responseCode = response.code
       if (response.isSuccessful) {
         return@runInterruptible Result.success(response.body.string())

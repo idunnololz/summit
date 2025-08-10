@@ -89,7 +89,13 @@ class CoilImagesPlugin(
       val target = AsyncDrawableTarget(drawable, loaded, drawable.destination)
       val request = coilStore.load(drawable).newBuilder()
         .target(target)
-        .size(Dimension.Pixels(drawable.lastKnownCanvasWidth), Dimension.Undefined)
+        .apply {
+          if (drawable.imageText?.startsWith("emoji", ignoreCase = true) == true) {
+            size(Utils.convertDpToPixel(24f).toInt(), Utils.convertDpToPixel(24f).toInt(),)
+          } else {
+            size(Dimension.Pixels(drawable.lastKnownCanvasWidth), Dimension.Undefined)
+          }
+        }
         .build()
       // @since 4.5.1 execute can return result _before_ disposable is created,
       //  thus `execute` would finish before we put disposable in cache (and thus result is
@@ -140,16 +146,7 @@ class CoilImagesPlugin(
 //                            )
 //                        }
 
-            if (drawable.imageText?.startsWith("emoji", ignoreCase = true) == true) {
-              loadedDrawable.bounds = Rect(
-                0,
-                0,
-                Utils.convertDpToPixel(24f).toInt(),
-                Utils.convertDpToPixel(24f).toInt(),
-              )
-            } else {
-              DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
-            }
+            DrawableUtils.applyIntrinsicBoundsIfEmpty(loadedDrawable)
 
             drawable.result = loadedDrawable
 
