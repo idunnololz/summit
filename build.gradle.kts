@@ -12,6 +12,10 @@ plugins {
   alias(libs.plugins.versions)
 }
 
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+  version.set("1.7.1")
+}
+
 subprojects {
   apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
