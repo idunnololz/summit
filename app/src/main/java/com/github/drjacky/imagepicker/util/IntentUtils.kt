@@ -125,9 +125,8 @@ object IntentUtils {
   }
 
   @JvmStatic
-  fun isCameraHardwareAvailable(context: Context): Boolean {
-    return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-  }
+  fun isCameraHardwareAvailable(context: Context): Boolean =
+    context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
 
   /**
    * Check if Camera app is available or not

@@ -82,7 +82,10 @@ class SlidingPaneController(
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.apply {
             val delta = panelOpenNavBarOpenPercent - panelClosedNavBarOpenPercent
-            setNavUiOpenPercent(panelClosedNavBarOpenPercent + delta * (1f - slideOffset), force = isSlideable)
+            setNavUiOpenPercent(
+              panelClosedNavBarOpenPercent + delta * (1f - slideOffset),
+              force = isSlideable,
+            )
           }
 
           slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)

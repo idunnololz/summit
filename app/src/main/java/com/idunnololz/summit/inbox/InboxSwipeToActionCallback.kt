@@ -46,21 +46,18 @@ class InboxSwipeToActionCallback(
 
   fun ViewHolder.isSwipeEnabled() = this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
 
-  override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
-    return if (viewHolder.isSwipeEnabled()) {
+  override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int =
+    if (viewHolder.isSwipeEnabled()) {
       makeMovementFlags(0, ItemTouchHelper.LEFT)
     } else {
       0
     }
-  }
 
   override fun onMove(
     recyclerView: RecyclerView,
     viewHolder: ViewHolder,
     viewHolder1: ViewHolder,
-  ): Boolean {
-    return false
-  }
+  ): Boolean = false
 
   override fun onChildDraw(
     c: Canvas,
@@ -133,25 +130,20 @@ class InboxSwipeToActionCallback(
     c.drawRect(left, top, right, bottom, clearPaint)
   }
 
-  override fun getSwipeThreshold(viewHolder: ViewHolder): Float {
-    return if (viewHolder.isSwipeEnabled()) {
-      0.5f
-    } else {
-      1f
-    }
+  override fun getSwipeThreshold(viewHolder: ViewHolder): Float = if (viewHolder.isSwipeEnabled()) {
+    0.5f
+  } else {
+    1f
   }
 
-  override fun getSwipeVelocityThreshold(defaultValue: Float): Float {
-    return if (lastVhSwiped?.isSwipeEnabled() == false) {
+  override fun getSwipeVelocityThreshold(defaultValue: Float): Float =
+    if (lastVhSwiped?.isSwipeEnabled() == false) {
       0f
     } else {
       5000f
     }
-  }
 
-  override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
-    return 1f
-  }
+  override fun getSwipeEscapeVelocity(defaultValue: Float): Float = 1f
 
   override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
     onSwipe(viewHolder, direction)

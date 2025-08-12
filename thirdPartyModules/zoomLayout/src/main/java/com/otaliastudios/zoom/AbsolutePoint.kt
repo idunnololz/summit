@@ -44,27 +44,23 @@ data class AbsolutePoint(
    *
    * @param absolutePoint the point to substract
    */
-  operator fun minus(absolutePoint: AbsolutePoint): AbsolutePoint {
-    return AbsolutePoint(this.x - absolutePoint.x, this.y - absolutePoint.y)
-  }
+  operator fun minus(absolutePoint: AbsolutePoint): AbsolutePoint =
+    AbsolutePoint(this.x - absolutePoint.x, this.y - absolutePoint.y)
 
   /**
    * Negate a point
    *
    * @return the negative value of this point
    */
-  operator fun unaryMinus(): AbsolutePoint {
-    return AbsolutePoint(-this.x, -this.y)
-  }
+  operator fun unaryMinus(): AbsolutePoint = AbsolutePoint(-this.x, -this.y)
 
   /**
    * Add a point to another point
    *
    * @param absolutePoint the point to add
    */
-  operator fun plus(absolutePoint: AbsolutePoint): AbsolutePoint {
-    return AbsolutePoint(this.x + absolutePoint.x, this.y + absolutePoint.y)
-  }
+  operator fun plus(absolutePoint: AbsolutePoint): AbsolutePoint =
+    AbsolutePoint(this.x + absolutePoint.x, this.y + absolutePoint.y)
 
   /**
    * Multiply every value in the point by a given factor
@@ -72,9 +68,8 @@ data class AbsolutePoint(
    * @param factor the factor to use
    * @return the multiplied point
    */
-  operator fun times(factor: Number): AbsolutePoint {
-    return AbsolutePoint(factor.toFloat() * this.x, factor.toFloat() * this.y)
-  }
+  operator fun times(factor: Number): AbsolutePoint =
+    AbsolutePoint(factor.toFloat() * this.x, factor.toFloat() * this.y)
 
   /**
    * Returns a [ScaledPoint] for this point, assuming that

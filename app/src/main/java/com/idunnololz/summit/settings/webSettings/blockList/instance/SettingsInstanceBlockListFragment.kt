@@ -26,7 +26,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsInstanceBlockListFragment : BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
+class SettingsInstanceBlockListFragment :
+  BaseFragment<FragmentSettingsCommunityBlockListBinding>() {
 
   private val viewModel: SettingsAccountBlockListViewModel by viewModels()
 

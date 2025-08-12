@@ -139,6 +139,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.extensionForMimeType
 import com.idunnololz.summit.util.guessMimeType
 import com.idunnololz.summit.util.retry
+import java.io.BufferedInputStream
 import java.io.InputStream
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
@@ -151,7 +152,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.BufferedInputStream
 
 const val COMMENTS_DEPTH_MAX = 6
 
@@ -421,28 +421,22 @@ class LemmyApiClient @Inject constructor(
   suspend fun createCommunity(
     account: Account?,
     createCommunity: CreateCommunity,
-  ): Result<CommunityResponse> {
-    return onApiClient {
-      getApi().createCommunity(authorization = account?.bearer, args = createCommunity)
-    }
+  ): Result<CommunityResponse> = onApiClient {
+    getApi().createCommunity(authorization = account?.bearer, args = createCommunity)
   }
 
   suspend fun updateCommunity(
     account: Account?,
     editCommunity: EditCommunity,
-  ): Result<CommunityResponse> {
-    return onApiClient {
-      getApi().updateCommunity(authorization = account?.bearer, args = editCommunity)
-    }
+  ): Result<CommunityResponse> = onApiClient {
+    getApi().updateCommunity(authorization = account?.bearer, args = editCommunity)
   }
 
   suspend fun deleteCommunity(
     account: Account?,
     deleteCommunity: DeleteCommunity,
-  ): Result<CommunityResponse> {
-    return onApiClient {
-      getApi().deleteCommunity(authorization = account?.bearer, args = deleteCommunity)
-    }
+  ): Result<CommunityResponse> = onApiClient {
+    getApi().deleteCommunity(authorization = account?.bearer, args = deleteCommunity)
   }
 
   suspend fun search(
@@ -1302,11 +1296,9 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> {
-    return onApiClient {
-      getApi().saveUserSettings(authorization = settings.auth.toBearer(), settings)
-    }.map { Unit }
-  }
+  suspend fun saveUserSettings(settings: SaveUserSettings): Result<Unit> = onApiClient {
+    getApi().saveUserSettings(authorization = settings.auth.toBearer(), settings)
+  }.map { Unit }
 
   suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
     val form = ResolveObject(
@@ -1544,7 +1536,7 @@ class LemmyApiClient @Inject constructor(
   suspend fun deleteMediaItem(
     deleteToken: String,
     filename: String,
-    account: Account
+    account: Account,
   ): Result<Unit> {
     val form = DeleteImage(
       delete_token = deleteToken,
@@ -1599,10 +1591,8 @@ class LemmyApiClient @Inject constructor(
     }
   }
 
-  suspend fun getCaptcha(): Result<GetCaptchaResponse> {
-    return onApiClient {
-      getApi().getCaptcha()
-    }
+  suspend fun getCaptcha(): Result<GetCaptchaResponse> = onApiClient {
+    getApi().getCaptcha()
   }
 
   private suspend fun <T> onApiClient(call: suspend () -> Result<T>): Result<T> {
@@ -1657,45 +1647,42 @@ class LemmyApiClient @Inject constructor(
   private fun newApi(
     instance: String = Consts.DEFAULT_INSTANCE,
     apiInfo: Result<SiteBackendHelper.ApiInfo>,
-  ): LemmyLikeApi {
-    return apiInfo.fold(
-      {
-        when (it.backendType) {
-          SiteBackendHelper.ApiType.PieFedAlpha -> PieFedApiAlphaAdapter(
-            Retrofit.Builder()
-              .baseUrl("https://$instance/api/alpha/")
-              .addConverterFactory(GsonConverterFactory.create())
-              .client(okHttpClient)
-              .build()
-              .create(PieFedApiAlpha::class.java),
-            instance,
-          )
+  ): LemmyLikeApi = apiInfo.fold(
+    {
+      when (it.backendType) {
+        SiteBackendHelper.ApiType.PieFedAlpha -> PieFedApiAlphaAdapter(
+          Retrofit.Builder()
+            .baseUrl("https://$instance/api/alpha/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(PieFedApiAlpha::class.java),
+          instance,
+        )
 //          SiteBackendHelper.ApiType.LemmyV4,
-          SiteBackendHelper.ApiType.LemmyV3,
-          null,
-          -> LemmyApiV3Adapter(
-            Retrofit.Builder()
-              .baseUrl("https://$instance/api/v3/")
-              .addConverterFactory(GsonConverterFactory.create())
-              .client(okHttpClient)
-              .build()
-              .create(LemmyApiV3::class.java),
-            instance,
-          )
-        }
-      },
-      { exception ->
-        val handler = object : InvocationHandler {
-          override fun invoke(proxy: Any?, method: Method?, args: Array<out Any?>?): Any? {
-            throw exception
-          }
-        }
-        Proxy.newProxyInstance(
-          LemmyLikeApi::class.java.classLoader,
-          arrayOf(LemmyLikeApi::class.java),
-          handler,
-        ) as LemmyLikeApi
-      },
-    )
-  }
+        SiteBackendHelper.ApiType.LemmyV3,
+        null,
+        -> LemmyApiV3Adapter(
+          Retrofit.Builder()
+            .baseUrl("https://$instance/api/v3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(LemmyApiV3::class.java),
+          instance,
+        )
+      }
+    },
+    { exception ->
+      val handler = object : InvocationHandler {
+        override fun invoke(proxy: Any?, method: Method?, args: Array<out Any?>?): Any? =
+          throw exception
+      }
+      Proxy.newProxyInstance(
+        LemmyLikeApi::class.java.classLoader,
+        arrayOf(LemmyLikeApi::class.java),
+        handler,
+      ) as LemmyLikeApi
+    },
+  )
 }

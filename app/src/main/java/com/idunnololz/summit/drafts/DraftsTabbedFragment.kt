@@ -20,8 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DraftsTabbedFragment :
-  BaseFragment<FragmentDraftsTabbedBinding>() {
+class DraftsTabbedFragment : BaseFragment<FragmentDraftsTabbedBinding>() {
 
   companion object {
     const val REQUEST_KEY = "DraftsDialogFragment_req_key"

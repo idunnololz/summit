@@ -68,7 +68,9 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ImageViewerActivity :
-  BaseActivity(), BottomMenuContainer, InsetsProvider by InsetsHelper(consumeInsets = false) {
+  BaseActivity(),
+  BottomMenuContainer,
+  InsetsProvider by InsetsHelper(consumeInsets = false) {
 
   companion object {
 
@@ -454,7 +456,8 @@ class ImageViewerActivity :
     url ?: return
 
     val uri = Uri.parse(url)
-    if (uri.host == "imgur.com" && !forceLoadAsImage &&
+    if (uri.host == "imgur.com" &&
+      !forceLoadAsImage &&
       uri.encodedPath?.endsWith(".png") != true
     ) {
       binding.progressBar.visibility = View.VISIBLE
@@ -485,7 +488,7 @@ class ImageViewerActivity :
             },
             onFailure = {
               binding.loadingView.showDefaultErrorMessageFor(it)
-            }
+            },
           )
       }
 

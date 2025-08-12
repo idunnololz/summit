@@ -16,11 +16,11 @@ import com.idunnololz.summit.inbox.PageType
 import com.idunnololz.summit.lemmy.utils.listSource.PageResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
+import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import kotlin.math.min
 
 @ViewModelScoped
 class InboxRepository @Inject constructor(
@@ -76,23 +76,18 @@ class InboxRepository @Inject constructor(
     val seenIds = mutableSetOf<Int>()
     val allItems = mutableListOf<LiteInboxItem>()
 
-    suspend fun getPage(
-      pageIndex: Int,
-      force: Boolean,
-      retainItemsOnForce: Boolean,
-    ) =
-      _getPage(
-        pageIndex = pageIndex,
-        force = force,
-        retainItemsOnForce = retainItemsOnForce,
-      ).fold(
-        {
-          it
-        },
-        {
-          PageResult.ErrorPageResult(pageIndex, it)
-        }
-      )
+    suspend fun getPage(pageIndex: Int, force: Boolean, retainItemsOnForce: Boolean) = _getPage(
+      pageIndex = pageIndex,
+      force = force,
+      retainItemsOnForce = retainItemsOnForce,
+    ).fold(
+      {
+        it
+      },
+      {
+        PageResult.ErrorPageResult(pageIndex, it)
+      },
+    )
 
     private suspend fun _getPage(
       pageIndex: Int,
@@ -132,8 +127,7 @@ class InboxRepository @Inject constructor(
           return@withContext Result.failure(RuntimeException("No sources!"))
         }
 
-        val nextSourceAndResult = sourceToResult.maxBy {
-            (_, result) ->
+        val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
           result.getOrNull()?.lastUpdateTs ?: 0L
         }
         val nextItem = nextSourceAndResult.second.getOrNull()

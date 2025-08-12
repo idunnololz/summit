@@ -11,9 +11,9 @@ import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentReportContentBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.conversation.MessageItem
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.inbox.conversation.MessageItem
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setSizeDynamically
@@ -21,8 +21,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ReportContentDialogFragment :
-  BaseDialogFragment<DialogFragmentReportContentBinding>() {
+class ReportContentDialogFragment : BaseDialogFragment<DialogFragmentReportContentBinding>() {
 
   companion object {
     fun show(fragmentManager: FragmentManager, postRef: PostRef?, commentRef: CommentRef?) {

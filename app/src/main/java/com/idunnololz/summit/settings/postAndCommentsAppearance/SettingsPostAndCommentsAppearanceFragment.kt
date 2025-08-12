@@ -98,139 +98,139 @@ class SettingsPostAndCommentsAppearanceFragment :
     updateRendering()
   }
 
-  override fun generateData(): List<SettingModelItem> {
-    return listOf(
-      BasicSettingItem(
-        icon = null,
-        title = getString(R.string.preview),
-        description = null,
-        id = R.id.post_and_comment_appearance_preview,
-      ).asCustomViewSettingsItem(
-        typeId = R.id.post_and_comment_appearance_preview,
-        payload = null,
-        inflateFn = PostAndCommentAppearanceDemoCardBinding::inflate,
-        bindViewHolder = { item, b, h ->
-          b.demoViewContainer.setTag(R.id.binding, b)
-          updateRendering(b)
+  override fun generateData(): List<SettingModelItem> = listOf(
+    BasicSettingItem(
+      icon = null,
+      title = getString(R.string.preview),
+      description = null,
+      id = R.id.post_and_comment_appearance_preview,
+    ).asCustomViewSettingsItem(
+      typeId = R.id.post_and_comment_appearance_preview,
+      payload = null,
+      inflateFn = PostAndCommentAppearanceDemoCardBinding::inflate,
+      bindViewHolder = { item, b, h ->
+        b.demoViewContainer.setTag(R.id.binding, b)
+        updateRendering(b)
+      },
+    ),
+    SettingModelItem.SubgroupItem(
+      getString(R.string.post_settings),
+      listOf(
+        settings.postFontSize.asSliderItem(
+          { viewModel.currentPostAndCommentUiConfig.postUiConfig.textSizeMultiplier },
+          {
+            viewModel.currentPostAndCommentUiConfig =
+              viewModel.currentPostAndCommentUiConfig.copy(
+                postUiConfig = viewModel.currentPostAndCommentUiConfig
+                  .postUiConfig
+                  .updateTextSizeMultiplier(it),
+              )
+
+            updateRendering()
+          },
+        ),
+        settings.alwaysShowLinkBelowPost.asOnOffSwitch(
+          { viewModel.preferences.alwaysShowLinkButtonBelowPost },
+          {
+            viewModel.preferences.alwaysShowLinkButtonBelowPost = it
+
+            updateRendering()
+          },
+        ),
+        settings.fullBleedImage.asOnOffSwitch(
+          { viewModel.preferences.postFullBleedImage },
+          {
+            viewModel.preferences.postFullBleedImage = it
+
+            updateRendering()
+          },
+        ),
+        SettingModelItem.DividerItem(R.id.divider0),
+        settings.resetPostStyles.asCustomItem {
+          resetPostStylesDialogLauncher.launchDialog {
+            messageResId = R.string.reset_view_to_default_styles
+            positionButtonResId = android.R.string.ok
+            negativeButtonResId = R.string.cancel
+          }
         },
+        SettingModelItem.DividerItem(R.id.divider1),
       ),
-      SettingModelItem.SubgroupItem(
-        getString(R.string.post_settings),
-        listOf(
-          settings.postFontSize.asSliderItem(
-            { viewModel.currentPostAndCommentUiConfig.postUiConfig.textSizeMultiplier },
-            {
-              viewModel.currentPostAndCommentUiConfig =
-                viewModel.currentPostAndCommentUiConfig.copy(
-                  postUiConfig = viewModel.currentPostAndCommentUiConfig
-                    .postUiConfig
-                    .updateTextSizeMultiplier(it),
-                )
+    ),
+    SettingModelItem.SubgroupItem(
+      getString(R.string.comment_settings),
+      listOf(
+        settings.commentFontSize.asSliderItem(
+          { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
+          {
+            viewModel.currentPostAndCommentUiConfig =
+              viewModel.currentPostAndCommentUiConfig.copy(
+                commentUiConfig = viewModel.currentPostAndCommentUiConfig
+                  .commentUiConfig
+                  .updateTextSizeMultiplier(it),
+              )
 
-              updateRendering()
-            },
-          ),
-          settings.alwaysShowLinkBelowPost.asOnOffSwitch(
-            { viewModel.preferences.alwaysShowLinkButtonBelowPost },
-            {
-              viewModel.preferences.alwaysShowLinkButtonBelowPost = it
-
-              updateRendering()
-            },
-          ),
-          settings.fullBleedImage.asOnOffSwitch(
-            { viewModel.preferences.postFullBleedImage },
-            {
-              viewModel.preferences.postFullBleedImage = it
-
-              updateRendering()
-            },
-          ),
-          SettingModelItem.DividerItem(R.id.divider0),
-          settings.resetPostStyles.asCustomItem {
-            resetPostStylesDialogLauncher.launchDialog {
-              messageResId = R.string.reset_view_to_default_styles
-              positionButtonResId = android.R.string.ok
-              negativeButtonResId = R.string.cancel
-            }
+            updateRendering()
           },
-          SettingModelItem.DividerItem(R.id.divider1),
         ),
-      ),
-      SettingModelItem.SubgroupItem(
-        getString(R.string.comment_settings),
-        listOf(
-          settings.commentFontSize.asSliderItem(
-            { viewModel.currentPostAndCommentUiConfig.commentUiConfig.textSizeMultiplier },
-            {
-              viewModel.currentPostAndCommentUiConfig =
-                viewModel.currentPostAndCommentUiConfig.copy(
-                  commentUiConfig = viewModel.currentPostAndCommentUiConfig
-                    .commentUiConfig
-                    .updateTextSizeMultiplier(it),
-                )
-
-              updateRendering()
-            },
-          ),
-          settings.commentIndentationLevel.asSliderItem(
-            { viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat() },
-            {
-              viewModel.currentPostAndCommentUiConfig =
-                viewModel.currentPostAndCommentUiConfig.copy(
-                  commentUiConfig = viewModel.currentPostAndCommentUiConfig
-                    .commentUiConfig
-                    .updateIndentationPerLevelDp(it),
-                )
-
-              updateRendering()
-            },
-          ),
-          settings.showCommentActions.asOnOffSwitch(
-            { !viewModel.preferences.hideCommentActions },
-            {
-              viewModel.preferences.hideCommentActions = !it
-
-              updateRendering()
-            },
-          ),
-          settings.tapCommentToCollapse.asOnOffSwitch(
-            { viewModel.preferences.tapCommentToCollapse },
-            {
-              viewModel.preferences.tapCommentToCollapse = it
-
-              updateRendering()
-            },
-          ),
-          settings.commentsThreadStyle.asSingleChoiceSelectorItem(
-            { viewModel.preferences.commentThreadStyle },
-            {
-              viewModel.preferences.commentThreadStyle = it
-
-              updateRendering()
-            },
-          ),
-          settings.useCondensedTypefaceForCommentHeader.asOnOffSwitch(
-            { viewModel.preferences.useCondensedTypefaceForCommentHeaders },
-            {
-              viewModel.preferences.useCondensedTypefaceForCommentHeaders = it
-
-              updateRendering()
-            },
-          ),
-          SettingModelItem.DividerItem(R.id.divider2),
-          settings.resetCommentStyles.asCustomItem {
-            resetCommentStylesDialogLauncher.launchDialog {
-              messageResId = R.string.reset_view_to_default_styles
-              positionButtonResId = android.R.string.ok
-              negativeButtonResId = R.string.cancel
-            }
+        settings.commentIndentationLevel.asSliderItem(
+          {
+            viewModel.currentPostAndCommentUiConfig.commentUiConfig.indentationPerLevelDp.toFloat()
           },
-          SettingModelItem.DividerItem(R.id.divider3),
+          {
+            viewModel.currentPostAndCommentUiConfig =
+              viewModel.currentPostAndCommentUiConfig.copy(
+                commentUiConfig = viewModel.currentPostAndCommentUiConfig
+                  .commentUiConfig
+                  .updateIndentationPerLevelDp(it),
+              )
+
+            updateRendering()
+          },
         ),
+        settings.showCommentActions.asOnOffSwitch(
+          { !viewModel.preferences.hideCommentActions },
+          {
+            viewModel.preferences.hideCommentActions = !it
+
+            updateRendering()
+          },
+        ),
+        settings.tapCommentToCollapse.asOnOffSwitch(
+          { viewModel.preferences.tapCommentToCollapse },
+          {
+            viewModel.preferences.tapCommentToCollapse = it
+
+            updateRendering()
+          },
+        ),
+        settings.commentsThreadStyle.asSingleChoiceSelectorItem(
+          { viewModel.preferences.commentThreadStyle },
+          {
+            viewModel.preferences.commentThreadStyle = it
+
+            updateRendering()
+          },
+        ),
+        settings.useCondensedTypefaceForCommentHeader.asOnOffSwitch(
+          { viewModel.preferences.useCondensedTypefaceForCommentHeaders },
+          {
+            viewModel.preferences.useCondensedTypefaceForCommentHeaders = it
+
+            updateRendering()
+          },
+        ),
+        SettingModelItem.DividerItem(R.id.divider2),
+        settings.resetCommentStyles.asCustomItem {
+          resetCommentStylesDialogLauncher.launchDialog {
+            messageResId = R.string.reset_view_to_default_styles
+            positionButtonResId = android.R.string.ok
+            negativeButtonResId = R.string.cancel
+          }
+        },
+        SettingModelItem.DividerItem(R.id.divider3),
       ),
-    )
-  }
+    ),
+  )
 
   private fun updateRendering(b: PostAndCommentAppearanceDemoCardBinding? = null) {
     if (!isBindingAvailable()) return
@@ -284,13 +284,14 @@ class SettingsPostAndCommentsAppearanceFragment :
 
     private val adapterHelper = AdapterHelper<Any>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is PostView -> true
-          is CommentView ->
-            old.comment.id == (new as CommentView).comment.id
-          else ->
-            false
-        }
+        old::class == new::class &&
+          when (old) {
+            is PostView -> true
+            is CommentView ->
+              old.comment.id == (new as CommentView).comment.id
+            else ->
+              false
+          }
       },
     )
 

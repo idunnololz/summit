@@ -90,9 +90,7 @@ object AnimationUtils {
         v.requestLayout()
       }
 
-      override fun willChangeBounds(): Boolean {
-        return true
-      }
+      override fun willChangeBounds(): Boolean = true
     }
 
     a.duration = duration
@@ -115,9 +113,7 @@ object AnimationUtils {
         }
       }
 
-      override fun willChangeBounds(): Boolean {
-        return true
-      }
+      override fun willChangeBounds(): Boolean = true
     }
 
     a.duration = 300
@@ -125,7 +121,9 @@ object AnimationUtils {
     v.requestLayout()
   }
 
-  class AnimationController(private val view: View) {
+  class AnimationController(
+    private val view: View,
+  ) {
     private var animatingIn: Boolean = false
     private var animatingOut: Boolean = false
 

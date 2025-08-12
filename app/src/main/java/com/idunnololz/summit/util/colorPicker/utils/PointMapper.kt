@@ -7,9 +7,8 @@ import kotlin.math.min
 import kotlin.math.sqrt
 
 internal object PointMapper {
-  internal fun getColorPoint(colorPickerView: ColorPickerView, point: Point): Point {
-    return getHuePoint(colorPickerView, point)
-  }
+  internal fun getColorPoint(colorPickerView: ColorPickerView, point: Point): Point =
+    getHuePoint(colorPickerView, point)
 
   private fun getHuePoint(colorPickerView: ColorPickerView, point: Point): Point {
     val lp = colorPickerView.palette.layoutParams as ConstraintLayout.LayoutParams

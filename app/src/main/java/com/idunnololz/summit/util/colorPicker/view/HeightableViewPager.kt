@@ -11,9 +11,7 @@ class HeightableViewPager : ViewPager {
 
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
-  override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-    return false
-  }
+  override fun onInterceptTouchEvent(event: MotionEvent): Boolean = false
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     var heightMeasureSpec = heightMeasureSpec
@@ -22,7 +20,9 @@ class HeightableViewPager : ViewPager {
     val adapter = adapter
     if (adapter != null && adapter is Heightable) {
       height = (adapter as Heightable).getHeightAt(
-        currentItem, widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+        currentItem,
+        widthMeasureSpec,
+        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
       )
     }
 

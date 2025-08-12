@@ -39,8 +39,7 @@ class GravitySnapHelper @JvmOverloads constructor(
   gravity: Int,
   enableSnapLastItem: Boolean = false,
   snapListener: SnapListener? = null,
-) :
-  LinearSnapHelper() {
+) : LinearSnapHelper() {
   var snapPadding: Int = 0
 
   private var gravity: Int
@@ -104,7 +103,13 @@ class GravitySnapHelper @JvmOverloads constructor(
 
   init {
     require(
-      !(gravity != Gravity.START && gravity != Gravity.END && gravity != Gravity.BOTTOM && gravity != Gravity.TOP && gravity != Gravity.CENTER),
+      !(
+        gravity != Gravity.START &&
+          gravity != Gravity.END &&
+          gravity != Gravity.BOTTOM &&
+          gravity != Gravity.TOP &&
+          gravity != Gravity.CENTER
+        ),
     ) {
       "Invalid gravity value. Use START " +
         "| END | BOTTOM | TOP | CENTER constants"
@@ -135,9 +140,7 @@ class GravitySnapHelper @JvmOverloads constructor(
     super.attachToRecyclerView(recyclerView)
   }
 
-  override fun findSnapView(lm: RecyclerView.LayoutManager): View? {
-    return findSnapView(lm, true)
-  }
+  override fun findSnapView(lm: RecyclerView.LayoutManager): View? = findSnapView(lm, true)
 
   fun findSnapView(lm: RecyclerView.LayoutManager, checkEdgeOfList: Boolean): View? {
     var snapView: View? = null
@@ -145,32 +148,44 @@ class GravitySnapHelper @JvmOverloads constructor(
     when (gravity) {
       Gravity.START -> snapView = findView(
         lm,
-        getHorizontalHelper(lm)!!, Gravity.START, checkEdgeOfList,
+        getHorizontalHelper(lm)!!,
+        Gravity.START,
+        checkEdgeOfList,
       )
 
       Gravity.END -> snapView = findView(
         lm,
-        getHorizontalHelper(lm)!!, Gravity.END, checkEdgeOfList,
+        getHorizontalHelper(lm)!!,
+        Gravity.END,
+        checkEdgeOfList,
       )
 
       Gravity.TOP -> snapView = findView(
         lm,
-        getVerticalHelper(lm)!!, Gravity.START, checkEdgeOfList,
+        getVerticalHelper(lm)!!,
+        Gravity.START,
+        checkEdgeOfList,
       )
 
       Gravity.BOTTOM -> snapView = findView(
         lm,
-        getVerticalHelper(lm)!!, Gravity.END, checkEdgeOfList,
+        getVerticalHelper(lm)!!,
+        Gravity.END,
+        checkEdgeOfList,
       )
 
       Gravity.CENTER -> snapView = if (lm.canScrollHorizontally()) {
         findView(
-          lm, getHorizontalHelper(lm)!!, Gravity.CENTER,
+          lm,
+          getHorizontalHelper(lm)!!,
+          Gravity.CENTER,
           checkEdgeOfList,
         )
       } else {
         findView(
-          lm, getVerticalHelper(lm)!!, Gravity.CENTER,
+          lm,
+          getVerticalHelper(lm)!!,
+          Gravity.CENTER,
           checkEdgeOfList,
         )
       }
@@ -216,7 +231,8 @@ class GravitySnapHelper @JvmOverloads constructor(
   }
 
   override fun calculateScrollDistance(velocityX: Int, velocityY: Int): IntArray {
-    if (recyclerView == null || (verticalHelper == null && horizontalHelper == null) ||
+    if (recyclerView == null ||
+      (verticalHelper == null && horizontalHelper == null) ||
       (
         maxFlingDistance == FLING_DISTANCE_DISABLE &&
           maxFlingSizeFraction == FLING_SIZE_FRACTION_DISABLE
@@ -270,9 +286,8 @@ class GravitySnapHelper @JvmOverloads constructor(
         }
       }
 
-      override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-        return scrollMsPerInch / displayMetrics.densityDpi
-      }
+      override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float =
+        scrollMsPerInch / displayMetrics.densityDpi
     }
   }
 
@@ -359,9 +374,7 @@ class GravitySnapHelper @JvmOverloads constructor(
    * @return one of the following: [Gravity.START], [Gravity.TOP], [Gravity.END],
    * [Gravity.BOTTOM], [Gravity.CENTER]
    */
-  fun getGravity(): Int {
-    return this.gravity
-  }
+  fun getGravity(): Int = this.gravity
 
   /**
    * Changes the gravity of this [GravitySnapHelper]
@@ -378,9 +391,7 @@ class GravitySnapHelper @JvmOverloads constructor(
    * @return last distance set through [GravitySnapHelper.setMaxFlingDistance]
    * or [GravitySnapHelper.FLING_DISTANCE_DISABLE] if we're not limiting the fling distance
    */
-  fun getMaxFlingDistance(): Int {
-    return maxFlingDistance
-  }
+  fun getMaxFlingDistance(): Int = maxFlingDistance
 
   /**
    * Changes the max fling distance in absolute values.
@@ -399,9 +410,7 @@ class GravitySnapHelper @JvmOverloads constructor(
    * or [GravitySnapHelper.FLING_SIZE_FRACTION_DISABLE]
    * if we're not limiting the fling distance
    */
-  fun getMaxFlingSizeFraction(): Float {
-    return maxFlingSizeFraction
-  }
+  fun getMaxFlingSizeFraction(): Float = maxFlingSizeFraction
 
   /**
    * Changes the max fling distance depending on the available size of the RecyclerView.
@@ -594,8 +603,8 @@ class GravitySnapHelper @JvmOverloads constructor(
     return edgeView
   }
 
-  private fun isAtEdgeOfList(lm: LinearLayoutManager): Boolean {
-    return if ((!lm.reverseLayout && gravity == Gravity.START) ||
+  private fun isAtEdgeOfList(lm: LinearLayoutManager): Boolean =
+    if ((!lm.reverseLayout && gravity == Gravity.START) ||
       (lm.reverseLayout && gravity == Gravity.END) ||
       (!lm.reverseLayout && gravity == Gravity.TOP) ||
       (lm.reverseLayout && gravity == Gravity.BOTTOM)
@@ -609,7 +618,6 @@ class GravitySnapHelper @JvmOverloads constructor(
     } else {
       lm.findFirstCompletelyVisibleItemPosition() == 0
     }
-  }
 
   /**
    * Dispatches a [SnapListener.onSnap] event if the snapped position

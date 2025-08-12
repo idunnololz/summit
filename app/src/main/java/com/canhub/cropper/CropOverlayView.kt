@@ -688,7 +688,11 @@ internal class CropOverlayView @JvmOverloads constructor(
       }
     }
     // To retain the changes in Paint object when the App goes background this is required
-    mBorderCornerPaint = getNewPaintOrNull(mOptions?.borderCornerThickness ?: 0.0f, mOptions?.borderCornerColor ?: Color.WHITE)
+    mBorderCornerPaint =
+      getNewPaintOrNull(
+        mOptions?.borderCornerThickness ?: 0.0f,
+        mOptions?.borderCornerColor ?: Color.WHITE,
+      )
     drawCropLabelText(canvas)
     drawBorders(canvas)
     drawCorners(canvas)
@@ -718,7 +722,8 @@ internal class CropOverlayView @JvmOverloads constructor(
 
     rectMiddle.left = rectTop.left
     rectMiddle.right = rectTop.right
-    rectMiddle.top = ((cropWindowRect.top + cropWindowRect.bottom) / 2.0f - (maxVerticalGestureExclusion * 0.2f)).toInt()
+    rectMiddle.top =
+      ((cropWindowRect.top + cropWindowRect.bottom) / 2.0f - (maxVerticalGestureExclusion * 0.2f)).toInt()
     rectMiddle.bottom = (rectMiddle.top + (maxVerticalGestureExclusion * 0.4f)).toInt()
 
     rectBottom.left = rectTop.left

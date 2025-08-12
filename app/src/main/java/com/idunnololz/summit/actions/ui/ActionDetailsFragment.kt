@@ -282,16 +282,17 @@ class ActionDetailsFragment :
     private var data: Action? = null
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.HeaderItem ->
-            old.actionDetails == (new as Item.HeaderItem).actionDetails
-          is Item.TextFieldItem ->
-            old.title == (new as Item.TextFieldItem).title
-          is Item.RichTextFieldItem ->
-            old.title == (new as Item.RichTextFieldItem).title
-          is Item.FooterItem ->
-            true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.HeaderItem ->
+              old.actionDetails == (new as Item.HeaderItem).actionDetails
+            is Item.TextFieldItem ->
+              old.title == (new as Item.TextFieldItem).title
+            is Item.RichTextFieldItem ->
+              old.title == (new as Item.RichTextFieldItem).title
+            is Item.FooterItem ->
+              true
+          }
       },
     ).apply {
       addItemType(

@@ -23,9 +23,9 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.inbox.InboxEntriesDao
-import com.idunnololz.summit.inbox.InboxEntry
 import com.idunnololz.summit.inbox.InboxItem
+import com.idunnololz.summit.inbox.db.InboxEntriesDao
+import com.idunnololz.summit.inbox.db.InboxEntry
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.preferences.NotificationsSharedPreference
 import com.idunnololz.summit.preferences.Preferences
@@ -341,11 +341,10 @@ class NotificationsManager @Inject constructor(
     }
   }
 
-  suspend fun findInboxItem(notificationId: Int): InboxEntry? {
-    return inboxEntriesDao.findInboxEntriesByNotificationId(notificationId).firstOrNull {
+  suspend fun findInboxItem(notificationId: Int): InboxEntry? =
+    inboxEntriesDao.findInboxEntriesByNotificationId(notificationId).firstOrNull {
       it.inboxItem != null
     }
-  }
 
   private fun getChannelIdForAccount(account: Account) =
     CHANNEL_ID_ACCOUNT_PREFIX + account.fullName

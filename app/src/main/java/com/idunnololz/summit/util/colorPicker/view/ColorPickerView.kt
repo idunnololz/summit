@@ -44,7 +44,11 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorPickerContainer {
+class ColorPickerView :
+  ConstraintLayout,
+  LifecycleObserver,
+  ColorPicker,
+  ColorPickerContainer {
 
   override val view: View
     get() = this
@@ -269,7 +273,8 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
 
     if (palette.drawable != null &&
       palette.drawable is BitmapDrawable &&
-      mappedPoints[0] >= 0 && mappedPoints[1] >= 0 &&
+      mappedPoints[0] >= 0 &&
+      mappedPoints[1] >= 0 &&
       mappedPoints[0] < palette.drawable.intrinsicWidth &&
       mappedPoints[1] < palette.drawable.intrinsicHeight
     ) {
@@ -330,9 +335,7 @@ class ColorPickerView : ConstraintLayout, LifecycleObserver, ColorPicker, ColorP
    * @return alpha from the selected color.
    */
   @FloatRange(from = 0.0, to = 1.0)
-  override fun getAlpha(): Float {
-    return Color.alpha(color) / 255f
-  }
+  override fun getAlpha(): Float = Color.alpha(color) / 255f
 
   /**
    * changes selector's selected point with notifies about changes manually.

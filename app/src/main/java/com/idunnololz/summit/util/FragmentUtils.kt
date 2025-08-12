@@ -3,11 +3,11 @@ package com.idunnololz.summit.util
 import android.util.Log
 import com.idunnololz.summit.actions.ui.ActionsTabbedFragment
 import com.idunnololz.summit.history.HistoryFragment
+import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.communities.CommunitiesFragment
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoFragment
 import com.idunnololz.summit.lemmy.createOrEditCommunity.CreateOrEditCommunityFragment
-import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.mod.viewVotes.ViewVotesFragment
 import com.idunnololz.summit.lemmy.modlogs.ModLogsFragment
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment

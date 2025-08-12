@@ -10,7 +10,9 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 @Serializable
 @JsonClassDiscriminator("t")
-sealed interface PersonRef : Parcelable, PageRef {
+sealed interface PersonRef :
+  Parcelable,
+  PageRef {
 
   val instance: String
 

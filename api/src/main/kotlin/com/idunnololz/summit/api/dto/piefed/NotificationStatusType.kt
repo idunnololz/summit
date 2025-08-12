@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: All,New,Read
  */
 
-enum class NotificationStatusType(val value: kotlin.String) {
+enum class NotificationStatusType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "All")
   All("All"),

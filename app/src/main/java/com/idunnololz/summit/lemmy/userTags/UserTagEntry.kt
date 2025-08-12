@@ -41,16 +41,16 @@ data class UserTagConfig(
 ) : Parcelable
 
 @ProvidedTypeConverter
-class UserTagConverters(private val json: Json) {
+class UserTagConverters(
+  private val json: Json,
+) {
 
   companion object {
     private const val TAG = "UserTagConverters"
   }
 
   @TypeConverter
-  fun userTagConfigToString(value: UserTagConfig): String {
-    return json.encodeToString(value)
-  }
+  fun userTagConfigToString(value: UserTagConfig): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToUserTagConfig(value: String): UserTagConfig? = try {

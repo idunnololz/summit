@@ -78,7 +78,9 @@ import kotlin.math.min
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNavigator {
+class PersonTabbedFragment :
+  BaseFragment<FragmentPersonBinding>(),
+  SignInNavigator {
 
   companion object {
     private const val TAG = "PersonTabbedFragment"
@@ -573,7 +575,8 @@ class PersonTabbedFragment : BaseFragment<FragmentPersonBinding>(), SignInNaviga
           val s = length
           append(
             context.getString(
-              R.string.new_account_desc_format, tsToConcise(context, person.published),
+              R.string.new_account_desc_format,
+              tsToConcise(context, person.published),
             ),
           )
           val e = length

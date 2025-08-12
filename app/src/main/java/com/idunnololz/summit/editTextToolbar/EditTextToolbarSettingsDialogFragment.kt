@@ -187,10 +187,11 @@ class EditTextToolbarSettingsDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.ToolbarItem ->
-            old == new
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.ToolbarItem ->
+              old == new
+          }
       },
     )
 
@@ -217,9 +218,7 @@ class EditTextToolbarSettingsDialogFragment :
           target: RecyclerView.ViewHolder,
         ): Boolean = items[target.bindingAdapterPosition] is Item.ToolbarItem
 
-        override fun isLongPressDragEnabled(): Boolean {
-          return false
-        }
+        override fun isLongPressDragEnabled(): Boolean = false
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
       }

@@ -441,9 +441,7 @@ class ModLogsViewModel @Inject constructor(
     reset()
   }
 
-  fun getFilter(): ModLogsFilterConfig {
-    return filter.value ?: ModLogsFilterConfig()
-  }
+  fun getFilter(): ModLogsFilterConfig = filter.value ?: ModLogsFilterConfig()
 
   fun reset() {
     pagesFetching.clear()

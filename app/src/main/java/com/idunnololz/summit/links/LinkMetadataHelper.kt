@@ -187,7 +187,7 @@ class LinkMetadataHelper @Inject constructor(
         imageUrl = imageUrls.firstOrNull(),
         pageRef = fixedPageRef,
         publishedTs = 0,
-      )
+      ),
     )
   }
 

@@ -22,8 +22,7 @@ class NoneTransition(
 
   class Factory : Transition.Factory {
 
-    override fun create(target: TransitionTarget, result: ImageResult): Transition {
-      return NoneTransition(target, result)
-    }
+    override fun create(target: TransitionTarget, result: ImageResult): Transition =
+      NoneTransition(target, result)
   }
 }

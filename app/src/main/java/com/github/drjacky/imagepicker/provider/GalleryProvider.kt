@@ -26,8 +26,7 @@ import java.io.IOException
 class GalleryProvider(
   activity: ImagePickerActivity,
   private val launcher: (Intent) -> Unit,
-) :
-  BaseProvider(activity) {
+) : BaseProvider(activity) {
 
   private var fileList: ArrayList<Uri>? = null
 
@@ -115,10 +114,8 @@ class GalleryProvider(
    * @param context Application Context
    * @return boolean true if all required permission granted else false.
    */
-  private fun isPermissionGranted(context: Context): Boolean {
-    return getRequiredPermission(context).none {
-      !PermissionUtil.isPermissionGranted(context, it)
-    }
+  private fun isPermissionGranted(context: Context): Boolean = getRequiredPermission(context).none {
+    !PermissionUtil.isPermissionGranted(context, it)
   }
 
   /**
@@ -127,11 +124,9 @@ class GalleryProvider(
    * @param context Application Context
    * @return Array<String> returns permission which are added in Manifest
    */
-  private fun getRequiredPermission(context: Context): Array<String> {
-    return REQUIRED_PERMISSIONS.filter {
-      PermissionUtil.isPermissionInManifest(context, it)
-    }.toTypedArray()
-  }
+  private fun getRequiredPermission(context: Context): Array<String> = REQUIRED_PERMISSIONS.filter {
+    PermissionUtil.isPermissionInManifest(context, it)
+  }.toTypedArray()
 
   /**
    * Handle Requested Permission Result

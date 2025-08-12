@@ -207,6 +207,9 @@
             app:exitAnim="@animator/fade_out"
             app:popEnterAnim="@animator/fade_in"
             app:popExitAnim="@animator/fade_out"/>
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsInboxFragment"
+            app:destination="@id/settingsInboxFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -522,4 +525,8 @@
         android:id="@+id/postsInFeedQuickActionsFragment"
         android:name="com.idunnololz.summit.settings.postsInFeedQuickActions.PostsInFeedQuickActionsFragment"
         android:label="PostsInFeedQuickActionsFragment" />
+    <fragment
+        android:id="@+id/settingsInboxFragment"
+        android:name="com.idunnololz.summit.settings.inbox.SettingsInboxFragment"
+        android:label="SettingsInboxFragment" />
 </navigation>

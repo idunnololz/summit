@@ -10,7 +10,9 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import com.idunnololz.summit.util.Utils
 
-class SeekBarBackgroundDrawable(private val drawable: Drawable) : Drawable() {
+class SeekBarBackgroundDrawable(
+  private val drawable: Drawable,
+) : Drawable() {
   private val height: Float = Utils.convertDpToPixel(16f)
   private val horizontalMargin = Utils.convertDpToPixel(8f)
   private val paint: Paint = Paint()
@@ -36,9 +38,7 @@ class SeekBarBackgroundDrawable(private val drawable: Drawable) : Drawable() {
   override fun setColorFilter(colorFilter: ColorFilter?) {
   }
 
-  override fun getOpacity(): Int {
-    return PixelFormat.TRANSPARENT
-  }
+  override fun getOpacity(): Int = PixelFormat.TRANSPARENT
 
   override fun onBoundsChange(bounds: Rect) {
     super.onBoundsChange(bounds)

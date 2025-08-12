@@ -6,14 +6,12 @@ import com.idunnololz.summit.api.dto.lemmy.LocalImageView
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.MultiLemmyListSource
 import com.idunnololz.summit.lemmy.utils.listSource.PageResult
-import com.idunnololz.summit.lemmy.utils.listSource.onFailure
-import com.idunnololz.summit.lemmy.utils.listSource.onSuccess
 import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 class UploadsEngine @Inject constructor(
   @ApplicationContext private val context: Context,
@@ -24,20 +22,20 @@ class UploadsEngine @Inject constructor(
     data class MediaItem(
       val media: LocalImageView,
       val instance: String,
-    ): UploadItem
+    ) : UploadItem
 
     data class LoadingItem(
-      val pageIndex: Int
-    ): UploadItem
+      val pageIndex: Int,
+    ) : UploadItem
 
     data class MoreItem(
-      val pageIndex: Int
-    ): UploadItem
+      val pageIndex: Int,
+    ) : UploadItem
 
     data class ErrorItem(
       val error: Throwable,
-      val pageIndex: Int
-    ): UploadItem
+      val pageIndex: Int,
+    ) : UploadItem
   }
 
   private val source =
@@ -99,12 +97,14 @@ class UploadsEngine @Inject constructor(
         }
 
         is PageResult.SuccessPageResult -> {
-          newItems.addAll(p.items.map {
-            UploadItem.MediaItem(
-              media = it,
-              instance = apiClient.instance,
-            )
-          })
+          newItems.addAll(
+            p.items.map {
+              UploadItem.MediaItem(
+                media = it,
+                instance = apiClient.instance,
+              )
+            },
+          )
         }
       }
     }
@@ -130,7 +130,8 @@ class UploadsEngine @Inject constructor(
     for ((index, page) in pages.withIndex()) {
       if (page is PageResult.SuccessPageResult) {
         if (page.items.any { it.local_image.pictrs_alias == filename }) {
-          pages[index] = page.copy(items = page.items.filter { it.local_image.pictrs_alias != filename })
+          pages[index] =
+            page.copy(items = page.items.filter { it.local_image.pictrs_alias != filename })
         }
       }
     }

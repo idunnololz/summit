@@ -422,7 +422,9 @@ class PendingActionsManager @Inject constructor(
   }
 
   sealed class ActionExecutionResult {
-    class Success(val result: LemmyActionResult<*, *>) : ActionExecutionResult()
+    class Success(
+      val result: LemmyActionResult<*, *>,
+    ) : ActionExecutionResult()
     data class Failure(
       val failureReason: LemmyActionFailureReason,
     ) : ActionExecutionResult()

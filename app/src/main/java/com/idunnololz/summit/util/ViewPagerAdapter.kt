@@ -27,7 +27,8 @@ class ViewPagerAdapter(
   private val context: Context,
   fragmentManager: FragmentManager,
   lifecycle: Lifecycle,
-) : FragmentStateAdapter(fragmentManager, lifecycle), TabLayoutMediator.TabConfigurationStrategy {
+) : FragmentStateAdapter(fragmentManager, lifecycle),
+  TabLayoutMediator.TabConfigurationStrategy {
 
   private val fragmentFactory: FragmentFactory = fragmentManager.fragmentFactory
   private val items = ArrayList<PageItem>()

@@ -28,7 +28,7 @@ data class SubgroupItem(
 data class BasicSettingItem(
   @DrawableRes val icon: Int?,
   override val title: String,
-  override val description: String?,
+  override val description: String? = null,
   override val relatedKeys: List<String> = listOf(),
   override val id: Int = nextId++,
 ) : SettingItem()
@@ -79,7 +79,7 @@ data class SliderSettingItem(
 data class OnOffSettingItem(
   @DrawableRes val icon: Int?,
   override val title: String,
-  override val description: String?,
+  override val description: String? = null,
   override val relatedKeys: List<String> = listOf(),
   override val id: Int = nextId++,
 ) : SettingItem()
@@ -88,7 +88,7 @@ data class OnOffSettingItem(
 data class ColorSettingItem(
   @DrawableRes val icon: Int?,
   override val title: String,
-  override val description: String?,
+  override val description: String? = null,
   override val relatedKeys: List<String> = listOf(),
   override val id: Int = nextId++,
 ) : SettingItem()
@@ -97,7 +97,7 @@ data class ColorSettingItem(
 data class RadioGroupSettingItem(
   @DrawableRes val icon: Int?,
   override val title: String,
-  override val description: String?,
+  override val description: String? = null,
   val options: List<RadioGroupOption>,
   override val isEnabled: Boolean = true,
   override val relatedKeys: List<String> = listOf(),

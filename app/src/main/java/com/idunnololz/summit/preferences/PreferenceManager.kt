@@ -58,13 +58,11 @@ class PreferenceManager @Inject constructor(
     return _currentPreferences!!
   }
 
-  fun getOnlyPreferencesForAccount(account: Account): Preferences {
-    return Preferences(
-      context = context,
-      sharedPreferencesManager = sharedPreferencesManager,
-      sharedPreferences = sharedPreferencesManager.getSharedPreferencesForAccount(account),
-      coroutineScopeFactory = coroutineScopeFactory,
-      json = json,
-    )
-  }
+  fun getOnlyPreferencesForAccount(account: Account): Preferences = Preferences(
+    context = context,
+    sharedPreferencesManager = sharedPreferencesManager,
+    sharedPreferences = sharedPreferencesManager.getSharedPreferencesForAccount(account),
+    coroutineScopeFactory = coroutineScopeFactory,
+    json = json,
+  )
 }

@@ -294,6 +294,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
               findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
+            is InboxSettings -> {
+              val directions = SettingsFragmentDirections
+                .actionSettingsFragmentToSettingsInboxFragment()
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
+            }
+
             null -> {
               // do nothing
             }
@@ -464,6 +470,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
               .actionSettingsFragmentToSettingsVideoPlayerFragment()
             findNavController().navigateSafe(directions)
           },
+          settings.inboxSettings.asCustomItem {
+            val directions = SettingsFragmentDirections
+              .actionSettingsFragmentToSettingsInboxFragment()
+            findNavController().navigateSafe(directions)
+          },
           settings.miscSettings.asCustomItem {
             val directions = SettingsFragmentDirections
               .actionSettingsFragmentToSettingMiscFragment()
@@ -578,10 +589,11 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.SearchResultItem ->
-            old.settingItem.id == (new as Item.SearchResultItem).settingItem.id
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.SearchResultItem ->
+              old.settingItem.id == (new as Item.SearchResultItem).settingItem.id
+          }
       },
     ).apply {
       addItemType(

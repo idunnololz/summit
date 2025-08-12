@@ -22,7 +22,9 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 class ColorPickerHistoryView(
   context: Context,
   private val globalStateStorage: GlobalStateStorage,
-) : ConstraintLayout(context), ColorPicker, ColorPickerContainer {
+) : ConstraintLayout(context),
+  ColorPicker,
+  ColorPickerContainer {
 
   private var listener: OnColorPickedListener? = null
 
@@ -70,10 +72,11 @@ class ColorPickerHistoryView(
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.ColorItem ->
-            old.color == (new as Item.ColorItem).color
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.ColorItem ->
+              old.color == (new as Item.ColorItem).color
+          }
       },
     ).apply {
       addItemType(

@@ -19,13 +19,11 @@ class PerCommunityPreferences @Inject constructor(
 ) {
   private val preferences = context.getSharedPreferences("pcp", Context.MODE_PRIVATE)
 
-  fun getCommunityConfig(communityRef: CommunityRef): CommunityConfig? {
-    return getCommunityConfig(communityRef.getKey())
-  }
+  fun getCommunityConfig(communityRef: CommunityRef): CommunityConfig? =
+    getCommunityConfig(communityRef.getKey())
 
-  fun getCommunityConfig(key: String): CommunityConfig? {
-    return preferences.getJsonValue<CommunityConfig>(json, key)
-  }
+  fun getCommunityConfig(key: String): CommunityConfig? =
+    preferences.getJsonValue<CommunityConfig>(json, key)
 
   fun setCommunityConfig(communityRef: CommunityRef, config: CommunityConfig?) {
     preferences.putJsonValue(json, communityRef.getKey(), config)

@@ -118,10 +118,11 @@ class ImageInfoDialogFragment :
 
     private val adapterHelper = AdapterHelper<ImageInfoModel.Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is ImageInfoModel.InfoItem ->
-            old.title == (new as ImageInfoModel.InfoItem).title
-        }
+        old::class == new::class &&
+          when (old) {
+            is ImageInfoModel.InfoItem ->
+              old.title == (new as ImageInfoModel.InfoItem).title
+          }
       },
     ).apply {
       addItemType(

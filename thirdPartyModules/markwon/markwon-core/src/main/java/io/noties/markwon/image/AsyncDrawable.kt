@@ -82,13 +82,9 @@ class AsyncDrawable(
    * @since 4.2.1
    */
   @Suppress("unused")
-  fun hasKnownDimensions(): Boolean {
-    return lastKnownCanvasWidth > 0
-  }
+  fun hasKnownDimensions(): Boolean = lastKnownCanvasWidth > 0
 
-  fun hasResult(): Boolean {
-    return result != null
-  }
+  fun hasResult(): Boolean = result != null
 
   val isAttached: Boolean
     get() = getCallback() != null
@@ -320,16 +316,14 @@ class AsyncDrawable(
     return imageSizeResolver.resolveImageSize(this)
   }
 
-  override fun toString(): String {
-    return "AsyncDrawable{" +
-      "destination='" + destination + '\'' +
-      ", imageSize=" + imageSize +
-      ", result=" + result +
-      ", canvasWidth=" + lastKnownCanvasWidth +
-      ", textSize=" + lastKnowTextSize +
-      ", waitingForDimensions=" + waitingForDimensions +
-      '}'
-  }
+  override fun toString(): String = "AsyncDrawable{" +
+    "destination='" + destination + '\'' +
+    ", imageSize=" + imageSize +
+    ", result=" + result +
+    ", canvasWidth=" + lastKnownCanvasWidth +
+    ", textSize=" + lastKnowTextSize +
+    ", waitingForDimensions=" + waitingForDimensions +
+    '}'
 
   @MainThread
   fun registerOnDimensionsKnownListener(l: OnDimensionsKnownListener) {
@@ -348,8 +342,9 @@ class AsyncDrawable(
 
   // @since 4.2.1
   //  Wrapped callback to trigger invalidation for this AsyncDrawable instance (and not result/placeholder)
-  private inner class WrappedCallback(private val callback: Callback) :
-    Callback {
+  private inner class WrappedCallback(
+    private val callback: Callback,
+  ) : Callback {
     override fun invalidateDrawable(who: Drawable) {
       callback.invalidateDrawable(this@AsyncDrawable)
     }

@@ -24,11 +24,9 @@ interface OverPanRangeProvider {
     @JvmField
     val DEFAULT = object : OverPanRangeProvider {
       private val DEFAULT_OVERPAN_FACTOR = 0.10f
-      override fun getOverPan(engine: ZoomEngine, horizontal: Boolean): Float {
-        return when (horizontal) {
-          true -> engine.containerWidth * DEFAULT_OVERPAN_FACTOR
-          false -> engine.containerHeight * DEFAULT_OVERPAN_FACTOR
-        }
+      override fun getOverPan(engine: ZoomEngine, horizontal: Boolean): Float = when (horizontal) {
+        true -> engine.containerWidth * DEFAULT_OVERPAN_FACTOR
+        false -> engine.containerHeight * DEFAULT_OVERPAN_FACTOR
       }
     }
   }

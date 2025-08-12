@@ -35,7 +35,8 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class FilteredPostsAndCommentsTabbedFragment :
-  BaseFragment<TabbedFragmentSavedBinding>(), SignInNavigator {
+  BaseFragment<TabbedFragmentSavedBinding>(),
+  SignInNavigator {
 
   private val args: FilteredPostsAndCommentsTabbedFragmentArgs by navArgs()
 

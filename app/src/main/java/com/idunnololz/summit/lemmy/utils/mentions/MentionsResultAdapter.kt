@@ -31,15 +31,16 @@ class MentionsResultAdapter @AssistedInject constructor(
 
   private val adapterHelper = AdapterHelper<MentionsAutoCompleteItem>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        EmptyItem -> true
-        is CommunityResultItem ->
-          old.communityView.community.id ==
-            (new as CommunityResultItem).communityView.community.id
-        is PersonResultItem ->
-          old.personView.person.id ==
-            (new as PersonResultItem).personView.person.id
-      }
+      old::class == new::class &&
+        when (old) {
+          EmptyItem -> true
+          is CommunityResultItem ->
+            old.communityView.community.id ==
+              (new as CommunityResultItem).communityView.community.id
+          is PersonResultItem ->
+            old.personView.person.id ==
+              (new as PersonResultItem).personView.person.id
+        }
     },
   ).apply {
     addItemType(

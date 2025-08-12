@@ -33,19 +33,17 @@ class GridAutofitLayoutManager : GridLayoutManager {
     setColumnWidth(checkedColumnWidth(context, columnWidth))
   }
 
-  private fun checkedColumnWidth(context: Context, columnWidth: Int): Int {
-    return if (columnWidth <= 0) {
+  private fun checkedColumnWidth(context: Context, columnWidth: Int): Int = if (columnWidth <= 0) {
             /* Set default columnWidth value (48dp here). It is better to move this constant
             to static constant on top, but we need context to convert it to dp, so can't really
             do so. */
-      TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_DIP,
-        48f,
-        context.resources.displayMetrics,
-      ).toInt()
-    } else {
-      columnWidth
-    }
+    TypedValue.applyDimension(
+      TypedValue.COMPLEX_UNIT_DIP,
+      48f,
+      context.resources.displayMetrics,
+    ).toInt()
+  } else {
+    columnWidth
   }
 
   private fun setColumnWidth(newColumnWidth: Int) {

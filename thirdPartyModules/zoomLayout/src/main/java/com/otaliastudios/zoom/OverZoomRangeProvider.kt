@@ -19,9 +19,8 @@ interface OverZoomRangeProvider {
     @JvmField
     val DEFAULT = object : OverZoomRangeProvider {
       private val DEFAULT_OVERZOOM_FACTOR = 0.1f
-      override fun getOverZoom(engine: ZoomEngine, inwards: Boolean): Float {
-        return DEFAULT_OVERZOOM_FACTOR * (engine.getMaxZoom() - engine.getMinZoom())
-      }
+      override fun getOverZoom(engine: ZoomEngine, inwards: Boolean): Float =
+        DEFAULT_OVERZOOM_FACTOR * (engine.getMaxZoom() - engine.getMinZoom())
     }
   }
 }

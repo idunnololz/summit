@@ -38,7 +38,9 @@ open class ZoomEngine
  *
  * @param context a valid context
  */
-constructor(context: Context) : ZoomApi {
+constructor(
+  context: Context,
+) : ZoomApi {
 
   /**
    * Constructs an helper instance.
@@ -120,9 +122,7 @@ constructor(context: Context) : ZoomApi {
 
     // State callbacks
 
-    override fun isStateAllowed(newState: Int): Boolean {
-      return matrixController.isInitialized
-    }
+    override fun isStateAllowed(newState: Int): Boolean = matrixController.isInitialized
 
     override fun onStateIdle() {
       dispatcher.dispatchOnIdle()
@@ -141,13 +141,11 @@ constructor(context: Context) : ZoomApi {
       scrollFlingDetector.cancelScroll()
     }
 
-    override fun maybeStartPinchGesture(event: MotionEvent): Boolean {
-      return pinchDetector.maybeStart(event)
-    }
+    override fun maybeStartPinchGesture(event: MotionEvent): Boolean =
+      pinchDetector.maybeStart(event)
 
-    override fun maybeStartScrollFlingGesture(event: MotionEvent): Boolean {
-      return scrollFlingDetector.maybeStart(event)
-    }
+    override fun maybeStartScrollFlingGesture(event: MotionEvent): Boolean =
+      scrollFlingDetector.maybeStart(event)
   }
 
   // Options & state
@@ -675,9 +673,7 @@ constructor(context: Context) : ZoomApi {
    * @param ev the motion event
    * @return whether we want to intercept the event
    */
-  fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-    return stateController.onInterceptTouchEvent(ev)
-  }
+  fun onInterceptTouchEvent(ev: MotionEvent): Boolean = stateController.onInterceptTouchEvent(ev)
 
   /**
    * Process the given touch event.
@@ -686,9 +682,7 @@ constructor(context: Context) : ZoomApi {
    * @param ev the motion event
    * @return whether we want to steal the event
    */
-  fun onTouchEvent(ev: MotionEvent): Boolean {
-    return stateController.onTouchEvent(ev)
-  }
+  fun onTouchEvent(ev: MotionEvent): Boolean = stateController.onTouchEvent(ev)
 
   //region Position APIs
 
@@ -950,9 +944,7 @@ constructor(context: Context) : ZoomApi {
    *
    * @return the horizontal scroll offset.
    */
-  fun computeHorizontalScrollOffset(): Int {
-    return (-matrixController.scaledPanX).toInt()
-  }
+  fun computeHorizontalScrollOffset(): Int = (-matrixController.scaledPanX).toInt()
 
   /**
    * Helper for implementing [View.computeHorizontalScrollRange]
@@ -960,9 +952,7 @@ constructor(context: Context) : ZoomApi {
    *
    * @return the horizontal scroll range.
    */
-  fun computeHorizontalScrollRange(): Int {
-    return matrixController.contentScaledWidth.toInt()
-  }
+  fun computeHorizontalScrollRange(): Int = matrixController.contentScaledWidth.toInt()
 
   /**
    * Helper for implementing [View.computeVerticalScrollOffset]
@@ -970,9 +960,7 @@ constructor(context: Context) : ZoomApi {
    *
    * @return the vertical scroll offset.
    */
-  fun computeVerticalScrollOffset(): Int {
-    return (-matrixController.scaledPanY).toInt()
-  }
+  fun computeVerticalScrollOffset(): Int = (-matrixController.scaledPanY).toInt()
 
   /**
    * Helper for implementing [View.computeVerticalScrollRange]
@@ -980,9 +968,7 @@ constructor(context: Context) : ZoomApi {
    *
    * @return the vertical scroll range.
    */
-  fun computeVerticalScrollRange(): Int {
-    return matrixController.contentScaledHeight.toInt()
-  }
+  fun computeVerticalScrollRange(): Int = matrixController.contentScaledHeight.toInt()
 
   //endregion
 

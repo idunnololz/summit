@@ -24,6 +24,7 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -77,14 +78,10 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
     with(binding) {
       requireSummitActivity().apply {
         setupForFragment<SettingsFragment>(animate = false)
-
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = args.title
-
         insetViewAutomaticallyByPadding(viewLifecycleOwner, coordinatorLayout)
       }
+
+      setupToolbar(toolbar, args.title)
 
       val adapter = FiltersAdapter(
         onEditClick = {
@@ -153,10 +150,11 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.FilterItem ->
-            old.filter.id == (new as Item.FilterItem).filter.id
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.FilterItem ->
+              old.filter.id == (new as Item.FilterItem).filter.id
+          }
       },
     ).apply {
       this.addItemType(Item.FilterItem::class, FilterItemBinding::inflate) { item, b, _ ->

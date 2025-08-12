@@ -22,38 +22,31 @@ import okhttp3.TlsVersion
  * [See this discussion for more details.](https://github.com/square/okhttp/issues/2372#issuecomment-244807676)
  *
  */
-class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFactory() {
+class Tls12SocketFactory(
+  private val delegate: SSLSocketFactory,
+) : SSLSocketFactory() {
 
   /**
    * Forcefully adds [TlsVersion.TLS_1_2] as an enabled protocol if called on an [SSLSocket]
    *
    * @return the (potentially modified) [Socket]
    */
-  private fun Socket.patchForTls12(): Socket {
-    return (this as? SSLSocket)?.apply {
-      enabledProtocols += TlsVersion.TLS_1_2.javaName
-    } ?: this
-  }
+  private fun Socket.patchForTls12(): Socket = (this as? SSLSocket)?.apply {
+    enabledProtocols += TlsVersion.TLS_1_2.javaName
+  } ?: this
 
-  override fun getDefaultCipherSuites(): Array<String> {
-    return delegate.defaultCipherSuites
-  }
+  override fun getDefaultCipherSuites(): Array<String> = delegate.defaultCipherSuites
 
-  override fun getSupportedCipherSuites(): Array<String> {
-    return delegate.supportedCipherSuites
-  }
+  override fun getSupportedCipherSuites(): Array<String> = delegate.supportedCipherSuites
 
   @Throws(IOException::class)
-  override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket? {
-    return delegate.createSocket(s, host, port, autoClose)
+  override fun createSocket(s: Socket, host: String, port: Int, autoClose: Boolean): Socket? =
+    delegate.createSocket(s, host, port, autoClose)
       .patchForTls12()
-  }
 
   @Throws(IOException::class, UnknownHostException::class)
-  override fun createSocket(host: String, port: Int): Socket? {
-    return delegate.createSocket(host, port)
-      .patchForTls12()
-  }
+  override fun createSocket(host: String, port: Int): Socket? = delegate.createSocket(host, port)
+    .patchForTls12()
 
   @Throws(IOException::class, UnknownHostException::class)
   override fun createSocket(
@@ -61,16 +54,13 @@ class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFact
     port: Int,
     localHost: InetAddress,
     localPort: Int,
-  ): Socket? {
-    return delegate.createSocket(host, port, localHost, localPort)
-      .patchForTls12()
-  }
+  ): Socket? = delegate.createSocket(host, port, localHost, localPort)
+    .patchForTls12()
 
   @Throws(IOException::class)
-  override fun createSocket(host: InetAddress, port: Int): Socket? {
-    return delegate.createSocket(host, port)
+  override fun createSocket(host: InetAddress, port: Int): Socket? =
+    delegate.createSocket(host, port)
       .patchForTls12()
-  }
 
   @Throws(IOException::class)
   override fun createSocket(
@@ -78,10 +68,8 @@ class Tls12SocketFactory(private val delegate: SSLSocketFactory) : SSLSocketFact
     port: Int,
     localAddress: InetAddress,
     localPort: Int,
-  ): Socket? {
-    return delegate.createSocket(address, port, localAddress, localPort)
-      .patchForTls12()
-  }
+  ): Socket? = delegate.createSocket(address, port, localAddress, localPort)
+    .patchForTls12()
 }
 
 /**

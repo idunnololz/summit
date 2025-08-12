@@ -9,16 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.databinding.DialogFragmentAddOrEditTemplateBinding
-import com.idunnololz.summit.databinding.DialogFragmentReasonBinding
-import com.idunnololz.summit.reason.ReasonDialogFragment.Companion.REQUEST_KEY
-import com.idunnololz.summit.reason.ReasonDialogFragment.Companion.RESULT_KEY
-import com.idunnololz.summit.reason.ReasonDialogFragment.Result
 import com.idunnololz.summit.templates.db.TemplateData
 import com.idunnololz.summit.templates.db.TemplateEntry
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -33,15 +28,15 @@ class AddOrEditTemplateFragmentDialog :
   BaseDialogFragment<DialogFragmentAddOrEditTemplateBinding>(),
   FullscreenDialogFragment {
 
-    companion object {
-      fun show(template: TemplateEntry?, fragmentManager: FragmentManager) {
-        AddOrEditTemplateFragmentDialog()
-          .apply {
-            arguments = AddOrEditTemplateFragmentDialogArgs(template).toBundle()
-          }
-          .show(fragmentManager, "AddOrEditTemplateFragmentDialog")
-      }
+  companion object {
+    fun show(template: TemplateEntry?, fragmentManager: FragmentManager) {
+      AddOrEditTemplateFragmentDialog()
+        .apply {
+          arguments = AddOrEditTemplateFragmentDialogArgs(template).toBundle()
+        }
+        .show(fragmentManager, "AddOrEditTemplateFragmentDialog")
     }
+  }
 
   private val args: AddOrEditTemplateFragmentDialogArgs by navArgs()
   private val viewModel: AddOrEditTemplateViewModel by viewModels()
@@ -50,6 +45,7 @@ class AddOrEditTemplateFragmentDialog :
 
   @Inject
   lateinit var templatesManager: TemplatesManager
+
   @Inject
   lateinit var accountManager: AccountManager
 
@@ -86,10 +82,7 @@ class AddOrEditTemplateFragmentDialog :
         },
       )
       toolbar.addMenuProvider(object : MenuProvider {
-        override fun onCreateMenu(
-          menu: Menu,
-          menuInflater: MenuInflater,
-        ) {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
           menuInflater.inflate(R.menu.menu_template, menu)
         }
 
@@ -113,7 +106,7 @@ class AddOrEditTemplateFragmentDialog :
               } else {
                 templatesManager.saveTemplateAsync(
                   templateData = data,
-                  showToast = true
+                  showToast = true,
                 )
               }
               dismiss()

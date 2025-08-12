@@ -19,7 +19,5 @@ class ImageViewerContract : ActivityResultContract<ImageViewerActivityArgs, Int?
     input: ImageViewerActivityArgs,
   ): SynchronousResult<Int?>? = null
 
-  final override fun parseResult(resultCode: Int, intent: Intent?): Int? {
-    return resultCode
-  }
+  final override fun parseResult(resultCode: Int, intent: Intent?): Int? = resultCode
 }

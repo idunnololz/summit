@@ -120,12 +120,13 @@ class ChooseDefaultAppBottomSheetFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          Item.ClearItem -> true
-          is Item.OptionItem ->
-            old.resolveInfo.resolvePackageName ==
-              (new as Item.OptionItem).resolveInfo.resolvePackageName
-        }
+        old::class == new::class &&
+          when (old) {
+            Item.ClearItem -> true
+            is Item.OptionItem ->
+              old.resolveInfo.resolvePackageName ==
+                (new as Item.OptionItem).resolveInfo.resolvePackageName
+          }
       },
     ).apply {
       addItemType(Item.OptionItem::class, ItemAppChoiceBinding::inflate) { item, b, h ->

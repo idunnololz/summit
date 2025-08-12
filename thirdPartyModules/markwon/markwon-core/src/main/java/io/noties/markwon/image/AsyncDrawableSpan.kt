@@ -21,7 +21,8 @@ class AsyncDrawableSpan(
   val drawable: AsyncDrawable,
   @param:Alignment private val alignment: Int,
   private val replacementTextIsLink: Boolean,
-) : ReplacementSpan(), TableDrawableSpan {
+) : ReplacementSpan(),
+  TableDrawableSpan {
 
   @IntDef(ALIGN_BOTTOM, ALIGN_BASELINE, ALIGN_CENTER)
   @Retention(

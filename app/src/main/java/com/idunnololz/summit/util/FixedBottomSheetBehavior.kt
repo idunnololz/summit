@@ -22,12 +22,10 @@ class FixedBottomSheetBehavior<V : View> : BottomSheetBehavior<V> {
     parent: CoordinatorLayout,
     child: V,
     event: MotionEvent,
-  ): Boolean {
-    return try {
-      super.onInterceptTouchEvent(parent, child, event)
-    } catch (ignored: NullPointerException) {
-      // BottomSheetBehavior receives input events too soon and mNestedScrollingChildRef is not set yet.
-      false
-    }
+  ): Boolean = try {
+    super.onInterceptTouchEvent(parent, child, event)
+  } catch (ignored: NullPointerException) {
+    // BottomSheetBehavior receives input events too soon and mNestedScrollingChildRef is not set yet.
+    false
   }
 }

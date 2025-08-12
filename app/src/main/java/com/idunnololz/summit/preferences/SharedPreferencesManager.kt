@@ -48,19 +48,15 @@ class SharedPreferencesManager @Inject constructor(
     return context.getSharedPreferences(key, Context.MODE_PRIVATE)
   }
 
-  fun getAccountIdSharedPreferences(): SharedPreferences {
-    return context.getSharedPreferences("account_ids@", Context.MODE_PRIVATE)
-  }
+  fun getAccountIdSharedPreferences(): SharedPreferences =
+    context.getSharedPreferences("account_ids@", Context.MODE_PRIVATE)
 
-  fun getNotificationsSharedPreferences(): SharedPreferences {
-    return context.getSharedPreferences("notifications@", Context.MODE_PRIVATE)
-  }
+  fun getNotificationsSharedPreferences(): SharedPreferences =
+    context.getSharedPreferences("notifications@", Context.MODE_PRIVATE)
 
-  fun getGlobalStateSharedPreferences(): SharedPreferences {
-    return context.getSharedPreferences("global_state@", Context.MODE_PRIVATE)
-  }
+  fun getGlobalStateSharedPreferences(): SharedPreferences =
+    context.getSharedPreferences("global_state@", Context.MODE_PRIVATE)
 
-  fun getAccountStateSharedPreferences(stableAccountId: StableAccountId): SharedPreferences {
-    return context.getSharedPreferences("state_$stableAccountId@", Context.MODE_PRIVATE)
-  }
+  fun getAccountStateSharedPreferences(stableAccountId: StableAccountId): SharedPreferences =
+    context.getSharedPreferences("state_$stableAccountId@", Context.MODE_PRIVATE)
 }

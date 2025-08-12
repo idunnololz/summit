@@ -106,20 +106,18 @@ class MainActivity : SummitActivity() {
     private const val ARG_ACCOUNT_FULL_NAME = "ARG_ACCOUNT_FULL_NAME"
     private const val ARG_NOTIFICATION_ID = "ARG_NOTIFICATION_ID"
 
-    fun createInboxItemIntent(context: Context, account: Account, notificationId: Int): Intent {
-      return Intent(context, MainActivity::class.java).apply {
+    fun createInboxItemIntent(context: Context, account: Account, notificationId: Int): Intent =
+      Intent(context, MainActivity::class.java).apply {
         putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
         putExtra(ARG_NOTIFICATION_ID, notificationId)
         action = Intent.ACTION_VIEW
       }
-    }
 
-    fun createInboxPageIntent(context: Context, account: Account): Intent {
-      return Intent(context, MainActivity::class.java).apply {
+    fun createInboxPageIntent(context: Context, account: Account): Intent =
+      Intent(context, MainActivity::class.java).apply {
         putExtra(ARG_ACCOUNT_FULL_NAME, account.fullName)
         action = Intent.ACTION_VIEW
       }
-    }
   }
 
   private lateinit var binding: ActivityMainBinding
@@ -513,12 +511,6 @@ class MainActivity : SummitActivity() {
     runOnReady(this) {
       handleIntent(intent)
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
-
-    Log.d("HAHA", "finishing: ${isFinishing}")
   }
 
   fun showNotificationBarBg() {

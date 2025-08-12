@@ -273,7 +273,12 @@ class LemmyTextHelper @Inject constructor(
 
           if (c == '>') return false
           if (c == '\n' && s.getOrNull(index + 1) == '\n') return false
-          if (c == '-' && s.getOrNull(index + 1) == '-' && s.getOrNull(index + 2) == '-') return false
+          if (c == '-' &&
+            s.getOrNull(index + 1) == '-' &&
+            s.getOrNull(index + 2) == '-'
+          ) {
+            return false
+          }
           if (c == '-' && s.getOrNull(index + 1) == ' ') return false
           if (c == '`') return true
 
@@ -357,13 +362,12 @@ class LemmyTextHelper @Inject constructor(
             CoilImagesPlugin(
               context,
               object : CoilStore {
-                override fun load(drawable: AsyncDrawable): ImageRequest {
-                  return ImageRequest.Builder(context)
+                override fun load(drawable: AsyncDrawable): ImageRequest =
+                  ImageRequest.Builder(context)
                     // Needed for the "take screenshot" feature
                     .allowHardware(false)
                     .data(drawable.destination)
                     .build()
-                }
 
                 override fun cancel(disposable: Disposable) {
                   disposable.dispose()

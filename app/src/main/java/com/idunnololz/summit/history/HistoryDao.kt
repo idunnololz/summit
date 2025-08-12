@@ -82,7 +82,8 @@ interface HistoryDao {
             // Url for community state is actually the tab id...
             val oldState = json.decodeFromString<TabCommunityState?>(lastEntry.extras)
             val newState = json.decodeFromString<TabCommunityState?>(newEntry.extras)
-            if (oldState?.viewState?.communityState?.communityRef == newState?.viewState?.communityState?.communityRef &&
+            if (oldState?.viewState?.communityState?.communityRef ==
+              newState?.viewState?.communityState?.communityRef &&
               oldState?.viewState?.communityState?.currentPageIndex ==
               newState?.viewState?.communityState?.currentPageIndex
             ) {

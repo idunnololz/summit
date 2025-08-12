@@ -15,8 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsNavigationFragment :
-  BaseSettingsFragment() {
+class SettingsNavigationFragment : BaseSettingsFragment() {
 
   @Inject
   override lateinit var settings: NavigationSettings

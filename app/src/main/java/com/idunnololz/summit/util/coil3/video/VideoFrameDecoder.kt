@@ -221,11 +221,9 @@ class VideoFrameDecoder(
     return outBitmap
   }
 
-  private fun isConfigValid(bitmap: Bitmap, options: Options): Boolean {
-    return SDK_INT < 26 ||
-      bitmap.config != Bitmap.Config.HARDWARE ||
-      options.bitmapConfig == Bitmap.Config.HARDWARE
-  }
+  private fun isConfigValid(bitmap: Bitmap, options: Options): Boolean = SDK_INT < 26 ||
+    bitmap.config != Bitmap.Config.HARDWARE ||
+    options.bitmapConfig == Bitmap.Config.HARDWARE
 
   private fun isSizeValid(bitmap: Bitmap, options: Options, size: Size): Boolean {
     if (options.precision == Precision.INEXACT) return true
@@ -289,8 +287,7 @@ class VideoFrameDecoder(
       return VideoFrameDecoder(result.source, options)
     }
 
-    private fun isApplicable(mimeType: String?): Boolean {
-      return mimeType != null && mimeType.startsWith("video/")
-    }
+    private fun isApplicable(mimeType: String?): Boolean =
+      mimeType != null && mimeType.startsWith("video/")
   }
 }

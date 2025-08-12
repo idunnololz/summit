@@ -780,7 +780,7 @@ class AddOrEditCommentFragment :
     if (messageView != null) {
       binding.messageContainer.addView(messageView)
       binding.messageContainer.updatePadding(
-        bottom = context.resources.getDimensionPixelOffset(R.dimen.padding_quarter)
+        bottom = context.resources.getDimensionPixelOffset(R.dimen.padding_quarter),
       )
     }
   }
@@ -878,9 +878,7 @@ class AddOrEditCommentFragment :
     binding.simpleContextScrollView.visibility = View.VISIBLE
   }
 
-  private fun isEdit(): Boolean {
-    return args.editCommentView != null
-  }
+  private fun isEdit(): Boolean = args.editCommentView != null
 
   override fun navigateToSignInScreen() {
     (parentFragment as? SignInNavigator)?.navigateToSignInScreen()

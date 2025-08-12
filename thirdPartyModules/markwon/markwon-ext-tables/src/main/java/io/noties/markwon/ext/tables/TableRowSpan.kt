@@ -36,22 +36,19 @@ class TableRowSpan(
     fun invalidate()
   }
 
-  class Cell(@param:Alignment val alignment: Int, val text: CharSequence) {
+  class Cell(
+    @param:Alignment val alignment: Int,
+    val text: CharSequence,
+  ) {
     @Alignment
-    fun alignment(): Int {
-      return alignment
-    }
+    fun alignment(): Int = alignment
 
-    fun text(): CharSequence {
-      return text
-    }
+    fun text(): CharSequence = text
 
-    override fun toString(): String {
-      return "Cell{" +
-        "alignment=" + alignment +
-        ", text=" + text +
-        '}'
-    }
+    override fun toString(): String = "Cell{" +
+      "alignment=" + alignment +
+      ", text=" + text +
+      '}'
   }
 
   private val layouts: MutableList<Layout> = ArrayList(cells.size)
@@ -251,9 +248,7 @@ class TableRowSpan(
     }
   }
 
-  private fun recreateLayouts(newWidth: Int): Boolean {
-    return width != newWidth
-  }
+  private fun recreateLayouts(newWidth: Int): Boolean = width != newWidth
 
   private fun makeNewLayouts() {
     textPaint.isFakeBoldText = header
@@ -357,14 +352,10 @@ class TableRowSpan(
   /**
    * @since 4.6.0
    */
-  fun cellWidth(): Int {
-    return cellWidth(layouts.size)
-  }
+  fun cellWidth(): Int = cellWidth(layouts.size)
 
   // @since 4.6.0
-  protected fun cellWidth(size: Int): Int {
-    return (1f * width / size + 0.5f).toInt()
-  }
+  protected fun cellWidth(size: Int): Int = (1f * width / size + 0.5f).toInt()
 
   fun invalidate() {
     width = 0

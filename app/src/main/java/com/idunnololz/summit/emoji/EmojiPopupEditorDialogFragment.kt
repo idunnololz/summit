@@ -136,7 +136,8 @@ class EmojiPopupEditorDialogFragment :
       }
 
       recyclerView.layoutManager = GridAutofitLayoutManager(
-        context, Utils.convertDpToPixel(200f).toInt(),
+        context,
+        Utils.convertDpToPixel(200f).toInt(),
       )
       recyclerView.setHasFixedSize(true)
       recyclerView.adapter = adapter
@@ -190,15 +191,12 @@ class EmojiPopupEditorDialogFragment :
     }
   }
 
-  class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) :
-    ItemTouchHelper.Callback() {
-    override fun isLongPressDragEnabled(): Boolean {
-      return true
-    }
+  class ItemMoveCallback(
+    private val mAdapter: ItemTouchHelperContract,
+  ) : ItemTouchHelper.Callback() {
+    override fun isLongPressDragEnabled(): Boolean = true
 
-    override fun isItemViewSwipeEnabled(): Boolean {
-      return false
-    }
+    override fun isItemViewSwipeEnabled(): Boolean = false
 
     override fun onSwiped(viewHolder: ViewHolder, i: Int) {
     }
@@ -242,7 +240,8 @@ class EmojiPopupEditorDialogFragment :
   private class EditEmojisAdapter(
     private val context: Context,
     private val onEditClick: (id: Long, textEmoji: String) -> Unit,
-  ) : Adapter<ViewHolder>(), ItemMoveCallback.ItemTouchHelperContract {
+  ) : Adapter<ViewHolder>(),
+    ItemMoveCallback.ItemTouchHelperContract {
 
     sealed interface Item {
       data class Emoji(
@@ -254,9 +253,10 @@ class EmojiPopupEditorDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.Emoji -> old.emoji == (new as Item.Emoji).emoji
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.Emoji -> old.emoji == (new as Item.Emoji).emoji
+          }
       },
     )
 

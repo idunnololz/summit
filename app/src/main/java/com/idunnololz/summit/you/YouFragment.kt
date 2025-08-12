@@ -34,7 +34,6 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.saved.FilteredPostAndCommentsType
-import com.idunnololz.summit.uploads.UploadsFragmentDirections
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -276,7 +275,9 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
       data object HeaderItem : Item
       data object FooterItem : Item
       data object SignInOrSignUpItem : Item
-      data class Divider(val key: String) : Item
+      data class Divider(
+        val key: String,
+      ) : Item
       data class ProfileItem(
         val name: String?,
         val account: Account?,
@@ -296,16 +297,17 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          Item.HeaderItem -> true
-          is Item.MenuItem ->
-            old.itemId == (new as Item.MenuItem).itemId
-          is Item.ProfileItem -> true
-          Item.FooterItem -> true
-          Item.SignInOrSignUpItem -> true
-          is Item.Divider ->
-            old.key == (new as Item.Divider).key
-        }
+        old::class == new::class &&
+          when (old) {
+            Item.HeaderItem -> true
+            is Item.MenuItem ->
+              old.itemId == (new as Item.MenuItem).itemId
+            is Item.ProfileItem -> true
+            Item.FooterItem -> true
+            Item.SignInOrSignUpItem -> true
+            is Item.Divider ->
+              old.key == (new as Item.Divider).key
+          }
       },
     ).apply {
       addItemType(

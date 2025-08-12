@@ -79,14 +79,15 @@ class SettingDataAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { oldItem, newItem ->
-      oldItem::class == newItem::class && when (oldItem) {
-        is Item.DatabaseTableSummaryItem ->
-          oldItem.tableName == (newItem as Item.DatabaseTableSummaryItem).tableName
-        is Item.ImportSettingItem ->
-          oldItem.settingKey == (newItem as Item.ImportSettingItem).settingKey
-        Item.EmptyItem -> true
-        Item.FooterItem -> true
-      }
+      oldItem::class == newItem::class &&
+        when (oldItem) {
+          is Item.DatabaseTableSummaryItem ->
+            oldItem.tableName == (newItem as Item.DatabaseTableSummaryItem).tableName
+          is Item.ImportSettingItem ->
+            oldItem.settingKey == (newItem as Item.ImportSettingItem).settingKey
+          Item.EmptyItem -> true
+          Item.FooterItem -> true
+        }
     },
   ).apply {
     addItemType(

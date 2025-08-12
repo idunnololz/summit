@@ -144,13 +144,9 @@ class GalleryImageView : ShapeableImageView {
         override fun onShowPress(e: MotionEvent) {
         }
 
-        override fun onSingleTapUp(e: MotionEvent): Boolean {
-          return false
-        }
+        override fun onSingleTapUp(e: MotionEvent): Boolean = false
 
-        override fun onDown(e: MotionEvent): Boolean {
-          return false
-        }
+        override fun onDown(e: MotionEvent): Boolean = false
 
         override fun onFling(
           e1: MotionEvent?,
@@ -158,15 +154,20 @@ class GalleryImageView : ShapeableImageView {
           velocityX: Float,
           velocityY: Float,
         ): Boolean {
-          if (e1 != null && (
+          if (e1 != null &&
+            (
               abs(
                 e1.x - e2.x,
-              ) > 50 || abs(e1.y - e2.y) > 50
-              ) && (
-              abs(velocityX) > 500 || Math.abs(
-                velocityY,
-              ) > 500
-              ) && !isZooming
+              ) > 50 ||
+                abs(e1.y - e2.y) > 50
+              ) &&
+            (
+              abs(velocityX) > 500 ||
+                Math.abs(
+                  velocityY,
+                ) > 500
+              ) &&
+            !isZooming
           ) {
             val scrollSpeedX: Float = -velocityX * 0.2f
             val scrollSpeedY: Float = -velocityY * 0.2f
@@ -242,9 +243,7 @@ class GalleryImageView : ShapeableImageView {
           return false
         }
 
-        override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-          return true
-        }
+        override fun onDoubleTapEvent(e: MotionEvent): Boolean = true
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
           callback?.toggleUi()
@@ -277,7 +276,9 @@ class GalleryImageView : ShapeableImageView {
     val g2 = scaleDetector.onTouchEvent(event)
     val gestureDetected = g1 || g2
 
-    if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
+    if (event.actionMasked == MotionEvent.ACTION_UP ||
+      event.actionMasked == MotionEvent.ACTION_CANCEL
+    ) {
       val keepOverscroll = callback?.overScrollEnd()
 
       if (keepOverscroll != true) {
@@ -432,7 +433,8 @@ class GalleryImageView : ShapeableImageView {
   override fun setImageDrawable(drawable: Drawable?) {
     val oldDrawable = this.drawable
     if (oldDrawable != null &&
-      oldDrawable.intrinsicWidth > 0 && oldDrawable.intrinsicHeight > 0
+      oldDrawable.intrinsicWidth > 0 &&
+      oldDrawable.intrinsicHeight > 0
     ) {
       if (oldDrawable.intrinsicWidth != drawable?.intrinsicWidth ||
         oldDrawable.intrinsicHeight != drawable.intrinsicHeight
@@ -534,9 +536,8 @@ class GalleryImageView : ShapeableImageView {
   /**
    * @return true if scroll was valid. False if scroll was impossible
    */
-  private fun scrollByAbsolute(deltaX: Float, deltaY: Float): Boolean {
-    return scrollToAbsolute(offX - deltaX, offY - deltaY)
-  }
+  private fun scrollByAbsolute(deltaX: Float, deltaY: Float): Boolean =
+    scrollToAbsolute(offX - deltaX, offY - deltaY)
 
   /**
    * @return true if scroll was valid. False if scroll was impossible

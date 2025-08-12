@@ -111,7 +111,8 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
         ).apply {
           id = View.generateViewId()
           layoutParams = ConstraintLayout.LayoutParams(
-            0, ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            0,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
           ).apply {
             startToStart = R.id.title
             endToEnd = R.id.title
@@ -131,7 +132,8 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
         ).apply {
           id = View.generateViewId()
           layoutParams = ConstraintLayout.LayoutParams(
-            0, ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            0,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
           ).apply {
             startToStart = R.id.title
             endToEnd = R.id.title
@@ -200,7 +202,9 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
         icon.imageTintList = ColorStateList.valueOf(modEventColor)
         icon.backgroundTintList = ColorStateList.valueOf(
           ColorUtils.blendARGB(
-            modEventColor, containerColor, 0.9f,
+            modEventColor,
+            containerColor,
+            0.9f,
           ),
         )
 

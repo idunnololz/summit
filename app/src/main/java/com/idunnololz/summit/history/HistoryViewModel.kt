@@ -22,7 +22,8 @@ import kotlinx.coroutines.launch
 class HistoryViewModel @Inject constructor(
   private val apiClient: LemmyApiClient,
   private val historyManager: HistoryManager,
-) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
+) : ViewModel(),
+  SlidingPaneController.PostViewPagerViewModel {
 
   private val entries = mutableListOf<LiteHistoryEntry>()
   private val seenIds = mutableSetOf<Long>()

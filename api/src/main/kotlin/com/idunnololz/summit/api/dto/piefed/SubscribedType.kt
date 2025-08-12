@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Subscribed,NotSubscribed,Pending
  */
 
-enum class SubscribedType(val value: kotlin.String) {
+enum class SubscribedType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "Subscribed")
   Subscribed("Subscribed"),

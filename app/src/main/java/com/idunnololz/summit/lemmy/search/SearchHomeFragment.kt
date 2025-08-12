@@ -381,18 +381,16 @@ class SearchHomeFragment :
         context.resources.getDimensionPixelSize(R.dimen.search_home_items_width),
       ).apply {
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-          override fun getSpanSize(position: Int): Int {
-            return when (adapter.getItem(position)) {
-              is Item.HeaderItem -> spanCount
-              is Item.TitleItem -> spanCount
-              is Item.SearchSuggestionItem -> 1
-              is Item.MyCommunityItem -> 1
-              is Item.TopCommunitiesItem -> spanCount
-              is Item.HotCommunitiesItem -> spanCount
-              is Item.TrendingCommunitiesItem -> spanCount
-              Item.EmptyNoSectionsEnabledItem -> spanCount
-              is Item.RandomCommunitiesItem -> spanCount
-            }
+          override fun getSpanSize(position: Int): Int = when (adapter.getItem(position)) {
+            is Item.HeaderItem -> spanCount
+            is Item.TitleItem -> spanCount
+            is Item.SearchSuggestionItem -> 1
+            is Item.MyCommunityItem -> 1
+            is Item.TopCommunitiesItem -> spanCount
+            is Item.HotCommunitiesItem -> spanCount
+            is Item.TrendingCommunitiesItem -> spanCount
+            Item.EmptyNoSectionsEnabledItem -> spanCount
+            is Item.RandomCommunitiesItem -> spanCount
           }
         }
       }
@@ -635,20 +633,21 @@ class SearchHomeFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { oldItem, newItem ->
-        oldItem::class == newItem::class && when (oldItem) {
-          is Item.HeaderItem -> true
-          is Item.TitleItem ->
-            oldItem.title == (newItem as Item.TitleItem).title
-          is Item.SearchSuggestionItem ->
-            oldItem.suggestion == (newItem as Item.SearchSuggestionItem).suggestion
-          is Item.MyCommunityItem ->
-            oldItem.community.id == (newItem as Item.MyCommunityItem).community.id
-          is Item.HotCommunitiesItem -> true
-          is Item.TrendingCommunitiesItem -> true
-          is Item.TopCommunitiesItem -> true
-          Item.EmptyNoSectionsEnabledItem -> true
-          is Item.RandomCommunitiesItem -> true
-        }
+        oldItem::class == newItem::class &&
+          when (oldItem) {
+            is Item.HeaderItem -> true
+            is Item.TitleItem ->
+              oldItem.title == (newItem as Item.TitleItem).title
+            is Item.SearchSuggestionItem ->
+              oldItem.suggestion == (newItem as Item.SearchSuggestionItem).suggestion
+            is Item.MyCommunityItem ->
+              oldItem.community.id == (newItem as Item.MyCommunityItem).community.id
+            is Item.HotCommunitiesItem -> true
+            is Item.TrendingCommunitiesItem -> true
+            is Item.TopCommunitiesItem -> true
+            Item.EmptyNoSectionsEnabledItem -> true
+            is Item.RandomCommunitiesItem -> true
+          }
       },
     ).apply {
       addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { _, _, _ -> }
@@ -718,7 +717,9 @@ class SearchHomeFragment :
         onViewCreated = { b ->
           val sectionData = topCommunitiesSectionData
           b.recyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false,
+            context,
+            LinearLayoutManager.HORIZONTAL,
+            false,
           ).apply {
             onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
           }.also {
@@ -753,7 +754,9 @@ class SearchHomeFragment :
         onViewCreated = { b ->
           val sectionData = trendingCommunitiesSectionData
           b.recyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false,
+            context,
+            LinearLayoutManager.HORIZONTAL,
+            false,
           ).apply {
             onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
           }.also {
@@ -788,7 +791,9 @@ class SearchHomeFragment :
         onViewCreated = { b ->
           val sectionData = hotCommunitiesSectionData
           b.recyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false,
+            context,
+            LinearLayoutManager.HORIZONTAL,
+            false,
           ).apply {
             onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
           }.also {
@@ -823,7 +828,9 @@ class SearchHomeFragment :
         onViewCreated = { b ->
           val sectionData = randomCommunitiesSectionData
           b.recyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false,
+            context,
+            LinearLayoutManager.HORIZONTAL,
+            false,
           ).apply {
             onRestoreInstanceState(sectionData.layoutManager.onSaveInstanceState())
           }.also {
@@ -1071,8 +1078,8 @@ class SearchHomeFragment :
       }
     }
 
-    private fun newRecyclerViewSection(name: String): RecyclerViewSectionData {
-      return RecyclerViewSectionData(
+    private fun newRecyclerViewSection(name: String): RecyclerViewSectionData =
+      RecyclerViewSectionData(
         name = name,
         SuggestedCommunitiesAdapter(
           context = context,
@@ -1088,7 +1095,6 @@ class SearchHomeFragment :
           false,
         ),
       )
-    }
   }
 
   private class SuggestedCommunitiesAdapter(
@@ -1107,10 +1113,11 @@ class SearchHomeFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.SuggestedCommunityItem ->
-            old.community.url == (new as Item.SuggestedCommunityItem).community.url
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.SuggestedCommunityItem ->
+              old.community.url == (new as Item.SuggestedCommunityItem).community.url
+          }
       },
     ).apply {
       addItemType(

@@ -40,16 +40,16 @@ data class DraftEntry(
 ) : Parcelable
 
 @ProvidedTypeConverter
-class DraftConverters(private val json: Json) {
+class DraftConverters(
+  private val json: Json,
+) {
 
   companion object {
     private const val TAG = "DraftConverters"
   }
 
   @TypeConverter
-  fun draftDataToString(value: DraftData): String {
-    return json.encodeToString(value)
-  }
+  fun draftDataToString(value: DraftData): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToDraftData(value: String): DraftData? = try {

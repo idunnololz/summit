@@ -109,10 +109,11 @@ class ColorSchemePickerDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.ColorSchemeItem ->
-            old.colorSchemeId == (new as Item.ColorSchemeItem).colorSchemeId
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.ColorSchemeItem ->
+              old.colorSchemeId == (new as Item.ColorSchemeItem).colorSchemeId
+          }
       },
     ).apply {
       addItemType(

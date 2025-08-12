@@ -82,11 +82,11 @@ fun UserCommunityEntry.toItem(): UserCommunityItem? {
 }
 
 @ProvidedTypeConverter
-class UserCommunitiesConverters(private val json: Json) {
+class UserCommunitiesConverters(
+  private val json: Json,
+) {
   @TypeConverter
-  fun communitySortOrderToString(value: CommunitySortOrder): String {
-    return json.encodeToString(value)
-  }
+  fun communitySortOrderToString(value: CommunitySortOrder): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToCommunitySortOrder(value: String): CommunitySortOrder = try {
@@ -96,9 +96,7 @@ class UserCommunitiesConverters(private val json: Json) {
   }
 
   @TypeConverter
-  fun communityRefToString(value: CommunityRef): String {
-    return json.encodeToString(value)
-  }
+  fun communityRefToString(value: CommunityRef): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToCommunityRef(value: String): CommunityRef? = try {

@@ -13,7 +13,9 @@ import android.hardware.SensorManager
  * @author Bob Lee (bob@squareup.com)
  * @author Eric Burke (eric@squareup.com)
  */
-class ShakeDetector(private val listener: Listener) : SensorEventListener {
+class ShakeDetector(
+  private val listener: Listener,
+) : SensorEventListener {
   /**
    * When the magnitude of total acceleration exceeds this
    * value, the phone is accelerating.

@@ -108,7 +108,7 @@ class PersonCommentsFragment :
           appBar = parentFragment.binding.appBar,
           title = null,
           url = url,
-          mimeType = null
+          mimeType = null,
         )
       },
       onVideoClick = { url, videoType, state ->

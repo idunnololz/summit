@@ -195,12 +195,20 @@ internal class CropWindowMoveHandler(
   ) {
     var dx = x - rect.centerX()
     var dy = y - rect.centerY()
-    if (rect.left + dx < 0 || rect.right + dx > viewWidth || rect.left + dx < bounds.left || rect.right + dx > bounds.right) {
+    if (rect.left + dx < 0 ||
+      rect.right + dx > viewWidth ||
+      rect.left + dx < bounds.left ||
+      rect.right + dx > bounds.right
+    ) {
       dx /= 1.05f
       mTouchOffset.x -= dx / 2
     }
 
-    if (rect.top + dy < 0 || rect.bottom + dy > viewHeight || rect.top + dy < bounds.top || rect.bottom + dy > bounds.bottom) {
+    if (rect.top + dy < 0 ||
+      rect.bottom + dy > viewHeight ||
+      rect.top + dy < bounds.top ||
+      rect.bottom + dy > bounds.bottom
+    ) {
       dy /= 1.05f
       mTouchOffset.y -= dy / 2
     }

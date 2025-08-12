@@ -46,7 +46,8 @@ class PersonTabbedViewModel @Inject constructor(
   private val commentListEngineFactory: CommentListEngine.Factory,
   private val postListEngineFactory: PostListEngine.Factory,
   private val savedStateHandle: SavedStateHandle,
-) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
+) : ViewModel(),
+  SlidingPaneController.PostViewPagerViewModel {
 
   companion object {
     private const val PAGE_SIZE = 10

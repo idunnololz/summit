@@ -5,7 +5,6 @@ import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
-import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.settings.AboutSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.SettingModelItem
@@ -30,12 +29,12 @@ class SettingsAboutFragment : BaseSettingsFragment() {
         val toCopy = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
         Utils.copyToClipboard(
           context = requireContext(),
-          toCopy = toCopy
+          toCopy = toCopy,
         )
         Toast.makeText(
           requireContext(),
           R.string.version_code_copied_to_clipboard,
-          Toast.LENGTH_SHORT
+          Toast.LENGTH_SHORT,
         ).show()
       }),
     settings.googlePlayLink.asCustomItem { openAppOnPlayStore() },
@@ -45,12 +44,12 @@ class SettingsAboutFragment : BaseSettingsFragment() {
       settings = listOf(
         settings.patreonSettings.asCustomItem(R.drawable.baseline_attach_money_24) {
           val directions = SettingsAboutFragmentDirections
-                  .actionSettingAboutFragmentToPatreonFragment()
+            .actionSettingAboutFragmentToPatreonFragment()
           findNavController().navigateSafe(directions)
         },
         settings.translatorsSettings.asCustomItem(R.drawable.baseline_translate_24) {
           val directions = SettingsAboutFragmentDirections
-                  .actionSettingAboutFragmentToTranslatorsFragment()
+            .actionSettingAboutFragmentToTranslatorsFragment()
           findNavController().navigateSafe(directions)
         },
       ),

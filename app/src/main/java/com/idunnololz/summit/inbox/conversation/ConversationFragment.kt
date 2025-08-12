@@ -24,11 +24,11 @@ import com.idunnololz.summit.databinding.FragmentConversationBinding
 import com.idunnololz.summit.databinding.ItemConversationHeaderBinding
 import com.idunnololz.summit.databinding.ItemConversationLoadMoreBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.inbox.InboxTabbedFragment
 import com.idunnololz.summit.lemmy.report.ReportContentDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
@@ -373,12 +373,13 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.ConversationItem ->
-            old.messageItem.id == (new as Item.ConversationItem).messageItem.id
-          is Item.HeaderItem -> true
-          is Item.LoadMoreItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.ConversationItem ->
+              old.messageItem.id == (new as Item.ConversationItem).messageItem.id
+            is Item.HeaderItem -> true
+            is Item.LoadMoreItem -> true
+          }
       },
     ).apply {
       addItemType(

@@ -122,7 +122,8 @@ class PostAdapter(
       val crossPosts: Int,
       val highlight: Boolean,
       val postHeaderInfo: PostHeaderInfo,
-    ) : Item(postView.getUniqueKey()), ScreenshotOptions
+    ) : Item(postView.getUniqueKey()),
+      ScreenshotOptions
 
     data class VisibleCommentItem(
       val commentId: CommentId,
@@ -219,13 +220,15 @@ class PostAdapter(
     data class ViewAllComments(
       val postId: PostId,
       val screenshotMode: Boolean,
-    ) : Item("view_all_comments"), ScreenshotOptions
+    ) : Item("view_all_comments"),
+      ScreenshotOptions
 
     data class ViewParentComments(
       val postId: PostId,
       val commentPath: String,
       val screenshotMode: Boolean,
-    ) : Item("view_parent_comments"), ScreenshotOptions
+    ) : Item("view_parent_comments"),
+      ScreenshotOptions
 
     data class NoCommentsItem(
       val postView: PostView,
@@ -1223,9 +1226,8 @@ class PostAdapter(
 
     val diff = DiffUtil.calculateDiff(
       object : DiffUtil.Callback() {
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-          return oldItems[oldItemPosition].id == newItems[newItemPosition].id
-        }
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+          oldItems[oldItemPosition].id == newItems[newItemPosition].id
 
         override fun getOldListSize(): Int = oldItems.size
 
@@ -1241,13 +1243,12 @@ class PostAdapter(
           }
         }
 
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-          return if (animate) {
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? =
+          if (animate) {
             null
           } else {
             Unit
           }
-        }
       },
     )
 

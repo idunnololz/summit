@@ -24,9 +24,8 @@ class ModeratedCommunitiesDataSource(
     private val accountInfoManager: AccountInfoManager,
     private val dataSourceFactory: MultiCommunityDataSource.Factory,
   ) {
-    fun create(): ModeratedCommunitiesDataSource {
-      return ModeratedCommunitiesDataSource(apiClient, accountInfoManager, dataSourceFactory)
-    }
+    fun create(): ModeratedCommunitiesDataSource =
+      ModeratedCommunitiesDataSource(apiClient, accountInfoManager, dataSourceFactory)
   }
 
   private var dataSource: MultiCommunityDataSource? = null

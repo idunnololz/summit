@@ -8,7 +8,9 @@ import com.otaliastudios.zoom.internal.matrix.MatrixController
  * They will typically need access to the [MatrixController] to check the
  * current matrix state.
  */
-internal abstract class MovementManager(private val controllerProvider: () -> MatrixController) {
+internal abstract class MovementManager(
+  private val controllerProvider: () -> MatrixController,
+) {
 
   protected val controller get() = controllerProvider()
 

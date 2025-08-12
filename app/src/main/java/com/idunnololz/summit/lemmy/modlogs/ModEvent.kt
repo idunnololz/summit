@@ -490,89 +490,87 @@ fun ModEvent.getColor(context: Context): Int {
 }
 
 @DrawableRes
-fun ModEvent.getIconRes(): Int {
-  return when (this) {
-    is ModEvent.AdminPurgeCommentViewEvent ->
-      R.drawable.baseline_delete_24
-    is ModEvent.AdminPurgeCommunityViewEvent ->
-      R.drawable.baseline_delete_24
-    is ModEvent.AdminPurgePersonViewEvent ->
-      R.drawable.baseline_delete_24
-    is ModEvent.AdminPurgePostViewEvent ->
-      R.drawable.baseline_delete_24
-    is ModEvent.ModAddCommunityViewEvent -> {
-      if (this.event.mod_add_community.removed) {
-        R.drawable.outline_remove_moderator_24
-      } else {
-        R.drawable.outline_add_moderator_24
-      }
+fun ModEvent.getIconRes(): Int = when (this) {
+  is ModEvent.AdminPurgeCommentViewEvent ->
+    R.drawable.baseline_delete_24
+  is ModEvent.AdminPurgeCommunityViewEvent ->
+    R.drawable.baseline_delete_24
+  is ModEvent.AdminPurgePersonViewEvent ->
+    R.drawable.baseline_delete_24
+  is ModEvent.AdminPurgePostViewEvent ->
+    R.drawable.baseline_delete_24
+  is ModEvent.ModAddCommunityViewEvent -> {
+    if (this.event.mod_add_community.removed) {
+      R.drawable.outline_remove_moderator_24
+    } else {
+      R.drawable.outline_add_moderator_24
     }
-    is ModEvent.ModAddViewEvent -> {
-      if (this.event.mod_add.removed) {
-        R.drawable.outline_remove_moderator_24
-      } else {
-        R.drawable.outline_add_moderator_24
-      }
-    }
-    is ModEvent.ModBanFromCommunityViewEvent -> {
-      if (this.event.mod_ban_from_community.banned) {
-        R.drawable.outline_person_remove_24
-      } else {
-        R.drawable.baseline_person_add_alt_24
-      }
-    }
-    is ModEvent.ModBanViewEvent -> {
-      if (this.event.mod_ban.banned) {
-        R.drawable.outline_person_remove_24
-      } else {
-        R.drawable.baseline_person_add_alt_24
-      }
-    }
-    is ModEvent.ModFeaturePostViewEvent -> {
-      if (this.event.mod_feature_post.featured) {
-        R.drawable.baseline_push_pin_24
-      } else {
-        R.drawable.ic_unpin_24
-      }
-    }
-    is ModEvent.ModHideCommunityViewEvent -> {
-      if (this.event.mod_hide_community.hidden) {
-        R.drawable.baseline_hide_24
-      } else {
-        R.drawable.baseline_expand_content_24
-      }
-    }
-    is ModEvent.ModLockPostViewEvent -> {
-      if (this.event.mod_lock_post.locked) {
-        R.drawable.outline_lock_24
-      } else {
-        R.drawable.baseline_lock_open_24
-      }
-    }
-    is ModEvent.ModRemoveCommentViewEvent -> {
-      if (this.event.mod_remove_comment.removed) {
-        R.drawable.baseline_remove_circle_outline_24
-      } else {
-        R.drawable.baseline_undo_24
-      }
-    }
-    is ModEvent.ModRemoveCommunityViewEvent -> {
-      if (this.event.mod_remove_community.removed) {
-        R.drawable.baseline_remove_circle_outline_24
-      } else {
-        R.drawable.baseline_undo_24
-      }
-    }
-    is ModEvent.ModRemovePostViewEvent -> {
-      if (this.event.mod_remove_post.removed) {
-        R.drawable.baseline_remove_circle_outline_24
-      } else {
-        R.drawable.baseline_undo_24
-      }
-    }
-    is ModEvent.ModTransferCommunityViewEvent ->
-      R.drawable.baseline_swap_horiz_24
   }
+  is ModEvent.ModAddViewEvent -> {
+    if (this.event.mod_add.removed) {
+      R.drawable.outline_remove_moderator_24
+    } else {
+      R.drawable.outline_add_moderator_24
+    }
+  }
+  is ModEvent.ModBanFromCommunityViewEvent -> {
+    if (this.event.mod_ban_from_community.banned) {
+      R.drawable.outline_person_remove_24
+    } else {
+      R.drawable.baseline_person_add_alt_24
+    }
+  }
+  is ModEvent.ModBanViewEvent -> {
+    if (this.event.mod_ban.banned) {
+      R.drawable.outline_person_remove_24
+    } else {
+      R.drawable.baseline_person_add_alt_24
+    }
+  }
+  is ModEvent.ModFeaturePostViewEvent -> {
+    if (this.event.mod_feature_post.featured) {
+      R.drawable.baseline_push_pin_24
+    } else {
+      R.drawable.ic_unpin_24
+    }
+  }
+  is ModEvent.ModHideCommunityViewEvent -> {
+    if (this.event.mod_hide_community.hidden) {
+      R.drawable.baseline_hide_24
+    } else {
+      R.drawable.baseline_expand_content_24
+    }
+  }
+  is ModEvent.ModLockPostViewEvent -> {
+    if (this.event.mod_lock_post.locked) {
+      R.drawable.outline_lock_24
+    } else {
+      R.drawable.baseline_lock_open_24
+    }
+  }
+  is ModEvent.ModRemoveCommentViewEvent -> {
+    if (this.event.mod_remove_comment.removed) {
+      R.drawable.baseline_remove_circle_outline_24
+    } else {
+      R.drawable.baseline_undo_24
+    }
+  }
+  is ModEvent.ModRemoveCommunityViewEvent -> {
+    if (this.event.mod_remove_community.removed) {
+      R.drawable.baseline_remove_circle_outline_24
+    } else {
+      R.drawable.baseline_undo_24
+    }
+  }
+  is ModEvent.ModRemovePostViewEvent -> {
+    if (this.event.mod_remove_post.removed) {
+      R.drawable.baseline_remove_circle_outline_24
+    } else {
+      R.drawable.baseline_undo_24
+    }
+  }
+  is ModEvent.ModTransferCommunityViewEvent ->
+    R.drawable.baseline_swap_horiz_24
 }
 //  when (this) {
 //    is ModEvent.AdminPurgeCommentViewEvent,

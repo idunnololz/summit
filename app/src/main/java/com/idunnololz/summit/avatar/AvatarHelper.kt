@@ -110,32 +110,30 @@ class AvatarHelper @Inject constructor(
     personName: String,
     personId: PersonId,
     personInstance: String,
-  ): Job {
-    return if (imageUrl.isNullOrBlank()) {
-      coroutineScope.launch {
-        val d = accountImageGenerator.generateDrawableForPerson(
-          personName = personName,
-          personId = personId,
-          personInstance = personInstance,
-          circleClip = true,
-        )
+  ): Job = if (imageUrl.isNullOrBlank()) {
+    coroutineScope.launch {
+      val d = accountImageGenerator.generateDrawableForPerson(
+        personName = personName,
+        personId = personId,
+        personInstance = personInstance,
+        circleClip = true,
+      )
 
-        withContext(Dispatchers.Main) {
-          target.onSuccess(d.asImage())
-        }
+      withContext(Dispatchers.Main) {
+        target.onSuccess(d.asImage())
       }
-    } else {
-      coroutineScope.launch {
-        context.imageLoader.execute(
-          ImageRequest.Builder(context)
-            .data(imageUrl)
-            .transformations(CircleCropTransformation())
-            .target(target)
-            .placeholder(newShimmerDrawableSquare(context).asImage())
-            .allowHardware(false)
-            .build(),
-        )
-      }
+    }
+  } else {
+    coroutineScope.launch {
+      context.imageLoader.execute(
+        ImageRequest.Builder(context)
+          .data(imageUrl)
+          .transformations(CircleCropTransformation())
+          .target(target)
+          .placeholder(newShimmerDrawableSquare(context).asImage())
+          .allowHardware(false)
+          .build(),
+      )
     }
   }
 

@@ -32,8 +32,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SettingsPostsFeedFragment :
-  BaseSettingsFragment() {
+class SettingsPostsFeedFragment : BaseSettingsFragment() {
 
   private val args: SettingsPostsFeedFragmentArgs by navArgs()
   private val preferencesViewModel: PreferencesViewModel by viewModels()

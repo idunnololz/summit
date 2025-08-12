@@ -21,7 +21,9 @@ import org.commonmark.parser.InlineParser
 import org.commonmark.parser.InlineParserContext
 import org.commonmark.parser.delimiter.DelimiterProcessor
 
-class SummitInlineParser(private val context: InlineParserContext) : InlineParser {
+class SummitInlineParser(
+  private val context: InlineParserContext,
+) : InlineParser {
   private val specialCharacters: BitSet
   private val delimiterCharacters: BitSet
   private val delimiterProcessors: Map<Char, DelimiterProcessor>
@@ -75,13 +77,10 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
     lastBracket = null
   }
 
-  private fun text(text: String?, beginIndex: Int, endIndex: Int): Text {
-    return Text(text!!.substring(beginIndex, endIndex))
-  }
+  private fun text(text: String?, beginIndex: Int, endIndex: Int): Text =
+    Text(text!!.substring(beginIndex, endIndex))
 
-  private fun text(text: String): Text {
-    return Text(text)
-  }
+  private fun text(text: String): Text = Text(text)
 
   /**
    * Parse the next inline element in subject, advancing input index.
@@ -148,12 +147,10 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
   /**
    * Returns the char at the current input index, or `'\0'` in case there are no more characters.
    */
-  private fun peek(): Char {
-    return if (index < input.length) {
-      input[index]
-    } else {
-      '\u0000'
-    }
+  private fun peek(): Char = if (index < input.length) {
+    input[index]
+  } else {
+    '\u0000'
   }
 
   /**
@@ -171,7 +168,8 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
 
     // Check previous text for trailing spaces.
     // The "endsWith" is an optimization to avoid an RE match in the common case.
-    return if (previous is Text && previous.literal.endsWith(
+    return if (previous is Text &&
+      previous.literal.endsWith(
         " ",
       )
     ) {
@@ -203,7 +201,8 @@ class SummitInlineParser(private val context: InlineParserContext) : InlineParse
     if (peek() == '\n') {
       node = HardLineBreak()
       index++
-    } else if (index < input.length && ESCAPABLE.matcher(
+    } else if (index < input.length &&
+      ESCAPABLE.matcher(
         input.substring(index, index + 1),
       ).matches()
     ) {

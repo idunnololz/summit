@@ -87,14 +87,12 @@ class SettingsWebFragment :
             menuInflater.inflate(R.menu.menu_setting_web, menu)
           }
 
-          override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return when (menuItem.itemId) {
-              R.id.ca_save -> {
-                save()
-                true
-              }
-              else -> false
+          override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+            R.id.ca_save -> {
+              save()
+              true
             }
+            else -> false
           }
         },
       )

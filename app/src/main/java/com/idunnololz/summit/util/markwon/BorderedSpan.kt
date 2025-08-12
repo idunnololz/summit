@@ -9,7 +9,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 
-class BorderedSpan(context: Context) : ReplacementSpan() {
+class BorderedSpan(
+  context: Context,
+) : ReplacementSpan() {
   val paintBorder: Paint
 
 //    val mPaintBackground: Paint

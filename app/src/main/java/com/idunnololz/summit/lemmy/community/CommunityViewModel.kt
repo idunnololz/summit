@@ -85,7 +85,8 @@ class CommunityViewModel @Inject constructor(
   val basePreferences: Preferences,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val postListEngineFactory: PostListEngine.Factory,
-) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
+) : ViewModel(),
+  SlidingPaneController.PostViewPagerViewModel {
 
   companion object {
     private val TAG = CommunityViewModel::class.java.canonicalName
@@ -481,8 +482,6 @@ class CommunityViewModel @Inject constructor(
     if (fetchingPages.contains(pageToFetch)) {
       return
     }
-
-    Log.d(TAG, "fetching page $pageToFetch")
 
     fetchingPages.add(pageToFetch)
 
@@ -934,24 +933,13 @@ class CommunityViewModel @Inject constructor(
   }
 
   private fun updatePreferencesState() {
-    if (postsRepository.showLinkPosts == preferences.showLinkPosts &&
-      postsRepository.showImagePosts == preferences.showImagePosts &&
-      postsRepository.showVideoPosts == preferences.showVideoPosts &&
-      postsRepository.showTextPosts == preferences.showTextPosts &&
-      postsRepository.showNsfwPosts == preferences.showNsfwPosts &&
-      postsRepository.showFilteredPosts == preferences.showFilteredPosts
-    ) {
+    if (!postsRepository.didPreferencesChange()) {
       return
     }
 
     updateStateMaintainingPosition(
       changeState = {
-        this.showLinkPosts = preferences.showLinkPosts
-        this.showImagePosts = preferences.showImagePosts
-        this.showVideoPosts = preferences.showVideoPosts
-        this.showTextPosts = preferences.showTextPosts
-        this.showNsfwPosts = preferences.showNsfwPosts
-        this.showFilteredPosts = preferences.showFilteredPosts
+        this.applyPreferences()
       },
       anchors = null,
     )

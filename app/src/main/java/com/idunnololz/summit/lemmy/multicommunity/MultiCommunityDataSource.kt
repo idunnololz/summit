@@ -60,7 +60,7 @@ class MultiCommunityDataSource(
             apiClient
               .fetchPosts(
                 communityIdOrName =
-                  Either.Right(communityRef.getServerId(apiClient.instance)),
+                Either.Right(communityRef.getServerId(apiClient.instance)),
                 sortType = sortOrder,
                 listingType = ListingType.All,
                 page = page,
@@ -186,10 +186,8 @@ class MultiCommunityDataSource(
     )
   }
 
-  fun getPersistentErrors(): List<Exception> {
-    return communityNotFoundOnInstance.map {
-      CommunityNotFoundException(instance, it)
-    }
+  fun getPersistentErrors(): List<Exception> = communityNotFoundOnInstance.map {
+    CommunityNotFoundException(instance, it)
   }
 
   val sourcesCount: Int

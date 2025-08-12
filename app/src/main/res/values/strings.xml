@@ -2297,6 +2297,16 @@
     <string name="finish_app_on_back_desc">By default, apps will retain their state when they are closed. If the app is relaunched via the recents screen, the app state will be restored. If this setting is enabled, then the app will discard its state on close and the state will not be restored even if launched via recents.</string>
     <string name="show_navigation_bar_on_post">Show navigation bar on post</string>
     <string name="smart_list">Smart list</string>
+    <string name="inbox_desc">Customize the inbox</string>
+    <string name="mark_all_as_read">Mark all as read</string>
+    <string name="inbox_fab_action">Inbox FAB action</string>
+    <string name="inbox_settings">Inbox settings</string>
+    <string name="inbox_layout">Inbox layout</string>
+    <string name="inbox_auto_mark_as_read">Auto-mark as read</string>
+    <string name="inbox_auto_mark_as_read_desc">When enabled, tapping on any inbox item will mark the item as read (if possible).</string>
+    <string name="full_content_max_height">Full content max height</string>
+    <string name="error_invalid_regex">Invalid regex</string>
+    <string name="match_whole_word">Match whole word</string>
 
 
     <!-- uCrop string resource end -->

@@ -14,8 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsBackupAndRestoreFragment :
-  BaseSettingsFragment() {
+class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
 
   @Inject
   override lateinit var settings: ImportAndExportSettings
@@ -48,32 +47,30 @@ class SettingsBackupAndRestoreFragment :
     }
   }
 
-  override fun generateData(): List<SettingModelItem> {
-    return listOf(
-      settings.importSettings.asCustomItem {
-        ImportSettingsDialogFragment.show(childFragmentManager)
-      },
-      settings.exportSettings.asCustomItem {
-        ExportSettingsDialogFragment.show(childFragmentManager)
-      },
-      settings.resetSettingsWithBackup.asCustomItem {
-        resetSettingsDialogLauncher.launchDialog {
-          titleResId = R.string.reset_settings_prompt
-          messageResId = R.string.backup_and_reset_settings_desc
-          positionButtonResId = R.string.reset_settings
-          negativeButtonResId = R.string.cancel
-        }
-      },
-      settings.manageInternalSettingsBackups.asCustomItem {
-        val direction = SettingsBackupAndRestoreFragmentDirections
-          .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()
-        findNavController().navigateSafe(direction)
-      },
-      settings.viewCurrentSettings.asCustomItem {
-        val direction = SettingsBackupAndRestoreFragmentDirections
-          .actionSettingBackupAndRestoreFragmentToViewCurrentSettingsFragment()
-        findNavController().navigateSafe(direction)
-      },
-    )
-  }
+  override fun generateData(): List<SettingModelItem> = listOf(
+    settings.importSettings.asCustomItem {
+      ImportSettingsDialogFragment.show(childFragmentManager)
+    },
+    settings.exportSettings.asCustomItem {
+      ExportSettingsDialogFragment.show(childFragmentManager)
+    },
+    settings.resetSettingsWithBackup.asCustomItem {
+      resetSettingsDialogLauncher.launchDialog {
+        titleResId = R.string.reset_settings_prompt
+        messageResId = R.string.backup_and_reset_settings_desc
+        positionButtonResId = R.string.reset_settings
+        negativeButtonResId = R.string.cancel
+      }
+    },
+    settings.manageInternalSettingsBackups.asCustomItem {
+      val direction = SettingsBackupAndRestoreFragmentDirections
+        .actionSettingBackupAndRestoreFragmentToManageInternalSettingsBackupsDialogFragment()
+      findNavController().navigateSafe(direction)
+    },
+    settings.viewCurrentSettings.asCustomItem {
+      val direction = SettingsBackupAndRestoreFragmentDirections
+        .actionSettingBackupAndRestoreFragmentToViewCurrentSettingsFragment()
+      findNavController().navigateSafe(direction)
+    },
+  )
 }

@@ -475,7 +475,14 @@ internal object BitmapUtils {
     options: RequestSizeOptions,
   ): Bitmap {
     try {
-      if (reqWidth > 0 && reqHeight > 0 && (options === RequestSizeOptions.RESIZE_FIT || options === RequestSizeOptions.RESIZE_INSIDE || options === RequestSizeOptions.RESIZE_EXACT)) {
+      if (reqWidth > 0 &&
+        reqHeight > 0 &&
+        (
+          options === RequestSizeOptions.RESIZE_FIT ||
+            options === RequestSizeOptions.RESIZE_INSIDE ||
+            options === RequestSizeOptions.RESIZE_EXACT
+          )
+      ) {
         var resized: Bitmap? = null
         if (options === RequestSizeOptions.RESIZE_EXACT) {
           resized = Bitmap.createScaledBitmap(bitmap!!, reqWidth, reqHeight, false)
@@ -777,7 +784,13 @@ internal object BitmapUtils {
       var width = 0
       var height = 0
       val rads = Math.toRadians(degreesRotated.toDouble())
-      val compareTo = if (degreesRotated < 90 || degreesRotated in 181..269) rect.left else rect.right
+      val compareTo = if (degreesRotated < 90 ||
+        degreesRotated in 181..269
+      ) {
+        rect.left
+      } else {
+        rect.right
+      }
       var i = 0
       while (i < cropPoints.size) {
         if (cropPoints[i] >= compareTo - 1 && cropPoints[i] <= compareTo + 1) {

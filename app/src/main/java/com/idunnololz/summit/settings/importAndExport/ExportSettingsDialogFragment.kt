@@ -51,11 +51,10 @@ class ExportSettingsDialogFragment :
   private val chooseSaveLocationLauncher =
     registerForActivityResult(
       object : ActivityResultContracts.CreateDocument("application/lol-catalyst-backup") {
-        override fun createIntent(context: Context, input: String): Intent {
-          return super.createIntent(context, input).apply {
+        override fun createIntent(context: Context, input: String): Intent =
+          super.createIntent(context, input).apply {
             type = "application/lol-catalyst-backup"
           }
-        }
       },
     ) { uri ->
       if (uri != null) {

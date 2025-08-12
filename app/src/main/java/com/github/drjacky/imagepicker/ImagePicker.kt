@@ -45,9 +45,7 @@ open class ImagePicker {
      * @param activity Activity Instance
      */
     @JvmStatic
-    fun with(activity: Activity): Builder {
-      return Builder(activity)
-    }
+    fun with(activity: Activity): Builder = Builder(activity)
 
     /**
      * Get error message from intent
@@ -66,14 +64,11 @@ open class ImagePicker {
      * Get File Path from intent
      */
     @JvmStatic
-    fun getFilePath(data: Intent?): String? {
-      return data?.getStringExtra(EXTRA_FILE_PATH)
-    }
+    fun getFilePath(data: Intent?): String? = data?.getStringExtra(EXTRA_FILE_PATH)
 
     @JvmStatic
-    fun getAllFilePath(data: Intent?): ArrayList<Uri>? {
-      return data?.getParcelableArrayListExtra(MULTIPLE_FILES_PATH)
-    }
+    fun getAllFilePath(data: Intent?): ArrayList<Uri>? =
+      data?.getParcelableArrayListExtra(MULTIPLE_FILES_PATH)
 
     /**
      * Get File from intent
@@ -97,7 +92,9 @@ open class ImagePicker {
     }
   }
 
-  class Builder(private val activity: Activity) {
+  class Builder(
+    private val activity: Activity,
+  ) {
 
     // Image Provider
     private var imageProvider = ImageProvider.BOTH
@@ -217,9 +214,7 @@ open class ImagePicker {
      * Crop Square Image, Useful for Profile Image.
      *
      */
-    fun cropSquare(): Builder {
-      return crop(1f, 1f)
-    }
+    fun cropSquare(): Builder = crop(1f, 1f)
 
     fun setMultipleAllowed(isMultiple: Boolean): Builder {
       this.isMultiple = isMultiple
@@ -277,24 +272,22 @@ open class ImagePicker {
     /**
      * Get Bundle for ImagePickerActivity
      */
-    private fun getBundle(): Bundle {
-      return Bundle().apply {
-        putSerializable(EXTRA_IMAGE_PROVIDER, imageProvider)
-        putStringArray(EXTRA_MIME_TYPES, mimeTypes)
+    private fun getBundle(): Bundle = Bundle().apply {
+      putSerializable(EXTRA_IMAGE_PROVIDER, imageProvider)
+      putStringArray(EXTRA_MIME_TYPES, mimeTypes)
 
-        putBoolean(EXTRA_CROP_OVAL, cropOval)
-        putBoolean(EXTRA_CROP_FREE_STYLE, cropFreeStyle)
-        putBoolean(EXTRA_CROP, crop)
-        putBoolean(MULTIPLE_FILES_ALLOWED, isMultiple)
-        putFloat(EXTRA_CROP_X, cropX)
-        putFloat(EXTRA_CROP_Y, cropY)
-        putSerializable(EXTRA_OUTPUT_FORMAT, outputFormat)
+      putBoolean(EXTRA_CROP_OVAL, cropOval)
+      putBoolean(EXTRA_CROP_FREE_STYLE, cropFreeStyle)
+      putBoolean(EXTRA_CROP, crop)
+      putBoolean(MULTIPLE_FILES_ALLOWED, isMultiple)
+      putFloat(EXTRA_CROP_X, cropX)
+      putFloat(EXTRA_CROP_Y, cropY)
+      putSerializable(EXTRA_OUTPUT_FORMAT, outputFormat)
 
-        putInt(EXTRA_MAX_WIDTH, maxWidth)
-        putInt(EXTRA_MAX_HEIGHT, maxHeight)
+      putInt(EXTRA_MAX_WIDTH, maxWidth)
+      putInt(EXTRA_MAX_HEIGHT, maxHeight)
 
-        putBoolean(EXTRA_KEEP_RATIO, keepRatio)
-      }
+      putBoolean(EXTRA_KEEP_RATIO, keepRatio)
     }
   }
 }

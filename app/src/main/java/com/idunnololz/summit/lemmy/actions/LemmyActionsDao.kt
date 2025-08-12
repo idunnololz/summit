@@ -61,16 +61,16 @@ data class LemmyPendingAction(
 ) : LemmyAction
 
 @ProvidedTypeConverter
-class LemmyActionConverters(private val json: Json) {
+class LemmyActionConverters(
+  private val json: Json,
+) {
 
   companion object {
     private const val TAG = "LemmyActionConverters"
   }
 
   @TypeConverter
-  fun actionInfoToString(value: ActionInfo): String {
-    return json.encodeToString(value)
-  }
+  fun actionInfoToString(value: ActionInfo): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToActionInfo(value: String): ActionInfo? = try {
@@ -82,9 +82,8 @@ class LemmyActionConverters(private val json: Json) {
   }
 
   @TypeConverter
-  fun lemmyActionFailureReasonToString(value: LemmyActionFailureReason): String {
-    return json.encodeToString(value)
-  }
+  fun lemmyActionFailureReasonToString(value: LemmyActionFailureReason): String =
+    json.encodeToString(value)
 
   @TypeConverter
   fun stringToLemmyActionFailureReason(value: String): LemmyActionFailureReason? = try {
@@ -227,7 +226,8 @@ interface LemmyActionResult<T : ActionInfo, R> {
     override val result = Unit
   }
 
-  class DeleteCommentLemmyActionResult : LemmyActionResult<ActionInfo.DeleteCommentActionInfo, Unit> {
+  class DeleteCommentLemmyActionResult :
+    LemmyActionResult<ActionInfo.DeleteCommentActionInfo, Unit> {
     override val result = Unit
   }
 
@@ -242,7 +242,9 @@ interface LemmyActionResult<T : ActionInfo, R> {
 /**
  * Used to deserialize action from db.
  */
-enum class ActionType(val code: Int) {
+enum class ActionType(
+  val code: Int,
+) {
   UNKNOWN(-1),
   VOTE(1),
   COMMENT(2),

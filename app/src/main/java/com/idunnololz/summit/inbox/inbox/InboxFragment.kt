@@ -39,11 +39,6 @@ import com.idunnololz.summit.databinding.ItemInboxHeaderBinding
 import com.idunnololz.summit.databinding.ItemInboxWarningBinding
 import com.idunnololz.summit.drafts.DraftData
 import com.idunnololz.summit.error.ErrorDialogFragment
-import com.idunnololz.summit.lemmy.LemmyTextHelper
-import com.idunnololz.summit.lemmy.PageRef
-import com.idunnololz.summit.lemmy.appendNameWithInstance
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.InboxItem.RegistrationApplicationInboxItem
 import com.idunnololz.summit.inbox.InboxSwipeToActionCallback
@@ -53,6 +48,11 @@ import com.idunnololz.summit.inbox.ReportItem
 import com.idunnololz.summit.inbox.conversation.Conversation
 import com.idunnololz.summit.inbox.conversation.ConversationsManager
 import com.idunnololz.summit.inbox.conversation.NewConversation
+import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.appendNameWithInstance
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
@@ -61,6 +61,8 @@ import com.idunnololz.summit.lemmy.utils.addEllipsizeToSpannedOnLayout
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.preferences.InboxFabActionId
+import com.idunnololz.summit.preferences.InboxLayoutId
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.reason.ReasonDialogFragment
@@ -88,8 +90,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class InboxFragment :
-  BaseFragment<FragmentInboxBinding>() {
+class InboxFragment : BaseFragment<FragmentInboxBinding>() {
 
   companion object {
     private const val TAG = "InboxFragment"
@@ -241,10 +242,17 @@ class InboxFragment :
 
         PageType.Conversation -> error("unreachable")
         else -> {
-          binding.fab.visibility = View.VISIBLE
-          binding.fab.setImageResource(R.drawable.baseline_done_all_24)
-          binding.fab.setOnClickListener {
-            viewModel.markAllAsRead()
+          when (preferences.inboxFabAction) {
+            InboxFabActionId.MARK_ALL_AS_READ -> {
+              binding.fab.visibility = View.VISIBLE
+              binding.fab.setImageResource(R.drawable.baseline_done_all_24)
+              binding.fab.setOnClickListener {
+                viewModel.markAllAsRead()
+              }
+            }
+            else -> {
+              binding.fab.visibility = View.GONE
+            }
           }
         }
       }
@@ -480,6 +488,7 @@ class InboxFragment :
       lifecycleOwner = viewLifecycleOwner,
       avatarHelper = avatarHelper,
       lemmyTextHelper = lemmyTextHelper,
+      preferences = preferences,
       onImageClick = { url ->
         getMainActivity()?.openImage(
           sharedElement = null,
@@ -504,7 +513,7 @@ class InboxFragment :
       },
       onMessageClick = {
         val accountId = viewModel.currentAccount.value?.id ?: return@InboxItemAdapter
-        if (!it.isRead && it !is ReportItem) {
+        if (!it.isRead && it !is ReportItem && preferences.inboxAutoMarkAsRead) {
           markAsRead(it, read = true)
         }
         (parentFragment as? InboxTabbedFragment)?.openMessage(
@@ -681,6 +690,7 @@ class InboxFragment :
     private val lifecycleOwner: LifecycleOwner,
     private val avatarHelper: AvatarHelper,
     private val lemmyTextHelper: LemmyTextHelper,
+    private val preferences: Preferences,
     private val onImageClick: (String) -> Unit,
     private val onVideoClick: (
       url: String,
@@ -709,9 +719,15 @@ class InboxFragment :
         val earliestMessageTs: Long,
       ) : Item
 
-      data class InboxListItem(
-        val inboxItem: InboxItem,
-      ) : Item
+      sealed interface InboxListItem : Item {
+        val inboxItem: InboxItem
+      }
+      data class CompactInboxListItem(
+        override val inboxItem: InboxItem,
+      ) : InboxListItem
+      data class FullInboxListItem(
+        override val inboxItem: InboxItem,
+      ) : InboxListItem
 
       data class RegistrationApplicationItem(
         val registrationApplication: RegistrationApplicationInboxItem,
@@ -731,18 +747,19 @@ class InboxFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.HeaderItem -> true
-          is Item.RegistrationApplicationItem ->
-            old.registrationApplication.id ==
-              (new as Item.RegistrationApplicationItem).registrationApplication.id
-          is Item.InboxListItem ->
-            old.inboxItem.id == (new as Item.InboxListItem).inboxItem.id
-          is Item.ConversationItem ->
-            old.conversation.id == (new as Item.ConversationItem).conversation.id
-          is Item.LoaderItem -> true
-          is Item.TooManyMessagesWarningItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.HeaderItem -> true
+            is Item.RegistrationApplicationItem ->
+              old.registrationApplication.id ==
+                (new as Item.RegistrationApplicationItem).registrationApplication.id
+            is Item.InboxListItem ->
+              old.inboxItem.id == (new as Item.InboxListItem).inboxItem.id
+            is Item.ConversationItem ->
+              old.conversation.id == (new as Item.ConversationItem).conversation.id
+            is Item.LoaderItem -> true
+            is Item.TooManyMessagesWarningItem -> true
+          }
       },
     ).apply {
       addItemType(Item.HeaderItem::class, ItemInboxHeaderBinding::inflate) { item, b, _ -> }
@@ -758,7 +775,30 @@ class InboxFragment :
           tsToShortDate(item.earliestMessageTs),
         )
       }
-      addItemType(Item.InboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
+      addItemType(Item.CompactInboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
+        postAndCommentViewBuilder.bindMessage(
+          b = b,
+          instance = instance,
+          accountId = accountId,
+          viewLifecycleOwner = lifecycleOwner,
+          item = item.inboxItem,
+          onImageClick = onImageClick,
+          onVideoClick = onVideoClick,
+          onMarkAsRead = onMarkAsRead,
+          onPageClick = onPageClick,
+          onMessageClick = onMessageClick,
+          onAddCommentClick = onAddCommentClick,
+          onOverflowMenuClick = onOverflowMenuClick,
+          onSignInRequired = onSignInRequired,
+          onInstanceMismatch = onInstanceMismatch,
+          onLinkClick = onLinkClick,
+          onLinkLongClick = onLinkLongClick,
+        )
+      }
+      addItemType(Item.FullInboxListItem::class, InboxListItemBinding::inflate) { item, b, _ ->
+        b.content.maxLines = Integer.MAX_VALUE
+        b.content.isSingleLine = false
+
         postAndCommentViewBuilder.bindMessage(
           b = b,
           instance = instance,
@@ -862,7 +902,7 @@ class InboxFragment :
       }
       addItemType(
         clazz = Item.LoaderItem::class,
-        inflateFn = InboxListLoaderItemBinding::inflate
+        inflateFn = InboxListLoaderItemBinding::inflate,
       ) { item, b, _ ->
         when (val state = item.state) {
           is StatefulData.Error -> {
@@ -938,7 +978,12 @@ class InboxFragment :
             )
           }
           is InboxListItem.RegularInboxItem -> {
-            newItems.add(Item.InboxListItem(item.item))
+            when (preferences.inboxLayout) {
+              InboxLayoutId.COMPACT ->
+                newItems.add(Item.CompactInboxListItem(item.item))
+              InboxLayoutId.FULL ->
+                newItems.add(Item.FullInboxListItem(item.item))
+            }
           }
         }
       }

@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.annotation.StyleRes
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.TextViewCompat
-import com.idunnololz.summit.util.ext.getResIdFromAttribute
 
 /**
  * From https://stackoverflow.com/a/73911699/1299750

@@ -182,7 +182,9 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
       }
 
       recentTagsRecyclerView.layoutManager = LinearLayoutManager(
-        context, LinearLayoutManager.HORIZONTAL, false,
+        context,
+        LinearLayoutManager.HORIZONTAL,
+        false,
       )
       recentTagsRecyclerView.setHasFixedSize(true)
       val adapter = RecentUserTagsAdapter(
@@ -282,8 +284,12 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
   ) : Adapter<ViewHolder>() {
 
     private sealed interface Item {
-      data class PlaceholderItem(val id: Int) : Item
-      data class UserTagItem(val userTag: UserTag) : Item
+      data class PlaceholderItem(
+        val id: Int,
+      ) : Item
+      data class UserTagItem(
+        val userTag: UserTag,
+      ) : Item
 
       data object EmptyItem : Item
     }
@@ -292,13 +298,14 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.PlaceholderItem ->
-            old.id == (new as Item.PlaceholderItem).id
-          is Item.UserTagItem ->
-            old.userTag.id == (new as Item.UserTagItem).userTag.id
-          Item.EmptyItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.PlaceholderItem ->
+              old.id == (new as Item.PlaceholderItem).id
+            is Item.UserTagItem ->
+              old.userTag.id == (new as Item.UserTagItem).userTag.id
+            Item.EmptyItem -> true
+          }
       },
     ).apply {
       addItemType(

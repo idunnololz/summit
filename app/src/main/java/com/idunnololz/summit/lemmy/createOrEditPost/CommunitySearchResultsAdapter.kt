@@ -62,20 +62,21 @@ class CommunitySearchResultsAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.GroupHeaderItem -> {
-          old.text == (new as Item.GroupHeaderItem).text
+      old::class == new::class &&
+        when (old) {
+          is Item.GroupHeaderItem -> {
+            old.text == (new as Item.GroupHeaderItem).text
+          }
+          is Item.NoResultsItem -> true
+          is Item.SearchResultCommunityItem -> {
+            old.communityView.community.id ==
+              (new as Item.SearchResultCommunityItem).communityView.community.id
+          }
+          is Item.RecentCommunityItem ->
+            old.communityRef ==
+              (new as Item.RecentCommunityItem).communityRef
+          Item.FooterItem -> true
         }
-        is Item.NoResultsItem -> true
-        is Item.SearchResultCommunityItem -> {
-          old.communityView.community.id ==
-            (new as Item.SearchResultCommunityItem).communityView.community.id
-        }
-        is Item.RecentCommunityItem ->
-          old.communityRef ==
-            (new as Item.RecentCommunityItem).communityRef
-        Item.FooterItem -> true
-      }
     },
   ).apply {
     addItemType(

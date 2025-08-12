@@ -31,7 +31,7 @@ import kotlinx.parcelize.Parcelize
 @AndroidEntryPoint
 class ReasonDialogFragment :
   BaseDialogFragment<DialogFragmentReasonBinding>(),
-    FullscreenDialogFragment {
+  FullscreenDialogFragment {
 
   companion object {
     fun show(fragmentManager: FragmentManager, title: String, positiveButton: String) =
@@ -59,9 +59,9 @@ class ReasonDialogFragment :
   ) : Parcelable
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?,
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
   ): View? {
     super.onCreateView(inflater, container, savedInstanceState)
 
@@ -99,10 +99,7 @@ class ReasonDialogFragment :
       }
 
       toolbar.addMenuProvider(object : MenuProvider {
-        override fun onCreateMenu(
-          menu: Menu,
-          menuInflater: MenuInflater,
-        ) {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
           menuInflater.inflate(R.menu.menu_reason, menu)
         }
 
@@ -138,13 +135,13 @@ class ReasonDialogFragment :
         onAddTemplateClick = {
           AddOrEditTemplateFragmentDialog.show(
             template = null,
-            fragmentManager = parentFragmentManager
+            fragmentManager = parentFragmentManager,
           )
         },
         onEditTemplateClick = {
           AddOrEditTemplateFragmentDialog.show(
             template = it,
-            fragmentManager = parentFragmentManager
+            fragmentManager = parentFragmentManager,
           )
         },
       )

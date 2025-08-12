@@ -5,7 +5,10 @@ import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.lifecycle.LifecycleOwner
 import com.idunnololz.summit.MainApplication
 
-interface BottomMenuContainer : LifecycleOwner, OnBackPressedDispatcherOwner, InsetsProvider {
+interface BottomMenuContainer :
+  LifecycleOwner,
+  OnBackPressedDispatcherOwner,
+  InsetsProvider {
   val context: Context
   val mainApplication: MainApplication
   val activity: BaseActivity?

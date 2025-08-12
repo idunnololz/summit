@@ -53,19 +53,20 @@ class InstanceAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.SelectedInstanceItem -> {
-          old == new
+      old::class == new::class &&
+        when (old) {
+          is Item.SelectedInstanceItem -> {
+            old == new
+          }
+          is Item.GroupHeaderItem -> {
+            old.text == (new as Item.GroupHeaderItem).text
+          }
+          is Item.NoResultsItem -> true
+          is Item.SearchResultInstanceItem -> {
+            old.instance ==
+              (new as Item.SearchResultInstanceItem).instance
+          }
         }
-        is Item.GroupHeaderItem -> {
-          old.text == (new as Item.GroupHeaderItem).text
-        }
-        is Item.NoResultsItem -> true
-        is Item.SearchResultInstanceItem -> {
-          old.instance ==
-            (new as Item.SearchResultInstanceItem).instance
-        }
-      }
     },
   ).apply {
     addItemType(

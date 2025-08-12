@@ -83,9 +83,8 @@ class SimpleDiskCache(
     return true
   }
 
-  fun hasFreshCache(key: String, freshTimeMs: Long): Boolean {
-    return System.currentTimeMillis() - getCachedDate(key) < freshTimeMs
-  }
+  fun hasFreshCache(key: String, freshTimeMs: Long): Boolean =
+    System.currentTimeMillis() - getCachedDate(key) < freshTimeMs
 
   fun getCachedDate(key: String): Long {
     var snapshot: DiskLruCache.Snapshot? = null
@@ -124,9 +123,7 @@ class SimpleDiskCache(
   }
 
   @Throws(IOException::class)
-  fun getCachedData(key: String): String? {
-    return getString(key)?.string
-  }
+  fun getCachedData(key: String): String? = getString(key)?.string
 
   @Throws(IOException::class)
   fun evict(key: String) {
@@ -204,9 +201,7 @@ class SimpleDiskCache(
     }
   }
 
-  private fun toInternalKey(key: String): String {
-    return md5(key)
-  }
+  private fun toInternalKey(key: String): String = md5(key)
 
   private fun md5(s: String): String {
     try {

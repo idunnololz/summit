@@ -89,9 +89,7 @@ class OfflineManager @Inject constructor(
     }
   }
 
-  fun isUrlCached(url: String): Boolean {
-    return cachedUrls.contains(url)
-  }
+  fun isUrlCached(url: String): Boolean = cachedUrls.contains(url)
 
   fun getCachedImageFile(url: String): File {
     val fileName = getFilenameForUrl(url)
@@ -239,15 +237,14 @@ class OfflineManager @Inject constructor(
     return Utils.hashSha256(url) + extension
   }
 
-  fun fetch(registration: Registration) =
-    fetchGeneric(
-      url = registration.url,
-      destDir = registration.destDir,
-      force = registration.force,
-      listener = registration.listener,
-      errorListener = registration.errorListener,
-      registerListenersIfTaskExists = registration.registerListenersIfTaskExists,
-    )
+  fun fetch(registration: Registration) = fetchGeneric(
+    url = registration.url,
+    destDir = registration.destDir,
+    force = registration.force,
+    listener = registration.listener,
+    errorListener = registration.errorListener,
+    registerListenersIfTaskExists = registration.registerListenersIfTaskExists,
+  )
 
   private fun fetchGeneric(
     url: String,
@@ -276,7 +273,7 @@ class OfflineManager @Inject constructor(
         force = force,
         listener = listener,
         errorListener = errorListener,
-        registerListenersIfTaskExists = registerListenersIfTaskExists
+        registerListenersIfTaskExists = registerListenersIfTaskExists,
       )
     }
 
@@ -358,7 +355,7 @@ class OfflineManager @Inject constructor(
       force = force,
       listener = listener,
       errorListener = errorListener,
-      registerListenersIfTaskExists = registerListenersIfTaskExists
+      registerListenersIfTaskExists = registerListenersIfTaskExists,
     )
   }
 

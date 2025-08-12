@@ -16,6 +16,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import arrow.core.Either
@@ -56,6 +57,7 @@ import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.PreviewInfo
 import com.idunnololz.summit.util.RecycledState
 import com.idunnololz.summit.util.Size
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.coil.BlurTransformation
@@ -63,6 +65,7 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.CustomPlayerView
+import com.idunnololz.summit.view.LinearLayoutWithFadingEdge
 import com.idunnololz.summit.view.LoadingView
 import java.io.File
 
@@ -111,6 +114,7 @@ class LemmyContentHelper(
     lazyUpdate: Boolean = false,
     videoState: VideoState? = null,
     contentMaxLines: Int = -1,
+    contentMaxHeightDp: Int = -1,
     highlight: HighlightTextData? = null,
     contentSpannable: Spanned? = null,
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
@@ -151,6 +155,21 @@ class LemmyContentHelper(
           R.dimen.post_list_image_view_horizontal_margin,
         ) * 2
         )
+    }
+    val contentMaxHeightPx = Utils.convertDpToPixel(contentMaxHeightDp.toFloat()).toInt()
+
+    val facingEdgeContainer = fullContentContainerView as? LinearLayoutWithFadingEdge
+    if (facingEdgeContainer != null && facingEdgeContainer.maxHeight != contentMaxHeightPx) {
+      facingEdgeContainer.maxHeight = contentMaxHeightPx
+      if (contentMaxHeightPx >= 0) {
+        fullContentContainerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+          this.matchConstraintMaxHeight = contentMaxHeightPx
+        }
+      } else {
+        fullContentContainerView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+          this.matchConstraintMaxHeight = 0
+        }
+      }
     }
 
     fun <T : View> getAndEnsureView(@LayoutRes resId: Int): T =
@@ -477,7 +496,8 @@ class LemmyContentHelper(
           alwaysShowLinkBelowPost ||
             postType == PostType.Link ||
             postType == PostType.Text
-          ) && showLink
+          ) &&
+        showLink
       ) {
         val embedVideoUrl = postView.post.embed_video_url
         if (embedVideoUrl != null) {

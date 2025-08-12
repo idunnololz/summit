@@ -144,7 +144,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         val userCommunityItem: UserCommunityItem,
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
-      ) : Item, CommunityBackedItem
+      ) : Item,
+        CommunityBackedItem
       data class BookmarkedCommunityItem(
         override val communityRef: CommunityRef,
         val iconUrl: String?,
@@ -152,7 +153,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
         val needsDisambiguation: Boolean,
-      ) : Item, CommunityBackedItem
+      ) : Item,
+        CommunityBackedItem
       data class SubscriptionHeaderItem(
         val isRefreshing: Boolean,
       ) : Item
@@ -162,7 +164,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
         val needsDisambiguation: Boolean,
-      ) : Item, CommunityBackedItem
+      ) : Item,
+        CommunityBackedItem
       data class ModeratedHeaderItem(
         val isRefreshing: Boolean,
       ) : Item
@@ -172,7 +175,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         val isSelected: Boolean,
         val resetTabOnClick: Boolean,
         val needsDisambiguation: Boolean,
-      ) : Item, CommunityBackedItem
+      ) : Item,
+        CommunityBackedItem
       data object NoSubscriptionsItem : Item
 
       data class TabStateItem(
@@ -237,7 +241,8 @@ class CommunitiesPaneController @AssistedInject constructor(
         clazz = Item.HomeCommunityItem::class,
         inflateFn = HomeCommunityItemBinding::inflate,
       ) { item, b, _ ->
-        b.title.text = context.getString(R.string.home) + " (${item.communityRef.getLocalizedFullName(context)})"
+        b.title.text =
+          context.getString(R.string.home) + " (${item.communityRef.getLocalizedFullName(context)})"
         b.root.isSelected = item.isSelected
         b.root.setOnClickListener {
           onCommunitySelected(Either.Left(item.userCommunityItem), item.resetTabOnClick)

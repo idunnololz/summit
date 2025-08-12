@@ -43,9 +43,7 @@ internal class PinchDetector(
    * Starts a pinch gesture or continues an ongoing gesture.
    * Returns true if we are interested in the result.
    */
-  internal fun maybeStart(event: MotionEvent): Boolean {
-    return detector.onTouchEvent(event)
-  }
+  internal fun maybeStart(event: MotionEvent): Boolean = detector.onTouchEvent(event)
 
   override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
     return true // We are interested in this gesture

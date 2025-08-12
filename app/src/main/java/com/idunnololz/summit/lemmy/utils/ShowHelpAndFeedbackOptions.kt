@@ -10,6 +10,5 @@ fun BaseFragment<*>.showHelpAndFeedbackOptions() {
   HelpAndFeedbackDialogFragment.show(childFragmentManager)
 }
 
-fun DirectoryHelper.getFeedbackScreenshotFile(): File {
-  return File(saveForLaterDir, "slot_feedback_screenshot.jpg")
-}
+fun DirectoryHelper.getFeedbackScreenshotFile(): File =
+  File(saveForLaterDir, "slot_feedback_screenshot.jpg")

@@ -18,8 +18,8 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 class ApiModule {
   @Provides
   @Singleton
-  fun provideSummitServerApi(@SummitApi okHttpClient: OkHttpClient, json: Json): SummitServerApi {
-    return Retrofit.Builder()
+  fun provideSummitServerApi(@SummitApi okHttpClient: OkHttpClient, json: Json): SummitServerApi =
+    Retrofit.Builder()
       .apply {
         if (BuildConfig.DEBUG) {
           baseUrl("https://summitforlemmyserver.idunnololz.com")
@@ -35,5 +35,4 @@ class ApiModule {
       .client(okHttpClient)
       .build()
       .create(SummitServerApi::class.java)
-  }
 }

@@ -3,7 +3,9 @@ package com.idunnololz.summit.util
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.
  */
-class Event<T>(content: T?) {
+class Event<T>(
+  content: T?,
+) {
   private val mContent: T
   private var hasBeenHandled = false
 
@@ -20,7 +22,5 @@ class Event<T>(content: T?) {
       mContent
     }
 
-  fun hasBeenHandled(): Boolean {
-    return hasBeenHandled
-  }
+  fun hasBeenHandled(): Boolean = hasBeenHandled
 }

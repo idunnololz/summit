@@ -151,14 +151,15 @@ class ManageSettingsFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { oldItem, newItem ->
-        oldItem::class == newItem::class && when (oldItem) {
-          is Item.SettingListItem ->
-            oldItem.settingKey == (newItem as Item.SettingListItem).settingKey
+        oldItem::class == newItem::class &&
+          when (oldItem) {
+            is Item.SettingListItem ->
+              oldItem.settingKey == (newItem as Item.SettingListItem).settingKey
 
-          Item.EmptyItem,
-          Item.InstructionItem,
-          -> true
-        }
+            Item.EmptyItem,
+            Item.InstructionItem,
+            -> true
+          }
       },
     ).apply {
       addItemType(

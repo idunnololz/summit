@@ -10,7 +10,9 @@ import com.otaliastudios.zoom.ZoomEngine.Listener
  * It asks for a new matrix at each listener update which is important
  * so they don't mess each other.
  */
-internal class UpdatesDispatcher(private val engine: ZoomEngine) {
+internal class UpdatesDispatcher(
+  private val engine: ZoomEngine,
+) {
 
   private val listeners = mutableListOf<Listener>()
 

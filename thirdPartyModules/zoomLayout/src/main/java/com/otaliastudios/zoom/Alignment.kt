@@ -74,28 +74,22 @@ object Alignment {
    * Returns the horizontal alignment for this alignment,
    * or [NO_VALUE] if no value was set.
    */
-  internal fun getHorizontal(alignment: Int): Int {
-    return alignment and MASK
-  }
+  internal fun getHorizontal(alignment: Int): Int = alignment and MASK
 
   /**
    * Returns the vertical alignment for this alignment,
    * or [NO_VALUE] if no value was set.
    */
-  internal fun getVertical(alignment: Int): Int {
-    return alignment and MASK.inv()
-  }
+  internal fun getVertical(alignment: Int): Int = alignment and MASK.inv()
 
   /**
    * Returns whether this alignment is of 'none' type.
    * In case [alignment] includes both axes, both are required to be 'none' or [NO_VALUE].
    */
-  internal fun isNone(alignment: Int): Boolean {
-    return alignment == NONE ||
-      alignment == NO_VALUE ||
-      alignment == NONE_HORIZONTAL ||
-      alignment == NONE_VERTICAL
-  }
+  internal fun isNone(alignment: Int): Boolean = alignment == NONE ||
+    alignment == NO_VALUE ||
+    alignment == NONE_HORIZONTAL ||
+    alignment == NONE_VERTICAL
 
   /**
    * Transforms this alignment to a horizontal gravity value.

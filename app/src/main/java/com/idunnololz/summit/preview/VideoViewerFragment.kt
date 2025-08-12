@@ -158,8 +158,9 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
   private fun isLandscapeReversed(orientation: Int): Boolean =
     (orientation >= 90 - ORIENTATION_SLOP_DEG && orientation <= 90 + ORIENTATION_SLOP_DEG)
 
-  private fun isPortrait(orientation: Int): Boolean =
-    orientation >= 360 - ORIENTATION_SLOP_DEG && orientation <= 360 || orientation in 0..ORIENTATION_SLOP_DEG
+  private fun isPortrait(orientation: Int): Boolean = orientation >= 360 - ORIENTATION_SLOP_DEG &&
+    orientation <= 360 ||
+    orientation in 0..ORIENTATION_SLOP_DEG
 
   override fun onCreateView(
     inflater: LayoutInflater,

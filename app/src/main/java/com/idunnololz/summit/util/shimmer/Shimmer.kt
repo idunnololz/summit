@@ -76,13 +76,10 @@ class Shimmer internal constructor() {
   var repeatDelay: Long = 0
   var startDelay: Long = 0
 
-  fun width(width: Int): Int {
-    return if (fixedWidth > 0) fixedWidth else Math.round(widthRatio * width)
-  }
+  fun width(width: Int): Int = if (fixedWidth > 0) fixedWidth else Math.round(widthRatio * width)
 
-  fun height(height: Int): Int {
-    return if (fixedHeight > 0) fixedHeight else Math.round(heightRatio * height)
-  }
+  fun height(height: Int): Int =
+    if (fixedHeight > 0) fixedHeight else Math.round(heightRatio * height)
 
   fun updateColors() {
     when (shape) {
@@ -336,10 +333,9 @@ class Shimmer internal constructor() {
     }
 
     companion object {
-      private fun clamp(min: Float, max: Float, value: Float): Float {
-        return min(max.toDouble(), max(min.toDouble(), value.toDouble()))
+      private fun clamp(min: Float, max: Float, value: Float): Float =
+        min(max.toDouble(), max(min.toDouble(), value.toDouble()))
           .toFloat()
-      }
     }
   }
 

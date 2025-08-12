@@ -32,8 +32,10 @@ import kotlin.math.min
  * ColorHsvPalette is a default drawable palette built by HSV (hue, saturation, value) color model
  * for alternating representations of the RGB color model.
  */
-class ColorHsvPalette(resources: Resources?, bitmap: Bitmap?) :
-  BitmapDrawable(resources, bitmap) {
+class ColorHsvPalette(
+  resources: Resources?,
+  bitmap: Bitmap?,
+) : BitmapDrawable(resources, bitmap) {
   private val huePaint =
     Paint(Paint.ANTI_ALIAS_FLAG)
   private val saturationPaint =
@@ -87,7 +89,5 @@ class ColorHsvPalette(resources: Resources?, bitmap: Bitmap?) :
     huePaint.setColorFilter(colorFilter)
   }
 
-  override fun getOpacity(): Int {
-    return PixelFormat.OPAQUE
-  }
+  override fun getOpacity(): Int = PixelFormat.OPAQUE
 }

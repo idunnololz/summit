@@ -24,9 +24,7 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     this,
     0.5f,
     object : ViewDragHelper.Callback() {
-      override fun tryCaptureView(child: View, pointerId: Int): Boolean {
-        return false
-      }
+      override fun tryCaptureView(child: View, pointerId: Int): Boolean = false
     },
   )
 
@@ -95,7 +93,5 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     return gestureInsets
   }
 
-  private fun isLayoutRtlSupport(): Boolean {
-    return this.layoutDirection == View.LAYOUT_DIRECTION_RTL
-  }
+  private fun isLayoutRtlSupport(): Boolean = this.layoutDirection == View.LAYOUT_DIRECTION_RTL
 }

@@ -23,8 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ViewCurrentSettingsFragment :
-  BaseFragment<FragmentViewCurrentSettingsBinding>() {
+class ViewCurrentSettingsFragment : BaseFragment<FragmentViewCurrentSettingsBinding>() {
 
   private val viewModel: ViewCurrentSettingsViewModel by viewModels()
 

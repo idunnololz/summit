@@ -19,7 +19,6 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preferences.toFontAsset
 import com.idunnololz.summit.settings.PreferencesViewModel
-import com.idunnololz.summit.settings.RadioGroupSettingItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
@@ -109,10 +108,11 @@ class FontPickerDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.FontItem ->
-            old.fontId == (new as Item.FontItem).fontId
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.FontItem ->
+              old.fontId == (new as Item.FontItem).fontId
+          }
       },
     ).apply {
       addItemType(

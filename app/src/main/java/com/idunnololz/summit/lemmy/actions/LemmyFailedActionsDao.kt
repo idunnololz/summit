@@ -116,6 +116,8 @@ sealed interface LemmyActionFailureReason : Parcelable {
   data object ConnectionError : LemmyActionFailureReason
 }
 
-class LemmyActionFailureException(val reason: LemmyActionFailureReason) : RuntimeException(
+class LemmyActionFailureException(
+  val reason: LemmyActionFailureReason,
+) : RuntimeException(
   "LemmyAction failed. Cause: ${reason::class.qualifiedName}. Details: $reason",
 )

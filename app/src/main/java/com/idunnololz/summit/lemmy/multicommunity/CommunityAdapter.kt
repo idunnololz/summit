@@ -115,26 +115,27 @@ class CommunityAdapter @AssistedInject constructor(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.SelectedCommunityItem -> {
-          old == new
+      old::class == new::class &&
+        when (old) {
+          is Item.SelectedCommunityItem -> {
+            old == new
+          }
+          is Item.GroupHeaderItem -> {
+            old.text == (new as Item.GroupHeaderItem).text
+          }
+          is Item.NoResultsItem ->
+            old.text == (new as Item.NoResultsItem).text
+          is Item.SearchResultCommunityItem -> {
+            old.communityView.community.id ==
+              (new as Item.SearchResultCommunityItem).communityView.community.id
+          }
+          is Item.SubscribedCommunityItem -> {
+            old.subscribedCommunity.id ==
+              (new as Item.SubscribedCommunityItem).subscribedCommunity.id
+          }
+          is Item.StaticChildItem ->
+            old.communityRef == (new as Item.StaticChildItem).communityRef
         }
-        is Item.GroupHeaderItem -> {
-          old.text == (new as Item.GroupHeaderItem).text
-        }
-        is Item.NoResultsItem ->
-          old.text == (new as Item.NoResultsItem).text
-        is Item.SearchResultCommunityItem -> {
-          old.communityView.community.id ==
-            (new as Item.SearchResultCommunityItem).communityView.community.id
-        }
-        is Item.SubscribedCommunityItem -> {
-          old.subscribedCommunity.id ==
-            (new as Item.SubscribedCommunityItem).subscribedCommunity.id
-        }
-        is Item.StaticChildItem ->
-          old.communityRef == (new as Item.StaticChildItem).communityRef
-      }
     },
   ).apply {
     addItemType(

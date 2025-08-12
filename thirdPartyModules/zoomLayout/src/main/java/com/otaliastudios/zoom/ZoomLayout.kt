@@ -165,14 +165,13 @@ open class ZoomLayout private constructor(
     super.addView(child, index, params)
   }
 
-  override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-    return engine.onInterceptTouchEvent(ev) || hasClickableChildren && super.onInterceptTouchEvent(ev)
-  }
+  override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = engine.onInterceptTouchEvent(ev) ||
+    hasClickableChildren &&
+    super.onInterceptTouchEvent(ev)
 
   @SuppressLint("ClickableViewAccessibility")
-  override fun onTouchEvent(ev: MotionEvent): Boolean {
-    return engine.onTouchEvent(ev) || hasClickableChildren && super.onTouchEvent(ev)
-  }
+  override fun onTouchEvent(ev: MotionEvent): Boolean =
+    engine.onTouchEvent(ev) || hasClickableChildren && super.onTouchEvent(ev)
 
   private fun onUpdate() {
     if (hasClickableChildren) {

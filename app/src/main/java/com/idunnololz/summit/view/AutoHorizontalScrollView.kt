@@ -19,19 +19,16 @@ class AutoHorizontalScrollView : HorizontalScrollView {
   )
 
   @SuppressLint("ClickableViewAccessibility")
-  override fun onTouchEvent(ev: MotionEvent?): Boolean {
-    return when (ev!!.action) {
-      MotionEvent.ACTION_DOWN ->
-        // if we can scroll pass the event to the superclass
-        isScrollable && super.onTouchEvent(ev)
+  override fun onTouchEvent(ev: MotionEvent?): Boolean = when (ev!!.action) {
+    MotionEvent.ACTION_DOWN ->
+      // if we can scroll pass the event to the superclass
+      isScrollable && super.onTouchEvent(ev)
 
-      else -> super.onTouchEvent(ev)
-    }
+    else -> super.onTouchEvent(ev)
   }
 
-  override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-    return isScrollable && super.onInterceptTouchEvent(ev)
-  }
+  override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean =
+    isScrollable && super.onInterceptTouchEvent(ev)
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)

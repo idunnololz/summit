@@ -568,7 +568,8 @@ class PostFragment :
                         )
                       },
                       icon = BottomMenu.MenuIcon.CommunityIcon(
-                        crossPost.community.toCommunityRef(), crossPost.community.icon,
+                        crossPost.community.toCommunityRef(),
+                        crossPost.community.icon,
                       ),
                     ),
                   )
@@ -655,9 +656,7 @@ class PostFragment :
         preferences,
       )
       smoothScroller = object : LinearSmoothScroller(context) {
-        override fun getVerticalSnapPreference(): Int {
-          return SNAP_TO_START
-        }
+        override fun getVerticalSnapPreference(): Int = SNAP_TO_START
 
         override fun calculateDtToFit(
           viewStart: Int,
@@ -665,9 +664,7 @@ class PostFragment :
           boxStart: Int,
           boxEnd: Int,
           snapPreference: Int,
-        ): Int {
-          return boxStart - viewStart + (getMainActivity()?.insets?.value?.topInset ?: 0)
-        }
+        ): Int = boxStart - viewStart + (getMainActivity()?.insets?.value?.topInset ?: 0)
       }
       viewModel.commentNavControlsState.observe(viewLifecycleOwner) {
         if (!preferences.commentsNavigationFab) {
@@ -992,7 +989,6 @@ class PostFragment :
     val context = requireContext()
 
     requireSummitActivity().apply {
-
       if (preferences.showNavigationBarOnPost) {
         insetViewAutomaticallyByPaddingAndNavUi(
           lifecycleOwner = viewLifecycleOwner,
@@ -1209,11 +1205,13 @@ class PostFragment :
 
           when (action.id) {
             CommentGestureAction.Upvote -> {
-              result = moreActionsHelper.vote(commentView, dir = 1, toggle = true, accountId = accountId)
+              result =
+                moreActionsHelper.vote(commentView, dir = 1, toggle = true, accountId = accountId)
             }
 
             CommentGestureAction.Downvote -> {
-              result = moreActionsHelper.vote(commentView, dir = -1, toggle = true, accountId = accountId)
+              result =
+                moreActionsHelper.vote(commentView, dir = -1, toggle = true, accountId = accountId)
             }
 
             CommentGestureAction.Bookmark -> {

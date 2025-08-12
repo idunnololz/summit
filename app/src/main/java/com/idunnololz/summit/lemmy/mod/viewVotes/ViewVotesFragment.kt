@@ -178,11 +178,14 @@ class ViewVotesFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.VoteItem -> old.voteView.creator.id == (new as Item.VoteItem).voteView.creator.id
-          Item.HeaderItem -> true
-          is Item.LoaderItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.VoteItem ->
+              old.voteView.creator.id ==
+                (new as Item.VoteItem).voteView.creator.id
+            Item.HeaderItem -> true
+            is Item.LoaderItem -> true
+          }
       },
     ).apply {
       addItemType(Item.HeaderItem::class, ItemInboxHeaderBinding::inflate) { item, b, _ -> }

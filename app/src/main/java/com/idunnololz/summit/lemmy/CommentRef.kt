@@ -9,4 +9,5 @@ import kotlinx.serialization.Serializable
 data class CommentRef(
   val instance: String,
   val id: Int,
-) : PageRef, Parcelable
+) : PageRef,
+  Parcelable

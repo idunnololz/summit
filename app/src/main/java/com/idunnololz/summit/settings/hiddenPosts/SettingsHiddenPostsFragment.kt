@@ -20,8 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
-class SettingsHiddenPostsFragment :
-  BaseSettingsFragment() {
+class SettingsHiddenPostsFragment : BaseSettingsFragment() {
 
   @Inject
   lateinit var hiddenPostsManager: HiddenPostsManager

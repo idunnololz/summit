@@ -43,7 +43,9 @@ sealed interface ReportItem : InboxItem {
 
 @Serializable
 @JsonClassDiscriminator("t")
-sealed interface InboxItem : Parcelable, LiteInboxItem {
+sealed interface InboxItem :
+  Parcelable,
+  LiteInboxItem {
 
   override val id: Int
   val authorId: PersonId
@@ -83,7 +85,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
-  ) : InboxItem, CommentBackedItem {
+  ) : InboxItem,
+    CommentBackedItem {
 
     constructor(reply: CommentReplyView) : this(
       id = reply.comment_reply.id,
@@ -138,7 +141,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
-  ) : InboxItem, CommentBackedItem {
+  ) : InboxItem,
+    CommentBackedItem {
 
     constructor(mention: PersonMentionView) : this(
       id = mention.person_mention.id,
@@ -246,7 +250,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     override val resolver: Person?,
     val reportedContent: String,
     val reportedContentLastUpdateTime: String,
-  ) : InboxItem, ReportItem {
+  ) : InboxItem,
+    ReportItem {
 
     constructor(message: PrivateMessageReportView) : this(
       id = message.private_message_report.id,
@@ -256,7 +261,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
       authorAvatar = message.creator.avatar,
       title = message.creator.name,
       content = message.private_message_report.reason,
-      lastUpdate = message.private_message_report.updated ?: message.private_message_report.published,
+      lastUpdate =
+      message.private_message_report.updated ?: message.private_message_report.published,
       lastUpdateTs = dateStringToTs(
         message.private_message_report.updated
           ?: message.private_message_report.published,
@@ -303,7 +309,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     val communityId: Int,
     override val creator: Person,
     override val resolver: Person?,
-  ) : InboxItem, ReportItem {
+  ) : InboxItem,
+    ReportItem {
 
     constructor(reportView: PostReportView) : this(
       id = reportView.post_report.id,
@@ -361,7 +368,8 @@ sealed interface InboxItem : Parcelable, LiteInboxItem {
     val communityId: Int,
     override val creator: Person,
     override val resolver: Person?,
-  ) : InboxItem, ReportItem {
+  ) : InboxItem,
+    ReportItem {
 
     constructor(reportView: CommentReportView) : this(
       id = reportView.comment_report.id,

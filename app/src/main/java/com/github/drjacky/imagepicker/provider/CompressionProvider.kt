@@ -21,7 +21,9 @@ import kotlinx.coroutines.launch
  * @version 1.0
  * @since 04 January 2019
  */
-class CompressionProvider(activity: ImagePickerActivity) : BaseProvider(activity) {
+class CompressionProvider(
+  activity: ImagePickerActivity,
+) : BaseProvider(activity) {
 
   private val maxWidth: Int
   private val maxHeight: Int
@@ -39,13 +41,11 @@ class CompressionProvider(activity: ImagePickerActivity) : BaseProvider(activity
    * Check if compression is required
    * @param uri File object to apply Compression
    */
-  fun isResizeRequired(uri: Uri): Boolean {
-    return if (maxWidth > 0 && maxHeight > 0) {
-      val sizes = getImageSize(uri)
-      sizes[0] > maxWidth || sizes[1] > maxHeight
-    } else {
-      false
-    }
+  fun isResizeRequired(uri: Uri): Boolean = if (maxWidth > 0 && maxHeight > 0) {
+    val sizes = getImageSize(uri)
+    sizes[0] > maxWidth || sizes[1] > maxHeight
+  } else {
+    false
   }
 
   /**

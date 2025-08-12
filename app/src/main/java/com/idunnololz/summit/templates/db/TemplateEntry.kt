@@ -8,9 +8,6 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.idunnololz.summit.drafts.DraftConverters
-import com.idunnololz.summit.drafts.DraftData
-import com.idunnololz.summit.drafts.DraftTypes
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -41,16 +38,16 @@ data class TemplateEntry(
 ) : Parcelable
 
 @ProvidedTypeConverter
-class TemplateConverters(private val json: Json) {
+class TemplateConverters(
+  private val json: Json,
+) {
 
   companion object {
     private const val TAG = "TemplateConverters"
   }
 
   @TypeConverter
-  fun templateDataToString(value: TemplateData): String {
-    return json.encodeToString(value)
-  }
+  fun templateDataToString(value: TemplateData): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToTemplateData(value: String): TemplateData? = try {

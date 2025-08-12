@@ -76,19 +76,20 @@ class PersonAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.SelectedPersonItem -> {
-          old == new
+      old::class == new::class &&
+        when (old) {
+          is Item.SelectedPersonItem -> {
+            old == new
+          }
+          is Item.GroupHeaderItem -> {
+            old.text == (new as Item.GroupHeaderItem).text
+          }
+          is Item.NoResultsItem -> true
+          is Item.SearchResultPersonItem -> {
+            old.personView.person.id ==
+              (new as Item.SearchResultPersonItem).personView.person.id
+          }
         }
-        is Item.GroupHeaderItem -> {
-          old.text == (new as Item.GroupHeaderItem).text
-        }
-        is Item.NoResultsItem -> true
-        is Item.SearchResultPersonItem -> {
-          old.personView.person.id ==
-            (new as Item.SearchResultPersonItem).personView.person.id
-        }
-      }
     },
   ).apply {
     addItemType(

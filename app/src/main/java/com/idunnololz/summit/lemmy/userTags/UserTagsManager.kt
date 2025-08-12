@@ -90,15 +90,12 @@ class UserTagsManager @Inject constructor(
     }
   }
 
-  suspend fun getAllUserTagEntries(): List<UserTagEntry> {
-    return coroutineScope.async {
-      dao.getAllUserTags()
-    }.await()
-  }
+  suspend fun getAllUserTagEntries(): List<UserTagEntry> = coroutineScope.async {
+    dao.getAllUserTags()
+  }.await()
 
-  fun getUserTag(fullName: String): UserTagConfig? {
-    return userTagsByName[fullName.lowercase(Locale.US)]?.config
-  }
+  fun getUserTag(fullName: String): UserTagConfig? =
+    userTagsByName[fullName.lowercase(Locale.US)]?.config
 
   fun getUserTags() = userTagsByName.values.toList()
 

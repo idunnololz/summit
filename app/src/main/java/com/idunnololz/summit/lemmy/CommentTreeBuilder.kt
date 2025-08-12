@@ -12,7 +12,6 @@ import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import java.util.LinkedHashMap
 import java.util.LinkedList
-import kotlin.math.min
 
 private const val TAG = "CommentTreeBuilder"
 
@@ -115,8 +114,6 @@ class CommentTreeBuilder(
             continue
           }
         }
-
-        Log.d("HAHA", "keeping comment ${listView.commentView.comment.path}")
       }
     }
 

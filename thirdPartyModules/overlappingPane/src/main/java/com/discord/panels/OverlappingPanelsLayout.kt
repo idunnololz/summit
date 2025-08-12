@@ -832,34 +832,30 @@ open class OverlappingPanelsLayout : FrameLayout {
     }
   }
 
-  private fun getStartPanelState(previousX: Float, x: Float): PanelState {
-    return when {
-      isLeftToRight && x <= 0F -> PanelState.Closed
-      !isLeftToRight && x >= 0f -> PanelState.Closed
-      x == startPanelOpenedCenterPanelX -> PanelState.Opened
-      isLeftToRight && x > previousX -> PanelState.Opening(
-        x,
-        x / startPanelOpenedCenterPanelX,
-      )
-      !isLeftToRight && x < previousX -> PanelState.Opening(
-        x,
-        x / startPanelOpenedCenterPanelX,
-      )
-      else -> PanelState.Closing(x, x / startPanelOpenedCenterPanelX)
-    }
+  private fun getStartPanelState(previousX: Float, x: Float): PanelState = when {
+    isLeftToRight && x <= 0F -> PanelState.Closed
+    !isLeftToRight && x >= 0f -> PanelState.Closed
+    x == startPanelOpenedCenterPanelX -> PanelState.Opened
+    isLeftToRight && x > previousX -> PanelState.Opening(
+      x,
+      x / startPanelOpenedCenterPanelX,
+    )
+    !isLeftToRight && x < previousX -> PanelState.Opening(
+      x,
+      x / startPanelOpenedCenterPanelX,
+    )
+    else -> PanelState.Closing(x, x / startPanelOpenedCenterPanelX)
   }
 
-  private fun getEndPanelState(previousX: Float, x: Float): PanelState {
-    return when {
-      isLeftToRight && x >= 0F -> PanelState.Closed
-      !isLeftToRight && x <= 0f -> PanelState.Closed
-      x == endPanelOpenedCenterPanelX -> PanelState.Opened
-      isLeftToRight && x < previousX ->
-        PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
-      !isLeftToRight && x > previousX ->
-        PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
-      else -> PanelState.Closing(x, x / endPanelOpenedCenterPanelX)
-    }
+  private fun getEndPanelState(previousX: Float, x: Float): PanelState = when {
+    isLeftToRight && x >= 0F -> PanelState.Closed
+    !isLeftToRight && x <= 0f -> PanelState.Closed
+    x == endPanelOpenedCenterPanelX -> PanelState.Opened
+    isLeftToRight && x < previousX ->
+      PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
+    !isLeftToRight && x > previousX ->
+      PanelState.Opening(x, x / endPanelOpenedCenterPanelX)
+    else -> PanelState.Closing(x, x / endPanelOpenedCenterPanelX)
   }
 
   private fun initPanels() {

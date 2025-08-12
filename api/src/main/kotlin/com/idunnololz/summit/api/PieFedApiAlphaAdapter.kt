@@ -180,9 +180,7 @@ class PieFedApiAlphaAdapter(
     return headers
   }
 
-  fun <T> T.serializeToMap(): Map<String, String> {
-    return convert()
-  }
+  fun <T> T.serializeToMap(): Map<String, String> = convert()
 
   // convert an object of type I to type O
   private inline fun <I, reified O> I.convert(): O {
@@ -266,7 +264,7 @@ class PieFedApiAlphaAdapter(
         },
         onFailure = {
           Result.failure(it)
-        }
+        },
       )
     }
 
@@ -337,10 +335,9 @@ class PieFedApiAlphaAdapter(
   override suspend fun editComment(
     authorization: String?,
     args: EditComment,
-  ): Result<CommentResponse> =
-    retrofitErrorHandler {
-      api.editComment(generateHeaders(authorization, false), args.toEditComment())
-    }.map { it.toCommentResponse() }
+  ): Result<CommentResponse> = retrofitErrorHandler {
+    api.editComment(generateHeaders(authorization, false), args.toEditComment())
+  }.map { it.toCommentResponse() }
 
   override suspend fun deleteComment(
     authorization: String?,
@@ -972,9 +969,6 @@ class PieFedApiAlphaAdapter(
     )
   }
 
-  override suspend fun deleteMedia(
-    authorization: String?,
-    args: DeleteImage,
-  ): Result<Unit> =
+  override suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit> =
     Result.failure(NotYetImplemented())
 }

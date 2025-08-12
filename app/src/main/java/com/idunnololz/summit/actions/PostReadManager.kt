@@ -31,9 +31,8 @@ class PostReadManager @Inject constructor(
   val postReadChanged = MutableSharedFlow<Unit>()
 
   private val readPosts = object : LinkedHashMap<String, Boolean>() {
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Boolean>?): Boolean {
-      return size > MAX_READ_POST_LIMIT
-    }
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Boolean>?): Boolean =
+      size > MAX_READ_POST_LIMIT
   }
 
   init {
@@ -55,9 +54,7 @@ class PostReadManager @Inject constructor(
     Log.d(TAG, "read posts: ${entries.size}")
   }
 
-  fun isPostRead(instance: String, postId: PostId): Boolean? {
-    return readPosts[toKey(instance, postId)]
-  }
+  fun isPostRead(instance: String, postId: PostId): Boolean? = readPosts[toKey(instance, postId)]
 
   fun markPostAsReadLocal(instance: String, postId: PostId, read: Boolean) {
     val key = toKey(instance, postId)

@@ -11,7 +11,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.ColorpickerLayoutRgbPickerBinding
 import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
 
-class RgbPickerView : PickerView, ColorPickerContainer {
+class RgbPickerView :
+  PickerView,
+  ColorPickerContainer {
   private lateinit var red: Slider
   private lateinit var green: Slider
   private lateinit var blue: Slider

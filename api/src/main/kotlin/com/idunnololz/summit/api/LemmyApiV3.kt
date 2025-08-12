@@ -94,7 +94,6 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.HeaderMap
@@ -668,8 +667,5 @@ interface LemmyApiV3 {
   ): Call<ListMediaResponse>
 
   @GET
-  fun deleteMedia(
-    @Url url: String,
-    @HeaderMap headers: Map<String, String>,
-  ): Call<Unit>
+  fun deleteMedia(@Url url: String, @HeaderMap headers: Map<String, String>): Call<Unit>
 }

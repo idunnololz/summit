@@ -69,9 +69,7 @@ class OldThreadLinesDecoration(
 
   private val tempRect = Rect()
 
-  private fun getColorForDepth(depth: Int): Int {
-    return lineColors[depth % lineColors.size]
-  }
+  private fun getColorForDepth(depth: Int): Int = lineColors[depth % lineColors.size]
 
   override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
     val childCount = parent.childCount

@@ -770,27 +770,28 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.WarningItem -> true
-          is Item.DescriptionItem ->
-            true
-          is Item.AdminItem ->
-            old.admin.person.id == (new as Item.AdminItem).admin.person.id
+        old::class == new::class &&
+          when (old) {
+            is Item.WarningItem -> true
+            is Item.DescriptionItem ->
+              true
+            is Item.AdminItem ->
+              old.admin.person.id == (new as Item.AdminItem).admin.person.id
 
-          is Item.ModItem ->
-            old.mod.id == (new as Item.ModItem).mod.id
-          is Item.StatsItem ->
-            true
-          is Item.TitleItem ->
-            old.title == (new as Item.TitleItem).title
-          is Item.CommunityItem ->
-            old.communityInfo.communityRef ==
-              (new as Item.CommunityItem).communityInfo.communityRef
+            is Item.ModItem ->
+              old.mod.id == (new as Item.ModItem).mod.id
+            is Item.StatsItem ->
+              true
+            is Item.TitleItem ->
+              old.title == (new as Item.TitleItem).title
+            is Item.CommunityItem ->
+              old.communityInfo.communityRef ==
+                (new as Item.CommunityItem).communityInfo.communityRef
 
-          is Item.CommunityHeaderItem -> true
-          is Item.InstanceHeaderItem -> true
-          is Item.MultiCommunityHeaderItem -> true
-        }
+            is Item.CommunityHeaderItem -> true
+            is Item.InstanceHeaderItem -> true
+            is Item.MultiCommunityHeaderItem -> true
+          }
       },
     ).apply {
       addItemType(

@@ -1,4 +1,4 @@
-package com.idunnololz.summit.inbox
+package com.idunnololz.summit.inbox.db
 
 import androidx.room.Dao
 import androidx.room.Delete

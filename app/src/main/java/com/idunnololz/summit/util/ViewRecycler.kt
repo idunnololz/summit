@@ -39,12 +39,10 @@ class ViewRecycler<T : View> {
    * @return a view of the type `typeView`. `null` if
    * not found.
    */
-  fun getRecycledView(viewType: Int = 0): T? {
-    return try {
-      views[viewType]?.pop()
-    } catch (e: EmptyStackException) {
-      null
-    }
+  fun getRecycledView(viewType: Int = 0): T? = try {
+    views[viewType]?.pop()
+  } catch (e: EmptyStackException) {
+    null
   }
 
   fun ensureViewGroupHasChildren(viewGroup: ViewGroup, numChildren: Int, viewFactory: () -> T) {

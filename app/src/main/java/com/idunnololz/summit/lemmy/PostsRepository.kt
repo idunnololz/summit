@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.ListingType
@@ -23,6 +22,7 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityDataSource
 import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds
+import com.idunnololz.summit.preferences.DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.retry
 import dagger.assisted.Assisted
@@ -90,6 +90,8 @@ class PostsRepository @AssistedInject constructor(
   var showTextPosts = true
   var showNsfwPosts = true
   var nsfwMode = false
+  var hideDuplicatePostsOnRead = false
+  var displayDeletedPosts: Int = ALWAYS_HIDE_DELETED_POSTS
 
   var showFilteredPosts = false
 
@@ -100,6 +102,10 @@ class PostsRepository @AssistedInject constructor(
     "PostsRepository.sortOrder",
     DefaultSortOrder,
   )
+
+  init {
+    applyPreferences()
+  }
 
   fun setSortOrder(sortOrder: CommunitySortOrder) {
     savedStateHandle["PostsRepository.sortOrder"] = sortOrder
@@ -372,6 +378,47 @@ class PostsRepository @AssistedInject constructor(
     allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) }
   }
 
+  fun update(posts: List<LocalPostView>): List<LocalPostView> = posts.map {
+    it.copy(
+      fetchedPost = transformPostWithLocalData(it.fetchedPost),
+    )
+  }
+
+  fun updateHideRead(hideRead: Boolean) {
+    this.hideRead = hideRead
+    hideReadCount = 0
+  }
+
+  fun addSeenPosts(posts: List<PostView>) {
+    seenPosts.addAll(posts.map { it.getUniqueKey() })
+  }
+
+  fun removeSeenPosts(posts: List<PostView>) {
+    seenPosts.removeAll(posts.map { it.getUniqueKey() }.toSet())
+  }
+
+  fun didPreferencesChange(): Boolean = !(
+    showLinkPosts == preferences.showLinkPosts &&
+      showImagePosts == preferences.showImagePosts &&
+      showVideoPosts == preferences.showVideoPosts &&
+      showTextPosts == preferences.showTextPosts &&
+      showNsfwPosts == preferences.showNsfwPosts &&
+      showFilteredPosts == preferences.showFilteredPosts &&
+      hideDuplicatePostsOnRead == preferences.hideDuplicatePostsOnRead &&
+      displayDeletedPosts == preferences.displayDeletedPosts
+    )
+
+  fun applyPreferences() {
+    showLinkPosts = preferences.showLinkPosts
+    showImagePosts = preferences.showImagePosts
+    showVideoPosts = preferences.showVideoPosts
+    showTextPosts = preferences.showTextPosts
+    showNsfwPosts = preferences.showNsfwPosts
+    showFilteredPosts = preferences.showFilteredPosts
+    hideDuplicatePostsOnRead = preferences.hideDuplicatePostsOnRead
+    displayDeletedPosts = preferences.displayDeletedPosts
+  }
+
   private fun transformPostWithLocalData(fetchedPost: FetchedPost): FetchedPost {
     val accountInstance = fetchedPost.source.instance ?: apiInstance
     val localRead = postReadManager.isPostRead(accountInstance, fetchedPost.postView.post.id)
@@ -410,7 +457,7 @@ class PostsRepository @AssistedInject constructor(
           }
         }
 
-        if (preferences.hideDuplicatePostsOnRead && account != null) {
+        if (hideDuplicatePostsOnRead && account != null) {
           newPosts.forEach {
             if (it.postView.read || hiddenPosts.contains(it.postView.post.id)) {
               duplicatePostsDetector.addReadOrHiddenPost(it.postView)
@@ -423,7 +470,7 @@ class PostsRepository @AssistedInject constructor(
           newPosts = newPosts,
           pageIndex = pageIndex,
           hiddenPosts = hiddenPosts,
-          duplicatePostsDetector = duplicatePostsDetector
+          duplicatePostsDetector = duplicatePostsDetector,
         )
 
         if (consecutiveFilteredPostsByFilter > 20) {
@@ -529,7 +576,7 @@ class PostsRepository @AssistedInject constructor(
           continue
         }
       }
-      if (preferences.displayDeletedPosts != DisplayDeletedPostIds.ALWAYS_SHOW_DELETED_POSTS &&
+      if (displayDeletedPosts != DisplayDeletedPostIds.ALWAYS_SHOW_DELETED_POSTS &&
         post.post.deleted
       ) {
         continue
@@ -567,27 +614,6 @@ class PostsRepository @AssistedInject constructor(
     Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allPosts.size}")
   }
 
-  fun update(posts: List<LocalPostView>): List<LocalPostView> {
-    return posts.map {
-      it.copy(
-        fetchedPost = transformPostWithLocalData(it.fetchedPost),
-      )
-    }
-  }
-
-  fun updateHideRead(hideRead: Boolean) {
-    this.hideRead = hideRead
-    hideReadCount = 0
-  }
-
-  fun addSeenPosts(posts: List<PostView>) {
-    seenPosts.addAll(posts.map { it.getUniqueKey() })
-  }
-
-  fun removeSeenPosts(posts: List<PostView>) {
-    seenPosts.removeAll(posts.map { it.getUniqueKey() }.toSet())
-  }
-
   class PageResult(
     val posts: List<LocalPostView>,
     val pageIndex: Int,
@@ -597,6 +623,6 @@ class PostsRepository @AssistedInject constructor(
   )
 }
 
-class LoadNsfwCommunityWhenNsfwDisabled() : RuntimeException()
-class FilterTooAggressiveException() : RuntimeException()
-class ContentTypeFilterTooAggressiveException() : RuntimeException()
+class LoadNsfwCommunityWhenNsfwDisabled : RuntimeException()
+class FilterTooAggressiveException : RuntimeException()
+class ContentTypeFilterTooAggressiveException : RuntimeException()

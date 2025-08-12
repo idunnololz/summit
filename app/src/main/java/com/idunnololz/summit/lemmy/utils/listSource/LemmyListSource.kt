@@ -59,9 +59,7 @@ open class LemmyListSource<T, O, Key>(
       invalidate()
     }
 
-  suspend fun peekNextItem(): Result<T?> {
-    return getItem(currentItemIndex, force = false)
-  }
+  suspend fun peekNextItem(): Result<T?> = getItem(currentItemIndex, force = false)
 
   fun next() {
     currentItemIndex++
@@ -87,19 +85,18 @@ open class LemmyListSource<T, O, Key>(
     pageIndex: Int,
     force: Boolean = false,
     deleteCacheOnForce: Boolean = true,
-  ): PageResult<T> =
-    _getPage(
-      pageIndex = pageIndex,
-      force = force,
-      deleteCacheOnForce = deleteCacheOnForce,
-    ).fold(
-      {
-        it
-      },
-      {
-        PageResult.ErrorPageResult(pageIndex, it)
-      }
-    )
+  ): PageResult<T> = _getPage(
+    pageIndex = pageIndex,
+    force = force,
+    deleteCacheOnForce = deleteCacheOnForce,
+  ).fold(
+    {
+      it
+    },
+    {
+      PageResult.ErrorPageResult(pageIndex, it)
+    },
+  )
 
   private suspend fun _getPage(
     pageIndex: Int,
@@ -127,7 +124,8 @@ open class LemmyListSource<T, O, Key>(
       }
 
       val hasMoreResult = retry {
-        val finalForce = (context.hasInternet() && invalidatedPages.contains(currentPageInternal)) || force
+        val finalForce =
+          (context.hasInternet() && invalidatedPages.contains(currentPageInternal)) || force
         fetchPage(currentPageInternal, sortOrder, pageSize, finalForce)
       }
 
@@ -232,9 +230,7 @@ open class LemmyListSource<T, O, Key>(
     Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allObjects.size}")
   }
 
-  protected fun removeItemAt(position: Int): ObjectData<T> {
-    return allObjects.removeAt(position).also {
-      seenObjects.remove(it.obj.id())
-    }
+  protected fun removeItemAt(position: Int): ObjectData<T> = allObjects.removeAt(position).also {
+    seenObjects.remove(it.obj.id())
   }
 }

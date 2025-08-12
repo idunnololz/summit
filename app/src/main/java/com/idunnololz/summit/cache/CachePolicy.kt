@@ -1,6 +1,8 @@
 package com.idunnololz.summit.cache
 
-enum class CachePolicy(val value: Int) {
+enum class CachePolicy(
+  val value: Int,
+) {
   Aggressive(100),
   Moderate(50),
   Lite(10),

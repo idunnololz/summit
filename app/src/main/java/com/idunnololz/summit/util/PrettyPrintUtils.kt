@@ -140,9 +140,7 @@ fun relativeTimeToConcise(context: Context, diffMs: Long): String {
   return shortDate
 }
 
-fun dateStringToFullDateTime(dateStr: String): String {
-  return tsToFullDateTime(dateStringToTs(dateStr))
-}
+fun dateStringToFullDateTime(dateStr: String): String = tsToFullDateTime(dateStringToTs(dateStr))
 
 fun tsToFullDateTime(ts: Long): String {
   val epochSecond = ts / 1000
@@ -194,15 +192,13 @@ fun durationToPretty(durationMs: Long): String {
   }
 }
 
-fun abbrevNumber(number: Long): String {
-  return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-    val formatter = CompactDecimalFormat.getInstance(
-      Locale.getDefault(),
-      CompactDecimalFormat.CompactStyle.SHORT,
-    )
+fun abbrevNumber(number: Long): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+  val formatter = CompactDecimalFormat.getInstance(
+    Locale.getDefault(),
+    CompactDecimalFormat.CompactStyle.SHORT,
+  )
 
-    formatter.format(number)
-  } else {
-    NumberFormatUtil.format(number)
-  }
+  formatter.format(number)
+} else {
+  NumberFormatUtil.format(number)
 }

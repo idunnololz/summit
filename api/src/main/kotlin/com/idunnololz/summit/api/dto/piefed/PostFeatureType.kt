@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Local,Community
  */
 
-enum class PostFeatureType(val value: kotlin.String) {
+enum class PostFeatureType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "Local")
   Local("Local"),

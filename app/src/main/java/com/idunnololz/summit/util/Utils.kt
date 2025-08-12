@@ -75,9 +75,8 @@ object Utils {
    * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
    * @return A float value to represent px equivalent to dp depending on device density
    */
-  fun convertDpToPixel(dp: Float): Float {
-    return dp * (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
-  }
+  fun convertDpToPixel(dp: Float): Float =
+    dp * (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
 
   /**
    * This method converts device specific pixels to density independent pixels.
@@ -85,14 +84,11 @@ object Utils {
    * @param px A value in px (pixels) unit. Which we need to convert into db
    * @return A float value to represent dp equivalent to px value
    */
-  fun convertPixelsToDp(px: Float): Float {
-    return px / (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
-  }
+  fun convertPixelsToDp(px: Float): Float =
+    px / (displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
 
   @Suppress("SuspiciousEqualsCombination")
-  fun equals(a: Any?, b: Any): Boolean {
-    return a === b || a != null && a == b
-  }
+  fun equals(a: Any?, b: Any): Boolean = a === b || a != null && a == b
 
   fun tint(context: Context, @DrawableRes res: Int, @ColorInt color: Int): Drawable {
     val drawable = checkNotNull(ContextCompat.getDrawable(context, res))
@@ -101,9 +97,7 @@ object Utils {
     return wrappedDrawable
   }
 
-  fun deleteDir(dir: File?): Boolean {
-    return clearDir(dir, true)
-  }
+  fun deleteDir(dir: File?): Boolean = clearDir(dir, true)
 
   fun clearDir(dir: File?, removeRootDir: Boolean): Boolean {
     if (dir == null) return false
@@ -122,9 +116,7 @@ object Utils {
   }
 
   @Throws(IOException::class)
-  fun compress(data: String, flags: Int): String {
-    return compress(data.toByteArray(), flags)
-  }
+  fun compress(data: String, flags: Int): String = compress(data.toByteArray(), flags)
 
   @Throws(IOException::class)
   fun compress(data: ByteArray, flags: Int): String {
@@ -165,17 +157,13 @@ object Utils {
   }
 
   @Throws(DataFormatException::class, IOException::class)
-  fun decompressZlib(s: String): String {
-    return String(decompressZlibRaw(s))
-  }
+  fun decompressZlib(s: String): String = String(decompressZlibRaw(s))
 
-  fun safeLaunchExternalIntent(context: Context, intent: Intent): Boolean {
-    return try {
-      context.startActivity(intent)
-      true
-    } catch (e: ActivityNotFoundException) {
-      false
-    }
+  fun safeLaunchExternalIntent(context: Context, intent: Intent): Boolean = try {
+    context.startActivity(intent)
+    true
+  } catch (e: ActivityNotFoundException) {
+    false
   }
 
   var openExternalLinksInBrowser = false
@@ -428,9 +416,7 @@ object Utils {
   }
 
   // convert a data class to a map
-  fun <T> T.serializeToMap(): Map<String, String> {
-    return convert()
-  }
+  fun <T> T.serializeToMap(): Map<String, String> = convert()
 
   // convert an object of type I to type O
   private inline fun <I, reified O> I.convert(): O {

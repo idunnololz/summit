@@ -36,8 +36,8 @@ class SummitServerClient @Inject constructor(
     "https://summitforlemmyserver.idunnololz.com"
   } + "/v1/auth/public/$fileName"
 
-  suspend fun communitySuggestions(seed: Long, force: Boolean): Result<CommunitySuggestionsDto> {
-    return retrofitErrorHandler {
+  suspend fun communitySuggestions(seed: Long, force: Boolean): Result<CommunitySuggestionsDto> =
+    retrofitErrorHandler {
       if (force) {
         summitServerApi.communitySuggestionsNoCache(seed)
       } else {
@@ -47,7 +47,6 @@ class SummitServerClient @Inject constructor(
       onSuccess = { Result.success(it) },
       onFailure = { Result.failure(it) },
     )
-  }
 
   suspend fun submitPreset(
     presetName: String,
@@ -55,53 +54,47 @@ class SummitServerClient @Inject constructor(
     presetData: String,
     phoneScreenshot: Uri?,
     tabletScreenshot: Uri?,
-  ): Result<PresetDto> {
-    return retrofitErrorHandler {
-      val ts = System.currentTimeMillis()
-      summitServerApi.submitPreset(
-        preset = PresetDto(
-          id = null,
-          presetName = presetName,
-          presetDescription = presetDescription,
-          presetData = presetData,
-          createTs = ts,
-          updateTs = ts,
-        ),
-        phoneScreenshot = phoneScreenshot?.toFile()?.let {
-          MultipartBody.Part.createFormData(
-            "file",
-            "phoneScreenshot",
-            it.asRequestBody("image/jpeg".toMediaType()),
-          )
-        },
-        tabletScreenshot = tabletScreenshot?.toFile()?.let {
-          MultipartBody.Part.createFormData(
-            "file",
-            "tabletScreenshot",
-            it.asRequestBody("image/jpeg".toMediaType()),
-          )
-        },
-      )
+  ): Result<PresetDto> = retrofitErrorHandler {
+    val ts = System.currentTimeMillis()
+    summitServerApi.submitPreset(
+      preset = PresetDto(
+        id = null,
+        presetName = presetName,
+        presetDescription = presetDescription,
+        presetData = presetData,
+        createTs = ts,
+        updateTs = ts,
+      ),
+      phoneScreenshot = phoneScreenshot?.toFile()?.let {
+        MultipartBody.Part.createFormData(
+          "file",
+          "phoneScreenshot",
+          it.asRequestBody("image/jpeg".toMediaType()),
+        )
+      },
+      tabletScreenshot = tabletScreenshot?.toFile()?.let {
+        MultipartBody.Part.createFormData(
+          "file",
+          "tabletScreenshot",
+          it.asRequestBody("image/jpeg".toMediaType()),
+        )
+      },
+    )
+  }
+
+  suspend fun getPresets(force: Boolean): Result<List<PresetDto>> = retrofitErrorHandler {
+    if (force) {
+      summitServerApi.getPresetsNoCache()
+    } else {
+      summitServerApi.getPresets()
     }
   }
 
-  suspend fun getPresets(force: Boolean): Result<List<PresetDto>> {
-    return retrofitErrorHandler {
-      if (force) {
-        summitServerApi.getPresetsNoCache()
-      } else {
-        summitServerApi.getPresets()
-      }
-    }
-  }
-
-  suspend fun getAllPresets(force: Boolean): Result<List<PresetDto>> {
-    return retrofitErrorHandler {
-      if (force) {
-        summitServerApi.getAllPresetsNoCache()
-      } else {
-        summitServerApi.getAllPresets()
-      }
+  suspend fun getAllPresets(force: Boolean): Result<List<PresetDto>> = retrofitErrorHandler {
+    if (force) {
+      summitServerApi.getAllPresetsNoCache()
+    } else {
+      summitServerApi.getAllPresets()
     }
   }
 

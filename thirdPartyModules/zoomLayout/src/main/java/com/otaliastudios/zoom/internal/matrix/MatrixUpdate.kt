@@ -105,13 +105,11 @@ internal class MatrixUpdate private constructor(
      * Builds a new [MatrixUpdate] with the current
      * options set.
      */
-    internal fun build(): MatrixUpdate {
-      return MatrixUpdate(
-        zoom, zoomRelative, overZoom,
-        pan, scaledPan, panRelative, overPan,
-        pivotX, pivotY, notify,
-      )
-    }
+    internal fun build(): MatrixUpdate = MatrixUpdate(
+      zoom, zoomRelative, overZoom,
+      pan, scaledPan, panRelative, overPan,
+      pivotX, pivotY, notify,
+    )
   }
 
   companion object {
@@ -120,8 +118,7 @@ internal class MatrixUpdate private constructor(
     /**
      * Creates a new update by acting on the given [Builder].
      */
-    internal fun obtain(builder: Builder.() -> Unit): MatrixUpdate {
-      return Builder().apply(builder).build()
-    }
+    internal fun obtain(builder: Builder.() -> Unit): MatrixUpdate =
+      Builder().apply(builder).build()
   }
 }

@@ -10,12 +10,10 @@ fun guessMimeType(file: File?): String? = file?.inputStream()?.use {
   }
 }
 
-fun guessMimeType(inputStream: InputStream): String? {
-  return try {
-    guessContentTypeFromStream(inputStream)
-  } catch (_: Exception) {
-    null
-  }
+fun guessMimeType(inputStream: InputStream): String? = try {
+  guessContentTypeFromStream(inputStream)
+} catch (_: Exception) {
+  null
 }
 
 fun extensionForMimeType(mimeType: String) = mimeTypeToExtension[mimeType]
@@ -49,30 +47,60 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
     return "application/x-java-serialized-object"
   }
   if (
-    c1 == 'R'.code && c2 == 'I'.code && c3 == 'F'.code && c4 == 'F'.code &&
-    c9 == 'W'.code && c10 == 'E'.code && c11 == 'B'.code && c12 == 'P'.code
+    c1 == 'R'.code &&
+    c2 == 'I'.code &&
+    c3 == 'F'.code &&
+    c4 == 'F'.code &&
+    c9 == 'W'.code &&
+    c10 == 'E'.code &&
+    c11 == 'B'.code &&
+    c12 == 'P'.code
   ) {
     return "image/webp"
   }
   if (c1 == '<'.code) {
     if ((
-      c2 == '!'.code || c2 == 'h'.code && (
-        c3 == 't'.code && c4 == 'm'.code && c5 == 'l'.code ||
-          c3 == 'e'.code && c4 == 'a'.code && c5 == 'd'.code
-        ) || c2 == 'b'.code && c3 == 'o'.code && c4 == 'd'.code && c5 == 'y'.code ||
+      c2 == '!'.code ||
+        c2 == 'h'.code &&
+        (
+          c3 == 't'.code &&
+            c4 == 'm'.code &&
+            c5 == 'l'.code ||
+            c3 == 'e'.code &&
+            c4 == 'a'.code &&
+            c5 == 'd'.code
+          ) ||
+        c2 == 'b'.code &&
+        c3 == 'o'.code &&
+        c4 == 'd'.code &&
+        c5 == 'y'.code ||
         (
           (
-            c2 == 'H'.code && (
-              c3 == 'T'.code && c4 == 'M'.code && c5 == 'L'.code ||
-                c3 == 'E'.code && c4 == 'A'.code && c5 == 'D'.code
-              ) || c2 == 'B'.code && c3 == 'O'.code && c4 == 'D'.code && c5 == 'Y'.code
+            c2 == 'H'.code &&
+              (
+                c3 == 'T'.code &&
+                  c4 == 'M'.code &&
+                  c5 == 'L'.code ||
+                  c3 == 'E'.code &&
+                  c4 == 'A'.code &&
+                  c5 == 'D'.code
+                ) ||
+              c2 == 'B'.code &&
+              c3 == 'O'.code &&
+              c4 == 'D'.code &&
+              c5 == 'Y'.code
             )
           )
       )
     ) {
       return "text/html"
     }
-    if ((c2 == '?'.code) && (c3 == 'x'.code) && (c4 == 'm'.code) && (c5 == 'l'.code) && (c6 == ' '.code)) {
+    if ((c2 == '?'.code) &&
+      (c3 == 'x'.code) &&
+      (c4 == 'm'.code) &&
+      (c5 == 'l'.code) &&
+      (c6 == ' '.code)
+    ) {
       return "application/xml"
     }
   }
@@ -86,17 +114,27 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
 
   // big and little endian UTF-16 encodings, with byte order mark
   if (c1 == 0xfe && c2 == 0xff) {
-    if ((c3 == 0) && (c4 == '<'.code) && (c5 == 0) && (c6 == '?'.code) && (
+    if ((c3 == 0) &&
+      (c4 == '<'.code) &&
+      (c5 == 0) &&
+      (c6 == '?'.code) &&
+      (
         c7 == 0
-        ) && (c8 == 'x'.code)
+        ) &&
+      (c8 == 'x'.code)
     ) {
       return "application/xml"
     }
   }
   if (c1 == 0xff && c2 == 0xfe) {
-    if ((c3 == '<'.code) && (c4 == 0) && (c5 == '?'.code) && (c6 == 0) && (
+    if ((c3 == '<'.code) &&
+      (c4 == 0) &&
+      (c5 == '?'.code) &&
+      (c6 == 0) &&
+      (
         c7 == 'x'.code
-        ) && (c8 == 0)
+        ) &&
+      (c8 == 0)
     ) {
       return "application/xml"
     }
@@ -104,21 +142,43 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
 
   // big and little endian UTF-32 encodings, with BOM
   if ((c1 == 0x00) && (c2 == 0x00) && (c3 == 0xfe) && (c4 == 0xff)) {
-    if ((c5 == 0) && (c6 == 0) && (c7 == 0) && (c8 == '<'.code) && (
+    if ((c5 == 0) &&
+      (c6 == 0) &&
+      (c7 == 0) &&
+      (c8 == '<'.code) &&
+      (
         c9 == 0
-        ) && (c10 == 0) && (c11 == 0) && (c12 == '?'.code) && (
+        ) &&
+      (c10 == 0) &&
+      (c11 == 0) &&
+      (c12 == '?'.code) &&
+      (
         c13 == 0
-        ) && (c14 == 0) && (c15 == 0) && (c16 == 'x'.code)
+        ) &&
+      (c14 == 0) &&
+      (c15 == 0) &&
+      (c16 == 'x'.code)
     ) {
       return "application/xml"
     }
   }
   if ((c1 == 0xff) && (c2 == 0xfe) && (c3 == 0x00) && (c4 == 0x00)) {
-    if ((c5 == '<'.code) && (c6 == 0) && (c7 == 0) && (c8 == 0) && (
+    if ((c5 == '<'.code) &&
+      (c6 == 0) &&
+      (c7 == 0) &&
+      (c8 == 0) &&
+      (
         c9 == '?'.code
-        ) && (c10 == 0) && (c11 == 0) && (c12 == 0) && (
+        ) &&
+      (c10 == 0) &&
+      (c11 == 0) &&
+      (c12 == 0) &&
+      (
         c13 == 'x'.code
-        ) && (c14 == 0) && (c15 == 0) && (c16 == 0)
+        ) &&
+      (c14 == 0) &&
+      (c15 == 0) &&
+      (c16 == 0)
     ) {
       return "application/xml"
     }
@@ -129,17 +189,29 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
   if ((c1 == '#'.code) && (c2 == 'd'.code) && (c3 == 'e'.code) && (c4 == 'f'.code)) {
     return "image/x-bitmap"
   }
-  if ((c1 == '!'.code) && (c2 == ' '.code) && (c3 == 'X'.code) && (c4 == 'P'.code) && (
+  if ((c1 == '!'.code) &&
+    (c2 == ' '.code) &&
+    (c3 == 'X'.code) &&
+    (c4 == 'P'.code) &&
+    (
       c5 == 'M'.code
-      ) && (c6 == '2'.code)
+      ) &&
+    (c6 == '2'.code)
   ) {
     return "image/x-pixmap"
   }
-  if ((c1 == 137) && (c2 == 80) && (c3 == 78) && (
+  if ((c1 == 137) &&
+    (c2 == 80) &&
+    (c3 == 78) &&
+    (
       c4 == 71
-      ) && (c5 == 13) && (c6 == 10) && (
+      ) &&
+    (c5 == 13) &&
+    (c6 == 10) &&
+    (
       c7 == 26
-      ) && (c8 == 10)
+      ) &&
+    (c8 == 10)
   ) {
     return "image/png"
   }
@@ -155,9 +227,13 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
      */
     if ((c4 == 0xE1) &&
       (
-        (c7 == 'E'.code) && (c8 == 'x'.code) && (c9 == 'i'.code) && (c10 == 'f'.code) && (
-          c11 == 0
-          )
+        (c7 == 'E'.code) &&
+          (c8 == 'x'.code) &&
+          (c9 == 'i'.code) &&
+          (c10 == 'f'.code) &&
+          (
+            c11 == 0
+            )
         )
     ) {
       return "image/jpeg"

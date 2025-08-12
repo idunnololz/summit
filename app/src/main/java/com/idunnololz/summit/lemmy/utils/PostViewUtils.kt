@@ -7,9 +7,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
-fun PostView.getHotRank(): Double {
-  return getHotRank(counts.score, dateStringToTs(this.counts.published))
-}
+fun PostView.getHotRank(): Double = getHotRank(counts.score, dateStringToTs(this.counts.published))
 
 fun PostView.getActiveRank(): Double {
   val publishTime = dateStringToTs(this.counts.published)
@@ -23,9 +21,8 @@ fun PostView.getActiveRank(): Double {
   return getHotRank(counts.score, timestampToUse)
 }
 
-fun PostView.getScaledRank(communityMau: Int?): Double {
-  return getHotRank() / ln(2.0 + (communityMau ?: 0))
-}
+fun PostView.getScaledRank(communityMau: Int?): Double =
+  getHotRank() / ln(2.0 + (communityMau ?: 0))
 
 fun PostView.getControversialRank(): Double {
   val downvotes = this.counts.downvotes.toDouble()

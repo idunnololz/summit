@@ -44,7 +44,13 @@ class BlurTransformation @JvmOverloads constructor(
     var blur: ScriptIntrinsicBlur? = null
     try {
       script = RenderScript.create(context)
-      tmpInt = Allocation.createFromBitmap(script, output, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT)
+      tmpInt =
+        Allocation.createFromBitmap(
+          script,
+          output,
+          Allocation.MipmapControl.MIPMAP_NONE,
+          Allocation.USAGE_SCRIPT,
+        )
       tmpOut = Allocation.createTyped(script, tmpInt.type)
       blur = ScriptIntrinsicBlur.create(script, Element.U8_4(script))
       blur.setRadius(radius)

@@ -21,6 +21,7 @@ android {
 
 dependencies {
   implementation(project(":thirdPartyModules:markwon:markwon-core"))
+  implementation("org.nibor.autolink:autolink:0.12.0")
   implementation(libs.commonmark)
   implementation(libs.core)
 }

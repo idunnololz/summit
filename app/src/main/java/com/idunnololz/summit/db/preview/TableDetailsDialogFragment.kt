@@ -33,8 +33,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class TableDetailsDialogFragment :
-  BaseDialogFragment<DialogFragmentTableDetailsBinding>() {
+class TableDetailsDialogFragment : BaseDialogFragment<DialogFragmentTableDetailsBinding>() {
 
   private val viewModel: TableDetailsViewModel by viewModels()
   private val args: TableDetailsDialogFragmentArgs by navArgs()
@@ -150,13 +149,14 @@ class TableDetailsDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.HeaderItem -> true
-          is Item.RowHeaderItem -> true
-          is Item.RowItem ->
-            old.tableRow.primaryKey == (new as Item.RowItem).tableRow.primaryKey
-          Item.FooterItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.HeaderItem -> true
+            is Item.RowHeaderItem -> true
+            is Item.RowItem ->
+              old.tableRow.primaryKey == (new as Item.RowItem).tableRow.primaryKey
+            Item.FooterItem -> true
+          }
       },
     ).apply {
       addItemType(Item.HeaderItem::class, ItemTableHeaderBinding::inflate) { item, b, h ->

@@ -35,7 +35,9 @@ private val CommunitiesNoAt = setOf(
 
 @Serializable
 @JsonClassDiscriminator("t")
-sealed interface CommunityRef : PageRef, Parcelable {
+sealed interface CommunityRef :
+  PageRef,
+  Parcelable {
 
 //    @Parcelize
 //    @JsonClass(generateAdapter = true)
@@ -122,7 +124,7 @@ sealed interface CommunityRef : PageRef, Parcelable {
   @Serializable
   @SerialName("8")
   @Parcelize
-  class AllSubscribed() : CommunityRef
+  class AllSubscribed : CommunityRef
 
   fun getName(context: Context): String = when (this) {
     is Local -> context.getString(R.string.local)
@@ -245,13 +247,11 @@ sealed interface CommunityRef : PageRef, Parcelable {
   }
 }
 
-fun Community.toCommunityRef(): CommunityRef.CommunityRefByName {
-  return CommunityRef.CommunityRefByName(this.name, this.instance)
-}
+fun Community.toCommunityRef(): CommunityRef.CommunityRefByName =
+  CommunityRef.CommunityRefByName(this.name, this.instance)
 
-fun AccountSubscription.toCommunityRef(): CommunityRef.CommunityRefByName {
-  return CommunityRef.CommunityRefByName(this.name, this.instance)
-}
+fun AccountSubscription.toCommunityRef(): CommunityRef.CommunityRefByName =
+  CommunityRef.CommunityRefByName(this.name, this.instance)
 
 val CommunityRef.instance: String?
   get() = when (this) {

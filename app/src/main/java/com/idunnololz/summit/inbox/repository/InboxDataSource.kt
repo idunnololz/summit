@@ -1,15 +1,9 @@
 package com.idunnololz.summit.inbox.repository
 
 import android.content.Context
-import android.util.Log
-import com.idunnololz.summit.lemmy.PostsRepository
 import com.idunnololz.summit.inbox.LiteInboxItem
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource
-import com.idunnololz.summit.lemmy.utils.listSource.PageResult
-import com.idunnololz.summit.util.ext.hasInternet
-import com.idunnololz.summit.util.retry
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlin.math.min
 
 const val DEFAULT_PAGE_SIZE = 20
 

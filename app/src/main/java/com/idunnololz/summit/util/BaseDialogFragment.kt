@@ -18,14 +18,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
-import com.idunnololz.summit.drafts.DraftEntry
-import com.idunnololz.summit.drafts.DraftsDialogFragment
-import com.idunnololz.summit.lemmy.comment.AddLinkDialogFragment
 import com.idunnololz.summit.main.MainActivity
-import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
 
-open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
+open class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
 
   companion object {
     val gestureInterpolator = PathInterpolatorCompat
@@ -72,11 +68,10 @@ open class BaseDialogFragment<T : ViewBinding>() : DialogFragment() {
   }
 
   @CallSuper
-  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-    return super.onCreateDialog(savedInstanceState).also {
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+    super.onCreateDialog(savedInstanceState).also {
       _onBackPressedDispatcher = (it as ComponentDialog).onBackPressedDispatcher
     }
-  }
 
   @CallSuper
   override fun onCreate(savedInstanceState: Bundle?) {

@@ -14,20 +14,16 @@ sealed interface PageResult<T> {
     val error: Throwable,
   ) : PageResult<T>
 
-  fun getOrNull() =
-    this as? SuccessPageResult<T>
+  fun getOrNull() = this as? SuccessPageResult<T>
 
-  fun exceptionOrNull() =
-    (this as? ErrorPageResult<T>)?.error
+  fun exceptionOrNull() = (this as? ErrorPageResult<T>)?.error
 
   fun <R> fold(
     onSuccess: (value: SuccessPageResult<T>) -> R,
-    onFailure: (exception: Throwable) -> R
-  ): R {
-    return when (val exception = exceptionOrNull()) {
-      null -> onSuccess(requireNotNull(getOrNull()))
-      else -> onFailure(exception)
-    }
+    onFailure: (exception: Throwable) -> R,
+  ): R = when (val exception = exceptionOrNull()) {
+    null -> onSuccess(requireNotNull(getOrNull()))
+    else -> onFailure(exception)
   }
 }
 
@@ -36,7 +32,9 @@ inline fun <T> PageResult<T>.onFailure(action: (exception: Throwable) -> Unit): 
   return this
 }
 
-inline fun <T> PageResult<T>.onSuccess(action: (value: PageResult.SuccessPageResult<T>) -> Unit): PageResult<T> {
+inline fun <T> PageResult<T>.onSuccess(
+  action: (value: PageResult.SuccessPageResult<T>) -> Unit,
+): PageResult<T> {
   getOrNull()?.let { action(it) }
   return this
 }

@@ -44,8 +44,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class PostsInFeedQuickActionsFragment :
-  BaseFragment<FragmentCustomQuickActionsBinding>() {
+class PostsInFeedQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBinding>() {
 
   private val viewModel: PostsInFeedQuickActionsViewModel by viewModels()
 
@@ -138,7 +137,9 @@ class PostsInFeedQuickActionsFragment :
   ) : Adapter<ViewHolder>() {
 
     private sealed interface Item {
-      data class EnableItem(val isEnabled: Boolean) : Item
+      data class EnableItem(
+        val isEnabled: Boolean,
+      ) : Item
       data object QuickActionsTitle : Item
       data object InactiveActionsTitle : Item
       data class QuickAction(
@@ -150,13 +151,14 @@ class PostsInFeedQuickActionsFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          Item.InactiveActionsTitle -> true
-          Item.QuickActionsTitle -> true
-          is Item.QuickAction ->
-            old.actionId == (new as Item.QuickAction).actionId
-          is Item.EnableItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            Item.InactiveActionsTitle -> true
+            Item.QuickActionsTitle -> true
+            is Item.QuickAction ->
+              old.actionId == (new as Item.QuickAction).actionId
+            is Item.EnableItem -> true
+          }
       },
     ).apply {
       addItemType(
@@ -215,9 +217,7 @@ class PostsInFeedQuickActionsFragment :
           return item is Item.QuickAction || item is Item.InactiveActionsTitle
         }
 
-        override fun isLongPressDragEnabled(): Boolean {
-          return true
-        }
+        override fun isLongPressDragEnabled(): Boolean = true
 
         override fun onSwiped(viewHolder: ViewHolder, direction: Int) {}
 

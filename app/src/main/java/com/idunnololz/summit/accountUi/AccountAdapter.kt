@@ -42,13 +42,14 @@ class AccountAdapter(
   }
 
   private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
-    old::class == new::class && when (old) {
-      Item.HeaderItem -> true
-      is Item.AccountItem ->
-        old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
-      is Item.AddAccountItem -> true
-      is Item.GuestAccountItem -> true
-    }
+    old::class == new::class &&
+      when (old) {
+        Item.HeaderItem -> true
+        is Item.AccountItem ->
+          old.accountView.account.id == (new as Item.AccountItem).accountView.account.id
+        is Item.AddAccountItem -> true
+        is Item.GuestAccountItem -> true
+      }
   }).apply {
     addItemType(Item.HeaderItem::class, ItemGenericHeaderBinding::inflate) { _, _, _ -> }
     addItemType(Item.AccountItem::class, CurrentAccountItemBinding::inflate) { item, b, _ ->

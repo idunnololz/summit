@@ -32,11 +32,10 @@ object PermissionUtil {
    *
    * @return true if all specified permission is granted
    */
-  fun isPermissionGranted(context: Context, permissions: Array<String>): Boolean {
-    return permissions.filter {
+  fun isPermissionGranted(context: Context, permissions: Array<String>): Boolean =
+    permissions.filter {
       isPermissionGranted(context, it)
     }.size == permissions.size
-  }
 
   /**
    * Check if Specified Permission is defined in AndroidManifest.xml file or not.

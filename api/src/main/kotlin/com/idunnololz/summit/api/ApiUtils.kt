@@ -13,7 +13,9 @@ import retrofit2.Call
 
 private const val TAG = "ApiUtils"
 
-internal suspend inline fun <reified T> retrofitErrorHandler(call: suspend () -> Call<T>): Result<T> {
+internal suspend inline fun <reified T> retrofitErrorHandler(
+  call: suspend () -> Call<T>,
+): Result<T> {
   val res = try {
     val call = call()
     runInterruptible(Dispatchers.IO) {
@@ -104,7 +106,9 @@ internal suspend inline fun <reified T> retrofitErrorHandler(call: suspend () ->
       return Result.failure(LanguageNotAllowed())
     }
     // TODO: Remove these checks once v0.19 is out for everyone.
-    if (errMsg?.contains("unknown variant") == true || (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))) {
+    if (errMsg?.contains("unknown variant") == true ||
+      (errorCode == 404 && res.raw().request.url.toString().contains("site/block"))
+    ) {
       return Result.failure(NewApiException("v0.19"))
     }
 
@@ -123,7 +127,12 @@ internal suspend inline fun <reified T> retrofitErrorHandler(call: suspend () ->
     if (errMsg?.contains("timeout", ignoreCase = true) == true) {
       return Result.failure(ServerTimeoutException(errorCode))
     }
-    if (errMsg?.contains("the database system is not yet accepting connections", ignoreCase = true) == true) {
+    if (errMsg?.contains(
+        "the database system is not yet accepting connections",
+        ignoreCase = true,
+      ) ==
+      true
+    ) {
       // this is a 4xx error but it should be a 5xx error because it's server sided and retry-able
       return Result.failure(ServerApiException(null, 503))
     }

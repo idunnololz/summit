@@ -20,27 +20,26 @@ class LinkFetcher @Inject constructor(
     url: String,
     cache: Boolean = false,
     client: OkHttpClient = okHttpClient,
-  ): Result<String> =
-    runInterruptible(Dispatchers.IO) {
-      val response = try {
-        doRequest(url, cache, client)
-      } catch (e: Exception) {
-        return@runInterruptible Result.failure(e)
-      }
-
-      val responseCode = response.code
-      if (response.isSuccessful) {
-        return@runInterruptible Result.success(response.body.string())
-      } else {
-        val err = response.body.string()
-        response.body.close()
-        return@runInterruptible Result.failure(
-          GetNetworkException(
-            "Response was not 200. Response code: $responseCode. Response: $err Url: $url. req-headers: ${response.request.headers}",
-          )
-        )
-      }
+  ): Result<String> = runInterruptible(Dispatchers.IO) {
+    val response = try {
+      doRequest(url, cache, client)
+    } catch (e: Exception) {
+      return@runInterruptible Result.failure(e)
     }
+
+    val responseCode = response.code
+    if (response.isSuccessful) {
+      return@runInterruptible Result.success(response.body.string())
+    } else {
+      val err = response.body.string()
+      response.body.close()
+      return@runInterruptible Result.failure(
+        GetNetworkException(
+          "Response was not 200. Response code: $responseCode. Response: $err Url: $url. req-headers: ${response.request.headers}",
+        ),
+      )
+    }
+  }
 
   private fun doRequest(url: String, cache: Boolean, client: OkHttpClient): Response {
     val builder = Request.Builder()

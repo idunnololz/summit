@@ -98,7 +98,9 @@ class InboxPaneController @AssistedInject constructor(
         val unreadCount: Int,
         val isSelected: Boolean,
       ) : Item
-      class DividerItem(val name: String) : Item
+      class DividerItem(
+        val name: String,
+      ) : Item
     }
 
     var unreadCounts: AccountInfoManager.UnreadCount? = null
@@ -122,13 +124,14 @@ class InboxPaneController @AssistedInject constructor(
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.CategoryItem ->
-            old.category == (new as Item.CategoryItem).category
-          is Item.DividerItem ->
-            old.name == (new as Item.DividerItem).name
-          Item.TitleItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.CategoryItem ->
+              old.category == (new as Item.CategoryItem).category
+            is Item.DividerItem ->
+              old.name == (new as Item.DividerItem).name
+            Item.TitleItem -> true
+          }
       },
     ).apply {
       addItemType(

@@ -32,7 +32,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNavigator {
+class PersonPostsFragment :
+  BaseFragment<FragmentPersonPostsBinding>(),
+  SignInNavigator {
 
   private var adapter: PostListAdapter? = null
 
@@ -126,7 +128,8 @@ class PersonPostsFragment : BaseFragment<FragmentPersonPostsBinding>(), SignInNa
           post,
           jumpToComments,
           reveal,
-          videoState, ->
+          videoState,
+        ->
 
         parentFragment.slidingPaneController?.openPost(
           instance = instance,

@@ -45,17 +45,14 @@ internal class ZoomManager(
    * Transforms a [ZoomApi.RealZoom] into a [ZoomApi.Zoom].
    */
   @ZoomApi.Zoom
-  internal fun realZoomToZoom(@ZoomApi.RealZoom realZoom: Float): Float {
-    return realZoom / transformationZoom
-  }
+  internal fun realZoomToZoom(@ZoomApi.RealZoom realZoom: Float): Float =
+    realZoom / transformationZoom
 
   /**
    * Transforms a [ZoomApi.Zoom] into a [ZoomApi.RealZoom].
    */
   @ZoomApi.RealZoom
-  internal fun zoomToRealZoom(@ZoomApi.Zoom zoom: Float): Float {
-    return zoom * transformationZoom
-  }
+  internal fun zoomToRealZoom(@ZoomApi.Zoom zoom: Float): Float = zoom * transformationZoom
 
   /**
    * Sets the maximum zoom and type allowed.
@@ -111,24 +108,20 @@ internal class ZoomManager(
    * Returns the current minimum zoom as a [ZoomApi.RealZoom] value.
    */
   @ZoomApi.RealZoom
-  internal fun getMinZoom(): Float {
-    return when (minZoomMode) {
-      ZoomApi.TYPE_REAL_ZOOM -> minZoom
-      ZoomApi.TYPE_ZOOM -> zoomToRealZoom(minZoom)
-      else -> throw IllegalArgumentException("Unknown ZoomType $minZoomMode")
-    }
+  internal fun getMinZoom(): Float = when (minZoomMode) {
+    ZoomApi.TYPE_REAL_ZOOM -> minZoom
+    ZoomApi.TYPE_ZOOM -> zoomToRealZoom(minZoom)
+    else -> throw IllegalArgumentException("Unknown ZoomType $minZoomMode")
   }
 
   /**
    * Returns the current maximum zoom as a [ZoomApi.RealZoom] value.
    */
   @ZoomApi.RealZoom
-  internal fun getMaxZoom(): Float {
-    return when (maxZoomMode) {
-      ZoomApi.TYPE_REAL_ZOOM -> maxZoom
-      ZoomApi.TYPE_ZOOM -> zoomToRealZoom(maxZoom)
-      else -> throw IllegalArgumentException("Unknown ZoomType $maxZoomMode")
-    }
+  internal fun getMaxZoom(): Float = when (maxZoomMode) {
+    ZoomApi.TYPE_REAL_ZOOM -> maxZoom
+    ZoomApi.TYPE_ZOOM -> zoomToRealZoom(maxZoom)
+    else -> throw IllegalArgumentException("Unknown ZoomType $maxZoomMode")
   }
 
   /**

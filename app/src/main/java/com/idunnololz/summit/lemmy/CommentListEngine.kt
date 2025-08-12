@@ -74,7 +74,8 @@ class CommentListEngine @AssistedInject constructor(
     val pages = commentPages.toMutableList()
     for ((index, page) in pages.withIndex()) {
       if (page.comments.any { it.commentView.comment.id == id }) {
-        pages[index] = page.copy(comments = page.comments.filter { it.commentView.comment.id != id })
+        pages[index] =
+          page.copy(comments = page.comments.filter { it.commentView.comment.id != id })
       }
     }
     commentPages = pages

@@ -21,7 +21,6 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
-import androidx.core.view.ViewCompat
 import com.canhub.cropper.CropImageView.CropResult
 import com.canhub.cropper.CropImageView.OnCropImageCompleteListener
 import com.canhub.cropper.CropImageView.OnSetImageUriCompleteListener
@@ -198,30 +197,28 @@ open class CropImageActivity :
           }
         }
 
-        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-          return when (menuItem.itemId) {
-            R.id.crop_image_menu_crop -> {
-              cropImage()
-              true
-            }
-            R.id.ic_rotate_left_24 -> {
-              rotateImage(-cropImageOptions.rotationDegrees)
-              true
-            }
-            R.id.ic_rotate_right_24 -> {
-              rotateImage(cropImageOptions.rotationDegrees)
-              true
-            }
-            R.id.ic_flip_24_horizontally -> {
-              cropImageView?.flipImageHorizontally()
-              true
-            }
-            R.id.ic_flip_24_vertically -> {
-              cropImageView?.flipImageVertically()
-              true
-            }
-            else -> false
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+          R.id.crop_image_menu_crop -> {
+            cropImage()
+            true
           }
+          R.id.ic_rotate_left_24 -> {
+            rotateImage(-cropImageOptions.rotationDegrees)
+            true
+          }
+          R.id.ic_rotate_right_24 -> {
+            rotateImage(cropImageOptions.rotationDegrees)
+            true
+          }
+          R.id.ic_flip_24_horizontally -> {
+            cropImageView?.flipImageHorizontally()
+            true
+          }
+          R.id.ic_flip_24_vertically -> {
+            cropImageView?.flipImageVertically()
+            true
+          }
+          else -> false
         }
       })
     }

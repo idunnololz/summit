@@ -25,6 +25,7 @@ class NetworkModule {
     cacheDir = directoryHelper.okHttpCacheDir,
     purpose = ClientFactory.Purpose.BrowserLike,
   )
+
   @Provides
   @Singleton
   @BrowserLikeUnauthed

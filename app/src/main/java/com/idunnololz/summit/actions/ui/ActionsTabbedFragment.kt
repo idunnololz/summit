@@ -20,8 +20,7 @@ import com.idunnololz.summit.util.setupToolbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ActionsTabbedFragment :
-  BaseFragment<TabbedFragmentActionsBinding>() {
+class ActionsTabbedFragment : BaseFragment<TabbedFragmentActionsBinding>() {
 
   val viewModel: ActionsViewModel by viewModels()
 

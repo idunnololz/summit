@@ -166,9 +166,7 @@ class AlertDialogFragment : DialogFragment() {
     }
   }
 
-  fun getExtra(key: String): String? {
-    return requireArguments().getString(key)
-  }
+  fun getExtra(key: String): String? = requireArguments().getString(key)
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val activity = activity ?: throw RuntimeException("Activity is null")

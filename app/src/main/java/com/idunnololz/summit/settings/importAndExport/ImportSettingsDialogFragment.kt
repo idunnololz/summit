@@ -299,11 +299,12 @@ class ImportSettingsDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { oldItem, newItem ->
-        oldItem::class == newItem::class && when (oldItem) {
-          is Item.BackupItem ->
-            oldItem.backupInfo.file.path ==
-              (newItem as Item.BackupItem).backupInfo.file.path
-        }
+        oldItem::class == newItem::class &&
+          when (oldItem) {
+            is Item.BackupItem ->
+              oldItem.backupInfo.file.path ==
+                (newItem as Item.BackupItem).backupInfo.file.path
+          }
       },
     ).apply {
       addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->

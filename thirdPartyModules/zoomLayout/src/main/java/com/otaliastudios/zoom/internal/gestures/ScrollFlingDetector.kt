@@ -46,9 +46,7 @@ internal class ScrollFlingDetector(
    * Starts a pinch gesture or continues an ongoing gesture.
    * Returns true if we are interested in the result.
    */
-  internal fun maybeStart(event: MotionEvent): Boolean {
-    return detector.onTouchEvent(event)
-  }
+  internal fun maybeStart(event: MotionEvent): Boolean = detector.onTouchEvent(event)
 
   /**
    * Cancels the current fling gesture. It will be released in the
@@ -227,9 +225,7 @@ internal class ScrollFlingDetector(
   override fun onShowPress(e: MotionEvent) {}
 
   // Not interested in this callback
-  override fun onSingleTapUp(e: MotionEvent): Boolean {
-    return false
-  }
+  override fun onSingleTapUp(e: MotionEvent): Boolean = false
 
   // Not interested in this callback
   override fun onLongPress(e: MotionEvent) {}

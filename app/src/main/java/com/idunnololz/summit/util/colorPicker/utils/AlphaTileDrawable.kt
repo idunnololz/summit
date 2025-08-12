@@ -109,9 +109,7 @@ class AlphaTileDrawable : Drawable {
     paint.setColorFilter(colorFilter)
   }
 
-  override fun getOpacity(): Int {
-    return PixelFormat.OPAQUE
-  }
+  override fun getOpacity(): Int = PixelFormat.OPAQUE
 
   override fun onBoundsChange(bounds: Rect) {
     super.onBoundsChange(bounds)

@@ -56,10 +56,12 @@ class ActionsRunnerHelper @Inject constructor(
                   Failure(TooManyRequests(retries + 1))
                 }
               } else {
-                Failure(LemmyActionFailureReason.UnknownError(
-                  errorCode = error.errorCode,
-                  errorMessage = error.errorMessage
-                ))
+                Failure(
+                  LemmyActionFailureReason.UnknownError(
+                    errorCode = error.errorCode,
+                    errorMessage = error.errorMessage,
+                  ),
+                )
               }
             }
             is ServerApiException ->

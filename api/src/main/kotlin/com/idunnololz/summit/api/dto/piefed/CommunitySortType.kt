@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Active,New
  */
 
-enum class CommunitySortType(val value: kotlin.String) {
+enum class CommunitySortType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "Active")
   Active("Active"),

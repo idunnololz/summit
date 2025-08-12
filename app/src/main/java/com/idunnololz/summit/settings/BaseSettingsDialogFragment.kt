@@ -15,7 +15,8 @@ import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.setupToolbar
 import javax.inject.Inject
 
-abstract class BaseSettingsDialogFragment : BaseDialogFragment<DialogFragmentBaseSettingsBinding>() {
+abstract class BaseSettingsDialogFragment :
+  BaseDialogFragment<DialogFragmentBaseSettingsBinding>() {
 
   @Inject
   lateinit var preferences: Preferences

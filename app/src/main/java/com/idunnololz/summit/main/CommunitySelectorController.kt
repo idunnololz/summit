@@ -555,11 +555,12 @@ class CommunitySelectorController @AssistedInject constructor(
                 }
               }
             } else {
-              b.actionButton.text = if (item.communityView.subscribed == SubscribedType.Subscribed) {
-                context.getString(R.string.unsubscribe)
-              } else {
-                context.getString(R.string.subscription_pending)
-              }
+              b.actionButton.text =
+                if (item.communityView.subscribed == SubscribedType.Subscribed) {
+                  context.getString(R.string.unsubscribe)
+                } else {
+                  context.getString(R.string.subscription_pending)
+                }
               b.actionButton.setOnClickListener {
                 viewModel.updateSubscriptionStatus(
                   item.communityView.community.id,
@@ -866,10 +867,11 @@ class CommunitySelectorController @AssistedInject constructor(
           newItems.add(Item.GroupHeaderItem(context.getString(R.string.top_communities)))
 
           val filteredPopularCommunities = rawData.filter {
-            query.isNullOrBlank() || it.community.name.contains(
-              query,
-              ignoreCase = true,
-            )
+            query.isNullOrBlank() ||
+              it.community.name.contains(
+                query,
+                ignoreCase = true,
+              )
           }
 
           filteredPopularCommunities
@@ -924,7 +926,8 @@ class CommunitySelectorController @AssistedInject constructor(
                 it.community.community.name,
                 it.community.community.instance,
               ),
-            ) && it.community.community.name.contains(query, ignoreCase = true)
+            ) &&
+              it.community.community.name.contains(query, ignoreCase = true)
           }
 
         newItems.sortByDescending { StringSearchUtils.similarity(query, getText(it)) }

@@ -400,7 +400,8 @@ class ConversationsManager @Inject constructor(
       ?: return
 
     stateStorage = stateStorageManager.getAccountStateStorage(
-      currentAccount.id, currentAccount.instance,
+      currentAccount.id,
+      currentAccount.instance,
     )
   }
 }

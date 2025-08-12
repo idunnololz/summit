@@ -22,7 +22,8 @@ data class MessageItem(
   val isDeleted: Boolean,
   val isRead: Boolean,
   val targetUserName: String?,
-) : LiteInboxItem, Parcelable {
+) : LiteInboxItem,
+  Parcelable {
   override fun updateIsRead(isRead: Boolean): LiteInboxItem = copy(isRead = isRead)
 }
 

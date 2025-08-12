@@ -73,7 +73,9 @@ class OfflinePostFeedWork @AssistedInject constructor(
   }
 
   @Parcelize
-  enum class ProgressPhase(val index: Int) : Parcelable {
+  enum class ProgressPhase(
+    val index: Int,
+  ) : Parcelable {
     Start(0),
     FetchingPostFeed(1),
     FetchingPosts(2),

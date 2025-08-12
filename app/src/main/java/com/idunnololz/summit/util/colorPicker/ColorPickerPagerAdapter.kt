@@ -13,7 +13,9 @@ class ColorPickerPagerAdapter(
   private val context: Context,
   private val pickers: List<ColorPickerContainer>,
   private val viewPager: ViewPager,
-) : HeightablePagerAdapter(), OnColorPickedListener, ViewPager.OnPageChangeListener {
+) : HeightablePagerAdapter(),
+  OnColorPickedListener,
+  ViewPager.OnPageChangeListener {
 
   private var listener: OnColorPickedListener? = null
 
@@ -89,9 +91,7 @@ class ColorPickerPagerAdapter(
     container.removeView(`object` as View)
   }
 
-  override fun getCount(): Int {
-    return pickers.size
-  }
+  override fun getCount(): Int = pickers.size
 
   override fun getHeightAt(position: Int, widthMeasureSpec: Int, heightMeasureSpec: Int): Int {
     val picker = pickers[position].rootView2
@@ -99,13 +99,9 @@ class ColorPickerPagerAdapter(
     return picker.measuredHeight
   }
 
-  override fun isViewFromObject(view: View, `object`: Any): Boolean {
-    return view === `object`
-  }
+  override fun isViewFromObject(view: View, `object`: Any): Boolean = view === `object`
 
-  override fun getPageTitle(position: Int): CharSequence {
-    return pickers[position].colorPicker.name
-  }
+  override fun getPageTitle(position: Int): CharSequence = pickers[position].colorPicker.name
 
   override fun onColorPicked(pickerView: ColorPicker?, @ColorInt color: Int) {
     this.color = color

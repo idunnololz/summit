@@ -148,9 +148,7 @@ class AdapterHelper<T : Any>(
     }
   }
 
-  fun getItemViewType(position: Int): Int {
-    return getItemInfoFromPosition(position).viewType
-  }
+  fun getItemViewType(position: Int): Int = getItemInfoFromPosition(position).viewType
 
   fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val itemInfo = if (itemInfos.size == 1) {

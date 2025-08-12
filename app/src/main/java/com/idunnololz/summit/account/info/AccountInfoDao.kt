@@ -107,16 +107,16 @@ abstract class AccountInfoDao {
 }
 
 @ProvidedTypeConverter
-class AccountInfoConverters(private val json: Json) {
+class AccountInfoConverters(
+  private val json: Json,
+) {
 
   companion object {
     private const val TAG = "AccountInfoConverters"
   }
 
   @TypeConverter
-  fun subscriptionsToString(value: List<AccountSubscription>): String {
-    return json.encodeToString(value)
-  }
+  fun subscriptionsToString(value: List<AccountSubscription>): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToSubscriptions(value: String): List<AccountSubscription>? = try {
@@ -128,9 +128,8 @@ class AccountInfoConverters(private val json: Json) {
   }
 
   @TypeConverter
-  fun miscAccountInfoToString(miscAccountInfo: MiscAccountInfo): String {
-    return json.encodeToString(miscAccountInfo)
-  }
+  fun miscAccountInfoToString(miscAccountInfo: MiscAccountInfo): String =
+    json.encodeToString(miscAccountInfo)
 
   @TypeConverter
   fun stringToMiscAccountInfo(value: String): MiscAccountInfo? = try {

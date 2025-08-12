@@ -183,7 +183,8 @@ class SettingsAdapter(
       override val setting: SettingItem,
       override val isEnabled: Boolean,
       val payload: T,
-    ) : Item, AdapterHelper.RuntimeItemType
+    ) : Item,
+      AdapterHelper.RuntimeItemType
 
     data class ImageValueItem(
       override val setting: ImageValueSettingItem,

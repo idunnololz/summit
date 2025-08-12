@@ -25,8 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RichTextValueDialogFragment :
-  BaseDialogFragment<DialogFragmentRichTextValueBinding>() {
+class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextValueBinding>() {
 
   companion object {
     private const val ARG_TITLE = "ARG_TITLE"

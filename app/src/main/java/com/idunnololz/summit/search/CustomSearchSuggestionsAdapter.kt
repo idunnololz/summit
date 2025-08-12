@@ -56,11 +56,12 @@ class CustomSearchSuggestionsAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     { old, new ->
-      old::class == new::class && when (old) {
-        is Item.SuggestionItem ->
-          old.suggestion == (new as Item.SuggestionItem).suggestion
-        Item.FooterItem -> true
-      }
+      old::class == new::class &&
+        when (old) {
+          is Item.SuggestionItem ->
+            old.suggestion == (new as Item.SuggestionItem).suggestion
+          Item.FooterItem -> true
+        }
     },
   ).apply {
     addItemType(

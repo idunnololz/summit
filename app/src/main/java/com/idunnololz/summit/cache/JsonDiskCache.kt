@@ -18,18 +18,16 @@ class JsonDiskCache(
     )
   }
 
-  inline fun <reified T> getCachedObject(key: String): T? {
-    return try {
-      val value = cache.getCachedData(key)
-      if (value.isNullOrBlank()) {
-        null
-      } else {
-        json.decodeFromString(value)
-      }
-    } catch (e: Exception) {
-      Log.e(TAG, "getCachedObject()", e)
+  inline fun <reified T> getCachedObject(key: String): T? = try {
+    val value = cache.getCachedData(key)
+    if (value.isNullOrBlank()) {
       null
+    } else {
+      json.decodeFromString(value)
     }
+  } catch (e: Exception) {
+    Log.e(TAG, "getCachedObject()", e)
+    null
   }
 
   inline fun <reified T> cacheObject(key: String, obj: T?) {

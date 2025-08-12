@@ -61,7 +61,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener {
+class MainFragment :
+  BaseFragment<FragmentMainBinding>(),
+  GestureRegionsListener {
 
   companion object {
     private const val TAG = "MainFragment"
@@ -185,11 +187,16 @@ class MainFragment : BaseFragment<FragmentMainBinding>(), GestureRegionsListener
         Log.d(TAG, "currentFragment: $currentFragment")
 
         if (!tab.isHomeTab &&
-          currentFragment is CommunityFragment && currentFragment.isPristineFirstPage()
+          currentFragment is CommunityFragment &&
+          currentFragment.isPristineFirstPage()
         ) {
           changeCommunity(tabsManager.getHomeTab())
         } else if (currentFragment is CommunityFragment) {
-          currentFragment.scrollToTop()
+          if (currentFragment.isPristineFirstPage()) {
+            resetCurrentTab(tab)
+          } else {
+            currentFragment.scrollToTop()
+          }
         } else {
           resetCurrentTab(tab)
         }

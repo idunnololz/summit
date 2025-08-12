@@ -8,7 +8,6 @@ import com.idunnololz.summit.main.MainActivity
 abstract class BasePreferenceFragment : PreferenceFragmentCompat() {
   fun requireMainActivity(): MainActivity = requireActivity() as MainActivity
 
-  protected fun <T : Preference> findPreference(@StringRes key: Int): T {
-    return checkNotNull(findPreference<T>(getString(key)))
-  }
+  protected fun <T : Preference> findPreference(@StringRes key: Int): T =
+    checkNotNull(findPreference<T>(getString(key)))
 }

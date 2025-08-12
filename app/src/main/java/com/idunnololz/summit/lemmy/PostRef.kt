@@ -9,4 +9,5 @@ import kotlinx.serialization.Serializable
 data class PostRef(
   val instance: String,
   val id: Int,
-) : PageRef, Parcelable
+) : PageRef,
+  Parcelable

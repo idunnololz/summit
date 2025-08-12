@@ -13,7 +13,9 @@ import com.otaliastudios.zoom.internal.StateController.Callback
  * the gesture in the callbacks. Whenever needed, [setState] must be called to keep
  * this class in sync with what's happening.
  */
-internal class StateController(private val callback: Callback) {
+internal class StateController(
+  private val callback: Callback,
+) {
 
   /**
    * Receives callbacks from this controller.
@@ -42,9 +44,7 @@ internal class StateController(private val callback: Callback) {
    * Whether this state needs cleanup even if called twice.
    * The [ANIMATING] state currently needs it.
    */
-  private fun needsCleanupWhenCalledTwice(@State state: Int): Boolean {
-    return state == ANIMATING
-  }
+  private fun needsCleanupWhenCalledTwice(@State state: Int): Boolean = state == ANIMATING
 
   /**
    * Private function to set the current state.
@@ -73,17 +73,14 @@ internal class StateController(private val callback: Callback) {
    * Processes the event. Should be called during the
    * [android.view.ViewGroup.onInterceptTouchEvent] callback.
    */
-  internal fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-    return processTouchEvent(ev) > TOUCH_LISTEN
-  }
+  internal fun onInterceptTouchEvent(ev: MotionEvent): Boolean =
+    processTouchEvent(ev) > TOUCH_LISTEN
 
   /**
    * Processes the event. Should be called during the
    * [android.view.View.onTouchEvent] callback.
    */
-  internal fun onTouchEvent(ev: MotionEvent): Boolean {
-    return processTouchEvent(ev) > TOUCH_NO
-  }
+  internal fun onTouchEvent(ev: MotionEvent): Boolean = processTouchEvent(ev) > TOUCH_NO
 
   /**
    * Processes the touch event and returns one of [TOUCH_LISTEN],
@@ -163,15 +160,13 @@ internal class StateController(private val callback: Callback) {
    */
   internal fun makeIdle() = setState(IDLE)
 
-  private fun Int.toStateName(): String {
-    return when (this) {
-      IDLE -> "IDLE"
-      FLINGING -> "FLINGING"
-      SCROLLING -> "SCROLLING"
-      PINCHING -> "PINCHING"
-      ANIMATING -> "ANIMATING"
-      else -> ""
-    }
+  private fun Int.toStateName(): String = when (this) {
+    IDLE -> "IDLE"
+    FLINGING -> "FLINGING"
+    SCROLLING -> "SCROLLING"
+    PINCHING -> "PINCHING"
+    ANIMATING -> "ANIMATING"
+    else -> ""
   }
 
   @Retention(AnnotationRetention.SOURCE)

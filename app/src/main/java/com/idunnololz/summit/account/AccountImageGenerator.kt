@@ -10,6 +10,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.collection.LruCache
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.util.DirectoryHelper
@@ -19,8 +21,6 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.drawable.toDrawable
 
 @Singleton
 class AccountImageGenerator @Inject constructor(
@@ -82,15 +82,12 @@ class AccountImageGenerator @Inject constructor(
     personId: PersonId,
     personInstance: String,
     circleClip: Boolean = false,
-  ): BitmapDrawable =
-    generateDrawableForGeneric(
-      key = personKey(personName, personId, personInstance),
-      circleClip = circleClip,
-    )
+  ): BitmapDrawable = generateDrawableForGeneric(
+    key = personKey(personName, personId, personInstance),
+    circleClip = circleClip,
+  )
 
-  fun generateDrawableForKey(key: String): Drawable {
-    return generateDrawableForGeneric(key)
-  }
+  fun generateDrawableForKey(key: String): Drawable = generateDrawableForGeneric(key)
 
   fun generateDrawableForGeneric(
     key: String,
@@ -99,7 +96,7 @@ class AccountImageGenerator @Inject constructor(
     ),
     circleClip: Boolean = false,
   ): BitmapDrawable {
-    val cacheKey = "$key|${circleClip}"
+    val cacheKey = "$key|$circleClip"
     val bitmap = if (memoryCache != null) {
       memoryCache[cacheKey]
         ?: generateBitmapForGeneric(key, drawable, circleClip).also {
@@ -111,9 +108,8 @@ class AccountImageGenerator @Inject constructor(
     return bitmap.toDrawable(context.resources)
   }
 
-  fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int {
-    return getColorForKey(personKey(personName, personId, personInstance))
-  }
+  fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int =
+    getColorForKey(personKey(personName, personId, personInstance))
 
   private fun generateBitmapForGeneric(
     key: String,
@@ -180,10 +176,6 @@ class AccountImageGenerator @Inject constructor(
   }
 
   @Suppress("NOTHING_TO_INLINE")
-  private inline fun personKey(
-    personName: String,
-    personId: PersonId,
-    personInstance: String,
-  ) =
+  private inline fun personKey(personName: String, personId: PersonId, personInstance: String) =
     "$personName@$personId@$personInstance"
 }

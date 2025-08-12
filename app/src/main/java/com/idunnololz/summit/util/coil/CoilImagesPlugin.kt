@@ -1,7 +1,6 @@
 package com.idunnololz.summit.util.coil
 
 import android.content.Context
-import android.graphics.Rect
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Handler
@@ -91,7 +90,7 @@ class CoilImagesPlugin(
         .target(target)
         .apply {
           if (drawable.imageText?.startsWith("emoji", ignoreCase = true) == true) {
-            size(Utils.convertDpToPixel(24f).toInt(), Utils.convertDpToPixel(24f).toInt(),)
+            size(Utils.convertDpToPixel(24f).toInt(), Utils.convertDpToPixel(24f).toInt())
           } else {
             size(Dimension.Pixels(drawable.lastKnownCanvasWidth), Dimension.Undefined)
           }
@@ -116,9 +115,7 @@ class CoilImagesPlugin(
       }
     }
 
-    override fun placeholder(drawable: AsyncDrawable): Drawable? {
-      return null
-    }
+    override fun placeholder(drawable: AsyncDrawable): Drawable? = null
 
     private inner class AsyncDrawableTarget(
       private val drawable: AsyncDrawable,

@@ -133,9 +133,8 @@ class AccountInfoManager @Inject constructor(
     )
   }
 
-  private fun getImageForAccount(account: Account): File {
-    return accountImageGenerator.getOrGenerateImageForAccount(account)
-  }
+  private fun getImageForAccount(account: Account): File =
+    accountImageGenerator.getOrGenerateImageForAccount(account)
 
   suspend fun getFullAccount(account: Account): FullAccount? {
     val fullAccount = currentFullAccount.value

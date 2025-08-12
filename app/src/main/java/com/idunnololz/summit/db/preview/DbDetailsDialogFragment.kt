@@ -27,8 +27,7 @@ import com.idunnololz.summit.util.ext.setSizeDynamically
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import java.util.Locale
 
-class DbDetailsDialogFragment :
-  BaseDialogFragment<DialogFragmentDbDetailsBinding>() {
+class DbDetailsDialogFragment : BaseDialogFragment<DialogFragmentDbDetailsBinding>() {
 
   companion object {
     fun show(
@@ -145,12 +144,13 @@ class DbDetailsDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.HeaderItem -> true
-          is Item.TableItem ->
-            old.tableInfo.tableName == (new as Item.TableItem).tableInfo.tableName
-          is Item.FooterItem -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.HeaderItem -> true
+            is Item.TableItem ->
+              old.tableInfo.tableName == (new as Item.TableItem).tableInfo.tableName
+            is Item.FooterItem -> true
+          }
       },
     ).apply {
       addItemType(Item.HeaderItem::class, ItemDbHeaderBinding::inflate) { item, b, h ->

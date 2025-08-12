@@ -63,7 +63,9 @@ object TextMeasurementUtils {
   /**
    * The text measurement parameters
    */
-  class TextMeasurementParams private constructor(builder: Builder) {
+  class TextMeasurementParams private constructor(
+    builder: Builder,
+  ) {
     val textPaint: TextPaint?
     val alignment: Layout.Alignment?
     val lineSpacingExtra: Float
@@ -173,9 +175,7 @@ object TextMeasurementUtils {
         return this
       }
 
-      fun build(): TextMeasurementParams {
-        return TextMeasurementParams(this)
-      }
+      fun build(): TextMeasurementParams = TextMeasurementParams(this)
 
       companion object {
         fun from(view: TextView): Builder {

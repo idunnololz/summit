@@ -49,17 +49,11 @@ fun PostView.getThumbnailUrl(reveal: Boolean): String? = if (shouldHideItem()) {
   post.thumbnail_url
 }
 
-fun PostView.getPreviewInfo(): PreviewInfo? {
-  return null
-}
+fun PostView.getPreviewInfo(): PreviewInfo? = null
 
-fun PostView.getUrl(instance: String): String {
-  return "https://$instance/post/${post.id}"
-}
+fun PostView.getUrl(instance: String): String = "https://$instance/post/${post.id}"
 
-fun PostView.getThumbnailPreviewInfo(): PreviewInfo? {
-  return null
-}
+fun PostView.getThumbnailPreviewInfo(): PreviewInfo? = null
 
 fun PostView.getVideoInfo(): VideoSizeHint? {
   val originalUrl = if (post.embed_video_url != null) {

@@ -33,8 +33,7 @@ import java.io.IOException
 class CropProvider(
   activity: ImagePickerActivity,
   private val launcher: ActivityResultLauncher<CropImageContractOptions>,
-) :
-  BaseProvider(activity) {
+) : BaseProvider(activity) {
 
   companion object {
     private val TAG = CropProvider::class.java.simpleName
@@ -202,8 +201,8 @@ class CropProvider(
 //    }
 //  }
 
-  private fun getBitmap(context: Context, imageUri: Uri): Bitmap? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+  private fun getBitmap(context: Context, imageUri: Uri): Bitmap? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       try {
         ImageDecoder.decodeBitmap(
           ImageDecoder.createSource(context.contentResolver, imageUri),
@@ -218,7 +217,6 @@ class CropProvider(
           BitmapFactory.decodeStream(inputStream)
         }
     }
-  }
 
   @Throws(IOException::class)
   private fun convertBitmapToFile(destinationFile: File, bitmap: Bitmap, extension: String) {

@@ -452,18 +452,19 @@ class MultiCommunityEditorDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.SelectedCommunityItem -> {
-            old == new
+        old::class == new::class &&
+          when (old) {
+            is Item.SelectedCommunityItem -> {
+              old == new
+            }
+            is Item.GroupHeaderItem -> {
+              old.text == (new as Item.GroupHeaderItem).text
+            }
+            is Item.NoResultsItem -> true
+            is Item.IconsItem -> true
+            is Item.HeaderItem -> true
+            is Item.SelectedCommunitiesHeader -> true
           }
-          is Item.GroupHeaderItem -> {
-            old.text == (new as Item.GroupHeaderItem).text
-          }
-          is Item.NoResultsItem -> true
-          is Item.IconsItem -> true
-          is Item.HeaderItem -> true
-          is Item.SelectedCommunitiesHeader -> true
-        }
       },
       getChangePayload = { _, new ->
         when (new) {

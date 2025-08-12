@@ -16,8 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsDefaultAppsFragment :
-  BaseSettingsFragment() {
+class SettingsDefaultAppsFragment : BaseSettingsFragment() {
 
   @Inject
   override lateinit var settings: DefaultAppsSettings

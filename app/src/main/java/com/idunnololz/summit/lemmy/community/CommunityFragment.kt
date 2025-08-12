@@ -63,7 +63,6 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.multicommunity.instance
-import com.idunnololz.summit.lemmy.post.PostFragment
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
@@ -391,7 +390,8 @@ class CommunityFragment :
             post,
             jumpToComments,
             reveal,
-            videoState, ->
+            videoState,
+          ->
 
           slidingPaneController?.openPost(
             instance = instance,
@@ -649,7 +649,7 @@ class CommunityFragment :
         },
         onHideReadOnClick = {
           createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
-            R.id.hide_read_off
+            R.id.hide_read_off,
           )
         },
         onHideReadOnLongClick = {
@@ -657,7 +657,7 @@ class CommunityFragment :
             titleResId = R.string.hide_read_on
             messageResId = R.string.hide_read_on_desc
           }
-        }
+        },
       )
 
       runAfterLayout {
@@ -1164,16 +1164,16 @@ class CommunityFragment :
 
     requireSummitActivity().apply {
       if (!args.isPreview) {
-          if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
-            // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
-          } else {
-            if (viewModel.lockBottomBar &&
-              !slidingPaneLayout.isOpen &&
-              mainFragment?.isPaneOpen() != true
-            ) {
-              showNavBar()
-            }
+        if (slidingPaneLayout.isSwipeEnabled && slidingPaneLayout.isOpen) {
+          // Post screen is open. Do not manipulate the nav bar. Let the post screen handle it.
+        } else {
+          if (viewModel.lockBottomBar &&
+            !slidingPaneLayout.isOpen &&
+            mainFragment?.isPaneOpen() != true
+          ) {
+            showNavBar()
           }
+        }
         setupForFragment<CommunityFragment>()
       }
     }
@@ -1707,7 +1707,8 @@ class CommunityFragment :
       }
       R.id.hide_read_on,
       R.id.hide_read_off,
-      R.id.hide_read -> {
+      R.id.hide_read,
+      -> {
         val anchors = mutableSetOf<Int>()
         val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
           it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
@@ -1722,9 +1723,9 @@ class CommunityFragment :
           } else if (actionId == R.id.hide_read_off) {
             HideReadMode.Off
           } else {
-            HideReadMode.OnUntilRefresh
+            HideReadMode.On
           },
-          anchors = anchors
+          anchors = anchors,
         )
       }
 

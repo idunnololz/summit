@@ -354,14 +354,12 @@ class FastScroller : LinearLayout {
     removeCallbacks(hideRunnable)
   }
 
-  private fun getRelativeTouchPosition(event: MotionEvent): Float {
-    return if (isVertical()) {
-      val yInParent = event.rawY - getViewRawY(handle) - touchOffset.toFloat()
-      yInParent / (height - handle.height)
-    } else {
-      val xInParent = event.rawX - getViewRawX(handle)
-      xInParent / (width - handle.width)
-    }
+  private fun getRelativeTouchPosition(event: MotionEvent): Float = if (isVertical()) {
+    val yInParent = event.rawY - getViewRawY(handle) - touchOffset.toFloat()
+    yInParent / (height - handle.height)
+  } else {
+    val xInParent = event.rawX - getViewRawX(handle)
+    xInParent / (width - handle.width)
   }
 
   private fun invalidateVisibility() {
@@ -413,19 +411,16 @@ class FastScroller : LinearLayout {
     return !manuallyChangingPosition && recyclerView != null && recyclerView.childCount > 0
   }
 
-  private fun getAnimator(): ValueAnimator {
-    return autoHideAnimator ?: ValueAnimator.ofFloat(0f, 0f).also { va ->
+  private fun getAnimator(): ValueAnimator =
+    autoHideAnimator ?: ValueAnimator.ofFloat(0f, 0f).also { va ->
       va.addUpdateListener { handle.translationX = it.animatedValue as Float }
       autoHideAnimator = va
     }
-  }
 
-  private fun isRecyclerViewScrollable(): Boolean {
-    return recyclerView?.let {
-      it.computeHorizontalScrollRange() > it.width ||
-        it.computeVerticalScrollRange() > it.height
-    } ?: false
-  }
+  private fun isRecyclerViewScrollable(): Boolean = recyclerView?.let {
+    it.computeHorizontalScrollRange() > it.width ||
+      it.computeVerticalScrollRange() > it.height
+  } ?: false
 
   private fun showHandle() {
     if (!animatingShow) {

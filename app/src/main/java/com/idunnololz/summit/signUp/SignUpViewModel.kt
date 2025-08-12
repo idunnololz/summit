@@ -157,7 +157,8 @@ class SignUpViewModel @Inject constructor(
             if (!lemmyApiClient.supportsFeature(ApiFeature.Register)) {
               site = it
               fetchSiteLiveData.setError(NotYetImplemented())
-              instanceError = context.getString(R.string.error_instance_does_not_support_registration)
+              instanceError =
+                context.getString(R.string.error_instance_does_not_support_registration)
             } else {
               site = it
               fetchSiteLiveData.setValue(Unit)
@@ -708,7 +709,9 @@ sealed interface InstanceError {
   data object InvalidUrl : InstanceError
   data object RegistrationClosed : InstanceError
   data object BlankInstance : InstanceError
-  data class InstanceCorrection(val correctedInstance: String) : InstanceError
+  data class InstanceCorrection(
+    val correctedInstance: String,
+  ) : InstanceError
 }
 
 sealed class CaptchaError : Exception() {

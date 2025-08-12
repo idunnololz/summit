@@ -12,8 +12,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 
 @SuppressLint("RestrictedApi")
-class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
-  CoordinatorLayout.Behavior<FloatingActionButton>(context, attrs) {
+class CustomFabWithBottomNavBehavior(
+  context: Context,
+  attrs: AttributeSet,
+) : CoordinatorLayout.Behavior<FloatingActionButton>(context, attrs) {
 
   private var bottomNavHeight: Float = 0f
   private var snackbarHeight: Float = 0f
@@ -32,9 +34,7 @@ class CustomFabWithBottomNavBehavior(context: Context, attrs: AttributeSet) :
     parent: CoordinatorLayout,
     child: FloatingActionButton,
     rect: Rect,
-  ): Boolean {
-    return super.getInsetDodgeRect(parent, child, rect)
-  }
+  ): Boolean = super.getInsetDodgeRect(parent, child, rect)
 
   override fun layoutDependsOn(
     parent: CoordinatorLayout,

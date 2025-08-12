@@ -9,6 +9,8 @@ import com.idunnololz.summit.util.crashLogger.crashLogger
 import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.set
+import kotlin.text.contains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,8 +27,8 @@ class ContentFiltersManager @Inject constructor(
 
   private val coroutineScope = coroutineScopeFactory.create()
 
-  private var postListFilters: List<FilterEntry> = listOf()
-  private var commentListFilters: List<FilterEntry> = listOf()
+  private var postListFilters: Filters = Filters(listOf())
+  private var commentListFilters: Filters = Filters(listOf())
 
   private var regexCache = mutableMapOf<Long, Pattern>()
 
@@ -65,53 +67,33 @@ class ContentFiltersManager @Inject constructor(
       }
     }
 
-    this.postListFilters = postListFilters
-    this.commentListFilters = commentListFilters
+    this.postListFilters = Filters(postListFilters)
+    this.commentListFilters = Filters(commentListFilters)
   }
 
   /**
    * Tests a [PostView] to see if it matches any of the filters.
    * @return true if the [PostView] matches at least one filter.
    */
-  fun testPostView(postView: PostView): Boolean {
-    return postListFilters.any { filter ->
-      when (filter.filterType) {
+  fun testPostView(postView: PostView): Boolean =
+    postListFilters.patternByType.any { (type, pattern) ->
+      when (type) {
         FilterTypes.KeywordFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(postView.post.name).find()
-          } else {
-            postView.post.name.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(postView.post.name).find()
         }
         FilterTypes.InstanceFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(postView.community.instance).find()
-          } else {
-            postView.community.instance.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(postView.community.instance).find()
         }
         FilterTypes.CommunityFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(postView.community.name).find()
-          } else {
-            postView.community.name.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(postView.community.name).find()
         }
         FilterTypes.UserFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(postView.creator.name).find()
-          } else {
-            postView.creator.name.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(postView.creator.name).find()
         }
         FilterTypes.UrlFilter -> {
           val url = postView.post.url
           if (url != null) {
-            if (filter.isRegex) {
-              getPattern(filter).matcher(url).find()
-            } else {
-              url.contains(filter.filter, ignoreCase = true)
-            }
+            pattern.matcher(url).find()
           } else {
             false
           }
@@ -119,52 +101,37 @@ class ContentFiltersManager @Inject constructor(
         else -> false
       }
     }
-  }
 
   /**
    * Tests a [CommentView] to see if it matches any of the filters.
    * @return true if the [CommentView] matches at least one filter.
    */
-  fun testCommentView(commentView: CommentView): Boolean {
-    return commentListFilters.any { filter ->
-      when (filter.filterType) {
+  fun testCommentView(commentView: CommentView): Boolean =
+    commentListFilters.patternByType.any { (type, pattern) ->
+      when (type) {
         FilterTypes.KeywordFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(commentView.comment.content).find()
-          } else {
-            commentView.comment.content.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(commentView.comment.content).find()
         }
         FilterTypes.InstanceFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(commentView.creator.instance).find()
-          } else {
-            commentView.creator.instance.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(commentView.creator.instance).find()
         }
         FilterTypes.UserFilter -> {
-          if (filter.isRegex) {
-            getPattern(filter).matcher(commentView.creator.name).find()
-          } else {
-            commentView.creator.name.contains(filter.filter, ignoreCase = true)
-          }
+          pattern.matcher(commentView.creator.name).find()
         }
         else -> false
       }
     }
-  }
 
-  fun getFilters(contentTypeId: ContentTypeId, filterTypeId: FilterTypeId): List<FilterEntry> {
-    return when (contentTypeId) {
+  fun getFilters(contentTypeId: ContentTypeId, filterTypeId: FilterTypeId): List<FilterEntry> =
+    when (contentTypeId) {
       ContentTypes.PostListType -> {
-        postListFilters.filter { it.filterType == filterTypeId }
+        postListFilters.filters.filter { it.filterType == filterTypeId }
       }
       ContentTypes.CommentListType -> {
-        commentListFilters.filter { it.filterType == filterTypeId }
+        commentListFilters.filters.filter { it.filterType == filterTypeId }
       }
       else -> listOf()
     }
-  }
 
   suspend fun addFilter(filter: FilterEntry) {
     dao.insertFilter(filter)
@@ -180,18 +147,62 @@ class ContentFiltersManager @Inject constructor(
     refreshFilters()
   }
 
-  private fun getPattern(filter: FilterEntry): Pattern {
-    return regexCache[filter.id]
-      ?: try {
-        Pattern.compile(filter.filter)
-      } catch (e: Exception) {
-        Pattern.compile("""a^""")
-      }.also {
-        regexCache[filter.id] = it
+  private class Filters(
+    val filters: List<FilterEntry>,
+  ) {
+
+    val patternByType: Map<Int, Pattern>
+
+    init {
+      val typeToRegex = mutableMapOf<Int, StringBuilder>()
+
+      for (filter in filters) {
+        val sb = typeToRegex.getOrPut(filter.filterType) { StringBuilder() }
+
+        if (filter.isRegex) {
+          sb.append(filter.filter)
+        } else {
+          if (filter.options?.matchWholeWord == true) {
+            sb.append("\\b")
+            sb.append(Pattern.quote(filter.filter))
+            sb.append("\\b")
+          } else {
+            sb.append(Pattern.quote(filter.filter))
+          }
+        }
+        sb.append("|")
       }
+
+      val patternByType = mutableMapOf<Int, Pattern>()
+      listOf(
+        FilterTypes.KeywordFilter,
+        FilterTypes.InstanceFilter,
+        FilterTypes.CommunityFilter,
+        FilterTypes.UserFilter,
+        FilterTypes.UrlFilter,
+      ).forEach { filterType ->
+        val regex = typeToRegex[filterType]
+        if (regex != null) {
+          regex.setLength(regex.length - 1)
+
+          try {
+            patternByType[filterType] = Pattern.compile(regex.toString(), Pattern.CASE_INSENSITIVE)
+              .also {
+                Log.d(TAG, "Compiling filter regex for type $filterType: $it")
+              }
+          } catch (e: Exception) {
+            Log.w(TAG, "Error compiling regex.", e)
+          }
+        }
+      }
+
+      this.patternByType = patternByType
+    }
   }
 }
 
-class TooManyFiltersException(filtersCount: Long) : RuntimeException(
+class TooManyFiltersException(
+  filtersCount: Long,
+) : RuntimeException(
   "Has $filtersCount filters!",
 )

@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Communities,Posts,Users,Url
  */
 
-enum class SearchType(val value: kotlin.String) {
+enum class SearchType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "All")
   All("All"),

@@ -177,31 +177,29 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
             }
           }
 
-          override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return when (menuItem.itemId) {
-              R.id.publish -> {
-                viewModel.update {
-                  it.copy(
-                    title = binding.displayNameEditText.text?.toString() ?: it.title,
-                    description = binding.descriptionEditText.text?.toString(),
-                  )
-                }
-                viewModel.createCommunity()
-                true
+          override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+            R.id.publish -> {
+              viewModel.update {
+                it.copy(
+                  title = binding.displayNameEditText.text?.toString() ?: it.title,
+                  description = binding.descriptionEditText.text?.toString(),
+                )
               }
-              R.id.save -> {
-                viewModel.update {
-                  it.copy(
-                    title = binding.displayNameEditText.text?.toString() ?: it.title,
-                    description = binding.descriptionEditText.text?.toString(),
-                  )
-                }
-                viewModel.saveChanges()
-                true
+              viewModel.createCommunity()
+              true
+            }
+            R.id.save -> {
+              viewModel.update {
+                it.copy(
+                  title = binding.displayNameEditText.text?.toString() ?: it.title,
+                  description = binding.descriptionEditText.text?.toString(),
+                )
               }
-              else -> {
-                false
-              }
+              viewModel.saveChanges()
+              true
+            }
+            else -> {
+              false
             }
           }
         },

@@ -118,10 +118,11 @@ class VideoInfoDialogFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.InfoItem ->
-            old.title == (new as Item.InfoItem).title
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.InfoItem ->
+              old.title == (new as Item.InfoItem).title
+          }
       },
     ).apply {
       addItemType(

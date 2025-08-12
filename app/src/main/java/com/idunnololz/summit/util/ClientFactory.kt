@@ -33,10 +33,11 @@ class ClientFactory @Inject constructor(
 
   companion object {
     // https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome
-
-    private const val CHROME_VERSION = "137.0.0.0"
+    private const val CHROME_VERSION = "139.0.0.0"
     private const val SAFARI_VERSION = "537.36"
-    private const val FIREFOX_VERSION = "134.0"
+
+    // https://www.whatismybrowser.com/guides/the-latest-user-agent/firefox
+    private const val FIREFOX_VERSION = "141.0"
   }
 
   enum class Purpose {
@@ -51,7 +52,8 @@ class ClientFactory @Inject constructor(
       Purpose.LemmyApiClient -> "lac"
       Purpose.SummitApiClient -> "sac"
       Purpose.BrowserLike,
-      Purpose.BrowserLikeUnauthed, -> "bl"
+      Purpose.BrowserLikeUnauthed,
+      -> "bl"
     }
 
     if (purpose == Purpose.BrowserLike) {

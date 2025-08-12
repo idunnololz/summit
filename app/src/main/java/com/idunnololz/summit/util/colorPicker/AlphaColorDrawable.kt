@@ -16,7 +16,9 @@ import com.idunnololz.summit.util.Utils
  * Aside from the tiled background, it functions the same
  * as any ColorDrawable.
  */
-class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
+class AlphaColorDrawable(
+  @ColorInt color: Int,
+) : Drawable() {
   private val bitmapPaint: Paint
   private val paint: Paint
 
@@ -87,9 +89,7 @@ class AlphaColorDrawable(@ColorInt color: Int) : Drawable() {
   override fun setColorFilter(colorFilter: ColorFilter?) {
   }
 
-  override fun getOpacity(): Int {
-    return PixelFormat.TRANSLUCENT
-  }
+  override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
   companion object {
     var tile: Bitmap? = null

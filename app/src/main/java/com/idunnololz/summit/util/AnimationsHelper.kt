@@ -12,7 +12,9 @@ class AnimationsHelper @Inject constructor(
   private val preferences: Preferences,
   private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
-  enum class AnimationLevel(val animationLevel: Int) {
+  enum class AnimationLevel(
+    val animationLevel: Int,
+  ) {
     /**
      * Animations that are absolutely critical.
      */

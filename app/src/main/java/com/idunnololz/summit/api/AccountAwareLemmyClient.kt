@@ -159,30 +159,28 @@ class AccountAwareLemmyClient @Inject constructor(
     upvotedOnly: Boolean? = null,
     downvotedOnly: Boolean? = null,
     account: Account? = accountForInstance(),
-  ): Result<GetPostsResponse> {
-    return apiClient.fetchPosts(
-      account = account,
-      communityIdOrName = communityIdOrName,
-      sortType = sortType
-        ?: if (account == null) {
-          SortType.Active
-        } else {
-          SortType.entries[account.defaultSortType]
-        },
-      listingType = listingType
-        ?: if (account == null) {
-          ListingType.All
-        } else {
-          ListingType.entries[account.defaultListingType]
-        },
-      limit = limit,
-      page = page,
-      cursor = cursor,
-      upvotedOnly = upvotedOnly,
-      downvotedOnly = downvotedOnly,
-      force = force,
-    ).autoSignOut(account)
-  }
+  ): Result<GetPostsResponse> = apiClient.fetchPosts(
+    account = account,
+    communityIdOrName = communityIdOrName,
+    sortType = sortType
+      ?: if (account == null) {
+        SortType.Active
+      } else {
+        SortType.entries[account.defaultSortType]
+      },
+    listingType = listingType
+      ?: if (account == null) {
+        ListingType.All
+      } else {
+        ListingType.entries[account.defaultListingType]
+      },
+    limit = limit,
+    page = page,
+    cursor = cursor,
+    upvotedOnly = upvotedOnly,
+    downvotedOnly = downvotedOnly,
+    force = force,
+  ).autoSignOut(account)
 
   suspend fun fetchPostWithRetry(
     id: Either<PostId, CommentId>,
@@ -195,13 +193,11 @@ class AccountAwareLemmyClient @Inject constructor(
     postId: PostId,
     read: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<SuccessResponse> {
-    return if (account != null) {
-      apiClient.markPostAsRead(postId, read, account)
-        .autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+  ): Result<SuccessResponse> = if (account != null) {
+    apiClient.markPostAsRead(postId, read, account)
+      .autoSignOut(account)
+  } else {
+    createAccountErrorResult()
   }
 
   suspend fun fetchCommentsWithRetry(
@@ -351,13 +347,11 @@ class AccountAwareLemmyClient @Inject constructor(
     communityId: Int,
     subscribe: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<CommunityView> {
-    return if (account != null) {
-      apiClient.followCommunityWithRetry(communityId, subscribe, account)
-        .autoSignOut(account)
-    } else {
-      createAccountErrorResult()
-    }
+  ): Result<CommunityView> = if (account != null) {
+    apiClient.followCommunityWithRetry(communityId, subscribe, account)
+      .autoSignOut(account)
+  } else {
+    createAccountErrorResult()
   }
 
   suspend fun banUserFromCommunity(
@@ -495,13 +489,11 @@ class AccountAwareLemmyClient @Inject constructor(
     id: PostId,
     delete: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<PostView> {
-    return if (account == null) {
-      createAccountErrorResult()
-    } else {
-      apiClient.deletePost(account, id, delete)
-        .autoSignOut(account)
-    }
+  ): Result<PostView> = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.deletePost(account, id, delete)
+      .autoSignOut(account)
   }
 
   suspend fun featurePost(
@@ -509,26 +501,22 @@ class AccountAwareLemmyClient @Inject constructor(
     featured: Boolean,
     featureType: PostFeatureType,
     account: Account? = accountForInstance(),
-  ): Result<PostView> {
-    return if (account == null) {
-      createAccountErrorResult()
-    } else {
-      apiClient.featurePost(account, id, featured, featureType)
-        .autoSignOut(account)
-    }
+  ): Result<PostView> = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.featurePost(account, id, featured, featureType)
+      .autoSignOut(account)
   }
 
   suspend fun lockPost(
     id: PostId,
     locked: Boolean,
     account: Account? = accountForInstance(),
-  ): Result<PostView> {
-    return if (account == null) {
-      createAccountErrorResult()
-    } else {
-      apiClient.lockPost(account, id, locked)
-        .autoSignOut(account)
-    }
+  ): Result<PostView> = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.lockPost(account, id, locked)
+      .autoSignOut(account)
   }
 
   suspend fun removePost(
@@ -536,13 +524,11 @@ class AccountAwareLemmyClient @Inject constructor(
     remove: Boolean,
     reason: String?,
     account: Account? = accountForInstance(),
-  ): Result<PostView> {
-    return if (account == null) {
-      createAccountErrorResult()
-    } else {
-      apiClient.removePost(account, id, reason, remove)
-        .autoSignOut(account)
-    }
+  ): Result<PostView> = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.removePost(account, id, reason, remove)
+      .autoSignOut(account)
   }
 
   suspend fun createPost(
@@ -937,14 +923,13 @@ class AccountAwareLemmyClient @Inject constructor(
   suspend fun deleteMediaItem(
     deleteToken: String,
     filename: String,
-    account: Account? = accountForInstance()
-  ) =
-    if (account == null) {
-      createAccountErrorResult()
-    } else {
-      apiClient.deleteMediaItem(deleteToken, filename, account)
-        .autoSignOut(account)
-    }
+    account: Account? = accountForInstance(),
+  ) = if (account == null) {
+    createAccountErrorResult()
+  } else {
+    apiClient.deleteMediaItem(deleteToken, filename, account)
+      .autoSignOut(account)
+  }
 
   suspend fun banUserFromSite(
     personId: PersonId,

@@ -560,34 +560,35 @@ class PostListAdapter(
           val oldItem = oldItems[oldItemPosition]
           val newItem = newItems[newItemPosition]
 
-          return oldItem::class == newItem::class && when (oldItem) {
-            is PostListEngineItem.FooterItem -> true
-            is PostListEngineItem.PostItem ->
-              oldItem.fetchedPost.postView.getUniqueKey() ==
-                (newItem as PostListEngineItem.PostItem).fetchedPost.postView.getUniqueKey()
-            is PostListEngineItem.AutoLoadItem ->
-              oldItem.pageToLoad ==
-                (newItem as PostListEngineItem.AutoLoadItem).pageToLoad
+          return oldItem::class == newItem::class &&
+            when (oldItem) {
+              is PostListEngineItem.FooterItem -> true
+              is PostListEngineItem.PostItem ->
+                oldItem.fetchedPost.postView.getUniqueKey() ==
+                  (newItem as PostListEngineItem.PostItem).fetchedPost.postView.getUniqueKey()
+              is PostListEngineItem.AutoLoadItem ->
+                oldItem.pageToLoad ==
+                  (newItem as PostListEngineItem.AutoLoadItem).pageToLoad
 
-            PostListEngineItem.EndItem -> true
-            PostListEngineItem.FooterSpacerItem -> true
-            is PostListEngineItem.ErrorItem ->
-              oldItem.pageToLoad ==
-                (newItem as PostListEngineItem.ErrorItem).pageToLoad
+              PostListEngineItem.EndItem -> true
+              PostListEngineItem.FooterSpacerItem -> true
+              is PostListEngineItem.ErrorItem ->
+                oldItem.pageToLoad ==
+                  (newItem as PostListEngineItem.ErrorItem).pageToLoad
 
-            is PostListEngineItem.PersistentErrorItem ->
-              oldItem.exception == (newItem as PostListEngineItem.PersistentErrorItem).exception
+              is PostListEngineItem.PersistentErrorItem ->
+                oldItem.exception == (newItem as PostListEngineItem.PersistentErrorItem).exception
 
-            is PostListEngineItem.ManualLoadItem ->
-              oldItem.pageToLoad ==
-                (newItem as PostListEngineItem.ManualLoadItem).pageToLoad
+              is PostListEngineItem.ManualLoadItem ->
+                oldItem.pageToLoad ==
+                  (newItem as PostListEngineItem.ManualLoadItem).pageToLoad
 
-            is PostListEngineItem.PageTitle ->
-              oldItem.pageIndex ==
-                (newItem as PostListEngineItem.PageTitle).pageIndex
+              is PostListEngineItem.PageTitle ->
+                oldItem.pageIndex ==
+                  (newItem as PostListEngineItem.PageTitle).pageIndex
 
-            PostListEngineItem.HeaderItem -> true
-          }
+              PostListEngineItem.HeaderItem -> true
+            }
         }
 
         override fun getOldListSize(): Int = oldItems.size
@@ -601,13 +602,12 @@ class PostListAdapter(
           return oldItem == newItem
         }
 
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-          return if (animate) {
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? =
+          if (animate) {
             null
           } else {
             Unit
           }
-        }
       },
     )
     this.items = newItems

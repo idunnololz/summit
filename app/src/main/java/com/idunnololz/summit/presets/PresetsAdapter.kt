@@ -61,12 +61,13 @@ class PresetsAdapter(
   }
 
   private val adapterHelper = AdapterHelper<Item>({ old, new ->
-    old::class == new::class && when (old) {
-      Item.HeaderItem -> true
-      Item.FooterItem -> true
-      is Item.PresetItem ->
-        old.presetData.id == (new as Item.PresetItem).presetData.id
-    }
+    old::class == new::class &&
+      when (old) {
+        Item.HeaderItem -> true
+        Item.FooterItem -> true
+        is Item.PresetItem ->
+          old.presetData.id == (new as Item.PresetItem).presetData.id
+      }
   }).apply {
     addItemType(Item.HeaderItem::class, ItemPresetsHeaderBinding::inflate) { item, b, h ->
       b.shareAPreset.setOnClickListener {

@@ -14,6 +14,7 @@
         android:textAppearance="?textAppearanceTitleMedium"
         android:paddingVertical="@dimen/padding"
         android:drawablePadding="@dimen/padding"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/unread_count"
         app:layout_constraintStart_toStartOf="parent"

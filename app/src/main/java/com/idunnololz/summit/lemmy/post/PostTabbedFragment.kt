@@ -27,8 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PostTabbedFragment :
-  BaseFragment<TabbedFragmentPostBinding>() {
+class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
 
   private val args: PostTabbedFragmentArgs by navArgs()
 
@@ -152,33 +151,29 @@ class PostTabbedFragment :
     var items: List<Item> = listOf()
     private var nsfwMode: Boolean = false
 
-    override fun getItemId(position: Int): Long {
-      return when (val item = items[position]) {
-        is Item.PostItem -> item.id
-        is Item.AutoLoadItem -> item.id
-      }
+    override fun getItemId(position: Int): Long = when (val item = items[position]) {
+      is Item.PostItem -> item.id
+      is Item.AutoLoadItem -> item.id
     }
 
     override fun containsItem(itemId: Long): Boolean = items.any { it.id == itemId }
 
-    override fun createFragment(position: Int): Fragment {
-      return when (val item = items[position]) {
-        is Item.PostItem ->
-          PostFragment().apply {
-            arguments = PostFragmentArgs(
-              instance = item.instance,
-              id = item.fetchedPost.postView.post.id,
-              reveal = nsfwMode,
-              post = item.fetchedPost.postView,
-              jumpToComments = false,
-              currentCommunity = item.fetchedPost.postView.community.toCommunityRef(),
-              videoState = null,
-              accountId = item.fetchedPost.source.accountId ?: 0L,
-            ).toBundle()
-          }
-        is Item.AutoLoadItem ->
-          PostListLoadingPageFragment()
-      }
+    override fun createFragment(position: Int): Fragment = when (val item = items[position]) {
+      is Item.PostItem ->
+        PostFragment().apply {
+          arguments = PostFragmentArgs(
+            instance = item.instance,
+            id = item.fetchedPost.postView.post.id,
+            reveal = nsfwMode,
+            post = item.fetchedPost.postView,
+            jumpToComments = false,
+            currentCommunity = item.fetchedPost.postView.community.toCommunityRef(),
+            videoState = null,
+            accountId = item.fetchedPost.source.accountId ?: 0L,
+          ).toBundle()
+        }
+      is Item.AutoLoadItem ->
+        PostListLoadingPageFragment()
     }
 
     override fun getItemCount(): Int = items.size
@@ -221,29 +216,25 @@ class PostTabbedFragment :
 
       val diff = DiffUtil.calculateDiff(
         object : DiffUtil.Callback() {
-          override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition].id == newItems[newItemPosition].id
-          }
+          override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldItems[oldItemPosition].id == newItems[newItemPosition].id
 
           override fun getOldListSize(): Int = oldItems.size
 
           override fun getNewListSize(): Int = newItems.size
 
-          override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return true
-          }
+          override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            true
         },
       )
       this.items = newItems
       diff.dispatchUpdatesTo(this)
     }
 
-    fun findPageIndex(id: Long): Int {
-      return items.indexOfLast {
-        when (it) {
-          is Item.PostItem -> it.id == id
-          is Item.AutoLoadItem -> false
-        }
+    fun findPageIndex(id: Long): Int = items.indexOfLast {
+      when (it) {
+        is Item.PostItem -> it.id == id
+        is Item.AutoLoadItem -> false
       }
     }
 

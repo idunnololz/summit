@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Active,Hot,New,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled
  */
 
-enum class SortType(val value: kotlin.String) {
+enum class SortType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "Active")
   Active("Active"),

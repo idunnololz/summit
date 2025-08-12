@@ -29,7 +29,8 @@ class ListEngine<T> {
 
     val pages = pages.values.sortedBy { it.pageIndex }
 
-    if (pages.isEmpty() || pages.all {
+    if (pages.isEmpty() ||
+      pages.all {
         it.data.fold(
           onSuccess = { it.items.isEmpty() },
           onFailure = { false },
@@ -86,7 +87,7 @@ class ListEngine<T> {
         get() = _data!!
     }
 
-    class EmptyItem<T>() : Item<T>
+    class EmptyItem<T> : Item<T>
 
     data class LoadItem<T>(
       val pageIndex: Int = 0,

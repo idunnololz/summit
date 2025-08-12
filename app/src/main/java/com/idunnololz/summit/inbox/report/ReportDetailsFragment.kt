@@ -26,6 +26,11 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentReportDetailsBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.InboxItem
+import com.idunnololz.summit.inbox.InboxTabbedFragment
+import com.idunnololz.summit.inbox.ReportItem
+import com.idunnololz.summit.inbox.inbox.InboxViewModel
+import com.idunnololz.summit.inbox.message.ContextFetcher
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATION
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -35,11 +40,6 @@ import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.getAccountAgeString
-import com.idunnololz.summit.inbox.InboxItem
-import com.idunnololz.summit.inbox.InboxTabbedFragment
-import com.idunnololz.summit.inbox.ReportItem
-import com.idunnololz.summit.inbox.inbox.InboxViewModel
-import com.idunnololz.summit.inbox.message.ContextFetcher
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
@@ -572,7 +572,8 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
                 val s = length
                 append(
                   context.getString(
-                    R.string.new_account_desc_format, tsToConcise(context, person.published),
+                    R.string.new_account_desc_format,
+                    tsToConcise(context, person.published),
                   ),
                 )
                 val e = length

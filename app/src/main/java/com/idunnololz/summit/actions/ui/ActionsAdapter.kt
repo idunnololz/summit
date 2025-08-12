@@ -49,12 +49,13 @@ class ActionsAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.ActionItem ->
-          old.action.id == (new as Item.ActionItem).action.id
+      old::class == new::class &&
+        when (old) {
+          is Item.ActionItem ->
+            old.action.id == (new as Item.ActionItem).action.id
 
-        Item.EmptyItem -> true
-      }
+          Item.EmptyItem -> true
+        }
     },
   ).apply {
     addItemType(Item.ActionItem::class, PendingActionItemBinding::inflate) { item, b, h ->

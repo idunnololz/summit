@@ -77,7 +77,7 @@ class ScreenshotSettingsDialogFragment :
             }
             else ->
               0
-          }
+          },
         )
       }
 

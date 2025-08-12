@@ -22,8 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsCacheFragment :
-  BaseSettingsFragment() {
+class SettingsCacheFragment : BaseSettingsFragment() {
 
   private val viewModel: SettingsCacheViewModel by viewModels()
 

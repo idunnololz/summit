@@ -18,7 +18,10 @@ import com.idunnololz.summit.util.colorPicker.utils.ColorPickerContainer
 import java.util.Locale
 
 abstract class PickerView :
-  LinearLayout, OnColorPickedListener, ColorPicker, ColorPickerContainer {
+  LinearLayout,
+  OnColorPickedListener,
+  ColorPicker,
+  ColorPickerContainer {
   private var listener: OnColorPickedListener? = null
 
   private var alphaInt: TextView? = null

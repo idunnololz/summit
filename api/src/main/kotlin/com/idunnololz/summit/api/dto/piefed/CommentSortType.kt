@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Hot,Top,New,Old
  */
 
-enum class CommentSortType(val value: kotlin.String) {
+enum class CommentSortType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "Hot")
   Hot("Hot"),

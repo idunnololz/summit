@@ -159,6 +159,7 @@ class PostListViewBuilder @Inject constructor(
   private var postVerticalMarginDp: Float? = postUiConfig.verticalMarginDp
   private var singleTapToViewImage: Boolean = preferences.postListViewImageOnSingleTap
   private var contentMaxLines: Int = postUiConfig.contentMaxLines
+  private var contentMaxHeightDp: Int = postUiConfig.contentMaxHeightDp
   private var showUpAndDownVotes: Boolean = preferences.postShowUpAndDownVotes
   private var displayInstanceStyle = preferences.displayInstanceStyle
   private var leftHandMode: Boolean = preferences.leftHandMode
@@ -208,6 +209,7 @@ class PostListViewBuilder @Inject constructor(
     lemmyContentHelper.config = postUiConfig.fullContentConfig
     textSizeMultiplier = postUiConfig.textSizeMultiplier
     contentMaxLines = postUiConfig.contentMaxLines
+    contentMaxHeightDp = postUiConfig.contentMaxHeightDp
     dimReadPosts = postUiConfig.dimReadPosts
     postHorizontalMarginDp = postUiConfig.horizontalMarginDp
     postVerticalMarginDp = postUiConfig.verticalMarginDp
@@ -460,21 +462,21 @@ class PostListViewBuilder @Inject constructor(
               rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceTitleMedium,
-                )
+                ),
               )
             }
             is ListingItemListWithCardsBinding -> {
               rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceTitleMedium,
-                )
+                ),
               )
             }
             is ListingItemCompactBinding -> {
               rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceTitleMedium,
-                )
+                ),
               )
             }
           }
@@ -484,21 +486,21 @@ class PostListViewBuilder @Inject constructor(
               rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceBodyMedium,
-                )
+                ),
               )
             }
             is ListingItemListWithCardsBinding -> {
               rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceBodyMedium,
-                )
+                ),
               )
             }
             is ListingItemCompactBinding -> {
               rb.title.setTextAppearanceCompat(
                 context.getResIdFromAttribute(
                   com.google.android.material.R.attr.textAppearanceBodyMedium,
-                )
+                ),
               )
             }
           }
@@ -1155,6 +1157,7 @@ class PostListViewBuilder @Inject constructor(
             rootView = itemView,
             fullContentContainerView = fullContentContainerView,
             contentMaxLines = contentMaxLines,
+            contentMaxHeightDp = contentMaxHeightDp,
             autoPlayVideos = autoPlayVideos,
             onFullImageViewClickListener = { v, url ->
               onImageClick(accountId, postView, v, url)

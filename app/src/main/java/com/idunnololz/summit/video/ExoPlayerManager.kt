@@ -72,8 +72,8 @@ class ExoPlayerManagerManager @Inject constructor(
       .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
   }
 
-  fun get(lifecycleOwner: LifecycleOwner): ExoPlayerManager {
-    return managersMap[lifecycleOwner] ?: ExoPlayerManager(
+  fun get(lifecycleOwner: LifecycleOwner): ExoPlayerManager =
+    managersMap[lifecycleOwner] ?: ExoPlayerManager(
       context,
       globalStateStorage,
       players,
@@ -103,7 +103,6 @@ class ExoPlayerManagerManager @Inject constructor(
         },
       )
     }
-  }
 
   fun destroyAll() {
     Log.d(TAG, "destroyAll()")

@@ -6,8 +6,10 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.idunnololz.summit.MainApplication
 
-class NotificationsWorker(context: Context, workerParams: WorkerParameters) :
-  Worker(context, workerParams) {
+class NotificationsWorker(
+  context: Context,
+  workerParams: WorkerParameters,
+) : Worker(context, workerParams) {
 
   companion object {
     private const val TAG = "NotificationsWorker"

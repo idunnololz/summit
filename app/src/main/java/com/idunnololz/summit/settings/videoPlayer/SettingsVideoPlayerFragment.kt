@@ -10,8 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsVideoPlayerFragment :
-  BaseSettingsFragment() {
+class SettingsVideoPlayerFragment : BaseSettingsFragment() {
 
   @Inject
   override lateinit var settings: VideoPlayerSettings

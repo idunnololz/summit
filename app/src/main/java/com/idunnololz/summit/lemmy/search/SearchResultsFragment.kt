@@ -224,7 +224,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             post,
             jumpToComments,
             reveal,
-            videoState, ->
+            videoState,
+          ->
 
           parentFragment.slidingPaneController?.openPost(
             instance = instance,
@@ -403,27 +404,28 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
 
     val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.AutoLoadItem ->
-            old.pageToLoad == (new as Item.AutoLoadItem).pageToLoad
-          is Item.CommentItem ->
-            old.commentView.comment.id ==
-              (new as Item.CommentItem).commentView.comment.id
-          is Item.CommunityItem ->
-            old.communityView.community.id ==
-              (new as Item.CommunityItem).communityView.community.id
-          is Item.PostItem ->
-            old.fetchedPost.postView.post.id ==
-              (new as Item.PostItem).fetchedPost.postView.post.id
-          is Item.UserItem ->
-            old.personView.person.id ==
-              (new as Item.UserItem).personView.person.id
-          is Item.ErrorItem ->
-            old.pageToLoad == (new as Item.ErrorItem).pageToLoad
-          Item.EndItem,
-          Item.FooterSpacerItem,
-          -> true
-        }
+        old::class == new::class &&
+          when (old) {
+            is Item.AutoLoadItem ->
+              old.pageToLoad == (new as Item.AutoLoadItem).pageToLoad
+            is Item.CommentItem ->
+              old.commentView.comment.id ==
+                (new as Item.CommentItem).commentView.comment.id
+            is Item.CommunityItem ->
+              old.communityView.community.id ==
+                (new as Item.CommunityItem).communityView.community.id
+            is Item.PostItem ->
+              old.fetchedPost.postView.post.id ==
+                (new as Item.PostItem).fetchedPost.postView.post.id
+            is Item.UserItem ->
+              old.personView.person.id ==
+                (new as Item.UserItem).personView.person.id
+            is Item.ErrorItem ->
+              old.pageToLoad == (new as Item.ErrorItem).pageToLoad
+            Item.EndItem,
+            Item.FooterSpacerItem,
+            -> true
+          }
       },
     ).apply {
 

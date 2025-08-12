@@ -14,8 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsGesturesFragment :
-  BaseSettingsFragment() {
+class SettingsGesturesFragment : BaseSettingsFragment() {
 
   @Inject
   lateinit var postAndCommentViewBuilder: PostAndCommentViewBuilder

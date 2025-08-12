@@ -28,6 +28,7 @@ import com.idunnololz.summit.lemmy.utils.listSource.onSuccess
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -38,7 +39,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -469,7 +469,9 @@ class InboxViewModel @Inject constructor(
             continue
           }
           allInboxItems[index] = data.copy(
-            item = data.item.updateIsRead(isRead = isRead) as InboxItem.RegistrationApplicationInboxItem,
+            item = data.item.updateIsRead(
+              isRead = isRead,
+            ) as InboxItem.RegistrationApplicationInboxItem,
           )
         }
       }
@@ -613,8 +615,7 @@ class InboxViewModel @Inject constructor(
   }
 }
 
-private fun PageResult.SuccessPageResult<LiteInboxItem>.toInboxItemResult(
-): PageResult.SuccessPageResult<InboxItem> =
+private fun PageResult.SuccessPageResult<LiteInboxItem>.toInboxItemResult(): PageResult.SuccessPageResult<InboxItem> =
   PageResult.SuccessPageResult(
     pageIndex = pageIndex,
     items = items.filterIsInstance<InboxItem>(),

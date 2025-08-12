@@ -631,7 +631,9 @@ class CropImageView @JvmOverloads constructor(
     if (originalBitmap != null) {
       val newReqWidth = if (options != RequestSizeOptions.NONE) reqWidth else 0
       val newReqHeight = if (options != RequestSizeOptions.NONE) reqHeight else 0
-      val croppedBitmap = if (imageUri != null && (loadedSampleSize > 1 || options == RequestSizeOptions.SAMPLING)) {
+      val croppedBitmap = if (imageUri != null &&
+        (loadedSampleSize > 1 || options == RequestSizeOptions.SAMPLING)
+      ) {
         BitmapUtils.cropBitmap(
           context = context,
           loadedImageUri = imageUri,
@@ -874,7 +876,10 @@ class CropImageView @JvmOverloads constructor(
       halfHeight *= change.toFloat()
       // calculate the new crop window rectangle to center in the same location and have proper
       // width/height
-      BitmapUtils.RECT[BitmapUtils.POINTS2[0] - halfWidth, BitmapUtils.POINTS2[1] - halfHeight, BitmapUtils.POINTS2[0] + halfWidth] =
+      BitmapUtils.RECT[
+        BitmapUtils.POINTS2[0] - halfWidth, BitmapUtils.POINTS2[1] - halfHeight, BitmapUtils.POINTS2[0] +
+          halfWidth,
+      ] =
         BitmapUtils.POINTS2[1] + halfHeight
       mCropOverlayView.resetCropOverlayView()
       mCropOverlayView.cropWindowRect = BitmapUtils.RECT
@@ -1179,7 +1184,11 @@ class CropImageView @JvmOverloads constructor(
   public override fun onRestoreInstanceState(state: Parcelable) {
     if (state is Bundle) {
       // prevent restoring state if already set by outside code
-      if (bitmapLoadingWorkerJob == null && imageUri == null && originalBitmap == null && mImageResource == 0) {
+      if (bitmapLoadingWorkerJob == null &&
+        imageUri == null &&
+        originalBitmap == null &&
+        mImageResource == 0
+      ) {
         var uri = state.parcelable<Uri>("LOADED_IMAGE_URI")
         if (uri != null) {
           val key = state.getString("LOADED_IMAGE_STATE_BITMAP_KEY")
@@ -1350,7 +1359,11 @@ class CropImageView @JvmOverloads constructor(
     if (originalBitmap != null && width > 0 && height > 0) {
       val cropRect = mCropOverlayView!!.cropWindowRect
       if (inProgress) {
-        if (cropRect.left < 0 || cropRect.top < 0 || cropRect.right > width || cropRect.bottom > height) {
+        if (cropRect.left < 0 ||
+          cropRect.top < 0 ||
+          cropRect.right > width ||
+          cropRect.bottom > height
+        ) {
           applyImageMatrix(
             width = width.toFloat(),
             height = height.toFloat(),
@@ -1361,7 +1374,10 @@ class CropImageView @JvmOverloads constructor(
       } else if (mAutoZoomEnabled || mZoom > 1) {
         var newZoom = 0f
         // keep the cropping window covered area to 50%-65% of zoomed sub-area
-        if (mZoom < mMaxZoom && cropRect.width() < width * 0.5f && cropRect.height() < height * 0.5f) {
+        if (mZoom < mMaxZoom &&
+          cropRect.width() < width * 0.5f &&
+          cropRect.height() < height * 0.5f
+        ) {
           newZoom = min(
             mMaxZoom.toFloat(),
             min(
@@ -1433,8 +1449,11 @@ class CropImageView @JvmOverloads constructor(
         width / BitmapUtils.getRectWidth(mImagePoints),
         height / BitmapUtils.getRectHeight(mImagePoints),
       )
-      if (mScaleType == ScaleType.FIT_CENTER || mScaleType == ScaleType.CENTER_INSIDE && scale < 1 ||
-        scale > 1 && mAutoZoomEnabled
+      if (mScaleType == ScaleType.FIT_CENTER ||
+        mScaleType == ScaleType.CENTER_INSIDE &&
+        scale < 1 ||
+        scale > 1 &&
+        mAutoZoomEnabled
       ) {
         mImageMatrix.postScale(
           scale,
@@ -1570,7 +1589,8 @@ class CropImageView @JvmOverloads constructor(
     val visible = (
       mShowProgressBar &&
         (
-          originalBitmap == null && bitmapLoadingWorkerJob != null ||
+          originalBitmap == null &&
+            bitmapLoadingWorkerJob != null ||
             bitmapCroppingWorkerJob != null
           )
       )
@@ -1803,7 +1823,9 @@ class CropImageView @JvmOverloads constructor(
      */
     fun getBitmap(context: Context): Bitmap? = bitmap ?: try {
       when {
-        SDK_INT >= 28 -> ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uriContent!!))
+        SDK_INT >= 28 -> ImageDecoder.decodeBitmap(
+          ImageDecoder.createSource(context.contentResolver, uriContent!!),
+        )
         else ->
           @Suppress("DEPRECATION")
           MediaStore.Images.Media.getBitmap(context.contentResolver, uriContent)
@@ -1852,61 +1874,187 @@ class CropImageView @JvmOverloads constructor(
   }
 
   init {
-    val options = (context as? Activity)?.intent?.getBundleExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE)?.parcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS)
-      ?: if (attrs != null) {
-        val a = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0)
-        val default = CropImageOptions()
-        try {
-          @Suppress("DEPRECATION")
-          isSaveBitmapToInstanceState = a.getBoolean(R.styleable.CropImageView_cropSaveBitmapToInstanceState, isSaveBitmapToInstanceState)
+    val options =
+      (context as? Activity)?.intent?.getBundleExtra(
+        CropImage.CROP_IMAGE_EXTRA_BUNDLE,
+      )?.parcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS)
+        ?: if (attrs != null) {
+          val a = context.obtainStyledAttributes(attrs, R.styleable.CropImageView, 0, 0)
+          val default = CropImageOptions()
+          try {
+            @Suppress("DEPRECATION")
+            isSaveBitmapToInstanceState =
+              a.getBoolean(
+                R.styleable.CropImageView_cropSaveBitmapToInstanceState,
+                isSaveBitmapToInstanceState,
+              )
 
-          CropImageOptions(
-            scaleType = ScaleType.entries[a.getInt(R.styleable.CropImageView_cropScaleType, default.scaleType.ordinal)],
-            cropShape = CropShape.entries[a.getInt(R.styleable.CropImageView_cropShape, default.cropShape.ordinal)],
-            cornerShape = CropCornerShape.entries[a.getInt(R.styleable.CropImageView_cornerShape, default.cornerShape.ordinal)],
-            guidelines = Guidelines.entries[a.getInt(R.styleable.CropImageView_cropGuidelines, default.guidelines.ordinal)],
-            aspectRatioX = a.getInteger(R.styleable.CropImageView_cropAspectRatioX, default.aspectRatioX),
-            aspectRatioY = a.getInteger(R.styleable.CropImageView_cropAspectRatioY, default.aspectRatioY),
-            autoZoomEnabled = a.getBoolean(R.styleable.CropImageView_cropAutoZoomEnabled, default.autoZoomEnabled),
-            multiTouchEnabled = a.getBoolean(R.styleable.CropImageView_cropMultiTouchEnabled, default.multiTouchEnabled),
-            centerMoveEnabled = a.getBoolean(R.styleable.CropImageView_cropCenterMoveEnabled, default.centerMoveEnabled),
-            cropCornerRadius = a.getDimension(R.styleable.CropImageView_cropCornerRadius, default.cropCornerRadius),
-            snapRadius = a.getDimension(R.styleable.CropImageView_cropSnapRadius, default.snapRadius),
-            touchRadius = a.getDimension(R.styleable.CropImageView_cropTouchRadius, default.touchRadius),
-            initialCropWindowPaddingRatio = a.getFloat(R.styleable.CropImageView_cropInitialCropWindowPaddingRatio, default.initialCropWindowPaddingRatio),
-            circleCornerFillColorHexValue = a.getInteger(R.styleable.CropImageView_cropCornerCircleFillColor, default.circleCornerFillColorHexValue),
-            borderLineThickness = a.getDimension(R.styleable.CropImageView_cropBorderLineThickness, default.borderLineThickness),
-            borderLineColor = a.getInteger(R.styleable.CropImageView_cropBorderLineColor, default.borderLineColor),
-            borderCornerThickness = a.getDimension(R.styleable.CropImageView_cropBorderCornerThickness, default.borderCornerThickness),
-            borderCornerOffset = a.getDimension(R.styleable.CropImageView_cropBorderCornerOffset, default.borderCornerOffset),
-            borderCornerLength = a.getDimension(R.styleable.CropImageView_cropBorderCornerLength, default.borderCornerLength),
-            borderCornerColor = a.getInteger(R.styleable.CropImageView_cropBorderCornerColor, default.borderCornerColor),
-            guidelinesThickness = a.getDimension(R.styleable.CropImageView_cropGuidelinesThickness, default.guidelinesThickness),
-            guidelinesColor = a.getInteger(R.styleable.CropImageView_cropGuidelinesColor, default.guidelinesColor),
-            backgroundColor = a.getInteger(R.styleable.CropImageView_cropBackgroundColor, default.backgroundColor),
-            minCropWindowWidth = a.getDimension(R.styleable.CropImageView_cropMinCropWindowWidth, default.minCropWindowWidth.toFloat()).toInt(),
-            minCropWindowHeight = a.getDimension(R.styleable.CropImageView_cropMinCropWindowHeight, default.minCropWindowHeight.toFloat()).toInt(),
-            minCropResultWidth = a.getFloat(R.styleable.CropImageView_cropMinCropResultWidthPX, default.minCropResultWidth.toFloat()).toInt(),
-            minCropResultHeight = a.getFloat(R.styleable.CropImageView_cropMinCropResultHeightPX, default.minCropResultHeight.toFloat()).toInt(),
-            maxCropResultWidth = a.getFloat(R.styleable.CropImageView_cropMaxCropResultWidthPX, default.maxCropResultWidth.toFloat()).toInt(),
-            maxCropResultHeight = a.getFloat(R.styleable.CropImageView_cropMaxCropResultHeightPX, default.maxCropResultHeight.toFloat()).toInt(),
-            flipHorizontally = a.getBoolean(R.styleable.CropImageView_cropFlipHorizontally, default.flipHorizontally),
-            flipVertically = a.getBoolean(R.styleable.CropImageView_cropFlipHorizontally, default.flipVertically),
-            cropperLabelTextSize = a.getDimension(R.styleable.CropImageView_cropperLabelTextSize, default.cropperLabelTextSize),
-            cropperLabelTextColor = a.getInteger(R.styleable.CropImageView_cropperLabelTextColor, default.cropperLabelTextColor),
-            showCropLabel = a.getBoolean(R.styleable.CropImageView_cropShowLabel, default.showCropLabel),
-            maxZoom = a.getInteger(R.styleable.CropImageView_cropMaxZoom, default.maxZoom),
-            showCropOverlay = a.getBoolean(R.styleable.CropImageView_cropShowCropOverlay, default.showCropOverlay),
-            showProgressBar = a.getBoolean(R.styleable.CropImageView_cropShowProgressBar, default.showProgressBar),
-            cropperLabelText = a.getString(R.styleable.CropImageView_cropperLabelText),
-            fixAspectRatio = a.getBoolean(R.styleable.CropImageView_cropFixAspectRatio, default.fixAspectRatio) || a.hasValue(R.styleable.CropImageView_cropAspectRatioX) && a.hasValue(R.styleable.CropImageView_cropAspectRatioX),
-          )
-        } finally {
-          a.recycle()
+            CropImageOptions(
+              scaleType = ScaleType.entries[
+                a.getInt(
+                  R.styleable.CropImageView_cropScaleType,
+                  default.scaleType.ordinal,
+                ),
+              ],
+              cropShape = CropShape.entries[
+                a.getInt(
+                  R.styleable.CropImageView_cropShape,
+                  default.cropShape.ordinal,
+                ),
+              ],
+              cornerShape = CropCornerShape.entries[
+                a.getInt(
+                  R.styleable.CropImageView_cornerShape,
+                  default.cornerShape.ordinal,
+                ),
+              ],
+              guidelines = Guidelines.entries[
+                a.getInt(
+                  R.styleable.CropImageView_cropGuidelines,
+                  default.guidelines.ordinal,
+                ),
+              ],
+              aspectRatioX = a.getInteger(
+                R.styleable.CropImageView_cropAspectRatioX,
+                default.aspectRatioX,
+              ),
+              aspectRatioY = a.getInteger(
+                R.styleable.CropImageView_cropAspectRatioY,
+                default.aspectRatioY,
+              ),
+              autoZoomEnabled = a.getBoolean(
+                R.styleable.CropImageView_cropAutoZoomEnabled,
+                default.autoZoomEnabled,
+              ),
+              multiTouchEnabled = a.getBoolean(
+                R.styleable.CropImageView_cropMultiTouchEnabled,
+                default.multiTouchEnabled,
+              ),
+              centerMoveEnabled = a.getBoolean(
+                R.styleable.CropImageView_cropCenterMoveEnabled,
+                default.centerMoveEnabled,
+              ),
+              cropCornerRadius = a.getDimension(
+                R.styleable.CropImageView_cropCornerRadius,
+                default.cropCornerRadius,
+              ),
+              snapRadius = a.getDimension(
+                R.styleable.CropImageView_cropSnapRadius,
+                default.snapRadius,
+              ),
+              touchRadius = a.getDimension(
+                R.styleable.CropImageView_cropTouchRadius,
+                default.touchRadius,
+              ),
+              initialCropWindowPaddingRatio = a.getFloat(
+                R.styleable.CropImageView_cropInitialCropWindowPaddingRatio,
+                default.initialCropWindowPaddingRatio,
+              ),
+              circleCornerFillColorHexValue = a.getInteger(
+                R.styleable.CropImageView_cropCornerCircleFillColor,
+                default.circleCornerFillColorHexValue,
+              ),
+              borderLineThickness = a.getDimension(
+                R.styleable.CropImageView_cropBorderLineThickness,
+                default.borderLineThickness,
+              ),
+              borderLineColor = a.getInteger(
+                R.styleable.CropImageView_cropBorderLineColor,
+                default.borderLineColor,
+              ),
+              borderCornerThickness = a.getDimension(
+                R.styleable.CropImageView_cropBorderCornerThickness,
+                default.borderCornerThickness,
+              ),
+              borderCornerOffset = a.getDimension(
+                R.styleable.CropImageView_cropBorderCornerOffset,
+                default.borderCornerOffset,
+              ),
+              borderCornerLength = a.getDimension(
+                R.styleable.CropImageView_cropBorderCornerLength,
+                default.borderCornerLength,
+              ),
+              borderCornerColor = a.getInteger(
+                R.styleable.CropImageView_cropBorderCornerColor,
+                default.borderCornerColor,
+              ),
+              guidelinesThickness = a.getDimension(
+                R.styleable.CropImageView_cropGuidelinesThickness,
+                default.guidelinesThickness,
+              ),
+              guidelinesColor = a.getInteger(
+                R.styleable.CropImageView_cropGuidelinesColor,
+                default.guidelinesColor,
+              ),
+              backgroundColor = a.getInteger(
+                R.styleable.CropImageView_cropBackgroundColor,
+                default.backgroundColor,
+              ),
+              minCropWindowWidth = a.getDimension(
+                R.styleable.CropImageView_cropMinCropWindowWidth,
+                default.minCropWindowWidth.toFloat(),
+              ).toInt(),
+              minCropWindowHeight = a.getDimension(
+                R.styleable.CropImageView_cropMinCropWindowHeight,
+                default.minCropWindowHeight.toFloat(),
+              ).toInt(),
+              minCropResultWidth = a.getFloat(
+                R.styleable.CropImageView_cropMinCropResultWidthPX,
+                default.minCropResultWidth.toFloat(),
+              ).toInt(),
+              minCropResultHeight = a.getFloat(
+                R.styleable.CropImageView_cropMinCropResultHeightPX,
+                default.minCropResultHeight.toFloat(),
+              ).toInt(),
+              maxCropResultWidth = a.getFloat(
+                R.styleable.CropImageView_cropMaxCropResultWidthPX,
+                default.maxCropResultWidth.toFloat(),
+              ).toInt(),
+              maxCropResultHeight = a.getFloat(
+                R.styleable.CropImageView_cropMaxCropResultHeightPX,
+                default.maxCropResultHeight.toFloat(),
+              ).toInt(),
+              flipHorizontally = a.getBoolean(
+                R.styleable.CropImageView_cropFlipHorizontally,
+                default.flipHorizontally,
+              ),
+              flipVertically = a.getBoolean(
+                R.styleable.CropImageView_cropFlipHorizontally,
+                default.flipVertically,
+              ),
+              cropperLabelTextSize = a.getDimension(
+                R.styleable.CropImageView_cropperLabelTextSize,
+                default.cropperLabelTextSize,
+              ),
+              cropperLabelTextColor = a.getInteger(
+                R.styleable.CropImageView_cropperLabelTextColor,
+                default.cropperLabelTextColor,
+              ),
+              showCropLabel = a.getBoolean(
+                R.styleable.CropImageView_cropShowLabel,
+                default.showCropLabel,
+              ),
+              maxZoom = a.getInteger(R.styleable.CropImageView_cropMaxZoom, default.maxZoom),
+              showCropOverlay = a.getBoolean(
+                R.styleable.CropImageView_cropShowCropOverlay,
+                default.showCropOverlay,
+              ),
+              showProgressBar = a.getBoolean(
+                R.styleable.CropImageView_cropShowProgressBar,
+                default.showProgressBar,
+              ),
+              cropperLabelText = a.getString(R.styleable.CropImageView_cropperLabelText),
+              fixAspectRatio =
+              a.getBoolean(R.styleable.CropImageView_cropFixAspectRatio, default.fixAspectRatio) ||
+                a.hasValue(R.styleable.CropImageView_cropAspectRatioX) &&
+                a.hasValue(R.styleable.CropImageView_cropAspectRatioX),
+            )
+          } finally {
+            a.recycle()
+          }
+        } else {
+          CropImageOptions()
         }
-      } else {
-        CropImageOptions()
-      }
 
     mScaleType = options.scaleType
     mAutoZoomEnabled = options.autoZoomEnabled

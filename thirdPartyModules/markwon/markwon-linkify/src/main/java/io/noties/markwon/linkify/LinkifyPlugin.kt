@@ -46,7 +46,9 @@ class LinkifyPlugin internal constructor(
     )
   }
 
-  private open class LinkifyTextAddedListener(private val mask: Int) : OnTextAddedListener {
+  private open class LinkifyTextAddedListener(
+    private val mask: Int,
+  ) : OnTextAddedListener {
     override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
       // @since 4.2.0 obtain span factory for links
       //  we will be using the link that is used by markdown (instead of directly applying URLSpan)
@@ -82,16 +84,16 @@ class LinkifyPlugin internal constructor(
       }
     }
 
-    protected open fun addLinks(text: Spannable, @LinkifyCompat.LinkifyMask mask: Int): Boolean {
-      return Linkify.addLinks(text, mask)
-    }
+    protected open fun addLinks(text: Spannable, @LinkifyCompat.LinkifyMask mask: Int): Boolean =
+      Linkify.addLinks(text, mask)
   }
 
   // @since 4.3.0
-  private class LinkifyCompatTextAddedListener(mask: Int) : LinkifyTextAddedListener(mask) {
-    override fun addLinks(text: Spannable, @LinkifyCompat.LinkifyMask mask: Int): Boolean {
-      return BetterLinkify.addLinks(text, mask)
-    }
+  private class LinkifyCompatTextAddedListener(
+    mask: Int,
+  ) : LinkifyTextAddedListener(mask) {
+    override fun addLinks(text: Spannable, @LinkifyCompat.LinkifyMask mask: Int): Boolean =
+      BetterLinkify.addLinks(text, mask)
   }
 
   companion object {
@@ -102,16 +104,12 @@ class LinkifyPlugin internal constructor(
      * @since 4.3.0 `useCompat` argument
      */
     @JvmOverloads
-    fun create(useCompat: Boolean = false): LinkifyPlugin {
-      return create(
-        Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS or Linkify.WEB_URLS,
-        useCompat,
-      )
-    }
+    fun create(useCompat: Boolean = false): LinkifyPlugin = create(
+      Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS or Linkify.WEB_URLS,
+      useCompat,
+    )
 
-    fun create(@LinkifyMask mask: Int): LinkifyPlugin {
-      return LinkifyPlugin(mask, false)
-    }
+    fun create(@LinkifyMask mask: Int): LinkifyPlugin = LinkifyPlugin(mask, false)
 
     /**
      * @param useCompat If true, use [LinkifyCompat] to handle links.
@@ -119,8 +117,7 @@ class LinkifyPlugin internal constructor(
      * the dependency must be added on a client side explicitly.
      * @since 4.3.0 `useCompat` argument
      */
-    fun create(@LinkifyMask mask: Int, useCompat: Boolean): LinkifyPlugin {
-      return LinkifyPlugin(mask, useCompat)
-    }
+    fun create(@LinkifyMask mask: Int, useCompat: Boolean): LinkifyPlugin =
+      LinkifyPlugin(mask, useCompat)
   }
 }

@@ -199,8 +199,10 @@ object AsyncDrawableSchedulerFixed {
     }
   }
 
-  private class TextViewInvalidator(private val textView: TextView) :
-    DrawableCallbackImpl.Invalidator, Runnable {
+  private class TextViewInvalidator(
+    private val textView: TextView,
+  ) : DrawableCallbackImpl.Invalidator,
+    Runnable {
     override fun invalidate() {
       textView.removeCallbacks(this)
       textView.post(this)
@@ -214,8 +216,8 @@ object AsyncDrawableSchedulerFixed {
   private class TableRowTextViewInvalidator(
     private val tableRowSpan: TableRowSpan,
     private val textView: TextView,
-  ) :
-    DrawableCallbackImpl.Invalidator, Runnable {
+  ) : DrawableCallbackImpl.Invalidator,
+    Runnable {
     override fun invalidate() {
       textView.removeCallbacks(this)
       textView.post(this)

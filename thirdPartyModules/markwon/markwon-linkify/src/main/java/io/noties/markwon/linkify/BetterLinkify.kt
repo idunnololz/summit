@@ -6,8 +6,11 @@ import android.text.style.URLSpan
 import android.text.util.Linkify
 import androidx.core.text.util.LinkifyCompat
 import java.util.Collections
+import java.util.EnumSet
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import org.nibor.autolink.LinkExtractor
+import org.nibor.autolink.LinkType
 
 object BetterLinkify {
   /**
@@ -359,6 +362,10 @@ object BetterLinkify {
       WORD_BOUNDARY + ")",
   )
 
+  private val extractor = LinkExtractor.builder()
+    .linkTypes(EnumSet.of(LinkType.URL, LinkType.WWW)) // limit to URLs
+    .build()
+
   class LinkSpec internal constructor() {
     var frameworkAddedSpan: URLSpan? = null
     var url: String? = null
@@ -395,14 +402,28 @@ object BetterLinkify {
     val links = ArrayList<LinkSpec>()
 
     if ((mask and Linkify.WEB_URLS) != 0) {
-      gatherLinks(
-        links,
-        text,
-        AUTOLINK_WEB_URL,
-        arrayOf<String>("http://", "https://", "rtsp://"),
-        Linkify.sUrlMatchFilter,
-        null,
-      )
+      for (span in extractor.extractLinks(text)) {
+        val link = text.substring(span.beginIndex, span.endIndex)
+
+        val spec = LinkSpec()
+        spec.url = if (link.startsWith("www", ignoreCase = true)) {
+          "https://$link"
+        } else {
+          link
+        }
+        spec.start = span.beginIndex
+        spec.end = span.endIndex
+
+        links.add(spec)
+      }
+//      gatherLinks(
+//        links,
+//        text,
+//        SKETCHY_LINK_FUZZY_PATTERN,
+//        arrayOf<String>("http://", "https://", "rtsp://"),
+//        Linkify.sUrlMatchFilter,
+//        null,
+//      )
     }
 
     if ((mask and Linkify.EMAIL_ADDRESSES) != 0) {
@@ -453,20 +474,19 @@ object BetterLinkify {
       val match = m.group(0)
 
       if ((matchFilter == null || matchFilter.acceptMatch(s, start, end)) && match != null) {
-        val cleanedMatch = match.trimEnd {
-          it == '.' ||
-            it == ',' ||
-            it == ';' ||
-            it == ':' ||
-            it == '!' ||
-            it == '?' ||
-            it == ')' ||
-            it == ']' ||
-            it == '}' ||
-            it == '\'' ||
-            it == '"' ||
-            it == '»'
-        }
+        val cleanedMatch = match
+//          .trimEnd {
+//            it == '.' ||
+//              it == ',' ||
+//              it == ';' ||
+//              it == ':' ||
+//              it == '!' ||
+//              it == '?' ||
+//              it == '}' ||
+//              it == '\'' ||
+//              it == '"' ||
+//              it == '»'
+//          }
 
         val spec = LinkSpec()
         spec.url = makeUrl(cleanedMatch, schemes, m, transformFilter)

@@ -23,16 +23,17 @@ import com.idunnololz.summit.emoji.db.TextEmojiDao
 import com.idunnololz.summit.emoji.db.TextEmojiEntry
 import com.idunnololz.summit.filterLists.ContentFiltersDao
 import com.idunnololz.summit.filterLists.FilterEntry
+import com.idunnololz.summit.filterLists.FilterEntryConverters
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsDao
 import com.idunnololz.summit.history.HistoryConverters
 import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.history.HistoryEntry
-import com.idunnololz.summit.inbox.InboxEntriesDao
-import com.idunnololz.summit.inbox.InboxEntry
-import com.idunnololz.summit.inbox.InboxEntryConverters
 import com.idunnololz.summit.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.inbox.db.ConversationEntry
+import com.idunnololz.summit.inbox.db.InboxEntriesDao
+import com.idunnololz.summit.inbox.db.InboxEntry
+import com.idunnololz.summit.inbox.db.InboxEntryConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
@@ -85,11 +86,16 @@ import kotlinx.serialization.json.Json
     AutoMigration(from = 42, to = 43),
     AutoMigration(from = 43, to = 44),
     AutoMigration(from = 45, to = 46),
+    AutoMigration(from = 46, to = 47),
   ],
-  version = 46,
+  version = 47,
   exportSchema = true,
 )
-@TypeConverters(HistoryConverters::class, DraftConverters::class, TemplateConverters::class)
+@TypeConverters(
+  HistoryConverters::class,
+  DraftConverters::class,
+  TemplateConverters::class,
+)
 abstract class MainDatabase : RoomDatabase() {
 
   abstract fun lemmyActionsDao(): LemmyActionsDao
@@ -145,6 +151,7 @@ abstract class MainDatabase : RoomDatabase() {
         .addTypeConverter(InboxEntryConverters(json))
         .addTypeConverter(UserTagConverters(json))
         .addTypeConverter(TemplateConverters(json))
+        .addTypeConverter(FilterEntryConverters(json))
         .addMigrations(MIGRATION_19_20)
         .addMigrations(MIGRATION_21_22)
         .addMigrations(MIGRATION_22_24)

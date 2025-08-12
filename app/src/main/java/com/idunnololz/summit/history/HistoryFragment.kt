@@ -198,9 +198,7 @@ class HistoryFragment :
               ).actionView as SearchView
               searchView.setOnQueryTextListener(
                 object : SearchView.OnQueryTextListener {
-                  override fun onQueryTextSubmit(query: String?): Boolean {
-                    return true
-                  }
+                  override fun onQueryTextSubmit(query: String?): Boolean = true
 
                   override fun onQueryTextChange(newText: String?): Boolean {
                     if (newText != null) {

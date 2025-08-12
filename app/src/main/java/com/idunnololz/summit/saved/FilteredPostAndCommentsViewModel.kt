@@ -48,7 +48,8 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
   private val savedManager: SavedManager,
   private val commentListEngineFactory: CommentListEngine.Factory,
   private val postListEngineFactory: PostListEngine.Factory,
-) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
+) : ViewModel(),
+  SlidingPaneController.PostViewPagerViewModel {
 
   companion object {
     private const val TAG = "SavedViewModel"

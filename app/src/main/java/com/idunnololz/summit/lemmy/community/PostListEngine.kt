@@ -6,7 +6,6 @@ import androidx.core.content.ContextCompat
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.key
-import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -66,15 +65,27 @@ sealed interface PostListEngineItem {
     val hasLess: Boolean,
   ) : PostListEngineItem
 
-  data class AutoLoadItem(val pageToLoad: Int) : PostListEngineItem
+  data class AutoLoadItem(
+    val pageToLoad: Int,
+  ) : PostListEngineItem
 
-  data class ManualLoadItem(val pageToLoad: Int) : PostListEngineItem
+  data class ManualLoadItem(
+    val pageToLoad: Int,
+  ) : PostListEngineItem
 
-  data class ErrorItem(val message: String, val pageToLoad: Int, val isLoading: Boolean) : PostListEngineItem
+  data class ErrorItem(
+    val message: String,
+    val pageToLoad: Int,
+    val isLoading: Boolean,
+  ) : PostListEngineItem
 
-  data class PersistentErrorItem(val exception: Exception) : PostListEngineItem
+  data class PersistentErrorItem(
+    val exception: Exception,
+  ) : PostListEngineItem
 
-  data class PageTitle(val pageIndex: Int) : PostListEngineItem
+  data class PageTitle(
+    val pageIndex: Int,
+  ) : PostListEngineItem
 
   data object EndItem : PostListEngineItem
   data object FooterSpacerItem : PostListEngineItem
@@ -348,8 +359,8 @@ class PostListEngine @AssistedInject constructor(
     postToHighlightForever = null
   }
 
-  fun toggleItem(postView: PostView): Boolean {
-    return if (expandedItems.contains(postView.getUniqueKey())) {
+  fun toggleItem(postView: PostView): Boolean =
+    if (expandedItems.contains(postView.getUniqueKey())) {
       expandedItems.remove(postView.getUniqueKey())
 
       false
@@ -358,7 +369,6 @@ class PostListEngine @AssistedInject constructor(
 
       true
     }
-  }
 
   fun toggleActions(postView: PostView) {
     if (actionsExpandedItems.contains(postView.getUniqueKey())) {

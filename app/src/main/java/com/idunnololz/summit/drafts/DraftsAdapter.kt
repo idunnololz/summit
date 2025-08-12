@@ -25,19 +25,20 @@ class DraftsAdapter(
 
   private val adapterHelper = AdapterHelper<DraftsViewModel.ViewModelItem>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is DraftsViewModel.ViewModelItem.PostDraftItem -> {
-          old.draftEntry.id ==
-            (new as DraftsViewModel.ViewModelItem.PostDraftItem).draftEntry.id
+      old::class == new::class &&
+        when (old) {
+          is DraftsViewModel.ViewModelItem.PostDraftItem -> {
+            old.draftEntry.id ==
+              (new as DraftsViewModel.ViewModelItem.PostDraftItem).draftEntry.id
+          }
+          is DraftsViewModel.ViewModelItem.CommentDraftItem -> {
+            old.draftEntry.id ==
+              (new as DraftsViewModel.ViewModelItem.CommentDraftItem).draftEntry.id
+          }
+          DraftsViewModel.ViewModelItem.LoadingItem -> true
+          DraftsViewModel.ViewModelItem.EmptyItem -> true
+          DraftsViewModel.ViewModelItem.HeaderItem -> true
         }
-        is DraftsViewModel.ViewModelItem.CommentDraftItem -> {
-          old.draftEntry.id ==
-            (new as DraftsViewModel.ViewModelItem.CommentDraftItem).draftEntry.id
-        }
-        DraftsViewModel.ViewModelItem.LoadingItem -> true
-        DraftsViewModel.ViewModelItem.EmptyItem -> true
-        DraftsViewModel.ViewModelItem.HeaderItem -> true
-      }
     },
   ).apply {
     addItemType(

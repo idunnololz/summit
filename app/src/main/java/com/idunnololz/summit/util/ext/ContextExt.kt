@@ -62,9 +62,7 @@ fun Context.getTextSizeFromTextAppearance(attribute: Int): Float {
   return fontSize
 }
 
-fun Context.getDimen(@DimenRes dimen: Int): Int {
-  return resources.getDimension(dimen).toInt()
-}
+fun Context.getDimen(@DimenRes dimen: Int): Int = resources.getDimension(dimen).toInt()
 
 fun Context.getColorCompat(@ColorRes color: Int): Int = ContextCompat.getColor(this, color)
 
@@ -148,6 +146,5 @@ fun Context.getActivity(): AppCompatActivity? {
   return null
 }
 
-fun Context.spToPx(sp: Float): Float {
-  return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
-}
+fun Context.spToPx(sp: Float): Float =
+  TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)

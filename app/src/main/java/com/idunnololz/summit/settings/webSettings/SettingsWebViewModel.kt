@@ -234,7 +234,8 @@ class SettingsWebViewModel @Inject constructor(
       showReadPosts = merged[settings.showReadPostsSetting.id] as? Boolean ?: true,
       botAccount = merged[settings.botAccountSetting.id] as? Boolean ?: false,
       showBotAccounts = merged[settings.showBotAccountsSetting.id] as? Boolean ?: true,
-      sendNotificationsToEmail = merged[settings.sendNotificationsToEmailSetting.id] as? Boolean ?: false,
+      sendNotificationsToEmail =
+      merged[settings.sendNotificationsToEmailSetting.id] as? Boolean ?: false,
     )
   }
 

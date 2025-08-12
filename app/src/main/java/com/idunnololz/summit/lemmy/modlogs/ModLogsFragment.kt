@@ -262,11 +262,17 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
     sealed interface Item {
       data object HeaderItem : Item
-      data class FilterItem(val filter: ModLogsFilterConfig) : Item
-      data class ModEventItem(val modEvent: ModEvent) : Item
+      data class FilterItem(
+        val filter: ModLogsFilterConfig,
+      ) : Item
+      data class ModEventItem(
+        val modEvent: ModEvent,
+      ) : Item
       data object FooterItem : Item
 
-      data class LoadItem(val pageIndex: Int = 0) : Item
+      data class LoadItem(
+        val pageIndex: Int = 0,
+      ) : Item
       data class ErrorItem(
         val pageIndex: Int,
         val error: Throwable,
@@ -307,18 +313,19 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          Item.EmptyItem -> true
-          is Item.ErrorItem ->
-            old.pageIndex == (new as Item.ErrorItem).pageIndex
-          is Item.FilterItem -> true
-          Item.FooterItem -> true
-          Item.HeaderItem -> true
-          is Item.LoadItem ->
-            old.pageIndex == (new as Item.LoadItem).pageIndex
-          is Item.ModEventItem ->
-            old.modEvent.id == (new as Item.ModEventItem).modEvent.id
-        }
+        old::class == new::class &&
+          when (old) {
+            Item.EmptyItem -> true
+            is Item.ErrorItem ->
+              old.pageIndex == (new as Item.ErrorItem).pageIndex
+            is Item.FilterItem -> true
+            Item.FooterItem -> true
+            Item.HeaderItem -> true
+            is Item.LoadItem ->
+              old.pageIndex == (new as Item.LoadItem).pageIndex
+            is Item.ModEventItem ->
+              old.modEvent.id == (new as Item.ModEventItem).modEvent.id
+          }
       },
     ).apply {
       addItemType(
@@ -349,7 +356,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           is ModEvent.AdminPurgeCommentViewEvent -> {
             description = context.getString(
               R.string.purged_comment_format,
-              "[${modEvent.event.post.name.summarize()}](${LinkUtils.getLinkForPost(instance, modEvent.event.post.id)})",
+              "[${modEvent.event.post.name.summarize()}](${LinkUtils.getLinkForPost(
+                instance,
+                modEvent.event.post.id,
+              )})",
             )
             reason = modEvent.event.admin_purge_comment.reason
           }
@@ -380,7 +390,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             if (modEvent.event.mod_add_community.removed) {
               description = context.getString(
                 R.string.removed_moderator_for_community_format,
-                "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(
+                  instance,
+                  modEvent.event.modded_person.name,
+                )})",
                 "[${modEvent.event.community.name}](${
                   LinkUtils.getLinkForCommunity(
                     modEvent.event.community.instance,
@@ -390,7 +403,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             } else {
               description = context.getString(
                 R.string.added_moderator_for_community_format,
-                "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+                "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(
+                  instance,
+                  modEvent.event.modded_person.name,
+                )})",
                 "[${modEvent.event.community.name}](${
                   LinkUtils.getLinkForCommunity(
                     modEvent.event.community.instance,
@@ -729,7 +745,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
                   modEvent.event.community.instance,
                   modEvent.event.community.name,
                 )})",
-              "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(instance, modEvent.event.modded_person.name)})",
+              "[${modEvent.event.modded_person.name}](${LinkUtils.getLinkForPerson(
+                instance,
+                modEvent.event.modded_person.name,
+              )})",
             )
           }
         }
@@ -741,7 +760,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         b.icon.imageTintList = ColorStateList.valueOf(modEventColor)
         b.icon.backgroundTintList = ColorStateList.valueOf(
           ColorUtils.blendARGB(
-            modEventColor, containerColor, 0.9f,
+            modEventColor,
+            containerColor,
+            0.9f,
           ),
         )
 

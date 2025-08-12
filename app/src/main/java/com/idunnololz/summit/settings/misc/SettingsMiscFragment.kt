@@ -16,7 +16,6 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.MiscSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
 import com.idunnololz.summit.settings.util.asCustomItem
@@ -26,12 +25,11 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.isPredictiveBackSupported
-import com.idunnololz.summit.util.setupForFragment
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsMiscFragment :
@@ -290,14 +288,12 @@ class SettingsMiscFragment :
 
   private fun convertAnimationLevelToOptionId(
     animationLevel: AnimationsHelper.AnimationLevel,
-  ): Int {
-    return when (animationLevel) {
-      AnimationsHelper.AnimationLevel.Critical -> R.id.animation_level_min
-      AnimationsHelper.AnimationLevel.Navigation -> R.id.animation_level_low
-      AnimationsHelper.AnimationLevel.Polish -> R.id.animation_level_low
-      AnimationsHelper.AnimationLevel.Extras -> R.id.animation_level_low
-      AnimationsHelper.AnimationLevel.Max -> R.id.animation_level_max
-    }
+  ): Int = when (animationLevel) {
+    AnimationsHelper.AnimationLevel.Critical -> R.id.animation_level_min
+    AnimationsHelper.AnimationLevel.Navigation -> R.id.animation_level_low
+    AnimationsHelper.AnimationLevel.Polish -> R.id.animation_level_low
+    AnimationsHelper.AnimationLevel.Extras -> R.id.animation_level_low
+    AnimationsHelper.AnimationLevel.Max -> R.id.animation_level_max
   }
 
   private fun convertOptionIdToAnimationLevel(@IdRes id: Int) = when (id) {

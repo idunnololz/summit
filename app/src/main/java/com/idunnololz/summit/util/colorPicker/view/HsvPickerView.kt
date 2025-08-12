@@ -55,12 +55,16 @@ class HsvPickerView : PickerView {
         R.id.hue -> hueInt.text = String.format("%s", (value).toInt())
         R.id.saturation ->
           saturationInt.text = String.format(
-            Locale.getDefault(), "%.2f", value / 255f,
+            Locale.getDefault(),
+            "%.2f",
+            value / 255f,
           )
 
         R.id.brightness ->
           brightnessInt.text = String.format(
-            Locale.getDefault(), "%.2f", value / 255f,
+            Locale.getDefault(),
+            "%.2f",
+            value / 255f,
           )
       }
       if (fromUser) {

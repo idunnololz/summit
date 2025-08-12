@@ -30,6 +30,5 @@ class GuestAccountManager @Inject constructor(
     }
   }
 
-  fun getGuestAccount(): GuestAccount =
-    accountManager.getGuestAccount()
+  fun getGuestAccount(): GuestAccount = accountManager.getGuestAccount()
 }

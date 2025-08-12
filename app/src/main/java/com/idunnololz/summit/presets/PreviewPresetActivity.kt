@@ -69,16 +69,14 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 
-class TakePreviewScreenshotContract :
-  ActivityResultContract<Unit, PreviewScreenshotResult?>() {
+class TakePreviewScreenshotContract : ActivityResultContract<Unit, PreviewScreenshotResult?>() {
 
   @CallSuper
   override fun createIntent(context: Context, input: Unit): Intent =
     Intent(context, PreviewPresetActivity::class.java)
 
-  override fun parseResult(resultCode: Int, intent: Intent?): PreviewScreenshotResult? {
-    return intent?.getParcelableExtra("result")
-  }
+  override fun parseResult(resultCode: Int, intent: Intent?): PreviewScreenshotResult? =
+    intent?.getParcelableExtra("result")
 }
 
 @Parcelize

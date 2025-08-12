@@ -11,8 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsLoggingFragment :
-  BaseSettingsFragment() {
+class SettingsLoggingFragment : BaseSettingsFragment() {
 
   @Inject
   override lateinit var settings: LoggingSettings
@@ -34,23 +33,21 @@ class SettingsLoggingFragment :
     }
   }
 
-  override fun generateData(): List<SettingModelItem> {
-    return listOf(
-      settings.useFirebase.asOnOffSwitch(
-        { preferences.useFirebase },
-        {
-          if (it) {
-            enableLogCrashesDialogLauncher
-          } else {
-            disableLogCrashesDialogLauncher
-          }.launchDialog {
-            titleResId = R.string.app_restart_required_by_setting
-            messageResId = R.string.app_restart_required_by_setting_desc
-            positionButtonResId = R.string.restart_app
-            negativeButtonResId = R.string.cancel
-          }
-        },
-      ),
-    )
-  }
+  override fun generateData(): List<SettingModelItem> = listOf(
+    settings.useFirebase.asOnOffSwitch(
+      { preferences.useFirebase },
+      {
+        if (it) {
+          enableLogCrashesDialogLauncher
+        } else {
+          disableLogCrashesDialogLauncher
+        }.launchDialog {
+          titleResId = R.string.app_restart_required_by_setting
+          messageResId = R.string.app_restart_required_by_setting_desc
+          positionButtonResId = R.string.restart_app
+          negativeButtonResId = R.string.cancel
+        }
+      },
+    ),
+  )
 }

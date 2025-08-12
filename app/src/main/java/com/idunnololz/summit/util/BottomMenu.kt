@@ -330,15 +330,16 @@ class BottomMenu(
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          FooterItem -> true
-          is MenuItemItem ->
-            old.menuItem.id == (new as MenuItemItem).menuItem.id
-          is TitleItem -> true
-          DividerItem -> true
-          is MenuItemWithSwitchItem ->
-            old.menuItem.id == (new as MenuItemWithSwitchItem).menuItem.id
-        }
+        old::class == new::class &&
+          when (old) {
+            FooterItem -> true
+            is MenuItemItem ->
+              old.menuItem.id == (new as MenuItemItem).menuItem.id
+            is TitleItem -> true
+            DividerItem -> true
+            is MenuItemWithSwitchItem ->
+              old.menuItem.id == (new as MenuItemWithSwitchItem).menuItem.id
+          }
       },
     ).apply {
       addItemType(TitleItem::class, MenuItemTitleBinding::inflate) { item, b, _ ->
@@ -522,7 +523,7 @@ class BottomMenu(
                 title = menuItem.title,
                 description = menuItem.description,
                 icon = menuItem.icon,
-              )
+              ),
             )
             bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
           }
@@ -538,7 +539,7 @@ class BottomMenu(
                 title = menuItem.title,
                 description = menuItem.description,
                 icon = menuItem.icon,
-              )
+              ),
             )
             bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
           }

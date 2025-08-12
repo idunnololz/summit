@@ -2,7 +2,9 @@ package com.canhub.cropper
 
 import android.net.Uri
 
-sealed class CropException(message: String) : Exception(message) {
+sealed class CropException(
+  message: String,
+) : Exception(message) {
   class Cancellation : CropException("$EXCEPTION_PREFIX cropping has been cancelled by the user")
 
   class FailedToLoadBitmap(
@@ -10,7 +12,9 @@ sealed class CropException(message: String) : Exception(message) {
     message: String?,
   ) : CropException("$EXCEPTION_PREFIX Failed to load sampled bitmap: $uri\r\n$message")
 
-  class FailedToDecodeImage(uri: Uri) : CropException(
+  class FailedToDecodeImage(
+    uri: Uri,
+  ) : CropException(
     "$EXCEPTION_PREFIX Failed to decode image: $uri",
   )
 

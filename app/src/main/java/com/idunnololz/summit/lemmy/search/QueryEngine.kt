@@ -53,9 +53,14 @@ sealed class Item {
     val pageIndex: Int,
   ) : Item()
 
-  data class AutoLoadItem(val pageToLoad: Int) : Item()
+  data class AutoLoadItem(
+    val pageToLoad: Int,
+  ) : Item()
 
-  data class ErrorItem(val error: Throwable, val pageToLoad: Int) : Item()
+  data class ErrorItem(
+    val error: Throwable,
+    val pageToLoad: Int,
+  ) : Item()
 
   data object EndItem : Item()
   data object FooterSpacerItem : Item()

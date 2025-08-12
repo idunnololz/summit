@@ -79,6 +79,9 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_HEADER_BANNER_I
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_POST_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_AUTO_MARK_AS_READ
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_FAB_ACTION
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_LAYOUT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY_PAGE_INDICATOR
@@ -243,18 +246,15 @@ class Preferences(
     }
   }
 
-  fun getPostInListUiConfig(): PostInListUiConfig {
-    return getPostInListUiConfig(getPostsLayout())
-  }
+  fun getPostInListUiConfig(): PostInListUiConfig = getPostInListUiConfig(getPostsLayout())
 
   fun setPostInListUiConfig(config: PostInListUiConfig) {
     sharedPreferences.putJsonValue(json, getPostUiConfigKey(getPostsLayout()), config)
   }
 
-  fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig {
-    return sharedPreferences.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
+  fun getPostInListUiConfig(layout: CommunityLayout): PostInListUiConfig =
+    sharedPreferences.getJsonValue<PostInListUiConfig>(json, getPostUiConfigKey(layout))
       ?: layout.getDefaultPostUiConfig()
-  }
 
   var postAndCommentsUiConfig: PostAndCommentsUiConfig
     by jsonPreference(KEY_POST_AND_COMMENTS_UI_CONFIG) { getDefaultPostAndCommentsUiConfig() }
@@ -451,16 +451,7 @@ class Preferences(
     by intPreference(KEY_PREF_VERSION, 0)
 
   var previewLinks: Int
-    get() = try {
-      sharedPreferences.getInt(KEY_PREVIEW_LINKS, PreviewTextLinks)
-    } catch (e: Exception) {
-      PreviewTextLinks
-    }
-    set(value) {
-      sharedPreferences.edit()
-        .putInt(KEY_PREVIEW_LINKS, value)
-        .apply()
-    }
+    by intPreference(KEY_PREVIEW_LINKS, PreviewTextLinks)
 
   var screenshotWidthDp: Int
     by intPreference(KEY_SCREENSHOT_WIDTH_DP, 400)
@@ -704,7 +695,12 @@ class Preferences(
     by booleanPreference(KEY_FINISH_APP_ON_BACK, false)
   var showNavigationBarOnPost
     by booleanPreference(KEY_SHOW_NAVIGATION_BAR_ON_POST, false)
-
+  var inboxFabAction
+    by intPreference(KEY_INBOX_FAB_ACTION, InboxFabActionId.MARK_ALL_AS_READ)
+  var inboxLayout
+    by intPreference(KEY_INBOX_LAYOUT, InboxLayoutId.COMPACT)
+  var inboxAutoMarkAsRead
+    by booleanPreference(KEY_INBOX_AUTO_MARK_AS_READ, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
@@ -714,9 +710,7 @@ class Preferences(
     sharedPreferences.edit { remove(key) }
   }
 
-  fun asJson(): JSONObject {
-    return sharedPreferences.asJson()
-  }
+  fun asJson(): JSONObject = sharedPreferences.asJson()
 
   fun generateCode(): String {
     val json = this.asJson()

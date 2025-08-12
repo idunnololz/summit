@@ -41,7 +41,8 @@ class CommentExpandedViewHolder(
   override var qaScoreCount: TextView? = null,
   override var qaUpvoteCount: TextView? = null,
   override var qaDownvoteCount: TextView? = null,
-) : RecyclerView.ViewHolder(root), QuickActionsViewHolder {
+) : RecyclerView.ViewHolder(root),
+  QuickActionsViewHolder {
 
   data class State(
     var preferUpAndDownVotes: Boolean? = null,

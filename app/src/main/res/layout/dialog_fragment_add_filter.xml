@@ -44,6 +44,7 @@
         android:layout_height="wrap_content"
         android:paddingVertical="@dimen/padding"
         android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filter_field"/>
 
@@ -56,6 +57,25 @@
         app:layout_constraintTop_toTopOf="@+id/regex_title"
         app:layout_constraintBottom_toBottomOf="@+id/regex_title"/>
 
+    <TextView
+        android:id="@+id/match_whole_word_title"
+        android:text="@string/match_whole_word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/padding"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/regex_title"/>
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/match_whole_word_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/match_whole_word_title"
+        app:layout_constraintBottom_toBottomOf="@+id/match_whole_word_title"/>
+
     <Button
         style="@style/Widget.Material3.Button.TextButton"
         android:id="@+id/add"
@@ -64,7 +84,7 @@
         android:text="@string/add"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginBottom="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/regex_title"
+        app:layout_constraintTop_toBottomOf="@+id/match_whole_word_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -76,7 +96,7 @@
         android:text="@android:string/cancel"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginBottom="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/regex_title"
+        app:layout_constraintTop_toBottomOf="@+id/match_whole_word_title"
         app:layout_constraintEnd_toStartOf="@+id/add"
         app:layout_constraintBottom_toBottomOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

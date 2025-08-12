@@ -160,12 +160,13 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.HiddenPostItem ->
-            old.hiddenPost.id == (new as Item.HiddenPostItem).hiddenPost.id
+        old::class == new::class &&
+          when (old) {
+            is Item.HiddenPostItem ->
+              old.hiddenPost.id == (new as Item.HiddenPostItem).hiddenPost.id
 
-          Item.EmptyItem -> true
-        }
+            Item.EmptyItem -> true
+          }
       },
     ).apply {
       addItemType(Item.HiddenPostItem::class, HiddenPostsItemBinding::inflate) { item, b, h ->
@@ -174,7 +175,9 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
         b.timestamp.text = if (System.currentTimeMillis() - hiddenPost.ts < ONE_DAY_MS * 7) {
           tsToConcise(context, hiddenPost.ts)
         } else {
-          dateFormat.format(Instant.ofEpochMilli(hiddenPost.ts).atZone(ZoneId.systemDefault()).toLocalDate())
+          dateFormat.format(
+            Instant.ofEpochMilli(hiddenPost.ts).atZone(ZoneId.systemDefault()).toLocalDate(),
+          )
         }
         b.text.text = Utils.fromHtml(
           context.getString(

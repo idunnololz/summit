@@ -2,6 +2,7 @@ package com.idunnololz.summit.account
 
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -22,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import androidx.core.content.edit
 
 @Singleton
 class AccountManager @Inject constructor(
@@ -147,9 +147,7 @@ class AccountManager @Inject constructor(
     this._currentAccount.emit(currentAccount)
   }
 
-  suspend fun getAccountById(id: Long): Account? {
-    return accountDao.getAccountById(id)?.fix()
-  }
+  suspend fun getAccountById(id: Long): Account? = accountDao.getAccountById(id)?.fix()
 
   suspend fun getAccountByIdOrDefault(accountId: Long?): Account? = if (accountId == null) {
     currentAccount.asAccount
@@ -235,8 +233,7 @@ class AccountManager @Inject constructor(
     return GuestAccount(guestAccountSettings.instance)
   }
 
-  fun isSignedIntoAnyAccount(): Boolean =
-    _numAccounts.value > 0
+  fun isSignedIntoAnyAccount(): Boolean = _numAccounts.value > 0
 }
 
 val StateFlow<GuestOrUserAccount?>.asAccount

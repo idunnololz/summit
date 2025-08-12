@@ -14,8 +14,10 @@ import kotlin.math.max
  * orientation when it can't fit its child views horizontally.
  */
 // From https://android.googlesource.com/platform/frameworks/support/+/26079d87c79a64829f036236353fac1dae4e0613/appcompat/src/main/java/androidx/appcompat/widget/ButtonBarLayout.java
-class ButtonBarLayout(context: Context, attrs: AttributeSet?) :
-  LinearLayout(context, attrs) {
+class ButtonBarLayout(
+  context: Context,
+  attrs: AttributeSet?,
+) : LinearLayout(context, attrs) {
   /** Whether the current configuration allows stacking.  */
   private var mAllowStacking: Boolean
   private var mLastWidthSize = -1
@@ -116,9 +118,8 @@ class ButtonBarLayout(context: Context, attrs: AttributeSet?) :
     return -1
   }
 
-  override fun getMinimumHeight(): Int {
-    return max(mMinimumHeight.toDouble(), super.getMinimumHeight().toDouble()).toInt()
-  }
+  override fun getMinimumHeight(): Int =
+    max(mMinimumHeight.toDouble(), super.getMinimumHeight().toDouble()).toInt()
 
   private var isStacked: Boolean
     get() = orientation == VERTICAL

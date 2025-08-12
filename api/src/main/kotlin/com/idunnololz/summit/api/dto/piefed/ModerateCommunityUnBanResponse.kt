@@ -20,4 +20,4 @@ package com.idunnololz.summit.api.dto.piefed
  *
  */
 
-class ModerateCommunityUnBanResponse()
+class ModerateCommunityUnBanResponse

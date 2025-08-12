@@ -3,7 +3,6 @@ package com.idunnololz.summit.links
 import android.util.Log
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.links.SiteBackendHelper.ApiType
-import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.network.BrowserLikeUnauthed
 import com.idunnololz.summit.util.LinkFetcher
 import java.io.InterruptedIOException
@@ -34,6 +33,7 @@ class SiteBackendHelper @Inject constructor(
 
   enum class ApiType {
     LemmyV3,
+
 //    LemmyV4,
     PieFedAlpha,
   }
@@ -68,7 +68,7 @@ class SiteBackendHelper @Inject constructor(
           linkFetcher.downloadSite(
             url = "https://$instance/api/v3/site",
             cache = true,
-            client = okHttpClient
+            client = okHttpClient,
           )
         }
 //        val v4Job = async {
@@ -84,14 +84,14 @@ class SiteBackendHelper @Inject constructor(
           linkFetcher.downloadSite(
             url = "https://$instance/api/alpha/site",
             cache = true,
-            client = okHttpClient
+            client = okHttpClient,
           )
         }
         val homePageJob = async {
           linkFetcher.downloadSite(
             url = "https://$instance/",
             cache = true,
-            client = okHttpClient
+            client = okHttpClient,
           )
         }
 
@@ -100,13 +100,13 @@ class SiteBackendHelper @Inject constructor(
 //          return@withContext Result.success(ApiInfo(ApiType.LemmyV4))
 //        } else
         if (alphaJob.isSiteView()) {
-          Log.d(TAG, "instance: ${instance} is type alpha")
+          Log.d(TAG, "instance: $instance is type alpha")
           return@withContext Result.success(ApiInfo(ApiType.PieFedAlpha))
         } else if (v3Job.isSiteView()) {
-          Log.d(TAG, "instance: ${instance} is type V3")
+          Log.d(TAG, "instance: $instance is type V3")
           return@withContext Result.success(ApiInfo(ApiType.LemmyV3))
         } else if (homePageJob.await().isSuccess) {
-          Log.d(TAG, "instance: ${instance} is not a lemmy site")
+          Log.d(TAG, "instance: $instance is not a lemmy site")
           return@withContext Result.success(ApiInfo(null))
         }
 
@@ -147,18 +147,16 @@ class SiteBackendHelper @Inject constructor(
     }
   }
 
-  private suspend fun Deferred<Result<String>>.isSiteView(): Boolean {
-    return this.await().fold(
-      onSuccess = {
-        Log.d(TAG, "onSuccess")
-        it.length > 100 && it.firstOrNull() == '{'
-      },
-      onFailure = {
-        Log.d(TAG, "onFailure", it)
-        false
-      },
-    )
-  }
+  private suspend fun Deferred<Result<String>>.isSiteView(): Boolean = this.await().fold(
+    onSuccess = {
+      Log.d(TAG, "onSuccess")
+      it.length > 100 && it.firstOrNull() == '{'
+    },
+    onFailure = {
+      Log.d(TAG, "onFailure", it)
+      false
+    },
+  )
 }
 
 val ApiType.isLemmy

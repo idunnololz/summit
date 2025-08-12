@@ -19,7 +19,8 @@ import com.idunnololz.summit.view.ScreenshotLayout
 class ModernThreadLinesDecoration(
   private val context: Context,
   private val isCompactView: Boolean,
-) : RecyclerView.ItemDecoration(), ScreenshotLayout.ScreenshotDecorator {
+) : RecyclerView.ItemDecoration(),
+  ScreenshotLayout.ScreenshotDecorator {
 
   private val distanceBetweenLinesUnit =
     Utils.convertDpToPixel(1f)

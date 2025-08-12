@@ -38,8 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsViewTypeFragment :
-  BaseSettingsFragment() {
+class SettingsViewTypeFragment : BaseSettingsFragment() {
 
   private val viewModel: SettingsViewTypeViewModel by viewModels()
 
@@ -82,172 +81,179 @@ class SettingsViewTypeFragment :
     }
   }
 
-  override fun generateData(): List<SettingModelItem> {
-    return listOf(
-      BasicSettingItem(
-        icon = null,
-        title = getString(R.string.preview),
-        description = null,
-        id = R.id.post_appearance_preview,
-      ).asCustomViewSettingsItem(
-        typeId = R.id.post_appearance_preview,
-        payload = null,
-        inflateFn = PostAppearanceDemoCardBinding::inflate,
-        bindViewHolder = { item, b, h ->
-          b.demoViewContainer.setTag(R.id.binding, b)
-          updateRendering(b)
-        },
-      ),
-      settings.baseViewType.asSingleChoiceSelectorItem(
-        {
-          preferences.getPostsLayout().ordinal
-        },
-        {
-          viewModel.onLayoutChanging()
-          preferences.setPostsLayout(CommunityLayout.entries[it])
-          viewModel.onLayoutChanged()
-
-          updateRendering()
-        },
-      ),
-      SettingModelItem.DividerItem(R.id.divider0),
-      settings.reset.asCustomItem {
-        resetDialogLauncher.launchDialog {
-          messageResId = R.string.reset_view_to_default_styles
-          positionButtonResId = android.R.string.ok
-          negativeButtonResId = R.string.cancel
-        }
+  override fun generateData(): List<SettingModelItem> = listOf(
+    BasicSettingItem(
+      icon = null,
+      title = getString(R.string.preview),
+      description = null,
+      id = R.id.post_appearance_preview,
+    ).asCustomViewSettingsItem(
+      typeId = R.id.post_appearance_preview,
+      payload = null,
+      inflateFn = PostAppearanceDemoCardBinding::inflate,
+      bindViewHolder = { item, b, h ->
+        b.demoViewContainer.setTag(R.id.binding, b)
+        updateRendering(b)
       },
-      SettingModelItem.DividerItem(R.id.divider1),
-      settings.fontSize.asSliderItem(
-        { viewModel.currentPostUiConfig.textSizeMultiplier },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.updateTextSizeMultiplier(it)
+    ),
+    settings.baseViewType.asSingleChoiceSelectorItem(
+      {
+        preferences.getPostsLayout().ordinal
+      },
+      {
+        viewModel.onLayoutChanging()
+        preferences.setPostsLayout(CommunityLayout.entries[it])
+        viewModel.onLayoutChanged()
 
-          updateRendering()
-        },
-      ),
-      settings.imageSize.asSliderItem(
-        { viewModel.currentPostUiConfig.imageWidthPercent },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(
-              imageWidthPercent = it,
-            )
+        updateRendering()
+      },
+    ),
+    SettingModelItem.DividerItem(R.id.divider0),
+    settings.reset.asCustomItem {
+      resetDialogLauncher.launchDialog {
+        messageResId = R.string.reset_view_to_default_styles
+        positionButtonResId = android.R.string.ok
+        negativeButtonResId = R.string.cancel
+      }
+    },
+    SettingModelItem.DividerItem(R.id.divider1),
+    settings.fontSize.asSliderItem(
+      { viewModel.currentPostUiConfig.textSizeMultiplier },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.updateTextSizeMultiplier(it)
 
-          updateRendering()
-        },
-      ),
-      *when (preferences.getPostsLayout()) {
-        CommunityLayout.Card,
-        CommunityLayout.Card2,
-        CommunityLayout.Card3,
-        CommunityLayout.ListWithCards,
-        CommunityLayout.FullWithCards,
-        -> {
-          arrayOf(
-            settings.horizontalMarginSize.asSliderItem(
-              { viewModel.currentPostUiConfig.horizontalMarginDp ?: 16f },
-              {
-                viewModel.currentPostUiConfig =
-                  viewModel.currentPostUiConfig.copy(
-                    horizontalMarginDp = it,
-                  )
-
-                updateRendering()
-              },
-            ),
-            settings.verticalMarginSize.asSliderItem(
-              { viewModel.currentPostUiConfig.verticalMarginDp ?: 0f },
-              {
-                viewModel.currentPostUiConfig =
-                  viewModel.currentPostUiConfig.copy(
-                    verticalMarginDp = it,
-                  )
-
-                updateRendering()
-              },
-            ),
+        updateRendering()
+      },
+    ),
+    settings.imageSize.asSliderItem(
+      { viewModel.currentPostUiConfig.imageWidthPercent },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(
+            imageWidthPercent = it,
           )
-        }
-        else -> {
-          arrayOf()
-        }
+
+        updateRendering()
       },
-      settings.preferImageAtEnd.asOnOffSwitch(
-        { viewModel.currentPostUiConfig.preferImagesAtEnd },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(preferImagesAtEnd = it)
+    ),
+    *when (preferences.getPostsLayout()) {
+      CommunityLayout.Card,
+      CommunityLayout.Card2,
+      CommunityLayout.Card3,
+      CommunityLayout.ListWithCards,
+      CommunityLayout.FullWithCards,
+      -> {
+        arrayOf(
+          settings.horizontalMarginSize.asSliderItem(
+            { viewModel.currentPostUiConfig.horizontalMarginDp ?: 16f },
+            {
+              viewModel.currentPostUiConfig =
+                viewModel.currentPostUiConfig.copy(
+                  horizontalMarginDp = it,
+                )
 
-          updateRendering()
-        },
-      ),
-      settings.preferFullImage.asOnOffSwitch(
-        { viewModel.currentPostUiConfig.preferFullSizeImages },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(preferFullSizeImages = it)
+              updateRendering()
+            },
+          ),
+          settings.verticalMarginSize.asSliderItem(
+            { viewModel.currentPostUiConfig.verticalMarginDp ?: 0f },
+            {
+              viewModel.currentPostUiConfig =
+                viewModel.currentPostUiConfig.copy(
+                  verticalMarginDp = it,
+                )
 
-          updateRendering()
-        },
-      ),
-      settings.preferTitleText.asOnOffSwitch(
-        { viewModel.currentPostUiConfig.preferTitleText },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(preferTitleText = it)
+              updateRendering()
+            },
+          ),
+        )
+      }
+      else -> {
+        arrayOf()
+      }
+    },
+    settings.preferImageAtEnd.asOnOffSwitch(
+      { viewModel.currentPostUiConfig.preferImagesAtEnd },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(preferImagesAtEnd = it)
 
-          updateRendering()
-        },
-      ),
-      settings.preferCommunityIcon.asOnOffSwitch(
-        { viewModel.currentPostUiConfig.showCommunityIcon },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(showCommunityIcon = it)
+        updateRendering()
+      },
+    ),
+    settings.preferFullImage.asOnOffSwitch(
+      { viewModel.currentPostUiConfig.preferFullSizeImages },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(preferFullSizeImages = it)
 
-          updateRendering()
-        },
-      ),
-      settings.contentMaxLines.asSingleChoiceSelectorItem(
-        {
-          viewModel.currentPostUiConfig.contentMaxLines
-        },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(contentMaxLines = it)
+        updateRendering()
+      },
+    ),
+    settings.preferTitleText.asOnOffSwitch(
+      { viewModel.currentPostUiConfig.preferTitleText },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(preferTitleText = it)
 
-          updateRendering()
-        },
-      ),
-      settings.dimReadPosts.asOnOffSwitch(
-        {
-          viewModel.currentPostUiConfig.dimReadPosts
-            ?: preferences.getPostsLayout().defaultDimReadPosts
-        },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(dimReadPosts = it)
+        updateRendering()
+      },
+    ),
+    settings.preferCommunityIcon.asOnOffSwitch(
+      { viewModel.currentPostUiConfig.showCommunityIcon },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(showCommunityIcon = it)
 
-          updateRendering()
-        },
-      ),
-      settings.preferTextPreviewIcon.asOnOffSwitch(
-        {
-          viewModel.currentPostUiConfig.showTextPreviewIcon
-            ?: true
-        },
-        {
-          viewModel.currentPostUiConfig =
-            viewModel.currentPostUiConfig.copy(showTextPreviewIcon = it)
+        updateRendering()
+      },
+    ),
+    settings.contentMaxLines.asSingleChoiceSelectorItem(
+      {
+        viewModel.currentPostUiConfig.contentMaxLines
+      },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(contentMaxLines = it)
 
-          updateRendering()
-        },
-      ),
-    )
-  }
+        updateRendering()
+      },
+    ),
+    settings.contentMaxHeight.asSingleChoiceSelectorItem(
+      { viewModel.currentPostUiConfig.contentMaxHeightDp },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(contentMaxHeightDp = it)
+
+        updateRendering()
+      },
+    ),
+    settings.dimReadPosts.asOnOffSwitch(
+      {
+        viewModel.currentPostUiConfig.dimReadPosts
+          ?: preferences.getPostsLayout().defaultDimReadPosts
+      },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(dimReadPosts = it)
+
+        updateRendering()
+      },
+    ),
+    settings.preferTextPreviewIcon.asOnOffSwitch(
+      {
+        viewModel.currentPostUiConfig.showTextPreviewIcon
+          ?: true
+      },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(showTextPreviewIcon = it)
+
+        updateRendering()
+      },
+    ),
+  )
 
   private var lastH = listOf<ListingItemViewHolder>()
   private fun updateRendering(b: PostAppearanceDemoCardBinding? = null) {

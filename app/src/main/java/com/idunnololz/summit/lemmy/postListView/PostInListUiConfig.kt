@@ -19,6 +19,7 @@ data class PostInListUiConfig(
   val preferFullSizeImages: Boolean = true,
   val preferTitleText: Boolean = false,
   val contentMaxLines: Int = -1,
+  val contentMaxHeightDp: Int = -1,
   val showCommunityIcon: Boolean = true,
   val dimReadPosts: Boolean? = null,
   val showTextPreviewIcon: Boolean? = null,

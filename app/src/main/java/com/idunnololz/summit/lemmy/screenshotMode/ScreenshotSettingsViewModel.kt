@@ -9,7 +9,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScreenshotSettingsViewModel @Inject constructor(
   private val savedStateHandle: SavedStateHandle,
-  val preferences: Preferences
+  val preferences: Preferences,
 ) : ViewModel() {
 
   val screenshotWatermarkId =

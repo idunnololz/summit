@@ -560,8 +560,5 @@ interface LemmyLikeApi : ApiCompat {
     force: Boolean,
   ): Result<ListMediaResponse>
 
-  suspend fun deleteMedia(
-    authorization: String?,
-    args: DeleteImage,
-  ): Result<Unit>
+  suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit>
 }

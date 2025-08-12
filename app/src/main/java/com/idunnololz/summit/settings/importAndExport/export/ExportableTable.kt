@@ -1,6 +1,8 @@
 package com.idunnololz.summit.settings.importAndExport.export
 
-enum class ExportableTable(val tableName: String) {
+enum class ExportableTable(
+  val tableName: String,
+) {
   UserCommunities("user_communities"),
   HiddenPosts("hidden_posts"),
   ContentFilters("content_filters"),

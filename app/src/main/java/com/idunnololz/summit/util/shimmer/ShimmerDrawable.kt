@@ -17,7 +17,9 @@ import kotlin.math.tan
 
 private const val ANIMATION_DURATION_MS = 1000
 
-class ShimmerDrawable : Drawable(), Animatable2Compat {
+class ShimmerDrawable :
+  Drawable(),
+  Animatable2Compat {
   private val shimmerPaint = Paint().apply {
     isAntiAlias = true
   }
@@ -117,22 +119,17 @@ class ShimmerDrawable : Drawable(), Animatable2Compat {
     }
   }
 
-  override fun getIntrinsicHeight(): Int {
-    return shimmer?.fixedHeight ?: -1
-  }
+  override fun getIntrinsicHeight(): Int = shimmer?.fixedHeight ?: -1
 
-  override fun getIntrinsicWidth(): Int {
-    return shimmer?.fixedWidth ?: -1
-  }
+  override fun getIntrinsicWidth(): Int = shimmer?.fixedWidth ?: -1
 
   fun setSize(width: Int, height: Int) {
     shimmer?.fixedWidth = width
     shimmer?.fixedHeight = height
   }
 
-  private fun offset(start: Float, end: Float, percent: Float): Float {
-    return start + (end - start) * percent
-  }
+  private fun offset(start: Float, end: Float, percent: Float): Float =
+    start + (end - start) * percent
 
   private fun updateShader() {
     val bounds = bounds

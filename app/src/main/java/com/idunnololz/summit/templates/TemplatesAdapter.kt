@@ -2,7 +2,6 @@ package com.idunnololz.summit.templates
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TemplateItemAddTemplateItemBinding
 import com.idunnololz.summit.databinding.TemplateItemEmptyTemplateItemBinding
 import com.idunnololz.summit.databinding.TemplateItemTemplateItemBinding
@@ -22,8 +21,8 @@ class TemplatesAdapter(
       val data: TemplateData,
     ) : Item
 
-    data object EmptyTemplateItem: Item
-    data object AddTemplateItem: Item
+    data object EmptyTemplateItem : Item
+    data object AddTemplateItem : Item
   }
 
   private val adapterHelper = AdapterHelper<Item>({ old, new ->
@@ -50,7 +49,7 @@ class TemplatesAdapter(
     }
     addItemType(
       clazz = Item.EmptyTemplateItem::class,
-      inflateFn = TemplateItemEmptyTemplateItemBinding::inflate
+      inflateFn = TemplateItemEmptyTemplateItemBinding::inflate,
     ) { item, b, h -> }
     addItemType(
       clazz = Item.AddTemplateItem::class,
@@ -64,23 +63,15 @@ class TemplatesAdapter(
 
   private var data: List<TemplateEntry>? = null
 
-  override fun getItemViewType(position: Int): Int =
-    adapterHelper.getItemViewType(position)
+  override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-  override fun onCreateViewHolder(
-    parent: ViewGroup,
-    viewType: Int,
-  ): RecyclerView.ViewHolder =
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
     adapterHelper.onCreateViewHolder(parent, viewType)
 
-  override fun onBindViewHolder(
-    holder: RecyclerView.ViewHolder,
-    position: Int,
-  ) =
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
     adapterHelper.onBindViewHolder(holder, position)
 
-  override fun getItemCount(): Int =
-    adapterHelper.itemCount
+  override fun getItemCount(): Int = adapterHelper.itemCount
 
   fun setData(data: List<TemplateEntry>) {
     this.data = data

@@ -97,12 +97,13 @@ class LocalePickerBottomSheetFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          Item.ClearItem -> true
-          is Item.LocaleItem ->
-            old.locale.toLanguageTag() ==
-              (new as Item.LocaleItem).locale.toLanguageTag()
-        }
+        old::class == new::class &&
+          when (old) {
+            Item.ClearItem -> true
+            is Item.LocaleItem ->
+              old.locale.toLanguageTag() ==
+                (new as Item.LocaleItem).locale.toLanguageTag()
+          }
       },
     ).apply {
       addItemType(

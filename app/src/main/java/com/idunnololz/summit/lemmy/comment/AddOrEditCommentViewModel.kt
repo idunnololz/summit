@@ -25,12 +25,12 @@ import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.filterLists.ContentFiltersManager
+import com.idunnololz.summit.inbox.CommentBackedItem
+import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.inbox.CommentBackedItem
-import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

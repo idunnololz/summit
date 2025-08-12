@@ -141,11 +141,12 @@ class UserTagsFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is Item.UserTagItem -> {
-            old.userTag.personName == (new as Item.UserTagItem).userTag.personName
+        old::class == new::class &&
+          when (old) {
+            is Item.UserTagItem -> {
+              old.userTag.personName == (new as Item.UserTagItem).userTag.personName
+            }
           }
-        }
       },
     ).apply {
       addItemType(

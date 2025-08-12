@@ -85,18 +85,30 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
         context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
       )
 
-      image.load(newShimmerDrawable16to9(context))
-
       url.text = args.url
 
       loadingView.setOnRefreshClickListener {
         viewModel.loadLinkMetadata(args.url, force = true)
       }
 
+      launchUrl.setOnClickListener {
+        onLinkClick(args.url, null, LinkContext.Force)
+      }
+      copyLink.setOnClickListener {
+        Utils.copyToClipboard(context, args.url)
+        copyLink.text = getString(R.string.copied)
+      }
+
       viewModel.linkMetadata.observe(viewLifecycleOwner) {
         when (it) {
-          is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
-          is StatefulData.Loading -> loadingView.showProgressBar()
+          is StatefulData.Error -> {
+            loadingView.showDefaultErrorMessageFor(it.error)
+            image.load(null)
+          }
+          is StatefulData.Loading -> {
+            loadingView.showProgressBar()
+            image.load(newShimmerDrawable16to9(context))
+          }
           is StatefulData.NotStarted -> {}
           is StatefulData.Success -> {
             loadingView.hideAll()
@@ -140,14 +152,6 @@ class LinkPreviewDialogFragment : BaseDialogFragment<DialogFragmentLinkPreviewBi
     } else {
       description.visibility = View.VISIBLE
       description.text = data.description
-    }
-
-    launchUrl.setOnClickListener {
-      onLinkClick(args.url, null, LinkContext.Force)
-    }
-    copyLink.setOnClickListener {
-      Utils.copyToClipboard(context, args.url)
-      copyLink.text = getString(R.string.copied)
     }
 
     if (data.pageRef != null) {

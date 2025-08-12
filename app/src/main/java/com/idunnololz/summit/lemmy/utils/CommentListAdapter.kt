@@ -77,9 +77,14 @@ class CommentListAdapter(
       val highlightForever: Boolean,
     ) : Item
 
-    data class AutoLoadItem(val pageToLoad: Int) : Item
+    data class AutoLoadItem(
+      val pageToLoad: Int,
+    ) : Item
 
-    data class ErrorItem(val error: Throwable, val pageToLoad: Int) : Item
+    data class ErrorItem(
+      val error: Throwable,
+      val pageToLoad: Int,
+    ) : Item
 
     data object EndItem : Item
   }
@@ -97,19 +102,20 @@ class CommentListAdapter(
 
   private val adapterHelper = AdapterHelper<Item>(
     areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.AutoLoadItem ->
-          old.pageToLoad == (new as Item.AutoLoadItem).pageToLoad
-        is Item.VisibleCommentItem ->
-          old.commentView.comment.id ==
-            (new as Item.VisibleCommentItem).commentView.comment.id
-        is Item.FilteredCommentItem ->
-          old.commentView.comment.id ==
-            (new as Item.FilteredCommentItem).commentView.comment.id
-        Item.EndItem -> true
-        is Item.ErrorItem ->
-          old.pageToLoad == (new as Item.ErrorItem).pageToLoad
-      }
+      old::class == new::class &&
+        when (old) {
+          is Item.AutoLoadItem ->
+            old.pageToLoad == (new as Item.AutoLoadItem).pageToLoad
+          is Item.VisibleCommentItem ->
+            old.commentView.comment.id ==
+              (new as Item.VisibleCommentItem).commentView.comment.id
+          is Item.FilteredCommentItem ->
+            old.commentView.comment.id ==
+              (new as Item.FilteredCommentItem).commentView.comment.id
+          Item.EndItem -> true
+          is Item.ErrorItem ->
+            old.pageToLoad == (new as Item.ErrorItem).pageToLoad
+        }
     },
   ).apply {
     addItemType(Item.AutoLoadItem::class, AutoLoadItemBinding::inflate) { _, b, _ ->

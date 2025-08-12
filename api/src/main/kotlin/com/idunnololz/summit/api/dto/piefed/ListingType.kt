@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: All,Local,Subscribed,Popular,ModeratorView
  */
 
-enum class ListingType(val value: kotlin.String) {
+enum class ListingType(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "All")
   All("All"),

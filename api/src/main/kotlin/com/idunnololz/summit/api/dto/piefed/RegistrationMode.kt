@@ -23,7 +23,9 @@ import com.google.gson.annotations.SerializedName
  * Values: Closed,RequireApplication,Open
  */
 
-enum class RegistrationMode(val value: kotlin.String) {
+enum class RegistrationMode(
+  val value: kotlin.String,
+) {
 
   @SerializedName(value = "Closed")
   Closed("Closed"),

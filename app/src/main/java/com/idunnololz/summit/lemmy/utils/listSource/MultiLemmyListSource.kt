@@ -18,11 +18,7 @@ class MultiLemmyListSource<T, O, Key>(
   val seenIds = mutableSetOf<Key>()
   val allItems = mutableListOf<T>()
 
-  suspend fun getPage(
-    pageIndex: Int,
-    force: Boolean,
-    retainItemsOnForce: Boolean,
-  ): PageResult<T> =
+  suspend fun getPage(pageIndex: Int, force: Boolean, retainItemsOnForce: Boolean): PageResult<T> =
     _getPage(
       pageIndex = pageIndex,
       force = force,
@@ -33,7 +29,7 @@ class MultiLemmyListSource<T, O, Key>(
       },
       {
         PageResult.ErrorPageResult(pageIndex, it)
-      }
+      },
     )
 
   private suspend fun _getPage(
@@ -68,8 +64,7 @@ class MultiLemmyListSource<T, O, Key>(
         return Result.failure(requireNotNull(sourceAndError.second.exceptionOrNull()))
       }
 
-      val nextSourceAndResult = sourceToResult.maxBy {
-          (_, result) ->
+      val nextSourceAndResult = sourceToResult.maxBy { (_, result) ->
         val value = result.getOrNull() ?: return@maxBy 0L
         sortValue(value)
       }

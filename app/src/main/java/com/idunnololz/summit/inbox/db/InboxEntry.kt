@@ -1,4 +1,4 @@
-package com.idunnololz.summit.inbox
+package com.idunnololz.summit.inbox.db
 
 import android.util.Log
 import androidx.room.ColumnInfo
@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import kotlinx.serialization.json.Json
 
@@ -29,16 +30,16 @@ data class InboxEntry(
 )
 
 @ProvidedTypeConverter
-class InboxEntryConverters(private val json: Json) {
+class InboxEntryConverters(
+  private val json: Json,
+) {
 
   companion object {
     private const val TAG = "InboxEntryConverters"
   }
 
   @TypeConverter
-  fun inboxItemToString(value: InboxItem): String {
-    return json.encodeToString(value)
-  }
+  fun inboxItemToString(value: InboxItem): String = json.encodeToString(value)
 
   @TypeConverter
   fun stringToInboxItem(value: String): InboxItem? = try {

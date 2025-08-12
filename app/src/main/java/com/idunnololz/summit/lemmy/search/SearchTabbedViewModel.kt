@@ -30,7 +30,8 @@ class SearchTabbedViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val savedStateHandle: SavedStateHandle,
-) : ViewModel(), SlidingPaneController.PostViewPagerViewModel {
+) : ViewModel(),
+  SlidingPaneController.PostViewPagerViewModel {
 
   companion object {
     private const val MAX_QUERY_PAGE_LIMIT = 20

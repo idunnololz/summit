@@ -154,8 +154,12 @@ sealed class StatefulData<T> {
     fun requirePayload(): T = requireNotNull(payload)
   }
 
-  class Success<T>(val data: T) : StatefulData<T>()
-  class Error<T>(val error: Throwable) : StatefulData<T>()
+  class Success<T>(
+    val data: T,
+  ) : StatefulData<T>()
+  class Error<T>(
+    val error: Throwable,
+  ) : StatefulData<T>()
 }
 
 val StatefulData<*>.isLoading

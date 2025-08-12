@@ -62,7 +62,11 @@ class EmojiPopupWindow @AssistedInject constructor(
 
     binding.recyclerView.apply {
       this.adapter = adapter
-      layoutManager = GridAutofitLayoutManager(context, context.resources.getDimensionPixelSize(R.dimen.emoji_item_width))
+      layoutManager =
+        GridAutofitLayoutManager(
+          context,
+          context.resources.getDimensionPixelSize(R.dimen.emoji_item_width),
+        )
       addItemDecoration(
         GridSpaceItemDecoration(
           space = context.resources.getDimensionPixelSize(R.dimen.padding_half),
@@ -154,10 +158,11 @@ class EmojiPopupWindow @AssistedInject constructor(
     }
 
     private val adapterHelper = AdapterHelper<Item>(areItemsTheSame = { old, new ->
-      old::class == new::class && when (old) {
-        is Item.EmojiItem ->
-          old.text == (new as Item.EmojiItem).text
-      }
+      old::class == new::class &&
+        when (old) {
+          is Item.EmojiItem ->
+            old.text == (new as Item.EmojiItem).text
+        }
     }).apply {
       addItemType(Item.EmojiItem::class, EmojiListEmojiItemBinding::inflate) { item, b, h ->
         b.text.text = item.text

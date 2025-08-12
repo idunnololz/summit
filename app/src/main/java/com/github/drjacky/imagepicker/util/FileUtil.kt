@@ -126,11 +126,9 @@ object FileUtil {
     )
   }
 
-  private inline fun <reified T : Enum<T>> safeValueOf(name: String, defaultValue: T): T {
-    return try {
-      java.lang.Enum.valueOf(T::class.java, name) ?: defaultValue
-    } catch (e: IllegalArgumentException) {
-      defaultValue
-    }
+  private inline fun <reified T : Enum<T>> safeValueOf(name: String, defaultValue: T): T = try {
+    java.lang.Enum.valueOf(T::class.java, name) ?: defaultValue
+  } catch (e: IllegalArgumentException) {
+    defaultValue
   }
 }

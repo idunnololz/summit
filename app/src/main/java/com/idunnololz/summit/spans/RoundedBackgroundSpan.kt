@@ -62,7 +62,6 @@ class RoundedBackgroundSpan(
     return (measureText(paint, text ?: "", start, end) + startEndPadding * 2).roundToInt()
   }
 
-  private fun measureText(paint: Paint, text: CharSequence, start: Int, end: Int): Float {
-    return paint.measureText(text, start, end)
-  }
+  private fun measureText(paint: Paint, text: CharSequence, start: Int, end: Int): Float =
+    paint.measureText(text, start, end)
 }

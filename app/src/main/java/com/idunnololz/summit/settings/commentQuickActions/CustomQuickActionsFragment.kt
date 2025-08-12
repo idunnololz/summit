@@ -146,12 +146,13 @@ class CustomQuickActionsFragment :
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          Item.InactiveActionsTitle -> true
-          Item.QuickActionsTitle -> true
-          is Item.QuickAction ->
-            old.actionId == (new as Item.QuickAction).actionId
-        }
+        old::class == new::class &&
+          when (old) {
+            Item.InactiveActionsTitle -> true
+            Item.QuickActionsTitle -> true
+            is Item.QuickAction ->
+              old.actionId == (new as Item.QuickAction).actionId
+          }
       },
     ).apply {
       addItemType(
@@ -197,9 +198,7 @@ class CustomQuickActionsFragment :
           return item is Item.QuickAction || item is Item.InactiveActionsTitle
         }
 
-        override fun isLongPressDragEnabled(): Boolean {
-          return true
-        }
+        override fun isLongPressDragEnabled(): Boolean = true
 
         override fun onSwiped(viewHolder: ViewHolder, direction: Int) {}
 

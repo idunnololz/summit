@@ -5,7 +5,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CachePolicyManager @Inject constructor(private val preferences: Preferences) {
+class CachePolicyManager @Inject constructor(
+  private val preferences: Preferences,
+) {
 
   var cachePolicy: CachePolicy = preferences.cachePolicy
     private set

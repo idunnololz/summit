@@ -47,15 +47,32 @@ internal class CropImageAnimation(
 
   override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
     val animRect = RectF().apply {
-      left = (startCropWindowRect.left + (endCropWindowRect.left - startCropWindowRect.left) * interpolatedTime)
-      top = (startCropWindowRect.top + (endCropWindowRect.top - startCropWindowRect.top) * interpolatedTime)
-      right = (startCropWindowRect.right + (endCropWindowRect.right - startCropWindowRect.right) * interpolatedTime)
-      bottom = (startCropWindowRect.bottom + (endCropWindowRect.bottom - startCropWindowRect.bottom) * interpolatedTime)
+      left =
+        (
+          startCropWindowRect.left +
+            (endCropWindowRect.left - startCropWindowRect.left) * interpolatedTime
+          )
+      top =
+        (
+          startCropWindowRect.top +
+            (endCropWindowRect.top - startCropWindowRect.top) * interpolatedTime
+          )
+      right =
+        (
+          startCropWindowRect.right +
+            (endCropWindowRect.right - startCropWindowRect.right) * interpolatedTime
+          )
+      bottom =
+        (
+          startCropWindowRect.bottom +
+            (endCropWindowRect.bottom - startCropWindowRect.bottom) * interpolatedTime
+          )
     }
 
     val animPoints = FloatArray(8)
     for (i in animPoints.indices) {
-      animPoints[i] = (startBoundPoints[i] + (endBoundPoints[i] - startBoundPoints[i]) * interpolatedTime)
+      animPoints[i] =
+        (startBoundPoints[i] + (endBoundPoints[i] - startBoundPoints[i]) * interpolatedTime)
     }
 
     cropOverlayView.apply {
@@ -66,7 +83,8 @@ internal class CropImageAnimation(
 
     val animMatrix = FloatArray(9)
     for (i in animMatrix.indices) {
-      animMatrix[i] = (startImageMatrix[i] + (endImageMatrix[i] - startImageMatrix[i]) * interpolatedTime)
+      animMatrix[i] =
+        (startImageMatrix[i] + (endImageMatrix[i] - startImageMatrix[i]) * interpolatedTime)
     }
 
     imageView.apply {

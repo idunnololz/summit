@@ -74,8 +74,11 @@ interface SharedPreferencesPreferences {
     val defaultValue: Int = 0,
   ) : ReadWriteProperty<Any, Int> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) =
+    override fun getValue(thisRef: Any, property: KProperty<*>) = try {
       prefs.sharedPreferences.getInt(key, defaultValue)
+    } catch (e: Exception) {
+      defaultValue
+    }
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: Int) =
       prefs.sharedPreferences.edit().putInt(key, value).apply()

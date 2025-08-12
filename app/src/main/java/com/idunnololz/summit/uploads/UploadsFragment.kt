@@ -32,8 +32,8 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
@@ -163,7 +163,7 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
               message = getString(R.string.error_delete_item_failed),
               error = it.error,
               fm = childFragmentManager,
-              )
+            )
           }
           is StatefulData.Loading -> {
             loadingView.showProgressBar()
@@ -193,26 +193,27 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
 
     private val adapterHelper = AdapterHelper<UploadsEngine.UploadItem>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is UploadsEngine.UploadItem.ErrorItem -> {
-            old.pageIndex == (new as UploadsEngine.UploadItem.ErrorItem).pageIndex
+        old::class == new::class &&
+          when (old) {
+            is UploadsEngine.UploadItem.ErrorItem -> {
+              old.pageIndex == (new as UploadsEngine.UploadItem.ErrorItem).pageIndex
+            }
+            is UploadsEngine.UploadItem.LoadingItem -> {
+              old.pageIndex == (new as UploadsEngine.UploadItem.LoadingItem).pageIndex
+            }
+            is UploadsEngine.UploadItem.MoreItem -> {
+              old.pageIndex == (new as UploadsEngine.UploadItem.MoreItem).pageIndex
+            }
+            is UploadsEngine.UploadItem.MediaItem -> {
+              old.media.local_image.pictrs_alias ==
+                (new as UploadsEngine.UploadItem.MediaItem).media.local_image.pictrs_alias
+            }
           }
-          is UploadsEngine.UploadItem.LoadingItem -> {
-            old.pageIndex == (new as UploadsEngine.UploadItem.LoadingItem).pageIndex
-          }
-          is UploadsEngine.UploadItem.MoreItem -> {
-            old.pageIndex == (new as UploadsEngine.UploadItem.MoreItem).pageIndex
-          }
-          is UploadsEngine.UploadItem.MediaItem -> {
-            old.media.local_image.pictrs_alias ==
-              (new as UploadsEngine.UploadItem.MediaItem).media.local_image.pictrs_alias
-          }
-        }
-      }
+      },
     ).apply {
       addItemType(
         clazz = UploadsEngine.UploadItem.MediaItem::class,
-        inflateFn = UploadItemMediaItemBinding::inflate
+        inflateFn = UploadItemMediaItemBinding::inflate,
       ) { item, b, h ->
         val instance = item.instance
         val pictrsAlias = item.media.local_image.pictrs_alias
@@ -245,41 +246,33 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
       }
       addItemType(
         clazz = UploadsEngine.UploadItem.LoadingItem::class,
-        inflateFn = UploadItemLoadingItemBinding::inflate
+        inflateFn = UploadItemLoadingItemBinding::inflate,
       ) { item, b, h ->
         b.loadingView.showProgressBar()
       }
       addItemType(
         clazz = UploadsEngine.UploadItem.MoreItem::class,
-        inflateFn = UploadItemLoadingItemBinding::inflate
+        inflateFn = UploadItemLoadingItemBinding::inflate,
       ) { item, b, h ->
         b.loadingView.showProgressBar()
       }
       addItemType(
         clazz = UploadsEngine.UploadItem.ErrorItem::class,
-        inflateFn = UploadItemErrorItemBinding::inflate
+        inflateFn = UploadItemErrorItemBinding::inflate,
       ) { item, b, h ->
         b.loadingView.showDefaultErrorMessageFor(item.error)
       }
     }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int,
-    ): ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun onBindViewHolder(
-      holder: ViewHolder,
-      position: Int,
-    ) =
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     fun setData(data: List<UploadsEngine.UploadItem>) {
       this.data = data
@@ -292,6 +285,5 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
 
       adapterHelper.setItems(data, this)
     }
-
   }
 }

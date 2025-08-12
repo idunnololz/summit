@@ -21,8 +21,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.TabbedFragmentInboxBinding
-import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.inbox.conversation.Conversation
 import com.idunnololz.summit.inbox.conversation.ConversationFragment
 import com.idunnololz.summit.inbox.conversation.ConversationFragmentArgs
@@ -34,6 +32,8 @@ import com.idunnololz.summit.inbox.message.MessageFragment
 import com.idunnololz.summit.inbox.message.MessageFragmentArgs
 import com.idunnololz.summit.inbox.report.ReportDetailsFragment
 import com.idunnololz.summit.inbox.report.ReportDetailsFragmentArgs
+import com.idunnololz.summit.lemmy.community.CommunityFragment
+import com.idunnololz.summit.lemmy.community.SlidingPaneController
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
@@ -313,13 +313,12 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
   class InboxPagerAdapter(
     private val context: Context,
     fragment: Fragment,
-  ) : FragmentStateAdapter(fragment), TabLayoutMediator.TabConfigurationStrategy {
+  ) : FragmentStateAdapter(fragment),
+    TabLayoutMediator.TabConfigurationStrategy {
 
     var items: List<PageItem> = listOf()
 
-    override fun getItemId(position: Int): Long {
-      return items[position].id
-    }
+    override fun getItemId(position: Int): Long = items[position].id
 
     override fun containsItem(itemId: Long): Boolean = items.any { it.id == itemId }
 
@@ -349,17 +348,15 @@ class InboxTabbedFragment : BaseFragment<TabbedFragmentInboxBinding>() {
 
       val diff = DiffUtil.calculateDiff(
         object : DiffUtil.Callback() {
-          override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition].id == newItems[newItemPosition].id
-          }
+          override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldItems[oldItemPosition].id == newItems[newItemPosition].id
 
           override fun getOldListSize(): Int = oldItems.size
 
           override fun getNewListSize(): Int = newItems.size
 
-          override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return true
-          }
+          override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            true
         },
       )
       this.items = newItems

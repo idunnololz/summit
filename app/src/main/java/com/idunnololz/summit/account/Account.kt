@@ -30,7 +30,8 @@ data class Account(
     defaultValue = "0",
   )
   val defaultSortType: Int,
-) : Parcelable, GuestOrUserAccount {
+) : Parcelable,
+  GuestOrUserAccount {
 
   companion object {
     fun from(instance: String, localUserView: LocalUserView, jwt: String) = Account(

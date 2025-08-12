@@ -232,17 +232,18 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
 
     private val adapterHelper = AdapterHelper<ListEngine.Item<CommunityView>>(
       areItemsTheSame = { old, new ->
-        old::class == new::class && when (old) {
-          is ListEngine.Item.DataItem -> {
-            old.data.community.id ==
-              (new as ListEngine.Item.DataItem).data.community.id
+        old::class == new::class &&
+          when (old) {
+            is ListEngine.Item.DataItem -> {
+              old.data.community.id ==
+                (new as ListEngine.Item.DataItem).data.community.id
+            }
+            is ListEngine.Item.ErrorItem ->
+              old.pageIndex == (new as ListEngine.Item.ErrorItem).pageIndex
+            is ListEngine.Item.LoadItem ->
+              old.pageIndex == (new as ListEngine.Item.LoadItem).pageIndex
+            is ListEngine.Item.EmptyItem -> true
           }
-          is ListEngine.Item.ErrorItem ->
-            old.pageIndex == (new as ListEngine.Item.ErrorItem).pageIndex
-          is ListEngine.Item.LoadItem ->
-            old.pageIndex == (new as ListEngine.Item.LoadItem).pageIndex
-          is ListEngine.Item.EmptyItem -> true
-        }
       },
     ).apply {
       addItemType(

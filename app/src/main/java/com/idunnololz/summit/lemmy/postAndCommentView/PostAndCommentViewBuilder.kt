@@ -60,6 +60,10 @@ import com.idunnololz.summit.databinding.PostMissingCommentItemBinding
 import com.idunnololz.summit.databinding.PostMoreCommentsItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
+import com.idunnololz.summit.inbox.CommentBackedItem
+import com.idunnololz.summit.inbox.InboxItem
+import com.idunnololz.summit.inbox.RegistrationDecision
+import com.idunnololz.summit.inbox.ReportItem
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.LemmyContentHelper
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
@@ -67,10 +71,6 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
-import com.idunnololz.summit.inbox.CommentBackedItem
-import com.idunnololz.summit.inbox.InboxItem
-import com.idunnololz.summit.inbox.RegistrationDecision
-import com.idunnololz.summit.inbox.ReportItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig

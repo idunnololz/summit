@@ -31,7 +31,12 @@ class SettingsHapticsFragment :
 
           if (it) {
             val hapticsEnabled =
-              Settings.System.getInt(context.contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) == 1
+              Settings.System.getInt(
+                context.contentResolver,
+                Settings.System.HAPTIC_FEEDBACK_ENABLED,
+                1,
+              ) ==
+                1
 
             if (!hapticsEnabled) {
               OldAlertDialogFragment.Builder()
