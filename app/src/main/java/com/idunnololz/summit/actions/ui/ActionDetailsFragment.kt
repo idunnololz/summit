@@ -159,6 +159,7 @@ class ActionDetailsFragment :
           is StatefulData.Error -> {
             loadingView.hideAll()
             adapter.disableActions = false
+            viewModel.retryActionResult.setIdle()
 
             ErrorDialogFragment.show(
               message = context.getString(R.string.retry_action_failed),

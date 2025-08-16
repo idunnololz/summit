@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-  compileSdk = 34
+  compileSdk = 36
   namespace = "io.github.inflationx.calligraphy3"
 
   defaultConfig {
@@ -21,6 +21,13 @@ android {
         "consumer-proguard-rules.txt",
       )
     }
+  }
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+  kotlin {
+    jvmToolchain(17)
   }
 }
 

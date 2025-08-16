@@ -225,8 +225,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
     binding.bottomAppBar.setOnMenuItemClickListener {
       when (it.itemId) {
-        R.id.mark_as_unread -> {
-          inboxViewModel.markAsRead(args.inboxItem, read = false)
+        R.id.toggle_mark_as_read -> {
+          inboxViewModel.toggleMarkAsRead(args.inboxItem)
           (parentFragment as? InboxTabbedFragment)?.closeMessage()
 
           if (preferences.hapticsOnActions) {
@@ -263,6 +263,20 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
         else -> {
           false
+        }
+      }
+    }
+
+    inboxViewModel.inboxUpdate.observe(viewLifecycleOwner) {
+      binding.bottomAppBar.menu.apply {
+        findItem(R.id.toggle_mark_as_read).apply {
+          if (inboxViewModel.isRead(args.inboxItem)) {
+            this.setIcon(R.drawable.baseline_mark_as_unread_24)
+            this.setTitle(R.string.mark_as_unread)
+          } else {
+            this.setIcon(R.drawable.baseline_check_24)
+            this.setTitle(R.string.mark_as_read)
+          }
         }
       }
     }

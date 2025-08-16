@@ -108,15 +108,6 @@ class MainApplication :
           ),
         )
         .components {
-          add(
-            OkHttpNetworkFetcherFactory(
-              callFactory = {
-                hiltEntryPoint.browserLikeOkHttpClient()
-              },
-            ),
-          )
-        }
-        .components {
           if (SDK_INT >= 28) {
             add(AnimatedImageDecoder.Factory())
           } else {
@@ -124,6 +115,13 @@ class MainApplication :
           }
           add(VideoFrameDecoder.Factory())
           add(SvgDecoder.Factory())
+          add(
+            OkHttpNetworkFetcherFactory(
+              callFactory = {
+                hiltEntryPoint.browserLikeOkHttpClient()
+              },
+            ),
+          )
         }
         .apply {
           if (BuildConfig.DEBUG) {

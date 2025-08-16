@@ -14,6 +14,7 @@ sealed interface InboxListItem {
 
   val page: Int
   val id: Long
+  val read: Boolean
 
   data class RegularInboxItem(
     override val page: Int,
@@ -21,6 +22,8 @@ sealed interface InboxListItem {
   ) : InboxListItem {
     override val id: Long
       get() = item.id.toLong()
+    override val read: Boolean
+      get() = item.isRead
   }
 
   data class ConversationItem(
@@ -30,6 +33,8 @@ sealed interface InboxListItem {
   ) : InboxListItem {
     override val id: Long
       get() = conversation.id
+    override val read: Boolean
+      get() = conversation.isRead
   }
 
   data class RegistrationApplicationInboxItem(
@@ -38,5 +43,7 @@ sealed interface InboxListItem {
   ) : InboxListItem {
     override val id: Long
       get() = item.id.toLong()
+    override val read: Boolean
+      get() = item.isRead
   }
 }

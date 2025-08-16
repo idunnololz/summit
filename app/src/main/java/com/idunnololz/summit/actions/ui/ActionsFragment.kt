@@ -105,7 +105,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
 
           adapter.accountDictionary = it.data.accountDictionary
 
-          when (args.actionType as ActionType) {
+          when (args.actionType) {
             ActionType.Completed -> {
               adapter.actions = it.data.completedActions
             }

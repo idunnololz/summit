@@ -336,6 +336,16 @@ class InboxViewModel @Inject constructor(
     }
   }
 
+  fun toggleMarkAsRead(inboxItem: InboxItem) {
+    val inboxListItem = allInboxItems.firstOrNull { it.id == inboxItem.id.toLong() }
+      ?: return
+
+    markAsRead(
+      inboxItem,
+      !inboxListItem.read
+    )
+  }
+
   fun markAsRead(inboxItem: InboxItem, read: Boolean, refreshAfter: Boolean = false) {
     markAsReadResult.setIsLoading()
 
@@ -613,6 +623,10 @@ class InboxViewModel @Inject constructor(
       }
     }
   }
+
+  fun isRead(inboxItem: InboxItem): Boolean =
+    allInboxItems.firstOrNull { it.id == inboxItem.id.toLong() }
+      ?.read ?: inboxItem.isRead
 }
 
 private fun PageResult.SuccessPageResult<LiteInboxItem>.toInboxItemResult(): PageResult.SuccessPageResult<InboxItem> =
