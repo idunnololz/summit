@@ -15,6 +15,9 @@ object PostQuickActionIds {
   const val DetailedView: PostQuickActionId = 1010
 
   const val More: PostQuickActionId = 1999
+  const val VotingWithScores: PostQuickActionId = 2000
+  const val VotingNoScores: PostQuickActionId = 2001
+  const val VotingWithUpAndDownScores: PostQuickActionId = 2002
 
   val AllActions = listOf(
     Voting,

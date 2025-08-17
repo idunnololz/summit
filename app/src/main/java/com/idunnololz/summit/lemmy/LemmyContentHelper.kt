@@ -21,6 +21,7 @@ import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
 import arrow.core.Either
 import coil3.Image
+import coil3.dispose
 import coil3.imageLoader
 import coil3.load
 import coil3.request.ImageRequest
@@ -62,6 +63,7 @@ import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.coil.BlurTransformation
 import com.idunnololz.summit.util.ext.setup
+import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.CustomPlayerView
@@ -301,7 +303,7 @@ class LemmyContentHelper(
         val pageRef = LinkResolver.parseUrl(url, instance)
         if (pageRef != null) {
           onLemmyUrlClick(pageRef)
-        } else if (ContentUtils.isUrlImage(url)) {
+        } else if (isUrlImage(url)) {
           onImageClickListener(url)
         } else if (uri.path?.endsWith(".gifv") == true ||
           uri.path?.endsWith(".mp4") == true
@@ -689,6 +691,10 @@ class LemmyContentHelper(
       imageView.updateLayoutParams(contentMaxWidth, imageSizeKey, tempSize)
     }
 
+
+    imageView.dispose()
+    offlineManager.cancelFetch(imageView)
+
     if (thumbnailUrl != null &&
       isUrlImage(thumbnailUrl) &&
       offlineManager.isUrlCached(thumbnailUrl) &&
@@ -708,6 +714,8 @@ class LemmyContentHelper(
 
         allowHardware(false)
       }
+    } else {
+      imageView.load(newShimmerDrawable16to9(context))
     }
 
     fun onImageLoaded(urlOrFile: Either<String, File>) {

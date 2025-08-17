@@ -126,6 +126,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class LemmyApiV3Adapter(
   private val api: LemmyApiV3,
   override val instance: String,
+  private val apiInfo: ApiInfo,
 ) : LemmyLikeApi {
 
   companion object {
@@ -134,12 +135,8 @@ class LemmyApiV3Adapter(
       .create()
   }
 
-  override fun supportsFeature(apiFeature: ApiFeature): Boolean = when (apiFeature) {
-    ApiFeature.Reports -> true
-    ApiFeature.Register -> true
-    ApiFeature.Downvoted -> true
-    ApiFeature.UploadsList -> true
-  }
+  override fun supportsFeature(apiFeature: ApiFeature): Boolean =
+    apiInfo.supportsFeature(apiFeature)
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
     val headers = mutableMapOf<String, String>()

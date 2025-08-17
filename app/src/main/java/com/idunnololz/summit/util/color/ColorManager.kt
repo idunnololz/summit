@@ -1,9 +1,11 @@
 package com.idunnololz.summit.util.color
 
 import android.content.Context
+import android.content.res.ColorStateList
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,11 +14,13 @@ class ColorManager @Inject constructor() {
 
   var textColor: Int = 0
     private set
-  var controlColor: Int = 0
+  var controlColor: ColorStateList = ColorStateList.valueOf(0)
     private set
 
   fun updateColors(context: Context) {
     textColor = context.getColorCompat(R.color.colorText)
-    controlColor = context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal)
+    controlColor =
+      context.getColorStateListFromAttribute(androidx.appcompat.R.attr.colorControlNormal)
+        ?: controlColor
   }
 }

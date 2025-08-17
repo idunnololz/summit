@@ -154,6 +154,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class PieFedApiAlphaAdapter(
   private val api: PieFedApiAlpha,
   override val instance: String,
+  private val apiInfo: ApiInfo,
 ) : LemmyLikeApi {
 
   companion object {
@@ -162,12 +163,8 @@ class PieFedApiAlphaAdapter(
       .create()
   }
 
-  override fun supportsFeature(apiFeature: ApiFeature): Boolean = when (apiFeature) {
-    ApiFeature.Reports -> false
-    ApiFeature.Register -> false
-    ApiFeature.Downvoted -> false
-    ApiFeature.UploadsList -> false
-  }
+  override fun supportsFeature(apiFeature: ApiFeature): Boolean =
+    apiInfo.supportsFeature(apiFeature)
 
   private fun generateHeaders(authorization: String?, force: Boolean): Map<String, String> {
     val headers = mutableMapOf<String, String>()

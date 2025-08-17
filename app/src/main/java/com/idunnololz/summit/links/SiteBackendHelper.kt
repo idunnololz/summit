@@ -1,8 +1,11 @@
 package com.idunnololz.summit.links
 
 import android.util.Log
+import com.google.gson.Gson
+import com.idunnololz.summit.api.ApiInfo
+import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
-import com.idunnololz.summit.links.SiteBackendHelper.ApiType
+import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.network.BrowserLikeUnauthed
 import com.idunnololz.summit.util.LinkFetcher
 import java.io.InterruptedIOException
@@ -31,19 +34,12 @@ class SiteBackendHelper @Inject constructor(
     private const val TAG = "SiteBackendHelper"
   }
 
-  enum class ApiType {
-    LemmyV3,
-
-//    LemmyV4,
-    PieFedAlpha,
-  }
-
-  data class ApiInfo(
-    val backendType: ApiType?,
-  )
-
   private val mutex = Mutex()
   private val instanceApiInfoCache = mutableMapOf<String, ApiInfo>()
+  private val gson = Gson()
+
+  fun getApiInfoFromCache(instance: String): ApiInfo? =
+    instanceApiInfoCache[instance]
 
   suspend fun fetchApiInfo(instance: String): Result<ApiInfo> {
     withContext(Dispatchers.Main) {
@@ -101,13 +97,27 @@ class SiteBackendHelper @Inject constructor(
 //        } else
         if (alphaJob.isSiteView()) {
           Log.d(TAG, "instance: $instance is type alpha")
-          return@withContext Result.success(ApiInfo(ApiType.PieFedAlpha))
+          val site = gson.fromJson(
+            v3Job.await().getOrNull(),
+            com.idunnololz.summit.api.dto.piefed.GetSiteResponse::class.java
+          )
+
+          return@withContext Result.success(ApiInfo(
+            backendType = ApiType.PieFedAlpha,
+            downvoteAllowed = site?.site?.enableDownvotes != false,
+          ))
         } else if (v3Job.isSiteView()) {
           Log.d(TAG, "instance: $instance is type V3")
-          return@withContext Result.success(ApiInfo(ApiType.LemmyV3))
+          val site = gson.fromJson(v3Job.await().getOrNull(), GetSiteResponse::class.java)
+
+          return@withContext Result.success(ApiInfo(
+            backendType = ApiType.LemmyV3,
+            downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
+          ))
         } else if (homePageJob.await().isSuccess) {
           Log.d(TAG, "instance: $instance is not a lemmy site")
-          return@withContext Result.success(ApiInfo(null))
+
+          return@withContext Result.success(ApiInfo(backendType = null, downvoteAllowed = false))
         }
 
         // All 3 network calls failed. This likely means either the site is down or we are down.

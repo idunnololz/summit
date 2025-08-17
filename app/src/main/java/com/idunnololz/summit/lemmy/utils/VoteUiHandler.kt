@@ -16,6 +16,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.LemmyUtils
+import com.idunnololz.summit.util.ext.imageTintListCompat
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -46,7 +47,7 @@ interface VoteUiHandler {
   val downvoteColor: Int
 
   fun neutralColor(context: Context): Int
-  fun controlColor(context: Context): Int
+  fun controlColor(context: Context): ColorStateList
 }
 
 fun VoteUiHandler.bind(
@@ -175,31 +176,25 @@ fun VoteUiHandler.bind(
   fun update(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
     if (upVoteView is ImageView && downVoteView is ImageView) {
       if (vote < 0) {
-        upVoteView.setColorFilter(controlColor)
-        downVoteView.setColorFilter(downvoteColor)
+        upVoteView.imageTintListCompat = controlColor
+        downVoteView.imageTintListCompat = ColorStateList.valueOf(downvoteColor)
       } else if (vote > 0) {
-        upVoteView.setColorFilter(upvoteColor)
-        downVoteView.setColorFilter(controlColor)
+        upVoteView.imageTintListCompat = ColorStateList.valueOf(upvoteColor)
+        downVoteView.imageTintListCompat = controlColor
       } else {
-        upVoteView.setColorFilter(controlColor)
-        downVoteView.setColorFilter(controlColor)
+        upVoteView.imageTintListCompat = controlColor
+        downVoteView.imageTintListCompat = controlColor
       }
     } else if (upVoteView is MaterialButton && downVoteView is MaterialButton) {
       if (vote < 0) {
-        upVoteView.iconTint =
-          ColorStateList.valueOf(controlColor)
-        downVoteView.iconTint =
-          ColorStateList.valueOf(downvoteColor)
+        upVoteView.iconTint = controlColor
+        downVoteView.iconTint = ColorStateList.valueOf(downvoteColor)
       } else if (vote > 0) {
-        upVoteView.iconTint =
-          ColorStateList.valueOf(upvoteColor)
-        downVoteView.iconTint =
-          ColorStateList.valueOf(controlColor)
+        upVoteView.iconTint = ColorStateList.valueOf(upvoteColor)
+        downVoteView.iconTint = controlColor
       } else {
-        upVoteView.iconTint =
-          ColorStateList.valueOf(controlColor)
-        downVoteView.iconTint =
-          ColorStateList.valueOf(controlColor)
+        upVoteView.iconTint = controlColor
+        downVoteView.iconTint = controlColor
       }
     }
     if (vote < 0) {

@@ -1966,6 +1966,8 @@ class CommunityFragment :
     val didLayoutChange = adapter?.layout != currentLayout
     val didActionsChange =
       postListViewBuilder.postsInFeedQuickActions != preferences.postsInFeedQuickActions
+    val didLayoutRelatedSettingChange =
+      postListViewBuilder.showUpAndDownVotes != preferences.postShowUpAndDownVotes
 
     if (didLayoutChange) {
       if (isBindingAvailable()) {
@@ -1977,12 +1979,7 @@ class CommunityFragment :
       postListViewBuilder.postUiConfig = newPostUiConfig
     }
 
-    if (didActionsChange) {
-      postListViewBuilder.postsInFeedQuickActions = preferences.postsInFeedQuickActions
-        ?: PostsInFeedQuickActionsSettings()
-    }
-
-    if (didLayoutChange || didUiConfigChange || didActionsChange) {
+    if (didLayoutChange || didUiConfigChange || didActionsChange || didLayoutRelatedSettingChange) {
       adapter?.layout = currentLayout
 
       // Need to manually call this in case the layout didn't change

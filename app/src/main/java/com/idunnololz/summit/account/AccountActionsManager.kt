@@ -1,6 +1,7 @@
 package com.idunnololz.summit.account
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -217,7 +218,7 @@ class AccountActionsManager @Inject constructor(
 
     override fun neutralColor(context: Context): Int = colorManager.textColor
 
-    override fun controlColor(context: Context): Int = colorManager.controlColor
+    override fun controlColor(context: Context): ColorStateList = colorManager.controlColor
   }
 
   private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {

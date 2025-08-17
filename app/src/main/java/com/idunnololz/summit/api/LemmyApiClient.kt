@@ -202,10 +202,10 @@ class LemmyApiClient @Inject constructor(
   private val coroutineScope = coroutineScopeFactory.create()
 
   private val apiInfo =
-    MutableStateFlow<StatefulData<SiteBackendHelper.ApiInfo>>(StatefulData.NotStarted())
+    MutableStateFlow<StatefulData<ApiInfo>>(StatefulData.NotStarted())
 
   private var fetchApiInfoInstance: String? = null
-  private var fetchApiInfoJob: Deferred<Result<SiteBackendHelper.ApiInfo>>? = null
+  private var fetchApiInfoJob: Deferred<Result<ApiInfo>>? = null
 
   fun changeInstance(newInstance: String) {
     instanceFlow.value = newInstance
@@ -1646,30 +1646,32 @@ class LemmyApiClient @Inject constructor(
 
   private fun newApi(
     instance: String = Consts.DEFAULT_INSTANCE,
-    apiInfo: Result<SiteBackendHelper.ApiInfo>,
+    apiInfo: Result<ApiInfo>,
   ): LemmyLikeApi = apiInfo.fold(
     {
       when (it.backendType) {
-        SiteBackendHelper.ApiType.PieFedAlpha -> PieFedApiAlphaAdapter(
-          Retrofit.Builder()
+        ApiType.PieFedAlpha -> PieFedApiAlphaAdapter(
+          api = Retrofit.Builder()
             .baseUrl("https://$instance/api/alpha/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
             .create(PieFedApiAlpha::class.java),
-          instance,
+          instance = instance,
+          apiInfo = it,
         )
 //          SiteBackendHelper.ApiType.LemmyV4,
-        SiteBackendHelper.ApiType.LemmyV3,
+        ApiType.LemmyV3,
         null,
         -> LemmyApiV3Adapter(
-          Retrofit.Builder()
+          api = Retrofit.Builder()
             .baseUrl("https://$instance/api/v3/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
             .create(LemmyApiV3::class.java),
-          instance,
+          instance = instance,
+          apiInfo = it,
         )
       }
     },
