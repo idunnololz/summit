@@ -10,6 +10,13 @@ class ApiFeatureHelper @Inject constructor(
 ) {
   fun instanceSupportsFeature(instance: String, feature: ApiFeature, defaultValue: Boolean) =
     siteBackendHelper.getApiInfoFromCache(instance)?.supportsFeature(feature) ?: defaultValue
+
+  suspend fun instanceSupportsFeatureAsync(
+    instance: String,
+    feature: ApiFeature,
+    defaultValue: Boolean,
+  ) =
+    siteBackendHelper.fetchApiInfo(instance).getOrNull()?.supportsFeature(feature) ?: defaultValue
 }
 
 fun ApiFeatureHelper.supportsDownvotes(instance: String): Boolean =

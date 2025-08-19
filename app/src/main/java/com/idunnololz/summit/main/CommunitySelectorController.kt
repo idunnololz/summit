@@ -82,7 +82,6 @@ class CommunitySelectorController @AssistedInject constructor(
   @Assisted private val context: Context,
   @Assisted private val viewModel: MainActivityViewModel,
   @Assisted private val viewLifecycleOwner: LifecycleOwner,
-  private val offlineManager: OfflineManager,
   private val accountManager: AccountManager,
   private val accountInfoManager: AccountInfoManager,
   private val lemmyApiClient: AccountAwareLemmyClient,

@@ -13,6 +13,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
@@ -21,6 +22,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
+import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Event
@@ -43,6 +45,7 @@ class MainActivityViewModel @Inject constructor(
   private val accountInfoManager: AccountInfoManager,
   private val userTagsManager: UserTagsManager,
   private val pendingActionsManager: PendingActionsManager,
+  private val apiFeatureHelper: ApiFeatureHelper,
   val communitySelectorControllerFactory: CommunitySelectorController.Factory,
   val userCommunitiesManager: UserCommunitiesManager,
   val postReadManager: PostReadManager,
@@ -158,10 +161,23 @@ class MainActivityViewModel @Inject constructor(
   fun loadCommunities() {
     communities.setIsLoading()
     viewModelScope.launch(Dispatchers.Default) {
-      apiClient.fetchCommunitiesWithRetry(
-        sortType = SortType.TopAll,
-        listingType = ListingType.All,
-      ).onSuccess {
+      val supportsGetCommunitiesAll = apiFeatureHelper.instanceSupportsFeatureAsync(
+        instance = apiClient.instance,
+        feature = ApiFeature.GetCommunitiesAll,
+        defaultValue = true
+      )
+
+      if (supportsGetCommunitiesAll) {
+        apiClient.fetchCommunitiesWithRetry(
+          sortType = SortType.TopAll,
+          listingType = ListingType.All,
+        )
+      } else {
+        apiClient.fetchCommunitiesWithRetry(
+          sortType = SortType.Hot,
+          listingType = ListingType.All,
+        )
+      }.onSuccess {
         communities.postValue(it)
       }.onFailure {
         communities.postError(it)

@@ -20,4 +20,7 @@ enum class ApiFeature {
 
   SearchAll,
   SearchComments,
+
+  // Whether the server supports GetCommunities with the ALL type.
+  GetCommunitiesAll,
 }
