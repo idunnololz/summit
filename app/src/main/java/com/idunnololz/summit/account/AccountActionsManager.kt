@@ -15,7 +15,9 @@ import com.idunnololz.summit.actions.PendingCommentsManager
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.VotesManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.ApiListenerManager
+import com.idunnololz.summit.api.FeatureNotSupported
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -38,6 +40,9 @@ import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
+import com.idunnololz.summit.links.ApiFeatureHelper
+import com.idunnololz.summit.links.SiteBackendHelper
+import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
@@ -57,6 +62,7 @@ class AccountActionsManager @Inject constructor(
   private val apiListenerManager: ApiListenerManager,
   private val colorManager: ColorManager,
   private val pendingCommentsManager: PendingCommentsManager,
+  private val apiFeatureHelper: ApiFeatureHelper,
 ) {
 
   companion object {
@@ -525,6 +531,9 @@ class AccountActionsManager @Inject constructor(
     }
     if (account.instance != instance) {
       return Result.failure(AccountInstanceMismatchException(account.instance, instance))
+    }
+    if (!apiFeatureHelper.supportsDownvotes(instance) && dir < 0) {
+      return Result.failure(FeatureNotSupported(ApiFeature.Downvote))
     }
 
     pendingActionsManager.voteOn(instance, ref, dir, account.id, account.instance)

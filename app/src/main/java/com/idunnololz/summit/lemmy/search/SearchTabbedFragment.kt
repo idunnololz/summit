@@ -26,6 +26,7 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -39,6 +40,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.lemmy.utils.showSortTypeMenu
+import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.search.CustomSearchSuggestionsAdapter
@@ -83,6 +85,9 @@ class SearchTabbedFragment :
 
   @Inject
   lateinit var animationsHelper: AnimationsHelper
+
+  @Inject
+  lateinit var siteBackendHelper: SiteBackendHelper
 
   private var isOnViewCreatedCalled = false
 
@@ -172,11 +177,21 @@ class SearchTabbedFragment :
       )
     }
 
+    val apiInfo = siteBackendHelper.getApiInfoFromCache(viewModel.instance)
+
     with(binding) {
-      val allTabs = listOf(
-        SearchType.All,
+      val allTabs = listOfNotNull(
+        if (apiInfo?.supportsFeature(ApiFeature.SearchAll) != false) {
+          SearchType.All
+        } else {
+          null
+        },
         SearchType.Posts,
-        SearchType.Comments,
+        if (apiInfo?.supportsFeature(ApiFeature.SearchComments) != false) {
+          SearchType.Comments
+        } else {
+          null
+        },
         SearchType.Communities,
         SearchType.Users,
         SearchType.Url,

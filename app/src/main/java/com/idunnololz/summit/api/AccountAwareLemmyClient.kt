@@ -109,7 +109,7 @@ class AccountAwareLemmyClient @Inject constructor(
     }
   }
 
-  suspend fun supportsFeature(apiFeature: ApiFeature): Boolean =
+  suspend fun supportsFeature(apiFeature: ApiFeature): Result<Boolean> =
     apiClient.supportsFeature(apiFeature)
 
   suspend fun fetchSavedPostsWithRetry(

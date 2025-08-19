@@ -6,6 +6,7 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.view.ViewCompat
+import androidx.core.view.updatePaddingRelative
 
 fun View.runAfterLayout(callback: () -> Unit) {
   if (this.isLaidOut) {
@@ -82,3 +83,19 @@ fun View.focusAndShowKeyboard() {
 fun View.performHapticFeedbackCompat(feedbackConstant: Int) {
   ViewCompat.performHapticFeedback(this, feedbackConstant)
 }
+
+inline var View.paddingStartCompat
+  get() = this.paddingStart
+  set(value) {
+    if (this.paddingStart != value) {
+    updatePaddingRelative(start = value)
+      }
+  }
+
+inline var View.paddingEndCompat
+  get() = this.paddingEnd
+  set(value) {
+    if (this.paddingEnd != value) {
+      updatePaddingRelative(end = value)
+    }
+  }

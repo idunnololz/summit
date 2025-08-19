@@ -120,6 +120,7 @@ class MainActivityViewModel @Inject constructor(
           if (mainTab != null) {
             break
           }
+          delay(16)
         }
 
         withContext(Dispatchers.Main) {

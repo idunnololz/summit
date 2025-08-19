@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
@@ -84,8 +85,11 @@ import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
+import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.links.SiteBackendHelper
+import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
@@ -109,6 +113,8 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
+import com.idunnololz.summit.util.ext.paddingEndCompat
+import com.idunnololz.summit.util.ext.paddingStartCompat
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.markwon.BorderedSpan
 import com.idunnololz.summit.util.tsToConcise
@@ -134,6 +140,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
   private val exoPlayerManagerManager: ExoPlayerManagerManager,
   private val lemmyTextHelper: LemmyTextHelper,
+  private val apiFeatureHelper: ApiFeatureHelper,
 ) {
 
   private var preferences = preferenceManager.currentPreferences
@@ -544,20 +551,42 @@ class PostAndCommentViewBuilder @Inject constructor(
         downvoteCount = null
       }
 
-      voteUiHandler.bind(
-        lifecycleOwner = viewLifecycleOwner,
-        instance = instance,
-        postView = postView,
-        upVoteView = viewHolder.upvoteButton,
-        downVoteView = viewHolder.downvoteButton,
-        scoreView = scoreCount,
-        upvoteCount = upvoteCount,
-        downvoteCount = downvoteCount,
-        accountId = accountId,
-        onUpdate = null,
-        onSignInRequired = onSignInRequired,
-        onInstanceMismatch = onInstanceMismatch,
-      )
+      voteUiHandler.run {
+        bind(
+          lifecycleOwner = viewLifecycleOwner,
+          instance = instance,
+          postView = postView,
+          upVoteView = viewHolder.upvoteButton,
+          downVoteView = viewHolder.downvoteButton,
+          scoreView = scoreCount,
+          upvoteCount = upvoteCount,
+          downvoteCount = downvoteCount,
+          accountId = accountId,
+          onUpdate = null,
+          onSignInRequired = onSignInRequired,
+          onInstanceMismatch = onInstanceMismatch,
+        )
+      }
+    }
+
+    if (apiFeatureHelper.supportsDownvotes(instance)) {
+      viewHolder.downvoteButton?.visibility = View.VISIBLE
+      viewHolder.qaScoreCount?.let {
+        if (leftHandMode) {
+          it.paddingStartCompat = 0
+        } else {
+          it.paddingEndCompat = 0
+        }
+      }
+    } else {
+      viewHolder.downvoteButton?.visibility = View.GONE
+      viewHolder.qaScoreCount?.let {
+        if (leftHandMode) {
+          it.paddingStartCompat = paddingFull
+        } else {
+          it.paddingEndCompat = paddingFull
+        }
+      }
     }
 
     root.tag = postView
@@ -1020,14 +1049,48 @@ class PostAndCommentViewBuilder @Inject constructor(
       )
     }
 
+    val supportsDownvotes = apiFeatureHelper.supportsDownvotes(instance)
+    var downvoteCountVisible = true
+    if (supportsDownvotes) {
+      downvoteButton?.visibility = View.VISIBLE
+      downvoteCountVisible = true
+      qaScoreCount?.let {
+        if (leftHandMode) {
+          it.paddingStartCompat = 0
+        } else {
+          it.paddingEndCompat = 0
+        }
+      }
+    } else {
+      downvoteButton?.visibility = View.GONE
+      downvoteCountVisible = false
+      qaScoreCount?.let {
+        if (leftHandMode) {
+          it.paddingStartCompat = paddingFull
+        } else {
+          it.paddingEndCompat = paddingFull
+        }
+      }
+    }
+
     if (isCompactView) {
       scoreCount?.visibility = View.VISIBLE
       upvoteCount?.visibility = View.VISIBLE
-      downvoteCount?.visibility = View.VISIBLE
+      if (supportsDownvotes) {
+        downvoteCountVisible = true
+      }
     } else {
       scoreCount?.visibility = View.GONE
       upvoteCount?.visibility = View.GONE
-      downvoteCount?.visibility = View.GONE
+      if (supportsDownvotes) {
+        downvoteCountVisible = false
+      }
+    }
+
+    downvoteCount?.visibility = if (downvoteCountVisible) {
+      View.VISIBLE
+    } else {
+      View.GONE
     }
 
     if (highlightTintColor == null) {
@@ -2000,10 +2063,7 @@ class PostAndCommentViewBuilder @Inject constructor(
             downvoteButton = buttons.downvoteButton
             qaDownvoteCount = buttons.downvoteButton
           } else {
-            val button1 = ImageView(
-              context,
-            ).apply {
-              id = View.generateViewId()
+            val button1 = makeQuickActionButton(View.generateViewId()).apply {
               layoutParams = LinearLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -2020,8 +2080,6 @@ class PostAndCommentViewBuilder @Inject constructor(
                 paddingHalf,
                 paddingHalf,
               )
-              setBackgroundResource(selectableItemBackgroundBorderless)
-              imageTintList = ColorStateList.valueOf(normalTextColor)
             }
 
             val scoreCount = TextView(
@@ -2038,22 +2096,13 @@ class PostAndCommentViewBuilder @Inject constructor(
               qaScoreCount = it
             }
 
-            val button2 = ImageView(
-              context,
-            ).apply {
-              id = View.generateViewId()
-              layoutParams = LinearLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-              )
+            val button2 = makeQuickActionButton(View.generateViewId()).apply {
               setPaddingRelative(
                 paddingIcon,
                 paddingHalf,
                 paddingHalf,
                 paddingHalf,
               )
-              setBackgroundResource(selectableItemBackgroundBorderless)
-              imageTintList = ColorStateList.valueOf(normalTextColor)
             }
 
             val finalUpvoteButton: ImageView = button2

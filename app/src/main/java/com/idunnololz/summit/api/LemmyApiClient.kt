@@ -220,8 +220,10 @@ class LemmyApiClient @Inject constructor(
     okHttpClient.cache?.evictAll()
   }
 
-  suspend fun supportsFeature(apiFeature: ApiFeature): Boolean =
-    getApi().supportsFeature(apiFeature)
+  suspend fun supportsFeature(apiFeature: ApiFeature): Result<Boolean> =
+    runCatching {
+      getApi().supportsFeature(apiFeature)
+    }
 
   suspend fun fetchPosts(
     account: Account?,

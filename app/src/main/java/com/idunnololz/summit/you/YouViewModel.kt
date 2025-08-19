@@ -72,7 +72,7 @@ class YouViewModel @Inject constructor(
               accountInfo = account.accountInfo,
               personResult = null,
               isLoading = true,
-              supportsUploads = apiClient.supportsFeature(ApiFeature.UploadsList),
+              supportsUploads = apiClient.supportsFeature(ApiFeature.UploadsList).getOrNull() != false,
             ),
           )
         }
@@ -93,7 +93,7 @@ class YouViewModel @Inject constructor(
             accountInfo = account?.accountInfo,
             personResult = personResult,
             isLoading = false,
-            supportsUploads = apiClient.supportsFeature(ApiFeature.UploadsList),
+            supportsUploads = apiClient.supportsFeature(ApiFeature.UploadsList).getOrNull() != false,
           ),
         )
       }

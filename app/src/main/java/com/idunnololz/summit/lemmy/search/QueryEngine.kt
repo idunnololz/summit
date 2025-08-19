@@ -171,13 +171,6 @@ class QueryEngine(
 
   val onItemsChangeFlow = MutableSharedFlow<Unit>()
 
-  init {
-    runBlocking {
-      // should be ok because we are generating a blank page.
-      generateItems()
-    }
-  }
-
   fun setPersonFilter(personId: Long?) {
     if (personIdFilter == personId) {
       return
@@ -249,6 +242,9 @@ class QueryEngine(
     }
     coroutineScope.launch {
       currentState.value = StatefulData.Loading()
+
+      pages = pages.filter { it.pageIndex != pageIndex }
+
       generateItems()
 
       if (force) {
@@ -455,7 +451,14 @@ class QueryEngine(
         }
         .onFailure {
           val newPages = pages.toMutableList().apply {
-            add(QueryResultsPage.ErrorPage(it, pageIndex, false))
+            val existingItemIndex = indexOfFirst { it.pageIndex == pageIndex }
+            val errorPage = QueryResultsPage.ErrorPage(it, pageIndex, false)
+
+            if (existingItemIndex == -1) {
+              add(errorPage)
+            } else {
+              this[existingItemIndex] = errorPage
+            }
           }
           withContext(Dispatchers.Main) {
             pages = newPages
@@ -482,6 +485,7 @@ class QueryEngine(
           Item.FooterSpacerItem,
         )
       }
+      onItemsChangeFlow.emit(Unit)
 
       return
     }

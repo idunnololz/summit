@@ -17,4 +17,7 @@ enum class ApiFeature {
   Downvoted,
   UploadsList,
   Downvote,
+
+  SearchAll,
+  SearchComments,
 }

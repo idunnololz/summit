@@ -64,8 +64,10 @@ import com.idunnololz.summit.lemmy.utils.bind
 import com.idunnololz.summit.lemmy.utils.compoundDrawableTintListCompat
 import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.lemmy.utils.setTextAppearanceCompat
+import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.SiteBackendHelper
+import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
@@ -123,7 +125,7 @@ class PostListViewBuilder @Inject constructor(
   private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
   private val exoPlayerManagerManager: ExoPlayerManagerManager,
   private val lemmyTextHelper: LemmyTextHelper,
-  private val siteBackendHelper: SiteBackendHelper,
+  private val apiFeatureHelper: ApiFeatureHelper,
 ) {
 
   companion object {
@@ -1448,9 +1450,6 @@ class PostListViewBuilder @Inject constructor(
         )
       }
 
-      val apiInfo = siteBackendHelper.getApiInfoFromCache(instance)
-      downvoteButton?.isEnabled = apiInfo?.supportsFeature(ApiFeature.Downvote) != false
-
       if (highlightForever) {
         highlightBg.visibility = View.VISIBLE
         highlightBg.alpha = 1f
@@ -1474,16 +1473,30 @@ class PostListViewBuilder @Inject constructor(
         onShowMoreOptions(accountId, postView)
       }
 
+      val supportsDownvotes = apiFeatureHelper.supportsDownvotes(instance)
+      var downvoteButtonVisible = true
+      if (supportsDownvotes) {
+        downvoteButtonVisible = true
+        downvoteCount?.visibility = View.VISIBLE
+      } else {
+        downvoteButtonVisible = false
+        downvoteCount?.visibility = View.GONE
+      }
+
       when (val rb = rawBinding) {
         is ListingItemCompactBinding -> {
           if (isActionsExpanded) {
             upvoteButton?.visibility = View.VISIBLE
-            downvoteButton?.visibility = View.VISIBLE
+            if (supportsDownvotes) {
+              downvoteButtonVisible = true
+            }
             createCommentButton?.visibility = View.VISIBLE
             moreButton?.visibility = View.VISIBLE
           } else {
             upvoteButton?.visibility = View.GONE
-            downvoteButton?.visibility = View.GONE
+            if (supportsDownvotes) {
+              downvoteButtonVisible = false
+            }
             createCommentButton?.visibility = View.GONE
             moreButton?.visibility = View.GONE
           }
@@ -1499,6 +1512,12 @@ class PostListViewBuilder @Inject constructor(
             true
           }
         }
+      }
+
+      downvoteButton?.visibility = if (downvoteButtonVisible) {
+        View.VISIBLE
+      } else {
+        View.GONE
       }
 
       if (themeColor != null) {
@@ -1638,7 +1657,9 @@ class PostListViewBuilder @Inject constructor(
             endId = endId,
             alignmentViewId = commentButton.id,
             margin = 0,
-          )
+          ).apply {
+            setPadding(context.getDimen(R.dimen.padding_half))
+          }
           root.addView(button1)
 
           val upvoteCount = TextView(
@@ -1654,8 +1675,10 @@ class PostListViewBuilder @Inject constructor(
 
               if (leftHandMode) {
                 startToEnd = button1.id
+                goneStartMargin = padding
               } else {
                 endToStart = button1.id
+                goneEndMargin = padding
               }
             }
           }.also {
@@ -1668,7 +1691,9 @@ class PostListViewBuilder @Inject constructor(
             endId = upvoteCount.id,
             alignmentViewId = commentButton.id,
             margin = 0,
-          )
+          ).apply {
+            setPadding(context.getDimen(R.dimen.padding_half))
+          }
           root.addView(button2)
 
           if (leftHandMode) {

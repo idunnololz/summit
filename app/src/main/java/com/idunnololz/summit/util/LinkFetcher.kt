@@ -13,7 +13,7 @@ import okhttp3.Response
 
 @Singleton
 class LinkFetcher @Inject constructor(
-  @param:BrowserLikeAuthed private val okHttpClient: OkHttpClient,
+  @BrowserLikeAuthed private val okHttpClient: OkHttpClient,
 ) {
 
   suspend fun downloadSite(
@@ -22,7 +22,7 @@ class LinkFetcher @Inject constructor(
     client: OkHttpClient = okHttpClient,
   ): Result<String> = runInterruptible(Dispatchers.IO) {
     val response = try {
-      doRequest(url, cache, client)
+      doRequest(url = url, force = !cache, client = client)
     } catch (e: Exception) {
       return@runInterruptible Result.failure(e)
     }
@@ -41,10 +41,10 @@ class LinkFetcher @Inject constructor(
     }
   }
 
-  private fun doRequest(url: String, cache: Boolean, client: OkHttpClient): Response {
+  private fun doRequest(url: String, force: Boolean, client: OkHttpClient): Response {
     val builder = Request.Builder()
       .url(url)
-    if (!cache) {
+    if (force) {
       builder.cacheControl(CacheControl.FORCE_NETWORK)
         .header("Cache-Control", "no-cache, no-store")
     }

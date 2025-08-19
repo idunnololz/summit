@@ -109,10 +109,9 @@ class DraftsFragment :
         val firstPos = layoutManager.findFirstVisibleItemPosition()
         val lastPos = layoutManager.findLastVisibleItemPosition()
 
-        fetchPageIfLoadItem(firstPos)
-        fetchPageIfLoadItem(firstPos - 1)
-        fetchPageIfLoadItem(lastPos)
-        fetchPageIfLoadItem(lastPos + 1)
+        for (i in (firstPos - 1)..(lastPos + 1)) {
+          fetchPageIfLoadItem(i)
+        }
       }
 
       viewModel.viewModelItems.observe(viewLifecycleOwner) {

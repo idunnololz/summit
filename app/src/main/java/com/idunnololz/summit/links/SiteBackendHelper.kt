@@ -2,6 +2,7 @@ package com.idunnololz.summit.links
 
 import android.util.Log
 import com.google.gson.Gson
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.ApiInfo
 import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
@@ -27,7 +28,7 @@ import okhttp3.OkHttpClient
 class SiteBackendHelper @Inject constructor(
   private val json: Json,
   private val linkFetcher: LinkFetcher,
-  @param:BrowserLikeUnauthed private val okHttpClient: OkHttpClient,
+  @BrowserLikeUnauthed private val okHttpClient: OkHttpClient,
 ) {
 
   companion object {
@@ -91,30 +92,62 @@ class SiteBackendHelper @Inject constructor(
           )
         }
 
+        val allJobs = listOf(
+          v3Job,
+          alphaJob,
+          homePageJob,
+        )
+
 //        if (v4Job.isSiteView()) {
 //          Log.d(TAG, "instance: ${instance} is type V4")
 //          return@withContext Result.success(ApiInfo(ApiType.LemmyV4))
 //        } else
-        if (alphaJob.isSiteView()) {
-          Log.d(TAG, "instance: $instance is type alpha")
-          val site = gson.fromJson(
-            v3Job.await().getOrNull(),
-            com.idunnololz.summit.api.dto.piefed.GetSiteResponse::class.java
-          )
 
-          return@withContext Result.success(ApiInfo(
-            backendType = ApiType.PieFedAlpha,
-            downvoteAllowed = site?.site?.enableDownvotes != false,
-          ))
-        } else if (v3Job.isSiteView()) {
-          Log.d(TAG, "instance: $instance is type V3")
-          val site = gson.fromJson(v3Job.await().getOrNull(), GetSiteResponse::class.java)
+        alphaJob.await().let { result ->
+          if (result.isSiteView()) {
+            allJobs.forEach { it.cancel() }
 
-          return@withContext Result.success(ApiInfo(
-            backendType = ApiType.LemmyV3,
-            downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
-          ))
-        } else if (homePageJob.await().isSuccess) {
+            try {
+              Log.d(TAG, "instance: $instance is type alpha")
+              val site = gson.fromJson(
+                result.getOrNull(),
+                com.idunnololz.summit.api.dto.piefed.GetSiteResponse::class.java
+              )
+
+              return@withContext Result.success(
+                ApiInfo(
+                  backendType = ApiType.PieFedAlpha,
+                  downvoteAllowed = site?.site?.enableDownvotes != false,
+                )
+              )
+            } catch (e: Exception) {
+              Log.e(TAG, "Error parsing site object", e)
+            }
+          }
+        }
+        v3Job.await().let { result ->
+          if (result.isSiteView()) {
+            allJobs.forEach { it.cancel() }
+
+            try {
+              Log.d(TAG, "instance: $instance is type V3")
+              val site = gson.fromJson(result.getOrNull(), GetSiteResponse::class.java)
+
+              return@withContext Result.success(
+                ApiInfo(
+                  backendType = ApiType.LemmyV3,
+                  downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
+                )
+              )
+            } catch (e: Exception) {
+              Log.e(TAG, "Error parsing site object", e)
+            }
+          }
+        }
+
+        if (homePageJob.await().isSuccess) {
+          allJobs.forEach { it.cancel() }
+
           Log.d(TAG, "instance: $instance is not a lemmy site")
 
           return@withContext Result.success(ApiInfo(backendType = null, downvoteAllowed = false))
@@ -122,12 +155,7 @@ class SiteBackendHelper @Inject constructor(
 
         // All 3 network calls failed. This likely means either the site is down or we are down.
 
-        val errors = listOfNotNull(
-//          v4Job.await().exceptionOrNull(),
-          v3Job.await().exceptionOrNull(),
-          alphaJob.await().exceptionOrNull(),
-          homePageJob.await().exceptionOrNull(),
-        )
+        val errors = allJobs.mapNotNull { it.await().exceptionOrNull() }
 
         if (errors.isEmpty()) {
           return@withContext Result.failure(RuntimeException("No errors! Impossible!"))
@@ -157,7 +185,7 @@ class SiteBackendHelper @Inject constructor(
     }
   }
 
-  private suspend fun Deferred<Result<String>>.isSiteView(): Boolean = this.await().fold(
+  private suspend fun Result<String>.isSiteView(): Boolean = this.fold(
     onSuccess = {
       Log.d(TAG, "onSuccess")
       it.length > 100 && it.firstOrNull() == '{'

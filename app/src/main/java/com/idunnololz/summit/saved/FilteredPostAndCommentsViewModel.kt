@@ -208,7 +208,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
             }
         }
         FilteredPostAndCommentsType.Downvoted -> {
-          if (apiClient.supportsFeature(ApiFeature.Downvoted)) {
+          if (apiClient.supportsFeature(ApiFeature.Downvoted).getOrNull() != false) {
             apiClient
               .fetchPosts(
                 communityIdOrName = null,

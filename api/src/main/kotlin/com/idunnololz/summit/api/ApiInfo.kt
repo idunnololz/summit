@@ -14,6 +14,8 @@ data class ApiInfo(
           ApiFeature.Downvoted -> true
           ApiFeature.UploadsList -> true
           ApiFeature.Downvote -> downvoteAllowed
+          ApiFeature.SearchAll -> true
+          ApiFeature.SearchComments -> true
         }
       ApiType.PieFedAlpha ->
         when (apiFeature) {
@@ -22,6 +24,8 @@ data class ApiInfo(
           ApiFeature.Downvoted -> false
           ApiFeature.UploadsList -> false
           ApiFeature.Downvote -> downvoteAllowed
+          ApiFeature.SearchAll -> false
+          ApiFeature.SearchComments -> false
         }
       null -> false
     }

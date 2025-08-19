@@ -44,6 +44,7 @@ class ForbiddenException : ClientApiException("Rate limit timed out.", 403)
 class ServerTimeoutException(
   errorCode: Int,
 ) : ClientApiException("Timed out waiting for server to respond", errorCode)
+
 sealed class ApiException(
   msg: String,
 ) : RuntimeException(msg)
@@ -87,3 +88,6 @@ class LanguageNotAllowed :
     "The language of the content you submitted is not allowed",
     400,
   )
+
+class FeatureNotSupported(val feature: ApiFeature) :
+  ClientApiException("Feature not supported: $feature", 400)

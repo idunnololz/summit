@@ -154,7 +154,7 @@ class SignUpViewModel @Inject constructor(
             instanceError = context.getString(R.string.error_unable_to_resolve_instance)
           }
           .onSuccess {
-            if (!lemmyApiClient.supportsFeature(ApiFeature.Register)) {
+            if (lemmyApiClient.supportsFeature(ApiFeature.Register).getOrNull() == false) {
               site = it
               fetchSiteLiveData.setError(NotYetImplemented())
               instanceError =
