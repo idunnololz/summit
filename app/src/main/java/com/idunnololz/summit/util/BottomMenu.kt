@@ -7,7 +7,9 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedDispatcher
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
@@ -230,6 +232,8 @@ class BottomMenu(
       }
     }
 
+    fixBottomSheetFling(bottomSheetBehavior, recyclerView)
+
     bottomSheetContainer.addView(rootView)
 
     rootView.postDelayed(
@@ -279,6 +283,27 @@ class BottomMenu(
     }
   }
 
+  private fun fixBottomSheetFling(
+    bottomSheetBehavior: BottomSheetBehavior<FrameLayout>,
+    recyclerView: RecyclerView
+  ) {
+    recyclerView.isNestedScrollingEnabled = false
+    recyclerView.overScrollMode = OVER_SCROLL_NEVER
+
+    recyclerView.addOnScrollListener(
+      object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+          super.onScrolled(recyclerView, dx, dy)
+
+          val position = (recyclerView.layoutManager as? LinearLayoutManager)
+            ?.findFirstCompletelyVisibleItemPosition()
+
+          bottomSheetBehavior.isDraggable = position == 0
+        }
+      }
+    )
+  }
+
   fun close(): Boolean {
     if (parent != null) {
       bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
@@ -321,10 +346,10 @@ class BottomMenu(
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val checkedTextColor = context.getColorFromAttribute(
-      com.google.android.material.R.attr.colorPrimary,
+      androidx.appcompat.R.attr.colorPrimary,
     )
     private val dangerTextColor = context.getColorFromAttribute(
-      com.google.android.material.R.attr.colorError,
+      androidx.appcompat.R.attr.colorError,
     )
     private val defaultTextColor = ContextCompat.getColor(context, R.color.colorTextTitle)
 
@@ -363,7 +388,7 @@ class BottomMenu(
           menuItem.checkIcon != 0 -> {
             b.checkbox.setColorFilter(
               context.getColorFromAttribute(
-                com.google.android.material.R.attr.colorControlNormal,
+                androidx.appcompat.R.attr.colorControlNormal,
               ),
             )
             b.checkbox.setImageResource(menuItem.checkIcon)
@@ -372,7 +397,7 @@ class BottomMenu(
           menuItem.id == checked -> {
             b.checkbox.setColorFilter(
               context.getColorFromAttribute(
-                com.google.android.material.R.attr.colorPrimary,
+                androidx.appcompat.R.attr.colorPrimary,
               ),
             )
             b.checkbox.setImageResource(R.drawable.baseline_done_24)

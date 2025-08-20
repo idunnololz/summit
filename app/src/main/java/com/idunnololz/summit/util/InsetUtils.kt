@@ -5,11 +5,15 @@ import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LifecycleOwner
 
-fun InsetsProvider.insetViewAutomaticallyByMargins(lifecycleOwner: LifecycleOwner, rootView: View) {
+fun InsetsProvider.insetViewAutomaticallyByMargins(
+  lifecycleOwner: LifecycleOwner,
+  rootView: View,
+  additionalMarginTop: Int = 0,
+) {
   insets.observe(lifecycleOwner) {
     val lp = rootView.layoutParams as ViewGroup.MarginLayoutParams
 
-    lp.topMargin = it.topInset
+    lp.topMargin = it.topInset + additionalMarginTop
     lp.bottomMargin = it.bottomInset
     lp.leftMargin = it.leftInset
     lp.rightMargin = it.rightInset

@@ -831,7 +831,16 @@ class PostListViewBuilder @Inject constructor(
             }
 
             iconImage.visibility = View.VISIBLE
-            iconImage.setImageResource(R.drawable.baseline_article_24)
+            when (postType) {
+              PostType.Image ->
+                iconImage.setImageResource(R.drawable.baseline_image_24)
+              PostType.Video ->
+                iconImage.setImageResource(R.drawable.baseline_play_circle_filled_24)
+              PostType.Text ->
+                iconImage.setImageResource(R.drawable.baseline_article_24)
+              PostType.Link ->
+                iconImage.setImageResource(R.drawable.baseline_link_24)
+            }
           } else {
             imageView?.visibility = View.GONE
           }
@@ -1065,7 +1074,7 @@ class PostListViewBuilder @Inject constructor(
           val urlVideo = isUrlVideo(imageUrl)
 
           if (!ContentUtils.isUrlImage(imageUrl) && !urlVideo) {
-            imageView.visibility = View.GONE
+            showDefaultImage()
             return
           }
 

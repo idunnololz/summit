@@ -70,13 +70,13 @@ class AccountAwareLemmyClient @Inject constructor(
   @Singleton
   class Factory @Inject constructor(
     @ApplicationContext private val context: Context,
-    val apiClient: LemmyApiClient,
+    val apiClientFactory: LemmyApiClient.Factory,
     private val accountManager: AccountManager,
     private val coroutineScopeFactory: CoroutineScopeFactory,
   ) {
     fun create() = AccountAwareLemmyClient(
       context,
-      apiClient,
+      apiClientFactory.create(),
       accountManager,
       coroutineScopeFactory,
     )

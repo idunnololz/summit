@@ -17,7 +17,7 @@ import com.idunnololz.summit.util.AnimationUtils
 import com.idunnololz.summit.util.ext.getActivity
 import com.idunnololz.summit.util.toErrorMessage
 
-class LoadingView : ConstraintLayout {
+class LoadingView2 : ConstraintLayout {
 
   companion object {
     private const val TAG = "LoadingView"
@@ -26,7 +26,7 @@ class LoadingView : ConstraintLayout {
   private lateinit var container: View
   private lateinit var errorTextView: TextView
   private lateinit var positiveButton: Button
-  private lateinit var progressView: LoadingIndicator
+  private lateinit var progressView: CircularProgressIndicator
   private lateinit var negativeButton: Button
   private val rootViewAnimationController: AnimationUtils.AnimationController
   private var onRefreshClickListener: (View) -> Unit = {}
@@ -40,7 +40,7 @@ class LoadingView : ConstraintLayout {
   )
 
   init {
-    View.inflate(context, R.layout.refresh_ui, this)
+      inflate(context, R.layout.refresh_ui2, this)
     rootViewAnimationController = AnimationUtils.makeAnimationControllerFor(this)
   }
 
@@ -67,21 +67,21 @@ class LoadingView : ConstraintLayout {
     // val animateChanges = rootViewAnimationController.isVisible
 
     rootViewAnimationController.cancelAnimations()
-    progressView.visibility = if (progressBar) View.VISIBLE else View.GONE
-    errorTextView.visibility = if (errorText) View.VISIBLE else View.GONE
+    progressView.visibility = if (progressBar) VISIBLE else GONE
+    errorTextView.visibility = if (errorText) VISIBLE else GONE
 
     if (progressBar) {
-      errorTextView.updateLayoutParams<ConstraintLayout.LayoutParams> {
+      errorTextView.updateLayoutParams<LayoutParams> {
         topToBottom = progressView.id
       }
     } else {
-      errorTextView.updateLayoutParams<ConstraintLayout.LayoutParams> {
-        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+      errorTextView.updateLayoutParams<LayoutParams> {
+        topToTop = LayoutParams.PARENT_ID
       }
     }
 
-    this.positiveButton.visibility = if (positiveButton) View.VISIBLE else View.GONE
-    this.negativeButton.visibility = if (negativeButton) View.VISIBLE else View.GONE
+    this.positiveButton.visibility = if (positiveButton) VISIBLE else GONE
+    this.negativeButton.visibility = if (negativeButton) VISIBLE else GONE
     ensureRootVisible()
   }
 
@@ -110,10 +110,25 @@ class LoadingView : ConstraintLayout {
     show(progressBar = true)
   }
 
+  fun setProgress(progress: Int, max: Int) {
+    progressView.isIndeterminate = false
+    progressView.max = max
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      progressView.setProgress(progress, true)
+    } else {
+      progressView.progress = progress
+    }
+  }
+
+  fun setProgressIndeterminate() {
+    progressView.isIndeterminate = true
+  }
+
   fun showProgressBarWithMessage(@StringRes message: Int) {
     show(progressBar = true, errorText = true)
     bindErrorText(context.getString(message))
-    progressView.visibility = View.VISIBLE
+    progressView.visibility = VISIBLE
   }
 
   fun showProgressBarWithMessage(message: String?) {
@@ -123,7 +138,7 @@ class LoadingView : ConstraintLayout {
       show(progressBar = true, errorText = true)
       bindErrorText(message)
     }
-    progressView.visibility = View.VISIBLE
+    progressView.visibility = VISIBLE
   }
 
   fun showProgressBarWithMessageAndButton(
@@ -134,7 +149,7 @@ class LoadingView : ConstraintLayout {
     show(progressBar = true, errorText = true, positiveButton = true)
     bindErrorText(context.getString(message))
     bindPositiveButton(context.getString(buttonText), onClickListener)
-    progressView.visibility = View.VISIBLE
+    progressView.visibility = VISIBLE
   }
 
   fun showErrorText(strId: Int) {
@@ -219,7 +234,7 @@ class LoadingView : ConstraintLayout {
   }
 
   fun hideAll(animate: Boolean = true, makeViewGone: Boolean = false) {
-    rootViewAnimationController.hideVisibility = if (makeViewGone) View.GONE else View.INVISIBLE
+    rootViewAnimationController.hideVisibility = if (makeViewGone) GONE else INVISIBLE
     rootViewAnimationController.hide(animate)
   }
 }

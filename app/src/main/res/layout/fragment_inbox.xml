@@ -83,16 +83,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/new_items_progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    android:layout_margin="@dimen/padding"
-                    style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -103,6 +93,13 @@
                 android:layout_margin="16dp"
                 android:contentDescription="@string/more_actions"/>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <com.google.android.material.loadingindicator.LoadingIndicator
+            android:id="@+id/new_items_progress_bar"
+            style="@style/Widget.Material3.LoadingIndicator.Contained"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"/>
     </FrameLayout>
 
 

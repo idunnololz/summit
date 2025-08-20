@@ -142,7 +142,7 @@ class ModEventDialogFragment : BaseDialogFragment<DialogFragmentModEventBinding>
           text = fieldValue
           if (onClick != null) {
             context.getColorStateListFromAttribute(
-              com.google.android.material.R.attr.colorPrimary,
+              androidx.appcompat.R.attr.colorPrimary,
             )?.let {
               setTextColor(it)
             }

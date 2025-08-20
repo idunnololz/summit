@@ -472,7 +472,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
           )
           b.cardView.setCardBackgroundColor(
             context.getColorFromAttribute(
-              com.google.android.material.R.attr.colorPrimary,
+              androidx.appcompat.R.attr.colorPrimary,
             ),
           )
 

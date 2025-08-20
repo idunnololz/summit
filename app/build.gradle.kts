@@ -122,6 +122,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.disklrucache)
   implementation(libs.slidingpanelayout)
+  implementation(libs.documentfile)
 
   implementation(libs.lifecycle.viewmodel.ktx)
   implementation(libs.lifecycle.extensions)

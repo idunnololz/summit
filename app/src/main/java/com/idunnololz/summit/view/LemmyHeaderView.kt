@@ -126,7 +126,7 @@ class LemmyHeaderView : FrameLayout {
     TextViewCompat.setCompoundDrawableTintList(
       this,
       ColorStateList.valueOf(
-        context.getColorFromAttribute(R.attr.colorControlNormal),
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
       ),
     )
     ellipsize = TextUtils.TruncateAt.END

@@ -116,7 +116,7 @@ class MoreActionsHelper(
 
   private var _fullAccount: FullAccount? = null
 
-  val apiClient = lemmyApiClientFactory.create()
+  private val apiClient = lemmyApiClientFactory.create()
 
   val currentAccount: Account?
     get() = apiClient.accountForInstance()

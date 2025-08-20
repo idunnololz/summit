@@ -412,33 +412,33 @@ fun ModEvent.getColor(context: Context): Int {
     is ModEvent.AdminPurgePersonViewEvent,
     is ModEvent.AdminPurgePostViewEvent,
     ->
-      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+      context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
     is ModEvent.ModAddCommunityViewEvent -> {
       if (modEvent.event.mod_add_community.removed) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
         context.getColorCompat(R.color.style_green)
       }
     }
     is ModEvent.ModAddViewEvent -> {
       if (modEvent.event.mod_add.removed) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
         context.getColorCompat(R.color.style_green)
       }
     }
     is ModEvent.ModBanFromCommunityViewEvent -> {
       if (modEvent.event.mod_ban_from_community.banned) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       }
     }
     is ModEvent.ModBanViewEvent -> {
       if (modEvent.event.mod_ban.banned) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       }
     }
     is ModEvent.ModFeaturePostViewEvent -> {
@@ -450,9 +450,9 @@ fun ModEvent.getColor(context: Context): Int {
     }
     is ModEvent.ModHideCommunityViewEvent -> {
       if (modEvent.event.mod_hide_community.hidden) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       } else {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       }
     }
     is ModEvent.ModLockPostViewEvent -> {
@@ -464,27 +464,27 @@ fun ModEvent.getColor(context: Context): Int {
     }
     is ModEvent.ModRemoveCommentViewEvent -> {
       if (modEvent.event.mod_remove_comment.removed) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       }
     }
     is ModEvent.ModRemoveCommunityViewEvent -> {
       if (modEvent.event.mod_remove_community.removed) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       }
     }
     is ModEvent.ModRemovePostViewEvent -> {
       if (modEvent.event.mod_remove_post.removed) {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
       } else {
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       }
     }
     is ModEvent.ModTransferCommunityViewEvent -> {
-      context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+      context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
     }
   }
 }
@@ -577,34 +577,34 @@ fun ModEvent.getIconRes(): Int = when (this) {
 //    is ModEvent.AdminPurgeCommunityViewEvent,
 //    is ModEvent.AdminPurgePersonViewEvent,
 //    is ModEvent.AdminPurgePostViewEvent ->
-//      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+//      context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
 //    is ModEvent.ModAddCommunityViewEvent -> {
 //      if (this.event.mod_add_community.removed) {
-//        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+//        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
 //      } else {
 //        context.getColorCompat(R.color.style_green)
 //      }
 //    }
 //    is ModEvent.ModAddViewEvent -> {
 //      if (this.event.mod_add.removed) {
-//        context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+//        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
 //      } else {
 //        context.getColorCompat(R.color.style_green)
 //      }
 //    }
 //    is ModEvent.ModBanFromCommunityViewEvent,
 //    is ModEvent.ModBanViewEvent ->
-//      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+//      context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
 //    is ModEvent.ModFeaturePostViewEvent ->
 //      context.getColorCompat(R.color.style_green)
 //    is ModEvent.ModHideCommunityViewEvent ->
-//      context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+//      context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
 //    is ModEvent.ModLockPostViewEvent ->
 //      context.getColorCompat(R.color.style_amber)
 //    is ModEvent.ModRemoveCommentViewEvent,
 //    is ModEvent.ModRemoveCommunityViewEvent,
 //    is ModEvent.ModRemovePostViewEvent ->
-//      context.getColorFromAttribute(com.google.android.material.R.attr.colorError)
+//      context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
 //    is ModEvent.ModTransferCommunityViewEvent ->
-//      context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+//      context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
 //  }

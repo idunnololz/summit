@@ -64,7 +64,7 @@
                 android:id="@+id/icon"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:layout_marginStart="@dimen/padding_three_quarters"
+                android:layout_marginStart="@dimen/padding"
                 android:layout_marginEnd="@dimen/padding"
                 android:background="?backgroundColor"
                 android:padding="3dp"

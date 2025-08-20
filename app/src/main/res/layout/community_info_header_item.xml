@@ -6,34 +6,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Text is set programmatically -->
-    <Button
+    <TextView
         android:id="@+id/button_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         android:layout_marginHorizontal="@dimen/padding"
-        style="@style/Widget.Material3.Button"
+        android:background="@drawable/secondary_chip_bg"
+        android:paddingHorizontal="@dimen/padding_three_quarters"
+        android:paddingVertical="@dimen/chip_button_padding"
+        android:drawablePadding="@dimen/padding_half"
+        android:textAppearance="?textAppearanceLabelLarge"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:drawableTint="?colorControlNormal"/>
 
-    <Button
+    <TextView
         android:id="@+id/button_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
         android:layout_marginStart="@dimen/padding_half"
-        style="@style/Widget.Material3.Button.TextButton"
+        android:background="@drawable/secondary_chip_bg"
+        android:paddingHorizontal="@dimen/padding_three_quarters"
+        android:paddingVertical="@dimen/chip_button_padding"
+        android:drawablePadding="@dimen/padding_half"
+        android:textAppearance="?textAppearanceLabelLarge"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/button_1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/padding_half"
-        app:layout_constraintTop_toBottomOf="@+id/button_1"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:drawableTint="?colorControlNormal"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

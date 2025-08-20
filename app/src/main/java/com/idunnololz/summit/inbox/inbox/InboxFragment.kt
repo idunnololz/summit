@@ -73,10 +73,12 @@ import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
@@ -216,6 +218,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
       )
       insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPanel.root)
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+      insetViewAutomaticallyByMargins(viewLifecycleOwner, binding.newItemsProgressBar, context.getDimen(R.dimen.padding))
     }
 
     viewModel.pageType.observe(viewLifecycleOwner) {

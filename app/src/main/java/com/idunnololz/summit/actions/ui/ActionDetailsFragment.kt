@@ -362,7 +362,7 @@ class ActionDetailsFragment :
           b.value.text = item.value
           b.value.setTextColor(
             context.getColorFromAttribute(
-              com.google.android.material.R.attr.colorPrimary,
+              androidx.appcompat.R.attr.colorPrimary,
             ),
           )
           b.root.setOnClickListener {

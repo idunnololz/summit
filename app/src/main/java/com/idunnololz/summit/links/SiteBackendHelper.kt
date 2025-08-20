@@ -105,8 +105,6 @@ class SiteBackendHelper @Inject constructor(
 
         alphaJob.await().let { result ->
           if (result.isSiteView()) {
-            allJobs.forEach { it.cancel() }
-
             try {
               Log.d(TAG, "instance: $instance is type alpha")
               val site = gson.fromJson(
@@ -127,8 +125,6 @@ class SiteBackendHelper @Inject constructor(
         }
         v3Job.await().let { result ->
           if (result.isSiteView()) {
-            allJobs.forEach { it.cancel() }
-
             try {
               Log.d(TAG, "instance: $instance is type V3")
               val site = gson.fromJson(result.getOrNull(), GetSiteResponse::class.java)
@@ -146,8 +142,6 @@ class SiteBackendHelper @Inject constructor(
         }
 
         if (homePageJob.await().isSuccess) {
-          allJobs.forEach { it.cancel() }
-
           Log.d(TAG, "instance: $instance is not a lemmy site")
 
           return@withContext Result.success(ApiInfo(backendType = null, downvoteAllowed = false))

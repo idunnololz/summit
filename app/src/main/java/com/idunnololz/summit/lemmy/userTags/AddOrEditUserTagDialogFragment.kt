@@ -113,7 +113,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
       }
 
       viewModel.fillColor =
-        context.getColorFromAttribute(com.google.android.material.R.attr.colorPrimary)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary)
       viewModel.strokeColor =
         context.getColorFromAttribute(com.google.android.material.R.attr.colorOnPrimary)
     }
