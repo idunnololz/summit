@@ -677,7 +677,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           lifecycleOwner = viewLifecycleOwner,
           instance = viewModel.apiInstance,
           accountId = null,
-          revealAll = false,
+          revealAll = !preferences.blurNsfwPosts,
           useFooter = false,
           isEmbedded = true,
           videoState = null,

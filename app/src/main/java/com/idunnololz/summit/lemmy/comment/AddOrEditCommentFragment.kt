@@ -993,7 +993,7 @@ class AddOrEditCommentFragment :
         lifecycleOwner = viewLifecycleOwner,
         instance = args.instance,
         accountId = null,
-        revealAll = false,
+        revealAll = !preferences.blurNsfwPosts,
         useFooter = false,
         isEmbedded = true,
         videoState = null,

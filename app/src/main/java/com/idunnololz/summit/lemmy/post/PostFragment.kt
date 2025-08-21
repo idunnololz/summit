@@ -439,7 +439,7 @@ class PostFragment :
           lifecycleOwner = this@PostFragment,
           instance = getInstance(),
           accountId = accountId,
-          revealAll = args.reveal,
+          revealAll = args.reveal || !preferences.blurNsfwPosts,
           useFooter = false,
           isEmbedded = false,
           videoState = args.videoState,
