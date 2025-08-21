@@ -1,7 +1,6 @@
 package com.idunnololz.summit.view
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
@@ -10,7 +9,6 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import com.google.android.material.loadingindicator.LoadingIndicator
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.util.AnimationUtils

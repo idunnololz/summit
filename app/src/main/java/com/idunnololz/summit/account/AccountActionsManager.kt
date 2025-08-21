@@ -41,7 +41,6 @@ import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.links.ApiFeatureHelper
-import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager

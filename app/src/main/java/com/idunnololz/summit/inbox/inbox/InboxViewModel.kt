@@ -342,7 +342,7 @@ class InboxViewModel @Inject constructor(
 
     markAsRead(
       inboxItem,
-      !inboxListItem.read
+      !inboxListItem.read,
     )
   }
 

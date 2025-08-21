@@ -40,7 +40,7 @@
             android:hint="@string/filter"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -55,6 +55,6 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingBottom="@dimen/footer_spacer_height"/>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

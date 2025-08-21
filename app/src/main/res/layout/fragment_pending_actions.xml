@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -21,7 +21,7 @@
             android:paddingBottom="96dp"
             android:clipToPadding="false"/>
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout>
 
     <com.idunnololz.summit.view.FastScroller
         android:id="@+id/fast_scroller"

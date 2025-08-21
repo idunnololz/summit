@@ -220,10 +220,9 @@ class LemmyApiClient @Inject constructor(
     okHttpClient.cache?.evictAll()
   }
 
-  suspend fun supportsFeature(apiFeature: ApiFeature): Result<Boolean> =
-    runCatching {
-      getApi().supportsFeature(apiFeature)
-    }
+  suspend fun supportsFeature(apiFeature: ApiFeature): Result<Boolean> = runCatching {
+    getApi().supportsFeature(apiFeature)
+  }
 
   suspend fun fetchPosts(
     account: Account?,
@@ -1610,7 +1609,7 @@ class LemmyApiClient @Inject constructor(
 
   private suspend fun getApi(instance: String = this.instance): LemmyLikeApi {
     val cachedApi = apis[instance]
-    if (cachedApi != null && cachedApi !is Proxy) {
+    if (cachedApi != null) {
       return cachedApi
     }
     apiInfo.value = StatefulData.Loading()
@@ -1642,7 +1641,9 @@ class LemmyApiClient @Inject constructor(
     )
 
     return newApi(instance, result).also {
-      apis[instance] = it
+      if (!Proxy.isProxyClass(it::class.java)) {
+        apis[instance] = it
+      }
     }
   }
 

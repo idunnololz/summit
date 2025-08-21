@@ -164,7 +164,7 @@ class MainActivityViewModel @Inject constructor(
       val supportsGetCommunitiesAll = apiFeatureHelper.instanceSupportsFeatureAsync(
         instance = apiClient.instance,
         feature = ApiFeature.GetCommunitiesAll,
-        defaultValue = true
+        defaultValue = true,
       )
 
       if (supportsGetCommunitiesAll) {

@@ -29,7 +29,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
@@ -88,7 +87,6 @@ import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
-import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId

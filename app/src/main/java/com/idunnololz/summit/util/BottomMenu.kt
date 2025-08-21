@@ -285,7 +285,7 @@ class BottomMenu(
 
   private fun fixBottomSheetFling(
     bottomSheetBehavior: BottomSheetBehavior<FrameLayout>,
-    recyclerView: RecyclerView
+    recyclerView: RecyclerView,
   ) {
     recyclerView.isNestedScrollingEnabled = false
     recyclerView.overScrollMode = OVER_SCROLL_NEVER
@@ -300,7 +300,7 @@ class BottomMenu(
 
           bottomSheetBehavior.isDraggable = position == 0
         }
-      }
+      },
     )
   }
 

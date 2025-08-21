@@ -88,8 +88,8 @@ inline var View.paddingStartCompat
   get() = this.paddingStart
   set(value) {
     if (this.paddingStart != value) {
-    updatePaddingRelative(start = value)
-      }
+      updatePaddingRelative(start = value)
+    }
   }
 
 inline var View.paddingEndCompat

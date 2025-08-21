@@ -691,7 +691,6 @@ class LemmyContentHelper(
       imageView.updateLayoutParams(contentMaxWidth, imageSizeKey, tempSize)
     }
 
-
     imageView.dispose()
     offlineManager.cancelFetch(imageView)
 

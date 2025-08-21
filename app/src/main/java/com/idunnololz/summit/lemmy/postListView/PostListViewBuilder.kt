@@ -24,7 +24,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import coil3.dispose
-import coil3.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
@@ -32,7 +31,6 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
@@ -66,7 +64,6 @@ import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.lemmy.utils.setTextAppearanceCompat
 import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
-import com.idunnololz.summit.links.SiteBackendHelper
 import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
@@ -95,14 +92,12 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.getImageErrorDrawable
 import com.idunnololz.summit.util.getVideoErrorDrawable
-import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.ExoPlayerManagerManager
 import com.idunnololz.summit.video.VideoState
@@ -221,28 +216,27 @@ class PostListViewBuilder @Inject constructor(
     val postsInFeedQuickActions = preferences.postsInFeedQuickActions
       ?: PostsInFeedQuickActionsSettings()
 
-    fun List<Int>.updateWithPreferences() =
-      this.map {
-        if (it == Voting) {
-          if (preferences.postShowUpAndDownVotes) {
-            VotingWithUpAndDownScores
-          } else if (preferences.hidePostScores) {
-            VotingNoScores
-          } else {
-            VotingWithScores
-          }
+    fun List<Int>.updateWithPreferences() = this.map {
+      if (it == Voting) {
+        if (preferences.postShowUpAndDownVotes) {
+          VotingWithUpAndDownScores
+        } else if (preferences.hidePostScores) {
+          VotingNoScores
         } else {
-          it
+          VotingWithScores
         }
+      } else {
+        it
       }
+    }
 
     if (postsInFeedQuickActions.enabled) {
       return postsInFeedQuickActions.copy(
-        actions = postsInFeedQuickActions.actions.updateWithPreferences()
+        actions = postsInFeedQuickActions.actions.updateWithPreferences(),
       )
     } else {
       return postsInFeedQuickActions.copy(
-        actions = listOf(Voting).updateWithPreferences()
+        actions = listOf(Voting).updateWithPreferences(),
       )
     }
   }
@@ -1729,47 +1723,47 @@ class PostListViewBuilder @Inject constructor(
           views.add(button2)
         }
         VotingWithUpAndDownScores -> {
-            val buttons = makeUpAndDownVoteButtons(context)
+          val buttons = makeUpAndDownVoteButtons(context)
 
-            if (leftHandMode) {
-              buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                topToTop = commentButton.id
-                bottomToBottom = commentButton.id
+          if (leftHandMode) {
+            buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+              topToTop = commentButton.id
+              bottomToBottom = commentButton.id
 
-                startToEnd = endId
-                marginStart = context.getDimen(R.dimen.padding)
-              }
-              buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                topToTop = commentButton.id
-                bottomToBottom = commentButton.id
-
-                startToEnd = buttons.upvoteButton.id
-              }
-            } else {
-              buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                topToTop = commentButton.id
-                bottomToBottom = commentButton.id
-
-                endToStart = endId
-                marginEnd = context.getDimen(R.dimen.padding)
-              }
-              buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                topToTop = commentButton.id
-                bottomToBottom = commentButton.id
-
-                endToStart = buttons.downvoteButton.id
-              }
+              startToEnd = endId
+              marginStart = context.getDimen(R.dimen.padding)
             }
-            root.addView(buttons.downvoteButton)
-            root.addView(buttons.upvoteButton)
+            buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+              topToTop = commentButton.id
+              bottomToBottom = commentButton.id
 
-            upvoteButton = buttons.upvoteButton
-            upvoteCount = buttons.upvoteButton
-            downvoteButton = buttons.downvoteButton
-            downvoteCount = buttons.downvoteButton
+              startToEnd = buttons.upvoteButton.id
+            }
+          } else {
+            buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+              topToTop = commentButton.id
+              bottomToBottom = commentButton.id
 
-            views.add(buttons.downvoteButton)
-            views.add(buttons.upvoteButton)
+              endToStart = endId
+              marginEnd = context.getDimen(R.dimen.padding)
+            }
+            buttons.upvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+              topToTop = commentButton.id
+              bottomToBottom = commentButton.id
+
+              endToStart = buttons.downvoteButton.id
+            }
+          }
+          root.addView(buttons.downvoteButton)
+          root.addView(buttons.upvoteButton)
+
+          upvoteButton = buttons.upvoteButton
+          upvoteCount = buttons.upvoteButton
+          downvoteButton = buttons.downvoteButton
+          downvoteCount = buttons.downvoteButton
+
+          views.add(buttons.downvoteButton)
+          views.add(buttons.upvoteButton)
         }
         Reply -> {
           makePostsInFeedActionButton(
@@ -1919,7 +1913,7 @@ class PostListViewBuilder @Inject constructor(
     @IdRes idRes: Int,
     @IdRes endId: Int,
     @IdRes alignmentViewId: Int,
-    margin: Int = context.getDimen(R.dimen.padding_quarter)
+    margin: Int = context.getDimen(R.dimen.padding_quarter),
   ) = ImageView(
     context,
   ).apply {
@@ -1955,7 +1949,9 @@ class PostListViewBuilder @Inject constructor(
     )
     setBackgroundResource(selectableItemBackgroundBorderless)
     ImageViewCompat.setImageTintList(
-      this, context.getColorStateListFromAttribute(androidx.appcompat.R.attr.colorControlNormal))
+      this,
+      context.getColorStateListFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
+    )
   }
 
   fun loadImage(

@@ -89,5 +89,6 @@ class LanguageNotAllowed :
     400,
   )
 
-class FeatureNotSupported(val feature: ApiFeature) :
-  ClientApiException("Feature not supported: $feature", 400)
+class FeatureNotSupported(
+  val feature: ApiFeature,
+) : ClientApiException("Feature not supported: $feature", 400)

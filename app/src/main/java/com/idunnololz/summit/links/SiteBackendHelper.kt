@@ -2,7 +2,6 @@ package com.idunnololz.summit.links
 
 import android.util.Log
 import com.google.gson.Gson
-import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.ApiInfo
 import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
@@ -15,7 +14,6 @@ import java.net.UnknownHostException
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
@@ -39,8 +37,7 @@ class SiteBackendHelper @Inject constructor(
   private val instanceApiInfoCache = mutableMapOf<String, ApiInfo>()
   private val gson = Gson()
 
-  fun getApiInfoFromCache(instance: String): ApiInfo? =
-    instanceApiInfoCache[instance]
+  fun getApiInfoFromCache(instance: String): ApiInfo? = instanceApiInfoCache[instance]
 
   suspend fun fetchApiInfo(instance: String): Result<ApiInfo> {
     withContext(Dispatchers.Main) {
@@ -106,17 +103,19 @@ class SiteBackendHelper @Inject constructor(
         alphaJob.await().let { result ->
           if (result.isSiteView()) {
             try {
+              allJobs.forEach { it.cancel() }
+
               Log.d(TAG, "instance: $instance is type alpha")
               val site = gson.fromJson(
                 result.getOrNull(),
-                com.idunnololz.summit.api.dto.piefed.GetSiteResponse::class.java
+                com.idunnololz.summit.api.dto.piefed.GetSiteResponse::class.java,
               )
 
               return@withContext Result.success(
                 ApiInfo(
                   backendType = ApiType.PieFedAlpha,
                   downvoteAllowed = site?.site?.enableDownvotes != false,
-                )
+                ),
               )
             } catch (e: Exception) {
               Log.e(TAG, "Error parsing site object", e)
@@ -126,6 +125,8 @@ class SiteBackendHelper @Inject constructor(
         v3Job.await().let { result ->
           if (result.isSiteView()) {
             try {
+              allJobs.forEach { it.cancel() }
+
               Log.d(TAG, "instance: $instance is type V3")
               val site = gson.fromJson(result.getOrNull(), GetSiteResponse::class.java)
 
@@ -133,7 +134,7 @@ class SiteBackendHelper @Inject constructor(
                 ApiInfo(
                   backendType = ApiType.LemmyV3,
                   downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
-                )
+                ),
               )
             } catch (e: Exception) {
               Log.e(TAG, "Error parsing site object", e)

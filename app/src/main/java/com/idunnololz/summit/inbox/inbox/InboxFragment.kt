@@ -218,7 +218,11 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
       )
       insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPanel.root)
       insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
-      insetViewAutomaticallyByMargins(viewLifecycleOwner, binding.newItemsProgressBar, context.getDimen(R.dimen.padding))
+      insetViewAutomaticallyByMargins(
+        viewLifecycleOwner,
+        binding.newItemsProgressBar,
+        context.getDimen(R.dimen.padding),
+      )
     }
 
     viewModel.pageType.observe(viewLifecycleOwner) {

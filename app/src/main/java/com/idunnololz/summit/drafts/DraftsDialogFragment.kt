@@ -209,7 +209,6 @@ class DraftsDialogFragment :
       }
 
       fun checkIfFetchNeeded() {
-
         val firstPos = layoutManager.findFirstVisibleItemPosition()
         val lastPos = layoutManager.findLastVisibleItemPosition()
 

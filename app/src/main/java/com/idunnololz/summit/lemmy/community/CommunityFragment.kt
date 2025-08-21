@@ -86,7 +86,6 @@ import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.dialog.MakeOfflineDialogFragment
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
-import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.settings.navigation.NavBarDestinations

@@ -121,10 +121,10 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    val context = binding.root.context
+
     isAnimatingTitleIn = false
     isAnimatingTitleOut = false
-
-    val context = binding.root.context
 
     parentFragmentManager.setFragmentResultListener(
       CreateOrEditCommunityFragment.REQUEST_KEY,
@@ -164,6 +164,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
           height = newToolbarHeight
         }
+        binding.swipeRefreshLayout.topInset = it.topInset
       }
     }
 
@@ -802,7 +803,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         b.button2.visibility = View.GONE
 
         b.button1.setCompoundDrawablesRelativeWithIntrinsicBounds(
-          R.drawable.outline_info_18, 0, 0, 0)
+          R.drawable.outline_info_18,
+          0,
+          0,
+          0,
+        )
         b.button1.setOnClickListener {
           onInstanceInfoClick(item.instance)
         }
@@ -814,7 +819,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         b.button1.visibility = View.VISIBLE
         b.button1.text = context.getString(R.string.communities)
         b.button1.setCompoundDrawablesRelativeWithIntrinsicBounds(
-          R.drawable.ic_communities_18, 0, 0, 0)
+          R.drawable.ic_communities_18,
+          0,
+          0,
+          0,
+        )
         b.button1.setOnClickListener {
           onCommunitiesClick(item.siteView.site.instance)
         }
@@ -822,7 +831,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         b.button2.visibility = View.VISIBLE
         b.button2.text = context.getString(R.string.mod_logs)
         b.button2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-          R.drawable.ic_notes_18, 0, 0, 0)
+          R.drawable.ic_notes_18,
+          0,
+          0,
+          0,
+        )
         b.button2.setOnClickListener {
           onModLogsClick(item.siteView.site.instance, null)
         }
@@ -836,17 +849,29 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         when (item.subscribedStatus) {
           SubscribedType.Subscribed -> {
             b.button1.setCompoundDrawablesRelativeWithIntrinsicBounds(
-              R.drawable.baseline_notifications_18, 0, 0, 0)
+              R.drawable.baseline_notifications_18,
+              0,
+              0,
+              0,
+            )
             b.button1.text = context.getString(R.string.unsubscribe)
           }
           SubscribedType.NotSubscribed -> {
             b.button1.setCompoundDrawablesRelativeWithIntrinsicBounds(
-              R.drawable.outline_notifications_18, 0, 0, 0)
+              R.drawable.outline_notifications_18,
+              0,
+              0,
+              0,
+            )
             b.button1.text = context.getString(R.string.subscribe)
           }
           SubscribedType.Pending -> {
             b.button1.setCompoundDrawablesRelativeWithIntrinsicBounds(
-              R.drawable.baseline_notifications_18, 0, 0, 0)
+              R.drawable.baseline_notifications_18,
+              0,
+              0,
+              0,
+            )
             b.button1.text = context.getString(R.string.subscription_pending)
           }
         }
@@ -866,7 +891,11 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         b.button2.visibility = View.VISIBLE
         b.button2.text = context.getString(R.string.instance_info)
         b.button2.setCompoundDrawablesRelativeWithIntrinsicBounds(
-          R.drawable.outline_info_18, 0, 0, 0)
+          R.drawable.outline_info_18,
+          0,
+          0,
+          0,
+        )
         b.button2.setOnClickListener {
           onInstanceInfoClick(item.communityView.community.instance)
         }

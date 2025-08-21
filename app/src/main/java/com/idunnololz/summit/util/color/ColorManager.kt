@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorCompat
-import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import javax.inject.Inject
 import javax.inject.Singleton

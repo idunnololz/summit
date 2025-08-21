@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
-import com.google.android.material.loadingindicator.LoadingIndicator
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -40,7 +39,7 @@ class LoadingView2 : ConstraintLayout {
   )
 
   init {
-      inflate(context, R.layout.refresh_ui2, this)
+    inflate(context, R.layout.refresh_ui2, this)
     rootViewAnimationController = AnimationUtils.makeAnimationControllerFor(this)
   }
 
