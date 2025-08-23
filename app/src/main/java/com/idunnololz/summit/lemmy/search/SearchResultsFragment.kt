@@ -74,6 +74,7 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.isLoading
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -291,53 +292,53 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
       swipeRefreshLayout.setOnRefreshListener {
         parentFragment.viewModel.loadPage(0, force = true)
       }
-    }
 
-    lifecycleScope.launch {
-      withContext(Dispatchers.Default) {
-        queryEngine
-          ?.onItemsChangeFlow
-          ?.collect {
-            if (!isBindingAvailable()) {
-              return@collect
-            }
-
-            adapter?.setData(queryEngine.getItems()) {
-              if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading) {
-                binding.recyclerView.scrollToPosition(0)
+      lifecycleScope.launch {
+        withContext(Dispatchers.Default) {
+          queryEngine
+            ?.onItemsChangeFlow
+            ?.collect {
+              if (!isBindingAvailable()) {
+                return@collect
               }
-            }
-          }
-      }
-    }
 
-    lifecycleScope.launch {
-      withContext(Dispatchers.Default) {
-        queryEngine
-          ?.currentState
-          ?.collect {
-            withContext(Dispatchers.Main) a@{
-              if (!isBindingAvailable()) return@a
-
-              when (it) {
-                is StatefulData.Error,
-                is StatefulData.NotStarted,
-                is StatefulData.Success,
-                -> {
-                  binding.loadingView.hideAll()
-                  binding.swipeRefreshLayout.isRefreshing = false
-                }
-                is StatefulData.Loading -> {
-                  binding.loadingView.showProgressBar()
+              adapter?.setData(queryEngine.getItems()) {
+                if (queryEngine.pageCount == 1 && !queryEngine.currentState.value.isLoading) {
+                  binding.recyclerView.scrollToPosition(0)
                 }
               }
             }
-          }
+        }
       }
-    }
 
-    queryEngine?.getItems()?.let {
-      adapter?.setData(it) {}
+      lifecycleScope.launch {
+        withContext(Dispatchers.Default) {
+          queryEngine
+            ?.currentState
+            ?.collect {
+              withContext(Dispatchers.Main) a@{
+                if (!isBindingAvailable()) return@a
+
+                when (it) {
+                  is StatefulData.Error,
+                  is StatefulData.NotStarted,
+                  is StatefulData.Success,
+                    -> {
+                    loadingView.hideAll()
+                    swipeRefreshLayout.isRefreshing = false
+                  }
+                  is StatefulData.Loading -> {
+                    loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
+                  }
+                }
+              }
+            }
+        }
+      }
+
+      queryEngine?.getItems()?.let {
+        adapter?.setData(it) {}
+      }
     }
   }
 

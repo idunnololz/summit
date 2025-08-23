@@ -47,6 +47,7 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -229,7 +230,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             loadingView.showDefaultErrorMessageFor(it.error)
           }
           is StatefulData.Loading ->
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           is StatefulData.NotStarted -> {
             swipeRefreshLayout.isRefreshing = false
             loadingView.hideAll()

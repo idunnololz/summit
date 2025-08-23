@@ -31,6 +31,7 @@ import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -152,73 +153,77 @@ class PersonCommentsFragment :
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val parentFragment = parentFragment as PersonTabbedFragment
+    with(binding) {
+      val parentFragment = parentFragment as PersonTabbedFragment
 
-    val layoutManager = LinearLayoutManager(context)
+      val layoutManager = LinearLayoutManager(context)
 
-    fun fetchPageIfLoadItem(position: Int) {
-      (adapter?.items?.getOrNull(position) as? CommentListAdapter.Item.AutoLoadItem)
-        ?.pageToLoad
-        ?.let {
-          parentFragment.viewModel.fetchPage(it)
-        }
-    }
-
-    fun checkIfFetchNeeded() {
-      val firstPos = layoutManager.findFirstVisibleItemPosition()
-      val lastPos = layoutManager.findLastVisibleItemPosition()
-
-      for (i in (firstPos - 1)..(lastPos + 1)) {
-        fetchPageIfLoadItem(i)
+      fun fetchPageIfLoadItem(position: Int) {
+        (adapter?.items?.getOrNull(position) as? CommentListAdapter.Item.AutoLoadItem)
+          ?.pageToLoad
+          ?.let {
+            parentFragment.viewModel.fetchPage(it)
+          }
       }
-    }
 
-    parentFragment.viewModel.commentsState.observe(viewLifecycleOwner) {
-      when (it) {
-        is StatefulData.Error -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-          binding.loadingView.showDefaultErrorMessageFor(it.error)
+      fun checkIfFetchNeeded() {
+        val firstPos = layoutManager.findFirstVisibleItemPosition()
+        val lastPos = layoutManager.findLastVisibleItemPosition()
+
+        for (i in (firstPos - 1)..(lastPos + 1)) {
+          fetchPageIfLoadItem(i)
         }
-        is StatefulData.Loading ->
-          binding.loadingView.showProgressBar()
-        is StatefulData.NotStarted -> {}
-        is StatefulData.Success -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-          binding.loadingView.hideAll()
+      }
 
-          adapter?.setData(parentFragment.viewModel.commentListEngine.commentPages)
+      parentFragment.viewModel.commentsState.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+            binding.loadingView.showDefaultErrorMessageFor(it.error)
+          }
 
-          binding.root.post {
-            checkIfFetchNeeded()
+          is StatefulData.Loading ->
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
 
-            if (it.data.isReset) {
-              layoutManager.scrollToPositionWithOffset(0, 0)
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+            binding.loadingView.hideAll()
+
+            adapter?.setData(parentFragment.viewModel.commentListEngine.commentPages)
+
+            binding.root.post {
+              checkIfFetchNeeded()
+
+              if (it.data.isReset) {
+                layoutManager.scrollToPositionWithOffset(0, 0)
+              }
             }
           }
         }
       }
-    }
 
-    with(binding) {
-      recyclerView.layoutManager = layoutManager
+      with(binding) {
+        recyclerView.layoutManager = layoutManager
 
-      binding.recyclerView.addOnScrollListener(
-        object : RecyclerView.OnScrollListener() {
-          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
+        binding.recyclerView.addOnScrollListener(
+          object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+              super.onScrolled(recyclerView, dx, dy)
 
-            checkIfFetchNeeded()
-          }
-        },
-      )
+              checkIfFetchNeeded()
+            }
+          },
+        )
 
-      swipeRefreshLayout.setOnRefreshListener {
-        parentFragment.viewModel.fetchPage(0, true, true)
+        swipeRefreshLayout.setOnRefreshListener {
+          parentFragment.viewModel.fetchPage(0, true, true)
+        }
       }
-    }
 
-    runAfterLayout {
-      setupView()
+      runAfterLayout {
+        setupView()
+      }
     }
   }
 

@@ -81,6 +81,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -417,7 +418,7 @@ class SearchHomeFragment :
             loadingView.showDefaultErrorMessageFor(it.error)
           }
           is StatefulData.Loading -> {
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
           is StatefulData.NotStarted -> {
             swipeRefreshLayout.isRefreshing = false

@@ -22,6 +22,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -104,7 +105,7 @@ class UserTagsFragment :
             loadingView.showDefaultErrorMessageFor(it.error)
           }
           is StatefulData.Loading -> {
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
           is StatefulData.NotStarted -> {
             swipeRefreshLayout.isRefreshing = false

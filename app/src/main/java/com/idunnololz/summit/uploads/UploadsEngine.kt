@@ -1,6 +1,7 @@
 package com.idunnololz.summit.uploads
 
 import android.content.Context
+import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.LocalImageView
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource

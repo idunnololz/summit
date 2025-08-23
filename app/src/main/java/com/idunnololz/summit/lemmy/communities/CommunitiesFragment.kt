@@ -40,6 +40,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -195,7 +196,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             loadingView.showDefaultErrorMessageFor(it.error)
           }
           is StatefulData.Loading -> {
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
           is StatefulData.NotStarted -> {}
           is StatefulData.Success -> {

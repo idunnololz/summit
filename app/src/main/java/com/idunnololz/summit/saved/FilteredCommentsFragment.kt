@@ -34,6 +34,7 @@ import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -149,68 +150,69 @@ class FilteredCommentsFragment :
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
-
-    val viewModel = parentFragment.viewModel
-
-    val layoutManager = LinearLayoutManager(context)
-
-    fun fetchPageIfLoadItem(position: Int) {
-      (adapter?.items?.getOrNull(position) as? CommentListAdapter.Item.AutoLoadItem)
-        ?.pageToLoad
-        ?.let {
-          viewModel.fetchCommentPage(it)
-        }
-    }
-
-    fun checkIfFetchNeeded() {
-      val firstPos = layoutManager.findFirstVisibleItemPosition()
-      val lastPos = layoutManager.findLastVisibleItemPosition()
-
-      for (i in (firstPos - 1)..(lastPos + 1)) {
-        fetchPageIfLoadItem(i)
-      }
-    }
-
-    viewModel.commentsState.observe(viewLifecycleOwner) {
-      when (it) {
-        is StatefulData.Error -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-
-          if (it.error is NotAuthenticatedException) {
-            binding.loadingView.showErrorWithRetry(
-              getString(R.string.error_not_signed_in),
-              getString(R.string.login),
-            )
-            binding.loadingView.setOnRefreshClickListener {
-              val direction = FilteredPostsAndCommentsTabbedFragmentDirections
-                .actionGlobalLogin()
-              findNavController().navigateSafe(direction)
-            }
-          } else {
-            binding.loadingView.showDefaultErrorMessageFor(it.error)
-            binding.loadingView.setOnRefreshClickListener {
-              viewModel.fetchCommentPage(0, true)
-            }
-          }
-        }
-        is StatefulData.Loading ->
-          binding.loadingView.showProgressBar()
-        is StatefulData.NotStarted -> {}
-        is StatefulData.Success -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-          binding.loadingView.hideAll()
-
-          adapter?.setData(viewModel.commentListEngine.commentPages)
-
-          binding.root.post {
-            checkIfFetchNeeded()
-          }
-        }
-      }
-    }
-
     with(binding) {
+
+      val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
+
+      val viewModel = parentFragment.viewModel
+
+      val layoutManager = LinearLayoutManager(context)
+
+      fun fetchPageIfLoadItem(position: Int) {
+        (adapter?.items?.getOrNull(position) as? CommentListAdapter.Item.AutoLoadItem)
+          ?.pageToLoad
+          ?.let {
+            viewModel.fetchCommentPage(it)
+          }
+      }
+
+      fun checkIfFetchNeeded() {
+        val firstPos = layoutManager.findFirstVisibleItemPosition()
+        val lastPos = layoutManager.findLastVisibleItemPosition()
+
+        for (i in (firstPos - 1)..(lastPos + 1)) {
+          fetchPageIfLoadItem(i)
+        }
+      }
+
+      viewModel.commentsState.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+
+            if (it.error is NotAuthenticatedException) {
+              binding.loadingView.showErrorWithRetry(
+                getString(R.string.error_not_signed_in),
+                getString(R.string.login),
+              )
+              binding.loadingView.setOnRefreshClickListener {
+                val direction = FilteredPostsAndCommentsTabbedFragmentDirections
+                  .actionGlobalLogin()
+                findNavController().navigateSafe(direction)
+              }
+            } else {
+              binding.loadingView.showDefaultErrorMessageFor(it.error)
+              binding.loadingView.setOnRefreshClickListener {
+                viewModel.fetchCommentPage(0, true)
+              }
+            }
+          }
+          is StatefulData.Loading ->
+            binding.loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+            binding.loadingView.hideAll()
+
+            adapter?.setData(viewModel.commentListEngine.commentPages)
+
+            binding.root.post {
+              checkIfFetchNeeded()
+            }
+          }
+        }
+      }
+
       recyclerView.layoutManager = layoutManager
 
       binding.recyclerView.addOnScrollListener(
@@ -226,25 +228,25 @@ class FilteredCommentsFragment :
       swipeRefreshLayout.setOnRefreshListener {
         viewModel.fetchCommentPage(0, true)
       }
-    }
 
-    viewModel.lastSelectedItemLiveData.observe(viewLifecycleOwner) { lastSelectedPost ->
-      if (lastSelectedPost != null) {
-        lastSelectedPost.fold(
-          {
-            adapter?.onHighlightComplete()
-          },
-          {
-            adapter?.highlightForever(it)
-          },
-        )
-      } else {
-        adapter?.endHighlightForever()
+      viewModel.lastSelectedItemLiveData.observe(viewLifecycleOwner) { lastSelectedPost ->
+        if (lastSelectedPost != null) {
+          lastSelectedPost.fold(
+            {
+              adapter?.onHighlightComplete()
+            },
+            {
+              adapter?.highlightForever(it)
+            },
+          )
+        } else {
+          adapter?.endHighlightForever()
+        }
       }
-    }
 
-    runAfterLayout {
-      setupView()
+      runAfterLayout {
+        setupView()
+      }
     }
   }
 

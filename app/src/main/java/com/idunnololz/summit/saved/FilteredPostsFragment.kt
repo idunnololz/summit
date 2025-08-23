@@ -31,6 +31,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -195,68 +196,68 @@ class FilteredPostsFragment :
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
-
-    val layoutManager = LinearLayoutManager(context)
-
-    val viewModel = parentFragment.viewModel
-
-    fun fetchPageIfLoadItem(position: Int) {
-      (adapter?.items?.getOrNull(position) as? PostListEngineItem.AutoLoadItem)
-        ?.pageToLoad
-        ?.let {
-          viewModel.fetchPostPage(it, false)
-        }
-    }
-
-    fun checkIfFetchNeeded() {
-      val firstPos = layoutManager.findFirstVisibleItemPosition()
-      val lastPos = layoutManager.findLastVisibleItemPosition()
-
-      for (i in (firstPos - 1)..(lastPos + 1)) {
-        fetchPageIfLoadItem(i)
-      }
-    }
-
-    viewModel.postsState.observe(viewLifecycleOwner) {
-      when (it) {
-        is StatefulData.Error -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-
-          if (it.error is NotAuthenticatedException) {
-            binding.loadingView.showErrorWithRetry(
-              getString(R.string.error_not_signed_in),
-              getString(R.string.login),
-            )
-            binding.loadingView.setOnRefreshClickListener {
-              val direction = FilteredPostsAndCommentsTabbedFragmentDirections
-                .actionGlobalLogin()
-              findNavController().navigateSafe(direction)
-            }
-          } else {
-            binding.loadingView.showDefaultErrorMessageFor(it.error)
-            binding.loadingView.setOnRefreshClickListener {
-              viewModel.fetchPostPage(0, true)
-            }
-          }
-        }
-        is StatefulData.Loading ->
-          binding.loadingView.showProgressBar()
-        is StatefulData.NotStarted -> {}
-        is StatefulData.Success -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-          binding.loadingView.hideAll()
-
-          adapter?.onItemsChanged()
-
-          binding.recyclerView.post {
-            checkIfFetchNeeded()
-          }
-        }
-      }
-    }
-
     with(binding) {
+
+      val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
+
+      val layoutManager = LinearLayoutManager(context)
+
+      val viewModel = parentFragment.viewModel
+
+      fun fetchPageIfLoadItem(position: Int) {
+        (adapter?.items?.getOrNull(position) as? PostListEngineItem.AutoLoadItem)
+          ?.pageToLoad
+          ?.let {
+            viewModel.fetchPostPage(it, false)
+          }
+      }
+
+      fun checkIfFetchNeeded() {
+        val firstPos = layoutManager.findFirstVisibleItemPosition()
+        val lastPos = layoutManager.findLastVisibleItemPosition()
+
+        for (i in (firstPos - 1)..(lastPos + 1)) {
+          fetchPageIfLoadItem(i)
+        }
+      }
+
+      viewModel.postsState.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+
+            if (it.error is NotAuthenticatedException) {
+              binding.loadingView.showErrorWithRetry(
+                getString(R.string.error_not_signed_in),
+                getString(R.string.login),
+              )
+              binding.loadingView.setOnRefreshClickListener {
+                val direction = FilteredPostsAndCommentsTabbedFragmentDirections
+                  .actionGlobalLogin()
+                findNavController().navigateSafe(direction)
+              }
+            } else {
+              binding.loadingView.showDefaultErrorMessageFor(it.error)
+              binding.loadingView.setOnRefreshClickListener {
+                viewModel.fetchPostPage(0, true)
+              }
+            }
+          }
+          is StatefulData.Loading ->
+            binding.loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+            binding.loadingView.hideAll()
+
+            adapter?.onItemsChanged()
+
+            binding.recyclerView.post {
+              checkIfFetchNeeded()
+            }
+          }
+        }
+      }
       recyclerView.layoutManager = layoutManager
       recyclerView.addOnScrollListener(
         object : RecyclerView.OnScrollListener() {
@@ -271,25 +272,25 @@ class FilteredPostsFragment :
       swipeRefreshLayout.setOnRefreshListener {
         viewModel.fetchPostPage(0, true)
       }
-    }
 
-    viewModel.lastSelectedItemLiveData.observe(viewLifecycleOwner) { lastSelectedPost ->
-      if (lastSelectedPost != null) {
-        lastSelectedPost.fold(
-          {
-            adapter?.highlightPostForever(it)
-          },
-          {
-            adapter?.clearHighlight()
-          },
-        )
-      } else {
-        adapter?.endHighlightForever()
+      viewModel.lastSelectedItemLiveData.observe(viewLifecycleOwner) { lastSelectedPost ->
+        if (lastSelectedPost != null) {
+          lastSelectedPost.fold(
+            {
+              adapter?.highlightPostForever(it)
+            },
+            {
+              adapter?.clearHighlight()
+            },
+          )
+        } else {
+          adapter?.endHighlightForever()
+        }
       }
-    }
 
-    runAfterLayout {
-      setupView()
+      runAfterLayout {
+        setupView()
+      }
     }
   }
 

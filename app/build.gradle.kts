@@ -103,6 +103,7 @@ dependencies {
   implementation(project(":thirdPartyModules:markwon:markwon-linkify"))
   implementation(project(":thirdPartyModules:markwon:markwon-simple-ext"))
   implementation(project(":thirdPartyModules:zoomLayout"))
+  implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
 
   implementation(libs.kotlin.reflect)
   implementation(libs.kotlin.stdlib.jdk7)

@@ -72,6 +72,5 @@
     <declare-styleable name="SimpleSwipeRefreshLayout">
         <attr name="max_offset_top" format="dimension" />
         <attr name="trigger_offset_top" format="dimension" />
-        <attr name="indicator_overlay" format="boolean" />
     </declare-styleable>
 </resources>

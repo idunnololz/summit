@@ -164,7 +164,6 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         binding.bannerGradient.updateLayoutParams<ViewGroup.LayoutParams> {
           height = newToolbarHeight
         }
-        binding.swipeRefreshLayout.topInset = it.topInset
       }
     }
 

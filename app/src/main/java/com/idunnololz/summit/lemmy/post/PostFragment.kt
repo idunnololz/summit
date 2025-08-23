@@ -103,6 +103,7 @@ import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -1084,7 +1085,7 @@ class PostFragment :
         }
         is StatefulData.Loading -> {
           if (!adapter.hasStartingData()) {
-            binding.loadingView.showProgressBar()
+            binding.loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
         }
         is StatefulData.NotStarted -> {}

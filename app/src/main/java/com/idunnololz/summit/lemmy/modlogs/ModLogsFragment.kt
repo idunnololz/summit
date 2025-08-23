@@ -58,6 +58,7 @@ import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -219,7 +220,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
             loadingView.showDefaultErrorMessageFor(it.error)
           }
           is StatefulData.Loading -> {
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
           is StatefulData.NotStarted -> {}
           is StatefulData.Success -> {

@@ -23,12 +23,12 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/content_container"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        <com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -42,17 +42,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"/>
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout>
 
         <com.idunnololz.summit.view.LoadingView
             android:id="@+id/loading_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintVertical_bias="0.33"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.25"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

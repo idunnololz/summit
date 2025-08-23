@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.idunnololz.summit.databinding.FragmentPendingActionsBinding
+import com.idunnololz.summit.databinding.FragmentActionsBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.AnimationsHelper
@@ -15,11 +15,12 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
+class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
   private val args by navArgs<ActionsFragmentArgs>()
 
   enum class ActionType {
@@ -41,7 +42,7 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
   ): View {
     super.onCreateView(inflater, container, savedInstanceState)
 
-    setBinding(FragmentPendingActionsBinding.inflate(inflater, container, false))
+    setBinding(FragmentActionsBinding.inflate(inflater, container, false))
 
     return binding.root
   }
@@ -51,83 +52,89 @@ class ActionsFragment : BaseFragment<FragmentPendingActionsBinding>() {
 
     val context = requireContext()
 
-    val parentFragment = parentFragment as ActionsTabbedFragment
-    val viewModel = parentFragment.viewModel
-    val adapter = ActionsAdapter(
-      context = context,
-      lemmyTextHelper = lemmyTextHelper,
-      onImageClick = { postView, sharedElementView, url ->
-        getMainActivity()?.openImage(
-          sharedElement = sharedElementView,
-          appBar = null,
-          title = null,
-          url = url,
-          mimeType = null,
-        )
-      },
-      onVideoClick = { url, videoType, state ->
-        getMainActivity()?.openVideo(url, videoType, state)
-      },
-      onPageClick = {
-        getMainActivity()?.launchPage(it)
-      },
-      onLinkClick = { url, text, linkType ->
-        onLinkClick(url, text, linkType)
-      },
-      onLinkLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
-      },
-      onActionClick = {
-        viewModel.markActionAsSeen(it)
-        parentFragment.openActionDetails(it)
+    with(binding) {
+      val parentFragment = parentFragment as ActionsTabbedFragment
+      val viewModel = parentFragment.viewModel
+      val adapter = ActionsAdapter(
+        context = context,
+        lemmyTextHelper = lemmyTextHelper,
+        onImageClick = { postView, sharedElementView, url ->
+          getMainActivity()?.openImage(
+            sharedElement = sharedElementView,
+            appBar = null,
+            title = null,
+            url = url,
+            mimeType = null,
+          )
+        },
+        onVideoClick = { url, videoType, state ->
+          getMainActivity()?.openVideo(url, videoType, state)
+        },
+        onPageClick = {
+          getMainActivity()?.launchPage(it)
+        },
+        onLinkClick = { url, text, linkType ->
+          onLinkClick(url, text, linkType)
+        },
+        onLinkLongClick = { url, text ->
+          getMainActivity()?.showMoreLinkOptions(url, text)
+        },
+        onActionClick = {
+          viewModel.markActionAsSeen(it)
+          parentFragment.openActionDetails(it)
 //                ActionDetailsDialogFragment.show(
 //                    fragmentManager = parentFragmentManager,
 //                    action = it,
 //                )
-      },
-    ).apply {
-      stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-    }
+        },
+      ).apply {
+        stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+      }
 
-    viewModel.actionsDataLiveData.observe(viewLifecycleOwner) {
-      when (it) {
-        is StatefulData.Error -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-          binding.loadingView.showDefaultErrorMessageFor(it.error)
-        }
-        is StatefulData.Loading -> {
-          binding.loadingView.showProgressBar()
-        }
-        is StatefulData.NotStarted -> {}
-        is StatefulData.Success -> {
-          binding.swipeRefreshLayout.isRefreshing = false
-          binding.loadingView.hideAll()
+      viewModel.actionsDataLiveData.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+            binding.loadingView.showDefaultErrorMessageFor(it.error)
+          }
 
-          adapter.accountDictionary = it.data.accountDictionary
+          is StatefulData.Loading -> {
+            binding.loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
+          }
 
-          when (args.actionType) {
-            ActionType.Completed -> {
-              adapter.actions = it.data.completedActions
-            }
-            ActionType.Pending -> {
-              adapter.actions = it.data.pendingActions
-            }
-            ActionType.Failed -> {
-              adapter.actions = it.data.failedActions
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            binding.swipeRefreshLayout.isRefreshing = false
+            binding.loadingView.hideAll()
+
+            adapter.accountDictionary = it.data.accountDictionary
+
+            when (args.actionType) {
+              ActionType.Completed -> {
+                adapter.actions = it.data.completedActions
+              }
+
+              ActionType.Pending -> {
+                adapter.actions = it.data.pendingActions
+              }
+
+              ActionType.Failed -> {
+                adapter.actions = it.data.failedActions
+              }
             }
           }
         }
       }
-    }
 
-    binding.swipeRefreshLayout.setOnRefreshListener {
-      viewModel.loadActions()
-    }
+      swipeRefreshLayout.setOnRefreshListener {
+        viewModel.loadActions()
+      }
 
-    binding.recyclerView.adapter = adapter
-    binding.recyclerView.layoutManager = LinearLayoutManager(context)
-    binding.recyclerView.setup(animationsHelper)
-    binding.recyclerView.setHasFixedSize(true)
-    binding.fastScroller.setRecyclerView(binding.recyclerView)
+      recyclerView.adapter = adapter
+      recyclerView.layoutManager = LinearLayoutManager(context)
+      recyclerView.setup(animationsHelper)
+      recyclerView.setHasFixedSize(true)
+      fastScroller.setRecyclerView(binding.recyclerView)
+    }
   }
 }

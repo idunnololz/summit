@@ -30,6 +30,7 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import com.idunnololz.summit.util.tsToConcise
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Instant
@@ -96,7 +97,7 @@ class HiddenPostsFragment : BaseFragment<FragmentHiddenPostsBinding>() {
             swipeRefreshLayout.isRefreshing = false
           }
           is StatefulData.Loading -> {
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
           is StatefulData.NotStarted -> {}
           is StatefulData.Success -> {

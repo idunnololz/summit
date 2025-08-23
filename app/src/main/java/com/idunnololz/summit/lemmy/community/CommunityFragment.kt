@@ -106,6 +106,7 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -873,6 +874,7 @@ class CommunityFragment :
               binding.coordinatorLayout,
             )
           }
+//          binding.swipeRefreshLayout.topInset = it.topInset
         }
       }
     }
@@ -952,9 +954,7 @@ class CommunityFragment :
           }
 
           is StatefulData.Loading -> {
-            if (!swipeRefreshLayout.isRefreshing) {
-              loadingView.showProgressBar()
-            }
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
 
           is StatefulData.NotStarted -> {

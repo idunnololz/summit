@@ -31,7 +31,9 @@ import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -165,7 +167,7 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
             )
           }
           is StatefulData.Loading -> {
-            loadingView.showProgressBar()
+            loadingView.showProgressBarIfNeeded(swipeRefreshLayout)
           }
           is StatefulData.NotStarted -> {
             loadingView.hideAll()
