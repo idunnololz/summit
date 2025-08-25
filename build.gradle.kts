@@ -10,6 +10,7 @@ plugins {
   alias(libs.plugins.jetbrains.kotlin.jvm) apply false
   alias(libs.plugins.kotlin.plugin.serialization) apply false
   alias(libs.plugins.versions)
+  alias(libs.plugins.sentry) apply false
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {

@@ -10,7 +10,7 @@ plugins {
   id("org.jetbrains.kotlin.plugin.parcelize")
   id("com.google.devtools.ksp")
   id("kotlin-kapt")
-  id("io.sentry.android.gradle") version "5.3.0"
+  alias(libs.plugins.sentry)
   alias(libs.plugins.hilt)
   alias(libs.plugins.kotlin.plugin.serialization)
 }
@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 36
-    versionCode = 284
-    versionName = "1.70.1"
+    versionCode = 285
+    versionName = "1.71.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
