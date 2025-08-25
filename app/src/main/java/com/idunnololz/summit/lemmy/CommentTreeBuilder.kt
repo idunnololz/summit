@@ -10,6 +10,7 @@ import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostViewModel
+import com.idunnololz.summit.lemmy.post.PostViewModel.ListView.CommentListView
 import java.util.LinkedHashMap
 import java.util.LinkedList
 
@@ -83,28 +84,28 @@ class CommentTreeBuilder(
      */
     fun pruneCommentTree(startingNodeId: Int) {
       val startingNode = map[startingNodeId] ?: return
-      val startingCommentView = startingNode.listView as? PostViewModel.ListView.CommentListView
+      val startingCommentView = startingNode.listView as? CommentListView
         ?: return
       val startingCommentDepth = startingCommentView.commentView.comment.getDepth()
-      val startingCommentPath = startingCommentView.commentView.comment.path
+      val startingComment = startingCommentView.commentView.comment
 
       val iterator = map.iterator()
       while (iterator.hasNext()) {
         val node = iterator.next()
         val listView = node.value.listView
-        if (listView !is PostViewModel.ListView.CommentListView) {
+        if (listView !is CommentListView) {
           continue
         }
 
         val commentDepth = listView.commentView.comment.getDepth()
 
         if (commentDepth > startingCommentDepth) {
-          if (!listView.commentView.comment.path.contains(startingCommentPath)) {
+          if (!listView.commentView.comment.isParent(startingComment)) {
             iterator.remove()
             continue
           }
         } else if (commentDepth < startingCommentDepth) {
-          if (!startingCommentPath.contains(listView.commentView.comment.path)) {
+          if (!startingComment.isParent(listView.commentView.comment)) {
             iterator.remove()
             continue
           }
@@ -122,7 +123,7 @@ class CommentTreeBuilder(
 
       for (node in map) {
         val listView = node.value.listView
-        if (listView !is PostViewModel.ListView.CommentListView) {
+        if (listView !is CommentListView) {
           continue
         }
 
@@ -152,7 +153,7 @@ class CommentTreeBuilder(
     // add missing comments first
     ArrayList(map.values).forEach { node ->
       val commentView = node.listView
-      if (commentView !is PostViewModel.ListView.CommentListView) {
+      if (commentView !is CommentListView) {
         return@forEach
       }
 
@@ -184,14 +185,14 @@ class CommentTreeBuilder(
 
     map.values.forEach { node ->
       val commentView = node.listView
-      if (commentView !is PostViewModel.ListView.CommentListView &&
+      if (commentView !is CommentListView &&
         commentView !is PostViewModel.ListView.MissingCommentItem
       ) {
         return@forEach
       }
 
       when (commentView) {
-        is PostViewModel.ListView.CommentListView -> {
+        is CommentListView -> {
           val parentId = getCommentParentId(commentView.commentView.comment)
 
           parentId?.let { cParentId ->
@@ -236,7 +237,7 @@ class CommentTreeBuilder(
 
         val originalComment = map[pendingComment.commentId]
         val commentView = originalComment?.listView
-        if (originalComment != null && commentView is PostViewModel.ListView.CommentListView) {
+        if (originalComment != null && commentView is CommentListView) {
           originalComment.listView = when (commentView) {
             is PostViewModel.ListView.FilteredCommentItem ->
               commentView.copy(
@@ -296,7 +297,7 @@ class CommentTreeBuilder(
       val node = toVisit.pollFirst() ?: continue
 
       val commentView = node.listView
-      if (commentView !is PostViewModel.ListView.CommentListView) {
+      if (commentView !is CommentListView) {
         continue
       }
 
@@ -305,7 +306,7 @@ class CommentTreeBuilder(
 
       node.children.forEach {
         when (val commentView = it.listView) {
-          is PostViewModel.ListView.CommentListView -> {
+          is CommentListView -> {
             childrenCount += commentView.commentView.counts.child_count + 1 // + 1 for this comment
             toVisit.push(it)
           }
@@ -362,7 +363,7 @@ class CommentTreeBuilder(
 
     topNodes.forEach {
       when (val commentView = it.listView) {
-        is PostViewModel.ListView.CommentListView -> {
+        is CommentListView -> {
           childrenCount += commentView.commentView.counts.child_count + 1 // + 1 for this comment
         }
         is PostViewModel.ListView.PendingCommentListView -> {
@@ -408,7 +409,54 @@ private val Comment.parentParentNodeId
     .lastOrNull()
     ?.toIntOrNull()
 
-fun List<CommentNodeData>.flatten(collapsedItemIds: Set<Long>): MutableList<CommentNodeData> {
+fun CommentNodeData.find(itemId: Long): CommentListView? {
+  val toVisit = LinkedList<CommentNodeData>()
+
+  toVisit.add(this)
+
+  while (toVisit.isNotEmpty()) {
+    val currentNode = toVisit.pollLast() ?: continue
+
+    when (val commentView = currentNode.listView) {
+      is PostViewModel.ListView.FilteredCommentItem -> {
+        if (commentView.commentView.comment.id.toLong() == itemId) {
+          return commentView
+        }
+      }
+      is PostViewModel.ListView.VisibleCommentListView -> {
+        if (commentView.commentView.comment.id.toLong() == itemId) {
+          return commentView
+        }
+      }
+      is PostViewModel.ListView.MissingCommentItem,
+      is PostViewModel.ListView.MoreCommentsItem,
+      is PostViewModel.ListView.PendingCommentListView,
+      is PostViewModel.ListView.PostListView,
+      -> {}
+    }
+
+    currentNode.children.reversed().forEach {
+      toVisit.addLast(it)
+    }
+  }
+
+  return null
+}
+
+fun List<CommentNodeData>.find(itemId: Long): CommentListView? {
+  for (data in this) {
+    val found = data.find(itemId)
+    if (found != null) {
+      return found
+    }
+  }
+  return null
+}
+
+fun List<CommentNodeData>.flatten(
+  collapsedItemIds: Set<Long>,
+  highlightedComment: Comment? = null,
+): MutableList<CommentNodeData> {
   val result = mutableListOf<CommentNodeData>()
 
   fun CommentNodeData.flatten(result: MutableList<CommentNodeData>) {
@@ -417,13 +465,18 @@ fun List<CommentNodeData>.flatten(collapsedItemIds: Set<Long>): MutableList<Comm
     toVisit.add(this)
 
     while (toVisit.isNotEmpty()) {
-      val currentNode = toVisit.pollLast()!!
+      val currentNode = toVisit.pollLast() ?: continue
 
       result.add(currentNode)
 
       when (val commentView = currentNode.listView) {
-        is PostViewModel.ListView.CommentListView -> {
-          if (collapsedItemIds.contains(commentView.id)) {
+        is CommentListView -> {
+          if (highlightedComment?.isParent(commentView.commentView.comment) == true) {
+            // do nothing
+          } else if (highlightedComment != null &&
+            highlightedComment.id == commentView.commentView.comment.id
+          ) {
+          } else if (collapsedItemIds.contains(commentView.id)) {
             continue
           }
         }
@@ -459,3 +512,5 @@ fun List<CommentNodeData>.flatten(collapsedItemIds: Set<Long>): MutableList<Comm
 
   return result
 }
+
+fun Comment.isParent(comment: Comment): Boolean = this.path.contains(comment.path)

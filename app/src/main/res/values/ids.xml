@@ -306,4 +306,7 @@
     <item name="instance_info" type="id" />
     <item name="hide_read_on" type="id" />
     <item name="hide_read_off" type="id" />
+    <item name="find_match_fn" type="id" />
+    <item name="highlight_line_y" type="id"/>
+    <item name="highlight_text_data" type="id"/>
 </resources>

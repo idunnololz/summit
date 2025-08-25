@@ -51,4 +51,6 @@
     <dimen name="post_list_image_view_border">2dp</dimen>
     <!-- This is a derived values. It is the card padding - border width. Eg. 16dp - 2dp = 14dp -->
     <dimen name="post_list_image_view_horizontal_margin">14dp</dimen>
+    <dimen name="loading_indicator_small">16dp</dimen>
+    <dimen name="loading_container_small">24dp</dimen>
 </resources>

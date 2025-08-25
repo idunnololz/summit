@@ -7,6 +7,8 @@ import android.text.style.ClickableSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import com.idunnololz.summit.R
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonPlugin
@@ -195,6 +197,8 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
 
         detailsStartSpan.isProcessed = true
         textView.text = spanned
+
+        updateHighlightTextData(textView)
       }
     } catch (e: Exception) {
       Log.d(TAG, "Spoiler error", e)
@@ -202,5 +206,52 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         RuntimeException("Spoiler error", e),
       )
     }
+  }
+}
+
+fun updateHighlightTextData(textView: TextView) {
+  val highlightTextData =
+    textView.getTag(R.id.highlight_text_data) as? QueryMatchHelper.HighlightTextData
+      ?: return
+
+  val spanned = SpannableStringBuilder(textView.text)
+  val queryHighlight = highlightTextData.query
+  val queryLength = queryHighlight.length
+  val matchIndex = highlightTextData.matchIndex
+  val matchedTextSpans = spanned.getSpans(0, spanned.length, MatchedTextSpan::class.java)
+
+  matchedTextSpans.forEach { it.highlight = false }
+
+  if (matchIndex == null) {
+    textView.setTag(R.id.highlight_line_y, null)
+    return
+  }
+
+  val matchedTextSpan = matchedTextSpans.firstOrNull { it.matchIndex == matchIndex }
+
+  if (matchedTextSpan == null) {
+    textView.setTag(R.id.highlight_line_y, null)
+    return
+  }
+
+  val currentMatchIndex = spanned.getSpanStart(matchedTextSpan)
+  matchedTextSpan.highlight = true
+
+  if (currentMatchIndex != -1) {
+    val layout = textView.layout
+
+    if (layout == null) {
+      textView.setTag(R.id.highlight_line_y, null)
+      textView.post {
+        updateHighlightTextData(textView)
+      }
+      return
+    }
+
+    val lineY = layout.getLineTop(layout.getLineForOffset(currentMatchIndex))
+
+    textView.setTag(R.id.highlight_line_y, lineY)
+  } else {
+    textView.setTag(R.id.highlight_line_y, null)
   }
 }

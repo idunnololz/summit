@@ -34,8 +34,9 @@ class LoadingIndicatorDrawable internal constructor(
   private val context: Context,
   private val specs: LoadingIndicatorSpec,
   var drawingDelegate: LoadingIndicatorDrawingDelegate,
-  private var animatorDelegate: LoadingIndicatorAnimatorDelegate
-) : Drawable(), Drawable.Callback {
+  private var animatorDelegate: LoadingIndicatorAnimatorDelegate,
+) : Drawable(),
+  Drawable.Callback {
   var animatorDurationScaleProvider: AnimatorDurationScaleProvider? =
     AnimatorDurationScaleProvider()
 
@@ -68,13 +69,9 @@ class LoadingIndicatorDrawable internal constructor(
   }
 
   // ******************* Overridden methods *******************
-  override fun getIntrinsicWidth(): Int {
-    return drawingDelegate.getPreferredWidth()
-  }
+  override fun getIntrinsicWidth(): Int = drawingDelegate.getPreferredWidth()
 
-  override fun getIntrinsicHeight(): Int {
-    return drawingDelegate.getPreferredHeight()
-  }
+  override fun getIntrinsicHeight(): Int = drawingDelegate.getPreferredHeight()
 
   override fun draw(canvas: Canvas) {
     val clipBounds = Rect()
@@ -100,9 +97,8 @@ class LoadingIndicatorDrawable internal constructor(
   }
 
   @CanIgnoreReturnValue
-  override fun setVisible(visible: Boolean, restart: Boolean): Boolean {
-    return setVisible(visible, restart,  /* animate= */visible)
-  }
+  override fun setVisible(visible: Boolean, restart: Boolean): Boolean =
+    setVisible(visible, restart, /* animate= */visible)
 
   /**
    * Changes the visibility with/without triggering the animation callbacks.
@@ -131,18 +127,14 @@ class LoadingIndicatorDrawable internal constructor(
     }
   }
 
-  override fun getAlpha(): Int {
-    return _alpha
-  }
+  override fun getAlpha(): Int = _alpha
 
   override fun setColorFilter(colorFilter: ColorFilter?) {
     paint.setColorFilter(colorFilter)
     invalidateSelf()
   }
 
-  override fun getOpacity(): Int {
-    return PixelFormat.TRANSLUCENT
-  }
+  override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
   override fun invalidateDrawable(drawable: Drawable) {
     val callback = getCallback()
@@ -171,7 +163,7 @@ class LoadingIndicatorDrawable internal constructor(
       if (animatorDurationScaleProvider != null) {
         val systemAnimatorDurationScale =
           animatorDurationScaleProvider!!.getSystemAnimatorDurationScale(
-            context.getContentResolver()
+            context.getContentResolver(),
           )
         return systemAnimatorDurationScale == 0f
       }
@@ -180,9 +172,7 @@ class LoadingIndicatorDrawable internal constructor(
 
   // ******************* Setter and getter *******************
 
-  fun getAnimatorDelegate(): LoadingIndicatorAnimatorDelegate {
-    return animatorDelegate
-  }
+  fun getAnimatorDelegate(): LoadingIndicatorAnimatorDelegate = animatorDelegate
 
   fun setAnimatorDelegate(animatorDelegate: LoadingIndicatorAnimatorDelegate) {
     this.animatorDelegate = animatorDelegate
@@ -191,27 +181,25 @@ class LoadingIndicatorDrawable internal constructor(
 
   fun setProgress(progress: Float) {
     animatorDelegate.indicatorState.rotationDegree += 360 * progress
-    animatorDelegate.setMorphFactor(1f)
+    animatorDelegate.setMorphFactor(0f)
     invalidateSelf()
   }
 
   companion object {
     @JvmStatic
-    fun create(
-      context: Context, specs: LoadingIndicatorSpec
-    ): LoadingIndicatorDrawable {
+    fun create(context: Context, specs: LoadingIndicatorSpec): LoadingIndicatorDrawable {
       val loadingIndicatorDrawable =
         LoadingIndicatorDrawable(
           context,
           specs,
           LoadingIndicatorDrawingDelegate(specs),
-          LoadingIndicatorAnimatorDelegate(specs)
+          LoadingIndicatorAnimatorDelegate(specs),
         )
       loadingIndicatorDrawable.staticDummyDrawable =
         VectorDrawableCompat.create(
           context.getResources(),
           R.drawable.ic_mtrl_arrow_circle,
-          null
+          null,
         )
       return loadingIndicatorDrawable
     }

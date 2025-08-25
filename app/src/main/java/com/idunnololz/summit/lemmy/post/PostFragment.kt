@@ -57,6 +57,7 @@ import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
+import com.idunnololz.summit.lemmy.postAndCommentView.FindMatchFn
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
@@ -796,9 +797,8 @@ class PostFragment :
         findInPageBackPressHandler.isEnabled = showFindInPage
       }
       viewModel.findInPageQuery.observe(viewLifecycleOwner) {
-        adapter?.setQuery(it) {
-          viewModel.queryMatchHelper.setMatches(it)
-        }
+        val matches = adapter?.setQuery(it) ?: return@observe
+        viewModel.queryMatchHelper.setMatches(matches)
       }
       viewModel.queryMatchHelper.currentQueryMatch.observe(viewLifecycleOwner) { match ->
         if (viewModel.queryMatchHelper.matchCount == 0) {
@@ -806,10 +806,11 @@ class PostFragment :
         } else {
           match ?: return@observe
 
-          highlightMatch(match)
-          adapter?.currentMatch = match
-          binding.foundCount.text = "${match.matchIndex + 1} / " +
-            "${viewModel.queryMatchHelper.matchCount}"
+          adapter?.setCurrentMatch(match) {
+            binding.foundCount.text = "${match.matchIndex + 1} / " +
+              "${viewModel.queryMatchHelper.matchCount}"
+            highlightMatch(match)
+          }
         }
       }
       viewModel.screenshotMode.observe(viewLifecycleOwner) { showScreenshotMode ->
@@ -923,8 +924,60 @@ class PostFragment :
     }
   }
 
-  private fun highlightMatch(match: QueryMatchHelper.QueryResult) {
-    layoutManager?.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop)
+  private fun highlightMatch(match: QueryMatchHelper.QueryResult, scrolled: Boolean = false) {
+    if (!isBindingAvailable()) {
+      return
+    }
+
+    val recyclerView = binding.recyclerView
+    val viewHolder = recyclerView.findViewHolderForAdapterPosition(match.itemIndex)
+    if (viewHolder == null && !scrolled) {
+      layoutManager?.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop)
+      binding.root.post {
+        highlightMatch(match, scrolled = true)
+      }
+      return
+    }
+
+    viewHolder ?: return
+
+    @Suppress("UNCHECKED_CAST")
+    val findMatchFn = (viewHolder.itemView.getTag(R.id.find_match_fn) as? FindMatchFn)
+
+    // Check if findMatchFn exists...
+    if (findMatchFn == null) {
+      layoutManager?.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop)
+      return
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      var tries = 0
+      while (tries < 10) {
+        delay(100)
+
+        val y = findMatchFn(match)
+        tries++
+
+        if (y == null) {
+          continue
+        }
+
+        layoutManager?.scrollToPositionWithOffset(match.itemIndex, scrollOffsetTop - y)
+        return@launch
+      }
+
+      Log.d(TAG, "Can't find match!")
+      Snackbar
+        .make(
+          binding.root,
+          getString(
+            R.string.cant_find_match_desc,
+            PrettyPrintUtils.defaultDecimalFormat.format(match.matchIndex + 1),
+          ),
+          Snackbar.LENGTH_LONG,
+        )
+        .show()
+    }
   }
 
   private fun goToNextComment() {

@@ -5,8 +5,6 @@ import android.graphics.RectF
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.util.Log
@@ -31,10 +29,12 @@ import com.idunnololz.summit.util.coil.CoilImagesPlugin.CoilStore
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.markwon.LemmyMentionsPlugin
+import com.idunnololz.summit.util.markwon.MatchedTextSpan
 import com.idunnololz.summit.util.markwon.SpoilerPlugin
 import com.idunnololz.summit.util.markwon.SubScriptSpan
 import com.idunnololz.summit.util.markwon.SummitInlineParser
 import com.idunnololz.summit.util.markwon.SuperScriptSpan
+import com.idunnololz.summit.util.markwon.updateHighlightTextData
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.core.MarkwonTheme
@@ -178,35 +178,27 @@ class LemmyTextHelper @Inject constructor(
         val queryLength = queryHighlight.length
         var curStartIndex = 0
         var matchIndex = 0
+
         while (true) {
-          val index =
-            spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
+          val index = spanned.indexOf(queryHighlight, curStartIndex, ignoreCase = true)
 
           if (index < 0) {
             break
           }
 
-          if (highlight.matchIndex == matchIndex) {
-            spanned.setSpan(
-              BackgroundColorSpan(currentQueryColor),
-              index,
-              index + queryLength,
-              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-          } else {
-            spanned.setSpan(
-              BackgroundColorSpan(highlightColor),
-              index,
-              index + queryLength,
-              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            spanned.setSpan(
-              ForegroundColorSpan(highlightTextColor),
-              index,
-              index + queryLength,
-              Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-          }
+          val matchedTextSpan = MatchedTextSpan(
+            matchIndex = matchIndex,
+            backgroundColor = highlightColor,
+            foregroundColor = highlightTextColor,
+            highlightColor = currentQueryColor,
+            highlight = highlight.matchIndex == matchIndex,
+          )
+          spanned.setSpan(
+            matchedTextSpan,
+            index,
+            index + queryLength,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+          )
           curStartIndex = index + queryLength
 
           matchIndex++
@@ -214,6 +206,10 @@ class LemmyTextHelper @Inject constructor(
       }
 
       markwon.setParsedMarkdown(textView, spanned)
+
+      textView.setTag(R.id.highlight_text_data, highlight)
+
+      updateHighlightTextData(textView)
 
       _spanned
     } catch (e: Exception) {

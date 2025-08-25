@@ -71,6 +71,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
+import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
 import com.idunnololz.summit.lemmy.postListView.CommentUiConfig
@@ -125,6 +126,8 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+
+typealias FindMatchFn = (QueryMatchHelper.QueryResult) -> Int?
 
 @FragmentScoped
 class PostAndCommentViewBuilder @Inject constructor(
@@ -635,6 +638,20 @@ class PostAndCommentViewBuilder @Inject constructor(
       }
       null -> {
       }
+    }
+
+    if (root.getTag(R.id.find_match_fn) == null) {
+      val findMatchFn: FindMatchFn = a@{ match ->
+
+        title.getTag(R.id.highlight_line_y)?.let {
+          return@a it as Int
+        }
+        fullContent.getTag(R.id.highlight_line_y)?.let {
+          return@a it as Int
+        }
+        null
+      }
+      root.setTag(R.id.find_match_fn, findMatchFn)
     }
   }
 
@@ -1150,6 +1167,16 @@ class PostAndCommentViewBuilder @Inject constructor(
       maxDepth = maxDepth,
       indentationPerLevel = commentUiConfig.indentationPerLevelDp,
     )
+
+    if (root.getTag(R.id.find_match_fn) == null) {
+      val findMatchFn: FindMatchFn = a@{ match ->
+        text.getTag(R.id.highlight_line_y)?.let {
+          return@a it as Int
+        }
+        null
+      }
+      root.setTag(R.id.find_match_fn, findMatchFn)
+    }
   }
 
   fun bindCommentViewCollapsed(

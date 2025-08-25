@@ -41,7 +41,9 @@ import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
+import com.idunnololz.summit.lemmy.find
 import com.idunnololz.summit.lemmy.flatten
+import com.idunnololz.summit.lemmy.isParent
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.FooterItem
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.HeaderItem
 import com.idunnololz.summit.lemmy.post.PostAdapter.Item.MoreCommentsItem
@@ -62,6 +64,7 @@ import com.idunnololz.summit.util.recyclerView.getBinding
 import com.idunnololz.summit.util.recyclerView.isBinding
 import com.idunnololz.summit.video.VideoState
 import java.util.LinkedList
+import kotlin.collections.plusAssign
 
 class PostAdapter(
   private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
@@ -276,12 +279,7 @@ class PostAdapter(
   private var contentCache = mutableMapOf<String, Spanned?>()
 
   private var query: String? = null
-  var currentMatch: QueryResult? = null
-    set(value) {
-      field = value
-
-      refreshItems(animate = false)
-    }
+  private var currentMatch: QueryResult? = null
 
   var isLoaded: Boolean = false
   var error: Throwable? = null
@@ -554,9 +552,9 @@ class PostAdapter(
             null
           } else {
             HighlightTextData(
-              item.query,
-              item.currentMatch?.relativeMatchIndex,
-              item.currentMatch?.targetSubtype,
+              query = item.query,
+              matchIndex = item.currentMatch?.relativeMatchIndex,
+              targetSubtype = item.currentMatch?.targetSubtype,
             )
           },
           contentSpannable = contentCache[k],
@@ -979,250 +977,15 @@ class PostAdapter(
     forceRefresh: Boolean = false,
     cb: () -> Unit = {},
   ) {
-    val rawData = rawData
     val oldItems = items
-    val query = query
-    val currentMatch = currentMatch
 
     val topLevelCommentIndices = mutableListOf<Int>()
     val absolutionPositionToTopLevelCommentPosition = mutableListOf<Int>()
 
-    val newItems =
-      if (error == null) {
-        rawData ?: return
-
-        val finalItems = mutableListOf<Item>()
-
-        val changed = if (autoCollapseComments) {
-          autoCollapseComments(rawData.commentTree)
-        } else {
-          false
-        }
-
-        val postView = rawData.postListView
-        val commentItems = rawData.commentTree.flatten(collapsedItemIds)
-
-        if (!rawData.isNativePost &&
-          !hideNonNativeInstanceWarning &&
-          rawData.accountInstance != null
-        ) {
-          finalItems += Item.NotNativeInstanceItem(
-            accountInstance = rawData.accountInstance,
-            postInstance = postView.post.instance,
-          )
-        }
-
-        finalItems += HeaderItem(
-          postView = postView.post,
-          videoState = videoState,
-          showBottomDivider = !isEmbedded || commentItems.isNotEmpty(),
-          query = query,
-          currentMatch = if (currentMatch?.targetId == postView.post.post.id) {
-            currentMatch
-          } else {
-            null
-          },
-          screenshotMode = screenshotMode,
-          crossPosts = rawData.crossPosts.size,
-          highlight = highlightPostForever,
-          postHeaderInfo = postView.postHeaderInfo,
-        )
-
-        absolutionPositionToTopLevelCommentPosition += -1
-
-        if (rawData.isSingleCommentChain) {
-          finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
-
-          if (rawData.commentPath != null && rawData.commentPath.count(".") > 1) {
-            finalItems += Item.ViewParentComments(
-              postId = postView.post.post.id,
-              commentPath = rawData.commentPath,
-              screenshotMode = screenshotMode,
-            )
-          }
-          absolutionPositionToTopLevelCommentPosition += -1
-        }
-
-        var lastTopLevelCommentPosition = -1
-
-        for (commentItem in commentItems) {
-          var depth = -1
-
-          when (val commentView = commentItem.listView) {
-            is PostViewModel.ListView.CommentListView -> {
-              val commentId = commentView.commentView.comment.id
-              val isCurrentMatchThisComment = currentMatch?.targetId == commentId
-              val isDeleting =
-                commentView.pendingCommentView?.isActionDelete == true
-              val show = when (commentView) {
-                is PostViewModel.ListView.FilteredCommentItem -> commentView.show
-                is PostViewModel.ListView.VisibleCommentListView -> true
-              }
-
-              depth = commentItem.depth
-
-              if (depth == 0) {
-                lastTopLevelCommentPosition++
-              }
-
-              finalItems +=
-                if (show) {
-                  Item.VisibleCommentItem(
-                    commentId = commentId,
-                    content = commentView.pendingCommentView?.content
-                      ?: commentView.commentView.comment.content,
-                    comment = commentView.commentView,
-                    depth = commentItem.depth,
-                    baseDepth = 0,
-                    isExpanded = !collapsedItemIds.contains(commentView.id) ||
-                      isCurrentMatchThisComment,
-                    isPending = false,
-                    view = commentView,
-                    childrenCount = commentItem.children.size,
-                    isPostLocked = commentView.commentView.post.locked,
-                    isUpdating = commentView.pendingCommentView != null,
-                    isDeleting = isDeleting,
-                    isRemoved = commentView.isRemoved,
-                    isActionsExpanded = actionExpandedComments.contains(
-                      commentId,
-                    ),
-                    isHighlighted = rawData.selectedCommentId == commentId,
-                    query = query,
-                    currentMatch = if (isCurrentMatchThisComment) {
-                      currentMatch
-                    } else {
-                      null
-                    },
-                    screenshotMode = screenshotMode,
-                    commentHeaderInfo = commentView.commentHeaderInfo,
-                  )
-                } else {
-                  Item.FilteredCommentItem(
-                    commentId = commentId,
-                    content =
-                    commentView.pendingCommentView?.content
-                      ?: commentView.commentView.comment.content,
-                    comment = commentView.commentView,
-                    depth = commentItem.depth,
-                    baseDepth = 0,
-                    isPending = false,
-                    view = commentView,
-                    childrenCount = commentItem.children.size,
-                    isPostLocked = commentView.commentView.post.locked,
-                    isUpdating = commentView.pendingCommentView != null,
-                    isDeleting = isDeleting,
-                    isRemoved = commentView.isRemoved,
-                    isActionsExpanded = actionExpandedComments.contains(
-                      commentId,
-                    ),
-                    isHighlighted = rawData.selectedCommentId == commentId,
-                    query = query,
-                    currentMatch = if (isCurrentMatchThisComment) {
-                      currentMatch
-                    } else {
-                      null
-                    },
-                    screenshotMode,
-                  )
-                }
-              absolutionPositionToTopLevelCommentPosition +=
-                lastTopLevelCommentPosition
-            }
-            is PostViewModel.ListView.PendingCommentListView -> {
-              depth = commentItem.depth
-              if (depth == 0) {
-                lastTopLevelCommentPosition++
-              }
-              finalItems += PendingCommentItem(
-                commentId = commentView.pendingCommentView.commentId,
-                content = commentView.pendingCommentView.content,
-                author = commentView.author,
-                depth = commentItem.depth,
-                baseDepth = 0,
-                isExpanded = !collapsedItemIds.contains(commentView.id),
-                isPending = false,
-                view = commentView,
-                childrenCount = commentItem.children.size,
-                query = query,
-                screenshotMode,
-              )
-              absolutionPositionToTopLevelCommentPosition +=
-                lastTopLevelCommentPosition
-            }
-            is PostViewModel.ListView.PostListView -> {
-              // should never happen
-            }
-            is PostViewModel.ListView.MoreCommentsItem -> {
-              if (commentView.parentCommentId != null) {
-                depth = commentItem.depth
-                if (depth == 0) {
-                  lastTopLevelCommentPosition++
-                }
-                finalItems += MoreCommentsItem(
-                  parentId = commentView.parentCommentId,
-                  moreCount = commentView.moreCount,
-                  depth = commentItem.depth,
-                  baseDepth = 0,
-                  screenshotMode,
-                )
-                absolutionPositionToTopLevelCommentPosition +=
-                  lastTopLevelCommentPosition
-              }
-            }
-
-            is PostViewModel.ListView.MissingCommentItem -> {
-              finalItems += Item.MissingCommentItem(
-                view = commentView,
-                commentId = commentView.commentId,
-                depth = commentItem.depth,
-                baseDepth = 0,
-                screenshotMode,
-                isExpanded = !collapsedItemIds.contains(commentView.id),
-              )
-            }
-          }
-
-          if (depth == 0) {
-            topLevelCommentIndices += finalItems.lastIndex
-          }
-        }
-
-        if (!isLoaded || !rawData.isCommentsLoaded) {
-          finalItems += listOf(ProgressOrErrorItem())
-        } else {
-          if (commentItems.isEmpty() && !isEmbedded) {
-            finalItems += listOf(Item.NoCommentsItem(postView.post))
-          }
-        }
-
-        if (useFooter) {
-          finalItems += FooterItem
-        }
-
-        finalItems
-      } else {
-        val finalItems = mutableListOf<Item>()
-        rawData?.postListView?.let {
-          finalItems += HeaderItem(
-            postView = it.post,
-            videoState = videoState,
-            showBottomDivider = true,
-            query = query,
-            currentMatch = if (currentMatch?.targetId == it.post.post.id) {
-              currentMatch
-            } else {
-              null
-            },
-            screenshotMode = screenshotMode,
-            crossPosts = rawData.crossPosts.size,
-            highlight = highlightPostForever,
-            postHeaderInfo = it.postHeaderInfo,
-          )
-        }
-        finalItems += ProgressOrErrorItem(error)
-
-        finalItems
-      }
+    val newItems = generateItems(
+      autoCollapseComments,
+      collapsedItemIds,
+    ) ?: return
 
     val diff = DiffUtil.calculateDiff(
       object : DiffUtil.Callback() {
@@ -1259,8 +1022,12 @@ class PostAdapter(
       notifyDataSetChanged()
     } else {
       diff.dispatchUpdatesTo(this)
+
       if (refreshHeader) {
-        notifyItemChanged(0, Unit)
+        val headerIndex = newItems.indexOfFirst { it is HeaderItem }
+        if (headerIndex != -1) {
+          notifyItemChanged(headerIndex, Unit)
+        }
       }
     }
 
@@ -1269,6 +1036,271 @@ class PostAdapter(
       absolutionPositionToTopLevelCommentPosition
 
     cb()
+  }
+
+  private fun generateItems(
+    autoCollapseComments: Boolean,
+    collapsedItemIds: Set<Long>,
+  ): List<Item>? {
+    val rawData = rawData
+    val oldItems = items
+    val query = query
+    val currentMatch = currentMatch
+    val error = error
+
+    if (error != null) {
+      val finalItems = mutableListOf<Item>()
+      rawData?.postListView?.let {
+        finalItems += HeaderItem(
+          postView = it.post,
+          videoState = videoState,
+          showBottomDivider = true,
+          query = query,
+          currentMatch = if (currentMatch?.targetId == it.post.post.id) {
+            currentMatch
+          } else {
+            null
+          },
+          screenshotMode = screenshotMode,
+          crossPosts = rawData.crossPosts.size,
+          highlight = highlightPostForever,
+          postHeaderInfo = it.postHeaderInfo,
+        )
+      }
+      finalItems += ProgressOrErrorItem(error)
+
+      return finalItems
+    }
+
+    rawData ?: return null
+
+    val finalItems = mutableListOf<Item>()
+
+    val changed = if (autoCollapseComments) {
+      autoCollapseComments(rawData.commentTree)
+    } else {
+      false
+    }
+
+    val postView = rawData.postListView
+    val highlightedComment =
+      if (currentMatch == null) {
+        null
+      } else {
+        rawData.commentTree.find(currentMatch.targetId.toLong())
+      }
+    val commentItems = rawData.commentTree.flatten(
+      collapsedItemIds = collapsedItemIds,
+      highlightedComment = highlightedComment?.commentView?.comment,
+    )
+
+    if (!rawData.isNativePost &&
+      !hideNonNativeInstanceWarning &&
+      rawData.accountInstance != null
+    ) {
+      finalItems += Item.NotNativeInstanceItem(
+        accountInstance = rawData.accountInstance,
+        postInstance = postView.post.instance,
+      )
+    }
+
+    finalItems += HeaderItem(
+      postView = postView.post,
+      videoState = videoState,
+      showBottomDivider = !isEmbedded || commentItems.isNotEmpty(),
+      query = query,
+      currentMatch = if (currentMatch?.targetId == postView.post.post.id) {
+        currentMatch
+      } else {
+        null
+      },
+      screenshotMode = screenshotMode,
+      crossPosts = rawData.crossPosts.size,
+      highlight = highlightPostForever,
+      postHeaderInfo = postView.postHeaderInfo,
+    )
+
+    absolutionPositionToTopLevelCommentPosition += -1
+
+    if (rawData.isSingleCommentChain) {
+      finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
+
+      if (rawData.commentPath != null && rawData.commentPath.count(".") > 1) {
+        finalItems += Item.ViewParentComments(
+          postId = postView.post.post.id,
+          commentPath = rawData.commentPath,
+          screenshotMode = screenshotMode,
+        )
+      }
+      absolutionPositionToTopLevelCommentPosition += -1
+    }
+
+    var lastTopLevelCommentPosition = -1
+
+    if (currentMatch != null) {
+      for (commentItem in commentItems) {
+        commentItem.listView
+      }
+    }
+
+    for (commentItem in commentItems) {
+      var depth = -1
+
+      when (val commentView = commentItem.listView) {
+        is PostViewModel.ListView.CommentListView -> {
+          val comment = commentView.commentView.comment
+          val commentId = comment.id
+          val isCurrentMatchThisCommentChain =
+            currentMatch?.targetId == commentId ||
+              highlightedComment?.commentView?.comment?.isParent(comment) == true
+          val isDeleting =
+            commentView.pendingCommentView?.isActionDelete == true
+          val show = when (commentView) {
+            is PostViewModel.ListView.FilteredCommentItem -> commentView.show
+            is PostViewModel.ListView.VisibleCommentListView -> true
+          }
+
+          depth = commentItem.depth
+
+          if (depth == 0) {
+            lastTopLevelCommentPosition++
+          }
+
+          finalItems +=
+            if (show) {
+              Item.VisibleCommentItem(
+                commentId = commentId,
+                content = commentView.pendingCommentView?.content
+                  ?: commentView.commentView.comment.content,
+                comment = commentView.commentView,
+                depth = commentItem.depth,
+                baseDepth = 0,
+                isExpanded = !collapsedItemIds.contains(commentView.id) ||
+                  isCurrentMatchThisCommentChain,
+                isPending = false,
+                view = commentView,
+                childrenCount = commentItem.children.size,
+                isPostLocked = commentView.commentView.post.locked,
+                isUpdating = commentView.pendingCommentView != null,
+                isDeleting = isDeleting,
+                isRemoved = commentView.isRemoved,
+                isActionsExpanded = actionExpandedComments.contains(
+                  commentId,
+                ),
+                isHighlighted = rawData.selectedCommentId == commentId,
+                query = query,
+                currentMatch = if (currentMatch?.targetId == commentId) {
+                  currentMatch
+                } else {
+                  null
+                },
+                screenshotMode = screenshotMode,
+                commentHeaderInfo = commentView.commentHeaderInfo,
+              )
+            } else {
+              Item.FilteredCommentItem(
+                commentId = commentId,
+                content =
+                commentView.pendingCommentView?.content
+                  ?: commentView.commentView.comment.content,
+                comment = commentView.commentView,
+                depth = commentItem.depth,
+                baseDepth = 0,
+                isPending = false,
+                view = commentView,
+                childrenCount = commentItem.children.size,
+                isPostLocked = commentView.commentView.post.locked,
+                isUpdating = commentView.pendingCommentView != null,
+                isDeleting = isDeleting,
+                isRemoved = commentView.isRemoved,
+                isActionsExpanded = actionExpandedComments.contains(
+                  commentId,
+                ),
+                isHighlighted = rawData.selectedCommentId == commentId,
+                query = query,
+                currentMatch = if (currentMatch?.targetId == commentId) {
+                  currentMatch
+                } else {
+                  null
+                },
+                screenshotMode,
+              )
+            }
+          absolutionPositionToTopLevelCommentPosition +=
+            lastTopLevelCommentPosition
+        }
+        is PostViewModel.ListView.PendingCommentListView -> {
+          depth = commentItem.depth
+          if (depth == 0) {
+            lastTopLevelCommentPosition++
+          }
+          finalItems += PendingCommentItem(
+            commentId = commentView.pendingCommentView.commentId,
+            content = commentView.pendingCommentView.content,
+            author = commentView.author,
+            depth = commentItem.depth,
+            baseDepth = 0,
+            isExpanded = !collapsedItemIds.contains(commentView.id),
+            isPending = false,
+            view = commentView,
+            childrenCount = commentItem.children.size,
+            query = query,
+            screenshotMode,
+          )
+          absolutionPositionToTopLevelCommentPosition +=
+            lastTopLevelCommentPosition
+        }
+        is PostViewModel.ListView.PostListView -> {
+          // should never happen
+        }
+        is PostViewModel.ListView.MoreCommentsItem -> {
+          if (commentView.parentCommentId != null) {
+            depth = commentItem.depth
+            if (depth == 0) {
+              lastTopLevelCommentPosition++
+            }
+            finalItems += MoreCommentsItem(
+              parentId = commentView.parentCommentId,
+              moreCount = commentView.moreCount,
+              depth = commentItem.depth,
+              baseDepth = 0,
+              screenshotMode,
+            )
+            absolutionPositionToTopLevelCommentPosition +=
+              lastTopLevelCommentPosition
+          }
+        }
+
+        is PostViewModel.ListView.MissingCommentItem -> {
+          finalItems += Item.MissingCommentItem(
+            view = commentView,
+            commentId = commentView.commentId,
+            depth = commentItem.depth,
+            baseDepth = 0,
+            screenshotMode,
+            isExpanded = !collapsedItemIds.contains(commentView.id),
+          )
+        }
+      }
+
+      if (depth == 0) {
+        topLevelCommentIndices += finalItems.lastIndex
+      }
+    }
+
+    if (!isLoaded || !rawData.isCommentsLoaded) {
+      finalItems += listOf(ProgressOrErrorItem())
+    } else {
+      if (commentItems.isEmpty() && !isEmbedded) {
+        finalItems += listOf(Item.NoCommentsItem(postView.post))
+      }
+    }
+
+    if (useFooter) {
+      finalItems += FooterItem
+    }
+
+    return finalItems
   }
 
   private fun autoCollapseComments(commentTree: List<CommentNodeData>): Boolean {
@@ -1504,7 +1536,7 @@ class PostAdapter(
     refreshItems(refreshHeader = false)
   }
 
-  fun setQuery(query: String?, cb: (List<QueryResult>) -> Unit) {
+  fun setQuery(query: String?): List<QueryResult>? {
     val realQuery = if (query.isNullOrBlank()) {
       null
     } else {
@@ -1512,10 +1544,17 @@ class PostAdapter(
     }
 
     if (realQuery == this.query) {
-      return
+      return null
     }
 
     this.query = realQuery
+
+    contentCache.clear()
+
+    if (realQuery == null) {
+      currentMatch = null
+      return listOf()
+    }
 
     val occurrences = mutableListOf<QueryResult>()
 
@@ -1539,75 +1578,74 @@ class PostAdapter(
       }
     }
 
-    refreshItems(refreshHeader = true) {
-      val finalQuery = this.query ?: return@refreshItems
+    val items = generateItems(false, setOf()) ?: return null
+    val finalQuery = this.query ?: return null
 
-      items.withIndex().forEach { (index, item) ->
-        when (item) {
-          is Item.NotNativeInstanceItem -> {}
-          is Item.VisibleCommentItem -> {
-            count(item.comment.comment.content, finalQuery) {
-              occurrences.add(
-                QueryResult(
-                  targetId = item.commentId,
-                  targetSubtype = 0,
-                  relativeMatchIndex = it,
-                  itemIndex = index,
-                  matchIndex = occurrences.size,
-                ),
-              )
-            }
+    items.withIndex().forEach { (index, item) ->
+      when (item) {
+        is Item.NotNativeInstanceItem -> {}
+        is Item.VisibleCommentItem -> {
+          count(item.comment.comment.content, finalQuery) {
+            occurrences.add(
+              QueryResult(
+                targetId = item.commentId,
+                targetSubtype = 0,
+                relativeMatchIndex = it,
+                itemIndex = index,
+                matchIndex = occurrences.size,
+              ),
+            )
           }
-          is Item.FilteredCommentItem -> {
-            count(item.comment.comment.content, finalQuery) {
-              occurrences.add(
-                QueryResult(
-                  targetId = item.commentId,
-                  targetSubtype = 0,
-                  relativeMatchIndex = it,
-                  itemIndex = index,
-                  matchIndex = occurrences.size,
-                ),
-              )
-            }
-          }
-          FooterItem -> {}
-          is HeaderItem -> {
-            count(item.postView.post.name, finalQuery) {
-              occurrences.add(
-                QueryResult(
-                  targetId = item.postView.post.id,
-                  targetSubtype = 0,
-                  relativeMatchIndex = it,
-                  itemIndex = index,
-                  matchIndex = occurrences.size,
-                ),
-              )
-            }
-            count(item.postView.post.body, finalQuery) {
-              occurrences.add(
-                QueryResult(
-                  targetId = item.postView.post.id,
-                  targetSubtype = 1,
-                  relativeMatchIndex = it,
-                  itemIndex = index,
-                  matchIndex = occurrences.size,
-                ),
-              )
-            }
-          }
-          is Item.MissingCommentItem -> {}
-          is MoreCommentsItem -> {}
-          is PendingCommentItem -> {}
-          is ProgressOrErrorItem -> {}
-          is Item.ViewAllComments -> {}
-          is Item.NoCommentsItem -> {}
-          is Item.ViewParentComments -> {}
         }
+        is Item.FilteredCommentItem -> {
+          count(item.comment.comment.content, finalQuery) {
+            occurrences.add(
+              QueryResult(
+                targetId = item.commentId,
+                targetSubtype = 0,
+                relativeMatchIndex = it,
+                itemIndex = index,
+                matchIndex = occurrences.size,
+              ),
+            )
+          }
+        }
+        FooterItem -> {}
+        is HeaderItem -> {
+          count(item.postView.post.name, finalQuery) {
+            occurrences.add(
+              QueryResult(
+                targetId = item.postView.post.id,
+                targetSubtype = 0,
+                relativeMatchIndex = it,
+                itemIndex = index,
+                matchIndex = occurrences.size,
+              ),
+            )
+          }
+          count(item.postView.post.body, finalQuery) {
+            occurrences.add(
+              QueryResult(
+                targetId = item.postView.post.id,
+                targetSubtype = 1,
+                relativeMatchIndex = it,
+                itemIndex = index,
+                matchIndex = occurrences.size,
+              ),
+            )
+          }
+        }
+        is Item.MissingCommentItem -> {}
+        is MoreCommentsItem -> {}
+        is PendingCommentItem -> {}
+        is ProgressOrErrorItem -> {}
+        is Item.ViewAllComments -> {}
+        is Item.NoCommentsItem -> {}
+        is Item.ViewParentComments -> {}
       }
-
-      cb(occurrences)
     }
+
+    return occurrences
   }
 
   fun isSelectedForScreenshot(position: Int): Boolean {
@@ -1638,5 +1676,11 @@ class PostAdapter(
         notifyItemChanged(i)
       }
     }
+  }
+
+  fun setCurrentMatch(currentMatch: QueryResult?, cb: () -> Unit = {}) {
+    this.currentMatch = currentMatch
+
+    refreshItems(animate = false, cb = cb)
   }
 }

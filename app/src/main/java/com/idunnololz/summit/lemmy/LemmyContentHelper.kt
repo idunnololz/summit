@@ -22,13 +22,12 @@ import androidx.core.view.updateLayoutParams
 import arrow.core.Either
 import coil3.Image
 import coil3.dispose
-import coil3.imageLoader
 import coil3.load
-import coil3.request.ImageRequest
+import coil3.memory.MemoryCache
 import coil3.request.allowHardware
 import coil3.request.transformations
 import coil3.request.transitionFactory
-import coil3.target.ImageViewTarget
+import coil3.result
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -187,6 +186,8 @@ class LemmyContentHelper(
       val textView = fullContentHiddenView.findViewById<TextView>(R.id.message)
       val button = fullContentHiddenView.findViewById<Button>(R.id.button)
       val loadingView = fullContentHiddenView.findViewById<LoadingView>(R.id.loading_view)
+
+      loadingView.lowProfile()
 
       fullImageView.load(null)
       textView.textSize = config.bodyTextSizeSp.toTextSize()
@@ -349,8 +350,9 @@ class LemmyContentHelper(
           getAndEnsureView<View>(R.layout.full_content_image_view2)
         }
       val fullImageView = fullContentImageView.findViewById<ImageView>(R.id.full_image)
-      val loadingView =
-        fullContentImageView.findViewById<LoadingView>(R.id.loading_view)
+      val loadingView = fullContentImageView.findViewById<LoadingView>(R.id.loading_view)
+
+      loadingView.lowProfile()
 
       if (onlyImage) {
         fullImageView.updateLayoutParams<MarginLayoutParams> {
@@ -528,6 +530,7 @@ class LemmyContentHelper(
         onLinkLongClick = onLinkLongClick,
       )
 
+      fullContentContainerView.setTag(R.id.highlight_line_y, textView.getTag(R.id.highlight_line_y))
       onTextBound(spannable)
     }
 
@@ -694,30 +697,14 @@ class LemmyContentHelper(
     imageView.dispose()
     offlineManager.cancelFetch(imageView)
 
-    if (thumbnailUrl != null &&
+    val thumbnailCached = thumbnailUrl != null &&
       isUrlImage(thumbnailUrl) &&
-      offlineManager.isUrlCached(thumbnailUrl) &&
-      !offlineManager.isUrlCached(imageUrl)
+      offlineManager.isUrlCached(thumbnailUrl)
+
+    fun onImageLoaded(
+      urlOrFile: Either<String, File>,
+      placeholderMemoryCacheKey: MemoryCache.Key?,
     ) {
-      Log.d(TAG, "thumbnail available, using thumbnail as placeholder!")
-
-      if (preferFullSizeImage) {
-        imageView.updateLayoutParams(contentMaxWidth, thumbnailUrl, tempSize)
-      }
-
-      imageView.load(offlineManager.getCachedImageFile(thumbnailUrl)) {
-        if (blur) {
-          val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-          this.transformations(BlurTransformation(context, sampling = sampling))
-        }
-
-        allowHardware(false)
-      }
-    } else {
-      imageView.load(newShimmerDrawable16to9(context))
-    }
-
-    fun onImageLoaded(urlOrFile: Either<String, File>) {
       Log.d(TAG, "image size: $tempSize")
 
       var w = 0
@@ -732,102 +719,122 @@ class LemmyContentHelper(
         }
       }
 
-      imageView.context.imageLoader
-        .enqueue(
-          ImageRequest.Builder(context)
-            .data(urlOrFile.getOrNull() ?: urlOrFile.leftOrNull())
-            .target(object : ImageViewTarget(imageView) {
-              override fun onStart(placeholder: Image?) {
-                if (thumbnailUrl != null && placeholder != null) {
-                  // Only update the image if placeholder is not null. This prevents the image view
-                  // from getting re-laid out causing the image view to shrink and then re-expand.
-                  updateImage(placeholder)
-                }
+      imageView.load(urlOrFile.getOrNull() ?: urlOrFile.leftOrNull()) {
+        allowHardware(false)
+        transitionFactory(NoneTransitionFactory)
+
+        placeholderMemoryCacheKey?.let {
+          placeholderMemoryCacheKey(it)
+        }
+
+        if (blur) {
+          val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+          this.transformations(BlurTransformation(context, sampling = sampling))
+        }
+
+        if (w > 0 && h > 0) {
+          Log.d(TAG, "size($w, $h)")
+          this.size(w, h)
+        }
+
+        listener(
+          onError = { _, error ->
+            loadingView?.showDefaultErrorMessageFor(error.throwable)
+            errorListener?.invoke(error.throwable)
+            Log.d(TAG, "Coil - Failed to load icon: $imageUrl")
+          },
+          onSuccess = { _, result ->
+            loadingView?.hideAll(animate = false)
+
+            tempSize.width = result.image.width
+            tempSize.height = result.image.height
+
+            Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
+            imageView.alpha = 1f
+
+            if (preferFullSizeImage) {
+              if (tempSize.width > 0 && tempSize.height > 0) {
+                offlineManager.setImageSizeHint(
+                  imageSizeKey,
+                  tempSize.width,
+                  tempSize.height,
+                )
               }
-            })
-            .apply {
-              allowHardware(false)
-              transitionFactory(NoneTransitionFactory)
-
-              if (blur) {
-                val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
-                this.transformations(BlurTransformation(context, sampling = sampling))
-              }
-
-              if (w > 0 && h > 0) {
-                Log.d(TAG, "size($w, $h)")
-                this.size(w, h)
-              }
-
-              listener(
-                onError = { _, error ->
-                  loadingView?.showDefaultErrorMessageFor(error.throwable)
-                  errorListener?.invoke(error.throwable)
-                  Log.d(TAG, "Coil - Failed to load icon: $imageUrl")
-                },
-                onSuccess = { _, result ->
-                  loadingView?.hideAll(animate = false)
-
-                  tempSize.width = result.image.width
-                  tempSize.height = result.image.height
-
-                  Log.d(TAG, "w: ${tempSize.width} h: ${tempSize.height}")
-                  imageView.alpha = 1f
-
-                  if (preferFullSizeImage) {
-                    if (tempSize.width > 0 && tempSize.height > 0) {
-                      offlineManager.setImageSizeHint(
-                        imageSizeKey,
-                        tempSize.width,
-                        tempSize.height,
-                      )
-                    }
-                    imageView.updateLayoutParams(
-                      contentMaxWidth = contentMaxWidth,
-                      imageUrl = imageSizeKey,
-                      tempSize = tempSize,
-                    )
-                  }
-                },
+              imageView.updateLayoutParams(
+                contentMaxWidth = contentMaxWidth,
+                imageUrl = imageSizeKey,
+                tempSize = tempSize,
               )
             }
-            .build(),
+          },
         )
+      }
     }
 
-    if (isUrlVideo) {
-      onImageLoaded(Either.Left(imageUrl))
+    fun startLoadImage(placeholderMemoryCacheKey: MemoryCache.Key? = null) {
+      if (isUrlVideo) {
+        onImageLoaded(Either.Left(imageUrl), placeholderMemoryCacheKey)
+      } else {
+        offlineManager.fetchImageWithError(
+          imageView = imageView,
+          url = imageUrl,
+          listener = b@{
+            onImageLoaded(Either.Right(it), placeholderMemoryCacheKey)
+          },
+          errorListener = {
+            if (imageUrl != fallbackUrl && fallbackUrl != null) {
+              loadImageIntoImageView(
+                imageUrl = fallbackUrl,
+                imageSizeKey = imageSizeKey,
+                fallbackUrl = fallbackUrl,
+                contentMaxWidth = contentMaxWidth,
+                blur = blur,
+                tempSize = tempSize,
+                rootView = rootView,
+                loadingView = loadingView,
+                imageView = imageView,
+                preferFullSizeImage = preferFullSizeImage,
+                errorListener = errorListener,
+                force = force,
+              )
+            } else {
+              loadingView?.showDefaultErrorMessageFor(it)
+            }
+            Log.d(TAG, "Failed to load icon: $imageUrl")
+            errorListener?.invoke(it)
+          },
+          force = force,
+        )
+      }
+    }
+
+    if (thumbnailCached && !offlineManager.isUrlCached(imageUrl)) {
+      Log.d(TAG, "thumbnail available, using thumbnail as placeholder!")
+
+      if (preferFullSizeImage) {
+        imageView.updateLayoutParams(contentMaxWidth, thumbnailUrl, tempSize)
+      }
+
+      imageView.load(offlineManager.getCachedImageFile(thumbnailUrl)) {
+        if (blur) {
+          val sampling = (contentMaxWidth * 0.04f).coerceAtLeast(10f)
+          this.transformations(BlurTransformation(context, sampling = sampling))
+        }
+
+        allowHardware(false)
+
+        listener(
+          onError = { _, error ->
+            startLoadImage()
+          },
+          onSuccess = { _, result ->
+            startLoadImage(result.memoryCacheKey)
+          },
+        )
+      }
     } else {
-      offlineManager.fetchImageWithError(
-        imageView = imageView,
-        url = imageUrl,
-        listener = b@{
-          onImageLoaded(Either.Right(it))
-        },
-        errorListener = {
-          if (imageUrl != fallbackUrl && fallbackUrl != null) {
-            loadImageIntoImageView(
-              imageUrl = fallbackUrl,
-              imageSizeKey = imageSizeKey,
-              fallbackUrl = fallbackUrl,
-              contentMaxWidth = contentMaxWidth,
-              blur = blur,
-              tempSize = tempSize,
-              rootView = rootView,
-              loadingView = loadingView,
-              imageView = imageView,
-              preferFullSizeImage = preferFullSizeImage,
-              errorListener = errorListener,
-              force = force,
-            )
-          } else {
-            loadingView?.showDefaultErrorMessageFor(it)
-          }
-          Log.d(TAG, "Failed to load icon: $imageUrl")
-          errorListener?.invoke(it)
-        },
-        force = force,
-      )
+      imageView.load(newShimmerDrawable16to9(context))
+      startLoadImage()
     }
   }
 

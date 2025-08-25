@@ -2307,6 +2307,7 @@
     <string name="full_content_max_height">Full content max height</string>
     <string name="error_invalid_regex">Invalid regex</string>
     <string name="match_whole_word">Match whole word</string>
+    <string name="cant_find_match_desc">Can\'t find match %1$s. The match might be inaccessible (eg. it\'s inside a spoiler block).</string>
 
 
     <!-- uCrop string resource end -->

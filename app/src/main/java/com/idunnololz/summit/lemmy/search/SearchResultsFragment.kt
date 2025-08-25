@@ -323,7 +323,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
                   is StatefulData.Error,
                   is StatefulData.NotStarted,
                   is StatefulData.Success,
-                    -> {
+                  -> {
                     loadingView.hideAll()
                     swipeRefreshLayout.isRefreshing = false
                   }

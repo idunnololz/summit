@@ -197,7 +197,6 @@ class FilteredPostsFragment :
     super.onViewCreated(view, savedInstanceState)
 
     with(binding) {
-
       val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
 
       val layoutManager = LinearLayoutManager(context)

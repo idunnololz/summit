@@ -6,7 +6,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -24,15 +23,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringAnimation
-import androidx.dynamicanimation.animation.SpringForce
 import com.idunnololz.summit.R
-import kotlin.io.path.Path
 import kotlin.math.abs
 import kotlin.math.max
 
 @SuppressLint("DrawAllocation")
-abstract class SimpleSwipeRefreshLayout
-  : ViewGroup, NestedScrollingParent, NestedScrollingChild {
+abstract class SimpleSwipeRefreshLayout :
+  ViewGroup,
+  NestedScrollingParent,
+  NestedScrollingChild {
 
   companion object {
     private const val STICKY_FACTOR = 0.66F
@@ -46,9 +45,7 @@ abstract class SimpleSwipeRefreshLayout
   private var notify: Boolean = true
   var isRefreshing: Boolean = false
     set(value) {
-      Log.d("HAHA", "isRefreshing: $value")
       if (field != value) {
-        Log.d("HAHA", "isRefreshing2: $value")
         field = value
 
         if (value) {
@@ -143,11 +140,28 @@ abstract class SimpleSwipeRefreshLayout
   }
 
   private fun applyAttrs(attrs: AttributeSet?, defStyleAttr: Int) {
-    context.theme.obtainStyledAttributes(attrs, R.styleable.SimpleSwipeRefreshLayout, defStyleAttr, 0).let {
-      val defaultValue = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, DEFAULT_INDICATOR_TARGET, context.resources.displayMetrics).toInt()
+    context.theme.obtainStyledAttributes(
+      attrs,
+      R.styleable.SimpleSwipeRefreshLayout,
+      defStyleAttr,
+      0,
+    ).let {
+      val defaultValue = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        DEFAULT_INDICATOR_TARGET,
+        context.resources.displayMetrics,
+      ).toInt()
 
-      triggerOffSetTop = it.getDimensionPixelOffset(R.styleable.SimpleSwipeRefreshLayout_trigger_offset_top, defaultValue)
-      maxOffSetTop = it.getDimensionPixelOffset(R.styleable.SimpleSwipeRefreshLayout_max_offset_top, defaultValue * 3)
+      triggerOffSetTop =
+        it.getDimensionPixelOffset(
+          R.styleable.SimpleSwipeRefreshLayout_trigger_offset_top,
+          defaultValue,
+        )
+      maxOffSetTop =
+        it.getDimensionPixelOffset(
+          R.styleable.SimpleSwipeRefreshLayout_max_offset_top,
+          defaultValue * 3,
+        )
 
       if (maxOffSetTop <= triggerOffSetTop) {
         maxOffSetTop = triggerOffSetTop * 3
@@ -161,7 +175,9 @@ abstract class SimpleSwipeRefreshLayout
     super.onFinishInflate()
 
     if (childCount != 2) {
-      throw IllegalStateException("Only a topView and a contentView are allowed. Exactly 2 children are expected, but was $childCount")
+      throw IllegalStateException(
+        "Only a topView and a contentView are allowed. Exactly 2 children are expected, but was $childCount",
+      )
     }
 
     topChildView = ChildView(getChildAt(0))
@@ -177,7 +193,8 @@ abstract class SimpleSwipeRefreshLayout
     fun setInitialValues() {
       val topView = topChildView.view
       val layoutParams = topView.layoutParams as LayoutParams
-      val topViewHeight = topView.measuredHeight + layoutParams.topMargin + layoutParams.bottomMargin
+      val topViewHeight =
+        topView.measuredHeight + layoutParams.topMargin + layoutParams.bottomMargin
       topChildView = topChildView.copy(positionAttr = PositionAttr(height = topViewHeight))
     }
 
@@ -202,8 +219,11 @@ abstract class SimpleSwipeRefreshLayout
       val left: Int = paddingLeft + lp.leftMargin
       val top: Int = (paddingTop + lp.topMargin) - topViewAttr.height - ELEVATION - topSpace
       val right: Int = left + topView.measuredWidth
-      val bottom = - ELEVATION
-      topChildView = topChildView.copy(positionAttr = PositionAttr(left = left, top = top, right = right, bottom = bottom))
+      val bottom = -ELEVATION
+      topChildView =
+        topChildView.copy(
+          positionAttr = PositionAttr(left = left, top = top, right = right, bottom = bottom),
+        )
       topView.layout(left, top, right, bottom)
     } else {
       val indicatorWidth: Int = topView.measuredWidth
@@ -212,7 +232,10 @@ abstract class SimpleSwipeRefreshLayout
       val right: Int = width / 2 + indicatorWidth / 2
       val bottom = -ELEVATION
 
-      topChildView = topChildView.copy(positionAttr = PositionAttr(left = left, top = top, right = right, bottom = bottom))
+      topChildView =
+        topChildView.copy(
+          positionAttr = PositionAttr(left = left, top = top, right = right, bottom = bottom),
+        )
       topView.layout(left, top, right, bottom)
     }
   }
@@ -226,12 +249,20 @@ abstract class SimpleSwipeRefreshLayout
     val right: Int = left + contentView.measuredWidth
     val bottom: Int = top + contentView.measuredHeight
 
-    contentChildView = contentChildView.copy(positionAttr = PositionAttr(left = left, top = top, right = right, bottom = bottom))
+    contentChildView =
+      contentChildView.copy(
+        positionAttr = PositionAttr(left = left, top = top, right = right, bottom = bottom),
+      )
     contentView.layout(left, top, right, bottom)
   }
 
   override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-    if (!isEnabled || isRefreshing || currentState == State.ROLLING || mNestedScrollInProgress || canChildScrollUp()) {
+    if (!isEnabled ||
+      isRefreshing ||
+      currentState == State.ROLLING ||
+      mNestedScrollInProgress ||
+      canChildScrollUp()
+    ) {
       return false
     }
 
@@ -269,7 +300,12 @@ abstract class SimpleSwipeRefreshLayout
   }
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
-    if (!isEnabled || isRefreshing || currentState == State.ROLLING || mNestedScrollInProgress || canChildScrollUp()) {
+    if (!isEnabled ||
+      isRefreshing ||
+      currentState == State.ROLLING ||
+      mNestedScrollInProgress ||
+      canChildScrollUp()
+    ) {
       return false
     }
 
@@ -289,7 +325,7 @@ abstract class SimpleSwipeRefreshLayout
       }
       MotionEvent.ACTION_CANCEL,
       MotionEvent.ACTION_UP,
-        -> {
+      -> {
         currentState = State.ROLLING
         onAnimateToFinalPosition()
       }
@@ -300,10 +336,11 @@ abstract class SimpleSwipeRefreshLayout
 
   open fun startRefreshing() {
     val realTriggerOffSetTop = actualTriggerOffSetTop
-    val triggerOffset: Float = if (indicatorOffsetY > realTriggerOffSetTop)
+    val triggerOffset: Float = if (indicatorOffsetY > realTriggerOffSetTop) {
       indicatorOffsetY
-    else
+    } else {
       realTriggerOffSetTop.toFloat()
+    }
 
     stopRefreshingAnimator?.cancel()
     startRefreshingAnimator?.cancel()
@@ -328,9 +365,13 @@ abstract class SimpleSwipeRefreshLayout
   private fun move() {
     val realTriggerOffSetTop = actualTriggerOffSetTop
     val pullFraction: Float =
-      if (indicatorOffsetY == 0F) 0F
-      else if (realTriggerOffSetTop > indicatorOffsetY) indicatorOffsetY / realTriggerOffSetTop
-      else 1F
+      if (indicatorOffsetY == 0F) {
+        0F
+      } else if (realTriggerOffSetTop > indicatorOffsetY) {
+        indicatorOffsetY / realTriggerOffSetTop
+      } else {
+        1F
+      }
 
     indicatorOffsetY = indicatorOffsetY.coerceIn(0f, maxOffSetTop.toFloat() + topInset)
     contentOffsetY = max(contentOffsetY, 0f)
@@ -419,7 +460,7 @@ abstract class SimpleSwipeRefreshLayout
     contentChildView.view.y = contentChildView.positionAttr.top + contentOffset
   }
 
-  //<editor-fold desc="Helpers">
+  // <editor-fold desc="Helpers">
   fun addProgressListener(onProgressListener: (Float) -> Unit) {
     onProgressListeners.add(onProgressListener)
   }
@@ -442,7 +483,8 @@ abstract class SimpleSwipeRefreshLayout
 
   override fun checkLayoutParams(p: ViewGroup.LayoutParams?) = null != p && p is LayoutParams
 
-  override fun generateDefaultLayoutParams() = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  override fun generateDefaultLayoutParams() =
+    LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
   override fun generateLayoutParams(attrs: AttributeSet?) = LayoutParams(context, attrs)
 
@@ -460,20 +502,31 @@ abstract class SimpleSwipeRefreshLayout
   enum class State {
     IDLE,
     ROLLING,
-    TRIGGERING
+    TRIGGERING,
   }
 
-  data class ChildView(val view: View, val positionAttr: PositionAttr = PositionAttr())
-  data class PositionAttr(val left: Int = 0, val top: Int = 0, val right: Int = 0, val bottom: Int = 0, val height: Int = 0)
-  //</editor-fold>
+  data class ChildView(
+    val view: View,
+    val positionAttr: PositionAttr = PositionAttr(),
+  )
+  data class PositionAttr(
+    val left: Int = 0,
+    val top: Int = 0,
+    val right: Int = 0,
+    val bottom: Int = 0,
+    val height: Int = 0,
+  )
+  // </editor-fold>
 
   // NestedScrollingParent
 
   // NestedScrollingParent
-  override fun onStartNestedScroll(child: View, target: View, nestedScrollAxes: Int): Boolean {
-    return (isEnabled && currentState != State.ROLLING && !isRefreshing
-      && nestedScrollAxes and ViewCompat.SCROLL_AXIS_VERTICAL != 0)
-  }
+  override fun onStartNestedScroll(child: View, target: View, nestedScrollAxes: Int): Boolean = (
+    isEnabled &&
+      currentState != State.ROLLING &&
+      !isRefreshing &&
+      nestedScrollAxes and ViewCompat.SCROLL_AXIS_VERTICAL != 0
+    )
 
   override fun onNestedScrollAccepted(child: View, target: View, axes: Int) {
     // Reset the counter of how much leftover scroll needs to be consumed.
@@ -509,9 +562,7 @@ abstract class SimpleSwipeRefreshLayout
     }
   }
 
-  override fun getNestedScrollAxes(): Int {
-    return mNestedScrollingParentHelper.nestedScrollAxes
-  }
+  override fun getNestedScrollAxes(): Int = mNestedScrollingParentHelper.nestedScrollAxes
 
   override fun onStopNestedScroll(target: View) {
     mNestedScrollingParentHelper.onStopNestedScroll(target)
@@ -529,12 +580,18 @@ abstract class SimpleSwipeRefreshLayout
   }
 
   override fun onNestedScroll(
-    target: View, dxConsumed: Int, dyConsumed: Int,
-    dxUnconsumed: Int, dyUnconsumed: Int,
+    target: View,
+    dxConsumed: Int,
+    dyConsumed: Int,
+    dxUnconsumed: Int,
+    dyUnconsumed: Int,
   ) {
     // Dispatch up to the nested parent first
     dispatchNestedScroll(
-      dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed,
+      dxConsumed,
+      dyConsumed,
+      dxUnconsumed,
+      dyUnconsumed,
       mParentOffsetInWindow,
     )
 
@@ -556,45 +613,50 @@ abstract class SimpleSwipeRefreshLayout
     mNestedScrollingChildHelper.isNestedScrollingEnabled = enabled
   }
 
-  override fun isNestedScrollingEnabled(): Boolean {
-    return mNestedScrollingChildHelper.isNestedScrollingEnabled
-  }
+  override fun isNestedScrollingEnabled(): Boolean =
+    mNestedScrollingChildHelper.isNestedScrollingEnabled
 
-  override fun startNestedScroll(axes: Int): Boolean {
-    return mNestedScrollingChildHelper.startNestedScroll(axes)
-  }
+  override fun startNestedScroll(axes: Int): Boolean =
+    mNestedScrollingChildHelper.startNestedScroll(axes)
 
   override fun stopNestedScroll() {
     mNestedScrollingChildHelper.stopNestedScroll()
   }
 
-  override fun hasNestedScrollingParent(): Boolean {
-    return mNestedScrollingChildHelper.hasNestedScrollingParent()
-  }
+  override fun hasNestedScrollingParent(): Boolean =
+    mNestedScrollingChildHelper.hasNestedScrollingParent()
 
   override fun dispatchNestedScroll(
-    dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int,
-    dyUnconsumed: Int, offsetInWindow: IntArray?,
-  ): Boolean {
-    return mNestedScrollingChildHelper.dispatchNestedScroll(
-      dxConsumed, dyConsumed,
-      dxUnconsumed, dyUnconsumed, offsetInWindow,
-    )
-  }
+    dxConsumed: Int,
+    dyConsumed: Int,
+    dxUnconsumed: Int,
+    dyUnconsumed: Int,
+    offsetInWindow: IntArray?,
+  ): Boolean = mNestedScrollingChildHelper.dispatchNestedScroll(
+    dxConsumed,
+    dyConsumed,
+    dxUnconsumed,
+    dyUnconsumed,
+    offsetInWindow,
+  )
 
-  override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?): Boolean {
-    return mNestedScrollingChildHelper.dispatchNestedPreScroll(
-      dx, dy, consumed, offsetInWindow,
-    )
-  }
+  override fun dispatchNestedPreScroll(
+    dx: Int,
+    dy: Int,
+    consumed: IntArray?,
+    offsetInWindow: IntArray?,
+  ): Boolean = mNestedScrollingChildHelper.dispatchNestedPreScroll(
+    dx,
+    dy,
+    consumed,
+    offsetInWindow,
+  )
 
-  override fun dispatchNestedFling(velocityX: Float, velocityY: Float, consumed: Boolean): Boolean {
-    return mNestedScrollingChildHelper.dispatchNestedFling(velocityX, velocityY, consumed)
-  }
+  override fun dispatchNestedFling(velocityX: Float, velocityY: Float, consumed: Boolean): Boolean =
+    mNestedScrollingChildHelper.dispatchNestedFling(velocityX, velocityY, consumed)
 
-  override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean {
-    return mNestedScrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY)
-  }
+  override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
+    mNestedScrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY)
 
   /**
    * @return Whether it is possible for the child view of this layout to
@@ -604,7 +666,8 @@ abstract class SimpleSwipeRefreshLayout
     val view = contentChildView.view
     return if (view is ListView) {
       view.canScrollList(-1)
-    } else contentChildView.view.canScrollVertically(-1)
+    } else {
+      contentChildView.view.canScrollVertically(-1)
+    }
   }
-
 }

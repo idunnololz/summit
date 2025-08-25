@@ -37,7 +37,7 @@ class LoadingIndicatorSpec @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet?,
   @AttrRes defStyleAttr: Int = R.attr.loadingIndicatorStyle,
-  @StyleRes defStyleRes: Int = LoadingIndicator.DEF_STYLE_RES
+  @StyleRes defStyleRes: Int = LoadingIndicator.DEF_STYLE_RES,
 ) {
   @JvmField
   var scaleToFit: Boolean = false
@@ -53,6 +53,7 @@ class LoadingIndicatorSpec @JvmOverloads constructor(
   @JvmField
   @Px
   var containerHeight: Int
+
   @JvmField
   var indicatorColors: IntArray = IntArray(0)
 
@@ -64,6 +65,7 @@ class LoadingIndicatorSpec @JvmOverloads constructor(
 
     @Px val defaultShapeSize =
       context.getResources().getDimensionPixelSize(R.dimen.m3_loading_indicator_shape_size)
+
     @Px val defaultContainerSize =
       context.getResources()
         .getDimensionPixelSize(R.dimen.m3_loading_indicator_container_size)
@@ -74,19 +76,19 @@ class LoadingIndicatorSpec @JvmOverloads constructor(
         attrs,
         R.styleable.LoadingIndicator,
         defStyleAttr,
-        defStyleRes
+        defStyleRes,
       )
     indicatorSize =
       a.getDimensionPixelSize(R.styleable.LoadingIndicator_indicatorSize, defaultShapeSize)
     containerWidth =
       a.getDimensionPixelSize(
         R.styleable.LoadingIndicator_containerWidth,
-        defaultContainerSize
+        defaultContainerSize,
       )
     containerHeight =
       a.getDimensionPixelSize(
         R.styleable.LoadingIndicator_containerHeight,
-        defaultContainerSize
+        defaultContainerSize,
       )
     loadIndicatorColors(context, a)
     containerColor = a.getColor(R.styleable.LoadingIndicator_containerColor, Color.TRANSPARENT)
@@ -98,7 +100,7 @@ class LoadingIndicatorSpec @JvmOverloads constructor(
       // Uses theme primary color for indicator if not provided in the attribute set.
       indicatorColors =
         intArrayOf(
-          MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, -1)
+          MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, -1),
         )
       return
     }
@@ -118,8 +120,8 @@ class LoadingIndicatorSpec @JvmOverloads constructor(
         .getIntArray(
           typedArray.getResourceId(
             R.styleable.LoadingIndicator_indicatorColor,
-            -1
-          )
+            -1,
+          ),
         )
     require(indicatorColors.isNotEmpty()) {
       "indicatorColors cannot be empty when indicatorColor is not used."

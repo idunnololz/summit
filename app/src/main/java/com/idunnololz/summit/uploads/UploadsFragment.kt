@@ -33,7 +33,6 @@ import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 

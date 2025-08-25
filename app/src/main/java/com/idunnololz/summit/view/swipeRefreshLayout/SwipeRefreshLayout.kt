@@ -2,7 +2,6 @@ package com.idunnololz.summit.view.swipeRefreshLayout
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import com.idunnololz.summit.R
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -22,7 +21,8 @@ class SwipeRefreshLayout : SimpleSwipeRefreshLayout {
   private val loadingIndicator = LoadingIndicator(context).apply {
     drawable.state
     containerColor = context.getColorFromAttribute(
-      com.google.android.material.R.attr.colorPrimaryContainer)
+      com.google.android.material.R.attr.colorPrimaryContainer,
+    )
   }
 
   init {
@@ -36,7 +36,7 @@ class SwipeRefreshLayout : SimpleSwipeRefreshLayout {
 
     addProgressListener {
       loadingIndicator.alpha = it
-      loadingIndicator.setProgress(it / 100f)
+      loadingIndicator.setProgress(it / 200f)
     }
     addTriggerListener {
       loadingIndicator.playing = true

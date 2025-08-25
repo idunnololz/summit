@@ -151,7 +151,6 @@ class FilteredCommentsFragment :
     super.onViewCreated(view, savedInstanceState)
 
     with(binding) {
-
       val parentFragment = parentFragment as FilteredPostsAndCommentsTabbedFragment
 
       val viewModel = parentFragment.viewModel

@@ -24,8 +24,6 @@ import android.widget.ProgressBar
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
-import androidx.annotation.RestrictTo
-import androidx.annotation.VisibleForTesting
 import com.google.android.material.R
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -36,12 +34,13 @@ import kotlin.math.min
 class LoadingIndicator @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
-  @AttrRes defStyleAttr: Int = R.attr.loadingIndicatorStyle
+  @AttrRes defStyleAttr: Int = R.attr.loadingIndicatorStyle,
 ) : View(
   MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, DEF_STYLE_RES),
   attrs,
-  defStyleAttr
-), Drawable.Callback {
+  defStyleAttr,
+),
+  Drawable.Callback {
 
   /** Returns the [LoadingIndicatorDrawable] object used in this loading indicator.  */
   val drawable: LoadingIndicatorDrawable
@@ -129,14 +128,18 @@ class LoadingIndicator @JvmOverloads constructor(
   override fun onVisibilityChanged(changedView: View, visibility: Int) {
     super.onVisibilityChanged(changedView, visibility)
     drawable.setVisible(
-      visibleToUser(),  /* restart= */false,  /* animate= */visibility == VISIBLE && playing
+      visibleToUser(), /* restart= */
+      false, /* animate= */
+      visibility == VISIBLE && playing,
     )
   }
 
   override fun onWindowVisibilityChanged(visibility: Int) {
     super.onWindowVisibilityChanged(visibility)
     drawable.setVisible(
-      visibleToUser(),  /* restart= */false,  /* animate= */visibility == VISIBLE && playing
+      visibleToUser(), /* restart= */
+      false, /* animate= */
+      visibility == VISIBLE && playing,
     )
   }
 
@@ -144,17 +147,14 @@ class LoadingIndicator @JvmOverloads constructor(
     invalidate()
   }
 
-  override fun getAccessibilityClassName(): CharSequence {
-    return ProgressBar::class.java.getName()
-  }
+  override fun getAccessibilityClassName(): CharSequence = ProgressBar::class.java.getName()
 
   /**
    * Returns whether or not this view is currently displayed in window, based on whether it is
    * attached to a window and whether it and its ancestors are visible.
    */
-  fun visibleToUser(): Boolean {
-    return isAttachedToWindow() && getWindowVisibility() == VISIBLE && this.isEffectivelyVisible
-  }
+  fun visibleToUser(): Boolean =
+    isAttachedToWindow() && getWindowVisibility() == VISIBLE && this.isEffectivelyVisible
 
   val isEffectivelyVisible: Boolean
     /**
@@ -203,6 +203,7 @@ class LoadingIndicator @JvmOverloads constructor(
   var indicatorSize: Int
     /** Returns the indicator size for this loading indicator in px.  */
     get() = specs.indicatorSize
+
     /**
      * Sets a new indicator size for this loading indicator.
      *
@@ -220,6 +221,7 @@ class LoadingIndicator @JvmOverloads constructor(
   var containerWidth: Int
     /** Returns the container width for this loading indicator in px.  */
     get() = specs.containerWidth
+
     /**
      * Sets a new container width for this loading indicator.
      *
@@ -237,6 +239,7 @@ class LoadingIndicator @JvmOverloads constructor(
   var containerHeight: Int
     /** Returns the container height for this loading indicator in px.  */
     get() = specs.containerHeight
+
     /**
      * Sets a new container height for this loading indicator.
      *
@@ -262,8 +265,10 @@ class LoadingIndicator @JvmOverloads constructor(
       indicatorColors =
         intArrayOf(
           MaterialColors.getColor(
-            getContext(), androidx.appcompat.R.attr.colorPrimary, -1
-          )
+            getContext(),
+            androidx.appcompat.R.attr.colorPrimary,
+            -1,
+          ),
         )
     }
     if (!this.indicatorColor.contentEquals(indicatorColors)) {
@@ -281,6 +286,7 @@ class LoadingIndicator @JvmOverloads constructor(
   var containerColor: Int
     /** Returns the container color for this loading indicator.  */
     get() = specs.containerColor
+
     /**
      * Sets a new container color for this loading indicator.
      *
@@ -294,7 +300,7 @@ class LoadingIndicator @JvmOverloads constructor(
     }
 
   fun setAnimatorDurationScaleProvider(
-    animatorDurationScaleProvider: AnimatorDurationScaleProvider
+    animatorDurationScaleProvider: AnimatorDurationScaleProvider,
   ) {
     drawable.animatorDurationScaleProvider = animatorDurationScaleProvider
   }

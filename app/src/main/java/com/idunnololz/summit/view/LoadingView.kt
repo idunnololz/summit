@@ -13,6 +13,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.util.AnimationUtils
 import com.idunnololz.summit.util.ext.getActivity
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.toErrorMessage
 
 class LoadingView : ConstraintLayout {
@@ -52,6 +53,12 @@ class LoadingView : ConstraintLayout {
     negativeButton = rootView.findViewById(R.id._negative_button)
   }
 
+  fun lowProfile() {
+    progressView.indicatorSize = context.getDimen(R.dimen.loading_indicator_small)
+    progressView.containerWidth = context.getDimen(R.dimen.loading_container_small)
+    progressView.containerHeight = context.getDimen(R.dimen.loading_container_small)
+  }
+
   private fun ensureRootVisible() {
     rootViewAnimationController.show(false)
   }
@@ -65,7 +72,11 @@ class LoadingView : ConstraintLayout {
     // val animateChanges = rootViewAnimationController.isVisible
 
     rootViewAnimationController.cancelAnimations()
-    progressView.visibility = if (progressBar) View.VISIBLE else View.GONE
+    if (progressBar) {
+      progressView.show()
+    } else {
+      progressView.hide()
+    }
     errorTextView.visibility = if (errorText) View.VISIBLE else View.GONE
 
     if (progressBar) {
