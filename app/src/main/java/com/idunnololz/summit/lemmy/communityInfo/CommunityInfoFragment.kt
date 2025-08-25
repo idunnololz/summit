@@ -72,6 +72,7 @@ import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.showProgressBarIfNeeded
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -241,7 +242,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           binding.loadingView.showDefaultErrorMessageFor(it.error)
         }
         is StatefulData.Loading -> {
-          binding.loadingView.showProgressBar()
+          binding.loadingView.showProgressBarIfNeeded(binding.swipeRefreshLayout)
         }
         is StatefulData.NotStarted -> {}
         is StatefulData.Success -> {

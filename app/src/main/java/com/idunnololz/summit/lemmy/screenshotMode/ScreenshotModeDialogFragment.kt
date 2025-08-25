@@ -532,12 +532,32 @@ class ScreenshotModeDialogFragment :
         when (screenshotWatermark) {
           ScreenshotWatermarkId.LEMMY -> {
             watermark.setImageResource(R.drawable.ic_lemmy_24)
+            watermark.apply {
+              setImageResource(R.drawable.ic_lemmy_24)
+              setPadding(0, 0, 0, 0)
+            }
           }
           ScreenshotWatermarkId.SUMMIT -> {
-            watermark.setImageResource(R.drawable.ic_logo_mono_24)
+            watermark.apply {
+              setImageResource(R.drawable.ic_logo_mono_24)
+              setPadding(
+                Utils.convertDpToPixel(2f).toInt(),
+                Utils.convertDpToPixel(2f).toInt(),
+                Utils.convertDpToPixel(2f).toInt(),
+                Utils.convertDpToPixel(2f).toInt(),
+              )
+            }
           }
           ScreenshotWatermarkId.PIEFED -> {
-            watermark.setImageResource(R.drawable.ic_piefed_24)
+            watermark.apply {
+              setImageResource(R.drawable.ic_piefed_24)
+              setPadding(
+                Utils.convertDpToPixel(2f).toInt(),
+                Utils.convertDpToPixel(2f).toInt(),
+                Utils.convertDpToPixel(2f).toInt(),
+                Utils.convertDpToPixel(2f).toInt(),
+              )
+            }
           }
           else -> {
             watermark.visibility = View.GONE
