@@ -28,10 +28,10 @@ fun makeUpAndDownVoteButtons(
     id = View.generateViewId()
     layoutParams = makeButtonLp()
     iconPadding = context.getDimen(com.idunnololz.summit.R.dimen.padding_half)
-    setPadding(
+    setPaddingRelative(
       context.getDimen(com.idunnololz.summit.R.dimen.padding_half),
       context.getDimen(com.idunnololz.summit.R.dimen.padding),
-      context.getDimen(com.idunnololz.summit.R.dimen.padding),
+      context.getDimen(com.idunnololz.summit.R.dimen.padding_half),
       context.getDimen(com.idunnololz.summit.R.dimen.padding),
     )
     this.insetTop = 0
@@ -49,10 +49,10 @@ fun makeUpAndDownVoteButtons(
     id = View.generateViewId()
     layoutParams = makeButtonLp()
     iconPadding = context.getDimen(com.idunnololz.summit.R.dimen.padding_half)
-    setPadding(
+    setPaddingRelative(
       context.getDimen(com.idunnololz.summit.R.dimen.padding_half),
       context.getDimen(com.idunnololz.summit.R.dimen.padding),
-      context.getDimen(com.idunnololz.summit.R.dimen.padding),
+      context.getDimen(com.idunnololz.summit.R.dimen.padding_half),
       context.getDimen(com.idunnololz.summit.R.dimen.padding),
     )
     this.insetTop = 0

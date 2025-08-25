@@ -1662,6 +1662,12 @@ class PostListViewBuilder @Inject constructor(
             margin = 0,
           ).apply {
             setPadding(context.getDimen(R.dimen.padding_half))
+
+            if (leftHandMode) {
+              updateLayoutParams<ConstraintLayout.LayoutParams> {
+                marginStart = paddingHalf
+              }
+            }
           }
           root.addView(button1)
 
@@ -1731,7 +1737,7 @@ class PostListViewBuilder @Inject constructor(
               bottomToBottom = commentButton.id
 
               startToEnd = endId
-              marginStart = context.getDimen(R.dimen.padding)
+              marginStart = context.getDimen(R.dimen.padding_half)
             }
             buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
               topToTop = commentButton.id
@@ -1762,8 +1768,8 @@ class PostListViewBuilder @Inject constructor(
           downvoteButton = buttons.downvoteButton
           downvoteCount = buttons.downvoteButton
 
-          views.add(buttons.downvoteButton)
           views.add(buttons.upvoteButton)
+          views.add(buttons.downvoteButton)
         }
         Reply -> {
           makePostsInFeedActionButton(

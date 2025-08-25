@@ -2059,7 +2059,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           if (showUpAndDownVotes) {
             val buttons = makeUpAndDownVoteButtons(context) {
               LinearLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
                 Utils.convertDpToPixel(48f).toInt(),
               )
             }
