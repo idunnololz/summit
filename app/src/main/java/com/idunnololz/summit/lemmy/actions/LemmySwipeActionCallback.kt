@@ -23,6 +23,8 @@ import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class LemmySwipeActionCallback(
   private val context: Context,
@@ -267,14 +269,20 @@ class LemmySwipeActionCallback(
             }
 
             drawable = icon.apply {
+              val itemViewTop = max(itemView.top, 0)
+              val itemViewBottom = min(itemView.bottom, recyclerView.height)
+              val itemViewHeight = itemViewBottom - itemViewTop
+              val iconTop = if (itemView.top < 0) {
+                itemViewTop + (itemViewHeight - intrinsicHeight) / 2
+              } else {
+                itemViewTop + (itemViewHeight - intrinsicHeight) / 2
+              }
               if (dX < 0) {
-                val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
                 val iconLeft = itemView.right - marginEnd - intrinsicWidth
                 val iconRight = itemView.right - marginEnd
                 val iconBottom = iconTop + intrinsicHeight
                 setBounds(iconLeft, iconTop, iconRight, iconBottom)
               } else {
-                val iconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
                 val iconLeft = itemView.left + marginEnd
                 val iconRight = itemView.left + marginEnd + intrinsicWidth
                 val iconBottom = iconTop + intrinsicHeight

@@ -1745,6 +1745,9 @@ class PostListViewBuilder @Inject constructor(
 
               startToEnd = buttons.upvoteButton.id
             }
+
+            views.add(buttons.upvoteButton)
+            views.add(buttons.downvoteButton)
           } else {
             buttons.downvoteButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
               topToTop = commentButton.id
@@ -1759,6 +1762,9 @@ class PostListViewBuilder @Inject constructor(
 
               endToStart = buttons.downvoteButton.id
             }
+
+            views.add(buttons.downvoteButton)
+            views.add(buttons.upvoteButton)
           }
           root.addView(buttons.downvoteButton)
           root.addView(buttons.upvoteButton)
@@ -1767,9 +1773,6 @@ class PostListViewBuilder @Inject constructor(
           upvoteCount = buttons.upvoteButton
           downvoteButton = buttons.downvoteButton
           downvoteCount = buttons.downvoteButton
-
-          views.add(buttons.upvoteButton)
-          views.add(buttons.downvoteButton)
         }
         Reply -> {
           makePostsInFeedActionButton(

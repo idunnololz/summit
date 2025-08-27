@@ -72,6 +72,7 @@ import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.autoScrollToEditTextCursorOnIme
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
@@ -273,6 +274,36 @@ class AddOrEditPostFragment :
     with(binding) {
       requireMainActivity().apply {
         insetViewAutomaticallyByMargins(viewLifecycleOwner, contentOuter)
+        autoScrollToEditTextCursorOnIme(
+          lifecycleOwner = viewLifecycleOwner,
+          scrollView = scrollView,
+          textInputs = listOf(
+            altText,
+            postEditor
+          )
+        )
+
+        var lastImeHeight = -1
+        insets.observe(viewLifecycleOwner) {
+          if (lastImeHeight == -1) {
+            lastImeHeight = it.imeHeight
+            return@observe
+          }
+
+          if (lastImeHeight != it.imeHeight) {
+            lastImeHeight = it.imeHeight
+
+            postEditText.post {
+              val pos = postEditText.selectionStart
+              val layout = postEditText.layout
+              if (pos >= 0 && layout != null) {
+                val line = layout.getLineForOffset(pos)
+                val lineTop = layout.getLineTop(line)
+                scrollView.smoothScrollTo(0, postEditText.top + lineTop)
+              }
+            }
+          }
+        }
       }
 
       toolbar.inflateMenu(R.menu.menu_create_or_edit_post)
