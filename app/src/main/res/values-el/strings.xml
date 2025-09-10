@@ -201,7 +201,7 @@
     <string name="reset_view_to_default_styles">Επαναφορά προβολής στην προεπιλογή;</string>
     <string name="reset_view_styles">Επαναφορά στυλ προβολής</string>
     <string name="dark_theme_settings">Ρυθμίσεις σκοτεινού θέματος</string>
-    <string name="black_theme">Μαύρο θέμα</string>
+    <string name="black">Μαύρο θέμα</string>
     <string name="black_theme_desc">Χρησιμοποιεί απόλυτο μαύρο ως χρώμα φόντου</string>
     <string name="lemmy_web_preferences">Προτιμήσεις Lemmy ιστού</string>
     <string name="display_name">Εμφανιζόμενο όνομα</string>

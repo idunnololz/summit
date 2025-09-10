@@ -1190,7 +1190,10 @@ class PostFragment :
         }
 
         withContext(Dispatchers.Main) {
-          viewModel.fetchPostData(switchToNativeInstance = args.switchToNativeInstance)
+          viewModel.fetchPostData(
+            switchToNativeInstance = args.switchToNativeInstance,
+            markPostAsRead = !args.isInViewPager,
+          )
         }
       }
     }

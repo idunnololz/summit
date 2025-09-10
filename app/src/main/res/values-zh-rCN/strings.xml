@@ -126,7 +126,7 @@
     <string name="reset_view_styles">重置视图样式</string>
     <string name="prefer_image_at_the_end">最好在最后附上图片</string>
     <string name="dark_theme_settings">深色主题设置</string>
-    <string name="black_theme">黑色主题</string>
+    <string name="black">黑色主题</string>
     <string name="black_theme_desc">使用纯黑色作为背景颜色</string>
     <string name="display_name">显示名称</string>
     <string name="share">分享</string>

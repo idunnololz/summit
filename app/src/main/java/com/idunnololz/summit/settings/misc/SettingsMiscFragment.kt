@@ -249,6 +249,10 @@ class SettingsMiscFragment :
         { preferences.finishAppOnBack },
         { preferences.finishAppOnBack = it },
       ),
+      settings.markAsReadOnHidePost.asOnOffSwitch(
+        { preferences.markAsReadOnHidePost },
+        { preferences.markAsReadOnHidePost = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

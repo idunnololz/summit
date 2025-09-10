@@ -309,4 +309,7 @@
     <item name="find_match_fn" type="id" />
     <item name="highlight_line_y" type="id"/>
     <item name="highlight_text_data" type="id"/>
+    <item name="black_theme" type="id" />
+    <item name="_default" type="id" />
+    <item name="less_dark_background_theme" type="id" />
 </resources>

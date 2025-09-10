@@ -39,13 +39,13 @@ class ReportContentViewModel @Inject constructor(
         } else {
           apiClient.createPrivateMessageReport(requireNotNull(messageItem).id, reason)
         }
-          .onSuccess {
-            reportState.postValue(Unit)
-          }
-          .onFailure {
-            reportState.postError(it)
-          }
       }
+        .onSuccess {
+          reportState.postValue(Unit)
+        }
+        .onFailure {
+          reportState.postError(it)
+        }
     }
   }
 

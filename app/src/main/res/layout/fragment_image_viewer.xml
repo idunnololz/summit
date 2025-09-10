@@ -38,12 +38,14 @@
 
             <com.idunnololz.summit.view.LoadingView
                 android:id="@+id/loading_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <FrameLayout
                 android:id="@+id/bottom_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,58 +53,74 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
 
-                <ImageButton
-                    android:id="@+id/share_button"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:src="@drawable/baseline_share_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:layout_marginBottom="@dimen/padding"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/download_button"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                <com.google.android.material.button.MaterialButtonGroup
+                    android:id="@+id/button_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
 
-                <ImageButton
-                    android:id="@+id/download_button"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:src="@drawable/baseline_download_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintStart_toEndOf="@+id/share_button"
-                    app:layout_constraintEnd_toStartOf="@+id/info_button"
-                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/share_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonStyle"
+                        app:icon="@drawable/baseline_share_24"
+                        app:iconGravity="textStart"
 
-                <ImageButton
-                    android:id="@+id/info_button"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:src="@drawable/outline_info_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintStart_toEndOf="@+id/download_button"
-                    app:layout_constraintEnd_toStartOf="@+id/hd_button"
-                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/download_button"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <ImageButton
-                    android:id="@+id/hd_button"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:src="@drawable/outline_hd_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintStart_toEndOf="@+id/info_button"
-                    app:layout_constraintEnd_toStartOf="@+id/more_button"
-                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/download_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonStyle"
+                        app:icon="@drawable/baseline_download_24"
+                        app:iconGravity="textStart"
 
-                <ImageButton
-                    android:id="@+id/more_button"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:src="@drawable/baseline_more_horiz_24"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:layout_constraintStart_toEndOf="@+id/hd_button"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintStart_toEndOf="@+id/share_button"
+                        app:layout_constraintEnd_toStartOf="@+id/info_button"
+                        app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/info_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonStyle"
+                        app:icon="@drawable/outline_info_24"
+                        app:iconGravity="textStart"
+
+                        app:layout_constraintStart_toEndOf="@+id/download_button"
+                        app:layout_constraintEnd_toStartOf="@+id/hd_button"
+                        app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/hd_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonStyle"
+                        app:icon="@drawable/outline_hd_24"
+                        app:iconGravity="textStart"
+
+                        app:layout_constraintStart_toEndOf="@+id/info_button"
+                        app:layout_constraintEnd_toStartOf="@+id/more_button"
+                        app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/more_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="?attr/materialIconButtonStyle"
+                        app:icon="@drawable/baseline_more_horiz_24"
+                        app:iconGravity="textStart"
+
+                        app:layout_constraintStart_toEndOf="@+id/hd_button"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
+                </com.google.android.material.button.MaterialButtonGroup>
+            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

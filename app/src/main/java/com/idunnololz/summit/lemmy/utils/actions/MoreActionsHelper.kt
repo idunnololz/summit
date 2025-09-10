@@ -29,6 +29,7 @@ import com.idunnololz.summit.lemmy.toPersonRef
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.video.VideoDownloadManager
@@ -58,6 +59,7 @@ class MoreActionsHelperManager @Inject constructor(
   private val nsfwModeManager: NsfwModeManager,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val preferences: Preferences,
 ) {
   private val defaultInstance = newMoreActionsHelper()
   private val accountIdToHelper = mutableMapOf<Long?, MoreActionsHelper>()
@@ -92,6 +94,7 @@ class MoreActionsHelperManager @Inject constructor(
     duplicatePostsDetector = duplicatePostsDetector,
     coroutineScopeFactory = coroutineScopeFactory,
     selectedAccountId = selectedAccountId,
+    preferences = preferences,
   )
 }
 
@@ -110,6 +113,7 @@ class MoreActionsHelper(
   private val duplicatePostsDetector: DuplicatePostsDetector,
   coroutineScopeFactory: CoroutineScopeFactory,
   private val selectedAccountId: Long?,
+  private val preferences: Preferences,
 ) {
 
   private val coroutineScope = coroutineScopeFactory.create()
@@ -341,6 +345,22 @@ class MoreActionsHelper(
 
   fun hidePost(id: PostId, postView: PostView?) {
     hiddenPostsManager.hidePost(id, postView, apiClient.instance)
+
+    if (preferences.markAsReadOnHidePost) {
+      if (postView != null) {
+        onPostRead(postView = postView, delayMs = 0, read = true)
+      }
+    }
+  }
+
+  fun unhidePost(id: PostId, instance: String, postView: PostView?) {
+    hiddenPostsManager.hidePost(id, postView, instance, hide = false)
+
+    if (preferences.markAsReadOnHidePost) {
+      if (postView != null) {
+        onPostRead(postView = postView, delayMs = 0, read = false)
+      }
+    }
   }
 
   fun onPostRead(postView: PostView, delayMs: Long, read: Boolean, accountId: Long? = null) {

@@ -294,7 +294,7 @@
     <!-- Title text for settings section containing settings for dark theme. -->
     <string name="dark_theme_settings">Dark theme settings</string>
     <!-- Setting title text. Lets the user toggle "black theme" which uses pure black for backgrounds. -->
-    <string name="black_theme">Black theme</string>
+    <string name="black">Black</string>
     <!-- Setting body text. Describes the black theme setting. -->
     <string name="black_theme_desc">Uses pure black as the background color</string>
     <!-- Keep short. Setting title text for page where users can change preferences for their account. -->
@@ -721,7 +721,7 @@
     <!-- Option. When selected, a warning is not shown under certain conditions. -->
     <string name="dont_warn">Don\'t warn</string>
     <!-- Setting title text. -->
-    <string name="less_dark_background_theme">Less dark background theme</string>
+    <string name="less_dark_background_theme">Less dark background</string>
     <!-- Setting body text. -->
     <string name="less_dark_background_theme_desc">Uses a brighter color as the background color</string>
     <!-- Setting title text. -->
@@ -2308,6 +2308,10 @@
     <string name="error_invalid_regex">Invalid regex</string>
     <string name="match_whole_word">Match whole word</string>
     <string name="cant_find_match_desc">Can\'t find match %1$s. The match might be inaccessible (eg. it\'s inside a spoiler block).</string>
+    <string name="mark_as_read_on_hide_post">Mark as read on hide post</string>
+    <string name="search_in_format">Search in %1$s</string>
+    <string name="error_set_community">Error setting community filter.</string>
+    <string name="background_color">Background color</string>
 
 
     <!-- uCrop string resource end -->

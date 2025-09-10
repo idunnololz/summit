@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/search"
+    app:startDestination="@id/searchHomeFragment">
+
+    <fragment
+        android:id="@+id/searchHomeFragment"
+        android:name="com.idunnololz.summit.lemmy.search.SearchHomeFragment"
+        android:label="SearchHomeFragment" >
+        <argument
+            android:name="show_home"
+            app:argType="boolean"
+            android:defaultValue='true' />
+        <argument
+            android:name="communityFilter"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_searchHomeFragment_to_searchFragment"
+            app:destination="@id/searchTabbedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchTabbedFragment"
+        android:name="com.idunnololz.summit.lemmy.search.SearchTabbedFragment"
+        android:label="SearchTabbedFragment" >
+        <action
+            android:id="@+id/action_searchFragment_self"
+            app:destination="@id/searchTabbedFragment" />
+        <argument
+            android:name="query"
+            app:argType="string"
+            android:defaultValue='' />
+        <argument
+            android:name="sortType"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.SortType"
+            android:defaultValue="Active" />
+        <argument
+            android:name="personFilter"
+            app:argType="com.idunnololz.summit.lemmy.search.SearchTabbedViewModel$PersonFilter"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="communityFilter"
+            app:argType="com.idunnololz.summit.lemmy.search.SearchTabbedViewModel$CommunityFilter"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+</navigation>

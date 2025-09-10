@@ -30,7 +30,6 @@ import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -196,12 +195,14 @@ class ImportSettingsDialogFragment :
       recyclerView.apply {
         setup(animationsHelper)
         adapter = BackupsAdapter(
-          backups,
+          context = context,
           onBackupClick = {
             viewModel.generatePreviewFromFile(it.file.toUri())
             dialog.dismiss()
           },
-        )
+        ).apply {
+          backupData = backups
+        }
         setHasFixedSize(true)
         layoutManager = LinearLayoutManager(context)
       }
@@ -284,55 +285,5 @@ class ImportSettingsDialogFragment :
         viewModel.confirmImport(excludedKeys, adapter.tableResolutions)
       }
     }
-  }
-
-  private class BackupsAdapter(
-    private val backupData: List<SettingsBackupManager.BackupInfo>,
-    private val onBackupClick: (SettingsBackupManager.BackupInfo) -> Unit,
-  ) : Adapter<ViewHolder>() {
-
-    private sealed interface Item {
-      data class BackupItem(
-        val backupInfo: SettingsBackupManager.BackupInfo,
-      ) : Item
-    }
-
-    private val adapterHelper = AdapterHelper<Item>(
-      areItemsTheSame = { oldItem, newItem ->
-        oldItem::class == newItem::class &&
-          when (oldItem) {
-            is Item.BackupItem ->
-              oldItem.backupInfo.file.path ==
-                (newItem as Item.BackupItem).backupInfo.file.path
-          }
-      },
-    ).apply {
-      addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
-        b.text.text = item.backupInfo.file.name
-        b.root.setOnClickListener {
-          onBackupClick(item.backupInfo)
-        }
-      }
-    }
-
-    init {
-      updateItems()
-    }
-
-    private fun updateItems() {
-      val newItems = backupData.map { Item.BackupItem(it) }
-
-      adapterHelper.setItems(newItems, this)
-    }
-
-    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-      adapterHelper.onCreateViewHolder(parent, viewType)
-
-    override fun getItemCount(): Int = adapterHelper.itemCount
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-      adapterHelper.onBindViewHolder(holder, position)
   }
 }

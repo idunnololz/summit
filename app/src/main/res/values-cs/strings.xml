@@ -112,7 +112,7 @@
     <string name="base_view_type">Aktuální typ vzhledu</string>
     <string name="reset_view_to_default_styles">Resetovat vzhled do základního nastavení?</string>
     <string name="reset_view_styles">Resetovat vzhled</string>
-    <string name="black_theme">Tmavý režim</string>
+    <string name="black">Tmavý režim</string>
     <string name="lemmy_web_preferences_desc">Konfigurovat webové preference Lemmy</string>
     <string name="show_nsfw">Zobrazovat NSFW</string>
     <string name="error_no_settings_changed">Žádné nastavení byla změněna</string>

@@ -266,11 +266,18 @@ class PostViewModel @Inject constructor(
     fetchPostData(force = true, switchToNativeInstance = true)
   }
 
+  fun markPostAsRead(postView: PostView) {
+    val postView = postView
+    postReadManager.markPostAsReadLocal(apiInstance, postView.post.id, read = true)
+    duplicatePostsDetector.addReadOrHiddenPost(postView)
+  }
+
   fun fetchPostData(
     fetchPostData: Boolean = true,
     fetchCommentData: Boolean = true,
     force: Boolean = false,
     switchToNativeInstance: Boolean = false,
+    markPostAsRead: Boolean = true,
   ): Job? {
     Log.d(
       TAG,
@@ -384,8 +391,9 @@ class PostViewModel @Inject constructor(
       val postView = post?.post_view
 
       if (postView != null) {
-        postReadManager.markPostAsReadLocal(apiInstance, postView.post.id, read = true)
-        duplicatePostsDetector.addReadOrHiddenPost(postView)
+        if (markPostAsRead) {
+          markPostAsRead(postView)
+        }
         if (force) {
           accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
         }

@@ -77,6 +77,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_RAIL_GRAVITY
@@ -1356,19 +1357,27 @@ class ThemeSettings @Inject constructor(
     relatedKeys = listOf(KEY_COLOR_SCHEME),
   )
 
-  val blackTheme = OnOffSettingItem(
+  val backgroundTheme = RadioGroupSettingItem(
     null,
-    context.getString(R.string.black_theme),
-    context.getString(R.string.black_theme_desc),
-    relatedKeys = listOf(KEY_USE_BLACK_THEME),
+    context.getString(R.string.background_color),
+    options = listOf(
+      RadioGroupSettingItem.RadioGroupOption(
+        R.id._default,
+        context.getString(R.string._default),
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        R.id.black_theme,
+        context.getString(R.string.black),
+        context.getString(R.string.black_theme_desc),
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        R.id.less_dark_background_theme,
+        context.getString(R.string.less_dark_background_theme),
+        context.getString(R.string.less_dark_background_theme_desc),
+      ),
+    ),
+    relatedKeys = listOf(KEY_USE_BLACK_THEME, KEY_USE_LESS_DARK_BACKGROUND),
   )
-  val lessDarkBackgroundTheme = OnOffSettingItem(
-    null,
-    context.getString(R.string.less_dark_background_theme),
-    context.getString(R.string.less_dark_background_theme_desc),
-    relatedKeys = listOf(KEY_USE_LESS_DARK_BACKGROUND),
-  )
-
   val font = RadioGroupSettingItem(
     icon = null,
     title = context.getString(R.string.font),
@@ -2030,6 +2039,12 @@ class MiscSettings @Inject constructor(
     context.getString(R.string.finish_app_on_back),
     context.getString(R.string.finish_app_on_back_desc),
     relatedKeys = listOf(KEY_FINISH_APP_ON_BACK),
+  )
+  val markAsReadOnHidePost = OnOffSettingItem(
+    null,
+    context.getString(R.string.mark_as_read_on_hide_post),
+    null,
+    relatedKeys = listOf(KEY_MARK_AS_READ_ON_HIDE_POST),
   )
 }
 

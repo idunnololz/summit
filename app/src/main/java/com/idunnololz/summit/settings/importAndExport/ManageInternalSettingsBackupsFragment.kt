@@ -6,9 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.databinding.BackupItemBinding
 import com.idunnololz.summit.databinding.DialogFragmentManageInternalSettingsBackupsBinding
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -16,7 +14,6 @@ import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
-import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -64,6 +61,7 @@ class ManageInternalSettingsBackupsFragment :
 
     with(binding) {
       val adapter = BackupsAdapter(
+        context = context,
         onBackupClick = { backupInfo ->
           val bottomMenu = BottomMenu(context).apply {
             addItemWithIcon(
@@ -114,61 +112,5 @@ class ManageInternalSettingsBackupsFragment :
         }
       }
     }
-  }
-
-  private class BackupsAdapter(
-    private val onBackupClick: (SettingsBackupManager.BackupInfo) -> Unit,
-  ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private sealed interface Item {
-      data class BackupItem(
-        val backupInfo: SettingsBackupManager.BackupInfo,
-      ) : Item
-    }
-
-    private val adapterHelper = AdapterHelper<Item>(
-      areItemsTheSame = { oldItem, newItem ->
-        oldItem::class == newItem::class &&
-          when (oldItem) {
-            is Item.BackupItem ->
-              oldItem.backupInfo.file.path ==
-                (newItem as Item.BackupItem).backupInfo.file.path
-          }
-      },
-    ).apply {
-      addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
-        b.text.text = item.backupInfo.file.name
-        b.root.setOnClickListener {
-          onBackupClick(item.backupInfo)
-        }
-      }
-    }
-
-    var backupData: List<SettingsBackupManager.BackupInfo> = listOf()
-      set(value) {
-        field = value
-
-        updateItems()
-      }
-
-    init {
-      updateItems()
-    }
-
-    private fun updateItems() {
-      val newItems = backupData.map { Item.BackupItem(it) }
-
-      adapterHelper.setItems(newItems, this)
-    }
-
-    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-      adapterHelper.onCreateViewHolder(parent, viewType)
-
-    override fun getItemCount(): Int = adapterHelper.itemCount
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
-      adapterHelper.onBindViewHolder(holder, position)
   }
 }

@@ -75,6 +75,7 @@
         android:textAppearance="?textAppearanceBodySmall"
         android:includeFontPadding="false"
         android:layout_marginTop="@dimen/padding_quarter"
+        android:textColor="@color/text_color_faint"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/icon_space"

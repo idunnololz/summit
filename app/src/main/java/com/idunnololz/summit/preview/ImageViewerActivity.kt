@@ -55,6 +55,7 @@ import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.crashLogger.crashLogger
+import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.util.imgur.ImgurPageParser
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -276,10 +277,11 @@ class ImageViewerActivity :
     val hasAltUrl = !urlAlt.isNullOrBlank()
     if (hasAltUrl && (viewModel.url == args.url || useHd)) {
       viewModel.url = urlAlt
-      binding.hdButton.setImageResource(R.drawable.baseline_hd_24)
+//      binding.hdButton.setIcon()
+      binding.hdButton.setIconResource(R.drawable.baseline_hd_24)
     } else {
       viewModel.url = args.url
-      binding.hdButton.setImageResource(R.drawable.outline_hd_24)
+      binding.hdButton.setIconResource(R.drawable.outline_hd_24)
     }
 
     loadImage(viewModel.url)
@@ -302,7 +304,11 @@ class ImageViewerActivity :
     }
 
     insets.observe(this) {
-      insetViewExceptTopAutomaticallyByPadding(this, binding.bottomBar)
+      insetViewExceptTopAutomaticallyByPadding(
+        lifecycleOwner = this,
+        rootView = binding.bottomBar,
+        additionalPaddingBottom = context.getDimen(R.dimen.padding)
+      )
     }
 
     val context = this

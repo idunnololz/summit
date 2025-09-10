@@ -21,6 +21,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +40,7 @@ import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.summit.TrendingCommunityData
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentSearchHomeBinding
@@ -49,6 +51,7 @@ import com.idunnololz.summit.databinding.ItemSearchHomeMyCommunityBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeSearchSuggestionBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeTitleBinding
 import com.idunnololz.summit.databinding.ItemSearchHomeTrendingCommunitiesBinding
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyHeaderHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
@@ -95,6 +98,8 @@ class SearchHomeFragment :
 
     private const val ARG_SUGGESTION_TO_DELETE = "ARG_SUGGESTION_TO_DELETE"
   }
+
+  private val args by navArgs<SearchHomeFragmentArgs>()
 
   private val viewModel: SearchHomeViewModel by viewModels()
 
@@ -180,6 +185,9 @@ class SearchHomeFragment :
         viewLifecycleOwner,
         searchViewBackPressedHandler,
       )
+    }
+    if (!args.showHome) {
+      searchViewBackPressedHandler.isEnabled = false
     }
 
     requireSummitActivity().apply {
@@ -286,6 +294,10 @@ class SearchHomeFragment :
       )
 
       searchEditTextDummy.setOnClickListener {
+        viewModel.showSearch.value = true
+      }
+
+      if (!args.showHome) {
         viewModel.showSearch.value = true
       }
 
@@ -412,6 +424,25 @@ class SearchHomeFragment :
 
       viewModel.generateModel(requireActivity().componentName)
 
+      viewModel.setCommunityResult.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            viewModel.setCommunityResult.postIdle()
+
+            ErrorDialogFragment.show(
+              getString(R.string.error_set_community),
+              it.error,
+              childFragmentManager,
+            )
+          }
+          is StatefulData.Loading -> {
+          }
+          is StatefulData.NotStarted -> {
+          }
+          is StatefulData.Success -> {
+          }
+        }
+      }
       viewModel.model.observe(viewLifecycleOwner) {
         when (it) {
           is StatefulData.Error -> {
@@ -433,8 +464,14 @@ class SearchHomeFragment :
         }
       }
 
-      if (savedInstanceState == null && preferences.autoFocusSearchBar && !onCreateViewCalled) {
-        viewModel.showSearch.value = true
+      if (savedInstanceState == null && !onCreateViewCalled) {
+        if (preferences.autoFocusSearchBar) {
+          viewModel.showSearch.value = true
+        }
+        val communityFilter = args.communityFilter
+        if (communityFilter != null && communityFilter is CommunityRef.CommunityRefByName) {
+          viewModel.setCommunityFilter(communityFilter)
+        }
       }
     }
 
@@ -467,7 +504,9 @@ class SearchHomeFragment :
     binding.searchEditText.requestFocus()
     binding.root.findFocus()?.focusAndShowKeyboard()
 
-    searchViewBackPressedHandler.isEnabled = true
+    if (args.showHome) {
+      searchViewBackPressedHandler.isEnabled = true
+    }
   }
 
   private fun hideSearch(animate: Boolean = true) {

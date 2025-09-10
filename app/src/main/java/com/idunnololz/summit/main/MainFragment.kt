@@ -352,10 +352,12 @@ class MainFragment :
       }
     }
 
-    ArrayList(deferredNavigationRequests).forEach {
-      it.run()
+    if (deferredNavigationRequests.isNotEmpty()) {
+      ArrayList(deferredNavigationRequests).forEach {
+        it.run()
+      }
+      deferredNavigationRequests.clear()
     }
-    deferredNavigationRequests.clear()
 
     binding.rootView
       .registerStartPanelStateListeners(

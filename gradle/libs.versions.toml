@@ -1,10 +1,10 @@
 [versions]
-androidGradlePlugin = "8.12.1"
+androidGradlePlugin = "8.12.2"
 arrowCore = "2.1.2"
 datastorePreferences = "1.1.7"
 desugar_jdk_libs = "2.1.5"
 exifinterface = "1.4.1"
-hilt = "2.57"
+hilt = "2.57.1"
 javaStringSimilarity = "2.0.0"
 kotlin = "2.2.10"
 kotlinxSerializationJson = "1.9.0"
@@ -12,7 +12,7 @@ ksp = "2.2.10-2.0.2"
 kotlinx = "1.10.2"
 navigation = "2.9.3"
 room = "2.7.2"
-lifecycle = "2.9.2"
+lifecycle = "2.9.3"
 media3 = "1.8.0"
 transformations = "3.0.7"
 viewpump = "2.1.1"
@@ -24,12 +24,14 @@ commonmark = "0.13.0" # DO NOT BUMP THIS PAST 0.13.0
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
+coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version = "1.3.0" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 slidingpanelayout = { module = "androidx.slidingpanelayout:slidingpanelayout", version = "1.2.0" }
+interpolator = { module = "androidx.interpolator:interpolator", version = "1.0.0" }
 
 java-string-similarity = { module = "info.debatty:java-string-similarity", version.ref = "javaStringSimilarity" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -73,7 +75,6 @@ coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil"}
 coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
-flow-layout = { module = "com.nex3z:flow-layout", version = "1.3.3" }
 material = { module = "com.google.android.material:material", version = "1.14.0-alpha04" }
 disklrucache = { module = "com.jakewharton:disklrucache", version = "2.0.2" }
 gson = { module = "com.google.code.gson:gson", version = "2.13.1" }
@@ -89,7 +90,7 @@ cardview = { module = "androidx.cardview:cardview", version = "1.0.0" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.4.0" }
 preference-ktx = { module = "androidx.preference:preference-ktx", version = "1.2.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.1" }
-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.2.0-beta01" }
+#swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version = "1.2.0-beta01" }
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.9" }
 activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.10.1" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
@@ -101,7 +102,7 @@ asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflat
 
 hilt-common = { module = "androidx.hilt:hilt-common", version = "1.2.0"}
 hilt-work = { module = "androidx.hilt:hilt-work", version = "1.2.0" }
-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version = "1.2.0" }
+#hilt-compiler = { module = "androidx.hilt:hilt-compiler", version = "1.2.0" }
 
 commonmark = { module = "com.atlassian.commonmark:commonmark", version.ref = "commonmark"}
 commonmark-strikethrough = { module = "com.atlassian.commonmark:commonmark-ext-gfm-strikethrough", version.ref = "commonmark"}

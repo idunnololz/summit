@@ -57,6 +57,7 @@ class PostReadManager @Inject constructor(
   fun isPostRead(instance: String, postId: PostId): Boolean? = readPosts[toKey(instance, postId)]
 
   fun markPostAsReadLocal(instance: String, postId: PostId, read: Boolean) {
+    Log.d("HAHA", "markPostAsReadLocal: ${postId} $read")
     val key = toKey(instance, postId)
     if (readPosts[key] == read) {
       return

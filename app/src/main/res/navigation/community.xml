@@ -55,7 +55,25 @@
         <action
             android:id="@+id/action_communityFragment_to_postTabbedFragment"
             app:destination="@id/postTabbedFragment" />
+        <action
+            android:id="@+id/action_communityFragment_to_search"
+            app:destination="@id/search"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim">
+            <argument
+                android:name="show_home"
+                app:argType="boolean"
+                android:defaultValue='true' />
+            <argument
+                android:name="communityFilter"
+                app:argType="com.idunnololz.summit.lemmy.CommunityRef"
+                app:nullable="true"
+                android:defaultValue="@null" />
+        </action>
     </fragment>
+    <include app:graph="@navigation/search"/>
     <fragment
         android:id="@+id/postFragment"
         android:name="com.idunnololz.summit.lemmy.post.PostFragment"
@@ -108,6 +126,10 @@
             android:name="accountId"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="is_in_view_pager"
+            android:defaultValue="false"
+            app:argType="boolean"/>
         <action
             android:id="@+id/action_postFragment_to_communityFragment"
             app:destination="@id/communityFragment" />

@@ -450,7 +450,7 @@
     <string name="reset_view_styles">Återställ vystilar</string>
     <string name="prefer_image_at_the_end">Föredrar bild i slutet</string>
     <string name="dark_theme_settings">Inställningar för mörkt tema</string>
-    <string name="black_theme">Svart tema</string>
+    <string name="black">Svart tema</string>
     <string name="black_theme_desc">Använder rent svart som bakgrundsfärg</string>
     <string name="lemmy_web_preferences">Lemmy webbpreferenser</string>
     <string name="lemmy_web_preferences_desc">Konfigurera Lemmy-webbinställningar</string>

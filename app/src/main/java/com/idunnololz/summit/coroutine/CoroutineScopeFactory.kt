@@ -8,6 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 
 @Singleton
 class CoroutineScopeFactory @Inject constructor() {
+
   fun create() = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
   fun createConfined() = CoroutineScope(

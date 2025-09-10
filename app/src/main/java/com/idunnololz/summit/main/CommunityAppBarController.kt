@@ -80,6 +80,7 @@ class CommunityAppBarController(
   useHeader: Boolean,
   state: State? = null,
   private val viewModel: CommunityViewModel,
+  private val onSearchClick: () -> Unit,
 ) {
 
   companion object {
@@ -158,6 +159,7 @@ class CommunityAppBarController(
       val titleHotspot: View,
       val feedInfoText: TextView,
       val communities: TextView,
+      val search: TextView,
       val scrollView: View,
       val headerBg: View,
       val hideReadOn2: TextView,
@@ -649,6 +651,10 @@ class CommunityAppBarController(
         summitActivity.showCommunityInfo(currentCommunity)
       }
     }
+
+    vh.search.setOnClickListener {
+      onSearchClick()
+    }
   }
 
   private fun ViewHolder.LargeAppBarViewHolder.updateBanner(url: String?, isLoading: Boolean) {
@@ -1073,6 +1079,7 @@ class CommunityAppBarController(
         titleHotspot = b.titleHotspot,
         feedInfoText = b.feedInfoText,
         communities = b.communities,
+        search = b.search,
         scrollView = b.scrollView,
         headerBg = b.headerBg,
         hideReadOn2 = b.hideReadOn2,

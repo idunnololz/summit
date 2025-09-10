@@ -212,6 +212,7 @@ object PreferenceKeys {
   const val KEY_INBOX_FAB_ACTION = "KEY_INBOX_FAB_ACTION"
   const val KEY_INBOX_LAYOUT = "KEY_INBOX_LAYOUT"
   const val KEY_INBOX_AUTO_MARK_AS_READ = "KEY_INBOX_AUTO_MARK_AS_READ"
+  const val KEY_MARK_AS_READ_ON_HIDE_POST = "KEY_MARK_AS_READ_ON_HIDE_POST"
 
   const val KEY_DATABASE_MAIN = "_key_database_main"
 

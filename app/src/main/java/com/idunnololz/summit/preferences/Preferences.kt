@@ -92,6 +92,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LAST_ACCOUNT_NOTIFIC
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LEFT_HAND_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_POSTS_AS_READ_ON_SCROLL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAVIGATION_RAIL_MODE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_NAV_BAR_ITEMS
@@ -701,6 +702,8 @@ class Preferences(
     by intPreference(KEY_INBOX_LAYOUT, InboxLayoutId.COMPACT)
   var inboxAutoMarkAsRead
     by booleanPreference(KEY_INBOX_AUTO_MARK_AS_READ, false)
+  var markAsReadOnHidePost
+    by booleanPreference(KEY_MARK_AS_READ_ON_HIDE_POST, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

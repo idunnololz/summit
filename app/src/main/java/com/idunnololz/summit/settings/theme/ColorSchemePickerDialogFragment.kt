@@ -29,6 +29,7 @@ import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.core.graphics.drawable.toDrawable
 
 @AndroidEntryPoint
 class ColorSchemePickerDialogFragment :
@@ -121,9 +122,9 @@ class ColorSchemePickerDialogFragment :
         inflateFn = ColorSchemeItemBinding::inflate,
       ) { item, b, h ->
         b.title.text = item.name
-        b.color1.background = ColorDrawable(item.primaryColor)
-        b.color2.background = ColorDrawable(item.secondaryColor)
-        b.color3.background = ColorDrawable(item.tertiaryColor)
+        b.color1.background = item.primaryColor.toDrawable()
+        b.color2.background = item.secondaryColor.toDrawable()
+        b.color3.background = item.tertiaryColor.toDrawable()
 
         b.root.setOnClickListener {
           onColorSchemeSelected(item.colorSchemeId)

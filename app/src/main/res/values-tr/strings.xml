@@ -249,7 +249,7 @@
     <string name="xxxl">XXXL</string>
     <string name="downloads">İndirmeler</string>
     <string name="downloads_settings">İndirme ayarları</string>
-    <string name="black_theme">Siyah tema</string>
+    <string name="black">Siyah tema</string>
     <string name="black_theme_desc">Arka plan rengi olarak saf siyahı kullanır</string>
     <string name="downloads_desc">Dosya indirmeyle ilgili ayarları değiştirin</string>
     <string name="reset_download_location">İndirme konumunu sıfırla</string>

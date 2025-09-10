@@ -146,7 +146,7 @@
     <string name="display_name">Anzeigename</string>
     <string name="default_sort_type">Standard-Sortierart</string>
     <string name="show_nsfw">NSFW zeigen</string>
-    <string name="black_theme">Schwarzer Modus</string>
+    <string name="black">Schwarzer Modus</string>
     <string name="lemmy_web_preferences">Lemmy Web-Einstellungen</string>
     <string name="settings_saved">Einstellungen gespeichert</string>
     <string name="error_no_settings_changed">Keine Einstellungen geändert</string>

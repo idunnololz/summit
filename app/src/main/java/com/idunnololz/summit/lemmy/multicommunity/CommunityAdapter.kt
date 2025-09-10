@@ -42,7 +42,6 @@ class CommunityAdapter @AssistedInject constructor(
     communityId: Int,
   ) -> Unit = { _, _, _ -> },
   private val avatarHelper: AvatarHelper,
-  private val offlineManager: OfflineManager,
   private val accountManager: AccountManager,
   private val accountInfoManager: AccountInfoManager,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

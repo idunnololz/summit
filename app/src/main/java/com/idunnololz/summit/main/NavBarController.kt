@@ -421,7 +421,7 @@ class NavBarController(
             NavBarDestinations.Search -> {
               add(
                 Menu.NONE,
-                R.id.searchHomeFragment,
+                R.id.search,
                 Menu.NONE,
                 context.getString(R.string.search),
               ).apply {

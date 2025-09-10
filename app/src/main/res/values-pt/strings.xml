@@ -125,7 +125,7 @@
     <string name="reset_view_styles">Repor estilos de visualização</string>
     <string name="prefer_image_at_the_end">Preferir a imagem no fundo</string>
     <string name="dark_theme_settings">Configurações do tema escuro</string>
-    <string name="black_theme">Tema preto</string>
+    <string name="black">Tema preto</string>
     <string name="black_theme_desc">Usa preto puro como cor de fundo</string>
     <string name="lemmy_web_preferences_desc">Configura a tua conta Lemmy</string>
     <string name="default_sort_type">Ordenação predefinida</string>

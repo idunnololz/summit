@@ -13,12 +13,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.SummitServerClient
 import com.idunnololz.summit.api.dto.lemmy.SortType
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.PersonFilter
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -60,6 +62,7 @@ class SearchHomeViewModel @Inject constructor(
   val currentQueryLiveData = currentQueryFlow.asLiveData()
   val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
   val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
+  val setCommunityResult = StatefulLiveData<Unit>()
 
   var subscriptionCommunities: List<AccountSubscription> = listOf()
 
@@ -322,6 +325,28 @@ class SearchHomeViewModel @Inject constructor(
       }
 
       generateModel(componentName)
+    }
+  }
+
+  fun setCommunityFilter(communityRef: CommunityRef.CommunityRefByName) {
+    setCommunityResult.setIsLoading()
+
+    viewModelScope.launch {
+      apiClient
+        .fetchCommunityWithRetry(
+          Either.Right(communityRef.fullName),
+          force = false
+        )
+        .onSuccess {
+          nextCommunityFilter.value = CommunityFilter(
+            it.community_view.community.id,
+            communityRef,
+          )
+          setCommunityResult.postValue(Unit)
+        }
+        .onFailure {
+          setCommunityResult.postError(it)
+        }
     }
   }
 }

@@ -492,53 +492,17 @@ class PostListViewBuilder @Inject constructor(
 
       if (holder.state.preferTitleText != postUiConfig.preferTitleText) {
         if (postUiConfig.preferTitleText) {
-          when (val rb = rawBinding) {
-            is ListingItemListBinding -> {
-              rb.title.setTextAppearanceCompat(
-                context.getResIdFromAttribute(
-                  com.google.android.material.R.attr.textAppearanceTitleMedium,
-                ),
-              )
-            }
-            is ListingItemListWithCardsBinding -> {
-              rb.title.setTextAppearanceCompat(
-                context.getResIdFromAttribute(
-                  com.google.android.material.R.attr.textAppearanceTitleMedium,
-                ),
-              )
-            }
-            is ListingItemCompactBinding -> {
-              rb.title.setTextAppearanceCompat(
-                context.getResIdFromAttribute(
-                  com.google.android.material.R.attr.textAppearanceTitleMedium,
-                ),
-              )
-            }
-          }
+          title.setTextAppearanceCompat(
+            context.getResIdFromAttribute(
+              com.google.android.material.R.attr.textAppearanceTitleLarge,
+            ),
+          )
         } else {
-          when (val rb = rawBinding) {
-            is ListingItemListBinding -> {
-              rb.title.setTextAppearanceCompat(
-                context.getResIdFromAttribute(
-                  com.google.android.material.R.attr.textAppearanceBodyMedium,
-                ),
-              )
-            }
-            is ListingItemListWithCardsBinding -> {
-              rb.title.setTextAppearanceCompat(
-                context.getResIdFromAttribute(
-                  com.google.android.material.R.attr.textAppearanceBodyMedium,
-                ),
-              )
-            }
-            is ListingItemCompactBinding -> {
-              rb.title.setTextAppearanceCompat(
-                context.getResIdFromAttribute(
-                  com.google.android.material.R.attr.textAppearanceBodyMedium,
-                ),
-              )
-            }
-          }
+          title.setTextAppearanceCompat(
+            context.getResIdFromAttribute(
+              com.google.android.material.R.attr.textAppearanceBodyLarge,
+            ),
+          )
         }
 
         holder.state.preferTitleText = postUiConfig.preferTitleText

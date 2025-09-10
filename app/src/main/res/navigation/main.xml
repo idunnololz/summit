@@ -10,6 +10,10 @@
 
     <include app:graph="@navigation/block_list" />
 
+    <include app:graph="@navigation/settings"/>
+
+    <include app:graph="@navigation/search"/>
+
     <action android:id="@+id/action_global_login" app:destination="@id/login"
         app:enterAnim="@animator/nav_default_enter_anim"
         app:exitAnim="@animator/nav_default_exit_anim"
@@ -218,6 +222,10 @@
             android:name="accountId"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="is_in_view_pager"
+            android:defaultValue="false"
+            app:argType="boolean"/>
     </fragment>
     <fragment
         android:id="@+id/communityInfoFragment"
@@ -243,33 +251,7 @@
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim"/>
-    <include app:graph="@navigation/settings"/>
-    <fragment
-        android:id="@+id/searchTabbedFragment"
-        android:name="com.idunnololz.summit.lemmy.search.SearchTabbedFragment"
-        android:label="SearchTabbedFragment" >
-        <action
-            android:id="@+id/action_searchFragment_self"
-            app:destination="@id/searchTabbedFragment" />
-        <argument
-            android:name="query"
-            app:argType="string"
-            android:defaultValue='' />
-        <argument
-            android:name="sortType"
-            app:argType="com.idunnololz.summit.api.dto.lemmy.SortType"
-            android:defaultValue="Active" />
-        <argument
-            android:name="personFilter"
-            app:argType="com.idunnololz.summit.lemmy.search.SearchTabbedViewModel$PersonFilter"
-            app:nullable="true"
-            android:defaultValue="@null" />
-        <argument
-            android:name="communityFilter"
-            app:argType="com.idunnololz.summit.lemmy.search.SearchTabbedViewModel$CommunityFilter"
-            app:nullable="true"
-            android:defaultValue="@null" />
-    </fragment>
+
     <fragment
         android:id="@+id/communitiesFragment"
         android:name="com.idunnololz.summit.lemmy.communities.CommunitiesFragment"
@@ -313,14 +295,6 @@
             app:argType="com.idunnololz.summit.api.dto.lemmy.Community"
             app:nullable="true"
             android:defaultValue="@null" />
-    </fragment>
-    <fragment
-        android:id="@+id/searchHomeFragment"
-        android:name="com.idunnololz.summit.lemmy.search.SearchHomeFragment"
-        android:label="SearchHomeFragment" >
-        <action
-            android:id="@+id/action_searchHomeFragment_to_searchFragment"
-            app:destination="@id/searchTabbedFragment" />
     </fragment>
     <fragment
         android:id="@+id/youFragment"

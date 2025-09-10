@@ -56,8 +56,8 @@ class TranslatorsViewModel @Inject constructor(
 
             translators.add(
               TranslationTranslatorStats(
-                translatorName = name as? String ?: continue,
-                stringsTranslated = stringsTranslated as? Double ?: continue,
+                translatorName = name ?: continue,
+                stringsTranslated = stringsTranslated,
               ),
             )
           }

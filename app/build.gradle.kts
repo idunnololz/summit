@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 36
-    versionCode = 287
-    versionName = "1.71.2"
+    versionCode = 288
+    versionName = "1.71.3"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -103,7 +103,6 @@ dependencies {
   implementation(project(":thirdPartyModules:markwon:markwon-linkify"))
   implementation(project(":thirdPartyModules:markwon:markwon-simple-ext"))
   implementation(project(":thirdPartyModules:zoomLayout"))
-  implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
 
   implementation(libs.kotlin.reflect)
   implementation(libs.kotlin.stdlib.jdk7)
@@ -118,12 +117,13 @@ dependencies {
   implementation(libs.gson)
   implementation(libs.constraintlayout)
   implementation(libs.ksoup)
-  implementation(libs.swiperefreshlayout)
   implementation(libs.transition.ktx)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.disklrucache)
   implementation(libs.slidingpanelayout)
   implementation(libs.documentfile)
+  implementation(libs.coordinatorlayout)
+  implementation(libs.interpolator)
 
   implementation(libs.lifecycle.viewmodel.ktx)
   implementation(libs.lifecycle.extensions)
@@ -161,8 +161,6 @@ dependencies {
   implementation(libs.work.runtime.ktx)
 
   implementation(libs.browser)
-
-  implementation(libs.flow.layout)
 
   implementation(libs.arrow.core)
 

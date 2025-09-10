@@ -170,6 +170,7 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
             currentCommunity = item.fetchedPost.postView.community.toCommunityRef(),
             videoState = null,
             accountId = item.fetchedPost.source.accountId ?: 0L,
+            isInViewPager = true,
           ).toBundle()
         }
       is Item.AutoLoadItem ->

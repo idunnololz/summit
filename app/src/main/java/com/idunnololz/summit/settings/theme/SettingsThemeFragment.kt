@@ -6,6 +6,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.color.DynamicColors
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.preferences.BaseTheme
 import com.idunnololz.summit.preferences.ColorSchemes
@@ -77,24 +78,28 @@ class SettingsThemeFragment : BaseSettingsFragment() {
       ),
       SettingModelItem.SubgroupItem(
         getString(R.string.theme_config),
-        listOf(
-          settings.materialYou.asOnOffSwitch(
-            { preferences.isUseMaterialYou },
-            {
-              if (DynamicColors.isDynamicColorAvailable()) {
-                preferences.isUseMaterialYou = it
-                preferences.colorScheme = ColorSchemes.Default
-                themeManager.onPreferencesChanged()
-              } else if (it) {
-                OldAlertDialogFragment.Builder()
-                  .setMessage(R.string.error_dynamic_color_not_supported)
-                  .createAndShow(childFragmentManager, "Asdfff")
-                preferences.isUseMaterialYou = false
-              } else {
-                preferences.isUseMaterialYou = false
-              }
-            },
-          ),
+        listOfNotNull(
+          if (DynamicColors.isDynamicColorAvailable()) {
+            settings.materialYou.asOnOffSwitch(
+              { preferences.isUseMaterialYou },
+              {
+                if (DynamicColors.isDynamicColorAvailable()) {
+                  preferences.isUseMaterialYou = it
+                  preferences.colorScheme = ColorSchemes.Default
+                  themeManager.onPreferencesChanged()
+                } else if (it) {
+                  launchAlertDialog("error_dynamic_color_not_supported") {
+                    messageResId = R.string.error_dynamic_color_not_supported
+                  }
+                  preferences.isUseMaterialYou = false
+                } else {
+                  preferences.isUseMaterialYou = false
+                }
+              },
+            )
+          } else {
+            null
+          },
           settings.colorScheme.asCustomItem(
             { preferences.colorScheme },
             {
@@ -107,19 +112,33 @@ class SettingsThemeFragment : BaseSettingsFragment() {
       SettingModelItem.SubgroupItem(
         getString(R.string.dark_theme_settings),
         listOf(
-          settings.blackTheme.asOnOffSwitch(
-            { preferences.isBlackTheme },
+          settings.backgroundTheme.asSingleChoiceSelectorItem(
             {
-              preferences.isBlackTheme = it
-              themeManager.onPreferencesChanged()
+              if (preferences.isBlackTheme) {
+                R.id.black_theme
+              } else if (preferences.useLessDarkBackgroundTheme) {
+                R.id.less_dark_background_theme
+              } else {
+                R.id._default
+              }
             },
-          ),
-          settings.lessDarkBackgroundTheme.asOnOffSwitch(
-            { preferences.useLessDarkBackgroundTheme },
             {
-              preferences.useLessDarkBackgroundTheme = it
+              when (it) {
+                R.id.black_theme -> {
+                  preferences.isBlackTheme = true
+                  preferences.useLessDarkBackgroundTheme = false
+                }
+                R.id.less_dark_background_theme -> {
+                  preferences.isBlackTheme = false
+                  preferences.useLessDarkBackgroundTheme = true
+                }
+                else -> {
+                  preferences.isBlackTheme = false
+                  preferences.useLessDarkBackgroundTheme = false
+                }
+              }
               themeManager.onPreferencesChanged()
-            },
+            }
           ),
         ),
       ),

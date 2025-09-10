@@ -20,7 +20,7 @@
     <string name="blank">रिक्त</string>
     <string name="sort_by_top">शीर्ष के अनुसार क्रमबद्ध करें</string>
     <string name="font_size">फॉन्ट आकार</string>
-    <string name="black_theme">काली थीम</string>
+    <string name="black">काली थीम</string>
     <string name="black_theme_desc">पृष्ठभूमि रंग के रूप में शुद्ध काले का उपयोग करता है</string>
     <string name="post_and_comments_settings_desc">पोस्ट और टिप्पणियां स्क्रीन को अनुकूलित करें</string>
     <string name="account_block_settings_desc">चुनें कि किस समुदाय/खाते को अवरुद्ध करना है</string>

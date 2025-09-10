@@ -114,7 +114,7 @@ class AccountInfoManager @Inject constructor(
     refreshAccountInfo(accountManager.currentAccount.asAccount, force)
 
   fun updateUnreadCount() {
-    coroutineScope.launch {
+    coroutineScope.launch(Dispatchers.Default) {
       unreadCountInvalidates.emit(Unit)
     }
   }

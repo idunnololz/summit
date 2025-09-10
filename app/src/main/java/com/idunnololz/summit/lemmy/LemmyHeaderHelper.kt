@@ -360,7 +360,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
         )
       } else {
         sb.setSpan(
-          ForegroundColorSpan(regularColor),
+          ForegroundColorSpan(unimportantColor),
           s,
           e,
           Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,

@@ -109,7 +109,13 @@ fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
         val idToChoice = mutableMapOf<Int, Int>()
         options.withIndex().forEach { (index, option) ->
           idToChoice[index] = option.id
-          addItem(index, option.title)
+          addRawItem(
+            BottomMenu.MenuItem.ActionItem(
+              id = index,
+              title = option.title,
+              description = option.description
+            )
+          )
 
           if (curChoice == null && option.isDefault) {
             setChecked(index)

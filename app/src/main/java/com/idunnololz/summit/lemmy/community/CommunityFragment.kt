@@ -58,6 +58,7 @@ import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
+import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
@@ -66,6 +67,7 @@ import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
+import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toId
@@ -555,6 +557,9 @@ class CommunityFragment :
         lemmyTextHelper = lemmyTextHelper,
         preferences = preferences,
         viewModel = viewModel,
+        onSearchClick = {
+          handleSearchClick()
+        },
       )
 
       // Prevent flickers by setting the app bar here first
@@ -1035,7 +1040,7 @@ class CommunityFragment :
             Snackbar.LENGTH_LONG,
           )
           .setAction(R.string.undo) {
-            viewModel.unhidePost(
+            moreActionsHelper.unhidePost(
               id = hiddenPost.postId,
               instance = hiddenPost.instance,
               postView = null,
@@ -1112,7 +1117,7 @@ class CommunityFragment :
             }
 
             PostGestureAction.Hide -> {
-              viewModel.hidePost(id = postView.post.id, postView = postView)
+              moreActionsHelper.hidePost(id = postView.post.id, postView = postView)
             }
 
             PostGestureAction.MarkAsRead -> {
@@ -1462,6 +1467,17 @@ class CommunityFragment :
             )
           }
         }
+
+        addItemWithIcon(
+          id = R.id.search,
+          title =
+            if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+              getString(R.string.search_in_format, currentCommunityRef.getName(context))
+            } else {
+              getString(R.string.search)
+            },
+          icon = R.drawable.baseline_search_24,
+        )
       }
 
       if (isCommunityMenu) {
@@ -1776,6 +1792,12 @@ class CommunityFragment :
         )
       }
 
+      R.id.search -> {
+        currentCommunityRef ?: return@a
+
+        handleSearchClick()
+      }
+
       R.id.remove_bookmark -> {
         currentCommunityRef ?: return@a
 
@@ -1883,6 +1905,16 @@ class CommunityFragment :
         getMainActivity()?.showCreateCommunityScreen()
       }
     }
+  }
+
+  private fun handleSearchClick() {
+    val currentCommunityRef = viewModel.currentCommunityRef.value ?: return
+    val direction = CommunityFragmentDirections.actionCommunityFragmentToSearch(
+      false,
+      currentCommunityRef
+    )
+
+    findNavController().navigate(direction)
   }
 
   private fun showPerCommunitySettings(currentCommunityRef: CommunityRef) {

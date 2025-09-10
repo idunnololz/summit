@@ -139,7 +139,7 @@
     <string name="reset_view_to_default_styles">Effettuare il reset della visualizzazione agli stili predefiniti?</string>
     <string name="prefer_image_at_the_end">Immagine alla fine come opzione preferenziale</string>
     <string name="dark_theme_settings">Impostazioni tema scuro</string>
-    <string name="black_theme">Tema nero</string>
+    <string name="black">Tema nero</string>
     <string name="black_theme_desc">Utilizza colore di sfondo totalmente nero</string>
     <string name="lemmy_web_preferences">Preferenze web di Lemmy</string>
     <string name="lemmy_web_preferences_desc">Configura le preferenze web di Lemmy</string>
