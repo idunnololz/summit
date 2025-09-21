@@ -43,66 +43,12 @@
                     android:id="@+id/content"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceBodyLarge"
+                    android:textAppearance="?textAppearanceBodyMedium"
                     android:layout_margin="@dimen/padding"
                     android:textIsSelectable="true"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
-
-                <TextView
-                    android:id="@+id/reporter"
-                    android:text="@string/reporter"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?textAppearanceTitleMedium"
-                    android:layout_marginStart="@dimen/padding"
-                    android:layout_marginEnd="@dimen/padding_half"
-                    android:layout_marginTop="@dimen/padding_two"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    app:layout_constraintTop_toBottomOf="@+id/content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/reporter_view"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/selectable_item_bg"
-                    app:layout_constraintTop_toBottomOf="@+id/reporter"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/reporter_icon"
-                        style="@style/RoundImageView"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:padding="1dp"
-                        android:layout_marginStart="@dimen/padding_half"
-                        android:layout_marginVertical="@dimen/padding_half"
-                        app:strokeColor="@color/colorOnSurface"
-                        app:strokeWidth="1dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <TextView
-                        android:id="@+id/reporter_name"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?textAppearanceBodyMedium"
-                        android:layout_marginHorizontal="@dimen/padding"
-                        android:layout_marginVertical="@dimen/padding_half"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        app:layout_constraintStart_toEndOf="@+id/reporter_icon"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
                     android:id="@+id/context_card"
@@ -112,7 +58,7 @@
                     android:layout_marginTop="@dimen/padding"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/reporter_view">
+                    app:layout_constraintTop_toBottomOf="@+id/content">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"

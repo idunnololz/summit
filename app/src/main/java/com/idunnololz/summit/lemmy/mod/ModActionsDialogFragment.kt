@@ -19,6 +19,7 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.AdminOrModActionsViewModel
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.mod.ModActionResult.UpdatedObject
 import com.idunnololz.summit.lemmy.mod.ModActionResult.setModActionResult
 import com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment.ModActionWithReason
@@ -64,6 +65,7 @@ class ModActionsDialogFragment :
         postId = postView.post.id,
         personId = postView.creator.id,
         communityInstance = postView.community.instance,
+        communityRef = null,
         fragmentManager = fragmentManager,
       )
     }
@@ -75,6 +77,22 @@ class ModActionsDialogFragment :
         postId = -1,
         personId = commentView.creator.id,
         communityInstance = commentView.community.instance,
+        communityRef = null,
+        fragmentManager = fragmentManager,
+      )
+    }
+
+
+    fun show(
+      communityRef: CommunityRef.CommunityRefByName,
+      fragmentManager: FragmentManager) {
+      show(
+        communityId = -1,
+        commentId = -1,
+        postId = -1,
+        personId = -1,
+        communityInstance = null,
+        communityRef = communityRef,
         fragmentManager = fragmentManager,
       )
     }
@@ -84,7 +102,8 @@ class ModActionsDialogFragment :
       commentId: Int,
       postId: Int,
       personId: PersonId,
-      communityInstance: String,
+      communityInstance: String?,
+      communityRef: CommunityRef.CommunityRefByName?,
       fragmentManager: FragmentManager,
     ) {
       ModActionsDialogFragment()
@@ -95,6 +114,7 @@ class ModActionsDialogFragment :
             postId = postId,
             personId = personId,
             communityInstance = communityInstance,
+            communityRef = communityRef,
           ).toBundle()
         }
         .show(fragmentManager, "ModActionsDialogFragment")
@@ -112,8 +132,9 @@ class ModActionsDialogFragment :
   lateinit var animationsHelper: AnimationsHelper
 
   private val confirmModUserDialogLauncher = newAlertDialogLauncher("mod_user") {
+    val communityId = viewModel.currentModState.valueOrNull?.communityId ?: args.communityId
     if (it.isOk) {
-      actionsViewModel.mod(communityId = args.communityId, personId = args.personId, mod = true)
+      actionsViewModel.mod(communityId = communityId, personId = args.personId, mod = true)
     }
   }
 
@@ -139,6 +160,7 @@ class ModActionsDialogFragment :
           .apply {
             arguments = ModActionWithReasonDialogFragmentArgs(
               modAction = modAction,
+              body = null,
             ).toBundle()
           }
           .showAllowingStateLoss(
@@ -150,12 +172,14 @@ class ModActionsDialogFragment :
 
       adapter = BottomMenu.BottomMenuAdapter(context).apply {
         title =
-          if (viewModel.isAdmin(args.communityInstance)) {
+          if (viewModel.isAdmin(viewModel.instance)) {
             getString(R.string.admin_actions)
           } else {
             getString(R.string.mod_actions)
           }
         onMenuItemClickListener = {
+          val communityId = viewModel.currentModState.valueOrNull?.communityId
+            ?: args.communityId
           when (it.id) {
             R.id.feature_post -> {
               actionsViewModel.featurePost(args.postId, true)
@@ -190,14 +214,14 @@ class ModActionsDialogFragment :
                 message = getString(
                   R.string.confirm_mod_user_desc,
                   viewModel.person?.fullName ?: args.personId,
-                  viewModel.community?.fullName ?: args.communityId,
+                  viewModel.community?.fullName ?: communityId,
                 )
                 positionButtonResId = R.string.mod_user
                 negativeButtonResId = R.string.cancel
               }
             }
             R.id.unmod -> {
-              actionsViewModel.mod(args.communityId, args.personId, false)
+              actionsViewModel.mod(communityId, args.personId, false)
             }
             R.id.ban -> {
               val accountId = viewModel.currentAccount?.id
@@ -206,9 +230,9 @@ class ModActionsDialogFragment :
                 BanUserDialogFragment()
                   .apply {
                     arguments = BanUserDialogFragmentArgs(
-                      args.communityId,
-                      args.personId,
-                      accountId,
+                      communityId = communityId,
+                      personId = args.personId,
+                      accountId = accountId,
                     ).toBundle()
                   }
                   .showAllowingStateLoss(
@@ -221,8 +245,8 @@ class ModActionsDialogFragment :
             R.id.undo_ban -> {
               launchModActionWithReason(
                 UndoBanUserFromCommunity(
-                  args.communityId,
-                  args.personId,
+                  communityId = communityId,
+                  personId = args.personId,
                 ),
               )
             }
@@ -281,7 +305,7 @@ class ModActionsDialogFragment :
             R.id.purge_community -> {
               launchModActionWithReason(
                 PurgeCommunity(
-                  args.communityId,
+                  communityId = communityId,
                 ),
               )
             }
@@ -310,28 +334,28 @@ class ModActionsDialogFragment :
             R.id.remove_community -> {
               launchModActionWithReason(
                 RemoveCommunity(
-                  args.communityId,
+                  communityId,
                 ),
               )
             }
             R.id.undo_remove_community -> {
               launchModActionWithReason(
                 UndoRemoveCommunity(
-                  args.communityId,
+                  communityId,
                 ),
               )
             }
             R.id.hide_community -> {
               launchModActionWithReason(
                 ModActionWithReason.HideCommunity(
-                  args.communityId,
+                  communityId,
                 ),
               )
             }
             R.id.undo_hide_community -> {
               launchModActionWithReason(
                 ModActionWithReason.UndoHideCommunity(
-                  args.communityId,
+                  communityId,
                 ),
               )
             }
@@ -363,6 +387,7 @@ class ModActionsDialogFragment :
         postId = args.postId,
         commentId = args.commentId,
         personId = args.personId,
+        communityRef = args.communityRef,
         force = true,
       )
 
@@ -372,6 +397,7 @@ class ModActionsDialogFragment :
           postId = args.postId,
           commentId = args.commentId,
           personId = args.personId,
+          communityRef = args.communityRef,
           force = true,
         )
       }
@@ -527,6 +553,7 @@ class ModActionsDialogFragment :
   }
 
   private fun setupUi(data: ModActionsViewModel.FullModState) {
+    val personId = args.personId
     for (modState in data.modStates) {
       when (modState) {
         is CommentModState -> {
@@ -565,9 +592,11 @@ class ModActionsDialogFragment :
           )
         }
         is CommunityModState -> {
-          if (args.personId != viewModel.currentAccount?.id) {
+          if (personId != viewModel.currentAccount?.id) {
             adapter?.addDividerIfNeeded()
-            if (modState.isMod) {
+            if (modState.isMod == null) {
+              // do nothing
+            } else if (modState.isMod) {
               adapter?.addItemWithIcon(
                 id = R.id.unmod,
                 title = R.string.unmod_user,
@@ -651,7 +680,7 @@ class ModActionsDialogFragment :
       }
     }
 
-    if (viewModel.isAdmin(args.communityInstance)) {
+    if (viewModel.isAdmin(viewModel.instance)) {
       adapter?.addDividerIfNeeded()
 
       val siteModState = data.modStates.filterIsInstance<SiteModState>().firstOrNull()
@@ -684,7 +713,7 @@ class ModActionsDialogFragment :
           adapter?.addItemWithIcon(
             id = R.id.remove_community,
             title = R.string.remove_community,
-            icon = R.drawable.baseline_remove_24,
+            icon = R.drawable.baseline_remove_circle_outline_24,
           )
         }
         if (communityModState.isHidden) {
@@ -704,12 +733,14 @@ class ModActionsDialogFragment :
 
       adapter?.addDividerIfNeeded()
 
-      adapter?.addItemWithIcon(
-        id = R.id.purge_user,
-        title = R.string.purge_user,
-        icon = R.drawable.outline_person_remove_24,
-        modifier = BottomMenu.ModifierIds.DANGER,
-      )
+      if (personId != -1L) {
+        adapter?.addItemWithIcon(
+          id = R.id.purge_user,
+          title = R.string.purge_user,
+          icon = R.drawable.outline_person_remove_24,
+          modifier = BottomMenu.ModifierIds.DANGER,
+        )
+      }
 
       if (data.modStates.any { it is PostModState }) {
         adapter?.addItemWithIcon(

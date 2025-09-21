@@ -5,5 +5,4 @@ data class GetReplies(
   val page: Int? = null,
   val limit: Int? = null,
   val unread_only: Boolean? = null,
-  val auth: String,
 )

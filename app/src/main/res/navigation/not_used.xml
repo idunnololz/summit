@@ -127,11 +127,17 @@ safeargs.
             app:argType="long" />
         <argument
             android:name="community_instance"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true" />
         <argument
             android:name="accountId"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="communityRef"
+            app:argType="com.idunnololz.summit.lemmy.CommunityRef$CommunityRefByName"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </dialog>
     <dialog
         android:id="@+id/multiCommunityEditorDialogFragment"
@@ -261,6 +267,10 @@ safeargs.
         <argument
             android:name="modAction"
             app:argType="com.idunnololz.summit.lemmy.mod.ModActionWithReasonDialogFragment$ModActionWithReason" />
+        <argument
+            android:name="body"
+            app:argType="string"
+            app:nullable="true" />
     </dialog>
     <dialog
         android:id="@+id/receiveFileDialogFragment"

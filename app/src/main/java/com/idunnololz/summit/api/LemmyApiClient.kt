@@ -567,7 +567,6 @@ class LemmyApiClient @Inject constructor(
     val form = CreateCommentLike(
       comment_id = commentId,
       score = score,
-      auth = account.jwt,
     )
 
     onApiClient { getApi().likeComment(authorization = account.bearer, form) }
@@ -618,7 +617,6 @@ class LemmyApiClient @Inject constructor(
     val form = FollowCommunity(
       community_id = communityId,
       follow = follow,
-      auth = account.jwt,
     )
 
     onApiClient { getApi().followCommunity(authorization = account.bearer, form) }
@@ -641,7 +639,6 @@ class LemmyApiClient @Inject constructor(
       remove_data = removeData,
       reason = reason,
       expires = expiresTs,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -709,7 +706,6 @@ class LemmyApiClient @Inject constructor(
     languageId: Int?,
   ): Result<CommentView> {
     val form = CreateComment(
-      auth = account.jwt,
       content = content,
       post_id = postId,
       parent_id = parentId,
@@ -728,7 +724,6 @@ class LemmyApiClient @Inject constructor(
     languageId: Int?,
   ): Result<CommentView> {
     val form = EditComment(
-      auth = account.jwt,
       content = content,
       comment_id = commentId,
       language_id = languageId,
@@ -741,7 +736,6 @@ class LemmyApiClient @Inject constructor(
 
   suspend fun deleteComment(account: Account, commentId: CommentId): Result<CommentView> {
     val form = DeleteComment(
-      auth = account.jwt,
       comment_id = commentId,
       deleted = true,
     )
@@ -768,7 +762,6 @@ class LemmyApiClient @Inject constructor(
       url = url,
       body = body,
       nsfw = isNsfw,
-      auth = account.jwt,
       custom_thumbnail = thumbnailUrl,
       alt_text = altText,
       language_id = languageId,
@@ -796,7 +789,6 @@ class LemmyApiClient @Inject constructor(
       url = url,
       body = body,
       nsfw = isNsfw,
-      auth = account.jwt,
       custom_thumbnail = thumbnailUrl,
       alt_text = altText,
       language_id = languageId,
@@ -811,7 +803,6 @@ class LemmyApiClient @Inject constructor(
     val form = DeletePost(
       post_id = id,
       deleted = delete,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -829,7 +820,6 @@ class LemmyApiClient @Inject constructor(
       post_id = id,
       featured = featured,
       feature_type = featureType,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -841,7 +831,6 @@ class LemmyApiClient @Inject constructor(
     val form = LockPost(
       post_id = id,
       locked = locked,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -859,7 +848,6 @@ class LemmyApiClient @Inject constructor(
       post_id = id,
       removed = removed,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -905,7 +893,6 @@ class LemmyApiClient @Inject constructor(
     val form = BlockCommunity(
       community_id = communityId,
       block = block,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -921,7 +908,6 @@ class LemmyApiClient @Inject constructor(
     val form = BlockPerson(
       person_id = personId,
       block = block,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -937,7 +923,7 @@ class LemmyApiClient @Inject constructor(
     val form = BlockInstance(
       instance_id = instanceId,
       block = block,
-      auth = account.jwt,
+
     )
 
     return onApiClient {
@@ -959,7 +945,7 @@ class LemmyApiClient @Inject constructor(
     val form = GetPersonDetails(
       person_id = personId,
       username = name,
-      auth = account?.jwt,
+
       page = page,
       limit = limit,
       sort = sort,
@@ -982,7 +968,6 @@ class LemmyApiClient @Inject constructor(
       new_password = newPassword,
       new_password_verify = newPasswordVerify,
       old_password = oldPassword,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1003,7 +988,6 @@ class LemmyApiClient @Inject constructor(
       page = page,
       limit = limit,
       unread_only = unreadOnly,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1045,7 +1029,6 @@ class LemmyApiClient @Inject constructor(
       page = page,
       limit = limit,
       creator_id = senderId,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1084,7 +1067,6 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
       unresolved_only = unresolvedOnly,
       community_id = null,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1098,7 +1080,6 @@ class LemmyApiClient @Inject constructor(
     account: Account,
   ): Result<PrivateMessageReportResponse> {
     val form = CreatePrivateMessageReport(
-      auth = account.jwt,
       private_message_id = privateMessageId,
       reason = reason,
     )
@@ -1114,7 +1095,6 @@ class LemmyApiClient @Inject constructor(
     account: Account,
   ): Result<PrivateMessageReportResponse> {
     val form = ResolvePrivateMessageReport(
-      auth = account.jwt,
       report_id = reportId,
       resolved = resolved,
     )
@@ -1130,7 +1110,6 @@ class LemmyApiClient @Inject constructor(
     account: Account,
   ): Result<PostReportResponse> {
     val form = ResolvePostReport(
-      auth = account.jwt,
       report_id = reportId,
       resolved = resolved,
     )
@@ -1152,7 +1131,6 @@ class LemmyApiClient @Inject constructor(
       limit = limit,
       unresolved_only = unresolvedOnly,
       community_id = null,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1166,7 +1144,6 @@ class LemmyApiClient @Inject constructor(
     account: Account,
   ): Result<CommentReportResponse> {
     val form = ResolveCommentReport(
-      auth = account.jwt,
       report_id = reportId,
       resolved = resolved,
     )
@@ -1238,7 +1215,6 @@ class LemmyApiClient @Inject constructor(
     val form = CreatePrivateMessage(
       content = content,
       recipient_id = recipient,
-      auth = account.jwt,
     )
     return onApiClient {
       getApi().createPrivateMessage(authorization = account.bearer, form)
@@ -1304,7 +1280,6 @@ class LemmyApiClient @Inject constructor(
   suspend fun resolveObject(q: String, account: Account): Result<ResolveObjectResponse> {
     val form = ResolveObject(
       q = q,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1326,7 +1301,6 @@ class LemmyApiClient @Inject constructor(
       remove_data = removeData,
       reason = reason,
       expires = expiresTs,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1344,7 +1318,6 @@ class LemmyApiClient @Inject constructor(
       community_id = communityId,
       removed = remove,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1362,7 +1335,6 @@ class LemmyApiClient @Inject constructor(
       community_id = communityId,
       hidden = hide,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1378,7 +1350,6 @@ class LemmyApiClient @Inject constructor(
     val form = PurgePerson(
       person_id = personId,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1394,7 +1365,6 @@ class LemmyApiClient @Inject constructor(
     val form = PurgeCommunity(
       community_id = communityId,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1410,7 +1380,6 @@ class LemmyApiClient @Inject constructor(
     val form = PurgePost(
       post_id = postId,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1426,7 +1395,6 @@ class LemmyApiClient @Inject constructor(
     val form = PurgeComment(
       comment_id = commentId,
       reason = reason,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1460,7 +1428,7 @@ class LemmyApiClient @Inject constructor(
       other_person_id = otherPersonId,
       post_id = post_id,
       comment_id = comment_id,
-      auth = account?.jwt,
+
     )
 
     return onApiClient {
@@ -1472,9 +1440,7 @@ class LemmyApiClient @Inject constructor(
     account: Account,
     force: Boolean,
   ): Result<GetUnreadRegistrationApplicationCountResponse> {
-    val form = GetUnreadRegistrationApplicationCount(
-      auth = account.jwt,
-    )
+    val form = GetUnreadRegistrationApplicationCount()
 
     return onApiClient {
       getApi().getRegistrationApplicationsCount(authorization = account.bearer, form, force = force)
@@ -1492,7 +1458,6 @@ class LemmyApiClient @Inject constructor(
       page = page,
       limit = limit,
       unread_only = unreadOnly,
-      auth = account.jwt,
     )
 
     return onApiClient {
@@ -1510,7 +1475,6 @@ class LemmyApiClient @Inject constructor(
       id = applicationId,
       approve = approve,
       deny_reason = denyReason,
-      auth = account.jwt,
     )
 
     return onApiClient {

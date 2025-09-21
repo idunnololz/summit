@@ -1437,31 +1437,29 @@ class PostAndCommentViewBuilder @Inject constructor(
     val isMessageItem = item is InboxItem.MessageInboxItem
 
     b.author.text = buildSpannedString {
-      run {
-        val s = length
-        appendLink(
-          if (isMessageItem) {
-            context.getString(R.string.message_from_format, item.authorName)
-          } else {
-            item.authorName
-          },
-          LinkUtils.getLinkForPerson(item.authorInstance, item.authorName),
-          underline = false,
-        )
-        val e = length
-        setSpan(
-          ForegroundColorSpan(normalTextColor),
-          s,
-          e,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-        setSpan(
-          StyleSpan(Typeface.BOLD),
-          s,
-          e,
-          Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-        )
-      }
+      val s = length
+      appendLink(
+        if (isMessageItem) {
+          context.getString(R.string.message_from_format, item.authorName)
+        } else {
+          item.authorName
+        },
+        LinkUtils.getLinkForPerson(item.authorInstance, item.authorName),
+        underline = false,
+      )
+      val e = length
+      setSpan(
+        ForegroundColorSpan(normalTextColor),
+        s,
+        e,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
+      setSpan(
+        StyleSpan(Typeface.BOLD),
+        s,
+        e,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
     }
     b.author.movementMethod = CustomLinkMovementMethod().apply {
       onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)

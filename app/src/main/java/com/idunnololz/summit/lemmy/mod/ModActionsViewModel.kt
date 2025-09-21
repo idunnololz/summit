@@ -9,6 +9,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.PersonId
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -38,7 +39,7 @@ class ModActionsViewModel @Inject constructor(
       val isBannedFromSite: Boolean,
     ) : ModState
     data class CommunityModState(
-      val isMod: Boolean,
+      val isMod: Boolean?,
       val isRemoved: Boolean,
       val isHidden: Boolean,
     ) : ModState
@@ -49,11 +50,14 @@ class ModActionsViewModel @Inject constructor(
   }
 
   data class FullModState(
+    val communityId: Int,
     val modStates: List<ModState>,
   )
 
   val currentAccount
     get() = apiClient.accountForInstance()
+  val instance
+    get() = apiClient.instance
   val currentModState = StatefulLiveData<FullModState>()
 
   var person: Person? = null
@@ -73,11 +77,24 @@ class ModActionsViewModel @Inject constructor(
     postId: Int,
     commentId: Int,
     personId: PersonId,
+    communityRef: CommunityRef.CommunityRefByName?,
     force: Boolean = false,
   ) {
     currentModState.setIsLoading()
 
     viewModelScope.launch {
+      val communityId = if (communityId != -1) {
+        communityId
+      } else if (communityRef != null) {
+        apiClient.fetchCommunityWithRetry(Either.Right(communityRef.fullName), force = false)
+          .getOrNull()
+          ?.community_view
+          ?.community
+          ?.id
+          ?: -1
+      } else {
+        -1
+      }
       val communityJob = if (communityId != -1) {
         async {
           apiClient.fetchCommunityWithRetry(Either.Left(communityId), force)
@@ -186,7 +203,11 @@ class ModActionsViewModel @Inject constructor(
       if (communityResult != null) {
         allModState +=
           ModState.CommunityModState(
-            isMod = communityResult.moderators.any { it.moderator.id == personId },
+            isMod = if (personId == -1L) {
+              null
+            } else {
+              communityResult.moderators.any { it.moderator.id == personId }
+            },
             isRemoved = communityResult.community_view.community.removed,
             isHidden = communityResult.community_view.community.hidden,
           )
@@ -200,7 +221,10 @@ class ModActionsViewModel @Inject constructor(
           )
       }
 
-      currentModState.postValue(FullModState(allModState))
+      currentModState.postValue(FullModState(
+        communityId,
+        allModState
+      ))
     }
   }
 }

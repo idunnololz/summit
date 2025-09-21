@@ -93,9 +93,27 @@ sealed interface AdvancedLink {
 
 fun SummitActivity.showMoreLinkOptions(url: String, text: String?) {
   showAdvancedLinkOptions(
-    url,
-    moreActionsHelper,
-    supportFragmentManager,
-    text,
+    url = url,
+    moreActionsHelper = moreActionsHelper,
+    fragmentManager = supportFragmentManager,
+    textOrFileName = text,
+  )
+}
+
+fun SummitActivity.showMoreLinkOptions(person: PersonRef.PersonRefByName, text: String?) {
+  showAdvancedLinkOptions(
+    url = LinkUtils.getLinkForPerson(person),
+    moreActionsHelper = moreActionsHelper,
+    fragmentManager = supportFragmentManager,
+    textOrFileName = text,
+  )
+}
+
+fun SummitActivity.showMoreLinkOptions(person: PersonRef.PersonRefComplete, text: String?) {
+  showAdvancedLinkOptions(
+    url = LinkUtils.getLinkForPerson(person),
+    moreActionsHelper = moreActionsHelper,
+    fragmentManager = supportFragmentManager,
+    textOrFileName = text,
   )
 }

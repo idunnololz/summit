@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.community
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -553,6 +554,8 @@ class PostListAdapter(
   fun refreshItems(animate: Boolean) {
     val newItems = postListEngine.items
     val oldItems = items
+
+    Log.d("HAHA", "refreshItems. page: ${postListEngine.currentPageIndex.value}")
 
     val diff = DiffUtil.calculateDiff(
       object : DiffUtil.Callback() {

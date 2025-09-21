@@ -105,13 +105,15 @@ class CommunityViewModel @Inject constructor(
     val isReadPostUpdate: Boolean = false,
     val scrollToTop: Boolean = false,
     val hideReadCount: Int? = null,
+
+    // Only used for non-infinity
+    val scrollToSavedPosition: Boolean = false,
   )
 
   private val postsRepository = postsRepositoryFactory.create(state)
   private var pagePositions = arrayListOf<PageScrollState>()
 
   val currentCommunityRef = state.getLiveData<CommunityRef?>("currentCommunityRef")
-  val currentPageIndex = MutableLiveData(0)
   private val communityRefChangeObserver = Observer<CommunityRef?> {
     it ?: return@Observer
 
@@ -158,11 +160,12 @@ class CommunityViewModel @Inject constructor(
   var preferences: Preferences = preferenceManager.currentPreferences
 
   private var fetchingPages = mutableSetOf<Int>()
-  var postListEngine = postListEngineFactory.create(
+  val postListEngine = postListEngineFactory.create(
     infinity = preferences.infinity,
     autoLoadMoreItems = preferences.autoLoadMorePosts,
     usePageIndicators = preferences.infinityPageIndicator,
   )
+  val currentPageIndex = postListEngine.currentPageIndex.asLiveData()
 
   val infinity: Boolean
     get() = postListEngine.infinity
@@ -218,7 +221,7 @@ class CommunityViewModel @Inject constructor(
 
     viewModelScope.launch {
       accountManager.currentAccount.collect {
-        val accountView = if (it != null && it is Account) {
+        val accountView = if (it is Account) {
           accountInfoManager.getAccountViewForAccount(it)
         } else {
           null
@@ -333,29 +336,49 @@ class CommunityViewModel @Inject constructor(
   }
 
   fun fetchPrevPage(force: Boolean = false) {
-    val pageIndex = requireNotNull(currentPageIndex.value)
-    if (pageIndex == 0) {
-      return
-    }
-
-    if (!postListEngine.infinity) {
-      currentPageIndex.value = pageIndex - 1
-    }
-    fetchPageInternal(pageIndex - 1, force)
+    loadPageRelativeNoInfinity(direction = -1, force = force, clearPagePosition = false)
   }
 
   fun fetchNextPage(force: Boolean = false, clearPagePosition: Boolean) {
-    val pageIndex = requireNotNull(currentPageIndex.value)
+    loadPageRelativeNoInfinity(direction = 1, force = force, clearPagePosition = clearPagePosition)
+  }
+
+  private fun loadPageRelativeNoInfinity(direction: Int, force: Boolean, clearPagePosition: Boolean) {
+    if (postListEngine.infinity) return
+
+    loadPageIndexNoInfinity(postListEngine.currentPageIndex.value + direction, force, clearPagePosition)
+  }
+
+  fun loadPageIndexNoInfinity(
+    pageIndex: Int,
+    force: Boolean,
+    clearPagePosition: Boolean
+  ) {
+    if (postListEngine.infinity) return
+
+    postListEngine.setPageIndex(pageIndex)
 
     if (clearPagePosition) {
-      pagePositions = ArrayList(pagePositions.take(pageIndex + 1))
+      pagePositions = ArrayList(pagePositions.take(postListEngine.currentPageIndex.value))
     }
 
-    if (!postListEngine.infinity) {
-      currentPageIndex.value = pageIndex + 1
+    if (force || !postListEngine.isCurrentPageLoaded()) {
+      postListEngine.purgeCurrentPageAndBeyond()
+      fetchPageInternal(
+        pageToFetch = postListEngine.currentPageIndex.value,
+        force = force,
+        scrollToTop = clearPagePosition,
+      )
+    } else {
+      postListEngine.createItems()
+      loadedPostsData.postValue(
+        PostUpdateInfo(
+          scrollToTop = clearPagePosition,
+          hideReadCount = null,
+          scrollToSavedPosition = !clearPagePosition,
+        ),
+      )
     }
-
-    fetchPageInternal(pageIndex + 1, force)
   }
 
   fun fetchPage(
@@ -365,16 +388,19 @@ class CommunityViewModel @Inject constructor(
     scrollToTop: Boolean = false,
     includeHideReadCount: Boolean = false,
   ) {
-    if (!postListEngine.infinity) {
-      currentPageIndex.value = pageIndex
+    postListEngine.setPageIndex(pageIndex)
+
+    if (!infinity) {
+      loadPageIndexNoInfinity(pageIndex = pageIndex, force = force, clearPagePosition = true)
+    } else {
+      fetchPageInternal(
+        pageToFetch = pageIndex,
+        force = force,
+        clearPagesOnSuccess = clearPagesOnSuccess,
+        scrollToTop = scrollToTop,
+        includeHideReadCount = includeHideReadCount,
+      )
     }
-    fetchPageInternal(
-      pageToFetch = pageIndex,
-      force = force,
-      clearPagesOnSuccess = clearPagesOnSuccess,
-      scrollToTop = scrollToTop,
-      includeHideReadCount = includeHideReadCount,
-    )
   }
 
   fun fetchInitialPage(
@@ -447,11 +473,20 @@ class CommunityViewModel @Inject constructor(
       }
       return
     }
-    pages.forEach {
-      fetchPageInternal(
-        pageToFetch = it,
+
+    if (postListEngine.infinity) {
+      pages.forEach {
+        fetchPageInternal(
+          pageToFetch = it,
+          force = force,
+          scrollToTop = scrollToTop,
+        )
+      }
+    } else {
+      loadPageIndexNoInfinity(
+        pageIndex = postListEngine.currentPageIndex.value,
         force = force,
-        scrollToTop = scrollToTop,
+        clearPagePosition = false,
       )
     }
   }
@@ -489,15 +524,15 @@ class CommunityViewModel @Inject constructor(
 
     fetchPageJob = viewModelScope.launch(Dispatchers.Default) {
       val result = postsRepository.getPage(
-        pageToFetch,
-        force,
+        pageIndex = pageToFetch,
+        force = force,
       )
 
       result
         .onSuccess {
           val pageData =
             LoadedPostsData(
-              accountKey = accountManager.currentAccount.value?.key,
+              accountKey = accountManager.currentAccount.value.key,
               allPosts = it.posts,
               posts = it.posts,
               instance = it.instance,
@@ -533,7 +568,7 @@ class CommunityViewModel @Inject constructor(
           postListEngine.setPersistentErrors(postsRepository.persistentErrors)
           postListEngine.addPage(
             LoadedPostsData(
-              accountKey = accountManager.currentAccount.value?.key,
+              accountKey = accountManager.currentAccount.value.key,
               allPosts = listOf(),
               posts = listOf(),
               instance = postsRepository.apiInstance,
@@ -752,8 +787,19 @@ class CommunityViewModel @Inject constructor(
     if (currentCommunityRef.value != state.communityState.communityRef) {
       currentCommunityRef.value = state.communityState.communityRef
     }
-    currentPageIndex.value = state.communityState.currentPageIndex
+    postListEngine.setPageIndex(state.communityState.currentPageIndex)
     pagePositions = ArrayList(state.pageScrollStates)
+
+    viewModelScope.launch {
+      delay(1000)
+
+      // "warm up" posts repository
+      // if we do not "warm it up" and force fetch the next page then we will have to force fetch
+      // all pages (eg. if we are on page 20, then we need to force fetch pages 1 to 21)
+      // if we warm up the repository, then it will cause pages 1 to 20 to cache so we will only
+      // need to force fetch page 21.
+      postsRepository.getPage(pageIndex = state.communityState.currentPageIndex)
+    }
   }
 
   fun getSharedLinkForCurrentPage(): String? = createState()?.toUrl(apiInstance)
@@ -879,7 +925,7 @@ class CommunityViewModel @Inject constructor(
     postListEngine.setPersistentErrors(postsRepository.persistentErrors)
     postListEngine.addPage(
       LoadedPostsData(
-        accountKey = accountManager.currentAccount.value?.key,
+        accountKey = accountManager.currentAccount.value.key,
         allPosts = listOf(),
         posts = listOf(),
         instance = postsRepository.apiInstance,
@@ -890,7 +936,6 @@ class CommunityViewModel @Inject constructor(
       ),
     )
     loadedPostsData.setValue(PostUpdateInfo())
-    currentPageIndex.value = 0
     setPagePositionAtTop(0)
     fetchCurrentPage(
       resetHideRead = resetHideRead,
@@ -960,7 +1005,7 @@ class CommunityViewModel @Inject constructor(
 
     val anchorPosts = if (anchors.isNullOrEmpty()) {
       postListEngine.getPostsCloseBy()
-        .mapTo(mutableSetOf<Int>()) { it.postView.post.id }
+        .mapTo(mutableSetOf()) { it.postView.post.id }
     } else {
       anchors
     }
@@ -968,9 +1013,9 @@ class CommunityViewModel @Inject constructor(
     viewModelScope.launch {
       postsRepository
         .updateStateMaintainingPosition(
-          changeState,
-          anchorPosts,
-          postListEngine.biggestPageIndex ?: 0,
+          performChanges = changeState,
+          anchors = anchorPosts,
+          maxPage = postListEngine.biggestPageIndex ?: 0,
         )
         .onSuccess {
           val position = it.posts.indexOfFirst {
@@ -991,7 +1036,7 @@ class CommunityViewModel @Inject constructor(
             postListEngine.clear()
             for (index in 0..it.pageIndex) {
               fetchPageInternal(
-                index,
+                pageToFetch = index,
                 force = false,
                 scrollToTop = scrollToTop,
                 includeHideReadCount = includeHideReadCount,
@@ -999,7 +1044,7 @@ class CommunityViewModel @Inject constructor(
             }
           } else {
             fetchPageInternal(
-              it.pageIndex,
+              pageToFetch = it.pageIndex,
               force = false,
               includeHideReadCount = includeHideReadCount,
             )

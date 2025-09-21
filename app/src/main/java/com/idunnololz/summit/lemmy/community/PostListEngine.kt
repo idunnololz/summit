@@ -25,6 +25,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 sealed interface PostListEngineItem {
@@ -127,6 +128,8 @@ class PostListEngine @AssistedInject constructor(
 
   private val coroutineScope = coroutineScopeFactory.create()
 
+  val currentPageIndex = MutableStateFlow<Int>(0)
+
   var infinity: Boolean = infinity
     set(value) {
       if (value == field) return
@@ -196,7 +199,7 @@ class PostListEngine @AssistedInject constructor(
 
     isRestored = true
 
-    val currentAccountKey = accountManager.currentAccount.value?.key
+    val currentAccountKey = accountManager.currentAccount.value.key
     Log.d(TAG, "Attempting to restore. Using keys $key, $secondaryKey, $currentAccountKey")
     val cachedPages = directoryHelper.getPages(key, secondaryKey)
 
@@ -204,13 +207,17 @@ class PostListEngine @AssistedInject constructor(
       return
     }
 
-    cachedPages?.let {
+    cachedPages.let {
       // We need to use let here because Google's lint rule doesn't support smart cast
       Log.d(
         TAG,
         "Restoration successful! Restored ${cachedPages.size} page(s) totalling " +
           "${it.sumOf { it.posts.size }} posts.",
       )
+
+      if (!infinity) {
+        currentPageIndex.value = it.maxOf { it.pageIndex }
+      }
 
       _pages = it
     }
@@ -223,20 +230,16 @@ class PostListEngine @AssistedInject constructor(
   }
 
   fun addPage(data: LoadedPostsData) {
-    if (infinity) {
-      val pages = pages.toMutableList()
-      val pageIndexInPages = pages.indexOfFirst { it.dedupingKey == data.dedupingKey }
-      if (pageIndexInPages != -1) {
-        // replace!
-        pages[pageIndexInPages] = data
-      } else {
-        pages.add(data)
-      }
-      pages.sortBy { it.pageIndex }
-      _pages = pages
+    val pages = pages.toMutableList()
+    val pageIndexInPages = pages.indexOfFirst { it.dedupingKey == data.dedupingKey }
+    if (pageIndexInPages != -1) {
+      // replace!
+      pages[pageIndexInPages] = data
     } else {
-      _pages = listOf(data)
+      pages.add(data)
     }
+    pages.sortBy { it.pageIndex }
+    _pages = pages
 
     coroutineScope.launch(Dispatchers.IO) {
       directoryHelper.addPage(key, secondaryKey, data, pages.size)
@@ -251,6 +254,13 @@ class PostListEngine @AssistedInject constructor(
     val context = ContextCompat.getContextForLanguage(context)
 
     Log.d(TAG, "createItems()")
+    Log.d("HAHA", "createItems(): ${currentPageIndex.value}", RuntimeException())
+
+    val pages = if (infinity) {
+      pages
+    } else {
+      listOfNotNull(pages.getOrNull(currentPageIndex.value))
+    }
 
     if (pages.isEmpty()) {
       _items = listOf()
@@ -338,6 +348,9 @@ class PostListEngine @AssistedInject constructor(
         items += PostListEngineItem.FooterSpacerItem
       }
     } else {
+      if (!lastPage.hasMore && lastPage.posts.isEmpty()) {
+        items.add(PostListEngineItem.EndItem)
+      }
       items.add(
         PostListEngineItem.FooterItem(
           hasMore = lastPage.hasMore,
@@ -474,6 +487,7 @@ class PostListEngine @AssistedInject constructor(
     coroutineScope.launch(Dispatchers.IO) {
       directoryHelper.clearPages(key, secondaryKey)
     }
+    currentPageIndex.value = 0
   }
 
   fun getPostsCloseBy(): MutableList<FetchedPost> {
@@ -583,5 +597,35 @@ class PostListEngine @AssistedInject constructor(
 
   fun unfilter(postId: PostId) {
     unfilteredItems.add(postId)
+  }
+
+  fun setPageRelative(direction: Int) {
+    if (infinity) return
+
+    setPageIndex(currentPageIndex.value + direction)
+  }
+
+  fun setPageIndex(pageIndex: Int) {
+    if (infinity) return
+
+    val newPageIndex = pageIndex
+
+    if (newPageIndex < 0) return
+
+    currentPageIndex.value = newPageIndex
+  }
+
+  fun isCurrentPageLoaded(): Boolean {
+    if (infinity) return true
+
+    val currentPageIndex = currentPageIndex.value
+    return _pages.any { it.pageIndex == currentPageIndex }
+  }
+
+  fun purgeCurrentPageAndBeyond() {
+    if (infinity) return
+
+    val currentPageIndex = currentPageIndex.value
+    _pages = pages.filter { it.pageIndex < currentPageIndex }
   }
 }

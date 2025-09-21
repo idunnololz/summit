@@ -195,7 +195,7 @@ class MainFragment :
           if (currentFragment.isPristineFirstPage()) {
             resetCurrentTab(tab)
           } else {
-            currentFragment.scrollToTop()
+            currentFragment.backToBeginning()
           }
         } else {
           resetCurrentTab(tab)

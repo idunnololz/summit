@@ -7,5 +7,4 @@ data class BanFromCommunity(
   val remove_data: Boolean? = null,
   val reason: String? = null,
   val expires: Long? = null,
-  val auth: String,
 )

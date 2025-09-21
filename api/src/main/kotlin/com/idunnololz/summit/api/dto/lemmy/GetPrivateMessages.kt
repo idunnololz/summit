@@ -5,5 +5,4 @@ data class GetPrivateMessages(
   val page: Int? = null,
   val limit: Int? = null,
   val creator_id: PersonId? = null,
-  val auth: String,
 )

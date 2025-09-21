@@ -19,6 +19,7 @@ import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
+import androidx.room.Embedded
 import arrow.core.Either
 import coil3.Image
 import coil3.dispose
@@ -392,6 +393,88 @@ class LemmyContentHelper(
       }
     }
 
+    fun insertAndLoadVideo(embeddedVideo: Boolean) {
+      val containerView = getAndEnsureView<View>(
+        if (embeddedVideo) {
+          R.layout.full_content_embedded_video_view
+        } else {
+          R.layout.full_content_video_view
+        }
+      )
+      val playerView = containerView.findViewById<CustomPlayerView>(R.id.player_view)
+
+      customPlayerView = playerView
+
+      val videoInfo = postView.getVideoInfo(embedded = embeddedVideo)
+
+      if (videoInfo == null) {
+        playerView.visibility = View.GONE
+        return
+      }
+
+      val urlWithoutParams = videoInfo.videoUrl.split("?").getOrElse(0) { "" }
+      val videoType = getVideoType(urlWithoutParams)
+
+      if (videoType == VideoType.Unknown) {
+        playerView.visibility = View.GONE
+        return
+      }
+
+      val bestSize = LemmyUtils.calculateBestVideoSize(
+        context,
+        videoInfo,
+        availableH = videoViewMaxHeight,
+      )
+      if (bestSize.y > 0) {
+        containerView.layoutParams = containerView.layoutParams.apply {
+          height = bestSize.y
+        }
+        playerView.layoutParams = playerView.layoutParams.apply {
+          height = bestSize.y
+        }
+      } else {
+        containerView.layoutParams = containerView.layoutParams.apply {
+          height = WRAP_CONTENT
+        }
+        playerView.layoutParams = playerView.layoutParams.apply {
+          height = WRAP_CONTENT
+        }
+      }
+      rootView.requestLayout()
+
+      playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
+        onVideoLongClickListener(videoInfo.videoUrl)
+      }
+      playerView.setFullscreenButtonClickListener {
+        onVideoClickListener(
+          videoInfo.videoUrl,
+          videoType,
+          customPlayerView?.getVideoState()?.let {
+            it.copy(
+              currentTime = it.currentTime -
+                ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS,
+            )
+          },
+        )
+      }
+      playerView.minimumHeight = (imageMaxWidth * 0.6f).toInt()
+
+      playerView.setup()
+
+      playerView.player = null
+      playerView.setPlayerWithPreferences(
+        getExoPlayerManager().getPlayerForUrl(
+          url = videoInfo.videoUrl,
+          videoType = videoType,
+          videoState = videoState,
+          isInline = true,
+          autoPlay = autoPlayVideos,
+        ),
+        videoState,
+        preferences,
+      )
+    }
+
     if (!lazyUpdate) {
       val postType = postView.getType()
       when (postType) {
@@ -402,78 +485,17 @@ class LemmyContentHelper(
           )
         }
         PostType.Video -> {
-          val containerView = getAndEnsureView<View>(R.layout.full_content_video_view)
-          val playerView = containerView.findViewById<CustomPlayerView>(R.id.player_view)
-
-          customPlayerView = playerView
-
-          val videoInfo = postView.getVideoInfo()
-          if (videoInfo != null) {
-            val urlWithoutParams = videoInfo.videoUrl.split("?").getOrElse(0) { "" }
-            val videoType = getVideoType(urlWithoutParams)
-
-            val bestSize = LemmyUtils.calculateBestVideoSize(
-              context,
-              videoInfo,
-              availableH = videoViewMaxHeight,
-            )
-            if (bestSize.y > 0) {
-              containerView.layoutParams = containerView.layoutParams.apply {
-                height = bestSize.y
-              }
-              playerView.layoutParams = playerView.layoutParams.apply {
-                height = bestSize.y
-              }
-            } else {
-              containerView.layoutParams = containerView.layoutParams.apply {
-                height = WRAP_CONTENT
-              }
-              playerView.layoutParams = playerView.layoutParams.apply {
-                height = WRAP_CONTENT
-              }
-            }
-            rootView.requestLayout()
-
-            playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
-              onVideoLongClickListener(videoInfo.videoUrl)
-            }
-            playerView.setFullscreenButtonClickListener {
-              onVideoClickListener(
-                videoInfo.videoUrl,
-                videoType,
-                customPlayerView?.getVideoState()?.let {
-                  it.copy(
-                    currentTime = it.currentTime -
-                      ExoPlayerManager.CONVENIENCE_REWIND_TIME_MS,
-                  )
-                },
-              )
-            }
-            playerView.minimumHeight = (imageMaxWidth * 0.6f).toInt()
-
-            playerView.setup()
-
-            playerView.player = null
-            playerView.setPlayerWithPreferences(
-              getExoPlayerManager().getPlayerForUrl(
-                url = videoInfo.videoUrl,
-                videoType = videoType,
-                videoState = videoState,
-                isInline = true,
-                autoPlay = autoPlayVideos,
-              ),
-              videoState,
-              preferences,
-            )
-          } else {
-            playerView.visibility = View.GONE
-          }
+          insertAndLoadVideo(embeddedVideo = false)
         }
         PostType.Text, PostType.Link -> {
           if (thumbnailUrl != null && isThumbnailUrlValid) {
             insertAndLoadFullImage(thumbnailUrl)
           }
         }
+      }
+
+      if (postView.getVideoInfo(embedded = true) != null) {
+        insertAndLoadVideo(embeddedVideo = true)
       }
 
       if (!postView.post.body.isNullOrBlank() && showText) {
@@ -496,20 +518,17 @@ class LemmyContentHelper(
         }
       }
 
-      if ((
+      if (showLink) {
+        if (
           alwaysShowLinkBelowPost ||
-            postType == PostType.Link ||
-            postType == PostType.Text
-          ) &&
-        showLink
-      ) {
-        val embedVideoUrl = postView.post.embed_video_url
-        if (embedVideoUrl != null) {
-          appendUiForExternalOrInternalUrl(embedVideoUrl)
-        } else if (postUrl != null &&
-          (thumbnailUrl != postUrl || !isThumbnailUrlValid)
+          postType == PostType.Link ||
+          postType == PostType.Text
         ) {
-          appendUiForExternalOrInternalUrl(postUrl)
+          if (postUrl != null &&
+            (thumbnailUrl != postUrl || !isThumbnailUrlValid)
+          ) {
+            appendUiForExternalOrInternalUrl(postUrl)
+          }
         }
       }
     }

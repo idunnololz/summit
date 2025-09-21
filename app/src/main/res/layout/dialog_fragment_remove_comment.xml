@@ -20,6 +20,21 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0"/>
 
+
+    <TextView
+        android:id="@+id/body"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/dialog_padding"
+        android:paddingHorizontal="@dimen/dialog_padding"
+        android:text="@string/remove_comment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"/>
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/reason"
         android:layout_width="match_parent"
@@ -29,7 +44,7 @@
         android:layout_marginTop="@dimen/padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title">
+        app:layout_constraintTop_toBottomOf="@+id/body">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/reason_edit_text"
@@ -45,6 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dialog_padding"
         android:layout_marginBottom="@dimen/padding_half"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintTop_toBottomOf="@+id/reason"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -57,6 +73,7 @@
         android:text="@android:string/cancel"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginBottom="@dimen/padding_half"
+        android:layout_marginTop="@dimen/padding_half"
         app:layout_constraintTop_toBottomOf="@+id/reason"
         app:layout_constraintEnd_toStartOf="@+id/positive_button"
         app:layout_constraintBottom_toBottomOf="parent"/>

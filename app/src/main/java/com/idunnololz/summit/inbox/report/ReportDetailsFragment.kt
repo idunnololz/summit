@@ -158,56 +158,16 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
       }
 
       setupToolbar(toolbar, title)
+      toolbar.subtitle = getString(R.string.by_format, reportItem.getReporterName())
+      toolbar.setOnClickListener {
+        getMainActivity()?.launchPage(reportItem.creator.toPersonRef())
+      }
+      toolbar.setOnLongClickListener {
+        getSummitActivity()?.showMoreLinkOptions(reportItem.creator.toPersonRef(), null)
+        true
+      }
       toolbar.setNavigationOnClickListener {
         (parentFragment as? InboxTabbedFragment)?.closeMessage()
-      }
-
-      avatarHelper.loadAvatar(
-        imageView = reporterIcon,
-        person = reportItem.creator,
-      )
-
-      val reportCreatorInstance = reportItem.creator.instance
-      val displayFullName = when (preferences.displayInstanceStyle) {
-        DisplayInstanceOptions.NeverDisplayInstance -> {
-          false
-        }
-        DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
-          viewModel.apiInstance != reportCreatorInstance
-        }
-        DisplayInstanceOptions.AlwaysDisplayInstance -> {
-          true
-        }
-        else -> false
-      }
-
-      val sb = SpannableStringBuilder()
-      if (displayFullName) {
-        sb.appendNameWithInstance(
-          context = context,
-          name = if (preferences.preferUserDisplayName) {
-            reportItem.creator.display_name
-              ?: reportItem.creator.name
-          } else {
-            reportItem.creator.name
-          },
-          instance = reportCreatorInstance,
-          url = LinkUtils.getLinkForPerson(reportItem.creator.toPersonRef()),
-        )
-      } else {
-        sb.appendLink(
-          if (preferences.preferUserDisplayName) {
-            reportItem.creator.display_name
-              ?: reportItem.creator.name
-          } else {
-            reportItem.creator.name
-          },
-          url = LinkUtils.getLinkForPerson(reportItem.creator.toPersonRef()),
-        )
-      }
-      reporterName.text = sb
-      reporterView.setOnClickListener {
-        getMainActivity()?.launchPage(reportItem.creator.toPersonRef())
       }
 
       val resolver = reportItem.resolver
@@ -308,6 +268,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           },
           personId = reportItem.reportedPersonId,
           communityInstance = viewModel.apiInstance,
+          communityRef = null,
           fragmentManager = childFragmentManager,
         )
       }
@@ -404,6 +365,50 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         }
       }
     }
+  }
+
+  private fun ReportItem.getReporterName(): SpannableStringBuilder {
+    val context = requireContext()
+    val reportCreatorInstance = this.creator.instance
+    val displayFullName = when (preferences.displayInstanceStyle) {
+      DisplayInstanceOptions.NeverDisplayInstance -> {
+        false
+      }
+      DisplayInstanceOptions.OnlyDisplayNonLocalInstances -> {
+        viewModel.apiInstance != reportCreatorInstance
+      }
+      DisplayInstanceOptions.AlwaysDisplayInstance -> {
+        true
+      }
+      else -> false
+    }
+
+    val sb = SpannableStringBuilder()
+    if (displayFullName) {
+      sb.appendNameWithInstance(
+        context = context,
+        name = if (preferences.preferUserDisplayName) {
+          this.creator.display_name
+            ?: this.creator.name
+        } else {
+          this.creator.name
+        },
+        instance = reportCreatorInstance,
+        url = LinkUtils.getLinkForPerson(this.creator.toPersonRef()),
+      )
+    } else {
+      sb.appendLink(
+        if (preferences.preferUserDisplayName) {
+          this.creator.display_name
+            ?: this.creator.name
+        } else {
+          this.creator.name
+        },
+        url = LinkUtils.getLinkForPerson(this.creator.toPersonRef()),
+      )
+    }
+
+    return sb
   }
 
   private fun updateReportedPersonContext(data: StatefulData<GetPersonDetailsResponse>) {

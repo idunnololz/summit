@@ -103,6 +103,8 @@ class PostsRepository @AssistedInject constructor(
     DefaultSortOrder,
   )
 
+  private var invalidatedPagesStartIndex = Int.MAX_VALUE
+
   init {
     applyPreferences()
   }
@@ -116,9 +118,13 @@ class PostsRepository @AssistedInject constructor(
     anchors: Set<PostId>,
     maxPage: Int,
   ): Result<PageResult> {
+    Log.d(TAG, "updateStateMaintainingPosition() with ${anchors.size} anchors")
+
     reset()
 
     this.performChanges()
+
+    invalidatePagesEqualToAndAbove(0)
 
     var curPage = 0
     while (true) {
@@ -126,7 +132,7 @@ class PostsRepository @AssistedInject constructor(
         break
       }
 
-      val result = getPage(curPage, force = true)
+      val result = getPage(curPage)
       if (result.isFailure) {
         return result
       }
@@ -141,6 +147,7 @@ class PostsRepository @AssistedInject constructor(
         anchors.contains(it.fetchedPost.postView.post.id)
       }
       if (anchorsMatched > 0) {
+        Log.d(TAG, "Anchor found! Returning...")
         return result
       }
 
@@ -148,6 +155,27 @@ class PostsRepository @AssistedInject constructor(
     }
 
     return getPage(0)
+  }
+
+  private fun invalidatePagesEqualToAndAbove(pageIndex: Int) {
+    val minPageInternal = if (pageIndex == 0) {
+      // just delete everything...
+      0
+    } else {
+      val startIndex = pageIndex * postsPerPage
+      val endIndex = startIndex + postsPerPage
+
+      // delete all cached data for the given page
+      val postsToInvalidate = allPosts
+        .slice(startIndex until min(endIndex, allPosts.size))
+
+      postsToInvalidate.minOfOrNull { it.postPageIndexInternal } ?: 0
+    }
+
+    deleteFromPage(minPageInternal)
+
+    invalidatedPagesStartIndex = minPageInternal
+    endReached = false
   }
 
   suspend fun getPage(
@@ -159,13 +187,7 @@ class PostsRepository @AssistedInject constructor(
     val endIndex = startIndex + postsPerPage
 
     if (force) {
-      // delete all cached data for the given page
-      val minPageInternal = allPosts
-        .slice(startIndex until min(endIndex, allPosts.size))
-        .minOfOrNull { it.postPageIndexInternal } ?: 0
-
-      deleteFromPage(minPageInternal)
-      endReached = false
+      invalidatePagesEqualToAndAbove(pageIndex)
     }
 
     var hasMore = true
@@ -437,7 +459,22 @@ class PostsRepository @AssistedInject constructor(
     force: Boolean,
   ): Result<Boolean> {
     val currentDataSource = currentDataSource
-    val newPostResults = currentDataSource.fetchPosts(sortType, pageIndex, force)
+
+    var force = force
+
+    if (pageIndex >= invalidatedPagesStartIndex) {
+      invalidatedPagesStartIndex = pageIndex + 1
+
+      force = true
+    }
+
+    Log.d(TAG, "Fetching page $pageIndex from data source... force = $force")
+
+    val newPostResults = currentDataSource.fetchPosts(
+      sortType = sortType,
+      page = pageIndex,
+      force = force
+    )
     val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
     val account = accountManager.currentAccount.asAccount
 

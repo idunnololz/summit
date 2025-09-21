@@ -60,6 +60,13 @@ class ModActionWithReasonDialogFragment :
         null
       }
 
+      if (args.body == null) {
+        body.visibility = View.GONE
+      } else {
+        body.visibility = View.VISIBLE
+        body.setText(args.body)
+      }
+
       when (modAction) {
         is ModActionWithReason.RemoveComment -> {
           binding.title.setText(R.string.remove_comment)

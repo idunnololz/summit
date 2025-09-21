@@ -2312,6 +2312,7 @@
     <string name="search_in_format">Search in %1$s</string>
     <string name="error_set_community">Error setting community filter.</string>
     <string name="background_color">Background color</string>
+    <string name="by_format">By %1$s</string>
 
 
     <!-- uCrop string resource end -->

@@ -60,6 +60,7 @@ import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
+import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.accountId
@@ -967,6 +968,8 @@ class CommunityFragment :
           }
 
           is StatefulData.Success -> {
+            Log.d("HAHA", "loaded page: ${viewModel.postListEngine.currentPageIndex.value}")
+
             loadingView.hideAll()
 
             val adapter = adapter ?: return@a
@@ -995,13 +998,12 @@ class CommunityFragment :
               listener.resetCache()
 
               if (it.data.scrollToTop) {
-                recyclerView.scrollToPosition(0)
+                scrollToTop()
               } else {
-                val biggestPageIndex = viewModel.postListEngine.biggestPageIndex
-                if (biggestPageIndex != null && !viewModel.infinity) {
-                  val pagePosition = viewModel.getPagePosition(
-                    biggestPageIndex,
-                  )
+                val currentPageIndex = viewModel.postListEngine.currentPageIndex.value
+                if (!viewModel.infinity && it.data.scrollToSavedPosition) {
+                  val pagePosition = viewModel.getPagePosition(currentPageIndex)
+                  Log.d("HAHA", "pagePosition: ${pagePosition}")
                   if (pagePosition.isAtBottom) {
                     (recyclerView.layoutManager as LinearLayoutManager)
                       .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
@@ -1012,8 +1014,7 @@ class CommunityFragment :
                         pagePosition.offset,
                       )
                   } else {
-                    recyclerView.scrollToPosition(0)
-                    communityAppBarController?.setExpanded(true)
+                    scrollToTop()
                   }
                 }
               }
@@ -1354,6 +1355,7 @@ class CommunityFragment :
   private fun showOverflowMenu() {
     val context = context ?: return
 
+    val instance = moreActionsHelper.apiInstance
     val fullAccount = moreActionsHelper.fullAccount
     val currentCommunityRef = viewModel.currentCommunityRef.value
     val currentDefaultPage = preferences.defaultPage
@@ -1435,6 +1437,24 @@ class CommunityFragment :
             icon = R.drawable.baseline_web_24,
           )
         }
+      }
+
+      val miscAccountInfo = fullAccount
+        ?.accountInfo
+        ?.miscAccountInfo
+      if (instance == fullAccount?.account?.instance &&
+        miscAccountInfo?.isAdmin == true &&
+        currentCommunityRef is CommunityRef.CommunityRefByName) {
+
+        addDivider()
+
+        addItemWithIcon(
+          id = R.id.community_admin_tools,
+          title = R.string.admin_tools,
+          icon = R.drawable.outline_shield_24,
+        )
+
+        addDivider()
       }
 
       if (!isCurrentPageDefault) {
@@ -1680,7 +1700,7 @@ class CommunityFragment :
   ): (Int) -> Unit = a@{ actionId ->
     when (actionId) {
       R.id.create_post -> {
-        val currentCommunity = viewModel.currentCommunityRef.value
+        val currentCommunity = currentCommunityRef
         var communityName: String? = null
         when (currentCommunity) {
           is CommunityRef.All -> {}
@@ -1747,7 +1767,11 @@ class CommunityFragment :
       R.id.sort -> {
         getMainActivity()?.showBottomMenu(getSortByMenu())
       }
-
+      R.id.community_admin_tools -> {
+        if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+          ModActionsDialogFragment.show(currentCommunityRef, childFragmentManager)
+        }
+      }
       R.id.set_as_default -> {
         currentCommunityRef ?: return@a
         viewModel.setDefaultPage(currentCommunityRef)
@@ -1846,7 +1870,7 @@ class CommunityFragment :
         getMainActivity()?.navigateTopLevel(actionId)
       }
       R.id.back_to_the_beginning -> {
-        scrollToTop()
+        backToBeginning()
       }
       R.id.per_community_settings -> {
         currentCommunityRef ?: return@a
@@ -2087,6 +2111,14 @@ class CommunityFragment :
         }
       }
     }
+
+  fun backToBeginning() {
+    if (viewModel.infinity) {
+      scrollToTop()
+    } else {
+      viewModel.loadPageIndexNoInfinity(pageIndex = 0, force = false, clearPagePosition = true)
+    }
+  }
 
   private val currentLayout: CommunityLayout
     get() {

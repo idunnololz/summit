@@ -55,9 +55,13 @@ fun PostView.getUrl(instance: String): String = "https://$instance/post/${post.i
 
 fun PostView.getThumbnailPreviewInfo(): PreviewInfo? = null
 
-fun PostView.getVideoInfo(): VideoSizeHint? {
-  val originalUrl = if (post.embed_video_url != null) {
-    post.embed_video_url
+fun PostView.getVideoInfo(embedded: Boolean = false): VideoSizeHint? {
+  val originalUrl = if (embedded) {
+    if (post.embed_video_url != null) {
+      post.embed_video_url
+    } else {
+      null
+    }
   } else if (isUrlVideo(post.thumbnail_url ?: "")) {
     post.thumbnail_url
   } else if (isUrlVideo(post.url ?: "")) {
@@ -100,17 +104,13 @@ fun PostView.getVideoInfo(): VideoSizeHint? {
   }
 
   return VideoSizeHint(
-    0,
-    0,
-    url,
+    width = 0,
+    height = 0,
+    videoUrl = url,
   )
 }
 
 fun PostView.getType(): PostType {
-  val embedVideoUrl = post.embed_video_url
-  if (embedVideoUrl != null && isUrlVideo(embedVideoUrl)) {
-    return PostType.Video
-  }
   val url = post.url
   if (url != null && isUrlImage(url)) {
     return PostType.Image

@@ -600,7 +600,7 @@ class BottomMenu(
     }
 
     fun addDividerIfNeeded() {
-      if (menuItems.lastOrNull() != MenuItem.DividerItem) {
+      if (menuItems.lastOrNull() != MenuItem.DividerItem && menuItems.isNotEmpty()) {
         menuItems.add(MenuItem.DividerItem)
       }
     }
@@ -620,6 +620,9 @@ class BottomMenu(
           is MenuItem.ActionWithSwitchItem ->
             newItems.add(MenuItemWithSwitchItem(it))
         }
+      }
+      if (newItems.lastOrNull() is DividerItem) {
+        newItems.removeAt(newItems.size - 1)
       }
       newItems.add(FooterItem)
 
