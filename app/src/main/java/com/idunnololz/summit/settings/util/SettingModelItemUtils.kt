@@ -180,6 +180,8 @@ fun TextValueSettingItem.asCustomItem(
 fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
   getCurrentValue: () -> String,
   fragmentManager: FragmentManager,
+  showResetButton: Boolean = false,
+  defaultValue: String? = null,
 ): SettingModelItem.CustomItem = SettingModelItem.CustomItem(
   setting = this,
   title = title,
@@ -189,20 +191,14 @@ fun TextValueSettingItem.asCustomItemWithTextEditorDialog(
   getCurrentValue = getCurrentValue,
   onValueChanged = {
     val setting = this@asCustomItemWithTextEditorDialog
-    if (setting.supportsRichText) {
-      RichTextValueDialogFragment.newInstance(
-        setting.title,
-        setting.id,
-        getCurrentValue() as? String,
-      ).showAllowingStateLoss(fragmentManager, "asdf")
-    } else {
-      TextValueDialogFragment.newInstance(
-        setting.title,
-        setting.id,
-        setting.hint,
-        getCurrentValue() as? String,
-      ).showAllowingStateLoss(fragmentManager, "asdf")
-    }
+    RichTextValueDialogFragment.newInstance(
+      title = setting.title,
+      key = setting.id,
+      currentValue = getCurrentValue(),
+      showResetButton = showResetButton,
+      resetValue = defaultValue,
+      supportsRichText = setting.supportsRichText,
+    ).showAllowingStateLoss(fragmentManager, "asdf")
   },
 )
 

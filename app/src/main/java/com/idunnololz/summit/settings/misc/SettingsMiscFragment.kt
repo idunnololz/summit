@@ -11,6 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.utils.DEFAULT_UNKNOWN_SCORE_STRING
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
@@ -19,6 +20,7 @@ import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.dialogs.SettingValueUpdateCallback
 import com.idunnololz.summit.settings.locale.LocalePickerBottomSheetFragment
 import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asCustomItemWithTextEditorDialog
 import com.idunnololz.summit.settings.util.asOnOffSwitch
 import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
 import com.idunnololz.summit.util.AnimationsHelper
@@ -253,6 +255,11 @@ class SettingsMiscFragment :
         { preferences.markAsReadOnHidePost },
         { preferences.markAsReadOnHidePost = it },
       ),
+      settings.stringForNullScore.asCustomItemWithTextEditorDialog(
+        getCurrentValue = { GlobalSettings.stringForUnknownScore },
+        fragmentManager = childFragmentManager,
+        showResetButton = true,
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(
@@ -335,12 +342,20 @@ class SettingsMiscFragment :
           preferences.warnReplyToOldContentThresholdMs = threshold
         }
         GlobalSettings.refresh(preferences)
+
+        refresh()
       }
       settings.animationLevel.id -> {
         preferences.animationLevel = convertOptionIdToAnimationLevel(value as Int)
       }
       settings.userAgentChoice.id -> {
         preferences.userAgentChoice = value as Int
+      }
+      settings.stringForNullScore.id -> {
+        preferences.stringForNullScore = value as? String
+        GlobalSettings.refresh(preferences)
+
+        refresh()
       }
     }
   }

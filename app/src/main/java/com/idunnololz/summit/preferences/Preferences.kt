@@ -147,6 +147,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_VIDEO_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_STRING_FOR_NULL_SCORE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SWIPE_BETWEEN_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_TAP_ANYWHERE_TO_PLAY_PAUSE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_TAP_COMMENT_TO_COLLAPSE
@@ -704,6 +705,9 @@ class Preferences(
     by booleanPreference(KEY_INBOX_AUTO_MARK_AS_READ, false)
   var markAsReadOnHidePost
     by booleanPreference(KEY_MARK_AS_READ_ON_HIDE_POST, false)
+
+  var stringForNullScore
+    by stringPreference(KEY_STRING_FOR_NULL_SCORE, null)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

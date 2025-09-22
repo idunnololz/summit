@@ -14,6 +14,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.SearchType
+import com.idunnololz.summit.preferences.GlobalSettings.stringForUnknownScore
 import com.idunnololz.summit.util.NumberFormatUtil
 import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
@@ -32,9 +33,12 @@ object LemmyUtils {
 
   fun formatAuthor(author: String): String = "@%s".format(author)
 
-  fun abbrevNumber(number: Long?): String {
+  fun abbrevScore(number: Long?): String =
+    abbrevNumber(number, stringForUnknownScore)
+
+  fun abbrevNumber(number: Long?, valueOnNull: String = "⬤"): String {
     if (number == null) {
-      return "⬤"
+      return valueOnNull
     }
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       val formatter = compactDecimalFormat ?: CompactDecimalFormat.getInstance(

@@ -1051,9 +1051,9 @@ class PostAndCommentViewBuilder @Inject constructor(
             }
           }
 
-          scoreCount2?.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
-          upvoteCount2?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
-          downvoteCount2?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
+          scoreCount2?.text = LemmyUtils.abbrevScore(totalScore?.toLong())
+          upvoteCount2?.text = LemmyUtils.abbrevScore(upvotes?.toLong())
+          downvoteCount2?.text = LemmyUtils.abbrevScore(downvotes?.toLong())
 
           scoreCount2?.invalidate()
           downvoteCount2?.invalidate()
@@ -1492,7 +1492,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           null,
           null,
         )
-        b.score.text = LemmyUtils.abbrevNumber(item.score.toLong())
+        b.score.text = LemmyUtils.abbrevScore(item.score.toLong())
         b.score.visibility = View.VISIBLE
 
         voteUiHandler.bind(

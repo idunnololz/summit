@@ -126,6 +126,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_POST_UPVOTE_PER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_PROFILE_ICONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_TEXT_POSTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_VIDEO_POSTS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_STRING_FOR_NULL_SCORE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_TAP_ANYWHERE_TO_PLAY_PAUSE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_TRACK_BROWSING_HISTORY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_TRANSPARENT_NOTIFICATION_BAR
@@ -756,15 +757,18 @@ class PostsFeedSettings @Inject constructor(
   )
 
   val postScores = RadioGroupSettingItem(
-    null,
-    context.getString(R.string.post_scores),
-    context.getString(R.string.post_scores_desc),
-    mapOf(
+    icon = null,
+    title = context.getString(R.string.post_scores),
+    description = context.getString(R.string.post_scores_desc),
+    options = mapOf(
       R.id.show_scores to context.getString(R.string.show_scores),
       R.id.show_up_and_down_votes to context.getString(R.string.show_up_and_down_votes),
       R.id.hide_scores to context.getString(R.string.hide_scores),
     ).toOptions(R.id.show_scores),
-    relatedKeys = listOf(KEY_HIDE_POST_SCORES, KEY_POST_SHOW_UP_AND_DOWN_VOTES),
+    relatedKeys = listOf(
+      KEY_HIDE_POST_SCORES,
+      KEY_POST_SHOW_UP_AND_DOWN_VOTES
+    ),
   )
   val keywordFilters = BasicSettingItem(
     null,
@@ -1092,24 +1096,27 @@ class PostAndCommentsSettings @Inject constructor(
     context.getString(R.string.show_inline_media_as_links_desc),
   )
   val commentScores = RadioGroupSettingItem(
-    null,
-    context.getString(R.string.comment_scores),
-    context.getString(R.string.comment_scores_desc),
-    listOf(
+    icon = null,
+    title = context.getString(R.string.comment_scores),
+    description = context.getString(R.string.comment_scores_desc),
+    options = listOf(
       RadioGroupSettingItem.RadioGroupOption(
-        R.id.show_scores,
-        context.getString(R.string.show_scores),
+            R.id.show_scores,
+            context.getString(R.string.show_scores),
       ),
       RadioGroupSettingItem.RadioGroupOption(
-        R.id.show_up_and_down_votes,
-        context.getString(R.string.show_up_and_down_votes),
+            R.id.show_up_and_down_votes,
+            context.getString(R.string.show_up_and_down_votes),
       ),
       RadioGroupSettingItem.RadioGroupOption(
-        R.id.hide_scores,
-        context.getString(R.string.hide_scores),
+            R.id.hide_scores,
+            context.getString(R.string.hide_scores),
       ),
     ),
-    relatedKeys = listOf(KEY_HIDE_COMMENT_SCORES, KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES),
+    relatedKeys = listOf(
+      KEY_HIDE_COMMENT_SCORES,
+      KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
+    ),
   )
   val swipeBetweenPosts = OnOffSettingItem(
     null,
@@ -2035,16 +2042,17 @@ class MiscSettings @Inject constructor(
     relatedKeys = listOf(KEY_AUTO_FOCUS_SEARCH_BAR),
   )
   val finishAppOnBack = OnOffSettingItem(
-    null,
-    context.getString(R.string.finish_app_on_back),
-    context.getString(R.string.finish_app_on_back_desc),
+    title = context.getString(R.string.finish_app_on_back),
+    description = context.getString(R.string.finish_app_on_back_desc),
     relatedKeys = listOf(KEY_FINISH_APP_ON_BACK),
   )
   val markAsReadOnHidePost = OnOffSettingItem(
-    null,
-    context.getString(R.string.mark_as_read_on_hide_post),
-    null,
+    title = context.getString(R.string.mark_as_read_on_hide_post),
     relatedKeys = listOf(KEY_MARK_AS_READ_ON_HIDE_POST),
+  )
+  val stringForNullScore = TextValueSettingItem(
+    title = context.getString(R.string.symbol_for_unknown_score),
+    relatedKeys = listOf(KEY_STRING_FOR_NULL_SCORE),
   )
 }
 

@@ -182,14 +182,14 @@ class AccountActionsManager @Inject constructor(
       Log.d(TAG, "Binding vote handler - $ref")
 
       if (upvoteCount != null && downvoteCount != null) {
-        upvoteCount.text = LemmyUtils.abbrevNumber(
+        upvoteCount.text = LemmyUtils.abbrevScore(
           votesManager.getUpvotes(ref)?.toLong(),
         )
-        downvoteCount.text = LemmyUtils.abbrevNumber(
+        downvoteCount.text = LemmyUtils.abbrevScore(
           votesManager.getDownvotes(ref)?.toLong(),
         )
       } else {
-        scoreView.text = LemmyUtils.abbrevNumber(
+        scoreView.text = LemmyUtils.abbrevScore(
           votesManager.getScore(ref)?.toLong(),
         )
       }

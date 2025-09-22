@@ -55,8 +55,8 @@ data class DescriptionSettingItem(
 @Parcelize
 data class TextValueSettingItem(
   override val title: String,
-  override val description: String?,
-  val supportsRichText: Boolean,
+  override val description: String? = null,
+  val supportsRichText: Boolean = false,
   override val isEnabled: Boolean = true,
   val hint: String? = null,
   override val relatedKeys: List<String> = listOf(),
@@ -77,7 +77,7 @@ data class SliderSettingItem(
 
 @Parcelize
 data class OnOffSettingItem(
-  @DrawableRes val icon: Int?,
+  @DrawableRes val icon: Int? = null,
   override val title: String,
   override val description: String? = null,
   override val relatedKeys: List<String> = listOf(),

@@ -24,6 +24,8 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 private val TAG = "VoteUiHandler"
 
+const val DEFAULT_UNKNOWN_SCORE_STRING = "⬤"
+
 interface VoteUiHandler {
   fun bindVoteUi(
     lifecycleOwner: LifecycleOwner,
@@ -242,16 +244,16 @@ fun VoteUiHandler.bind(
     registration = object : AccountActionsManager.Registration {
       override fun voteCurrent(vote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
         update(vote, totalScore, upvotes, downvotes)
-        scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
-        upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
-        downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
+        scoreView.text = LemmyUtils.abbrevScore(totalScore?.toLong())
+        upvoteCount?.text = LemmyUtils.abbrevScore(upvotes?.toLong())
+        downvoteCount?.text = LemmyUtils.abbrevScore(downvotes?.toLong())
       }
 
       override fun voteSuccess(newVote: Int, totalScore: Int?, upvotes: Int?, downvotes: Int?) {
         update(newVote, totalScore, upvotes, downvotes)
-        scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
-        upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
-        downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
+        scoreView.text = LemmyUtils.abbrevScore(totalScore?.toLong())
+        upvoteCount?.text = LemmyUtils.abbrevScore(upvotes?.toLong())
+        downvoteCount?.text = LemmyUtils.abbrevScore(downvotes?.toLong())
       }
 
       override fun votePending(
@@ -261,9 +263,9 @@ fun VoteUiHandler.bind(
         downvotes: Int?,
       ) {
         update(pendingVote, totalScore, upvotes, downvotes)
-        scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
-        upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
-        downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
+        scoreView.text = LemmyUtils.abbrevScore(totalScore?.toLong())
+        upvoteCount?.text = LemmyUtils.abbrevScore(upvotes?.toLong())
+        downvoteCount?.text = LemmyUtils.abbrevScore(downvotes?.toLong())
       }
 
       override fun voteFailed(
@@ -274,9 +276,9 @@ fun VoteUiHandler.bind(
         e: Throwable,
       ) {
         update(vote, totalScore, upvotes, downvotes)
-        scoreView.text = LemmyUtils.abbrevNumber(totalScore?.toLong())
-        upvoteCount?.text = LemmyUtils.abbrevNumber(upvotes?.toLong())
-        downvoteCount?.text = LemmyUtils.abbrevNumber(downvotes?.toLong())
+        scoreView.text = LemmyUtils.abbrevScore(totalScore?.toLong())
+        upvoteCount?.text = LemmyUtils.abbrevScore(upvotes?.toLong())
+        downvoteCount?.text = LemmyUtils.abbrevScore(downvotes?.toLong())
 
         if (e is NotAuthenticatedException) {
           onSignInRequired()

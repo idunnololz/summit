@@ -22,6 +22,7 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
@@ -698,11 +699,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
           headerContainer.context.resources.getQuantityString(
             R.plurals.point_count_format,
             score,
-            LemmyUtils.abbrevNumber(score.toLong()),
+            LemmyUtils.abbrevScore(score.toLong()),
           ),
         )
       } else {
-        sb.append("⬤")
+        sb.append(GlobalSettings.stringForUnknownScore)
       }
 
       if (scoreColor != null) {
