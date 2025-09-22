@@ -4,7 +4,7 @@
     <string name="error_network_timeout">Erro de rede. O pedido demorou demasiado. Por favor, tente novamente.</string>
     <string name="error_unknown">Erro desconhecido. Por favor, tente novamente.</string>
     <string name="error_server_maintenance">O servidor está em manutenção. Por favor, tente novamente mais tarde.</string>
-    <string name="error_external_activity_not_found">Não existe nenhuma aplicação capaz de ler ficheiros</string>
+    <string name="error_external_activity_not_found">Não foi possível encontrar um aplicativo neste dispositivo para o tipo de arquivo %1$s .</string>
     <string name="no_results_found">Sem resultados</string>
     <string name="recents">Recentes</string>
     <string name="server_results">Resultados</string>
