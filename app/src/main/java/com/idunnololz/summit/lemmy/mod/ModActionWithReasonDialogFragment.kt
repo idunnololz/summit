@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.PersonId
@@ -32,6 +33,47 @@ class ModActionWithReasonDialogFragment :
   private val args by navArgs<ModActionWithReasonDialogFragmentArgs>()
 
   private val actionsViewModel: AdminOrModActionsViewModel by viewModels()
+
+  private val purgeCommunityDialogLauncher = newAlertDialogLauncher("purge_community") {
+    if (it.isOk) {
+      actionsViewModel.purgeCommunity(
+        communityId = (args.modAction as ModActionWithReason.PurgeCommunity).communityId,
+        reason = binding.reasonEditText.text.toString().ifBlank {
+          null
+        },
+      )
+    }
+  }
+  private val purgePostDialogLauncher = newAlertDialogLauncher("purge_post") {
+    if (it.isOk) {
+      actionsViewModel.purgePost(
+        postId = (args.modAction as ModActionWithReason.PurgePost).postId,
+        reason = binding.reasonEditText.text.toString().ifBlank {
+          null
+        },
+      )
+    }
+  }
+  private val purgeUserDialogLauncher = newAlertDialogLauncher("purge_user") {
+    if (it.isOk) {
+      actionsViewModel.purgePerson(
+        personId = (args.modAction as ModActionWithReason.PurgePerson).personId,
+        reason = binding.reasonEditText.text.toString().ifBlank {
+          null
+        },
+      )
+    }
+  }
+  private val purgeCommentDialogLauncher = newAlertDialogLauncher("purge_comment") {
+    if (it.isOk) {
+      actionsViewModel.purgeComment(
+        commentId = (args.modAction as ModActionWithReason.PurgeComment).commentId,
+        reason = binding.reasonEditText.text.toString().ifBlank {
+          null
+        },
+      )
+    }
+  }
 
   override fun onStart() {
     super.onStart()
@@ -155,12 +197,12 @@ class ModActionWithReasonDialogFragment :
           binding.title.setText(R.string.purge_comment)
           binding.positiveButton.setText(R.string.purge_comment)
           binding.positiveButton.setOnClickListener {
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.purge_comment_title)
-              .setMessage(R.string.purge_community_body)
-              .setPositiveButton(R.string.purge_comment)
-              .setNegativeButton(android.R.string.cancel)
-              .createAndShow(childFragmentManager, "purge_comment")
+            purgeCommentDialogLauncher.launchDialog {
+              titleResId = R.string.purge_comment_title
+              messageResId = R.string.purge_comment_body
+              positionButtonResId = R.string.purge_comment
+              negativeButtonResId = android.R.string.cancel
+            }
           }
           actionsViewModel.purgeCommentResult.handleResult(
             onErrorMessage = {
@@ -175,12 +217,12 @@ class ModActionWithReasonDialogFragment :
           binding.title.setText(R.string.purge_community)
           binding.positiveButton.setText(R.string.purge_community)
           binding.positiveButton.setOnClickListener {
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.purge_community_title)
-              .setMessage(R.string.purge_community_body)
-              .setPositiveButton(R.string.purge_community)
-              .setNegativeButton(android.R.string.cancel)
-              .createAndShow(childFragmentManager, "purge_community")
+            purgeCommunityDialogLauncher.launchDialog {
+              titleResId = R.string.purge_community_title
+              messageResId = R.string.purge_community_body
+              positionButtonResId = R.string.purge_community
+              negativeButtonResId = android.R.string.cancel
+            }
           }
           actionsViewModel.purgeCommunityResult.handleResult(
             { getString(R.string.error_purge_community) },
@@ -191,12 +233,12 @@ class ModActionWithReasonDialogFragment :
           binding.title.setText(R.string.purge_person)
           binding.positiveButton.setText(R.string.purge_person)
           binding.positiveButton.setOnClickListener {
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.purge_user_title)
-              .setMessage(R.string.purge_community_body)
-              .setPositiveButton(R.string.purge_user)
-              .setNegativeButton(android.R.string.cancel)
-              .createAndShow(childFragmentManager, "purge_user")
+            purgeUserDialogLauncher.launchDialog {
+              titleResId = R.string.purge_user_title
+              messageResId = R.string.purge_community_body
+              positionButtonResId = R.string.purge_user
+              negativeButtonResId = android.R.string.cancel
+            }
           }
           actionsViewModel.purgeUserResult.handleResult(
             { getString(R.string.error_purge_user) },
@@ -207,12 +249,12 @@ class ModActionWithReasonDialogFragment :
           binding.title.setText(R.string.purge_post)
           binding.positiveButton.setText(R.string.purge_post)
           binding.positiveButton.setOnClickListener {
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.purge_post_title)
-              .setMessage(R.string.purge_community_body)
-              .setPositiveButton(R.string.purge_post)
-              .setNegativeButton(android.R.string.cancel)
-              .createAndShow(childFragmentManager, "purge_post")
+            purgePostDialogLauncher.launchDialog {
+              titleResId = R.string.purge_post_title
+              messageResId = R.string.purge_community_body
+              positionButtonResId = R.string.purge_post
+              negativeButtonResId = android.R.string.cancel
+            }
           }
           actionsViewModel.purgePostResult.handleResult(
             { getString(R.string.error_purge_post) },

@@ -33,6 +33,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -979,11 +980,11 @@ class AddOrEditCommentFragment :
       val recyclerView = contextRecyclerView
 
       fun showError() {
-        OldAlertDialogFragment.Builder()
-          .setTitle(R.string.error_operation_not_permitted)
-          .setMessage(R.string.error_action_on_comment_context)
-          .setPositiveButton(android.R.string.ok)
-          .createAndShow(childFragmentManager, "error_action_on_comment_context")
+        launchAlertDialog("error_action_on_comment_context") {
+          titleResId = R.string.error_operation_not_permitted
+          messageResId = R.string.error_action_on_comment_context
+          positionButtonResId = android.R.string.ok
+        }
       }
 
       val adapter = PostAdapter(
@@ -1006,16 +1007,14 @@ class AddOrEditCommentFragment :
             .show(childFragmentManager, "asdf")
         },
         onInstanceMismatch = { accountInstance, apiInstance ->
-          OldAlertDialogFragment.Builder()
-            .setTitle(R.string.error_account_instance_mismatch_title)
-            .setMessage(
-              getString(
-                R.string.error_account_instance_mismatch,
-                accountInstance,
-                apiInstance,
-              ),
+          launchAlertDialog("instance_mismatch") {
+            titleResId = R.string.error_account_instance_mismatch_title
+            message = getString(
+              R.string.error_account_instance_mismatch,
+              accountInstance,
+              apiInstance,
             )
-            .createAndShow(childFragmentManager, "aa")
+          }
         },
         onAddCommentClick = { postOrComment ->
           showError()

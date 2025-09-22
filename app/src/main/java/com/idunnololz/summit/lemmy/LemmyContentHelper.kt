@@ -29,6 +29,7 @@ import coil3.request.allowHardware
 import coil3.request.transformations
 import coil3.request.transitionFactory
 import coil3.result
+import coil3.transition.CrossfadeDrawable
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -63,6 +64,7 @@ import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.coil.BlurTransformation
 import com.idunnololz.summit.util.ext.setup
+import com.idunnololz.summit.util.shimmer.ShimmerDrawable
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.video.ExoPlayerManager
 import com.idunnololz.summit.video.VideoState
@@ -818,6 +820,13 @@ class LemmyContentHelper(
               )
             } else {
               loadingView?.showDefaultErrorMessageFor(it)
+
+              val drawable = imageView.drawable
+              if (drawable is ShimmerDrawable ||
+                (drawable is CrossfadeDrawable && drawable.end is ShimmerDrawable)) {
+
+                imageView.setImageDrawable(null)
+              }
             }
             Log.d(TAG, "Failed to load icon: $imageUrl")
             errorListener?.invoke(it)

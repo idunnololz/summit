@@ -45,6 +45,7 @@ import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.postAndCommentView.GeneralQuickActionsViewHolder
@@ -186,6 +187,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         onCommentActionClick = { commentView, actionId ->
           createCommentActionHandler(
             commentView = commentView,
+            postRef = PostRef(parentFragment.viewModel.instance, commentView.post.id),
             moreActionsHelper = moreActionsHelper,
             fragmentManager = childFragmentManager,
           )(actionId)

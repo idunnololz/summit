@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentEmojiPopupEditorBinding
 import com.idunnololz.summit.databinding.EmojiEditorEmojiItemBinding
 import com.idunnololz.summit.util.AnimationsHelper
@@ -34,8 +35,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EmojiPopupEditorDialogFragment :
   BaseDialogFragment<DialogFragmentEmojiPopupEditorBinding>(),
-  FullscreenDialogFragment,
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  FullscreenDialogFragment {
 
   companion object {
     const val REQUEST_KEY = "DraftsDialogFragment_req_key"
@@ -53,6 +53,12 @@ class EmojiPopupEditorDialogFragment :
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
+  private val resetEmojisDialogLauncher = newAlertDialogLauncher("reset_emojis") {
+    if (it.isOk) {
+      viewModel.resetEmojis()
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -61,11 +67,8 @@ class EmojiPopupEditorDialogFragment :
 
   override fun onStart() {
     super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
+    dialog?.window?.let { window ->
+      WindowCompat.setDecorFitsSystemWindows(window, false)
     }
   }
 
@@ -120,11 +123,11 @@ class EmojiPopupEditorDialogFragment :
         setOnMenuItemClickListener {
           when (it.itemId) {
             R.id.reset -> {
-              OldAlertDialogFragment.Builder()
-                .setMessage(R.string.warn_reset_emojis)
-                .setPositiveButton(R.string.reset_emojis)
-                .setNegativeButton(android.R.string.cancel)
-                .createAndShow(childFragmentManager, "reset_emojis")
+              resetEmojisDialogLauncher.launchDialog {
+                messageResId = R.string.warn_reset_emojis
+                positionButtonResId = R.string.reset_emojis
+                negativeButtonResId = android.R.string.cancel
+              }
             }
           }
           true
@@ -322,14 +325,5 @@ class EmojiPopupEditorDialogFragment :
 
     override fun onRowClear(myViewHolder: ViewHolder?) {
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (tag == "reset_emojis") {
-      viewModel.resetEmojis()
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

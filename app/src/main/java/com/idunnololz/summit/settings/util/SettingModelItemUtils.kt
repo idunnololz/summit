@@ -16,7 +16,6 @@ import com.idunnololz.summit.settings.SettingsAdapter
 import com.idunnololz.summit.settings.SliderSettingItem
 import com.idunnololz.summit.settings.TextValueSettingItem
 import com.idunnololz.summit.settings.dialogs.RichTextValueDialogFragment
-import com.idunnololz.summit.settings.dialogs.TextValueDialogFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 

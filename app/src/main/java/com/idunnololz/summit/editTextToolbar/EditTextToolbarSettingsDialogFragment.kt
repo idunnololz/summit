@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentEditTextToolbarSettingsBinding
 import com.idunnololz.summit.databinding.TextFieldToolbarOptionItemBinding
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
@@ -33,8 +34,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class EditTextToolbarSettingsDialogFragment :
   BaseDialogFragment<DialogFragmentEditTextToolbarSettingsBinding>(),
-  FullscreenDialogFragment,
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  FullscreenDialogFragment {
 
   companion object {
     fun show(childFragmentManager: FragmentManager) {
@@ -51,14 +51,20 @@ class EditTextToolbarSettingsDialogFragment :
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
+  private val unsavedChangesDialogLauncher = newAlertDialogLauncher("unsaved_changes") {
+    if (it.isOk) {
+      dismiss()
+    }
+  }
+
   private val unsavedChangesBackPressedHandler = object : OnBackPressedCallback(false) {
     override fun handleOnBackPressed() {
-      OldAlertDialogFragment.Builder()
-        .setTitle(R.string.error_unsaved_changes)
-        .setMessage(R.string.error_multi_community_unsaved_changes)
-        .setPositiveButton(R.string.proceed_anyways)
-        .setNegativeButton(R.string.cancel)
-        .createAndShow(childFragmentManager, "UnsavedChanges")
+      unsavedChangesDialogLauncher.launchDialog {
+        titleResId = R.string.error_unsaved_changes
+        messageResId = R.string.error_multi_community_unsaved_changes
+        positionButtonResId = R.string.proceed_anyways
+        negativeButtonResId = R.string.cancel
+      }
     }
   }
 
@@ -70,11 +76,8 @@ class EditTextToolbarSettingsDialogFragment :
 
   override fun onStart() {
     super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
+    dialog?.window?.let { window ->
+      WindowCompat.setDecorFitsSystemWindows(window, false)
     }
   }
 
@@ -289,12 +292,5 @@ class EditTextToolbarSettingsDialogFragment :
     override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
     override fun getItemCount(): Int = adapterHelper.itemCount
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    dismiss()
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

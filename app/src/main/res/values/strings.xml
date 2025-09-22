@@ -2314,6 +2314,8 @@
     <string name="background_color">Background color</string>
     <string name="by_format">By %1$s</string>
     <string name="symbol_for_unknown_score">Symbol for unknown score</string>
+    <string name="no_text_selected">No text selected</string>
+    <string name="purge_comment_body">Purging will delete this item. You will not be able to recover the data. Use with extreme caution.</string>
 
 
     <!-- uCrop string resource end -->

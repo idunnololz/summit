@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
@@ -341,6 +342,12 @@ class TextFormatToolbarViewHolder(
       val selectedText: String =
         editText.text.toString().substring(startSelection, endSelection)
       var index = 0
+
+      if (selectedText.isEmpty()) {
+        Toast.makeText(editText.context, R.string.no_text_selected, Toast.LENGTH_SHORT)
+          .show()
+        return@setOnClickListener
+      }
 
       val newString = buildString {
         selectedText.lowercase().forEach a@{

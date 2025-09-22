@@ -15,6 +15,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedCommentsBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
@@ -41,14 +42,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FilteredCommentsFragment :
   BaseFragment<FragmentSavedCommentsBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener,
   SignInNavigator {
-
-  companion object {
-    private const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
-    private const val EXTRA_POST_REF = "EXTRA_POST_REF"
-    private const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
-  }
 
   private var adapter: CommentListAdapter? = null
 
@@ -84,16 +78,14 @@ class FilteredCommentsFragment :
           .show(childFragmentManager, "asdf")
       },
       onInstanceMismatch = { accountInstance, apiInstance ->
-        OldAlertDialogFragment.Builder()
-          .setTitle(R.string.error_account_instance_mismatch_title)
-          .setMessage(
-            getString(
-              R.string.error_account_instance_mismatch,
-              accountInstance,
-              apiInstance,
-            ),
+        launchAlertDialog("instance_mismatch") {
+          titleResId = R.string.error_account_instance_mismatch_title
+          message = getString(
+            R.string.error_account_instance_mismatch,
+            accountInstance,
+            apiInstance,
           )
-          .createAndShow(childFragmentManager, "aa")
+        }
       },
       onImageClick = { view, url ->
         getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
@@ -116,6 +108,7 @@ class FilteredCommentsFragment :
       onCommentActionClick = { view, commentView, actionId ->
         createCommentActionHandler(
           commentView = commentView,
+          postRef = PostRef(parentFragment.viewModel.instance, commentView.post.id),
           moreActionsHelper = moreActionsHelper,
           fragmentManager = childFragmentManager,
         )(actionId)
@@ -282,21 +275,6 @@ class FilteredCommentsFragment :
         },
       )
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    when (tag) {
-      CONFIRM_DELETE_COMMENT_TAG -> {
-        val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
-        val postRef = dialog.arguments?.getParcelableCompat<PostRef>(EXTRA_POST_REF)
-        if (commentId != null && postRef != null) {
-          moreActionsHelper.deleteComment(postRef, commentId.toInt())
-        }
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 
   override fun navigateToSignInScreen() {

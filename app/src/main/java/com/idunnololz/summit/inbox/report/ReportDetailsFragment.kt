@@ -20,6 +20,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
@@ -676,6 +677,11 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
       var adapter = recyclerView.adapter as? PostAdapter
 
       if (adapter == null) {
+        val postId = when (val inboxItem = args.reportItem) {
+          is InboxItem.ReportMessageInboxItem -> null
+          is InboxItem.ReportCommentInboxItem -> inboxItem.postId
+          is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
+        }
         adapter = PostAdapter(
           postAndCommentViewBuilder = postAndCommentViewBuilder,
           context = context,
@@ -696,16 +702,14 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               .show(childFragmentManager, "asdf")
           },
           onInstanceMismatch = { accountInstance, apiInstance ->
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.error_account_instance_mismatch_title)
-              .setMessage(
-                getString(
-                  R.string.error_account_instance_mismatch,
-                  accountInstance,
-                  apiInstance,
-                ),
+            launchAlertDialog("instance_mismatch") {
+              titleResId = R.string.error_account_instance_mismatch_title
+              message = getString(
+                R.string.error_account_instance_mismatch,
+                accountInstance,
+                apiInstance,
               )
-              .createAndShow(childFragmentManager, "aa")
+            }
           },
           onAddCommentClick = { postOrComment ->
             if (viewModel.accountManager.currentAccount.value == null) {
@@ -749,19 +753,14 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           onCommentActionClick = { commentView, _, actionId ->
             createCommentActionHandler(
               commentView = commentView,
+              postRef = PostRef(viewModel.apiInstance, postId ?: return@PostAdapter),
               moreActionsHelper = moreActionsHelper,
               fragmentManager = childFragmentManager,
             )(actionId)
           },
           onFetchComments = {
-            val postId = when (val inboxItem = args.reportItem) {
-              is InboxItem.ReportMessageInboxItem -> TODO()
-              is InboxItem.ReportCommentInboxItem -> inboxItem.postId
-              is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
-            }
-
             getMainActivity()?.launchPage(
-              PostRef(viewModel.apiInstance, postId),
+              PostRef(viewModel.apiInstance, postId ?: return@PostAdapter),
             )
           },
           onLoadPost = { _, _ -> },

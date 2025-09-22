@@ -21,6 +21,7 @@ import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunityIconItemBinding
@@ -331,11 +332,11 @@ class MultiCommunityEditorDialogFragment :
       ?: listOf()
 
     if (selectedCommunities.isEmpty()) {
-      OldAlertDialogFragment.Builder()
-        .setTitle(R.string.error_no_communities_selected)
-        .setMessage(R.string.error_no_communities_selected_desc)
-        .setPositiveButton(android.R.string.ok)
-        .createAndShow(childFragmentManager, "defsdaf")
+      launchAlertDialog("no_communities") {
+        titleResId = R.string.error_no_communities_selected
+        messageResId = R.string.error_no_communities_selected_desc
+        positionButtonResId = android.R.string.ok
+      }
       return
     }
 
@@ -366,14 +367,12 @@ class MultiCommunityEditorDialogFragment :
   }
 
   private fun showTooManyCommunitiesMessage() {
-    OldAlertDialogFragment.Builder()
-      .setMessage(
-        getString(
-          R.string.error_multi_community_limit_reached,
-          MULTI_COMMUNITY_DATA_SOURCE_LIMIT.toString(),
-        ),
+    launchAlertDialog("too_many_communities") {
+      message = getString(
+        R.string.error_multi_community_limit_reached,
+        MULTI_COMMUNITY_DATA_SOURCE_LIMIT.toString(),
       )
-      .createAndShow(childFragmentManager, "asdfss")
+    }
   }
 
   private fun showSearch() {

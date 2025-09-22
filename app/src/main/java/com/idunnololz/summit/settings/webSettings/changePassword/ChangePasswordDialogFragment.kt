@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentChangePasswordBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -130,10 +132,10 @@ class ChangePasswordDialogFragment :
             enableInputs()
           }
           is StatefulData.Success -> {
-            OldAlertDialogFragment.Builder()
-              .setMessage(R.string.password_changed)
-              .setPositiveButton(android.R.string.ok)
-              .createAndShow(childFragmentManager, "password_changed")
+            launchAlertDialog("password_changed") {
+              messageResId = R.string.password_changed
+              positionButtonResId = android.R.string.ok
+            }
           }
         }
       }

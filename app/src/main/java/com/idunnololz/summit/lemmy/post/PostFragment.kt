@@ -122,9 +122,6 @@ class PostFragment :
 
   companion object {
     private val TAG = PostFragment::class.java.canonicalName
-
-    private const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
-    private const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
   }
 
   private val args: PostFragmentArgs by navArgs()
@@ -505,6 +502,7 @@ class PostFragment :
           onCommentActionClick = { commentView, itemId, actionId ->
             createCommentActionHandler(
               commentView = commentView,
+              postRef = PostRef(getInstance(), args.id),
               moreActionsHelper = moreActionsHelper,
               fragmentManager = childFragmentManager,
               onLoadComment = {
@@ -1460,16 +1458,6 @@ class PostFragment :
 
   override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
     when (tag) {
-      CONFIRM_DELETE_COMMENT_TAG -> {
-        val commentId = dialog.getExtra(EXTRA_COMMENT_ID)
-        if (commentId != null) {
-          viewModel.deleteComment(
-            accountId = accountId,
-            postRef = PostRef(getInstance(), args.id),
-            commentId = commentId.toInt(),
-          )
-        }
-      }
       "instance_mismatch" -> {
         viewModel.switchToNativeInstance()
       }

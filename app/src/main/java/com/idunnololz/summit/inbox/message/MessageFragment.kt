@@ -21,6 +21,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment.*
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.inbox.InboxItem
@@ -357,16 +358,14 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               .show(childFragmentManager, "asdf")
           },
           onInstanceMismatch = { accountInstance, apiInstance ->
-            Builder()
-              .setTitle(R.string.error_account_instance_mismatch_title)
-              .setMessage(
-                getString(
-                  R.string.error_account_instance_mismatch,
-                  accountInstance,
-                  apiInstance,
-                ),
+            launchAlertDialog("instance_mismatch") {
+              titleResId = R.string.error_account_instance_mismatch_title
+              message = getString(
+                R.string.error_account_instance_mismatch,
+                accountInstance,
+                apiInstance,
               )
-              .createAndShow(childFragmentManager, "aa")
+            }
           },
         )
 
@@ -497,6 +496,16 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       var adapter = recyclerView.adapter as? PostAdapter
 
       if (adapter == null) {
+        val postId = when (val inboxItem = args.inboxItem) {
+          is InboxItem.MentionInboxItem -> inboxItem.postId
+          is InboxItem.MessageInboxItem -> null
+          is InboxItem.ReplyInboxItem -> inboxItem.postId
+          is InboxItem.ReportMessageInboxItem -> null
+          is InboxItem.ReportCommentInboxItem -> inboxItem.postId
+          is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
+          is InboxItem.RegistrationApplicationInboxItem -> null
+        }
+
         adapter = PostAdapter(
           postAndCommentViewBuilder = postAndCommentViewBuilder,
           context = context,
@@ -518,16 +527,14 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               .show(childFragmentManager, "asdf")
           },
           onInstanceMismatch = { accountInstance, apiInstance ->
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.error_account_instance_mismatch_title)
-              .setMessage(
-                getString(
-                  R.string.error_account_instance_mismatch,
-                  accountInstance,
-                  apiInstance,
-                ),
+            launchAlertDialog("instance_mismatch") {
+              titleResId = R.string.error_account_instance_mismatch_title
+              message = getString(
+                R.string.error_account_instance_mismatch,
+                accountInstance,
+                apiInstance,
               )
-              .createAndShow(childFragmentManager, "aa")
+            }
           },
           onAddCommentClick = { postOrComment ->
             if (viewModel.accountManager.currentAccount.value == null) {
@@ -571,23 +578,14 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           onCommentActionClick = { commentView, _, actionId ->
             createCommentActionHandler(
               commentView = commentView,
+              postRef = PostRef(args.instance, postId ?: return@PostAdapter),
               moreActionsHelper = moreActionsHelper,
               fragmentManager = childFragmentManager,
             )(actionId)
           },
           onFetchComments = {
-            val postId = when (val inboxItem = args.inboxItem) {
-              is InboxItem.MentionInboxItem -> inboxItem.postId
-              is InboxItem.MessageInboxItem -> return@PostAdapter
-              is InboxItem.ReplyInboxItem -> inboxItem.postId
-              is InboxItem.ReportMessageInboxItem -> TODO()
-              is InboxItem.ReportCommentInboxItem -> inboxItem.postId
-              is InboxItem.ReportPostInboxItem -> inboxItem.reportedPostId
-              is InboxItem.RegistrationApplicationInboxItem -> TODO()
-            }
-
             getMainActivity()?.launchPage(
-              PostRef(args.instance, postId),
+              PostRef(args.instance, postId ?: return@PostAdapter),
             )
           },
           onLoadPost = { _, _ -> },

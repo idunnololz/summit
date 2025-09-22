@@ -40,6 +40,7 @@ import com.google.gson.reflect.TypeToken
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.error.ErrorDialogFragment
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.preferences.DefaultAppPreference
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -365,15 +366,15 @@ object Utils {
       context.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
       fm ?: return
-      OldAlertDialogFragment.Builder()
-        .setMessage(
-          context.getString(
-            R.string.error_external_activity_not_found,
-            intent.type,
-          ),
-        )
-        .setPositiveButton(android.R.string.ok)
-        .createAndShow(fm, "asdf")
+
+      ErrorDialogFragment.show(
+        message = context.getString(
+          R.string.error_external_activity_not_found,
+          intent.type,
+        ),
+        error = e,
+        fm = fm,
+      )
     }
   }
 

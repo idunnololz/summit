@@ -3,14 +3,17 @@ package com.idunnololz.summit.lemmy.postAndCommentView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.lemmy.CommentRef
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragmentArgs
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -31,9 +34,6 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.clearItemDecorations
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
-
-const val CONFIRM_DELETE_COMMENT_TAG = "CONFIRM_DELETE_COMMENT_TAG"
-const val EXTRA_COMMENT_ID = "EXTRA_COMMENT_ID"
 
 fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
   clearItemDecorations()
@@ -59,6 +59,7 @@ fun RecyclerView.setupForPostAndComments(preferences: Preferences) {
 
 fun BaseFragment<*>.showMoreCommentOptions(
   commentView: CommentView,
+  postRef: PostRef?,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
   onLoadComment: ((CommentId) -> Unit)? = null,
@@ -189,6 +190,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
     setOnMenuItemClickListener {
       createCommentActionHandler(
         commentView = commentView,
+        postRef = postRef,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
         onLoadComment = onLoadComment,
@@ -203,6 +205,7 @@ fun BaseFragment<*>.showMoreCommentOptions(
 
 fun BaseFragment<*>.createCommentActionHandler(
   commentView: CommentView,
+  postRef: PostRef?,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
   onLoadComment: ((CommentId) -> Unit)? = null,
@@ -230,22 +233,25 @@ fun BaseFragment<*>.createCommentActionHandler(
         ).toBundle()
     }.show(childFragmentManager, "asdf")
   }
-  val onDeleteCommentClick: (CommentView) -> Unit = a@{
+  val onDeleteCommentClick: (CommentView) -> Unit = a@{ commentView ->
     if (currentAccount == null) {
       PreAuthDialogFragment.newInstance()
         .show(childFragmentManager, "asdf")
       return@a
     }
 
-    OldAlertDialogFragment.Builder()
-      .setMessage(R.string.delete_comment_confirm)
-      .setPositiveButton(android.R.string.ok)
-      .setNegativeButton(android.R.string.cancel)
-      .setExtra(EXTRA_COMMENT_ID, it.comment.id.toString())
-      .createAndShow(
-        childFragmentManager,
-        CONFIRM_DELETE_COMMENT_TAG,
-      )
+    if (postRef != null) {
+      MaterialAlertDialogBuilder(context)
+        .setMessage(R.string.delete_comment_confirm)
+        .setPositiveButton(android.R.string.ok) { dialog, which ->
+          moreActionsHelper.deleteComment(
+            postRef,
+            commentView.comment.id,
+          )
+        }
+        .setNegativeButton(android.R.string.cancel) { dialog, which -> }
+        .show()
+    }
   }
 
   when (id) {
@@ -336,6 +342,7 @@ fun BaseFragment<*>.createCommentActionHandler(
     R.id.ca_more -> {
       showMoreCommentOptions(
         commentView = commentView,
+        postRef = postRef,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = fragmentManager,
         onLoadComment = onLoadComment,
