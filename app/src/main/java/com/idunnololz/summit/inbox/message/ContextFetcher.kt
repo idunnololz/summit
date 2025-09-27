@@ -37,6 +37,7 @@ class ContextFetcher @Inject constructor(
   val accountManager: AccountManager,
   coroutineScopeFactory: CoroutineScopeFactory,
 ) : AutoCloseable {
+
   private val coroutineScope = coroutineScopeFactory.create()
   private val commentsFetcher = CommentsFetcher(apiClient)
 
@@ -151,34 +152,29 @@ class ContextFetcher @Inject constructor(
       return Result.failure(RuntimeException("No context found."))
     }
 
-    var commentIdToFetch: Int = topCommentId
-    while (true) {
-      commentsFetcher
-        .fetchCommentsWithRetry(
-          Either.Right(commentIdToFetch),
-          CommentSortType.Top,
-          null,
-          force,
-        )
-        .onSuccess {
+    return commentsFetcher
+      .fetchAllCommentsWithRetry(
+        id = Either.Right(topCommentId),
+        sort = null,
+        maxDepth = null,
+        force = force,
+      )
+      .fold(
+        {
           result.addAll(it)
 
           val furthestCommentSeen = it.maxByOrNull { commentIds.indexOf(it.comment.id) }
 
           if (furthestCommentSeen == null) {
-            return Result.failure(RuntimeException("Can't fetch comment."))
+            Result.failure(RuntimeException("Can't fetch comment."))
+          } else {
+            Result.success(result)
           }
-
-          if (furthestCommentSeen.comment.path == commentPath) {
-            return Result.success(result)
-          }
-
-          commentIdToFetch = furthestCommentSeen.comment.id
+        },
+        {
+          Result.failure(it)
         }
-        .onFailure {
-          return Result.failure(it)
-        }
-    }
+      )
   }
 
   override fun close() {

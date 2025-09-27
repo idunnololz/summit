@@ -202,7 +202,7 @@ class AccountAwareLemmyClient @Inject constructor(
 
   suspend fun fetchCommentsWithRetry(
     id: Either<PostId, CommentId>?,
-    sort: CommentSortType,
+    sort: CommentSortType?,
     force: Boolean,
     limit: Int? = null,
     page: Int? = null,

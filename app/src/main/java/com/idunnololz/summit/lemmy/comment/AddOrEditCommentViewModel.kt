@@ -282,10 +282,9 @@ class AddOrEditCommentViewModel @Inject constructor(
           async {
             commentsFetcher
               .fetchCommentsWithRetry(
-                Either.Right(finalTopCommentId),
-                CommentSortType.Top,
-                null,
-                force,
+                id = Either.Right(finalTopCommentId),
+                sort = CommentSortType.Top,
+                force = force,
               )
           }
         } else {

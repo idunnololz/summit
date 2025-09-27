@@ -341,7 +341,7 @@ class LemmyApiClient @Inject constructor(
   suspend fun fetchComments(
     account: Account?,
     id: Either<PostId, CommentId>?,
-    sort: CommentSortType,
+    sort: CommentSortType?,
     maxDepth: Int?,
     limit: Int? = null,
     page: Int? = null,

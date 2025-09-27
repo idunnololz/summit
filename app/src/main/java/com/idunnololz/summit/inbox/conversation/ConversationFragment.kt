@@ -192,8 +192,12 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
       )
 
       fun markMessagesAsReadIfNeeded() {
-        val firstPos = layoutManager.findFirstCompletelyVisibleItemPosition()
-        val lastPos = layoutManager.findLastCompletelyVisibleItemPosition()
+        var firstPos = layoutManager.findFirstCompletelyVisibleItemPosition()
+        val lastPos = layoutManager.findLastVisibleItemPosition()
+
+        if (firstPos == -1) {
+          firstPos = lastPos
+        }
 
         for (i in firstPos..lastPos) {
           val conversationItem =

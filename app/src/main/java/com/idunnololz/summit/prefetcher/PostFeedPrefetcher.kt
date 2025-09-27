@@ -37,5 +37,5 @@ class PostFeedPrefetcher @Inject constructor(
     pageIndex: Int,
     postsRepository: PostsRepository,
   ): Result<PostsRepository.PageResult> =
-    postsRepository.getPage(pageIndex, dispatcher = Dispatchers.IO)
+    postsRepository.getPage(pageIndex)
 }

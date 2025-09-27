@@ -233,7 +233,7 @@ class LemmyTextHelper @Inject constructor(
      * 1. Matches against spoiler (ending) tags
      */
     private val largeRegex = Pattern.compile(
-      """[^\n](\n:::(?:\n|${'$'}))""",
+      """([^\n])(\n:::(?:\n|${'$'}))""",
     )
 
     private fun processAll(s: String): String {
@@ -241,11 +241,12 @@ class LemmyTextHelper @Inject constructor(
       val matcher = largeRegex.matcher(s)
       val sb = StringBuffer()
       while (matcher.find()) {
-        val spoilerEndTag = matcher.group(1)
+        val replaced = matcher.group(1)
+        val spoilerEndTag = matcher.group(2)
         if (spoilerEndTag != null) {
           matcher.appendReplacement(
             sb,
-            "\n$spoilerEndTag",
+            "$replaced\n$spoilerEndTag",
           )
           continue
         }

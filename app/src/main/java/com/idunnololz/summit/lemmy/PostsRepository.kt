@@ -15,6 +15,7 @@ import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
@@ -31,6 +32,9 @@ import dagger.assisted.AssistedInject
 import kotlin.math.min
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class PostsRepository @AssistedInject constructor(
@@ -105,6 +109,9 @@ class PostsRepository @AssistedInject constructor(
 
   private var invalidatedPagesStartIndex = Int.MAX_VALUE
 
+  private val serialContext = Dispatchers.Default.limitedParallelism(1)
+  private val mutex = Mutex()
+
   init {
     applyPreferences()
   }
@@ -114,15 +121,15 @@ class PostsRepository @AssistedInject constructor(
   }
 
   suspend fun updateStateMaintainingPosition(
-    performChanges: PostsRepository.() -> Unit,
+    performChanges: suspend PostsRepository.() -> Unit,
     anchors: Set<PostId>,
     maxPage: Int,
-  ): Result<PageResult> {
+  ): Result<PageResult> = withContext(serialContext) {
     Log.d(TAG, "updateStateMaintainingPosition() with ${anchors.size} anchors")
 
     reset()
 
-    this.performChanges()
+    performChanges()
 
     invalidatePagesEqualToAndAbove(0)
 
@@ -134,7 +141,7 @@ class PostsRepository @AssistedInject constructor(
 
       val result = getPage(curPage)
       if (result.isFailure) {
-        return result
+        return@withContext result
       }
 
       val pageResult = result.getOrNull() ?: break
@@ -148,16 +155,16 @@ class PostsRepository @AssistedInject constructor(
       }
       if (anchorsMatched > 0) {
         Log.d(TAG, "Anchor found! Returning...")
-        return result
+        return@withContext result
       }
 
       curPage++
     }
 
-    return getPage(0)
+    return@withContext getPage(0)
   }
 
-  private fun invalidatePagesEqualToAndAbove(pageIndex: Int) {
+  private suspend fun invalidatePagesEqualToAndAbove(pageIndex: Int) = withContext(serialContext) {
     val minPageInternal = if (pageIndex == 0) {
       // just delete everything...
       0
@@ -181,67 +188,70 @@ class PostsRepository @AssistedInject constructor(
   suspend fun getPage(
     pageIndex: Int,
     force: Boolean = false,
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
-  ): Result<PageResult> = withContext(dispatcher) {
-    val startIndex = pageIndex * postsPerPage
-    val endIndex = startIndex + postsPerPage
+  ): Result<PageResult> = withContext(serialContext) {
+    mutex.withLock {
+      val startIndex = pageIndex * postsPerPage
+      val endIndex = startIndex + postsPerPage
 
-    if (force) {
-      invalidatePagesEqualToAndAbove(pageIndex)
+      Log.d(TAG, "getPage(): $pageIndex. Returning items in range [${startIndex}, ${endIndex}]")
+
+      if (force) {
+        invalidatePagesEqualToAndAbove(pageIndex)
+      }
+
+      var hasMore = true
+
+      while (true) {
+        if (allPosts.size >= endIndex) {
+          break
+        }
+
+        if (endReached) {
+          hasMore = false
+          break
+        }
+
+        val hasMoreResult = retry {
+          fetchPage(
+            pageIndex = currentPageInternal,
+            sortType = sortOrder.value.toApiSortOrder(),
+            force = force,
+          )
+        }
+
+        if (hasMoreResult.isFailure) {
+          return@withContext Result.failure(
+            requireNotNull(hasMoreResult.exceptionOrNull()),
+          )
+        } else {
+          hasMore = hasMoreResult.getOrThrow()
+          currentPageInternal++
+        }
+
+        if (!hasMore) {
+          endReached = true
+          break
+        }
+      }
+
+      return@withContext Result.success(
+        PageResult(
+          posts = allPosts
+            .slice(startIndex until min(endIndex, allPosts.size))
+            .map {
+              LocalPostView(
+                fetchedPost = transformPostWithLocalData(it.post),
+                filterReason = it.filterReason,
+                isDuplicatePost = it.isDuplicatePost,
+              )
+            },
+          pageIndex = pageIndex,
+          instance = apiClient.instance,
+          hasMore = hasMore,
+          feed = communityRef,
+        ),
+      )
     }
-
-    var hasMore = true
-
-    while (true) {
-      if (allPosts.size >= endIndex) {
-        break
-      }
-
-      if (endReached) {
-        hasMore = false
-        break
-      }
-
-      val hasMoreResult = retry {
-        fetchPage(
-          pageIndex = currentPageInternal,
-          sortType = sortOrder.value.toApiSortOrder(),
-          force = force,
-        )
-      }
-
-      if (hasMoreResult.isFailure) {
-        return@withContext Result.failure(
-          requireNotNull(hasMoreResult.exceptionOrNull()),
-        )
-      } else {
-        hasMore = hasMoreResult.getOrThrow()
-        currentPageInternal++
-      }
-
-      if (!hasMore) {
-        endReached = true
-        break
-      }
-    }
-
-    return@withContext Result.success(
-      PageResult(
-        posts = allPosts
-          .slice(startIndex until min(endIndex, allPosts.size))
-          .map {
-            LocalPostView(
-              fetchedPost = transformPostWithLocalData(it.post),
-              filterReason = it.filterReason,
-              isDuplicatePost = it.isDuplicatePost,
-            )
-          },
-        pageIndex = pageIndex,
-        instance = apiClient.instance,
-        hasMore = hasMore,
-        feed = communityRef,
-      ),
-    )
   }
 
   val communityInstance: String
@@ -263,8 +273,8 @@ class PostsRepository @AssistedInject constructor(
   val apiInstanceFlow
     get() = apiClient.instanceFlow
 
-  suspend fun setCommunity(communityRef: CommunityRef?) {
-    this.communityRef = communityRef ?: CommunityRef.All()
+  suspend fun setCommunity(communityRef: CommunityRef?) = withContext(serialContext) {
+    this@PostsRepository.communityRef = communityRef ?: CommunityRef.All()
 
     when (communityRef) {
       is CommunityRef.Local -> {
@@ -359,7 +369,7 @@ class PostsRepository @AssistedInject constructor(
     reset()
   }
 
-  suspend fun resetCacheForCommunity() {
+  suspend fun resetCacheForCommunity() = withContext(serialContext) {
     reset()
 
     val apiClient = apiClient
@@ -378,7 +388,7 @@ class PostsRepository @AssistedInject constructor(
     }
   }
 
-  fun reset() {
+  suspend fun reset() = withContext(serialContext) {
     currentPageInternal = 0
     endReached = false
 
@@ -386,7 +396,7 @@ class PostsRepository @AssistedInject constructor(
     seenPosts = mutableSetOf()
   }
 
-  suspend fun onAccountChanged() {
+  suspend fun onAccountChanged() = withContext(serialContext) {
     reset()
 
     if (communityRef is CommunityRef.ModeratedCommunities) {
@@ -395,27 +405,29 @@ class PostsRepository @AssistedInject constructor(
     }
   }
 
-  suspend fun onHiddenPostsChange() {
+  suspend fun onHiddenPostsChange() = withContext(serialContext) {
     val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
     allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) }
   }
 
-  fun update(posts: List<LocalPostView>): List<LocalPostView> = posts.map {
-    it.copy(
-      fetchedPost = transformPostWithLocalData(it.fetchedPost),
-    )
+  suspend fun update(posts: List<LocalPostView>): List<LocalPostView> = withContext(serialContext) {
+    posts.map {
+      it.copy(
+        fetchedPost = transformPostWithLocalData(it.fetchedPost),
+      )
+    }
   }
 
-  fun updateHideRead(hideRead: Boolean) {
-    this.hideRead = hideRead
+  suspend fun updateHideRead(hideRead: Boolean) = withContext(serialContext) {
+    this@PostsRepository.hideRead = hideRead
     hideReadCount = 0
   }
 
-  fun addSeenPosts(posts: List<PostView>) {
+  suspend fun addSeenPosts(posts: List<PostView>) = withContext(serialContext) {
     seenPosts.addAll(posts.map { it.getUniqueKey() })
   }
 
-  fun removeSeenPosts(posts: List<PostView>) {
+  suspend fun removeSeenPosts(posts: List<PostView>) = withContext(serialContext) {
     seenPosts.removeAll(posts.map { it.getUniqueKey() }.toSet())
   }
 
@@ -637,7 +649,7 @@ class PostsRepository @AssistedInject constructor(
     allPosts = mutableAllPosts
   }
 
-  private fun deleteFromPage(minPageInternal: Int) {
+  private suspend fun deleteFromPage(minPageInternal: Int) = withContext(serialContext) {
     allPosts = allPosts.filter {
       val keep = it.postPageIndexInternal < minPageInternal
       if (!keep) {

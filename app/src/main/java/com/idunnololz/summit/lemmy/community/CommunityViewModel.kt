@@ -438,56 +438,58 @@ class CommunityViewModel @Inject constructor(
     clearPages: Boolean = false,
     scrollToTop: Boolean = false,
   ) {
-    if (resetHideRead) {
-      if (hideReadMode.value == HideReadMode.OnUntilRefresh) {
-        hideReadMode.value = HideReadMode.Off
+    viewModelScope.launch {
+      if (resetHideRead) {
+        if (hideReadMode.value == HideReadMode.OnUntilRefresh) {
+          hideReadMode.value = HideReadMode.Off
+        }
+        postsRepository.updateHideRead(hideRead = hideReadMode.value != HideReadMode.Off)
       }
-      postsRepository.updateHideRead(hideRead = hideReadMode.value != HideReadMode.Off)
-    }
 
-    val pages = if (postListEngine.infinity) {
+      val pages = if (postListEngine.infinity) {
+        if (clearPages) {
+          listOf()
+        } else {
+          postListEngine.getCurrentPages()
+        }
+      } else {
+        listOf(requireNotNull(currentPageIndex.value))
+      }
+
       if (clearPages) {
-        listOf()
-      } else {
-        postListEngine.getCurrentPages()
+        postsRepository.reset()
       }
-    } else {
-      listOf(requireNotNull(currentPageIndex.value))
-    }
 
-    if (clearPages) {
-      postsRepository.reset()
-    }
+      if (pages.isEmpty()) {
+        if (postListEngine.infinity) {
+          fetchPage(
+            pageIndex = 0,
+            force = true,
+            clearPagesOnSuccess = clearPages,
+            scrollToTop = scrollToTop,
+            includeHideReadCount = hideReadMode.value != HideReadMode.Off,
+          )
+        } else {
+          fetchCurrentPage()
+        }
+        return@launch
+      }
 
-    if (pages.isEmpty()) {
       if (postListEngine.infinity) {
-        fetchPage(
-          pageIndex = 0,
-          force = true,
-          clearPagesOnSuccess = clearPages,
-          scrollToTop = scrollToTop,
-          includeHideReadCount = hideReadMode.value != HideReadMode.Off,
-        )
+        pages.forEach {
+          fetchPageInternal(
+            pageToFetch = it,
+            force = force,
+            scrollToTop = scrollToTop,
+          )
+        }
       } else {
-        fetchCurrentPage()
-      }
-      return
-    }
-
-    if (postListEngine.infinity) {
-      pages.forEach {
-        fetchPageInternal(
-          pageToFetch = it,
+        loadPageIndexNoInfinity(
+          pageIndex = postListEngine.currentPageIndex.value,
           force = force,
-          scrollToTop = scrollToTop,
+          clearPagePosition = false,
         )
       }
-    } else {
-      loadPageIndexNoInfinity(
-        pageIndex = postListEngine.currentPageIndex.value,
-        force = force,
-        clearPagePosition = false,
-      )
     }
   }
 
@@ -498,6 +500,10 @@ class CommunityViewModel @Inject constructor(
     scrollToTop: Boolean = false,
     includeHideReadCount: Boolean = false,
   ) {
+    if (fetchingPages.contains(pageToFetch)) {
+      return
+    }
+
     if (pageToFetch < postListEngine.pages.size) {
       if (!force) {
         if (postListEngine.infinity) {
@@ -508,21 +514,24 @@ class CommunityViewModel @Inject constructor(
         }
 
         // If we are not using infinity, do nothing...
-      } else {
-        postsRepository.removeSeenPosts(
-          postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView },
-        )
       }
     }
-    if (fetchingPages.contains(pageToFetch)) {
-      return
-    }
+
+    Log.d(TAG, "Fetching page $pageToFetch")
 
     fetchingPages.add(pageToFetch)
 
     loadedPostsData.setIsLoading()
 
     fetchPageJob = viewModelScope.launch(Dispatchers.Default) {
+      if (pageToFetch < postListEngine.pages.size) {
+        if (force) {
+          postsRepository.removeSeenPosts(
+            postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView },
+          )
+        }
+      }
+
       val result = postsRepository.getPage(
         pageIndex = pageToFetch,
         force = force,
@@ -706,18 +715,18 @@ class CommunityViewModel @Inject constructor(
       .map { it.fetchedPost.postView }
       .toList()
 
-    postsRepository.addSeenPosts(allPosts)
-
-    postListEngine.createItems()
-
-    loadedPostsData.postValue(
-      PostUpdateInfo(
-        scrollToTop = false,
-        hideReadCount = null,
-      ),
-    )
-
     viewModelScope.launch {
+      postsRepository.addSeenPosts(allPosts)
+
+      postListEngine.createItems()
+
+      loadedPostsData.postValue(
+        PostUpdateInfo(
+          scrollToTop = false,
+          hideReadCount = null,
+        ),
+      )
+
       // restore read state
       onPostReadChanged()
     }
@@ -997,7 +1006,7 @@ class CommunityViewModel @Inject constructor(
   }
 
   private fun updateStateMaintainingPosition(
-    changeState: PostsRepository.() -> Unit,
+    changeState: suspend PostsRepository.() -> Unit,
     anchors: Set<Int>?,
     includeHideReadCount: Boolean = false,
   ) {

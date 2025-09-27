@@ -254,7 +254,6 @@ class PostListEngine @AssistedInject constructor(
     val context = ContextCompat.getContextForLanguage(context)
 
     Log.d(TAG, "createItems()")
-    Log.d("HAHA", "createItems(): ${currentPageIndex.value}", RuntimeException())
 
     val pages = if (infinity) {
       pages

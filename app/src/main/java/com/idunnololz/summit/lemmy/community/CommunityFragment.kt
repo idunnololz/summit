@@ -44,6 +44,7 @@ import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.goTo.GoToDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
+import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityViewState
@@ -52,8 +53,10 @@ import com.idunnololz.summit.lemmy.FilterTooAggressiveException
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LoadNsfwCommunityWhenNsfwDisabled
 import com.idunnololz.summit.lemmy.MultiCommunityException
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.LemmySwipeActionCallback
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
+import com.idunnololz.summit.lemmy.community.PostListEngineItem.PostItem
 import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.getShortDesc
@@ -2117,6 +2120,30 @@ class CommunityFragment :
       scrollToTop()
     } else {
       viewModel.loadPageIndexNoInfinity(pageIndex = 0, force = false, clearPagePosition = true)
+    }
+  }
+
+  fun updateLastSelectedItem(postRef: PostRef) {
+    val newRef = Either.Left(postRef)
+    if (viewModel.lastSelectedItem == newRef) {
+      return
+    }
+
+    viewModel.lastSelectedItem = newRef
+    adapter?.highlightPostForever(postRef)
+
+    val index = viewModel.postListEngine.items.indexOfFirst {
+      if (it is PostItem) {
+        it.fetchedPost.postView.post.id == postRef.id
+      } else {
+        false
+      }
+    }
+    if (index >= 0) {
+      (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+        index,
+        communityAppBarController?.appBarRoot?.height ?: 0
+      )
     }
   }
 

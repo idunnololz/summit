@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,11 +14,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.idunnololz.summit.databinding.TabbedFragmentPostBinding
+import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.PostListEngineItem
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
@@ -29,12 +32,19 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
 
+  companion object {
+    private const val TAG = "PostTabbedFragment"
+  }
+
   private val args: PostTabbedFragmentArgs by navArgs()
 
   private var argumentsHandled = false
 
   @Inject
   lateinit var nsfwModeManager: NsfwModeManager
+
+  @Inject
+  lateinit var moreActionsHelper: MoreActionsHelper
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -51,12 +61,13 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    fun getViewModel() = (parentFragment as? CommunityFragment)?.viewModel
+    val parentFragment = parentFragment as? CommunityFragment
+
+    fun getViewModel() = parentFragment?.viewModel
 
     val context = requireContext()
 
     val pagerAdapter = PostAdapter(
-      context,
       this,
     ).apply {
       stateRestorationPolicy =
@@ -76,8 +87,21 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
 
+          val item = pagerAdapter.items[position]
+
+          if (item is PostAdapter.Item.PostItem) {
+            moreActionsHelper.onPostRead(
+              postView = item.fetchedPost.postView,
+              delayMs = 500,
+              read = true
+            )
+            parentFragment?.updateLastSelectedItem(
+              PostRef(parentFragment.viewModel.apiInstance, item.fetchedPost.postView.post.id)
+            )
+          }
+
           if (position + 1 == pagerAdapter.itemCount) {
-            val pageToFetch = pagerAdapter.items[position] as? PostAdapter.Item.AutoLoadItem
+            val pageToFetch = item as? PostAdapter.Item.AutoLoadItem
 
             // end reached; load more items
             if (pageToFetch != null) {
@@ -129,7 +153,6 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
   }
 
   class PostAdapter(
-    private val context: Context,
     fragment: Fragment,
   ) : FragmentStateAdapter(fragment) {
 
