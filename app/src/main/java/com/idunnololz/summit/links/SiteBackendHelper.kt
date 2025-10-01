@@ -6,8 +6,11 @@ import com.idunnololz.summit.api.ApiInfo
 import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
+import com.idunnololz.summit.cache.JsonDiskCache
 import com.idunnololz.summit.network.BrowserLikeUnauthed
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.LinkFetcher
+import com.idunnololz.summit.util.retry
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -24,7 +27,6 @@ import okhttp3.OkHttpClient
 
 @Singleton
 class SiteBackendHelper @Inject constructor(
-  private val json: Json,
   private val linkFetcher: LinkFetcher,
   @BrowserLikeUnauthed private val okHttpClient: OkHttpClient,
 ) {
@@ -59,11 +61,13 @@ class SiteBackendHelper @Inject constructor(
 
       val result = withContext(Dispatchers.Default) {
         val v3Job = async {
-          linkFetcher.downloadSite(
-            url = "https://$instance/api/v3/site",
-            cache = true,
-            client = okHttpClient,
-          )
+          retry {
+            linkFetcher.downloadSite(
+              url = "https://$instance/api/v3/site",
+              cache = true,
+              client = okHttpClient,
+            )
+          }
         }
 //        val v4Job = async {
 //          runCatching {
@@ -75,11 +79,13 @@ class SiteBackendHelper @Inject constructor(
 //          }
 //        }
         val alphaJob = async {
-          linkFetcher.downloadSite(
-            url = "https://$instance/api/alpha/site",
-            cache = true,
-            client = okHttpClient,
-          )
+          retry {
+            linkFetcher.downloadSite(
+              url = "https://$instance/api/alpha/site",
+              cache = true,
+              client = okHttpClient,
+            )
+          }
         }
         val homePageJob = async {
           linkFetcher.downloadSite(
@@ -145,7 +151,7 @@ class SiteBackendHelper @Inject constructor(
         if (homePageJob.await().isSuccess) {
           Log.d(TAG, "instance: $instance is not a lemmy site")
 
-          return@withContext Result.success(ApiInfo(backendType = null, downvoteAllowed = false))
+          return@withContext Result.success(ApiInfo(backendType = null, downvoteAllowed = true))
         }
 
         // All 3 network calls failed. This likely means either the site is down or we are down.

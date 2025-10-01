@@ -28,6 +28,7 @@ class DirectoryHelper @Inject constructor(
   val videoCacheDir = File(context.cacheDir, "videos")
   val tabsCacheDir = File(context.cacheDir, "tabs")
   val miscCacheDir = File(context.cacheDir, "misc")
+  val apiInfoCacheDir = File(context.cacheDir, "api_info")
 
   val settingBackupsDir = File(context.filesDir, "sb")
   val saveForLaterDir = File(context.filesDir, "sfl")
