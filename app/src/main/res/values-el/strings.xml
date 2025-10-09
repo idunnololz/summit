@@ -1488,4 +1488,8 @@
     <string name="match_whole_word">Αντιστοίχιση ολόκληρης λέξης</string>
     <string name="show_navigation_bar_on_post">Εμφάνιση γραμμής πλοήγησης στην ανάρτηση</string>
     <string name="full_content_max_height">Μέγιστο ύψος πλήρους περιεχομένου</string>
+    <string name="by_format">Από %1$s</string>
+    <string name="no_text_selected">Δεν έχει επιλεγεί κείμενο</string>
+    <string name="purge_comment_body">Η εκκαθάριση θα διαγράψει αυτό το στοιχείο. Δεν θα μπορείς να ανακτήσεις τα δεδομένα. Χρησιμοποίησέ το με εξαιρετική προσοχή.</string>
+    <string name="symbol_for_unknown_score">Σύμβολο για άγνωστο σκορ</string>
 </resources>
