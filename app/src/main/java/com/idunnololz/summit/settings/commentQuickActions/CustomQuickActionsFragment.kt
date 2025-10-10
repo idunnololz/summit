@@ -40,8 +40,7 @@ import java.util.Collections
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CustomQuickActionsFragment :
-  BaseFragment<FragmentCustomQuickActionsBinding>() {
+class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBinding>() {
 
   private val viewModel: CustomQuickActionsViewModel by viewModels()
 

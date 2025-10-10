@@ -112,8 +112,8 @@ fun RadioGroupSettingItem.asSingleChoiceSelectorItem(
             BottomMenu.MenuItem.ActionItem(
               id = index,
               title = option.title,
-              description = option.description
-            )
+              description = option.description,
+            ),
           )
 
           if (curChoice == null && option.isDefault) {

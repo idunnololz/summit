@@ -36,6 +36,5 @@ class PostFeedPrefetcher @Inject constructor(
   suspend fun suspendPrefetchPage(
     pageIndex: Int,
     postsRepository: PostsRepository,
-  ): Result<PostsRepository.PageResult> =
-    postsRepository.getPage(pageIndex)
+  ): Result<PostsRepository.PageResult> = postsRepository.getPage(pageIndex)
 }

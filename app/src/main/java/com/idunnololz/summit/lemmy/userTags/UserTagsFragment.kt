@@ -26,8 +26,7 @@ import com.idunnololz.summit.util.showProgressBarIfNeeded
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UserTagsFragment :
-  BaseFragment<FragmentUserTagsBinding>() {
+class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
 
   private val viewModel: UserTagsViewModel by viewModels()
 

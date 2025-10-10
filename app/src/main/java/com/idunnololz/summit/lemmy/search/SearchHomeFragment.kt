@@ -39,7 +39,6 @@ import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
-import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.summit.TrendingCommunityData
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -89,8 +88,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchHomeFragment :
-  BaseFragment<FragmentSearchHomeBinding>() {
+class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
 
   companion object {
     private const val TAG = "SearchHomeFragment"

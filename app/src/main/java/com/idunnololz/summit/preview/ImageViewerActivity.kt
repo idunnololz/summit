@@ -307,7 +307,7 @@ class ImageViewerActivity :
       insetViewExceptTopAutomaticallyByPadding(
         lifecycleOwner = this,
         rootView = binding.bottomBar,
-        additionalPaddingBottom = context.getDimen(R.dimen.padding)
+        additionalPaddingBottom = context.getDimen(R.dimen.padding),
       )
     }
 

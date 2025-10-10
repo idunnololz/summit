@@ -31,8 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ManageSettingsFragment :
-  BaseFragment<FragmentManageSettingsBinding>() {
+class ManageSettingsFragment : BaseFragment<FragmentManageSettingsBinding>() {
 
   private val args: ManageSettingsFragmentArgs by navArgs()
   private val viewModel: ManageSettingsViewModel by viewModels()

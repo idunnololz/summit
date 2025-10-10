@@ -1008,7 +1008,7 @@ class CommunityFragment :
                 val currentPageIndex = viewModel.postListEngine.currentPageIndex.value
                 if (!viewModel.infinity && it.data.scrollToSavedPosition) {
                   val pagePosition = viewModel.getPagePosition(currentPageIndex)
-                  Log.d("HAHA", "pagePosition: ${pagePosition}")
+                  Log.d("HAHA", "pagePosition: $pagePosition")
                   if (pagePosition.isAtBottom) {
                     (recyclerView.layoutManager as LinearLayoutManager)
                       .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
@@ -1449,8 +1449,8 @@ class CommunityFragment :
         ?.miscAccountInfo
       if (instance == fullAccount?.account?.instance &&
         miscAccountInfo?.isAdmin == true &&
-        currentCommunityRef is CommunityRef.CommunityRefByName) {
-
+        currentCommunityRef is CommunityRef.CommunityRefByName
+      ) {
         addDivider()
 
         addItemWithIcon(
@@ -1496,11 +1496,11 @@ class CommunityFragment :
         addItemWithIcon(
           id = R.id.search,
           title =
-            if (currentCommunityRef is CommunityRef.CommunityRefByName) {
-              getString(R.string.search_in_format, currentCommunityRef.getName(context))
-            } else {
-              getString(R.string.search)
-            },
+          if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+            getString(R.string.search_in_format, currentCommunityRef.getName(context))
+          } else {
+            getString(R.string.search)
+          },
           icon = R.drawable.baseline_search_24,
         )
       }
@@ -1940,7 +1940,7 @@ class CommunityFragment :
     val currentCommunityRef = viewModel.currentCommunityRef.value ?: return
     val direction = CommunityFragmentDirections.actionCommunityFragmentToSearch(
       false,
-      currentCommunityRef
+      currentCommunityRef,
     )
 
     findNavController().navigate(direction)
@@ -2134,7 +2134,7 @@ class CommunityFragment :
     if (index >= 0) {
       (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
         index,
-        communityAppBarController?.appBarRoot?.height ?: 0
+        communityAppBarController?.appBarRoot?.height ?: 0,
       )
     }
   }

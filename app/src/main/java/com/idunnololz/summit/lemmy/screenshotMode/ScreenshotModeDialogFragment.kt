@@ -23,7 +23,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentScreenshotModeBinding
 import com.idunnololz.summit.databinding.ScreenshotBottomBarBinding

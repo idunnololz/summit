@@ -221,10 +221,12 @@ class ModActionsViewModel @Inject constructor(
           )
       }
 
-      currentModState.postValue(FullModState(
-        communityId,
-        allModState
-      ))
+      currentModState.postValue(
+        FullModState(
+          communityId,
+          allModState,
+        ),
+      )
     }
   }
 }

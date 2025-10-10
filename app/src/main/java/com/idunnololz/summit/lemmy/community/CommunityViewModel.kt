@@ -343,17 +343,21 @@ class CommunityViewModel @Inject constructor(
     loadPageRelativeNoInfinity(direction = 1, force = force, clearPagePosition = clearPagePosition)
   }
 
-  private fun loadPageRelativeNoInfinity(direction: Int, force: Boolean, clearPagePosition: Boolean) {
+  private fun loadPageRelativeNoInfinity(
+    direction: Int,
+    force: Boolean,
+    clearPagePosition: Boolean,
+  ) {
     if (postListEngine.infinity) return
 
-    loadPageIndexNoInfinity(postListEngine.currentPageIndex.value + direction, force, clearPagePosition)
+    loadPageIndexNoInfinity(
+      postListEngine.currentPageIndex.value + direction,
+      force,
+      clearPagePosition,
+    )
   }
 
-  fun loadPageIndexNoInfinity(
-    pageIndex: Int,
-    force: Boolean,
-    clearPagePosition: Boolean
-  ) {
+  fun loadPageIndexNoInfinity(pageIndex: Int, force: Boolean, clearPagePosition: Boolean) {
     if (postListEngine.infinity) return
 
     postListEngine.setPageIndex(pageIndex)

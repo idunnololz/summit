@@ -31,7 +31,8 @@ class BackupsAdapter(
   ).apply {
     addItemType(Item.BackupItem::class, BackupItemBinding::inflate) { item, b, h ->
       b.title.text = item.backupInfo.file.name
-      b.subtitle.text = tsToConcise(context, item.backupInfo.file.lastModified(), PrettyPrintStyles.SHORT_DYNAMIC)
+      b.subtitle.text =
+        tsToConcise(context, item.backupInfo.file.lastModified(), PrettyPrintStyles.SHORT_DYNAMIC)
       b.root.setOnClickListener {
         onBackupClick(item.backupInfo)
       }

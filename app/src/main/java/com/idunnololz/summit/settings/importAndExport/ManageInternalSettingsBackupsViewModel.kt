@@ -32,7 +32,7 @@ class ManageInternalSettingsBackupsViewModel @Inject constructor(
   private suspend fun loadBackupsData() = withContext(Dispatchers.Default) {
     backupsInfo.postValue(
       settingsBackupManager.getBackups()
-        .sortedByDescending { it.file.lastModified() }
+        .sortedByDescending { it.file.lastModified() },
     )
   }
 }

@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentChangePasswordBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
@@ -19,8 +18,7 @@ import com.idunnololz.summit.util.toErrorMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ChangePasswordDialogFragment :
-  BaseDialogFragment<DialogFragmentChangePasswordBinding>() {
+class ChangePasswordDialogFragment : BaseDialogFragment<DialogFragmentChangePasswordBinding>() {
 
   companion object {
     fun show(fragmentManager: FragmentManager) {

@@ -8,7 +8,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentsManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
-import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -173,7 +172,7 @@ class ContextFetcher @Inject constructor(
         },
         {
           Result.failure(it)
-        }
+        },
       )
   }
 

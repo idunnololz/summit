@@ -33,7 +33,6 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -877,7 +876,7 @@ class PostFragment :
         apiInstance,
       )
       positionButtonResId = R.string.change_instance
-      negativeButtonResId  = R.string.cancel
+      negativeButtonResId = R.string.cancel
     }
   }
 

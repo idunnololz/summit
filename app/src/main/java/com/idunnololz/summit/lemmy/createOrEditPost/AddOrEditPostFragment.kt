@@ -160,7 +160,6 @@ class AddOrEditPostFragment :
   @Inject
   lateinit var recentCommunityManager: RecentCommunityManager
 
-
   private val createPostConfirmationDialogLauncher = newAlertDialogLauncher("create_post") {
     if (it.isOk) {
       createPost()
@@ -291,8 +290,8 @@ class AddOrEditPostFragment :
           scrollView = scrollView,
           textInputs = listOf(
             altText,
-            postEditor
-          )
+            postEditor,
+          ),
         )
 
         var lastImeHeight = -1

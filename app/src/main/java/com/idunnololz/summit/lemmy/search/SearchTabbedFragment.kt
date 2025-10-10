@@ -60,8 +60,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchTabbedFragment :
-  BaseFragment<FragmentSearchBinding>() {
+class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
 
   companion object {
     private const val TAG = "SearchTabbedFragment"

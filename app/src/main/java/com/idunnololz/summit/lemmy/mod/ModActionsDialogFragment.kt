@@ -82,10 +82,7 @@ class ModActionsDialogFragment :
       )
     }
 
-
-    fun show(
-      communityRef: CommunityRef.CommunityRefByName,
-      fragmentManager: FragmentManager) {
+    fun show(communityRef: CommunityRef.CommunityRefByName, fragmentManager: FragmentManager) {
       show(
         communityId = -1,
         commentId = -1,

@@ -767,7 +767,7 @@ class PostsFeedSettings @Inject constructor(
     ).toOptions(R.id.show_scores),
     relatedKeys = listOf(
       KEY_HIDE_POST_SCORES,
-      KEY_POST_SHOW_UP_AND_DOWN_VOTES
+      KEY_POST_SHOW_UP_AND_DOWN_VOTES,
     ),
   )
   val keywordFilters = BasicSettingItem(
@@ -1101,21 +1101,21 @@ class PostAndCommentsSettings @Inject constructor(
     description = context.getString(R.string.comment_scores_desc),
     options = listOf(
       RadioGroupSettingItem.RadioGroupOption(
-            R.id.show_scores,
-            context.getString(R.string.show_scores),
+        R.id.show_scores,
+        context.getString(R.string.show_scores),
       ),
       RadioGroupSettingItem.RadioGroupOption(
-            R.id.show_up_and_down_votes,
-            context.getString(R.string.show_up_and_down_votes),
+        R.id.show_up_and_down_votes,
+        context.getString(R.string.show_up_and_down_votes),
       ),
       RadioGroupSettingItem.RadioGroupOption(
-            R.id.hide_scores,
-            context.getString(R.string.hide_scores),
+        R.id.hide_scores,
+        context.getString(R.string.hide_scores),
       ),
     ),
     relatedKeys = listOf(
       KEY_HIDE_COMMENT_SCORES,
-      KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
+      KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES,
     ),
   )
   val swipeBetweenPosts = OnOffSettingItem(

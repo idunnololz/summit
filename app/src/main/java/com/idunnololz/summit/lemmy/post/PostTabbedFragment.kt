@@ -1,8 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -93,10 +91,10 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
             moreActionsHelper.onPostRead(
               postView = item.fetchedPost.postView,
               delayMs = 500,
-              read = true
+              read = true,
             )
             parentFragment?.updateLastSelectedItem(
-              PostRef(parentFragment.viewModel.apiInstance, item.fetchedPost.postView.post.id)
+              PostRef(parentFragment.viewModel.apiInstance, item.fetchedPost.postView.post.id),
             )
           }
 

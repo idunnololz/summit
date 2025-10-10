@@ -43,8 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsPostAndCommentsAppearanceFragment :
-  BaseSettingsFragment() {
+class SettingsPostAndCommentsAppearanceFragment : BaseSettingsFragment() {
 
   private val viewModel: SettingsPostAndCommentsAppearanceViewModel by viewModels()
 

@@ -33,8 +33,7 @@ object LemmyUtils {
 
   fun formatAuthor(author: String): String = "@%s".format(author)
 
-  fun abbrevScore(number: Long?): String =
-    abbrevNumber(number, stringForUnknownScore)
+  fun abbrevScore(number: Long?): String = abbrevNumber(number, stringForUnknownScore)
 
   fun abbrevNumber(number: Long?, valueOnNull: String = "⬤"): String {
     if (number == null) {

@@ -44,17 +44,16 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
       showResetButton: Boolean,
       resetValue: String?,
       supportsRichText: Boolean,
-    ) =
-      RichTextValueDialogFragment().apply {
-        arguments = Bundle().apply {
-          putString(ARG_TITLE, title)
-          putInt(ARG_KEY_ID, key)
-          putString(ARG_CURRENT_VALUE, currentValue)
-          putBoolean(ARG_SHOW_RESET_BUTTON, showResetButton)
-          putString(ARG_RESET_VALUE, resetValue)
-          putBoolean(ARG_SUPPORTS_RICH_TEXT, supportsRichText)
-        }
+    ) = RichTextValueDialogFragment().apply {
+      arguments = Bundle().apply {
+        putString(ARG_TITLE, title)
+        putInt(ARG_KEY_ID, key)
+        putString(ARG_CURRENT_VALUE, currentValue)
+        putBoolean(ARG_SHOW_RESET_BUTTON, showResetButton)
+        putString(ARG_RESET_VALUE, resetValue)
+        putBoolean(ARG_SUPPORTS_RICH_TEXT, supportsRichText)
       }
+    }
   }
 
   private val viewModel: RichTextValueViewModel by viewModels()
@@ -227,11 +226,11 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
             is StatefulData.Error -> {
               loadingView.hideAll()
               launchAlertDialog("update_image_error") {
-                 message = getString(
-                   R.string.error_unable_to_send_post,
-                   it.error::class.qualifiedName,
-                   it.error.message,
-                 )
+                message = getString(
+                  R.string.error_unable_to_send_post,
+                  it.error::class.qualifiedName,
+                  it.error.message,
+                )
               }
             }
             is StatefulData.Loading -> {

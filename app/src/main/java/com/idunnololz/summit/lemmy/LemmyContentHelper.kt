@@ -19,7 +19,6 @@ import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
 import androidx.core.view.updateLayoutParams
-import androidx.room.Embedded
 import arrow.core.Either
 import coil3.Image
 import coil3.dispose
@@ -401,7 +400,7 @@ class LemmyContentHelper(
           R.layout.full_content_embedded_video_view
         } else {
           R.layout.full_content_video_view
-        }
+        },
       )
       val playerView = containerView.findViewById<CustomPlayerView>(R.id.player_view)
 
@@ -823,8 +822,8 @@ class LemmyContentHelper(
 
               val drawable = imageView.drawable
               if (drawable is ShimmerDrawable ||
-                (drawable is CrossfadeDrawable && drawable.end is ShimmerDrawable)) {
-
+                (drawable is CrossfadeDrawable && drawable.end is ShimmerDrawable)
+              ) {
                 imageView.setImageDrawable(null)
               }
             }

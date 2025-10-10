@@ -137,7 +137,7 @@ class SettingsThemeFragment : BaseSettingsFragment() {
                 }
               }
               themeManager.onPreferencesChanged()
-            }
+            },
           ),
         ),
       ),

@@ -2,9 +2,6 @@ package com.idunnololz.summit.util
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ScrollView
-import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.LifecycleOwner
@@ -112,7 +109,7 @@ fun InsetsProvider.insetViewAutomaticallyByPadding(
 fun InsetsProvider.autoScrollToEditTextCursorOnIme(
   lifecycleOwner: LifecycleOwner,
   scrollView: NestedScrollView,
-  textInputs: List<TextInputLayout>
+  textInputs: List<TextInputLayout>,
 ) {
   var lastImeHeight = -1
   insets.observe(lifecycleOwner) {
@@ -141,7 +138,7 @@ fun InsetsProvider.autoScrollToEditTextCursorOnIme(
 
                     scrollView.smoothScrollTo(0, textInput.top + lineTop)
                   }
-                }
+                },
               )
               break
             }

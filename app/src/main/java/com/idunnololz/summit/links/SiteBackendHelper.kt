@@ -6,9 +6,7 @@ import com.idunnololz.summit.api.ApiInfo
 import com.idunnololz.summit.api.ApiType
 import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.dto.lemmy.GetSiteResponse
-import com.idunnololz.summit.cache.JsonDiskCache
 import com.idunnololz.summit.network.BrowserLikeUnauthed
-import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.LinkFetcher
 import com.idunnololz.summit.util.retry
 import java.io.InterruptedIOException
@@ -22,7 +20,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 
 @Singleton

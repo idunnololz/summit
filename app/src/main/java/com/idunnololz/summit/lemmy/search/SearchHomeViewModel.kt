@@ -335,7 +335,7 @@ class SearchHomeViewModel @Inject constructor(
       apiClient
         .fetchCommunityWithRetry(
           Either.Right(communityRef.fullName),
-          force = false
+          force = false,
         )
         .onSuccess {
           nextCommunityFilter.value = CommunityFilter(

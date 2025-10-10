@@ -15,7 +15,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -73,8 +72,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runInterruptible
 
 @AndroidEntryPoint
-class SignUpFragment :
-  BaseFragment<FragmentSignUpBinding>() {
+class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
 
   private val viewModel: SignUpViewModel by viewModels()
 

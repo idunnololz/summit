@@ -13,8 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsHapticsFragment :
-  BaseSettingsFragment() {
+class SettingsHapticsFragment : BaseSettingsFragment() {
 
   @Inject
   override lateinit var settings: HapticSettings

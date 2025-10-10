@@ -15,7 +15,6 @@ import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
-import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
@@ -30,9 +29,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlin.math.min
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -185,74 +182,72 @@ class PostsRepository @AssistedInject constructor(
     endReached = false
   }
 
-  suspend fun getPage(
-    pageIndex: Int,
-    force: Boolean = false,
-  ): Result<PageResult> = withContext(serialContext) {
-    mutex.withLock {
-      val startIndex = pageIndex * postsPerPage
-      val endIndex = startIndex + postsPerPage
+  suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> =
+    withContext(serialContext) {
+      mutex.withLock {
+        val startIndex = pageIndex * postsPerPage
+        val endIndex = startIndex + postsPerPage
 
-      Log.d(TAG, "getPage(): $pageIndex. Returning items in range [${startIndex}, ${endIndex}]")
+        Log.d(TAG, "getPage(): $pageIndex. Returning items in range [$startIndex, $endIndex]")
 
-      if (force) {
-        invalidatePagesEqualToAndAbove(pageIndex)
+        if (force) {
+          invalidatePagesEqualToAndAbove(pageIndex)
+        }
+
+        var hasMore = true
+
+        while (true) {
+          if (allPosts.size >= endIndex) {
+            break
+          }
+
+          if (endReached) {
+            hasMore = false
+            break
+          }
+
+          val hasMoreResult = retry {
+            fetchPage(
+              pageIndex = currentPageInternal,
+              sortType = sortOrder.value.toApiSortOrder(),
+              force = force,
+            )
+          }
+
+          if (hasMoreResult.isFailure) {
+            return@withContext Result.failure(
+              requireNotNull(hasMoreResult.exceptionOrNull()),
+            )
+          } else {
+            hasMore = hasMoreResult.getOrThrow()
+            currentPageInternal++
+          }
+
+          if (!hasMore) {
+            endReached = true
+            break
+          }
+        }
+
+        return@withContext Result.success(
+          PageResult(
+            posts = allPosts
+              .slice(startIndex until min(endIndex, allPosts.size))
+              .map {
+                LocalPostView(
+                  fetchedPost = transformPostWithLocalData(it.post),
+                  filterReason = it.filterReason,
+                  isDuplicatePost = it.isDuplicatePost,
+                )
+              },
+            pageIndex = pageIndex,
+            instance = apiClient.instance,
+            hasMore = hasMore,
+            feed = communityRef,
+          ),
+        )
       }
-
-      var hasMore = true
-
-      while (true) {
-        if (allPosts.size >= endIndex) {
-          break
-        }
-
-        if (endReached) {
-          hasMore = false
-          break
-        }
-
-        val hasMoreResult = retry {
-          fetchPage(
-            pageIndex = currentPageInternal,
-            sortType = sortOrder.value.toApiSortOrder(),
-            force = force,
-          )
-        }
-
-        if (hasMoreResult.isFailure) {
-          return@withContext Result.failure(
-            requireNotNull(hasMoreResult.exceptionOrNull()),
-          )
-        } else {
-          hasMore = hasMoreResult.getOrThrow()
-          currentPageInternal++
-        }
-
-        if (!hasMore) {
-          endReached = true
-          break
-        }
-      }
-
-      return@withContext Result.success(
-        PageResult(
-          posts = allPosts
-            .slice(startIndex until min(endIndex, allPosts.size))
-            .map {
-              LocalPostView(
-                fetchedPost = transformPostWithLocalData(it.post),
-                filterReason = it.filterReason,
-                isDuplicatePost = it.isDuplicatePost,
-              )
-            },
-          pageIndex = pageIndex,
-          instance = apiClient.instance,
-          hasMore = hasMore,
-          feed = communityRef,
-        ),
-      )
     }
-  }
 
   val communityInstance: String
     get() =
@@ -485,7 +480,7 @@ class PostsRepository @AssistedInject constructor(
     val newPostResults = currentDataSource.fetchPosts(
       sortType = sortType,
       page = pageIndex,
-      force = force
+      force = force,
     )
     val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
     val account = accountManager.currentAccount.asAccount
