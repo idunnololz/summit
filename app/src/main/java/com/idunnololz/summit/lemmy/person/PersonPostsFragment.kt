@@ -10,7 +10,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.AlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentPersonPostsBinding
 import com.idunnololz.summit.lemmy.community.PostListAdapter
 import com.idunnololz.summit.lemmy.community.PostListEngineItem
@@ -79,17 +81,14 @@ class PersonPostsFragment :
           .show(childFragmentManager, "asdf")
       },
       onInstanceMismatch = { accountInstance, apiInstance ->
-        OldAlertDialogFragment.Builder()
-          .setTitle(R.string.error_account_instance_mismatch_title)
-          .setMessage(
-            getString(
-              R.string.error_account_instance_mismatch,
-              accountInstance,
-              apiInstance,
-            ),
+        launchAlertDialog("instance_mismatch") {
+          titleResId = R.string.error_account_instance_mismatch_title
+          message = getString(
+            R.string.error_account_instance_mismatch,
+            accountInstance,
+            apiInstance,
           )
-          .setNegativeButton(R.string.go_to_account_instance)
-          .createAndShow(childFragmentManager, "onInstanceMismatch")
+        }
       },
       onImageClick = { _, postView, sharedElementView, url ->
         val altUrl = if (url == postView.post.thumbnail_url) {

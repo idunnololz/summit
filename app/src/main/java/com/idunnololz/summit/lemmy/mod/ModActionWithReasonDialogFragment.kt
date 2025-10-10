@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommunityId
@@ -27,8 +26,7 @@ import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 class ModActionWithReasonDialogFragment :
-  BaseDialogFragment<DialogFragmentRemoveCommentBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseDialogFragment<DialogFragmentRemoveCommentBinding>() {
 
   private val args by navArgs<ModActionWithReasonDialogFragmentArgs>()
 
@@ -439,50 +437,6 @@ class ModActionWithReasonDialogFragment :
       positiveButton.isEnabled = !disable
       cancel.isEnabled = !disable
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (!isBindingAvailable()) {
-      return
-    }
-
-    when (tag) {
-      "purge_community" -> {
-        actionsViewModel.purgeCommunity(
-          communityId = (args.modAction as ModActionWithReason.PurgeCommunity).communityId,
-          reason = binding.reasonEditText.text.toString().ifBlank {
-            null
-          },
-        )
-      }
-      "purge_post" -> {
-        actionsViewModel.purgePost(
-          postId = (args.modAction as ModActionWithReason.PurgePost).postId,
-          reason = binding.reasonEditText.text.toString().ifBlank {
-            null
-          },
-        )
-      }
-      "purge_user" -> {
-        actionsViewModel.purgePerson(
-          personId = (args.modAction as ModActionWithReason.PurgePerson).personId,
-          reason = binding.reasonEditText.text.toString().ifBlank {
-            null
-          },
-        )
-      }
-      "purge_comment" -> {
-        actionsViewModel.purgeComment(
-          commentId = (args.modAction as ModActionWithReason.PurgeComment).commentId,
-          reason = binding.reasonEditText.text.toString().ifBlank {
-            null
-          },
-        )
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 
   sealed class ModActionWithReason : Parcelable {

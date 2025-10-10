@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
@@ -24,9 +25,9 @@ import androidx.viewbinding.ViewBinding
 import coil3.asImage
 import coil3.dispose
 import coil3.load
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.NotYetImplemented
 import com.idunnololz.summit.databinding.FragmentSignUpBinding
@@ -73,8 +74,7 @@ import kotlinx.coroutines.runInterruptible
 
 @AndroidEntryPoint
 class SignUpFragment :
-  BaseFragment<FragmentSignUpBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentSignUpBinding>() {
 
   private val viewModel: SignUpViewModel by viewModels()
 
@@ -95,7 +95,7 @@ class SignUpFragment :
 
   private var currentBinding: ViewBinding? = null
 
-  private var submitApplicationErrorDialog: DialogFragment? = null
+  private var submitApplicationErrorDialog: AlertDialog? = null
 
   val backPressHandler = object : OnBackPressedCallback(true) {
     override fun handleOnBackPressed() {
@@ -598,17 +598,16 @@ class SignUpFragment :
           viewModel.submitApplication(scene.instance, data.signUpFormData)
         }
 
-        if (scene.error != null && submitApplicationErrorDialog?.isVisible != true) {
-          val fm = childFragmentManager
-          submitApplicationErrorDialog = OldAlertDialogFragment.Builder()
+        if (scene.error != null && submitApplicationErrorDialog?.isShowing != true) {
+          submitApplicationErrorDialog = MaterialAlertDialogBuilder(context)
             .setTitle(R.string.error_sign_up)
             .setMessage(scene.error)
-            .setPositiveButton(android.R.string.ok)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+              viewModel.goBack()
+            }
             .create()
-            .apply {
-              fm.beginTransaction()
-                .add(this, "submit_application_error")
-                .commitAllowingStateLoss()
+            .also {
+              it.show()
             }
         }
       }
@@ -774,14 +773,5 @@ class SignUpFragment :
           true,
         )
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (tag == "submit_application_error") {
-      viewModel.goBack()
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

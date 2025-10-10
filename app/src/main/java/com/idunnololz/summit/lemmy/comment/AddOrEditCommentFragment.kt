@@ -32,8 +32,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -86,8 +86,7 @@ import kotlinx.parcelize.Parcelize
 class AddOrEditCommentFragment :
   BaseDialogFragment<FragmentAddOrEditCommentBinding>(),
   FullscreenDialogFragment,
-  SignInNavigator,
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  SignInNavigator {
 
   companion object {
     const val REQUEST_KEY = "AddOrEditCommentFragment_req_key"
@@ -158,6 +157,18 @@ class AddOrEditCommentFragment :
         }
       }
     }
+
+  private val sendCommentConfirmationDialogLauncher = newAlertDialogLauncher("send_comment") {
+    if (it.isOk) {
+      sendComment()
+    }
+  }
+
+  private val updateCommentConfirmationDialogLauncher = newAlertDialogLauncher("update_comment") {
+    if (it.isOk) {
+      updateComment()
+    }
+  }
 
   @Inject
   lateinit var preferences: Preferences
@@ -458,11 +469,11 @@ class AddOrEditCommentFragment :
         when (it.itemId) {
           R.id.send_comment -> {
             if (uploadImageViewModel.isUploading) {
-              OldAlertDialogFragment.Builder()
-                .setMessage(R.string.warn_upload_in_progress)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(this@AddOrEditCommentFragment, "send_comment")
+              sendCommentConfirmationDialogLauncher.launchDialog {
+                messageResId = R.string.warn_upload_in_progress
+                positionButtonResId = R.string.proceed_anyways
+                negativeButtonResId = R.string.cancel
+              }
               return@a true
             }
             when (args.sendAction as SendAction) {
@@ -494,11 +505,11 @@ class AddOrEditCommentFragment :
           }
           R.id.update_comment -> {
             if (uploadImageViewModel.isUploading) {
-              OldAlertDialogFragment.Builder()
-                .setMessage(R.string.warn_upload_in_progress)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(this@AddOrEditCommentFragment, "update_comment")
+              updateCommentConfirmationDialogLauncher.launchDialog {
+                messageResId = R.string.warn_upload_in_progress
+                positionButtonResId = R.string.proceed_anyways
+                negativeButtonResId = R.string.cancel
+              }
               return@a true
             }
             updateComment()
@@ -1099,20 +1110,6 @@ class AddOrEditCommentFragment :
         }
       }
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    when (tag) {
-      "send_comment" -> {
-        sendComment()
-      }
-      "update_comment" -> {
-        updateComment()
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 
   private val isDm: Boolean

@@ -23,7 +23,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentScreenshotModeBinding
 import com.idunnololz.summit.databinding.ScreenshotBottomBarBinding
 import com.idunnololz.summit.databinding.ScreenshotStageBinding
@@ -65,8 +66,7 @@ import kotlinx.parcelize.Parcelize
 @AndroidEntryPoint
 class ScreenshotModeDialogFragment :
   BaseDialogFragment<DialogFragmentScreenshotModeBinding>(),
-  FullscreenDialogFragment,
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  FullscreenDialogFragment {
 
   companion object {
     const val REQUEST_KEY = "ScreenshotModeDialogFragment_req_key"
@@ -116,6 +116,12 @@ class ScreenshotModeDialogFragment :
     ) { result ->
       onCreateDocumentResult(result, MimeTypes.WEBM)
     }
+
+  private val recordScreenCompleteDialogLauncher = newAlertDialogLauncher("recording_stats") {
+    setResultIfPossible()
+
+    dismiss()
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -599,41 +605,23 @@ class ScreenshotModeDialogFragment :
         if (recordingStats != null) {
           val df = PrettyPrintUtils.defaultDecimalFormat
 
-          OldAlertDialogFragment.Builder()
-            .setMessage(
-              getString(
-                R.string.desc_recording_stats,
-                df.format(recordingStats.effectiveFrameRate),
-                df.format(recordingStats.frameTimeMs),
-                durationToPretty(recordingStats.totalTimeSpent ?: 0L),
-                FileSizeUtils.convertToStringRepresentation(
-                  recordingStats.fileSize ?: 0L,
-                ),
+          recordScreenCompleteDialogLauncher.launchDialog {
+            message = getString(
+              R.string.desc_recording_stats,
+              df.format(recordingStats.effectiveFrameRate),
+              df.format(recordingStats.frameTimeMs),
+              durationToPretty(recordingStats.totalTimeSpent ?: 0L),
+              FileSizeUtils.convertToStringRepresentation(
+                recordingStats.fileSize ?: 0L,
               ),
             )
-            .createAndShow(childFragmentManager, "recording_stats")
+          }
         } else {
           setResultIfPossible()
 
           dismiss()
         }
       }
-    }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (tag == "recording_stats") {
-      setResultIfPossible()
-
-      dismiss()
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (tag == "recording_stats") {
-      setResultIfPossible()
-
-      dismiss()
     }
   }
 

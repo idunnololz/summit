@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
@@ -61,8 +61,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchTabbedFragment :
-  BaseFragment<FragmentSearchBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentSearchBinding>() {
 
   companion object {
     private const val TAG = "SearchTabbedFragment"
@@ -95,6 +94,36 @@ class SearchTabbedFragment :
     override fun handleOnBackPressed() {
       viewModel.showSearch.value = false
     }
+  }
+
+  private val deleteSuggestionDialogLauncher = newAlertDialogLauncher("delete_suggestion") a@{
+    val context = context ?: return@a
+
+    val suggestionToDelete = it.extras?.getString(ARG_SUGGESTION_TO_DELETE) ?: return@a
+    val searchManager = context.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
+    val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(
+      requireActivity().componentName,
+    )
+    val searchable = searchableInfo ?: return@a
+    val authority = searchable.suggestAuthority ?: return@a
+
+    val uriBuilder = Uri.Builder()
+      .scheme(ContentResolver.SCHEME_CONTENT)
+      .authority(authority)
+      .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+      .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
+      .appendEncodedPath("suggestions")
+
+    val uri = uriBuilder.build()
+
+    // finally, make the query
+    context.contentResolver.delete(
+      uri,
+      "query = ?",
+      arrayOf(suggestionToDelete),
+    )
+
+    searchSuggestionsAdapter?.refreshSuggestions()
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -330,12 +359,12 @@ class SearchTabbedFragment :
           }
 
           override fun onSuggestionLongClicked(query: String) {
-            OldAlertDialogFragment.Builder()
-              .setTitle(R.string.delete_suggest)
-              .setPositiveButton(android.R.string.ok)
-              .setNegativeButton(android.R.string.cancel)
-              .setExtra(ARG_SUGGESTION_TO_DELETE, query)
-              .createAndShow(childFragmentManager, "asdf")
+            deleteSuggestionDialogLauncher.launchDialog {
+              titleResId = R.string.delete_suggest
+              positionButtonResId = android.R.string.ok
+              negativeButtonResId = android.R.string.cancel
+              extras.putString(ARG_SUGGESTION_TO_DELETE, query)
+            }
           }
         },
       )
@@ -563,40 +592,5 @@ class SearchTabbedFragment :
 
   fun closePost(postFragment: Fragment) {
     slidingPaneController?.closePost(postFragment)
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    val context = context ?: return
-
-    val suggestionToDelete = dialog.getExtra(ARG_SUGGESTION_TO_DELETE)
-    if (suggestionToDelete != null) {
-      val searchManager = context?.getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-      val searchableInfo: SearchableInfo? = searchManager?.getSearchableInfo(
-        requireActivity().componentName,
-      )
-      val searchable = searchableInfo ?: return
-      val authority = searchable.suggestAuthority ?: return
-
-      val uriBuilder = Uri.Builder()
-        .scheme(ContentResolver.SCHEME_CONTENT)
-        .authority(authority)
-        .query("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-        .fragment("") // TODO: Remove, workaround for a bug in Uri.writeToParcel()
-        .appendEncodedPath("suggestions")
-
-      val uri = uriBuilder.build()
-
-      // finally, make the query
-      context.contentResolver.delete(
-        uri,
-        "query = ?",
-        arrayOf(suggestionToDelete),
-      )
-
-      searchSuggestionsAdapter?.refreshSuggestions()
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

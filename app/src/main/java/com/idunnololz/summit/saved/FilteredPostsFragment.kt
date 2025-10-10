@@ -11,7 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.databinding.FragmentSavedPostsBinding
 import com.idunnololz.summit.lemmy.community.PostListAdapter
@@ -82,17 +82,14 @@ class FilteredPostsFragment :
           .show(childFragmentManager, "asdf")
       },
       onInstanceMismatch = { accountInstance, apiInstance ->
-        OldAlertDialogFragment.Builder()
-          .setTitle(R.string.error_account_instance_mismatch_title)
-          .setMessage(
-            getString(
-              R.string.error_account_instance_mismatch,
-              accountInstance,
-              apiInstance,
-            ),
+        launchAlertDialog("instance_mismatch") {
+          titleResId = R.string.error_account_instance_mismatch_title
+          message = getString(
+            R.string.error_account_instance_mismatch,
+            accountInstance,
+            apiInstance,
           )
-          .setNegativeButton(R.string.go_to_account_instance)
-          .createAndShow(childFragmentManager, "onInstanceMismatch")
+        }
       },
       onImageClick = { _, postView, sharedElementView, url ->
         val altUrl = if (url == postView.post.thumbnail_url) {

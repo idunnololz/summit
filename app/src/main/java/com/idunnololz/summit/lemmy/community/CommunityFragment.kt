@@ -33,8 +33,9 @@ import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -44,7 +45,6 @@ import com.idunnololz.summit.databinding.FragmentCommunityBinding
 import com.idunnololz.summit.goTo.GoToDialogFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
-import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.CommunitySortOrder
 import com.idunnololz.summit.lemmy.CommunityViewState
@@ -61,7 +61,6 @@ import com.idunnololz.summit.lemmy.communityInfo.CommunityInfoViewModel
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.getShortDesc
 import com.idunnololz.summit.lemmy.idToSortOrder
-import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.instancePicker.InstancePickerDialogFragment
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
@@ -71,7 +70,6 @@ import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
-import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toId
@@ -122,8 +120,7 @@ import kotlinx.serialization.json.Json
 @AndroidEntryPoint
 class CommunityFragment :
   BaseFragment<FragmentCommunityBinding>(),
-  SignInNavigator,
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  SignInNavigator {
 
   companion object {
     private const val TAG = "CommunityFragment"
@@ -204,6 +201,12 @@ class CommunityFragment :
         isEnabled = false
         requireActivity().onBackPressed()
       }
+    }
+  }
+
+  private val instanceMismatchDialogLauncher = newAlertDialogLauncher("instance_mismatch") {
+    if (it is AlertDialogFragment.Result.Neutral) {
+      viewModel.resetToAccountInstance()
     }
   }
 
@@ -345,17 +348,15 @@ class CommunityFragment :
             .show(childFragmentManager, "asdf")
         },
         onInstanceMismatch = { accountInstance, apiInstance ->
-          OldAlertDialogFragment.Builder()
-            .setTitle(R.string.error_account_instance_mismatch_title)
-            .setMessage(
-              getString(
-                R.string.error_account_instance_mismatch,
-                accountInstance,
-                apiInstance,
-              ),
+          instanceMismatchDialogLauncher.launchDialog {
+            titleResId = R.string.error_account_instance_mismatch_title
+            message = getString(
+              R.string.error_account_instance_mismatch,
+              accountInstance,
+              apiInstance,
             )
-            .setNegativeButton(R.string.go_to_account_instance)
-            .createAndShow(childFragmentManager, "onInstanceMismatch")
+            neutralButtonResId = R.string.go_to_account_instance
+          }
         },
         onImageClick = { accountId, postView, sharedElementView, url ->
           val altUrl = if (url == postView.post.thumbnail_url) {
@@ -896,6 +897,7 @@ class CommunityFragment :
           clearPages = true,
           scrollToTop = true,
         )
+        communityAppBarController?.refreshCommunityInfoIfNeeded()
       }
       loadingView.setOnRefreshClickListener {
         viewModel.fetchCurrentPage(true)
@@ -2006,16 +2008,6 @@ class CommunityFragment :
   }
 
   override fun proceedAnyways(tag: Int) {}
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (tag == "onInstanceMismatch") {
-      dialog.dismiss()
-      viewModel.resetToAccountInstance()
-    }
-  }
 
   private fun onSelectedLayoutChanged() {
     val currentLayout = currentLayout

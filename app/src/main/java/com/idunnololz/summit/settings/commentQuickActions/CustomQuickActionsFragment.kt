@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentCustomQuickActionsBinding
 import com.idunnololz.summit.databinding.InactiveActionsTitleBinding
 import com.idunnololz.summit.databinding.QuickActionBinding
@@ -41,10 +41,15 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class CustomQuickActionsFragment :
-  BaseFragment<FragmentCustomQuickActionsBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentCustomQuickActionsBinding>() {
 
   private val viewModel: CustomQuickActionsViewModel by viewModels()
+
+  private val resetSettingsDialogLauncher = newAlertDialogLauncher("reset_settings") {
+    if (it.isOk) {
+      viewModel.resetSettings()
+    }
+  }
 
   @Inject
   lateinit var animationsHelper: AnimationsHelper
@@ -81,11 +86,11 @@ class CustomQuickActionsFragment :
 
           override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
             R.id.reset_settings -> {
-              OldAlertDialogFragment.Builder()
-                .setMessage(R.string.warn_reset_settings)
-                .setPositiveButton(R.string.reset_settings)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(childFragmentManager, "reset_settings")
+              resetSettingsDialogLauncher.launchDialog {
+                messageResId = R.string.warn_reset_settings
+                positionButtonResId = R.string.reset_settings
+                negativeButtonResId = R.string.cancel
+              }
               true
             }
 
@@ -366,12 +371,5 @@ class CustomQuickActionsFragment :
       quickActions = newQuickActions
       onQuickActionsChanged(newQuickActions)
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    viewModel.resetSettings()
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

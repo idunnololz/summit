@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentChangePasswordBinding
@@ -21,8 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ChangePasswordDialogFragment :
-  BaseDialogFragment<DialogFragmentChangePasswordBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseDialogFragment<DialogFragmentChangePasswordBinding>() {
 
   companion object {
     fun show(fragmentManager: FragmentManager) {
@@ -32,6 +30,10 @@ class ChangePasswordDialogFragment :
   }
 
   private val viewModel: ChangePasswordViewModel by viewModels()
+
+  private val successDialogLauncher = newAlertDialogLauncher("password_changed") {
+    dismiss()
+  }
 
   override fun onStart() {
     super.onStart()
@@ -132,7 +134,7 @@ class ChangePasswordDialogFragment :
             enableInputs()
           }
           is StatefulData.Success -> {
-            launchAlertDialog("password_changed") {
+            successDialogLauncher.launchDialog {
               messageResId = R.string.password_changed
               positionButtonResId = android.R.string.ok
             }
@@ -140,12 +142,5 @@ class ChangePasswordDialogFragment :
         }
       }
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    dismiss()
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

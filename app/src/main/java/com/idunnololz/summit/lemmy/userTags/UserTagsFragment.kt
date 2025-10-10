@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.FragmentUserTagsBinding
 import com.idunnololz.summit.databinding.ItemUserTagsUserTagBinding
 import com.idunnololz.summit.spans.RoundedBackgroundSpan
@@ -27,10 +27,17 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class UserTagsFragment :
-  BaseFragment<FragmentUserTagsBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentUserTagsBinding>() {
 
   private val viewModel: UserTagsViewModel by viewModels()
+
+  private val deleteUserTagDialogLauncher = newAlertDialogLauncher("delete_user_tag") {
+    if (it.isOk) {
+      val personName = it.extras?.getString("tag")
+
+      viewModel.deleteTag(personName)
+    }
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -68,12 +75,12 @@ class UserTagsFragment :
           AddOrEditUserTagDialogFragment.show(childFragmentManager, userTag = it)
         },
         onDeleteClick = {
-          OldAlertDialogFragment.Builder()
-            .setExtra("tag", it.personName)
-            .setMessage(getString(R.string.warn_delete_user_tag, it.personName))
-            .setPositiveButton(R.string.delete)
-            .setNegativeButton(R.string.cancel)
-            .createAndShow(childFragmentManager, "delete_user_tag")
+          deleteUserTagDialogLauncher.launchDialog {
+            extras.putString("tag", it.personName)
+            message = getString(R.string.warn_delete_user_tag, it.personName)
+            positionButtonResId = R.string.delete
+            negativeButtonResId = R.string.cancel
+          }
         },
       )
 
@@ -208,14 +215,5 @@ class UserTagsFragment :
 
       adapterHelper.setItems(newItems, this)
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    val personName = dialog.getExtra("tag")
-
-    viewModel.deleteTag(personName)
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

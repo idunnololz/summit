@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -45,8 +44,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsPostAndCommentsAppearanceFragment :
-  BaseSettingsFragment(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseSettingsFragment() {
 
   private val viewModel: SettingsPostAndCommentsAppearanceViewModel by viewModels()
 
@@ -409,16 +407,5 @@ class SettingsPostAndCommentsAppearanceFragment :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    if (tag == "reset_post_to_default_styles") {
-      viewModel.resetPostUiConfig()
-    } else if (tag == "reset_comment_to_default_styles") {
-      viewModel.resetCommentUiConfig()
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

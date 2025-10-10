@@ -37,8 +37,8 @@ import androidx.transition.TransitionSet
 import com.github.drjacky.imagepicker.ImagePicker
 import com.google.android.material.textfield.TextInputLayout
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -86,8 +86,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AddOrEditPostFragment :
   BaseDialogFragment<FragmentCreateOrEditPostBinding>(),
-  FullscreenDialogFragment,
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  FullscreenDialogFragment {
 
   companion object {
     const val REQUEST_KEY = "CreateOrEditPostFragment_req_key"
@@ -160,6 +159,19 @@ class AddOrEditPostFragment :
 
   @Inject
   lateinit var recentCommunityManager: RecentCommunityManager
+
+
+  private val createPostConfirmationDialogLauncher = newAlertDialogLauncher("create_post") {
+    if (it.isOk) {
+      createPost()
+    }
+  }
+
+  private val updatePostConfirmationDialogLauncher = newAlertDialogLauncher("update_post") {
+    if (it.isOk) {
+      updatePost()
+    }
+  }
 
   private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -328,11 +340,11 @@ class AddOrEditPostFragment :
         when (it.itemId) {
           R.id.create_post -> {
             if (uploadImageViewModel.isUploading) {
-              OldAlertDialogFragment.Builder()
-                .setMessage(R.string.warn_upload_in_progress)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(this@AddOrEditPostFragment, "create_post")
+              createPostConfirmationDialogLauncher.launchDialog {
+                messageResId = R.string.warn_upload_in_progress
+                positionButtonResId = R.string.proceed_anyways
+                negativeButtonResId = R.string.cancel
+              }
               return@a true
             }
 
@@ -347,11 +359,11 @@ class AddOrEditPostFragment :
           }
           R.id.update_post -> {
             if (uploadImageViewModel.isUploading) {
-              OldAlertDialogFragment.Builder()
-                .setMessage(R.string.warn_upload_in_progress)
-                .setPositiveButton(R.string.proceed_anyways)
-                .setNegativeButton(R.string.cancel)
-                .createAndShow(this@AddOrEditPostFragment, "update_post")
+              updatePostConfirmationDialogLauncher.launchDialog {
+                messageResId = R.string.warn_upload_in_progress
+                positionButtonResId = R.string.proceed_anyways
+                negativeButtonResId = R.string.cancel
+              }
               return@a true
             }
 
@@ -1348,18 +1360,4 @@ class AddOrEditPostFragment :
     this.url,
     this.nsfw,
   )
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    when (tag) {
-      "create_post" -> {
-        createPost()
-      }
-      "update_post" -> {
-        updatePost()
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-  }
 }

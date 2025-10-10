@@ -19,8 +19,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.alert.OldAlertDialogFragment
-import com.idunnololz.summit.alert.OldAlertDialogFragment.*
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.FragmentMessageBinding
 import com.idunnololz.summit.inbox.CommentBackedItem

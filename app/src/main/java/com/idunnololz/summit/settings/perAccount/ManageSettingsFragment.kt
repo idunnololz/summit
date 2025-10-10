@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.fullName
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.databinding.FragmentManageSettingsBinding
 import com.idunnololz.summit.databinding.ImportSettingItemBinding
@@ -32,11 +32,16 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ManageSettingsFragment :
-  BaseFragment<FragmentManageSettingsBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener {
+  BaseFragment<FragmentManageSettingsBinding>() {
 
   private val args: ManageSettingsFragmentArgs by navArgs()
   private val viewModel: ManageSettingsViewModel by viewModels()
+
+  private val deleteSettingConfirmDialogLauncher = newAlertDialogLauncher("delete_confirm") {
+    if (it.isOk) {
+      viewModel.deleteSetting(args.account, it.extras?.getString("setting_key"))
+    }
+  }
 
   @Inject
   lateinit var allSettings: AllSettings
@@ -82,17 +87,15 @@ class ManageSettingsFragment :
         keyToSettingItems = allSettings.generateMapFromKeysToRelatedSettingItems(),
         onClearSettingClick = { settingKey ->
           if (args.account != null) {
-            OldAlertDialogFragment.Builder()
-              .setMessage(
-                getString(
-                  R.string.delete_setting_override_for_setting_format,
-                  settingKey,
-                ),
+            deleteSettingConfirmDialogLauncher.launchDialog {
+              message = getString(
+                R.string.delete_setting_override_for_setting_format,
+                settingKey,
               )
-              .setNegativeButton(R.string.cancel)
-              .setPositiveButton(R.string.delete)
-              .setExtra("setting_key", settingKey)
-              .createAndShow(childFragmentManager, "delete_confirm")
+              positionButtonResId = R.string.delete
+              negativeButtonResId = R.string.cancel
+              extras.putString("setting_key", settingKey)
+            }
           }
         },
       )
@@ -224,16 +227,5 @@ class ManageSettingsFragment :
 
       adapterHelper.setItems(newItems, this)
     }
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    when (tag) {
-      "delete_confirm" -> {
-        viewModel.deleteSetting(args.account, dialog.getExtra("setting_key"))
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
   }
 }

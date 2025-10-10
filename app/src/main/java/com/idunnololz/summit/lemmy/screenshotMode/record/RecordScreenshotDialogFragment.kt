@@ -12,7 +12,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.DialogFragmentRecordScreenshotBinding
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.ext.setSizeDynamically
@@ -102,9 +102,9 @@ class RecordScreenshotDialogFragment :
         resolutionScalingSlider.value = config.resolutionFactor.toFloat()
 
         fpsTitle.setOnClickListener {
-          OldAlertDialogFragment.Builder()
-            .setMessage(R.string.desc_screenshot_recording_fps)
-            .createAndShow(childFragmentManager, "fps_info")
+          launchAlertDialog("fps_info") {
+            messageResId = R.string.desc_screenshot_recording_fps
+          }
         }
       }
 

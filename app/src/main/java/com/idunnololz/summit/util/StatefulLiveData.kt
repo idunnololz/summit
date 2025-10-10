@@ -32,6 +32,12 @@ class StatefulLiveData<T> {
       return value is StatefulData.NotStarted
     }
 
+  val isError: Boolean
+    get() {
+      val value = value
+      return value is StatefulData.Error
+    }
+
   val valueOrNull: T?
     get() {
       return value.valueOrNull

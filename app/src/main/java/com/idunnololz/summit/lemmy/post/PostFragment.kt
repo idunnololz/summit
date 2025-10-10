@@ -33,8 +33,9 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.alert.OldAlertDialogFragment
+import com.idunnololz.summit.alert.AlertDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
+import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -117,7 +118,6 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class PostFragment :
   BaseFragment<FragmentPostBinding>(),
-  OldAlertDialogFragment.AlertDialogFragmentListener,
   SignInNavigator {
 
   companion object {
@@ -197,6 +197,12 @@ class PostFragment :
   private val screenshotModeBackPressHandler = object : OnBackPressedCallback(false) {
     override fun handleOnBackPressed() {
       viewModel.screenshotMode.value = false
+    }
+  }
+
+  private val instanceMismatchDialogLauncher = newAlertDialogLauncher("instance_mismatch") {
+    if (it.isOk) {
+      viewModel.switchToNativeInstance()
     }
   }
 
@@ -863,18 +869,16 @@ class PostFragment :
   }
 
   private fun onInstanceMismatch(accountInstance: String, apiInstance: String) {
-    OldAlertDialogFragment.Builder()
-      .setTitle(R.string.error_account_instance_mismatch_title)
-      .setMessage(
-        getString(
-          R.string.error_account_instance_mismatch,
-          accountInstance,
-          apiInstance,
-        ),
+    instanceMismatchDialogLauncher.launchDialog {
+      titleResId = R.string.error_account_instance_mismatch_title
+      message = getString(
+        R.string.error_account_instance_mismatch,
+        accountInstance,
+        apiInstance,
       )
-      .setPositiveButton(R.string.change_instance)
-      .setNegativeButton(R.string.cancel)
-      .createAndShow(childFragmentManager, "instance_mismatch")
+      positionButtonResId = R.string.change_instance
+      negativeButtonResId  = R.string.cancel
+    }
   }
 
   private fun updateScreenshotMode(screenshotMode: Boolean?) {
@@ -1454,18 +1458,6 @@ class PostFragment :
     }
 
     return _sortByMenu
-  }
-
-  override fun onPositiveClick(dialog: OldAlertDialogFragment, tag: String?) {
-    when (tag) {
-      "instance_mismatch" -> {
-        viewModel.switchToNativeInstance()
-      }
-    }
-  }
-
-  override fun onNegativeClick(dialog: OldAlertDialogFragment, tag: String?) {
-    // do nothing
   }
 
   private fun PostFragmentArgs.postOrCommentRef() = if (this.id > 0) {

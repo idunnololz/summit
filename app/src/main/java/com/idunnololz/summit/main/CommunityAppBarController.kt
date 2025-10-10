@@ -334,6 +334,12 @@ class CommunityAppBarController(
     updateCommunityButton()
   }
 
+  fun refreshCommunityInfoIfNeeded() {
+    if (communityInfoViewModel.siteOrCommunity.isError) {
+      communityInfoViewModel.refetchCommunityOrSite(force = false)
+    }
+  }
+
   private fun updateCommunityButton() {
     val vh = vh
     val currentCommunity = state.currentCommunity
@@ -391,9 +397,7 @@ class CommunityAppBarController(
     if (vh is ViewHolder.LargeAppBarViewHolder) {
       loadLargeAppBar(vh)
 
-      if (currentCommunity != null) {
-        communityInfoViewModel.onCommunityChanged(currentCommunity)
-      }
+      communityInfoViewModel.onCommunityChanged(currentCommunity)
     }
   }
 
