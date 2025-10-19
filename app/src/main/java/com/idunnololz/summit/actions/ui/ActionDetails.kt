@@ -13,6 +13,6 @@ sealed interface ActionDetails : Parcelable {
 
   @Parcelize
   data class FailureDetails(
-    val reason: LemmyActionFailureReason,
+    val reason: LemmyActionFailureReason?,
   ) : ActionDetails
 }

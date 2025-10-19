@@ -437,4 +437,13 @@
         android:id="@+id/uploadsFragment"
         android:name="com.idunnololz.summit.uploads.UploadsFragment"
         android:label="UploadsFragment" />
+    <fragment
+        android:id="@+id/actionDetailsFragment2"
+        android:name="com.idunnololz.summit.actions.ui.ActionDetailsFragment"
+        android:label="ActionDetailsFragment">
+        <argument
+            android:name="action"
+            app:argType="com.idunnololz.summit.actions.ui.Action" />
+    </fragment>
+    <action android:id="@+id/action_global_actionDetailsFragment2" app:destination="@id/actionDetailsFragment2"/>
 </navigation>

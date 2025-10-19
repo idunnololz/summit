@@ -33,6 +33,7 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
+import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -587,6 +588,9 @@ class PostFragment :
                 }
               }
             activity.showBottomMenu(bottomMenu)
+          },
+          onPendingCommentActionInfoClick = {
+            getMainActivity()?.launchActionDetails(it)
           },
         ).apply {
           stateRestorationPolicy =
@@ -1396,6 +1400,8 @@ class PostFragment :
     }
 
     postAndCommentViewBuilder.onPreferencesChanged()
+
+    viewModel.onCommentActionChanged()
   }
 
   override fun navigateToSignInScreen() {

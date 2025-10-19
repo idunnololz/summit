@@ -2,19 +2,58 @@ package com.idunnololz.summit.actions
 
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
+import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * IMPORTANT: Pending comments are any comment actions that are in the pending or failed state.
+ */
 @Singleton
-class PendingCommentsManager @Inject constructor() {
+class PendingCommentsManager @Inject constructor(
+  coroutineScopeFactory: CoroutineScopeFactory,
+  private val actionsDao: LemmyActionsDao,
+) {
+
+  private val coroutineScope = coroutineScopeFactory.create()
 
   private val idToPendingCommentView = mutableMapOf<Long, PendingCommentView>()
   private val pendingCommentsDict = hashMapOf<PostRef, MutableList<PendingCommentView>>()
 
-  fun getPendingComments(postRef: PostRef): List<PendingCommentView> {
+  private var initialized = false
+  private var mutex = Mutex()
+
+  private suspend fun initIfNeeded() {
+    mutex.withLock {
+      if (initialized) {
+        return
+      }
+
+      initialized = true
+
+      val failedOrPendingActions = actionsDao.getLast100FailedActions() +
+        actionsDao.getAllPendingActions()
+      failedOrPendingActions.forEach {
+        if (it.info is ActionInfo.CommentActionInfo) {
+          onCommentActionAdded(id = it.id, action = it.info)
+
+          if (it.error != null) {
+            onCommentActionFailed(id = it.id, reason = it.error)
+          }
+        }
+      }
+    }
+  }
+
+  suspend fun getPendingComments(postRef: PostRef): List<PendingCommentView> {
+    initIfNeeded()
     return ArrayList(pendingCommentsDict[postRef] ?: return listOf())
   }
 
@@ -26,7 +65,6 @@ class PendingCommentsManager @Inject constructor() {
 
   fun onCommentActionFailed(
     id: Long,
-    info: ActionInfo.CommentActionInfo,
     reason: LemmyActionFailureReason,
   ) {
     idToPendingCommentView[id]?.error = reason
@@ -48,6 +86,11 @@ class PendingCommentsManager @Inject constructor() {
 
   fun onCommentActionComplete(id: Long, info: ActionInfo.CommentActionInfo) {
     idToPendingCommentView[id]?.complete = true
+  }
+
+  fun onCommentActionDeleted(id: Long) {
+    val pendingComment = idToPendingCommentView[id] ?: return
+    removePendingComment(pendingComment)
   }
 
   fun onEditCommentActionAdded(id: Long, action: ActionInfo.EditCommentActionInfo) {

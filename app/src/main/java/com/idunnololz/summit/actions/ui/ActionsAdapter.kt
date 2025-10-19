@@ -12,6 +12,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.lemmy.actions.toText
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
@@ -234,32 +235,7 @@ class ActionsAdapter(
           b.failureReason.text = buildString {
             appendLine("This action failed for the following reason:")
 
-            when (details.reason) {
-              is LemmyActionFailureReason.AccountNotFoundError ->
-                append("There was an authentication issue.")
-              LemmyActionFailureReason.ActionOverwritten ->
-                append("An action performed after this one overrode this action.")
-              LemmyActionFailureReason.NoInternetError ->
-                append("Network issues were encountered.")
-              LemmyActionFailureReason.DeserializationError ->
-                append("Deserialization error.")
-              is LemmyActionFailureReason.RateLimit ->
-                append("Rate limit errors were encountered.")
-              LemmyActionFailureReason.ServerError ->
-                append("There was an error on the server side.")
-              is LemmyActionFailureReason.TooManyRequests ->
-                append(
-                  "This client was blocked by the server for issuing too " +
-                    "many requests.",
-                )
-              is LemmyActionFailureReason.UnknownError ->
-                append(
-                  "Unknown error. Code '${details.reason.errorCode}'. " +
-                    "Key '${details.reason.errorMessage}'.",
-                )
-              LemmyActionFailureReason.ConnectionError ->
-                append(context.getString(R.string.error_network))
-            }
+            append(details.reason.toText(context))
           }
         }
         ActionDetails.PendingDetails -> {

@@ -7,9 +7,9 @@ import com.idunnololz.summit.actions.ActionsRunnerHelper
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
-import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
+import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
+import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -54,7 +54,7 @@ class ActionDetailsViewModel @Inject constructor(
           retryActionResult.setValue(Unit)
 
           pendingActionsManager.completeActionSuccess(
-            action = LemmyPendingAction(
+            action = LemmyAction(
               action.id,
               action.ts,
               action.creationTs,
@@ -63,8 +63,8 @@ class ActionDetailsViewModel @Inject constructor(
             result = result.result,
           )
           if (action.details is ActionDetails.FailureDetails) {
-            pendingActionsManager.deleteFailedAction(
-              action = action.toLemmyAction() as LemmyFailedAction,
+            pendingActionsManager.deleteAction(
+              action = action.toLemmyAction(),
             )
           }
         }
@@ -86,23 +86,9 @@ class ActionDetailsViewModel @Inject constructor(
         return@launch
       }
 
-      when (val lemmyAction = action.toLemmyAction()) {
-        is LemmyCompletedAction -> {
-          pendingActionsManager.deleteCompletedAction(
-            action = lemmyAction,
-          )
-        }
-        is LemmyFailedAction -> {
-          pendingActionsManager.deleteFailedAction(
-            action = lemmyAction,
-          )
-        }
-        is LemmyPendingAction -> {
-          pendingActionsManager.deletePendingAction(
-            action = lemmyAction,
-          )
-        }
-      }
+      pendingActionsManager.deleteAction(
+        action = action.toLemmyAction(),
+      )
 
       deleteActionResult.postValue(Unit)
     }

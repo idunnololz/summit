@@ -15,7 +15,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.AccountNotFo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -34,34 +34,34 @@ class PendingActionsRunner @AssistedInject constructor(
   @ApplicationContext private val context: Context,
   private val actionsRunnerHelper: ActionsRunnerHelper,
 
-  @Assisted private val actions: LinkedList<LemmyPendingAction>,
+  @Assisted private val actions: LinkedList<LemmyAction>,
   @Assisted private val coroutineScope: CoroutineScope,
   @Assisted private val actionsContext: CoroutineContext,
 
   @Assisted private val delayAction:
-  suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
+  suspend (action: LemmyAction, nextRefreshMs: Long) -> Unit,
   @Assisted private val completeActionError: suspend (
-    action: LemmyPendingAction,
+    action: LemmyAction,
     failureReason: LemmyActionFailureReason,
   ) -> Unit,
   @Assisted private val completeActionSuccess: suspend (
-    action: LemmyPendingAction,
+    action: LemmyAction,
     result: LemmyActionResult<*, *>,
   ) -> Unit,
 ) {
   @AssistedFactory
   interface Factory {
     fun create(
-      actions: LinkedList<LemmyPendingAction>,
+      actions: LinkedList<LemmyAction>,
       coroutineScope: CoroutineScope,
       actionsContext: CoroutineContext,
-      delayAction: suspend (action: LemmyPendingAction, nextRefreshMs: Long) -> Unit,
+      delayAction: suspend (action: LemmyAction, nextRefreshMs: Long) -> Unit,
       completeActionError: suspend (
-        action: LemmyPendingAction,
+        action: LemmyAction,
         failureReason: LemmyActionFailureReason,
       ) -> Unit,
       completeActionSuccess: suspend (
-        action: LemmyPendingAction,
+        action: LemmyAction,
         result: LemmyActionResult<*, *>,
       ) -> Unit,
     ): PendingActionsRunner
@@ -125,7 +125,7 @@ class PendingActionsRunner @AssistedInject constructor(
     }
   }
 
-  private suspend fun checkAndExecuteAction(action: LemmyPendingAction) {
+  private suspend fun checkAndExecuteAction(action: LemmyAction) {
     if (action.info == null) {
       completeActionError(action, LemmyActionFailureReason.DeserializationError)
       return

@@ -17,13 +17,16 @@ private const val COMPLETED_ACTIONS_LIMIT = 150
 interface LemmyCompletedActionsDao {
 
   @Query("SELECT * FROM lemmy_completed_actions")
-  suspend fun getAllCompletedActions(): List<LemmyCompletedAction>
+  suspend fun getAllCompletedActions(): List<OldLemmyCompletedAction>
+
+  @Query("SELECT * FROM lemmy_completed_actions WHERE id = :actionId")
+  suspend fun findActionById(actionId: Long): List<LemmyAction>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun insertAction(action: LemmyCompletedAction): Long
+  suspend fun insertAction(action: OldLemmyCompletedAction): Long
 
   @Delete
-  suspend fun delete(action: LemmyCompletedAction)
+  suspend fun delete(action: OldLemmyCompletedAction)
 
   @Query("DELETE FROM lemmy_completed_actions")
   suspend fun deleteAllActions()
@@ -38,7 +41,7 @@ interface LemmyCompletedActionsDao {
   suspend fun pruneDb()
 
   @Transaction
-  open suspend fun insertActionRespectingTableLimit(newEntry: LemmyCompletedAction) {
+  open suspend fun insertActionRespectingTableLimit(newEntry: OldLemmyCompletedAction) {
     pruneDb()
     insertAction(newEntry)
   }
@@ -46,14 +49,14 @@ interface LemmyCompletedActionsDao {
 
 @Entity(tableName = "lemmy_completed_actions")
 @TypeConverters(LemmyActionConverters::class)
-data class LemmyCompletedAction(
+data class OldLemmyCompletedAction(
   @PrimaryKey(autoGenerate = true)
   @ColumnInfo(name = "id")
-  override val id: Long,
+  val id: Long,
   @ColumnInfo(name = "ts")
-  override val ts: Long,
+  val ts: Long,
   @ColumnInfo(name = "cts")
-  override val creationTs: Long,
+  val creationTs: Long,
   @ColumnInfo(name = "info")
-  override val info: ActionInfo?,
-) : LemmyAction
+  val info: ActionInfo?,
+)

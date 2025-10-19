@@ -39,7 +39,7 @@
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="@+id/collapse_section_button"
         app:layout_constraintBottom_toBottomOf="@+id/collapse_section_button"
-        app:layout_constraintStart_toEndOf="@+id/progress_bar"
+        app:layout_constraintStart_toEndOf="@+id/status_barrier_end"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -53,6 +53,22 @@
         app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         style="@style/Widget.Material3.CircularProgressIndicator.ExtraSmall" />
 
+    <ImageView
+        android:id="@+id/status_indicator"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@+id/collapse_section_button"
+        app:layout_constraintBottom_toBottomOf="@+id/collapse_section_button"
+        app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/status_barrier_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="progress_bar,status_indicator"/>
+
     <HorizontalScrollView
         android:id="@+id/header_view"
         android:layout_width="wrap_content"
@@ -65,7 +81,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="@+id/collapse_section_button"
         app:layout_constraintBottom_toBottomOf="@+id/collapse_section_button"
-        app:layout_constraintStart_toEndOf="@+id/progress_bar"
+        app:layout_constraintStart_toEndOf="@+id/status_barrier_end"
         app:layout_constraintEnd_toStartOf="@+id/collapse_section_button">
 
         <com.idunnololz.summit.view.LemmyHeaderView
@@ -96,7 +112,7 @@
         android:textIsSelectable="true"
         android:layout_marginEnd="@dimen/padding_half"
         android:paddingBottom="@dimen/padding"
-        app:layout_constraintTop_toBottomOf="@+id/progress_bar"
+        app:layout_constraintTop_toBottomOf="@+id/header_view"
         app:layout_constraintStart_toEndOf="@+id/thread_lines_spacer"
         app:layout_constraintEnd_toEndOf="parent" />
 

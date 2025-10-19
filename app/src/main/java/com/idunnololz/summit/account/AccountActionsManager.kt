@@ -32,11 +32,10 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
@@ -227,7 +226,7 @@ class AccountActionsManager @Inject constructor(
   }
 
   private val onActionChangedListener = object : PendingActionsManager.OnActionChangedListener {
-    override fun onActionAdded(action: LemmyPendingAction) {
+    override fun onActionAdded(action: LemmyAction) {
       when (action.info) {
         is ActionInfo.VoteActionInfo -> {
           votesManager.setPendingVote(action.info.ref, action.info.dir)
@@ -272,7 +271,7 @@ class AccountActionsManager @Inject constructor(
       }
     }
 
-    override fun onActionFailed(action: LemmyPendingAction, reason: LemmyActionFailureReason) {
+    override fun onActionFailed(action: LemmyAction, reason: LemmyActionFailureReason) {
       Log.d(TAG, "onActionComplete(): $action, reason: $reason")
       when (action.info) {
         is ActionInfo.VoteActionInfo -> {
@@ -289,7 +288,7 @@ class AccountActionsManager @Inject constructor(
         }
         is ActionInfo.CommentActionInfo -> {
           coroutineScope.launch {
-            pendingCommentsManager.onCommentActionFailed(action.id, action.info, reason)
+            pendingCommentsManager.onCommentActionFailed(id = action.id, reason = reason)
             onCommentActionChanged.emit(Unit)
           }
         }
@@ -326,7 +325,7 @@ class AccountActionsManager @Inject constructor(
       }
     }
 
-    override fun onActionComplete(action: LemmyPendingAction, result: LemmyActionResult<*, *>) {
+    override fun onActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>) {
       Log.d(TAG, "onActionComplete(): $action")
       when (action.info) {
         is ActionInfo.VoteActionInfo -> {
@@ -410,7 +409,26 @@ class AccountActionsManager @Inject constructor(
       }
     }
 
-    override fun onActionDeleted(action: LemmyAction) {}
+    override fun onActionDeleted(action: LemmyAction) {
+      when (action.info) {
+        is ActionInfo.VoteActionInfo -> {}
+
+        is ActionInfo.CommentActionInfo -> {
+          coroutineScope.launch {
+            pendingCommentsManager.onCommentActionDeleted(id = action.id)
+          }
+        }
+
+        is ActionInfo.DeleteCommentActionInfo -> {}
+        is ActionInfo.EditCommentActionInfo -> {
+          coroutineScope.launch {
+            pendingCommentsManager.onCommentActionDeleted(id = action.id)
+          }
+        }
+        is ActionInfo.MarkPostAsReadActionInfo -> {}
+        null -> {}
+      }
+    }
   }
 
   init {
@@ -540,7 +558,7 @@ class AccountActionsManager @Inject constructor(
     return Result.success(Unit)
   }
 
-  fun getPendingComments(postRef: PostRef) = pendingCommentsManager.getPendingComments(postRef)
+  suspend fun getPendingComments(postRef: PostRef) = pendingCommentsManager.getPendingComments(postRef)
 
   fun removePendingComment(pendingComment: PendingCommentView) {
     pendingCommentsManager.removePendingComment(pendingComment)

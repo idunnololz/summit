@@ -1,13 +1,17 @@
 package com.idunnololz.summit.db
 
+import android.content.ContentValues
 import android.content.Context
+import android.util.Log
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
+import androidx.sqlite.SQLiteStatement
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
@@ -34,13 +38,19 @@ import com.idunnololz.summit.inbox.db.ConversationEntry
 import com.idunnololz.summit.inbox.db.InboxEntriesDao
 import com.idunnololz.summit.inbox.db.InboxEntry
 import com.idunnololz.summit.inbox.db.InboxEntryConverters
+import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.lemmy.actions.ActionStatus
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
+import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
 import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
+import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
+import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.lemmy.actions.LemmyActionsDao_Impl
+import com.idunnololz.summit.lemmy.actions.getAllCompletedActions
+import com.idunnololz.summit.lemmy.actions.getAllFailedActions
 import com.idunnololz.summit.lemmy.userTags.UserTagConverters
 import com.idunnololz.summit.lemmy.userTags.UserTagEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
@@ -53,6 +63,8 @@ import com.idunnololz.summit.user.UserCommunityEntry
 import com.idunnololz.summit.util.dagger.json
 import kotlinx.serialization.json.Json
 
+private const val TAG = "MainDatabase"
+
 /**
  * Db that contains actions taken by the user. This is necessary to cache all of the user's actions.
  */
@@ -61,9 +73,9 @@ import kotlinx.serialization.json.Json
     UserCommunityEntry::class,
     HistoryEntry::class,
     Account::class,
-    LemmyPendingAction::class,
-    LemmyFailedAction::class,
-    LemmyCompletedAction::class,
+    LemmyAction::class,
+    OldLemmyFailedAction::class,
+    OldLemmyCompletedAction::class,
     AccountInfo::class,
     HiddenPostEntry::class,
     FilterEntry::class,
@@ -87,8 +99,9 @@ import kotlinx.serialization.json.Json
     AutoMigration(from = 43, to = 44),
     AutoMigration(from = 45, to = 46),
     AutoMigration(from = 46, to = 47),
+    AutoMigration(from = 47, to = 48),
   ],
-  version = 47,
+  version = 49,
   exportSchema = true,
 )
 @TypeConverters(
@@ -99,8 +112,6 @@ import kotlinx.serialization.json.Json
 abstract class MainDatabase : RoomDatabase() {
 
   abstract fun lemmyActionsDao(): LemmyActionsDao
-  abstract fun lemmyFailedActionsDao(): LemmyFailedActionsDao
-  abstract fun lemmyCompletedActionsDao(): LemmyCompletedActionsDao
   abstract fun userCommunitiesDao(): UserCommunitiesDao
   abstract fun historyDao(): HistoryDao
   abstract fun accountDao(): AccountDao
@@ -169,6 +180,7 @@ abstract class MainDatabase : RoomDatabase() {
         .addMigrations(MIGRATION_39_40)
         .addMigrations(MIGRATION_40_41)
         .addMigrations(MIGRATION_44_45)
+        .addMigrations(MIGRATION_48_49(json))
         .build()
     }
   }
@@ -330,6 +342,77 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
     db.execSQL("ALTER TABLE user_tags ADD COLUMN used_ts INTEGER NOT NULL DEFAULT 0;")
   }
 }
+
+fun MIGRATION_48_49(json: Json) =
+  object : Migration(48, 49) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      val lemmyActionConverters = LemmyActionConverters(json)
+      val allFailedActions = getAllFailedActions(db, lemmyActionConverters)
+      val allCompletedActions = getAllCompletedActions(db, lemmyActionConverters)
+
+      val lemmyActionsToMigrate = mutableListOf<LemmyAction>()
+
+      allFailedActions.mapTo(lemmyActionsToMigrate) {
+        LemmyAction(
+          id = 0L,
+          ts = it.ts,
+          creationTs = it.creationTs,
+          info = it.info,
+          failedTs = it.ts,
+          error = it.error,
+          seen = it.seen,
+          completedTs = null,
+          status = ActionStatus.Errored,
+        )
+      }
+      allCompletedActions.mapTo(lemmyActionsToMigrate) {
+        LemmyAction(
+          id = 0L,
+          ts = it.ts,
+          creationTs = it.creationTs,
+          info = it.info,
+          failedTs = null,
+          error = null,
+          seen = null,
+          completedTs = it.ts,
+          status = ActionStatus.Completed,
+        )
+      }
+
+      Log.d(TAG, "Migrating ${lemmyActionsToMigrate.size} actions")
+
+      lemmyActionsToMigrate.forEach {
+        val cv = ContentValues()
+        cv.put("ts", it.ts)
+        cv.put("cts", it.creationTs)
+        if (it.info != null) {
+          cv.put("info", lemmyActionConverters.actionInfoToString(it.info))
+        }
+
+        cv.put("fts", it.failedTs)
+        if (it.error != null) {
+          cv.put("error", lemmyActionConverters.lemmyActionFailureReasonToString(it.error))
+        }
+        cv.put("seen", it.seen)
+        cv.put("cots", it.completedTs)
+        if (it.status != null) {
+          // Convert the enum to strings. This is for (1) parity with Room conversion code and (2)
+          // this keeps the code from breaking due to R8/refactoring
+          cv.put("status", when (it.status) {
+            ActionStatus.Pending -> "Pending"
+            ActionStatus.Errored -> "Errored"
+            ActionStatus.Completed -> "Completed"
+          })
+        }
+
+        db.insert(
+          "lemmy_actions",
+          android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE,
+          cv
+        )
+      }
+    }
+  }
 
 private fun createConversationsEntriesTable(db: SupportSQLiteDatabase) {
   db.execSQL("DROP TABLE IF EXISTS conversation_entries;")

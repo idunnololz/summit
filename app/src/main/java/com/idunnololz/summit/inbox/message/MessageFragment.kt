@@ -596,6 +596,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           },
           switchToNativeInstance = {},
           onCrossPostsClick = {},
+          onPendingCommentActionInfoClick = {},
         ).apply {
           stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }

@@ -24,10 +24,23 @@
         android:textAppearance="?textAppearanceHeadlineSmall"
         android:layout_marginHorizontal="@dimen/padding"
         android:layout_marginTop="@dimen/padding_half"
-        android:layout_marginBottom="@dimen/padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/status"
+        app:layout_constraintBottom_toTopOf="@+id/subtitle"/>
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceLabelMedium"
+        android:textColor="@color/colorTextFaint"
+        android:layout_marginHorizontal="@dimen/padding"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginBottom="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

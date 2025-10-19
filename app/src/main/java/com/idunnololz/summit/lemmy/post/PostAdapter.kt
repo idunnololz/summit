@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.idunnololz.summit.R
+import com.idunnololz.summit.actions.ui.Action
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostId
@@ -41,6 +42,7 @@ import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.find
 import com.idunnololz.summit.lemmy.flatten
 import com.idunnololz.summit.lemmy.isParent
@@ -99,6 +101,7 @@ class PostAdapter(
   private val onLinkLongClick: (url: String, text: String?) -> Unit,
   private val switchToNativeInstance: (instance: String) -> Unit,
   private val onCrossPostsClick: () -> Unit,
+  private val onPendingCommentActionInfoClick: (actionId: Long) -> Unit,
 ) : RecyclerView.Adapter<ViewHolder>() {
 
   interface ScreenshotOptions
@@ -188,6 +191,8 @@ class PostAdapter(
       val childrenCount: Int,
       val query: String?,
       val screenshotMode: Boolean,
+      val error: LemmyActionFailureReason?,
+      val actionId: Long,
     ) : Item(
       "pending_comment_${view.pendingCommentView.id}",
     ),
@@ -736,6 +741,8 @@ class PostAdapter(
             content = item.content,
             instance = instance,
             author = item.author,
+            error = item.error,
+            actionId = item.actionId,
             highlight = highlight,
             highlightForever = highlightForever,
             highlightTintColor = highlightTintColor,
@@ -745,6 +752,7 @@ class PostAdapter(
             onLinkClick = onLinkClick,
             onLinkLongClick = onLinkLongClick,
             collapseSection = ::collapseSection,
+            onPendingCommentActionInfoClick = onPendingCommentActionInfoClick,
           )
 
           updateScreenshotMode(
@@ -1245,7 +1253,9 @@ class PostAdapter(
             view = commentView,
             childrenCount = commentItem.children.size,
             query = query,
-            screenshotMode,
+            screenshotMode = screenshotMode,
+            error = commentView.pendingCommentView.error,
+            actionId = commentView.pendingCommentView.actionId,
           )
           absolutionPositionToTopLevelCommentPosition +=
             lastTopLevelCommentPosition

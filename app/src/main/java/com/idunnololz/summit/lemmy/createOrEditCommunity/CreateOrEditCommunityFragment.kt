@@ -595,31 +595,34 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
       }
 
       val communityIconUrl = community.icon
-      if (communityIconUrl == null) {
-        icon.load(R.drawable.ic_default_community_with_inset)
-        icon.setOnClickListener(null)
-      } else {
-        icon.dispose()
-        offlineManager.fetchImageWithError(
-          imageView = icon,
-          url = communityIconUrl,
-          listener = {
-            icon.load(it)
-          },
-          errorListener = {
-            icon.load(R.drawable.ic_default_community_with_inset)
-          },
-        )
-        icon.setOnClickListener {
-          getMainActivity()?.let {
-            it.showAdvancedLinkOptions(
-              url = communityIconUrl,
-              moreActionsHelper = it.moreActionsHelper,
-              fragmentManager = childFragmentManager,
-            )
+      if (icon.tag != communityIconUrl) {
+        if (communityIconUrl == null) {
+          icon.load(R.drawable.ic_default_community_with_inset)
+          icon.setOnClickListener(null)
+        } else {
+          icon.dispose()
+          offlineManager.fetchImageWithError(
+            imageView = icon,
+            url = communityIconUrl,
+            listener = {
+              icon.load(it)
+            },
+            errorListener = {
+              icon.load(R.drawable.ic_default_community_with_inset)
+            },
+          )
+          icon.setOnClickListener {
+            getMainActivity()?.let {
+              it.showAdvancedLinkOptions(
+                url = communityIconUrl,
+                moreActionsHelper = it.moreActionsHelper,
+                fragmentManager = childFragmentManager,
+              )
+            }
           }
         }
       }
+      icon.tag = communityIconUrl
 
       editIconButton.setOnClickListener {
         showInsertImageMenu(

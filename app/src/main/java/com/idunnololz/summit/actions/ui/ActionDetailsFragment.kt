@@ -3,6 +3,7 @@ package com.idunnololz.summit.actions.ui
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.telecom.Call
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.lemmy.actions.toText
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragmentArgs
 import com.idunnololz.summit.lemmy.utils.VotableRef
@@ -42,13 +44,14 @@ import com.idunnololz.summit.util.getColorWithAlpha
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
+import com.idunnololz.summit.util.tsToConcise
+import com.idunnololz.summit.util.tsToFullDateTime
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ActionDetailsFragment :
-  BaseFragment<DialogFragmentActionDetailsBinding>(),
-  FullscreenDialogFragment {
+  BaseFragment<DialogFragmentActionDetailsBinding>() {
 
   private val args: ActionDetailsFragmentArgs by navArgs()
   private val viewModel: ActionDetailsViewModel by viewModels()
@@ -251,7 +254,7 @@ class ActionDetailsFragment :
     sealed interface Item {
 
       class HeaderItem(
-        val actionDetails: ActionDetails,
+        val action: Action,
         val title: String,
       ) : Item
 
@@ -286,7 +289,7 @@ class ActionDetailsFragment :
         old::class == new::class &&
           when (old) {
             is Item.HeaderItem ->
-              old.actionDetails == (new as Item.HeaderItem).actionDetails
+              old.action == (new as Item.HeaderItem).action
             is Item.TextFieldItem ->
               old.title == (new as Item.TextFieldItem).title
             is Item.RichTextFieldItem ->
@@ -300,8 +303,7 @@ class ActionDetailsFragment :
         clazz = Item.HeaderItem::class,
         inflateFn = ActionDetailsItemHeaderBinding::inflate,
       ) { item, b, h ->
-        val details = item.actionDetails
-        when (details) {
+        when (val details = item.action.details) {
           is ActionDetails.FailureDetails -> {
             b.status.chipBackgroundColor =
               ColorStateList.valueOf(
@@ -311,6 +313,16 @@ class ActionDetailsFragment :
                 ),
               )
             b.status.text = context.getString(R.string.failed)
+            b.subtitle.text = buildString {
+              appendLine(context.getString(
+                R.string.created_ts_format,
+                tsToFullDateTime(item.action.creationTs))
+              )
+              append(context.getString(
+                R.string.failed_ts_format,
+                tsToFullDateTime(item.action.failedTs ?: item.action.ts))
+              )
+            }
           }
           ActionDetails.PendingDetails -> {
             b.status.chipBackgroundColor =
@@ -321,6 +333,12 @@ class ActionDetailsFragment :
                 ),
               )
             b.status.text = context.getString(R.string.pending)
+            b.subtitle.text = buildString {
+              append(context.getString(
+                R.string.created_ts_format,
+                tsToFullDateTime(item.action.creationTs))
+              )
+            }
           }
           ActionDetails.SuccessDetails -> {
             b.status.chipBackgroundColor =
@@ -331,6 +349,16 @@ class ActionDetailsFragment :
                 ),
               )
             b.status.text = context.getString(R.string.success)
+            b.subtitle.text = buildString {
+              appendLine(context.getString(
+                R.string.created_ts_format,
+                tsToFullDateTime(item.action.creationTs))
+              )
+              append(context.getString(
+                R.string.completed_ts_format,
+                tsToFullDateTime(item.action.completedTs ?: item.action.ts))
+              )
+            }
           }
         }
 
@@ -453,11 +481,24 @@ class ActionDetailsFragment :
 
       items.add(
         Item.HeaderItem(
-          actionDetails = data.details,
+          action = data,
           title = info?.getActionName(context)
             ?: context.getString(R.string.unknown),
         ),
       )
+
+      when (val details = data.details) {
+        is ActionDetails.FailureDetails -> {
+          items.add(Item.TextFieldItem(
+            context.getString(R.string.error_reason),
+            details.reason.toText(context),
+            null,
+          ))
+        }
+        ActionDetails.PendingDetails -> {}
+        ActionDetails.SuccessDetails -> {}
+      }
+
       items.add(
         Item.TextFieldItem(
           title = context.getString(R.string.account),

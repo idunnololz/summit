@@ -126,6 +126,13 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import androidx.core.view.isNotEmpty
+import com.idunnololz.summit.account.info.AccountInfo
+import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.isMod
+import com.idunnololz.summit.actions.ui.ActionDetailsFragment
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
+import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 
 typealias FindMatchFn = (QueryMatchHelper.QueryResult) -> Int?
 
@@ -137,6 +144,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private val accountActionsManager: AccountActionsManager,
   private val preferenceManager: PreferenceManager,
   private val accountManager: AccountManager,
+  private val accountInfoManager: AccountInfoManager,
   private val avatarHelper: AvatarHelper,
   private val lemmyHeaderHelperFactory: LemmyHeaderHelper.Factory,
   private val exoPlayerManagerManager: ExoPlayerManagerManager,
@@ -226,18 +234,26 @@ class PostAndCommentViewBuilder @Inject constructor(
   private val paddingIcon = Utils.convertDpToPixel(12f).toInt()
 
   private var currentUser: Account? = null
+  private var currentAccountInfo: AccountInfo? = null
 
   init {
     lemmyContentHelper.config = uiConfig.postUiConfig.fullContentConfig
 
     fragment.lifecycleScope.launch {
-      accountManager.currentAccount.collect {
-        val account = it as? Account
-        currentUser = account
+      launch {
+        accountManager.currentAccount.collect {
+          val account = it as? Account
+          currentUser = account
 
-        preferences = preferenceManager.updateCurrentPreferences(account)
+          preferences = preferenceManager.updateCurrentPreferences(account)
 
-        onPreferencesChanged()
+          onPreferencesChanged()
+        }
+      }
+      launch {
+        accountInfoManager.currentFullAccount.collect {
+          currentAccountInfo = it?.accountInfo
+        }
       }
     }
   }
@@ -330,6 +346,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   ) = with(binding) {
     val showCommunityIcon = postInListUiConfig.showCommunityIcon
     val useMultilineHeader = showCommunityIcon
+    val isUserMod = currentAccountInfo?.isMod(postView.post.community_id) == true
 
     val viewHolder =
       root.getTag(R.id.view_holder) as? PostViewHolder
@@ -494,7 +511,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
       }
       if (it.id == R.id.pa_reply) {
-        it.isEnabled = !postView.post.locked
+        it.isEnabled = !postView.post.locked || isUserMod
       }
     }
 
@@ -799,6 +816,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     val useMultilineHeader =
       showProfileIcons || commentHeaderLayout == CommentHeaderLayoutId.Multiline
     val isActionsExpanded = isActionsExpanded || !preferences.hideCommentActions
+    val isUserMod = currentAccountInfo?.isMod(commentView.post.community_id) == true
 
     with(holder) {
       if (holder.state.preferUpAndDownVotes != commentShowUpAndDownVotes) {
@@ -943,7 +961,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       onTextBound(spannable)
     }
 
-    if (mediaContainer.childCount > 0) {
+    if (mediaContainer.isNotEmpty()) {
       mediaContainer.removeAllViews()
     }
     mediaContainer.visibility = View.GONE
@@ -971,7 +989,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         }
       }
       if (it.id == R.id.ca_reply) {
-        it.isEnabled = !isPostLocked
+        it.isEnabled = !isPostLocked || isUserMod
       }
     }
 
@@ -1309,6 +1327,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     content: String,
     instance: String,
     author: String?,
+    error: LemmyActionFailureReason?,
+    actionId: Long,
     highlight: Boolean,
     highlightForever: Boolean,
     highlightTintColor: Int?,
@@ -1318,6 +1338,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
     collapseSection: (position: Int) -> Unit,
+    onPendingCommentActionInfoClick: (actionId: Long) -> Unit,
   ) = with(binding) {
     scaleTextSizes()
 
@@ -1326,6 +1347,22 @@ class PostAndCommentViewBuilder @Inject constructor(
     threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
     headerContainer.setTextFirstPart(author ?: context.getString(R.string.unknown_special))
     headerContainer.setTextSecondPart("")
+
+    if (error == null) {
+      progressBar.visibility = View.VISIBLE
+      statusIndicator.visibility = View.GONE
+    } else {
+      progressBar.visibility = View.GONE
+      statusIndicator.visibility = View.VISIBLE
+
+      statusIndicator.imageTintList = ColorStateList.valueOf(
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
+      )
+      statusIndicator.setImageResource(R.drawable.outline_info_18)
+      statusIndicator.setOnClickListener {
+        onPendingCommentActionInfoClick(actionId)
+      }
+    }
 
     lemmyTextHelper.bindText(
       textView = text,
@@ -1971,7 +2008,8 @@ class PostAndCommentViewBuilder @Inject constructor(
       paddingHalf,
     )
     setBackgroundResource(selectableItemBackgroundBorderless)
-    imageTintList = ColorStateList.valueOf(normalTextColor)
+    imageTintList = context.getColorStateListFromAttribute(
+      androidx.appcompat.R.attr.colorControlNormal)
   }
 
   fun ensureCommentsActionButtons(

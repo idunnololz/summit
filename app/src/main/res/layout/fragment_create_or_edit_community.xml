@@ -102,6 +102,8 @@
                     android:scaleType="centerCrop"
                     android:padding="1dp"
                     android:layout_marginTop="@dimen/padding_half"
+                    android:src="@drawable/ic_default_community_with_inset"
+                    app:tint="@color/colorText"
                     style="@style/RoundImageView"
                     app:strokeColor="?colorOnSurface"
                     app:strokeWidth="1dp"

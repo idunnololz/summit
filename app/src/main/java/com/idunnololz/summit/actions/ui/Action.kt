@@ -2,12 +2,15 @@ package com.idunnololz.summit.actions.ui
 
 import android.content.Context
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import com.idunnololz.summit.R
+import com.idunnololz.summit.actions.ui.ActionDetails.*
 import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.lemmy.actions.ActionStatus
+import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
+import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyAction
-import com.idunnololz.summit.lemmy.actions.LemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.LemmyFailedAction
-import com.idunnololz.summit.lemmy.actions.LemmyPendingAction
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -18,7 +21,31 @@ data class Action(
   val creationTs: Long,
   val details: ActionDetails,
   val seen: Boolean,
+  val failedTs: Long? = null,
+  val error: LemmyActionFailureReason? = null,
+  val completedTs: Long? = null,
 ) : Parcelable
+
+fun LemmyAction.toAction() =
+  Action(
+    id = this.id,
+    info = this.info,
+    ts = this.ts,
+    creationTs = this.creationTs,
+    details =
+      when (this.status) {
+        null,
+        ActionStatus.Pending -> ActionDetails.PendingDetails
+        ActionStatus.Errored -> FailureDetails(
+          this.error,
+        )
+        ActionStatus.Completed -> ActionDetails.SuccessDetails
+      },
+    seen = this.seen ?: false,
+    failedTs = this.failedTs,
+    error = this.error,
+    completedTs = this.completedTs,
+  )
 
 fun ActionInfo.getActionName(context: Context) = when (this) {
   is ActionInfo.CommentActionInfo ->
@@ -44,30 +71,40 @@ fun ActionInfo.getActionName(context: Context) = when (this) {
 }
 
 fun Action.toLemmyAction(): LemmyAction = when (this.details) {
-  is ActionDetails.FailureDetails -> {
-    LemmyFailedAction(
+  is FailureDetails -> {
+    LemmyAction(
       id = this.id,
       ts = this.ts,
       creationTs = this.creationTs,
-      failedTs = 0,
+      info = this.info,
+      status = ActionStatus.Errored,
+      seen = this.seen,
+      failedTs = this.failedTs,
       error = this.details.reason,
-      info = this.info,
+      completedTs = this.completedTs,
     )
   }
-  ActionDetails.PendingDetails -> {
-    LemmyPendingAction(
+  PendingDetails -> {
+    LemmyAction(
       id = this.id,
       ts = this.ts,
       creationTs = this.creationTs,
       info = this.info,
+      seen = this.seen,
+      failedTs = this.failedTs,
+      completedTs = this.completedTs,
     )
   }
-  ActionDetails.SuccessDetails -> {
-    LemmyCompletedAction(
+  SuccessDetails -> {
+    LemmyAction(
       id = this.id,
       ts = this.ts,
       creationTs = this.creationTs,
       info = this.info,
+      status = ActionStatus.Completed,
+      seen = this.seen,
+      failedTs = this.failedTs,
+      completedTs = this.completedTs,
     )
   }
 }

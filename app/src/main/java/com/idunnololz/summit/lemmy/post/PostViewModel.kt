@@ -167,13 +167,7 @@ class PostViewModel @Inject constructor(
     }
     viewModelScope.launch(Dispatchers.Default) {
       accountActionsManager.onCommentActionChanged.collect {
-        val postOrCommentRef = postOrCommentRef
-        if (postOrCommentRef != null) {
-          updatePendingComments(
-            postOrCommentRef = postOrCommentRef,
-            resolveCompletedPendingComments = true,
-          )
-        }
+        onCommentActionChanged()
       }
     }
     viewModelScope.launch(Dispatchers.Default) {
@@ -964,6 +958,16 @@ class PostViewModel @Inject constructor(
       }
 
     return result
+  }
+
+  fun onCommentActionChanged() {
+    val postOrCommentRef = postOrCommentRef
+    if (postOrCommentRef != null) {
+      updatePendingComments(
+        postOrCommentRef = postOrCommentRef,
+        resolveCompletedPendingComments = true,
+      )
+    }
   }
 
   data class PostData(

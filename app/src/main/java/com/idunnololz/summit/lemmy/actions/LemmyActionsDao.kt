@@ -11,6 +11,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import arrow.core.Either
@@ -27,38 +28,87 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
 
+private const val ACTIONS_LIMIT = 1000
+
 @Dao
 interface LemmyActionsDao {
 
-  @Query("SELECT * FROM lemmy_actions")
-  suspend fun getAllPendingActions(): List<LemmyPendingAction>
+  @Query("SELECT * FROM lemmy_actions WHERE status = NULL or status = 'Pending'")
+  suspend fun getAllPendingActions(): List<LemmyAction>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun insertAction(action: LemmyPendingAction): Long
+  suspend fun insertAction(action: LemmyAction): Long
+
+  @Query("SELECT * FROM lemmy_actions WHERE status = 'Errored' ORDER BY fts DESC LIMIT 100")
+  suspend fun getLast100FailedActions(): List<LemmyAction>
+
+  @Query("SELECT * FROM lemmy_actions WHERE status = 'Completed'")
+  suspend fun getAllCompletedActions(): List<LemmyAction>
+
+  @Query("SELECT * FROM lemmy_actions WHERE status = 'Errored'")
+  suspend fun getAllFailedActions(): List<LemmyAction>
+
+  @Query("SELECT * FROM lemmy_actions WHERE id = :actionId")
+  suspend fun getActionById(actionId: Long): List<LemmyAction>
 
   @Delete
-  suspend fun delete(action: LemmyPendingAction)
+  suspend fun delete(action: LemmyAction)
 
   @Query("DELETE FROM lemmy_actions")
   suspend fun deleteAllActions()
 
+  @Query("DELETE FROM lemmy_actions WHERE status = 'Completed'")
+  suspend fun deleteAllCompletedActions()
+
+  @Query("DELETE FROM lemmy_actions WHERE status = 'Errored'")
+  suspend fun deleteAllFailedActions()
+
   @Query("SELECT COUNT(*) FROM lemmy_actions")
   suspend fun count(): Int
+
+  @Query(
+    "DELETE FROM lemmy_actions WHERE id IN (SELECT id FROM lemmy_actions ORDER BY ts DESC " +
+      "LIMIT 10 OFFSET $ACTIONS_LIMIT)",
+  )
+  suspend fun pruneDb()
+
+  @Transaction
+  open suspend fun insertActionRespectingTableLimit(newEntry: LemmyAction) {
+    pruneDb()
+    insertAction(newEntry)
+  }
 }
 
 @Entity(tableName = "lemmy_actions")
 @TypeConverters(LemmyActionConverters::class)
-data class LemmyPendingAction(
+data class LemmyAction(
   @PrimaryKey(autoGenerate = true)
   @ColumnInfo(name = "id")
-  override val id: Long,
+  val id: Long,
   @ColumnInfo(name = "ts")
-  override val ts: Long,
+  val ts: Long,
   @ColumnInfo(name = "cts")
-  override val creationTs: Long,
+  val creationTs: Long,
   @ColumnInfo(name = "info")
-  override val info: ActionInfo?,
-) : LemmyAction
+  val info: ActionInfo?,
+
+  @ColumnInfo(name = "fts")
+  val failedTs: Long? = null,
+  @ColumnInfo(name = "error")
+  val error: LemmyActionFailureReason? = null,
+  @ColumnInfo(name = "seen")
+  val seen: Boolean? = null,
+
+  @ColumnInfo(name = "cots")
+  val completedTs: Long? = null,
+
+  @ColumnInfo(name = "status")
+  val status: ActionStatus? = null,
+)
+
+enum class ActionStatus {
+  Pending, Errored, Completed
+}
 
 @ProvidedTypeConverter
 class LemmyActionConverters(

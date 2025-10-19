@@ -46,6 +46,8 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.fullName
+import com.idunnololz.summit.actions.PendingActionsManager
+import com.idunnololz.summit.actions.ui.toAction
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostId
@@ -179,6 +181,9 @@ class MainActivity : SummitActivity() {
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  @Inject
+  lateinit var pendingActionsManager: PendingActionsManager
 
   private val imageViewerLauncher = registerForActivityResult(
     ImageViewerContract(),
@@ -789,6 +794,23 @@ class MainActivity : SummitActivity() {
       commentId = commentId.toLong(),
     )
     currentNavController?.navigateSafe(direction)
+  }
+
+  fun launchActionDetails(actionId: Long) {
+    lifecycleScope.launch {
+      val action = pendingActionsManager.findActionById(actionId)
+
+      if (action == null) {
+        launchAlertDialog("action_not_found") {
+          messageResId = R.string.error_action_not_found
+        }
+      } else {
+        val direction = MainDirections.actionGlobalActionDetailsFragment2(
+          action.toAction()
+        )
+        currentNavController?.navigateSafe(direction)
+      }
+    }
   }
 
   private fun executeWhenMainFragmentAvailable(fn: (MainFragment) -> Unit) {

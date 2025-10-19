@@ -37,13 +37,13 @@ class DatabaseModule {
   @Provides
   fun provideLemmyActionsDao(db: MainDatabase): LemmyActionsDao = db.lemmyActionsDao()
 
-  @Provides
-  fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
-    db.lemmyFailedActionsDao()
-
-  @Provides
-  fun provideLemmyCompletedActionsDao(db: MainDatabase): LemmyCompletedActionsDao =
-    db.lemmyCompletedActionsDao()
+//  @Provides
+//  fun provideLemmyFailedActionsDao(db: MainDatabase): LemmyFailedActionsDao =
+//    db.lemmyFailedActionsDao()
+//
+//  @Provides
+//  fun provideLemmyCompletedActionsDao(db: MainDatabase): LemmyCompletedActionsDao =
+//    db.lemmyCompletedActionsDao()
 
   @Provides
   fun provideHistoryDao(db: MainDatabase): HistoryDao = db.historyDao()

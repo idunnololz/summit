@@ -2316,6 +2316,11 @@
     <string name="symbol_for_unknown_score">Symbol for unknown score</string>
     <string name="no_text_selected">No text selected</string>
     <string name="purge_comment_body">Purging will delete this item. You will not be able to recover the data. Use with extreme caution.</string>
+    <string name="error_action_not_found">Action not found.</string>
+    <string name="error_reason">Error reason</string>
+    <string name="failed_ts_format">Failed %1$s</string>
+    <string name="created_ts_format">Created %1$s</string>
+    <string name="completed_ts_format">Completed %1$s</string>
 
 
     <!-- uCrop string resource end -->
