@@ -363,7 +363,7 @@
     <string name="a_month">Ένας μήνας</string>
     <string name="a_year">Ένας χρόνος</string>
     <string name="dont_warn">Μην προειδοποιείς</string>
-    <string name="less_dark_background_theme">Λιγότερο σκούρο θέμα παρασκηνίου</string>
+    <string name="less_dark_background_theme">Λιγότερο σκούρο παρασκήνιο</string>
     <string name="backup_and_restore_settings">Ρυθμίσεις εισαγωγής και εξαγωγής</string>
     <string name="manage_internal_settings_backups">Διαχειρήσου τα αντίγραφα ασφαλείας των εσωτερικών ρυθμίσεων</string>
     <string name="save_drafts_automatically_desc">Όταν είναι ενεργό, τα πρόχειρα αναρτήσεων/σχολίων αποθηκεύονται αυτόματα εάν απομακρυνθείς από την οθόνη δημιουργίας/επεξεργασίας ανάρτησης/σχολίου χωρίς να πατήσεις αποστολή.</string>
@@ -1047,7 +1047,7 @@
 \n
 \nΕάν δεν δεις το email εντός 10 λεπτών, έλεγξε τους φακέλους ανεπιθύμητης αλληλογραφίας ή κάδου απορριμμάτων.</string>
     <string name="finish">Τέλος</string>
-    <string name="registration_created">Η αίτησή σου έχει υποβληθεί. Πρέπει να περιμένεις έως ότου ένας διαχειριστής ιστότοπου εγκρίνει την αίτησή σου για να μπορέσεις να χρησιμοποιήσεις τον λογαριασμό σου.</string>
+    <string name="registration_created">Η αίτησή σου έχει υποβληθεί. Περίμενε μέχρι ένας διαχειριστής ιστότοπου εγκρίνει την αίτησή σου για να μπορέσεις να χρησιμοποιήσεις τον λογαριασμό σου.</string>
     <string name="error_unknown_sign_up_error">Παρουσιάστηκε απροσδόκητο σφάλμα κατά την εγγραφή.</string>
     <string name="solve_captcha_desc">Πρέπει να λύσεις ένα captcha για να εγγραφείς. Εισήγαγε τον κωδικό από την παρακάτω εικόνα.</string>
     <string name="configure">Διαμόρφωση</string>
@@ -1448,4 +1448,48 @@
     <string name="instance_info_format">Πληροφορίες οντότητας (%1$s)</string>
     <string name="error_not_yet_implemented">Αυτή η λειτουργία δεν υποστηρίζεται ακόμη από τον διακομιστή.</string>
     <string name="error_instance_does_not_support_registration">Δεν μπορείς να δημιουργήσεις νέο λογαριασμό με την εφαρμογή, επειδή αυτή η οντότητα δεν το υποστηρίζει. Πρέπει να επισκεφθείς τον ιστότοπο για να δημιουργήσεις έναν λογαριασμό.</string>
+    <string name="retry_action_failed">Η ενέργεια επανάληψης απέτυχε.</string>
+    <string name="atkinson_hyperlegible_next">Atkinson Hyperregible Next™</string>
+    <string name="delete_item_desc">Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.</string>
+    <string name="template_saved">Το πρότυπο αποθηκεύτηκε</string>
+    <string name="content">Περιεχόμενο</string>
+    <string name="edit_template">Επεξεργασία προτύπου</string>
+    <string name="toggle_hide_read_mode">Εναλλαγή απόκρυψης ανάγνωσης</string>
+    <string name="hide_read_on">Η απόκρυψη ανάγνωσης είναι ενεργή</string>
+    <string name="no_watermark">Χωρίς υδατογράφημα</string>
+    <string name="smart_list">Έξυπνη λίστα</string>
+    <string name="inbox_settings">Ρυθμίσεις εισερχομένων</string>
+    <string name="inbox_layout">Διάταξη εισερχομένων</string>
+    <string name="inbox_auto_mark_as_read">Αυτόματη σήμανση ως αναγνωσμένο</string>
+    <string name="error_invalid_regex">Μη έγκυρο regex</string>
+    <string name="cant_find_match_desc">Δεν είναι δυνατή η αντιστοίχιση του %1$s . Η αντιστοίχιση ενδέχεται να μην είναι προσβάσιμη (π.χ. βρίσκεται μέσα σε ένα μπλοκ spoiler).</string>
+    <string name="mark_as_read_on_hide_post">Επισήμανση ως αναγνωσμένης στην απόκρυψη ανάρτησης</string>
+    <string name="search_in_format">Αναζήτηση σε %1$s</string>
+    <string name="error_set_community">Σφάλμα κατά τον ορισμό του φίλτρου κοινότητας.</string>
+    <string name="background_color">Χρώμα φόντου</string>
+    <string name="atkinson_hyperlegible_next_desc">«Για τους αναγνώστες με μειωμένη όραση, ορισμένα γράμματα και αριθμοί μπορεί να είναι δύσκολο να διακριθούν μεταξύ τους. Η γραμματοσειρά Atkinson Hyperlegible™ χρησιμοποιεί ειδικές αρχές σχεδιασμού για να διαφοροποιήσει τους χαρακτήρες και να κάνει τον καθένα μοναδικό»</string>
+    <string name="delete_item">Διαγραφή στοιχείου</string>
+    <string name="templates">Πρότυπα</string>
+    <string name="inbox_fab_action">Ενέργεια FAB στα Εισερχόμενα</string>
+    <string name="error_delete_item_failed">Η διαγραφή του στοιχείου απέτυχε.</string>
+    <string name="add_template">Προσθήκη προτύπου</string>
+    <string name="template_empty_desc">Αποθήκευσε τους συνήθεις λόγους απόρριψης ως πρότυπο για να επιταχύνεις τη διαδικασία αξιολόγησης.</string>
+    <string name="inbox_auto_mark_as_read_desc">Όταν είναι ενεργό, πατώντας σε οποιοδήποτε στοιχείο των εισερχομένων θα επισημανθεί το στοιχείο ως αναγνωσμένο (αν είναι δυνατόν).</string>
+    <string name="version_code_copied_to_clipboard">Ο κωδικός έκδοσης αντιγράφηκε στο πρόχειρο</string>
+    <string name="hide_read_on_desc">Αυτό το κουμπί υποδεικνύει ότι η επιλογή \"απόκρυψη αναγνωσμένων\" είναι ενεργή.
+\n
+\n Όταν είναι ενεργή η επιλογή \"απόκρυψη αναγνωσμένων\", η ανανέωση της ροής αναρτήσεων θα εμφανίζει μόνο τις μη αναγνωσμένες αναρτήσεις.
+\n
+\n Πάτα αυτό το κουμπί για να απενεργοποιήσεις την επιλογή \"απόκρυψη αναγνωσμένων\".</string>
+    <string name="finish_app_on_back">Ολοκλήρωση εφαρμογής στο πίσω</string>
+    <string name="inbox_desc">Προσάρμοσε τα εισερχόμενα</string>
+    <string name="mark_all_as_read">Σήμανση όλων ως αναγνωσμένων</string>
+    <string name="finish_app_on_back_desc">Από προεπιλογή, οι εφαρμογές θα διατηρούν την κατάστασή τους όταν είναι κλειστές. Εάν η εφαρμογή επανεκκινηθεί μέσω της οθόνης πρόσφατων, η κατάσταση της εφαρμογής θα αποκατασταθεί. Εάν αυτή η ρύθμιση είναι ενεργοποιημένη, τότε η εφαρμογή θα απορρίψει την κατάστασή της κατά το κλείσιμο και η κατάσταση δεν θα αποκατασταθεί ακόμη και αν εκκινηθεί μέσω πρόσφατων.</string>
+    <string name="match_whole_word">Αντιστοίχιση ολόκληρης λέξης</string>
+    <string name="show_navigation_bar_on_post">Εμφάνιση γραμμής πλοήγησης στην ανάρτηση</string>
+    <string name="full_content_max_height">Μέγιστο ύψος πλήρους περιεχομένου</string>
+    <string name="by_format">Από %1$s</string>
+    <string name="no_text_selected">Δεν έχει επιλεγεί κείμενο</string>
+    <string name="purge_comment_body">Η εκκαθάριση θα διαγράψει αυτό το στοιχείο. Δεν θα μπορείς να ανακτήσεις τα δεδομένα. Χρησιμοποίησέ το με εξαιρετική προσοχή.</string>
+    <string name="symbol_for_unknown_score">Σύμβολο για άγνωστο σκορ</string>
 </resources>
