@@ -16,7 +16,7 @@ import com.idunnololz.summit.inbox.inbox.InboxFragmentArgs
 import com.idunnololz.summit.inbox.inbox.getName
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.notifications.NotificationsManager
 import com.idunnololz.summit.util.PageItem
 import dagger.hilt.android.lifecycle.HiltViewModel

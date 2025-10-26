@@ -101,6 +101,7 @@ import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -547,7 +548,7 @@ class CommunityFragment :
 
       viewModel.updatePreferences()
 
-      communityAppBarController = CommunityAppBarController(
+      val communityAppBarController = CommunityAppBarController(
         summitActivity = requireSummitActivity(),
         baseFragment = this@CommunityFragment,
         parentContainer = coordinatorLayout,
@@ -565,23 +566,25 @@ class CommunityFragment :
         onSearchClick = {
           handleSearchClick()
         },
-      )
+      ).also {
+        communityAppBarController = it
+      }
 
       // Prevent flickers by setting the app bar here first
-      communityAppBarController?.setCommunity(args.communityRef)
+      communityAppBarController.setCommunity(args.communityRef)
       // Prevent flickers by setting the header thing
-      communityAppBarController?.setUseHeader(preferences.usePostsFeedHeader)
+      communityAppBarController.setUseHeader(preferences.usePostsFeedHeader)
 
       viewModel.defaultCommunity.observe(viewLifecycleOwner) {
         if (it != null) {
-          communityAppBarController?.setDefaultCommunity(it)
+          communityAppBarController.setDefaultCommunity(it)
         }
       }
       viewModel.currentAccount.observe(viewLifecycleOwner) {
-        communityAppBarController?.onAccountChanged(it)
+        communityAppBarController.onAccountChanged(it)
       }
       viewModel.sortOrder.observe(viewLifecycleOwner) {
-        communityAppBarController?.setSortOrder(it)
+        communityAppBarController.setSortOrder(it)
       }
 
       installOnActionResultHandler(
@@ -607,7 +610,7 @@ class CommunityFragment :
           if (navBarController.useNavigationRail) {
             navBarController.updatePaddingForNavBar(coordinatorLayout)
           }
-          communityAppBarController?.percentShown?.observe(viewLifecycleOwner) {
+          communityAppBarController.percentShown.observe(viewLifecycleOwner) {
             if (!isBindingAvailable() || viewModel.lockBottomBar) {
               return@observe
             }
@@ -624,50 +627,50 @@ class CommunityFragment :
         }
       }
 
-      communityAppBarController?.setup(
-        communitySelectedListener = { controller, communityRef ->
-          val action =
-            CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
-              communityRef = communityRef,
-              tab = args.tab,
+      communityAppBarController.setup(
+          communitySelectedListener = { controller, communityRef ->
+            val action =
+              CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
+                communityRef = communityRef,
+                tab = args.tab,
+              )
+            findNavController().navigate(action)
+            Utils.hideKeyboard(activity)
+            controller.hide()
+          },
+          onAccountClick = {
+            AccountsAndSettingsDialogFragment.newInstance()
+              .showAllowingStateLoss(
+                childFragmentManager,
+                "AccountsDialogFragment",
+              )
+          },
+          onSortOrderClick = {
+            getMainActivity()?.showBottomMenu(getSortByMenu())
+          },
+          onChangeInstanceClick = {
+            InstancePickerDialogFragment.show(childFragmentManager)
+          },
+          onCommunityLongClick = { communityRef, text ->
+            val url = communityRef?.toUrl(viewModel.apiInstance)
+            if (url != null) {
+              getMainActivity()?.showMoreLinkOptions(url, text)
+              true
+            } else {
+              false
+            }
+          },
+          onHideReadOnClick = {
+            createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+              R.id.hide_read_off,
             )
-          findNavController().navigate(action)
-          Utils.hideKeyboard(activity)
-          controller.hide()
-        },
-        onAccountClick = {
-          AccountsAndSettingsDialogFragment.newInstance()
-            .showAllowingStateLoss(
-              childFragmentManager,
-              "AccountsDialogFragment",
-            )
-        },
-        onSortOrderClick = {
-          getMainActivity()?.showBottomMenu(getSortByMenu())
-        },
-        onChangeInstanceClick = {
-          InstancePickerDialogFragment.show(childFragmentManager)
-        },
-        onCommunityLongClick = { communityRef, text ->
-          val url = communityRef?.toUrl(viewModel.apiInstance)
-          if (url != null) {
-            getMainActivity()?.showMoreLinkOptions(url, text)
-            true
-          } else {
-            false
-          }
-        },
-        onHideReadOnClick = {
-          createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
-            R.id.hide_read_off,
-          )
-        },
-        onHideReadOnLongClick = {
-          launchAlertDialog("hide_read_on") {
-            titleResId = R.string.hide_read_on
-            messageResId = R.string.hide_read_on_desc
-          }
-        },
+          },
+          onHideReadOnLongClick = {
+            launchAlertDialog("hide_read_on") {
+              titleResId = R.string.hide_read_on
+              messageResId = R.string.hide_read_on_desc
+            }
+          },
       )
 
       runAfterLayout {
@@ -801,7 +804,7 @@ class CommunityFragment :
         }
 
         viewModel.hideReadMode.observe(viewLifecycleOwner) {
-          communityAppBarController?.onHideReadModeChange()
+          communityAppBarController.onHideReadModeChange()
         }
 
         init()
@@ -973,8 +976,6 @@ class CommunityFragment :
           }
 
           is StatefulData.Success -> {
-            Log.d("HAHA", "loaded page: ${viewModel.postListEngine.currentPageIndex.value}")
-
             loadingView.hideAll()
 
             val adapter = adapter ?: return@a
@@ -1008,7 +1009,6 @@ class CommunityFragment :
                 val currentPageIndex = viewModel.postListEngine.currentPageIndex.value
                 if (!viewModel.infinity && it.data.scrollToSavedPosition) {
                   val pagePosition = viewModel.getPagePosition(currentPageIndex)
-                  Log.d("HAHA", "pagePosition: $pagePosition")
                   if (pagePosition.isAtBottom) {
                     (recyclerView.layoutManager as LinearLayoutManager)
                       .scrollToPositionWithOffset(adapter.itemCount - 1, 0)
@@ -1259,6 +1259,31 @@ class CommunityFragment :
     super.onPause()
   }
 
+  override fun onDestroyView() {
+    Log.d(TAG, "onDestroyView()")
+
+    itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
+    itemTouchHelper = null
+
+    slidingPaneController = null
+    communityAppBarController = null
+    swipeActionCallback = null
+    binding.recyclerView.adapter = null
+
+    super.onDestroyView()
+  }
+
+  override fun navigateToSignInScreen() {
+    val direction = CommunityFragmentDirections.actionCommunityFragmentToLogin()
+    findNavController().navigateSafe(direction)
+  }
+
+  override fun proceedAnyways(tag: Int) {}
+
+  fun getPost(postId: Int): PostView? {
+    return viewModel.postListEngine.getFetchedPost(postId)
+  }
+
   private fun updateHistory() {
     if (!isBindingAvailable()) return
 
@@ -1273,20 +1298,6 @@ class CommunityFragment :
         shortDesc = viewState.getShortDesc(context),
       )
     }
-  }
-
-  override fun onDestroyView() {
-    Log.d(TAG, "onDestroyView()")
-
-    itemTouchHelper?.attachToRecyclerView(null) // detach the itemTouchHelper
-    itemTouchHelper = null
-
-    slidingPaneController = null
-    communityAppBarController = null
-    swipeActionCallback = null
-    binding.recyclerView.adapter = null
-
-    super.onDestroyView()
   }
 
   private fun restoreState(state: CommunityViewState?, reload: Boolean) {
@@ -2001,13 +2012,6 @@ class CommunityFragment :
 
     getMainActivity()?.showBottomMenu(bottomMenu, expandFully = false)
   }
-
-  override fun navigateToSignInScreen() {
-    val direction = CommunityFragmentDirections.actionCommunityFragmentToLogin()
-    findNavController().navigateSafe(direction)
-  }
-
-  override fun proceedAnyways(tag: Int) {}
 
   private fun onSelectedLayoutChanged() {
     val currentLayout = currentLayout

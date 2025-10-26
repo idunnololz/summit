@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.databinding.TabbedFragmentPostBinding
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
@@ -60,8 +62,6 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
     super.onViewCreated(view, savedInstanceState)
 
     val parentFragment = parentFragment as? CommunityFragment
-
-    fun getViewModel() = parentFragment?.viewModel
 
     val context = requireContext()
 
@@ -150,6 +150,12 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
 //    outState.remove("android:support:fragments")
   }
 
+  fun getPost(postId: Int): PostView? {
+    return getViewModel()?.postListEngine?.getFetchedPost(postId)
+  }
+
+  private fun getViewModel() = (parentFragment as? CommunityFragment)?.viewModel
+
   class PostAdapter(
     fragment: Fragment,
   ) : FragmentStateAdapter(fragment) {
@@ -170,6 +176,7 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
     }
 
     var items: List<Item> = listOf()
+      private set
     private var nsfwMode: Boolean = false
 
     override fun getItemId(position: Int): Long = when (val item = items[position]) {
@@ -186,7 +193,6 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
             instance = item.instance,
             id = item.fetchedPost.postView.post.id,
             reveal = nsfwMode,
-            post = item.fetchedPost.postView,
             jumpToComments = false,
             currentCommunity = item.fetchedPost.postView.community.toCommunityRef(),
             videoState = null,

@@ -555,8 +555,6 @@ class PostListAdapter(
     val newItems = postListEngine.items
     val oldItems = items
 
-    Log.d("HAHA", "refreshItems. page: ${postListEngine.currentPageIndex.value}")
-
     val diff = DiffUtil.calculateDiff(
       object : DiffUtil.Callback() {
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

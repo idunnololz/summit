@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.FragmentMessageBinding
@@ -53,6 +54,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
+import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -94,6 +96,24 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    childFragmentManager.setFragmentResultListener(
+      AddOrEditCommentFragment.REQUEST_KEY,
+      this,
+    ) { key, bundle ->
+      bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(
+        AddOrEditCommentFragment.REQUEST_KEY_RESULT,
+      )?.let { result ->
+        val lastInboxItemSelected = result.inboxItem
+        if (result.wasCommentSent && lastInboxItemSelected != null) {
+          inboxViewModel.markAsRead(inboxItem = lastInboxItemSelected, read = true)
+        }
+      }
+    }
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -302,7 +322,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     } else {
       binding.fab.setImageResource(R.drawable.baseline_reply_24)
       binding.fab.setOnClickListener {
-        if (accountManager.currentAccount.value == null) {
+        if (accountManager.currentAccount.value.isGuestAccount) {
           PreAuthDialogFragment.newInstance(R.id.action_add_comment)
             .show(childFragmentManager, "asdf")
           return@setOnClickListener

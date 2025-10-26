@@ -33,7 +33,7 @@ import com.idunnololz.summit.inbox.message.MessageFragmentArgs
 import com.idunnololz.summit.inbox.report.ReportDetailsFragment
 import com.idunnololz.summit.inbox.report.ReportDetailsFragmentArgs
 import com.idunnololz.summit.lemmy.community.CommunityFragment
-import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem

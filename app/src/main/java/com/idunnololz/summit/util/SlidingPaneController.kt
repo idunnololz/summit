@@ -1,4 +1,4 @@
-package com.idunnololz.summit.lemmy.community
+package com.idunnololz.summit.util
 
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
-import androidx.slidingpanelayout.widget.SlidingPaneLayout.PanelSlideListener
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentId
@@ -25,7 +24,6 @@ import com.idunnololz.summit.lemmy.post.PostTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostTabbedFragmentArgs
 import com.idunnololz.summit.preferences.GlobalLayoutMode
 import com.idunnololz.summit.preferences.GlobalLayoutModes
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.video.VideoState
 import com.idunnololz.summit.view.FixedSlidingPaneLayout
 import kotlinx.coroutines.Dispatchers
@@ -35,20 +33,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SlidingPaneController(
-  private val fragment: BaseFragment<*>,
-  private val slidingPaneLayout: FixedSlidingPaneLayout,
-  private val childFragmentManager: FragmentManager,
-  private val viewModel: PostViewPagerViewModel,
-  private val globalLayoutMode: GlobalLayoutMode,
-  /**
+    private val fragment: BaseFragment<*>,
+    private val slidingPaneLayout: FixedSlidingPaneLayout,
+    private val childFragmentManager: FragmentManager,
+    private val viewModel: PostViewPagerViewModel,
+    private val globalLayoutMode: GlobalLayoutMode,
+    /**
    * Used for tablets. The message is shown on the side pane when nothing is selected.
    */
   private val emptyScreenText: String,
-  @IdRes private val fragmentContainerId: Int,
-  val lockPanes: Boolean = false,
-  private val retainClosedPosts: Boolean = false,
-  private val useSwipeBetweenPosts: Boolean = false,
-  private val isPreview: Boolean = false,
+    @IdRes private val fragmentContainerId: Int,
+    val lockPanes: Boolean = false,
+    private val retainClosedPosts: Boolean = false,
+    private val useSwipeBetweenPosts: Boolean = false,
+    private val isPreview: Boolean = false,
 ) {
 
   interface PostViewPagerViewModel {
@@ -75,7 +73,7 @@ class SlidingPaneController(
   var panelOpenNavBarOpenPercent: Float = 0f
 
   private val panelSlideListener =
-    object : PanelSlideListener {
+    object : SlidingPaneLayout.PanelSlideListener {
       override fun onPanelSlide(panel: View, slideOffset: Float) {
         Log.d(TAG, "onPanelSlide() - $slideOffset")
 
@@ -150,7 +148,7 @@ class SlidingPaneController(
             setReorderingAllowed(true)
             replace(
               fragmentContainerId,
-              EmptyScreenFragment.newInstance(emptyScreenText),
+              EmptyScreenFragment.Companion.newInstance(emptyScreenText),
             )
           }
         }
@@ -164,6 +162,10 @@ class SlidingPaneController(
           slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
         }
       }
+
+      if (slidingPaneLayout.isOpen && slidingPaneLayout.isSlideable) {
+        panelSlideListener.onPanelOpened(slidingPaneLayout)
+      }
     }
 
     if (globalLayoutMode == GlobalLayoutModes.SmallScreen) {
@@ -176,14 +178,14 @@ class SlidingPaneController(
   }
 
   fun openPost(
-    instance: String,
-    id: Int,
-    currentCommunity: CommunityRef?,
-    accountId: Long?,
-    post: PostView? = null,
-    jumpToComments: Boolean = false,
-    reveal: Boolean = false,
-    videoState: VideoState? = null,
+      instance: String,
+      id: Int,
+      currentCommunity: CommunityRef?,
+      accountId: Long?,
+      post: PostView? = null,
+      jumpToComments: Boolean = false,
+      reveal: Boolean = false,
+      videoState: VideoState? = null,
   ) {
     try {
       // Best effort restore PostFragment
@@ -219,7 +221,6 @@ class SlidingPaneController(
         instance = instance,
         id = id,
         reveal = reveal,
-        post = post,
         isPreview = isPreview,
         jumpToComments = jumpToComments,
         currentCommunity = currentCommunity,
@@ -247,9 +248,9 @@ class SlidingPaneController(
   }
 
   private fun openPostInternal(
-    args: PostFragmentArgs?,
-    itemRef: Either<PostRef, CommentRef>? = null,
-    postFragmentOverride: PostFragment? = null,
+      args: PostFragmentArgs?,
+      itemRef: Either<PostRef, CommentRef>? = null,
+      postFragmentOverride: PostFragment? = null,
   ) {
     if (activeOpenPostJob != null) {
       Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
@@ -280,19 +281,19 @@ class SlidingPaneController(
       }
 
       if (postFragmentOverride != null) {
-        withContext(Dispatchers.IO) {
-          // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
-          delay(100)
-        }
+          withContext(Dispatchers.IO) {
+              // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
+              delay(100)
+          }
       }
 
       viewModel.lastSelectedItem = itemRef
 
       openPane()
 
-      withContext(Dispatchers.IO) {
-        delay(250)
-      }
+        withContext(Dispatchers.IO) {
+            delay(250)
+        }
       activeOpenPostJob = null
     }
   }
@@ -306,9 +307,9 @@ class SlidingPaneController(
     activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
       closePane()
 
-      withContext(Dispatchers.IO) {
-        delay(250)
-      }
+        withContext(Dispatchers.IO) {
+            delay(250)
+        }
       activeClosePostJob = null
     }
   }

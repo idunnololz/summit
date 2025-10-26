@@ -49,6 +49,7 @@ import com.idunnololz.summit.editTextToolbar.EditTextToolbarSettingsDialogFragme
 import com.idunnololz.summit.editTextToolbar.TextFieldToolbarManager
 import com.idunnololz.summit.editTextToolbar.TextFormatToolbarViewHolder
 import com.idunnololz.summit.error.ErrorDialogFragment
+import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.UploadImageViewModel
@@ -140,6 +141,7 @@ class AddOrEditCommentFragment :
     val wasCommentSent: Boolean,
     val didUserTapSend: Boolean,
     val content: String?,
+    val inboxItem: InboxItem?,
   ) : Parcelable
 
   private val args by navArgs<AddOrEditCommentFragmentArgs>()
@@ -418,6 +420,7 @@ class AddOrEditCommentFragment :
                 wasCommentSent = true,
                 didUserTapSend = true,
                 content = null,
+                inboxItem = args.inboxItem,
               ),
             ),
           )
@@ -488,6 +491,7 @@ class AddOrEditCommentFragment :
                       wasCommentSent = true,
                       didUserTapSend = true,
                       content = binding.commentEditText.text?.toString(),
+                      inboxItem = args.inboxItem,
                     ),
                   ),
                 )
@@ -913,6 +917,7 @@ class AddOrEditCommentFragment :
                 wasCommentSent = false,
                 didUserTapSend = false,
                 content = binding.commentEditText.text?.toString(),
+                inboxItem = args.inboxItem,
               ),
             ),
           )

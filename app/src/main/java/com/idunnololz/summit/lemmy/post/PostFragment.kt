@@ -33,7 +33,6 @@ import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
-import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -209,6 +208,7 @@ class PostFragment :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    val parentFragment = parentFragment
     val accountId = accountId
     if (accountId != null) {
       viewModel.forceAccount(accountId)
@@ -216,11 +216,12 @@ class PostFragment :
     } else {
       moreActionsHelper = moreActionsHelperManager.getDefaultInstance()
     }
+    val initialPostView = getInitialPostView()
 
     preferences = viewModel.preferences
 
     if (savedInstanceState == null) {
-      viewModel.updatePostViewIfNeeded(args.post)
+      viewModel.updatePostViewIfNeeded(initialPostView)
       viewModel.updateOriginalPostOrCommentRef(args.postOrCommentRef())
       viewModel.updatePostOrCommentRef(args.postOrCommentRef())
     }
@@ -400,6 +401,8 @@ class PostFragment :
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    val initialPost = getInitialPostView()
+
     with(binding) {
       requireSummitActivity().apply {
         insetViewExceptBottomAutomaticallyByPadding(
@@ -410,7 +413,7 @@ class PostFragment :
 
       fun onMoreClick() {
         val data = viewModel.postData.valueOrNull
-        val postView = data?.postListView?.post ?: args.post
+        val postView = data?.postListView?.post ?: initialPost
 
         if (postView != null) {
           showMorePostOptions(
@@ -694,7 +697,7 @@ class PostFragment :
             },
             onMoreClick = {
               val data = viewModel.postData.valueOrNull
-              val postView = data?.postListView?.post ?: args.post
+              val postView = data?.postListView?.post ?: initialPost
 
               if (postView != null) {
                 onMoreClick()
@@ -845,7 +848,7 @@ class PostFragment :
           binding.recyclerView.height,
         )
 
-        setup()
+        setup(initialPost)
       }
 
       viewLifecycleOwner.lifecycleScope.launch {
@@ -1038,7 +1041,7 @@ class PostFragment :
     super.onDestroyView()
   }
 
-  private fun setup() {
+  private fun setup(initialPostView: PostView?) {
     if (!isBindingAvailable()) {
       return
     }
@@ -1111,7 +1114,7 @@ class PostFragment :
       forceRefresh()
     }
 
-    args.post?.let { post ->
+    initialPostView?.let { post ->
       adapter.setStartingData(
         PostViewModel.PostData(
           postListView = PostViewModel.ListView.PostListView(
@@ -1203,11 +1206,11 @@ class PostFragment :
       }
     }
 
-    args.post?.getUrl(getInstance())?.let { url ->
+    initialPostView?.getUrl(getInstance())?.let { url ->
       historyManager.recordVisit(
         jsonUrl = url,
         saveReason = HistorySaveReason.LOADING,
-        post = args.post,
+        post = initialPostView,
       )
     }
 
@@ -1480,4 +1483,27 @@ class PostFragment :
       } else {
         null
       }
+
+  private var _initialPostView: PostView? = null
+  private fun getInitialPostView(): PostView? {
+    if (args.post != null) {
+      return args.post
+    } else {
+      if (_initialPostView != null) {
+        return _initialPostView
+      }
+
+      val parentFragment = parentFragment
+      // check if we can get the post some other way...
+      if (parentFragment is PostTabbedFragment) {
+        _initialPostView = parentFragment.getPost(args.id)
+        return _initialPostView
+      } else if (parentFragment is CommunityFragment) {
+        _initialPostView = parentFragment.getPost(args.id)
+        return _initialPostView
+      } else {
+        return null
+      }
+    }
+  }
 }

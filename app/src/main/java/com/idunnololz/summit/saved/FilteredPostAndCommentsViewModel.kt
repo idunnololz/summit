@@ -25,7 +25,7 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import com.idunnololz.summit.lemmy.community.PostListEngine
 import com.idunnololz.summit.lemmy.community.PostLoadError
-import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.lemmy.multicommunity.toFetchedPost
 import com.idunnololz.summit.lemmy.utils.actions.SaveCommentResult
 import com.idunnololz.summit.lemmy.utils.actions.SavePostResult

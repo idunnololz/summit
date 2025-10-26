@@ -250,6 +250,19 @@ class PostListEngine @AssistedInject constructor(
     }
   }
 
+  fun getFetchedPost(postId: Int): PostView? {
+    val pages = _pages
+    for (page in pages) {
+      for (post in page.posts) {
+        val postView = post.fetchedPost.postView
+        if (postView.post.id == postId) {
+          return postView
+        }
+      }
+    }
+    return null
+  }
+
   fun createItems() {
     val context = ContextCompat.getContextForLanguage(context)
 

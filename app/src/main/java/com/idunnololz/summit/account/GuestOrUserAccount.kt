@@ -20,3 +20,6 @@ val GuestOrUserAccount.key
 
 val GuestOrUserAccount.asAccount: Account?
   get() = this as? Account
+
+val GuestOrUserAccount.isGuestAccount: Boolean
+  get() = this is GuestAccount

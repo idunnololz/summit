@@ -36,7 +36,7 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATI
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.lemmy.community.SlidingPaneController
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.toPersonRef

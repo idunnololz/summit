@@ -188,6 +188,20 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
         }
       }
     }
+
+    childFragmentManager.setFragmentResultListener(
+      AddOrEditCommentFragment.REQUEST_KEY,
+      this,
+    ) { key, bundle ->
+      bundle.getParcelableCompat<AddOrEditCommentFragment.Result>(
+        AddOrEditCommentFragment.REQUEST_KEY_RESULT,
+      )?.let { result ->
+        val lastInboxItemSelected = result.inboxItem
+        if (result.wasCommentSent && lastInboxItemSelected != null) {
+          viewModel.markAsRead(inboxItem = lastInboxItemSelected, read = true)
+        }
+      }
+    }
   }
 
   override fun onCreateView(
@@ -482,10 +496,6 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
     )
   }
 
-  private fun markAsRead(inboxItem: InboxItem, read: Boolean) {
-    viewModel.markAsRead(inboxItem, read)
-  }
-
   private fun createAdapter(): InboxItemAdapter {
     return InboxItemAdapter(
       context = requireContext(),
@@ -509,7 +519,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
         getMainActivity()?.openVideo(url, videoType, state)
       },
       onMarkAsRead = { view, inboxItem, read ->
-        markAsRead(inboxItem, read)
+        viewModel.markAsRead(inboxItem, read)
 
         if (preferences.hapticsOnActions) {
           view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
@@ -521,7 +531,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
       onMessageClick = {
         val accountId = viewModel.currentAccount.value?.id ?: return@InboxItemAdapter
         if (!it.isRead && it !is ReportItem && preferences.inboxAutoMarkAsRead) {
-          markAsRead(it, read = true)
+          viewModel.markAsRead(it, read = true)
         }
         (parentFragment as? InboxTabbedFragment)?.openMessage(
           accountId = accountId,

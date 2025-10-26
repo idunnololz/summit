@@ -49,6 +49,7 @@ import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.prefetcher.PostFeedPrefetcher
 import com.idunnololz.summit.tabs.TabsManager
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.assertMainThread
 import com.idunnololz.summit.util.toErrorMessage

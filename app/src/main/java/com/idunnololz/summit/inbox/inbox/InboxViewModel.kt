@@ -346,7 +346,7 @@ class InboxViewModel @Inject constructor(
     )
   }
 
-  fun markAsRead(inboxItem: InboxItem, read: Boolean, refreshAfter: Boolean = false) {
+  fun markAsRead(inboxItem: InboxItem, read: Boolean) {
     markAsReadResult.setIsLoading()
 
     markAsReadInViewData(
