@@ -1588,6 +1588,11 @@ class PostsFeedAppearanceSettings @Inject constructor(
     context.getString(R.string.prefer_text_preview_icon),
     context.getString(R.string.prefer_text_preview_icon_desc),
   )
+  val showUrlDomain = OnOffSettingItem(
+    null,
+    context.getString(R.string.show_url_domain),
+    context.getString(R.string.show_url_domain_desc),
+  )
 
   val horizontalMarginSize = SliderSettingItem(
     context.getString(R.string.horizontal_margin_size),

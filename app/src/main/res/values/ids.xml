@@ -313,4 +313,5 @@
     <item name="_default" type="id" />
     <item name="less_dark_background_theme" type="id" />
     <item name="community_admin_tools" type="id" />
+    <item name="pa_hide_post" type="id" />
 </resources>

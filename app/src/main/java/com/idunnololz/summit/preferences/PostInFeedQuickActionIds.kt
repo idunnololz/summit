@@ -14,6 +14,7 @@ object PostInFeedQuickActionIds {
   const val ViewSource: PostInFeedQuickActionId = 1009
   const val DetailedView: PostInFeedQuickActionId = 1010
   const val MarkAsRead: PostInFeedQuickActionId = 1011
+  const val HidePost: PostInFeedQuickActionId = 1012
 
   val AllActions = listOf(
     Voting,
@@ -26,5 +27,6 @@ object PostInFeedQuickActionIds {
     ViewSource,
     DetailedView,
     MarkAsRead,
+    HidePost,
   )
 }

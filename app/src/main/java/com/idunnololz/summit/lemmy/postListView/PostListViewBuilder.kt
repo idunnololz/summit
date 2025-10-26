@@ -68,6 +68,7 @@ import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
 import com.idunnololz.summit.preferences.GlobalFontSizeId
+import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.HidePost
 import com.idunnololz.summit.preferences.PostInFeedQuickActionIds.MarkAsRead
 import com.idunnololz.summit.preferences.PostQuickActionIds.CommunityInfo
 import com.idunnololz.summit.preferences.PostQuickActionIds.CrossPost
@@ -180,6 +181,7 @@ class PostListViewBuilder @Inject constructor(
   private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
   private var hapticsOnActions: Boolean = preferences.hapticsOnActions
   private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
+  private var showUrlDomain: Boolean = postUiConfig.showUrlDomain()
   var postsInFeedQuickActions = generateQuickActions()
     private set
   private var openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
@@ -250,6 +252,7 @@ class PostListViewBuilder @Inject constructor(
     postHorizontalMarginDp = postUiConfig.horizontalMarginDp
     postVerticalMarginDp = postUiConfig.verticalMarginDp
     showTextPreviewIcon = postUiConfig.showTextPreviewIcon ?: true
+    showUrlDomain = postUiConfig.showUrlDomain()
 
     globalFontSizeMultiplier =
       GlobalFontSizeId.getFontSizeMultiplier(preferences.globalFontSize)
@@ -1450,6 +1453,19 @@ class PostListViewBuilder @Inject constructor(
         downvoteCount?.visibility = View.GONE
       }
 
+      if (showUrlDomain && holder.subtitle != null) {
+        val domain = url?.toUri()?.host ?: url
+
+        if (domain != null) {
+          holder.subtitle.text = domain
+          holder.subtitle.visibility = View.VISIBLE
+        } else {
+          holder.subtitle.visibility = View.GONE
+        }
+      } else {
+        holder.subtitle?.visibility = View.GONE
+      }
+
       when (val rb = rawBinding) {
         is ListingItemCompactBinding -> {
           if (isActionsExpanded) {
@@ -1509,6 +1525,7 @@ class PostListViewBuilder @Inject constructor(
     headerContainer.textSize = postUiConfig.headerTextSizeSp.toTextSize() * 0.9f
 
     title.textSize = postUiConfig.titleTextSizeSp.toTextSize()
+    subtitle?.textSize = postUiConfig.subtitleTextSizeSp()
     commentText?.textSize = postUiConfig.footerTextSizeSp.toTextSize()
     upvoteCount?.textSize = postUiConfig.footerTextSizeSp.toTextSize()
     downvoteCount?.textSize = postUiConfig.footerTextSizeSp.toTextSize()
@@ -1857,6 +1874,18 @@ class PostListViewBuilder @Inject constructor(
             alignmentViewId = commentButton.id,
           ).apply {
             setImageResource(R.drawable.baseline_check_24)
+            root.addView(this)
+            views.add(this)
+            actionViews.add(this)
+          }
+        }
+        HidePost -> {
+          makePostsInFeedActionButton(
+            idRes = R.id.pa_hide_post,
+            endId = endId,
+            alignmentViewId = commentButton.id,
+          ).apply {
+            setImageResource(R.drawable.baseline_hide_24)
             root.addView(this)
             views.add(this)
             actionViews.add(this)

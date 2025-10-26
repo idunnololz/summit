@@ -332,6 +332,10 @@ class PostsInFeedQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsB
             icon = R.drawable.baseline_check_24
             name = context.getString(R.string.mark_as_read)
           }
+          PostInFeedQuickActionIds.HidePost -> {
+            icon = R.drawable.baseline_hide_24
+            name = context.getString(R.string.hide_post)
+          }
           else -> return null
         }
 

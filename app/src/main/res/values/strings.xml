@@ -2321,6 +2321,8 @@
     <string name="failed_ts_format">Failed %1$s</string>
     <string name="created_ts_format">Created %1$s</string>
     <string name="completed_ts_format">Completed %1$s</string>
+    <string name="show_url_domain">Show URL domain</string>
+    <string name="show_url_domain_desc">Only works for some layouts.</string>
 
 
     <!-- uCrop string resource end -->

@@ -419,6 +419,12 @@ fun BaseFragment<*>.createPostActionHandler(
         accountId = accountId,
       )
     }
+    R.id.pa_hide_post -> {
+      moreActionsHelper.hidePost(
+        id = postView.post.id,
+        postView = postView,
+      )
+    }
     R.id.pa_mark_post_as_unread -> {
       moreActionsHelper.onPostRead(
         postView = postView,

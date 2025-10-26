@@ -98,13 +98,25 @@
             app:layout_constraintStart_toEndOf="@+id/left_barrier"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?textAppearanceBodySmall"
+            android:layout_marginTop="@dimen/padding_quarter"
+            android:includeFontPadding="false"
+            android:textColor="@color/colorTextFaint"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintEnd_toEndOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/title"/>
+
         <com.idunnololz.summit.view.LemmyHeaderView
             android:id="@+id/header_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_half"
             app:layout_constrainedWidth="true"
-            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/subtitle"
             app:layout_constraintStart_toStartOf="@id/title"
             app:layout_constraintEnd_toEndOf="parent"/>
 

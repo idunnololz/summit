@@ -71,6 +71,7 @@ import com.idunnololz.summit.view.CustomPlayerView
 import com.idunnololz.summit.view.LinearLayoutWithFadingEdge
 import com.idunnololz.summit.view.LoadingView
 import java.io.File
+import androidx.core.net.toUri
 
 class LemmyContentHelper(
   private val context: Context,
@@ -300,9 +301,9 @@ class LemmyContentHelper(
 
       loadPreviewInfo(thumbnailView)
 
-      externalContentTextView.text = Uri.parse(url).host ?: url
+      externalContentTextView.text = url.toUri().host ?: url
       externalContentView.setOnClickListener {
-        val uri = Uri.parse(url)
+        val uri = url.toUri()
         val pageRef = LinkResolver.parseUrl(url, instance)
         if (pageRef != null) {
           onLemmyUrlClick(pageRef)
@@ -362,7 +363,8 @@ class LemmyContentHelper(
         }
       }
 
-      fullImageView.load(null)
+      fullImageView.dispose()
+      fullImageView.setImageDrawable(null)
       fullImageView.setOnLongClickListener {
         onLinkLongClick(imageUrl, null)
         true

@@ -10,6 +10,7 @@ data class PostInListUiConfig(
   val headerTextSizeSp: Float = 14f,
   val titleTextSizeSp: Float = 14f,
   val footerTextSizeSp: Float = 14f,
+  val subtitleTextSizeSp: Float? = null,
   val horizontalMarginDp: Float? = null,
   val verticalMarginDp: Float? = null,
 
@@ -23,6 +24,8 @@ data class PostInListUiConfig(
   val showCommunityIcon: Boolean = true,
   val dimReadPosts: Boolean? = null,
   val showTextPreviewIcon: Boolean? = null,
+  // Only works with some layouts.
+  val showUrlDomain: Boolean? = null,
   /**
    * This is a special setting for "smart" layouts. Eg. layouts that combine multiple other layouts.
    * For smart layouts, we don't want to use the [imageWidthPercent] fields for all layouts so we
@@ -34,6 +37,10 @@ data class PostInListUiConfig(
     textSizeMultiplier = it,
     fullContentConfig = this.fullContentConfig.copy(textSizeMultiplier = it),
   )
+
+  fun showUrlDomain() = showUrlDomain ?: false
+
+  fun subtitleTextSizeSp() = subtitleTextSizeSp ?: 11f
 }
 
 @Serializable

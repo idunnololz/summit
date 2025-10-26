@@ -253,6 +253,17 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
         updateRendering()
       },
     ),
+    settings.showUrlDomain.asOnOffSwitch(
+      {
+        viewModel.currentPostUiConfig.showUrlDomain()
+      },
+      {
+        viewModel.currentPostUiConfig =
+          viewModel.currentPostUiConfig.copy(showUrlDomain = it)
+
+        updateRendering()
+      }
+    )
   )
 
   private var lastH = listOf<ListingItemViewHolder>()
