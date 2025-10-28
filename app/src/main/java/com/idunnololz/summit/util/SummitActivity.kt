@@ -22,7 +22,7 @@ abstract class SummitActivity :
   BaseActivity(),
   BottomMenuContainer,
   InsetsProvider by InsetsHelper(
-    consumeInsets = true,
+    consumeInsets = false,
   ) {
 
   val keyPressRegistrationManager = KeyPressRegistrationManager()

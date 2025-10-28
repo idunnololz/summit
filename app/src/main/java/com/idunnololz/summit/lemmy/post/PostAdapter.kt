@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.idunnololz.summit.R
-import com.idunnololz.summit.actions.ui.Action
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostId
@@ -991,8 +990,10 @@ class PostAdapter(
     val absolutionPositionToTopLevelCommentPosition = mutableListOf<Int>()
 
     val newItems = generateItems(
-      autoCollapseComments,
-      collapsedItemIds,
+      autoCollapseComments = autoCollapseComments,
+      collapsedItemIds = collapsedItemIds,
+      topLevelCommentIndices = topLevelCommentIndices,
+      absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition,
     ) ?: return
 
     val diff = DiffUtil.calculateDiff(
@@ -1040,8 +1041,7 @@ class PostAdapter(
     }
 
     this.topLevelCommentIndices = topLevelCommentIndices
-    this.absolutionPositionToTopLevelCommentPosition =
-      absolutionPositionToTopLevelCommentPosition
+    this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
 
     cb()
   }
@@ -1049,6 +1049,8 @@ class PostAdapter(
   private fun generateItems(
     autoCollapseComments: Boolean,
     collapsedItemIds: Set<Long>,
+    topLevelCommentIndices: MutableList<Int>,
+    absolutionPositionToTopLevelCommentPosition: MutableList<Int>,
   ): List<Item>? {
     val rawData = rawData
     val oldItems = items
@@ -1132,6 +1134,7 @@ class PostAdapter(
 
     if (rawData.isSingleCommentChain) {
       finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
+      absolutionPositionToTopLevelCommentPosition += -1
 
       if (rawData.commentPath != null && rawData.commentPath.count(".") > 1) {
         finalItems += Item.ViewParentComments(
@@ -1139,8 +1142,8 @@ class PostAdapter(
           commentPath = rawData.commentPath,
           screenshotMode = screenshotMode,
         )
+        absolutionPositionToTopLevelCommentPosition += -1
       }
-      absolutionPositionToTopLevelCommentPosition += -1
     }
 
     var lastTopLevelCommentPosition = -1
@@ -1234,8 +1237,7 @@ class PostAdapter(
                 screenshotMode,
               )
             }
-          absolutionPositionToTopLevelCommentPosition +=
-            lastTopLevelCommentPosition
+          absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
         }
         is PostViewModel.ListView.PendingCommentListView -> {
           depth = commentItem.depth
@@ -1257,8 +1259,7 @@ class PostAdapter(
             error = commentView.pendingCommentView.error,
             actionId = commentView.pendingCommentView.actionId,
           )
-          absolutionPositionToTopLevelCommentPosition +=
-            lastTopLevelCommentPosition
+          absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
         }
         is PostViewModel.ListView.PostListView -> {
           // should never happen
@@ -1276,8 +1277,7 @@ class PostAdapter(
               baseDepth = 0,
               screenshotMode,
             )
-            absolutionPositionToTopLevelCommentPosition +=
-              lastTopLevelCommentPosition
+            absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
           }
         }
 
@@ -1290,6 +1290,7 @@ class PostAdapter(
             screenshotMode,
             isExpanded = !collapsedItemIds.contains(commentView.id),
           )
+          absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
         }
       }
 
@@ -1588,7 +1589,14 @@ class PostAdapter(
       }
     }
 
-    val items = generateItems(false, setOf()) ?: return null
+    val topLevelCommentIndices = mutableListOf<Int>()
+    val absolutionPositionToTopLevelCommentPosition = mutableListOf<Int>()
+    val items = generateItems(
+      autoCollapseComments = false,
+      collapsedItemIds = setOf(),
+      topLevelCommentIndices = topLevelCommentIndices,
+      absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
+    ) ?: return null
     val finalQuery = this.query ?: return null
 
     items.withIndex().forEach { (index, item) ->
@@ -1654,6 +1662,9 @@ class PostAdapter(
         is Item.ViewParentComments -> {}
       }
     }
+
+    this.topLevelCommentIndices = topLevelCommentIndices
+    this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
 
     return occurrences
   }

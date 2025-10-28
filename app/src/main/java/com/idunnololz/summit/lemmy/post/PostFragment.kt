@@ -996,8 +996,7 @@ class PostFragment :
         curPos = it.findFirstVisibleItemPosition()
       }
 
-      val pos = adapter
-        ?.getNextTopLevelCommentPosition(curPos)
+      val pos = adapter?.getNextTopLevelCommentPosition(curPos)
       if (pos != null) {
         smoothScroller?.targetPosition = pos
         it.startSmoothScroll(smoothScroller)
@@ -1013,8 +1012,7 @@ class PostFragment :
         curPos = it.findFirstVisibleItemPosition()
       }
 
-      val pos = adapter
-        ?.getPrevTopLevelCommentPosition(curPos)
+      val pos = adapter?.getPrevTopLevelCommentPosition(curPos)
       if (pos != null) {
         smoothScroller?.targetPosition = pos
         it.startSmoothScroll(smoothScroller)

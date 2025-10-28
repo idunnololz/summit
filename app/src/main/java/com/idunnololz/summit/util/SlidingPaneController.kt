@@ -33,20 +33,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SlidingPaneController(
-    private val fragment: BaseFragment<*>,
-    private val slidingPaneLayout: FixedSlidingPaneLayout,
-    private val childFragmentManager: FragmentManager,
-    private val viewModel: PostViewPagerViewModel,
-    private val globalLayoutMode: GlobalLayoutMode,
-    /**
+  private val fragment: BaseFragment<*>,
+  private val slidingPaneLayout: FixedSlidingPaneLayout,
+  private val childFragmentManager: FragmentManager,
+  private val viewModel: PostViewPagerViewModel,
+  private val globalLayoutMode: GlobalLayoutMode,
+  /**
    * Used for tablets. The message is shown on the side pane when nothing is selected.
    */
   private val emptyScreenText: String,
-    @IdRes private val fragmentContainerId: Int,
-    val lockPanes: Boolean = false,
-    private val retainClosedPosts: Boolean = false,
-    private val useSwipeBetweenPosts: Boolean = false,
-    private val isPreview: Boolean = false,
+  @IdRes private val fragmentContainerId: Int,
+  val lockPanes: Boolean = false,
+  private val retainClosedPosts: Boolean = false,
+  private val useSwipeBetweenPosts: Boolean = false,
+  private val isPreview: Boolean = false,
 ) {
 
   interface PostViewPagerViewModel {
@@ -178,14 +178,14 @@ class SlidingPaneController(
   }
 
   fun openPost(
-      instance: String,
-      id: Int,
-      currentCommunity: CommunityRef?,
-      accountId: Long?,
-      post: PostView? = null,
-      jumpToComments: Boolean = false,
-      reveal: Boolean = false,
-      videoState: VideoState? = null,
+    instance: String,
+    id: Int,
+    currentCommunity: CommunityRef?,
+    accountId: Long?,
+    post: PostView? = null,
+    jumpToComments: Boolean = false,
+    reveal: Boolean = false,
+    videoState: VideoState? = null,
   ) {
     try {
       // Best effort restore PostFragment
@@ -195,7 +195,7 @@ class SlidingPaneController(
       if (lastPostFragment != null) {
         val args = PostFragmentArgs.fromBundle(requireNotNull(lastPostFragment.arguments))
 
-        if (id == args.post?.post?.id) {
+        if (id == args.id) {
           openPostInternal(
             args = null,
             itemRef = Either.Left(PostRef(instance, id)),
@@ -212,7 +212,7 @@ class SlidingPaneController(
           }
         }
       }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
       // do nothing
     }
 
@@ -248,9 +248,9 @@ class SlidingPaneController(
   }
 
   private fun openPostInternal(
-      args: PostFragmentArgs?,
-      itemRef: Either<PostRef, CommentRef>? = null,
-      postFragmentOverride: PostFragment? = null,
+    args: PostFragmentArgs?,
+    itemRef: Either<PostRef, CommentRef>? = null,
+    postFragmentOverride: PostFragment? = null,
   ) {
     if (activeOpenPostJob != null) {
       Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
@@ -281,19 +281,19 @@ class SlidingPaneController(
       }
 
       if (postFragmentOverride != null) {
-          withContext(Dispatchers.IO) {
-              // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
-              delay(100)
-          }
+        withContext(Dispatchers.IO) {
+          // Restoring the last fragment is laggy. Delay for a bit to reduce stuttering.
+          delay(100)
+        }
       }
 
       viewModel.lastSelectedItem = itemRef
 
       openPane()
 
-        withContext(Dispatchers.IO) {
-            delay(250)
-        }
+      withContext(Dispatchers.IO) {
+        delay(250)
+      }
       activeOpenPostJob = null
     }
   }
@@ -307,9 +307,9 @@ class SlidingPaneController(
     activeClosePostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
       closePane()
 
-        withContext(Dispatchers.IO) {
-            delay(250)
-        }
+      withContext(Dispatchers.IO) {
+        delay(250)
+      }
       activeClosePostJob = null
     }
   }
