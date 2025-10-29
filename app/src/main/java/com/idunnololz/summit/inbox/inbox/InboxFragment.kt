@@ -525,8 +525,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
           view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
         }
       },
-      onPageClick = {
-        getMainActivity()?.launchPage(it)
+      onPageClick = { url, pageRef ->
+        getMainActivity()?.launchPage(pageRef, url = url)
       },
       onMessageClick = {
         val accountId = viewModel.currentAccount.value?.id ?: return@InboxItemAdapter
@@ -715,7 +715,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
       videoState: VideoState?,
     ) -> Unit,
     private val onMarkAsRead: (View, InboxItem, Boolean) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onMessageClick: (InboxItem) -> Unit,
     private val onConversationClick: (Conversation) -> Unit,
     private val onAddCommentClick: (View, InboxItem) -> Unit,

@@ -62,7 +62,7 @@ class PostListAdapter(
   private val onImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
   private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
   private val onVideoLongClickListener: (url: String) -> Unit,
-  private val onPageClick: (accountId: Long?, PageRef) -> Unit,
+  private val onPageClick: (accountId: Long?, url: String, PageRef) -> Unit,
   private val onItemClick: (
     accountId: Long?,
     instance: String,

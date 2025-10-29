@@ -371,7 +371,7 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
         onImageClick = { _, _, _, _ -> },
         onVideoClick = { _, _, _ -> },
         onVideoLongClickListener = { _ -> },
-        onPageClick = { _, _ -> },
+        onPageClick = { _, _, _ -> },
         onItemClick = { _, _, _, _, _, _, _, _ -> },
         onShowMoreOptions = { _, _ -> },
         toggleItem = {},

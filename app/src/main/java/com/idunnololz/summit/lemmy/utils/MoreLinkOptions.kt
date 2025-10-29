@@ -15,6 +15,7 @@ import com.idunnololz.summit.lemmy.userTags.AddOrEditUserTagDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkPreviewDialogFragment
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.AdvancedLink
@@ -29,6 +30,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
   url: String,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
+  linkResolver: LinkResolver,
   textOrFileName: String? = null,
   mimeType: String? = null,
 ): BottomMenu {
@@ -36,7 +38,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
   val instance = moreActionsHelper.apiInstance
   val mainActivity = this as? MainActivity
 
-  val advancedLink = LinkUtils.analyzeLink(url, instance)
+  val advancedLink = LinkUtils.analyzeLink(url, instance, linkResolver)
 
   val textOrFileName = if (textOrFileName.isNullOrBlank()) {
     null
@@ -370,10 +372,11 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   url: String,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
+  linkResolver: LinkResolver,
   textOrFileName: String? = null,
   mimeType: String? = null,
 ): (Int) -> Unit = createImageOrLinkActionsHandler(
-  advancedLink = LinkUtils.analyzeLink(url, moreActionsHelper.apiInstance),
+  advancedLink = LinkUtils.analyzeLink(url, moreActionsHelper.apiInstance, linkResolver),
   moreActionsHelper = moreActionsHelper,
   fragmentManager = fragmentManager,
   textOrFileName = textOrFileName,

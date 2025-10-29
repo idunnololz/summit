@@ -32,6 +32,9 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
   @Inject
   lateinit var apiClient: LemmyApiClient
 
+  @Inject
+  lateinit var linkResolver: LinkResolver
+
   override fun onStart() {
     super.onStart()
 
@@ -76,7 +79,7 @@ class GoToDialogFragment : BaseDialogFragment<DialogFragmentGoToBinding>() {
 
       positiveButton.setOnClickListener {
         val url = linkEditText.text.toString()
-        val pageRef = LinkResolver.parseUrl(url, apiClient.instance)
+        val pageRef = linkResolver.parseUrl(url, apiClient.instance)
 
         if (pageRef != null) {
           requireMainActivity().launchPage(pageRef)

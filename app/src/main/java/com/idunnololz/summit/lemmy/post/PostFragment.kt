@@ -493,8 +493,8 @@ class PostFragment :
               fragmentManager = childFragmentManager,
             )
           },
-          onPageClick = {
-            getMainActivity()?.launchPage(it)
+          onPageClick = { url, pageRef ->
+            getMainActivity()?.launchPage(pageRef, url = url)
           },
           onPostActionClick = { postView, itemId, actionId ->
             createPostActionHandler(
@@ -990,34 +990,53 @@ class PostFragment :
 
   private fun goToNextComment() {
     (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-      var curPos = it.findFirstCompletelyVisibleItemPosition()
-
-      if (curPos == -1) {
-        curPos = it.findFirstVisibleItemPosition()
-      }
+      val curPos = it.getFirstVisibleItem()
 
       val pos = adapter?.getNextTopLevelCommentPosition(curPos)
       if (pos != null) {
         smoothScroller?.targetPosition = pos
         it.startSmoothScroll(smoothScroller)
       }
+
+      if (pos == 0) {
+        binding.appBar.setExpanded(true, true)
+      }
     }
   }
 
   private fun goToPreviousComment() {
     (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-      var curPos = it.findFirstCompletelyVisibleItemPosition()
-
-      if (curPos == -1) {
-        curPos = it.findFirstVisibleItemPosition()
-      }
+      val curPos = it.getFirstVisibleItem()
 
       val pos = adapter?.getPrevTopLevelCommentPosition(curPos)
       if (pos != null) {
         smoothScroller?.targetPosition = pos
         it.startSmoothScroll(smoothScroller)
       }
+
+      if (pos == 0) {
+        binding.appBar.setExpanded(true, true)
+      }
     }
+  }
+
+  private fun LinearLayoutManager.getFirstVisibleItem(): Int {
+    var curPos = findFirstCompletelyVisibleItemPosition()
+
+    if (curPos == -1) {
+      curPos = findFirstVisibleItemPosition()
+    }
+
+    val bottom = binding.recyclerView.findViewHolderForAdapterPosition(curPos)?.itemView?.bottom
+      ?: 0
+
+    if (bottom <= (getMainActivity()?.insets?.value?.topInset ?: 0)) {
+      if (curPos + 1 < (binding.recyclerView.adapter?.itemCount ?: 0)) {
+        curPos++
+      }
+    }
+
+    return curPos
   }
 
   private fun getInstance() = viewModel.postOrCommentRef?.fold(

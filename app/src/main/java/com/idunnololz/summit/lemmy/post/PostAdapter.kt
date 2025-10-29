@@ -90,7 +90,7 @@ class PostAdapter(
   private val onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
   private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
   private val onVideoLongClickListener: (url: String) -> Unit,
-  private val onPageClick: (PageRef) -> Unit,
+  private val onPageClick: (url: String, PageRef) -> Unit,
   private val onPostActionClick: (PostView, String, actionId: Int) -> Unit,
   private val onCommentActionClick: (CommentView, String, actionId: Int) -> Unit,
   private val onFetchComments: (CommentId) -> Unit,

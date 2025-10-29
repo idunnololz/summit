@@ -1044,7 +1044,7 @@ class AddOrEditCommentFragment :
         onVideoLongClickListener = { url ->
           showError()
         },
-        onPageClick = {
+        onPageClick = { _, _ ->
           showError()
         },
         onPostActionClick = { postView, _, actionId ->

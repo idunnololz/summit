@@ -1,7 +1,6 @@
 package com.idunnololz.summit.links
 
 import android.content.Context
-import android.net.Uri
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewAllLinks
@@ -12,6 +11,7 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
+import androidx.core.net.toUri
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
   getBaseActivity()?.onLinkClick(
@@ -46,7 +46,7 @@ fun BaseActivity.onLinkClick(
   val preferences = application.preferences
 
   try {
-    val uri = Uri.parse(url)
+    val uri = url.toUri()
 
     if (this is MainActivity) {
       if (uri.host.equals("loops.video", ignoreCase = true) &&
@@ -56,7 +56,7 @@ fun BaseActivity.onLinkClick(
         return
       }
     }
-  } catch (e: Exception) {
+  } catch (_: Exception) {
     // do nothing
   }
 

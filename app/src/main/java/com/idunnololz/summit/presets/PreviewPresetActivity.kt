@@ -41,6 +41,7 @@ import com.idunnololz.summit.databinding.PresetPreviewScreenContainerBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.main.MainFragmentArgs
@@ -120,6 +121,9 @@ class PreviewPresetActivity : SummitActivity() {
 
   @Inject
   lateinit var directoryHelper: DirectoryHelper
+
+  @Inject
+  override lateinit var linkResolver: LinkResolver
 
   override fun onCreate(savedInstanceState: Bundle?) {
 //        sharedPreferencesManager.useTempPreferences = true
@@ -364,6 +368,7 @@ class PreviewPresetActivity : SummitActivity() {
     page: PageRef,
     switchToNativeInstance: Boolean,
     preferMainFragment: Boolean,
+    url: String,
   ) {
     TODO("Not yet implemented")
   }

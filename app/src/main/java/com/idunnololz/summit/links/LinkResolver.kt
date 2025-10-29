@@ -7,8 +7,14 @@ import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.dagger.json
+import androidx.core.net.toUri
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object LinkResolver {
+@Singleton
+class LinkResolver @Inject constructor(
+  private val siteBackendHelper: SiteBackendHelper,
+) {
 
   fun parseUrl(url: String, currentInstance: String, mustHandle: Boolean = false): PageRef? {
     val normalizedUrl = normalizeUrl(url, currentInstance)
@@ -52,7 +58,7 @@ object LinkResolver {
       return null
     }
 
-    val uri = Uri.parse(url)
+    val uri = url.toUri()
     val instance = uri.host ?: return null
     val defaultResult = CommunityRef.Local(instance, url)
 

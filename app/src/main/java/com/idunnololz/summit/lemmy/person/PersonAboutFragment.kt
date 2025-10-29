@@ -119,8 +119,8 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
       onVideoClick = { url ->
         getMainActivity()?.openVideo(url, VideoType.Unknown, null)
       },
-      onPageClick = {
-        getMainActivity()?.launchPage(it)
+      onPageClick = { url, pageRef ->
+        getMainActivity()?.launchPage(pageRef, url = url)
       },
       onLinkClick = { url, text, linkType ->
         onLinkClick(url, text, linkType)
@@ -147,7 +147,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
     private val avatarHelper: AvatarHelper,
     private val onImageClick: (url: String) -> Unit,
     private val onVideoClick: (url: String) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
   ) : Adapter<ViewHolder>() {
@@ -254,7 +254,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
           )
         }
         b.root.setOnClickListener {
-          onPageClick(community.community.toCommunityRef())
+          onPageClick("", community.community.toCommunityRef())
         }
       }
     }

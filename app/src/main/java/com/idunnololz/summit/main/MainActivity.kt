@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.navigateUp
 import androidx.window.layout.WindowMetricsCalculator
 import coil3.Image
 import coil3.asDrawable
@@ -69,9 +68,11 @@ import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.getFeedbackScreenshotFile
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
+import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkFixer
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.ResolvingLinkDialog
+import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
@@ -148,6 +149,9 @@ class MainActivity : SummitActivity() {
 
   @Inject
   override lateinit var moreActionsHelper: MoreActionsHelper
+
+  @Inject
+  override lateinit var linkResolver: LinkResolver
 
   @Inject
   lateinit var themeManager: ThemeManager
@@ -641,7 +645,7 @@ class MainActivity : SummitActivity() {
     }
 
     val data = intent.data ?: return
-    val page = LinkResolver.parseUrl(
+    val page = linkResolver.parseUrl(
       url = data.toString(),
       currentInstance = viewModel.currentInstance,
       mustHandle = true,
@@ -664,18 +668,28 @@ class MainActivity : SummitActivity() {
     page: PageRef,
     switchToNativeInstance: Boolean,
     preferMainFragment: Boolean,
+    url: String,
   ) {
     Log.d(TAG, "launchPage(): $page")
 
     val pageRefResult = linkFixer.fixPageRefSync(page)
 
-    if (pageRefResult.isSuccess) {
-      launchPageInternal(
-        page = pageRefResult.getOrNull() ?: page,
-        switchToNativeInstance = switchToNativeInstance,
-        preferMainFragment = preferMainFragment,
-      )
-      return
+    when (pageRefResult) {
+      is LinkFixer.FixPageRefResult.Success -> {
+        launchPageInternal(
+          page = pageRefResult.pageRef,
+          switchToNativeInstance = switchToNativeInstance,
+          preferMainFragment = preferMainFragment,
+        )
+        return
+      }
+      is LinkFixer.FixPageRefResult.InvalidLemmyInstance -> {
+        if (!url.isBlank()) {
+          onLinkClick(this, mainApplication, supportFragmentManager, url, null, LinkContext.Text)
+          return
+        }
+      }
+      is LinkFixer.FixPageRefResult.NoInformation -> {}
     }
 
     var job: Job? = null
@@ -688,11 +702,34 @@ class MainActivity : SummitActivity() {
       }
 
     job = lifecycleScope.launch {
-      val pageRef = linkFixer.fixPageRef(page) ?: page
+      val fixPageRefResult = linkFixer.fixPageRef(page)
 
       withContext(Dispatchers.Main) {
         alertDialog?.dismiss()
-        launchPageInternal(pageRef, switchToNativeInstance, preferMainFragment)
+
+
+        when (fixPageRefResult) {
+          is LinkFixer.FixPageRefResult.Success -> {
+            launchPageInternal(
+              page = fixPageRefResult.pageRef,
+              switchToNativeInstance = switchToNativeInstance,
+              preferMainFragment = preferMainFragment
+            )
+          }
+          is LinkFixer.FixPageRefResult.InvalidLemmyInstance -> {
+            if (!url.isBlank()) {
+              onLinkClick(
+                context = this@MainActivity,
+                application = mainApplication,
+                fragmentManager = supportFragmentManager,
+                url = url,
+                text = null,
+                linkContext = LinkContext.Text
+              )
+            }
+          }
+          is LinkFixer.FixPageRefResult.NoInformation -> {}
+        }
       }
     }
   }

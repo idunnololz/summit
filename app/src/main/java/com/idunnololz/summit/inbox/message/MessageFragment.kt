@@ -170,8 +170,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           onVideoClick = { url ->
             getMainActivity()?.openVideo(url, VideoType.Unknown, null)
           },
-          onPageClick = {
-            getMainActivity()?.launchPage(it)
+          onPageClick = { url, pageRef ->
+            getMainActivity()?.launchPage(pageRef, url = url)
           },
           onLinkClick = { url, text, linkType ->
             onLinkClick(url, text, linkType)
@@ -204,8 +204,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       onVideoClick = { url ->
         getMainActivity()?.openVideo(url, VideoType.Unknown, null)
       },
-      onPageClick = {
-        getMainActivity()?.launchPage(it)
+      onPageClick = { url, pageRef ->
+        getMainActivity()?.launchPage(pageRef, url = url)
       },
       onLinkClick = { url, text, linkType ->
         onLinkClick(url, text, linkType)
@@ -582,8 +582,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               fragmentManager = childFragmentManager,
             )
           },
-          onPageClick = {
-            getMainActivity()?.launchPage(it)
+          onPageClick = { url, pageRef ->
+            getMainActivity()?.launchPage(pageRef, url = url)
           },
           onPostActionClick = { postView, _, actionId ->
             showMorePostOptions(

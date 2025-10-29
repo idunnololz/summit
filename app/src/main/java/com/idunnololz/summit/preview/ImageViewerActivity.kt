@@ -39,6 +39,7 @@ import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseActivity
@@ -109,6 +110,9 @@ class ImageViewerActivity :
 
   @Inject
   lateinit var linkFetcher: LinkFetcher
+
+  @Inject
+  lateinit var linkResolver: LinkResolver
 
   override val context: Context
     get() = this
@@ -417,6 +421,7 @@ class ImageViewerActivity :
         moreActionsHelper = moreActionsHelper,
         fragmentManager = supportFragmentManager,
         textOrFileName = args.mimeType,
+        linkResolver = linkResolver,
       )(R.id.share_image)
     }
     binding.downloadButton.setOnClickListener {
@@ -426,6 +431,7 @@ class ImageViewerActivity :
         moreActionsHelper = moreActionsHelper,
         fragmentManager = supportFragmentManager,
         textOrFileName = args.mimeType,
+        linkResolver = linkResolver,
       )(R.id.download)
     }
     binding.infoButton.setOnClickListener {
@@ -435,10 +441,11 @@ class ImageViewerActivity :
     binding.moreButton.setOnClickListener {
       val url = viewModel.url ?: return@setOnClickListener
       showAdvancedLinkOptions(
-        url,
-        moreActionsHelper,
-        supportFragmentManager,
-        args.mimeType,
+        url = url,
+        moreActionsHelper = moreActionsHelper,
+        fragmentManager = supportFragmentManager,
+        linkResolver = linkResolver,
+        textOrFileName = args.mimeType,
       )
     }
 

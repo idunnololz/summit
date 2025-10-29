@@ -121,8 +121,8 @@ class ActionDetailsFragment :
         onVideoClick = { url ->
           getMainActivity()?.openVideo(url, VideoType.Unknown, null)
         },
-        onPageClick = {
-          getMainActivity()?.launchPage(it)
+        onPageClick = { url, pageRef ->
+          getMainActivity()?.launchPage(pageRef, url = url)
         },
         onLinkClick = { url, text, linkType ->
           onLinkClick(url, text, linkType)
@@ -242,7 +242,7 @@ class ActionDetailsFragment :
     private val lemmyTextHelper: LemmyTextHelper,
     private val onImageClick: (url: String) -> Unit,
     private val onVideoClick: (url: String) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
     private val onRetryClick: () -> Unit,
@@ -394,7 +394,7 @@ class ActionDetailsFragment :
             ),
           )
           b.root.setOnClickListener {
-            onPageClick(item.pageRef)
+            onPageClick("", item.pageRef)
           }
         }
       }
@@ -418,7 +418,7 @@ class ActionDetailsFragment :
         } else {
           b.value.text = item.value
           b.root.setOnClickListener {
-            onPageClick(item.pageRef)
+            onPageClick("", item.pageRef)
           }
         }
 

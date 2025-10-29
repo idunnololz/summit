@@ -311,19 +311,22 @@ class PostViewModel @Inject constructor(
       )
 
       val apiInstance = lemmyApiClient.instance
-      val postResult: Result<GetPostResponse?> = if (fetchPostData) {
-        postOrCommentRef
-          .fold(
-            {
-              lemmyApiClient.fetchPostWithRetry(Either.Left(it.id), force)
-            },
-            {
-              lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
-            },
-          )
-      } else {
-        Result.success(this@PostViewModel.getPostResponse)
-      }
+      val postResult: Result<GetPostResponse?> =
+        if (!markPostAsRead) {
+          Result.failure(RuntimeException("Can't fetch post or else it will be marked as read!"))
+        } else if (fetchPostData) {
+          postOrCommentRef
+            .fold(
+              {
+                lemmyApiClient.fetchPostWithRetry(Either.Left(it.id), force)
+              },
+              {
+                lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
+              },
+            )
+        } else {
+          Result.success(this@PostViewModel.getPostResponse)
+        }
 
       this@PostViewModel.getPostResponse = if (force) {
         postResult.getOrNull()
@@ -332,7 +335,7 @@ class PostViewModel @Inject constructor(
           ?: this@PostViewModel.getPostResponse
       }
 
-      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view
+      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view ?: postView
 
       this@PostViewModel.postView?.let {
         postRef = PostRef(instance = apiInstance, id = it.post.id)
@@ -382,7 +385,7 @@ class PostViewModel @Inject constructor(
 
       val post = postResult.getOrNull()
       val comments = commentsResult.getOrNull()
-      val postView = post?.post_view
+      val postView = post?.post_view ?: postView
 
       if (postView != null) {
         if (markPostAsRead) {
@@ -407,7 +410,7 @@ class PostViewModel @Inject constructor(
       if (post == null || comments == null) {
         // see if we can recover gracefully
 
-        if (postView != null && comments != null && !force) {
+        if ((postView != null || comments != null) && !force) {
           // lets recover!
           updateData(wasUpdateForced = force)
         } else {

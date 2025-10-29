@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -108,6 +109,9 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
 
+  @Inject
+  lateinit var linkResolver: LinkResolver
+
   private var adapter: SearchResultAdapter? = null
 
   override fun onCreateView(
@@ -139,6 +143,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         postAndCommentViewBuilder = postAndCommentViewBuilder,
         postListViewBuilder = postListViewBuilder,
         avatarHelper = avatarHelper,
+        linkResolver = linkResolver,
         onLoadPage = {
           queryEngine?.performQuery(it, force = false)
         },
@@ -159,11 +164,11 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             fragmentManager = childFragmentManager,
           )
         },
-        onPageClick = {
-          getMainActivity()?.launchPage(it)
+        onPageClick = { url, pageRef ->
+          getMainActivity()?.launchPage(pageRef, url = url)
         },
         onAddCommentClick = { postOrComment ->
-          if (accountManager.currentAccount.value == null) {
+          if (accountManager.currentAccount.value.isGuestAccount) {
             PreAuthDialogFragment.newInstance(R.id.action_add_comment)
               .show(childFragmentManager, "asdf")
             return@SearchResultAdapter
@@ -351,6 +356,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
     private val postListViewBuilder: PostListViewBuilder,
     private val avatarHelper: AvatarHelper,
+    private val linkResolver: LinkResolver,
     private val onLoadPage: (Int) -> Unit,
     private val onImageClick: (View?, String) -> Unit,
     private val onPostImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
@@ -360,7 +366,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
       videoState: VideoState?,
     ) -> Unit,
     private val onVideoLongClickListener: (url: String) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
     private val onPostActionClick: (PostView, actionId: Int) -> Unit,
     private val onCommentActionClick: (CommentView, actionId: Int) -> Unit,
@@ -497,10 +503,10 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
               text: String,
               rect: RectF,
             ): Boolean {
-              val pageRef = LinkResolver.parseUrl(url, item.instance)
+              val pageRef = linkResolver.parseUrl(url, item.instance)
 
               return if (pageRef != null) {
-                onPageClick(pageRef)
+                onPageClick(url, pageRef)
                 true
               } else {
                 false
@@ -590,7 +596,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         b.instance.text = community.community.instance
 
         h.itemView.setOnClickListener {
-          onPageClick(community.community.toCommunityRef())
+          onPageClick("", community.community.toCommunityRef())
         }
       }
       addItemType(Item.PostItem::class, SearchResultPostItemBinding::inflate) { item, b, _ ->
@@ -633,8 +639,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           },
           onVideoClick = onVideoClick,
           onVideoLongClickListener = onVideoLongClickListener,
-          onPageClick = { accountId, pageRef ->
-            onPageClick(pageRef)
+          onPageClick = { accountId, url, pageRef ->
+            onPageClick(url, pageRef)
           },
           onItemClick = {
               _: Long?,
@@ -680,7 +686,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         b.instance.text = person.instance
 
         b.root.setOnClickListener {
-          onPageClick(person.toPersonRef())
+          onPageClick("", person.toPersonRef())
         }
       }
       addItemType(Item.ErrorItem::class, LoadingViewItemBinding::inflate) { item, b, _ ->

@@ -82,6 +82,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
   @Inject
   lateinit var preferences: Preferences
 
+  @Inject
+  lateinit var linkResolver: LinkResolver
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -151,8 +154,9 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
         instance = args.instance,
         availableWidth = binding.recyclerView.width,
         lemmyTextHelper = lemmyTextHelper,
-        onPageClick = {
-          getMainActivity()?.launchPage(it)
+        linkResolver = linkResolver,
+        onPageClick = { url, pageRef ->
+          getMainActivity()?.launchPage(pageRef, url = url)
         },
         onLoadPageClick = {
           viewModel.fetchModLogs(it)
@@ -253,7 +257,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
     private val instance: String,
     private val availableWidth: Int,
     private val lemmyTextHelper: LemmyTextHelper,
-    private val onPageClick: (PageRef) -> Unit,
+    private val linkResolver: LinkResolver,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLoadPageClick: (Int) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
@@ -797,10 +802,10 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
               text: String,
               rect: RectF,
             ): Boolean {
-              val pageRef = LinkResolver.parseUrl(url, instance)
+              val pageRef = linkResolver.parseUrl(url, instance)
 
               if (pageRef != null) {
-                onPageClick(pageRef)
+                onPageClick(url, pageRef)
               } else {
                 onLinkClick(url, text, LinkContext.Text)
               }
@@ -819,8 +824,8 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           instance = instance,
           onImageClick = {},
           onVideoClick = {},
-          onPageClick = {
-            onPageClick(it)
+          onPageClick = { url, pageRef ->
+            onPageClick(url, pageRef)
           },
           onLinkClick = { url, text, linkType ->
             onLinkClick(url, text, linkType)

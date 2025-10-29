@@ -70,8 +70,8 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
         onVideoClick = { url, videoType, state ->
           getMainActivity()?.openVideo(url, videoType, state)
         },
-        onPageClick = {
-          getMainActivity()?.launchPage(it)
+        onPageClick = { url, pageRef ->
+          getMainActivity()?.launchPage(pageRef, url = url)
         },
         onLinkClick = { url, text, linkType ->
           onLinkClick(url, text, linkType)

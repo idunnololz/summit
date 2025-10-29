@@ -66,6 +66,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
   @Inject
   lateinit var preferences: Preferences
 
+  @Inject
+  lateinit var linkResolver: LinkResolver
+
   private var slidingPaneController: SlidingPaneController? = null
 
   private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
@@ -103,7 +106,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
         viewModel.removeEntry(it)
       },
       onEntryClick = {
-        val pageRef = LinkResolver.parseUrl(it.url, viewModel.instance, mustHandle = true)
+        val pageRef = linkResolver.parseUrl(it.url, viewModel.instance, mustHandle = true)
         if (pageRef == null) {
           launchAlertDialog("error_history_entry_corrupt") {
             messageResId = R.string.error_history_entry_corrupt

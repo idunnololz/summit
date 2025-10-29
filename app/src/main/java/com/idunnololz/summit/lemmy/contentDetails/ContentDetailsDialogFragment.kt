@@ -281,7 +281,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
           onVideoClick = { url ->
 //                    getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
           },
-          onPageClick = {
+          onPageClick = { _, _ ->
 //                    getMainActivity()?.launchPage(it)
           },
           onLinkClick = { url, text, linkType ->
@@ -307,7 +307,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
           onVideoClick = { url ->
 //                    getMainActivity()?.openVideo(url, VideoType.UNKNOWN, null)
           },
-          onPageClick = {
+          onPageClick = { _, _ ->
 //                    getMainActivity()?.launchPage(it)
           },
           onLinkClick = { url, text, linkType ->

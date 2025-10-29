@@ -21,6 +21,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.utils.CommentListAdapter
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
@@ -59,6 +60,9 @@ class PersonCommentsFragment :
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
 
+  @Inject
+  lateinit var linkResolver: LinkResolver
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -68,6 +72,7 @@ class PersonCommentsFragment :
       context = requireContext(),
       postAndCommentViewBuilder = postAndCommentViewBuilder,
       lemmyTextHelper = lemmyTextHelper,
+      linkResolver = linkResolver,
       onSignInRequired = {
         PreAuthDialogFragment.newInstance()
           .show(childFragmentManager, "asdf")
@@ -106,8 +111,8 @@ class PersonCommentsFragment :
       onVideoClick = { url, videoType, state ->
         getMainActivity()?.openVideo(url, videoType, state)
       },
-      onPageClick = {
-        getMainActivity()?.launchPage(it)
+      onPageClick = { url, pageRef ->
+        getMainActivity()?.launchPage(pageRef, url = url)
       },
       onCommentClick = {
         parentFragment.slidingPaneController?.openComment(

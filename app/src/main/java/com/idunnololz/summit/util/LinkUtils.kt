@@ -26,13 +26,13 @@ object LinkUtils {
     }
   }
 
-  fun analyzeLink(url: String, instance: String): AdvancedLink {
+  fun analyzeLink(url: String, instance: String, linkResolver: LinkResolver): AdvancedLink {
     if (ContentUtils.isUrlImage(url)) {
       return AdvancedLink.ImageLink(url)
     } else if (ContentUtils.isUrlVideo(url)) {
       return AdvancedLink.VideoLink(url)
     } else {
-      val pageRef = LinkResolver.parseUrl(
+      val pageRef = linkResolver.parseUrl(
         url = url,
         currentInstance = instance,
         mustHandle = false,
@@ -96,6 +96,7 @@ fun SummitActivity.showMoreLinkOptions(url: String, text: String?) {
     url = url,
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
+    linkResolver = linkResolver,
     textOrFileName = text,
   )
 }
@@ -105,6 +106,7 @@ fun SummitActivity.showMoreLinkOptions(person: PersonRef.PersonRefByName, text: 
     url = LinkUtils.getLinkForPerson(person),
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
+    linkResolver = linkResolver,
     textOrFileName = text,
   )
 }
@@ -114,6 +116,7 @@ fun SummitActivity.showMoreLinkOptions(person: PersonRef.PersonRefComplete, text
     url = LinkUtils.getLinkForPerson(person),
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
+    linkResolver = linkResolver,
     textOrFileName = text,
   )
 }

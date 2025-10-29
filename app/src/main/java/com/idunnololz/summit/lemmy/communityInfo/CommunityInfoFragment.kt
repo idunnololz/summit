@@ -187,8 +187,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
       onVideoClick = { url, videoType, state ->
         getMainActivity()?.openVideo(url, videoType, state)
       },
-      onPageClick = {
-        getMainActivity()?.launchPage(it)
+      onPageClick = { url, pageRef ->
+        getMainActivity()?.launchPage(pageRef, url = url)
       },
       onLinkClick = { url, text, linkType ->
         onLinkClick(url, text, linkType)
@@ -704,7 +704,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private val avatarHelper: AvatarHelper,
     private val onImageClick: (String, View?, String) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (url: String, text: String) -> Unit,
     private val onCommunityInfoClick: (communityRef: CommunityRef) -> Unit,
@@ -951,7 +951,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         b.name.text = item.admin.person.fullName
 
         b.root.setOnClickListener {
-          onPageClick(item.admin.person.toPersonRef())
+          onPageClick("", item.admin.person.toPersonRef())
         }
       }
       addItemType(
@@ -962,7 +962,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         b.name.text = item.mod.fullName
 
         b.root.setOnClickListener {
-          onPageClick(item.mod.toPersonRef())
+          onPageClick("", item.mod.toPersonRef())
         }
       }
       addItemType(

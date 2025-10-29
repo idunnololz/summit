@@ -12,6 +12,7 @@ import com.idunnololz.summit.MainDirections
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.main.CommunitySelectorController
 import com.idunnololz.summit.main.NavBarController
 import com.idunnololz.summit.preview.VideoType
@@ -101,6 +102,7 @@ abstract class SummitActivity :
 
   abstract var navBarController: NavBarController
   abstract var moreActionsHelper: MoreActionsHelper
+  abstract var linkResolver: LinkResolver
   protected abstract var currentNavController: NavController?
 
   abstract fun runOnReady(lifecycleOwner: LifecycleOwner, cb: () -> Unit)
@@ -127,6 +129,7 @@ abstract class SummitActivity :
     page: PageRef,
     switchToNativeInstance: Boolean = false,
     preferMainFragment: Boolean = false,
+    url: String = "",
   )
 
   abstract fun showCommunitySelector(

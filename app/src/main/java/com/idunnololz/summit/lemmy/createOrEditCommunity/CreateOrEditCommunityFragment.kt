@@ -40,6 +40,7 @@ import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
 import com.idunnololz.summit.lemmy.utils.showInsertImageMenu
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saveForLater.ChooseSavedImageDialogFragment
@@ -94,6 +95,9 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
 
   @Inject
   lateinit var preferences: Preferences
+
+  @Inject
+  lateinit var linkResolver: LinkResolver
 
   private var textFormatToolbar: TextFormatToolbarViewHolder? = null
 
@@ -617,6 +621,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
                 url = communityIconUrl,
                 moreActionsHelper = it.moreActionsHelper,
                 fragmentManager = childFragmentManager,
+                linkResolver = linkResolver,
               )
             }
           }
@@ -660,6 +665,7 @@ class CreateOrEditCommunityFragment : BaseFragment<FragmentCreateOrEditCommunity
               url = bannerUrl,
               moreActionsHelper = it.moreActionsHelper,
               fragmentManager = childFragmentManager,
+              linkResolver = linkResolver,
             )
           }
         }

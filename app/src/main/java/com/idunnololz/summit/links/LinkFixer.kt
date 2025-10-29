@@ -139,7 +139,15 @@ class LinkFixer @Inject constructor(
   private var notAnInstance: Set<String> = setOf()
   private var hostToInstance: Map<String, String> = mapOf()
 
-  fun fixPageRefSync(pageRef: PageRef): Result<PageRef?> {
+  sealed interface FixPageRefResult {
+    val pageRef: PageRef
+
+    class Success(override val pageRef: PageRef): FixPageRefResult
+    class InvalidLemmyInstance(override val pageRef: PageRef): FixPageRefResult
+    class NoInformation(override val pageRef: PageRef): FixPageRefResult
+  }
+
+  fun fixPageRefSync(pageRef: PageRef): FixPageRefResult {
     val instance = when (pageRef) {
       is CommentRef -> pageRef.instance
       is CommunityRef.All -> pageRef.instance
@@ -154,26 +162,26 @@ class LinkFixer @Inject constructor(
     }
 
     if (instance == null) {
-      return Result.success(pageRef)
+      return FixPageRefResult.Success(pageRef)
     }
 
     if (knownInstances.contains(instance)) {
-      return Result.success(pageRef)
+      return FixPageRefResult.Success(pageRef)
     }
 
     if (notAnInstance.contains(instance)) {
-      return Result.success(null)
+      return FixPageRefResult.InvalidLemmyInstance(pageRef)
     }
 
     val newInstance = hostToInstance[instance]
     if (!newInstance.isNullOrBlank()) {
-      return Result.success(pageRef.updateInstance(newInstance))
+      return FixPageRefResult.Success(pageRef.updateInstance(newInstance))
     }
 
-    return Result.failure(RuntimeException())
+    return FixPageRefResult.NoInformation(pageRef)
   }
 
-  suspend fun fixPageRef(pageRef: PageRef): PageRef? = withContext(Dispatchers.Default) a@{
+  suspend fun fixPageRef(pageRef: PageRef): FixPageRefResult = withContext(Dispatchers.Default) a@{
     val instance = when (pageRef) {
       is CommentRef -> pageRef.instance
       is CommunityRef.All -> pageRef.instance
@@ -185,10 +193,10 @@ class LinkFixer @Inject constructor(
       is CommunityRef.Subscribed -> pageRef.instance
       is PersonRef -> pageRef.instance
       is PostRef -> pageRef.instance
-    } ?: return@a pageRef
+    } ?: return@a FixPageRefResult.Success(pageRef)
 
     if (knownInstances.contains(instance)) {
-      return@a pageRef
+      return@a FixPageRefResult.Success(pageRef)
     }
 
     var tokens = instance.split(".")
@@ -204,7 +212,7 @@ class LinkFixer @Inject constructor(
 
         hostToInstance = hostToInstance + (instance to possibleInstance)
 
-        return@a pageRef.updateInstance(possibleInstance)
+        return@a FixPageRefResult.Success(pageRef.updateInstance(possibleInstance))
       } else {
         val exception = result.exceptionOrNull()
         if (exception !is ClientApiException) {
@@ -218,7 +226,7 @@ class LinkFixer @Inject constructor(
     notAnInstance = notAnInstance + instance
 
     // we failed :(
-    return@a null
+    return@a FixPageRefResult.InvalidLemmyInstance(pageRef)
   }
 
   private fun PageRef.updateInstance(newInstance: String): PageRef = when (this) {

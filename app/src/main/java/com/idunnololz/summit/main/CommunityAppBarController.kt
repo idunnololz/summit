@@ -752,8 +752,8 @@ class CommunityAppBarController(
         onVideoClick = { url ->
           summitActivity.openVideo(url, VideoType.Unknown, null)
         },
-        onPageClick = {
-          summitActivity.launchPage(it)
+        onPageClick = { url, pageRef ->
+          summitActivity.launchPage(pageRef, url = url)
         },
         onLinkClick = { url, text, linkType ->
           baseFragment.onLinkClick(url, text, linkType)

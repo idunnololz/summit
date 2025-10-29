@@ -48,10 +48,11 @@ class CommentListAdapter(
   private val context: Context,
   private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
   private val lemmyTextHelper: LemmyTextHelper,
+  private val linkResolver: LinkResolver,
   private val onLoadPage: (Int) -> Unit,
   private val onImageClick: (View?, String) -> Unit,
   private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
-  private val onPageClick: (PageRef) -> Unit,
+  private val onPageClick: (url: String, PageRef) -> Unit,
   private val onCommentClick: (CommentRef) -> Unit,
   private val onCommentActionClick: (View, CommentView, actionId: Int) -> Unit,
   private val onSignInRequired: () -> Unit,
@@ -183,10 +184,10 @@ class CommentListAdapter(
             text: String,
             rect: RectF,
           ): Boolean {
-            val pageRef = LinkResolver.parseUrl(url, item.instance)
+            val pageRef = linkResolver.parseUrl(url, item.instance)
 
             return if (pageRef != null) {
-              onPageClick(pageRef)
+              onPageClick(url, pageRef)
               true
             } else {
               false

@@ -387,8 +387,8 @@ class CommunityFragment :
         onVideoLongClickListener = { url ->
           showMoreVideoOptions(url, url, moreActionsHelper, childFragmentManager)
         },
-        onPageClick = { accountId, pageRef ->
-          getMainActivity()?.launchPage(pageRef)
+        onPageClick = { accountId, url, pageRef ->
+          getMainActivity()?.launchPage(pageRef, url = url)
         },
         onItemClick = {
             accountId,

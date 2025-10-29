@@ -51,6 +51,7 @@ import org.commonmark.parser.Parser
 @Singleton
 class LemmyTextHelper @Inject constructor(
   private val preferences: Preferences,
+  private val linkResolver: LinkResolver,
 ) {
 
   companion object {
@@ -81,7 +82,7 @@ class LemmyTextHelper @Inject constructor(
     showMediaAsLinks: Boolean = false,
     onImageClick: (url: String) -> Unit,
     onVideoClick: (url: String) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
   ): Spanned? {
@@ -90,14 +91,14 @@ class LemmyTextHelper @Inject constructor(
     textView.movementMethod = CustomLinkMovementMethod().apply {
       onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
         override fun onClick(textView: TextView, url: String, text: String, rect: RectF): Boolean {
-          val pageRef = LinkResolver.parseUrl(url, instance)
+          val pageRef = linkResolver.parseUrl(url, instance)
 
           if (isUrlVideo(url)) {
             onVideoClick(url)
           } else if (isUrlImage(url)) {
             onImageClick(url)
           } else if (pageRef != null) {
-            onPageClick(pageRef)
+            onPageClick(url, pageRef)
           } else {
             onLinkClick(url, text, LinkContext.Text)
           }

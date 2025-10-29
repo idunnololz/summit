@@ -26,7 +26,7 @@ class ActionsAdapter(
   private val lemmyTextHelper: LemmyTextHelper,
   private val onImageClick: (String, View?, String) -> Unit,
   private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
-  private val onPageClick: (PageRef) -> Unit,
+  private val onPageClick: (url: String, PageRef) -> Unit,
   private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
   private val onLinkLongClick: (url: String, text: String) -> Unit,
   private val onActionClick: (Action) -> Unit,

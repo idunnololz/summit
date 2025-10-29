@@ -64,6 +64,7 @@ import com.idunnololz.summit.lemmy.utils.makeUpAndDownVoteButtons
 import com.idunnololz.summit.lemmy.utils.setTextAppearanceCompat
 import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.LinkContext
+import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.offline.TaskFailedListener
@@ -122,6 +123,7 @@ class PostListViewBuilder @Inject constructor(
   private val exoPlayerManagerManager: ExoPlayerManagerManager,
   private val lemmyTextHelper: LemmyTextHelper,
   private val apiFeatureHelper: ApiFeatureHelper,
+  private val linkResolver: LinkResolver,
 ) {
 
   companion object {
@@ -149,6 +151,7 @@ class PostListViewBuilder @Inject constructor(
     lemmyTextHelper = lemmyTextHelper,
     getExoPlayerManager = { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     preferences = preferences,
+    linkResolver = linkResolver,
   ).also {
     it.globalFontSizeMultiplier = globalFontSizeMultiplier
     it.fullBleedImage = preferences.postFullBleedImage
@@ -302,7 +305,7 @@ class PostListViewBuilder @Inject constructor(
     onImageClick: (accountId: Long?, PostView, sharedElementView: View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
-    onPageClick: (accountId: Long?, PageRef) -> Unit,
+    onPageClick: (accountId: Long?, url: String, PageRef) -> Unit,
     onItemClick: (
       accountId: Long?,
       instance: String,
@@ -735,8 +738,8 @@ class PostListViewBuilder @Inject constructor(
           headerContainer = headerContainer,
           postView = postView,
           instance = instance,
-          onPageClick = {
-            onPageClick(accountId, it)
+          onPageClick = { url, pageRef ->
+            onPageClick(accountId, url, pageRef)
           },
           onLinkClick = { url, text, linkContext ->
             onLinkClick(accountId, url, text, linkContext)
@@ -768,7 +771,7 @@ class PostListViewBuilder @Inject constructor(
           val iconImageView = headerContainer.getIconImageView()
           avatarHelper.loadCommunityIcon(iconImageView, postView.community)
           iconImageView.setOnClickListener {
-            onPageClick(accountId, postView.community.toCommunityRef())
+            onPageClick(accountId, "", postView.community.toCommunityRef())
           }
           iconImageView.setOnLongClickListener {
             onLinkLongClick(
@@ -1180,8 +1183,8 @@ class PostListViewBuilder @Inject constructor(
             onRevealContentClickedFn = {
               onRevealContentClickedFn()
             },
-            onLemmyUrlClick = {
-              onPageClick(accountId, it)
+            onLemmyUrlClick = { url, pageRef ->
+              onPageClick(accountId, url, pageRef)
             },
             onLinkClick = { url, text, linkContext ->
               onLinkClick(accountId, url, text, linkContext)
@@ -1285,8 +1288,8 @@ class PostListViewBuilder @Inject constructor(
           onVideoClick = {
             onVideoClick(it, VideoType.Unknown, null)
           },
-          onPageClick = {
-            onPageClick(accountId, it)
+          onPageClick = { url, pageRef ->
+            onPageClick(accountId, url, pageRef)
           },
           onLinkClick = { url, text, linkContext ->
             onLinkClick(accountId, url, text, linkContext)

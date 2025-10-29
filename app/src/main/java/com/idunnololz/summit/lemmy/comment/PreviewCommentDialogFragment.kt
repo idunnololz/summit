@@ -52,7 +52,7 @@ class PreviewCommentDialogFragment : BaseDialogFragment<DialogFragmentPreviewCom
         instance = args.instance,
         onImageClick = {},
         onVideoClick = {},
-        onPageClick = {},
+        onPageClick = { _, _ -> },
         onLinkClick = { _, _, _ -> },
         onLinkLongClick = { _, _ -> },
       )

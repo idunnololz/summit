@@ -150,6 +150,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private val exoPlayerManagerManager: ExoPlayerManagerManager,
   private val lemmyTextHelper: LemmyTextHelper,
   private val apiFeatureHelper: ApiFeatureHelper,
+  private val linkResolver: LinkResolver,
 ) {
 
   private var preferences = preferenceManager.currentPreferences
@@ -183,6 +184,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     lemmyTextHelper = lemmyTextHelper,
     getExoPlayerManager = { exoPlayerManagerManager.get(fragment.viewLifecycleOwner) },
     preferences = preferences,
+    linkResolver = linkResolver,
   ).also {
     it.globalFontSizeMultiplier = globalFontSizeMultiplier
     it.fullBleedImage = preferences.postFullBleedImage
@@ -335,7 +337,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
     onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String?) -> Unit,
@@ -430,7 +432,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       val iconImageView = headerContainer.getIconImageView()
       avatarHelper.loadCommunityIcon(iconImageView, postView.community)
       iconImageView.setOnClickListener {
-        onPageClick(postView.community.toCommunityRef())
+        onPageClick("", postView.community.toCommunityRef())
       }
       iconImageView.setOnLongClickListener {
         onLinkLongClick(
@@ -802,7 +804,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     commentHeaderInfo: CommentHeaderInfo,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     collapseSection: (position: Int) -> Unit,
     toggleActionsExpanded: () -> Unit,
     onCommentActionClick: (CommentView, actionId: Int) -> Unit,
@@ -904,7 +906,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         val iconImageView = headerView.getIconImageView()
         avatarHelper.loadAvatar(iconImageView, commentView.creator)
         iconImageView.setOnClickListener {
-          onPageClick(commentView.creator.toPersonRef())
+          onPageClick("", commentView.creator.toPersonRef())
         }
         iconImageView.setOnLongClickListener {
           onLinkLongClick(
@@ -1214,7 +1216,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     viewLifecycleOwner: LifecycleOwner,
     commentHeaderInfo: CommentHeaderInfo,
     expandSection: (position: Int) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
   ) = with(binding) {
@@ -1334,7 +1336,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlightTintColor: Int?,
     onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
     collapseSection: (position: Int) -> Unit,
@@ -1445,7 +1447,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     item: InboxItem,
     onImageClick: (String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onMarkAsRead: (View, InboxItem, Boolean) -> Unit,
     onMessageClick: (InboxItem) -> Unit,
     onAddCommentClick: (View, InboxItem) -> Unit,
@@ -1502,10 +1504,10 @@ class PostAndCommentViewBuilder @Inject constructor(
       onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
       onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
         override fun onClick(textView: TextView, url: String, text: String, rect: RectF): Boolean {
-          val pageRef = LinkResolver.parseUrl(url, instance)
+          val pageRef = linkResolver.parseUrl(url, instance)
 
           return if (pageRef != null) {
-            onPageClick(pageRef)
+            onPageClick(url, pageRef)
             true
           } else {
             false
@@ -1768,7 +1770,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     item: InboxItem.RegistrationApplicationInboxItem,
     onImageClick: (String) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
     onApproveClick: (applicationId: Int) -> Unit,
@@ -1817,10 +1819,10 @@ class PostAndCommentViewBuilder @Inject constructor(
       onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
       onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
         override fun onClick(textView: TextView, url: String, text: String, rect: RectF): Boolean {
-          val pageRef = LinkResolver.parseUrl(url, instance)
+          val pageRef = linkResolver.parseUrl(url, instance)
 
           return if (pageRef != null) {
-            onPageClick(pageRef)
+            onPageClick(url, pageRef)
             true
           } else {
             false
@@ -2483,7 +2485,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     commentView: CommentView,
     instance: String,
     commentHeaderInfo: CommentHeaderInfo,
-    onPageClick: (PageRef) -> Unit,
+    onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
   ) {

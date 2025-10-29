@@ -72,11 +72,13 @@ import com.idunnololz.summit.view.LinearLayoutWithFadingEdge
 import com.idunnololz.summit.view.LoadingView
 import java.io.File
 import androidx.core.net.toUri
+import javax.inject.Inject
 
 class LemmyContentHelper(
   private val context: Context,
   private val offlineManager: OfflineManager,
   private val lemmyTextHelper: LemmyTextHelper,
+  private val linkResolver: LinkResolver,
   private val getExoPlayerManager: () -> ExoPlayerManager,
   private val preferences: Preferences,
   private val viewRecycler: ViewRecycler<View> = ViewRecycler(),
@@ -128,7 +130,7 @@ class LemmyContentHelper(
     onVideoLongClickListener: (url: String) -> Unit,
     onItemClickListener: () -> Unit,
     onRevealContentClickedFn: () -> Unit,
-    onLemmyUrlClick: (PageRef) -> Unit,
+    onLemmyUrlClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String?) -> Unit,
     onTextBound: (Spanned?) -> Unit = {},
@@ -304,9 +306,9 @@ class LemmyContentHelper(
       externalContentTextView.text = url.toUri().host ?: url
       externalContentView.setOnClickListener {
         val uri = url.toUri()
-        val pageRef = LinkResolver.parseUrl(url, instance)
+        val pageRef = linkResolver.parseUrl(url, instance)
         if (pageRef != null) {
-          onLemmyUrlClick(pageRef)
+          onLemmyUrlClick(url, pageRef)
         } else if (isUrlImage(url)) {
           onImageClickListener(url)
         } else if (uri.path?.endsWith(".gifv") == true ||

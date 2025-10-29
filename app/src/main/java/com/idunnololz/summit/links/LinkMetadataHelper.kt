@@ -17,6 +17,7 @@ class LinkMetadataHelper @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val linkFixer: LinkFixer,
   private val linkFetcher: LinkFetcher,
+  private val linkResolver: LinkResolver,
 ) {
 
   suspend fun loadLinkMetadata(url: String): Result<LinkMetadata> {
@@ -167,8 +168,8 @@ class LinkMetadataHelper @Inject constructor(
     }
     val host = uri?.host ?: url
 
-    val pageRef = LinkResolver.parseUrl(url, apiClient.instance, mustHandle = true)
-    val fixedPageRef = if (pageRef != null) {
+    val pageRef = linkResolver.parseUrl(url, apiClient.instance, mustHandle = true)
+    val fixedPageRefResult = if (pageRef != null) {
       linkFixer.fixPageRef(pageRef)
     } else {
       null
@@ -185,7 +186,12 @@ class LinkMetadataHelper @Inject constructor(
         host = host,
         siteName = siteName,
         imageUrl = imageUrls.firstOrNull(),
-        pageRef = fixedPageRef,
+        pageRef = when (fixedPageRefResult) {
+          is LinkFixer.FixPageRefResult.InvalidLemmyInstance -> null
+          is LinkFixer.FixPageRefResult.NoInformation -> null
+          is LinkFixer.FixPageRefResult.Success -> fixedPageRefResult.pageRef
+          null -> null
+        },
         publishedTs = 0,
       ),
     )
@@ -195,7 +201,7 @@ class LinkMetadataHelper @Inject constructor(
     return if (LinkUtils.isValidUrl(part)) {
       part
     } else {
-      var baseUri: URI? = null
+      var baseUri: URI?
       try {
         baseUri = URI(url)
         baseUri = baseUri.resolve(part)

@@ -160,8 +160,8 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
         onVideoClick = { url, videoType, state ->
           getMainActivity()?.openVideo(url, videoType, state)
         },
-        onPageClick = {
-          getMainActivity()?.launchPage(it)
+        onPageClick = { url, pageRef ->
+          getMainActivity()?.launchPage(pageRef, url = url)
         },
         onLinkClick = { url, text, linkType ->
           onLinkClick(url, text, linkType)
@@ -354,7 +354,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
       videoType: VideoType,
       videoState: VideoState?,
     ) -> Unit,
-    private val onPageClick: (PageRef) -> Unit,
+    private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     private val onLinkLongClick: (String, String) -> Unit,
     private val onMessageLongClick: (MessageItem) -> Unit,
