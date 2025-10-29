@@ -215,7 +215,7 @@ class CommunitySelectorController @AssistedInject constructor(
     )
 
     activity.insets.observe(activity, insetObserver)
-    activity.insetViewExceptTopAutomaticallyByMargins(activity, binding.recyclerView)
+//    activity.insetViewExceptTopAutomaticallyByMargins(activity, binding.recyclerView)
   }
 
   fun show(bottomSheetContainer: ViewGroup, activity: MainActivity) {

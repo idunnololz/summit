@@ -187,7 +187,7 @@ class LinkMetadataHelper @Inject constructor(
         siteName = siteName,
         imageUrl = imageUrls.firstOrNull(),
         pageRef = when (fixedPageRefResult) {
-          is LinkFixer.FixPageRefResult.InvalidLemmyInstance -> null
+          is LinkFixer.FixPageRefResult.InvalidFedInstance -> null
           is LinkFixer.FixPageRefResult.NoInformation -> null
           is LinkFixer.FixPageRefResult.Success -> fixedPageRefResult.pageRef
           null -> null

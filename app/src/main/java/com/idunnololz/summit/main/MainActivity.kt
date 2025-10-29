@@ -683,7 +683,7 @@ class MainActivity : SummitActivity() {
         )
         return
       }
-      is LinkFixer.FixPageRefResult.InvalidLemmyInstance -> {
+      is LinkFixer.FixPageRefResult.InvalidFedInstance -> {
         if (!url.isBlank()) {
           onLinkClick(this, mainApplication, supportFragmentManager, url, null, LinkContext.Text)
           return
@@ -716,7 +716,7 @@ class MainActivity : SummitActivity() {
               preferMainFragment = preferMainFragment
             )
           }
-          is LinkFixer.FixPageRefResult.InvalidLemmyInstance -> {
+          is LinkFixer.FixPageRefResult.InvalidFedInstance -> {
             if (!url.isBlank()) {
               onLinkClick(
                 context = this@MainActivity,

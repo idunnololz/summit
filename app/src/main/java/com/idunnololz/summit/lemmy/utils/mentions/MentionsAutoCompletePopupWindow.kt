@@ -37,12 +37,12 @@ class MentionsAutoCompletePopupWindow(
     adapter.onResultSelected = {
       when (it) {
         is CommunityResultItem -> {
-          val text = "${it.mentionPrefix}${it.communityView.community.fullName}"
+          val text = "!${it.communityView.community.fullName}"
 
           onItemSelected(text)
         }
         is PersonResultItem -> {
-          val text = "${it.mentionPrefix}${it.personView.person.fullName}"
+          val text = "@${it.personView.person.fullName}"
 
           onItemSelected(text)
         }

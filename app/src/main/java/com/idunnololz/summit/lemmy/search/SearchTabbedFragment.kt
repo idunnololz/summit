@@ -297,7 +297,6 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
         childFragmentManager = childFragmentManager,
         viewModel = viewModel,
         globalLayoutMode = preferences.globalLayoutMode,
-        lockPanes = true,
         retainClosedPosts = preferences.retainLastPost,
         emptyScreenText = getString(R.string.select_a_post),
         fragmentContainerId = R.id.post_fragment_container,

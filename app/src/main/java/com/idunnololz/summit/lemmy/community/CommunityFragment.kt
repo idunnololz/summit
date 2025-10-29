@@ -21,8 +21,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
+import com.discord.panels.PanelState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
@@ -757,25 +759,11 @@ class CommunityFragment :
             if (lastSelectedPost != null) {
               adapter?.highlightPostForever(lastSelectedPost)
             }
-
-            if (isSlideable) {
-              val mainFragment = parentFragment?.parentFragment as? MainFragment
-              mainFragment?.setStartPanelLockState(OverlappingPanelsLayout.LockState.CLOSE)
-            }
           } else {
             if (lastSelectedPost != null) {
               // We came from a post...
               adapter?.highlightPost(lastSelectedPost)
               viewModel.lastSelectedItem = null
-            }
-
-            if (isSlideable) {
-              val mainFragment = parentFragment?.parentFragment as? MainFragment
-              if (!lockPanes) {
-                mainFragment?.setStartPanelLockState(
-                  OverlappingPanelsLayout.LockState.UNLOCKED,
-                )
-              }
             }
           }
         }
@@ -801,6 +789,33 @@ class CommunityFragment :
               ),
             )
           }
+        }
+
+        panelSlideListener = object : SlidingPaneLayout.PanelSlideListener {
+          override fun onPanelSlide(panel: View, slideOffset: Float) {
+            if (isSlideable) {
+              (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
+                OverlappingPanelsLayout.LockState.CLOSE
+              )
+            }
+          }
+
+          override fun onPanelOpened(panel: View) {
+            if (isSlideable) {
+              (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
+                OverlappingPanelsLayout.LockState.CLOSE
+              )
+            }
+          }
+
+          override fun onPanelClosed(panel: View) {
+            if (isSlideable) {
+              (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
+                OverlappingPanelsLayout.LockState.UNLOCKED
+              )
+            }
+          }
+
         }
 
         viewModel.hideReadMode.observe(viewLifecycleOwner) {

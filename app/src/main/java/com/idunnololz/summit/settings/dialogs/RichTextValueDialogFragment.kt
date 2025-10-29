@@ -199,7 +199,6 @@ class RichTextValueDialogFragment : BaseDialogFragment<DialogFragmentRichTextVal
               bottomSheetContainer = binding.root,
               expandFully = true,
               handleBackPress = true,
-              handleInsets = false,
               onBackPressedDispatcher = onBackPressedDispatcher,
             )
           },

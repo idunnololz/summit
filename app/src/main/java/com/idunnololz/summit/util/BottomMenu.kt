@@ -56,9 +56,6 @@ class BottomMenu(
 
   private var parent: ViewGroup? = null
 
-  private var topInset = MutableLiveData(0)
-  private var bottomInset = MutableLiveData(0)
-
   var bottomSheetView: View? = null
 
   private val onBackPressedCallback =
@@ -68,10 +65,6 @@ class BottomMenu(
     ) {
       close()
     }
-
-  private val insetsObserver = Observer<ActivityInsets> {
-    setInsets(it.topInset, it.bottomInset)
-  }
 
   var onClose: (() -> Unit)? = null
 
@@ -173,15 +166,10 @@ class BottomMenu(
     bottomSheetContainer: ViewGroup,
     expandFully: Boolean,
     handleBackPress: Boolean = true,
-    handleInsets: Boolean = true,
     onBackPressedDispatcher: OnBackPressedDispatcher =
       bottomMenuContainer.onBackPressedDispatcher,
     avatarHelper: AvatarHelper? = null,
   ) {
-    if (handleInsets) {
-      bottomMenuContainer.insets.observeForever(insetsObserver)
-    }
-
     parent = bottomSheetContainer
 
     adapter.avatarHelper = avatarHelper
@@ -223,15 +211,6 @@ class BottomMenu(
     }
     adapter.bottomSheetBehavior = bottomSheetBehavior
 
-    bottomInset.observeForever {
-      recyclerView.updatePadding(bottom = it)
-    }
-    topInset.observeForever { topInset ->
-      binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-        topMargin = topInset
-      }
-    }
-
     fixBottomSheetFling(bottomSheetBehavior, recyclerView)
 
     bottomSheetContainer.addView(rootView)
@@ -254,7 +233,6 @@ class BottomMenu(
                 parent = null
                 onBackPressedCallback.remove()
                 bottomSheetContainer.removeView(rootView)
-                bottomMenuContainer.insets.removeObserver(insetsObserver)
 
                 onClose?.invoke()
               }
@@ -310,11 +288,6 @@ class BottomMenu(
       return true
     }
     return false
-  }
-
-  fun setInsets(topInset: Int, bottomInset: Int) {
-    this.topInset.value = topInset
-    this.bottomInset.value = bottomInset
   }
 
   private sealed interface Item {

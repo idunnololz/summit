@@ -32,6 +32,7 @@
             android:orientation="vertical"
             app:paddingBottomSystemWindowInsets="false"
             app:paddingTopSystemWindowInsets="false"
+            app:marginTopSystemWindowInsets="true"
             app:layout_behavior="com.idunnololz.summit.util.FixedBottomSheetBehavior"
             style="@style/Widget.Material3.BottomSheet.Modal">
 

@@ -43,7 +43,6 @@ class SlidingPaneController(
    */
   private val emptyScreenText: String,
   @IdRes private val fragmentContainerId: Int,
-  val lockPanes: Boolean = false,
   private val retainClosedPosts: Boolean = false,
   private val useSwipeBetweenPosts: Boolean = false,
   private val isPreview: Boolean = false,
@@ -62,6 +61,7 @@ class SlidingPaneController(
   private var lastPostFragment: PostFragment? = null
   var onPageSelectedListener: (isOpen: Boolean) -> Unit = {}
   var onPostOpen: (accountId: Long?, postView: PostView?) -> Unit = { _, _ -> }
+  var panelSlideListener: SlidingPaneLayout.PanelSlideListener? = null
 
   val isSlideable: Boolean
     get() = slidingPaneLayout.isSlideable
@@ -72,7 +72,7 @@ class SlidingPaneController(
   var panelClosedNavBarOpenPercent: Float = 1f
   var panelOpenNavBarOpenPercent: Float = 0f
 
-  private val panelSlideListener =
+  private val _panelSlideListener =
     object : SlidingPaneLayout.PanelSlideListener {
       override fun onPanelSlide(panel: View, slideOffset: Float) {
         Log.d(TAG, "onPanelSlide() - $slideOffset")
@@ -88,6 +88,8 @@ class SlidingPaneController(
 
           slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)
         }
+
+        panelSlideListener?.onPanelSlide(panel, slideOffset)
       }
 
       override fun onPanelOpened(panel: View) {
@@ -99,6 +101,8 @@ class SlidingPaneController(
 
         onPageSelectedListener(true)
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_UNLOCKED
+
+        panelSlideListener?.onPanelOpened(panel)
       }
 
       override fun onPanelClosed(panel: View) {
@@ -132,11 +136,13 @@ class SlidingPaneController(
         }
         onPageSelectedListener(false)
         slidingPaneLayout.lockMode = SlidingPaneLayout.LOCK_MODE_LOCKED
+
+        panelSlideListener?.onPanelClosed(panel)
       }
     }
 
   fun init() {
-    slidingPaneLayout.addPanelSlideListener(panelSlideListener)
+    slidingPaneLayout.addPanelSlideListener(_panelSlideListener)
     slidingPaneLayout.post {
       if (!slidingPaneLayout.isSlideable) {
         val firstChild = slidingPaneLayout.getChildAt(0) ?: return@post
@@ -164,7 +170,7 @@ class SlidingPaneController(
       }
 
       if (slidingPaneLayout.isOpen && slidingPaneLayout.isSlideable) {
-        panelSlideListener.onPanelOpened(slidingPaneLayout)
+        _panelSlideListener.onPanelOpened(slidingPaneLayout)
       }
     }
 
@@ -321,14 +327,14 @@ class SlidingPaneController(
   private fun openPane() {
     slidingPaneLayout.openPane()
     if (!slidingPaneLayout.isSlideable) {
-      panelSlideListener.onPanelOpened(slidingPaneLayout)
+      _panelSlideListener.onPanelOpened(slidingPaneLayout)
     }
   }
 
   private fun closePane() {
     slidingPaneLayout.closePane()
     if (!slidingPaneLayout.isSlideable) {
-      panelSlideListener.onPanelClosed(slidingPaneLayout)
+      _panelSlideListener.onPanelClosed(slidingPaneLayout)
     }
   }
 }
