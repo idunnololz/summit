@@ -1104,6 +1104,7 @@ class AddOrEditCommentFragment :
           commentPath = null,
           crossPosts = listOf(),
           wasUpdateForced = false,
+          loadCommentError = null,
         ),
       )
 

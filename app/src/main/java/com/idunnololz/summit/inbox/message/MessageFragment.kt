@@ -655,6 +655,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           commentPath = null,
           crossPosts = listOf(),
           wasUpdateForced = false,
+          loadCommentError = null,
         ),
       )
 

@@ -811,6 +811,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
           commentPath = null,
           crossPosts = listOf(),
           wasUpdateForced = false,
+          loadCommentError = null,
         ),
       )
 

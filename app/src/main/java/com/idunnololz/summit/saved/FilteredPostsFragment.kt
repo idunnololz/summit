@@ -152,8 +152,8 @@ class FilteredPostsFragment :
         )
       },
       onPostRead = { _, _ -> },
-      onLoadPage = {
-        viewModel.fetchPostPage(it, false)
+      onLoadPage = { pageIndex, force ->
+        viewModel.fetchPostPage(pageIndex, force)
       },
       onLinkClick = { accountId, url, text, linkType ->
         onLinkClick(url, text, linkType)

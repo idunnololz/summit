@@ -138,6 +138,7 @@ class PostViewModel @Inject constructor(
   private var supplementaryComments = mutableMapOf<Int, CommentView>()
 
   private val commentsFetcher = CommentsFetcher(lemmyApiClient)
+  private var lastLoadCommentError: Throwable? = null
 
   var preferences: Preferences = preferenceManager.currentPreferences
 
@@ -366,7 +367,8 @@ class PostViewModel @Inject constructor(
         Result.success(this@PostViewModel.comments)
       }
       val newComments = commentsResult.getOrNull()
-      this@PostViewModel.comments = newComments
+      lastLoadCommentError = commentsResult.exceptionOrNull()
+      this@PostViewModel.comments = newComments ?: this@PostViewModel.comments
 
       invalidateSupplementaryComments(newComments)
 
@@ -815,7 +817,9 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  private suspend fun updateData(wasUpdateForced: Boolean) = withContext(Dispatchers.Default) {
+  private suspend fun updateData(
+    wasUpdateForced: Boolean,
+  ) = withContext(Dispatchers.Default) {
     Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
 
     val context = ContextCompat.getContextForLanguage(context)
@@ -862,6 +866,7 @@ class PostViewModel @Inject constructor(
       isCommentsLoaded = comments != null,
       commentPath = comments?.firstOrNull()?.comment?.path,
       wasUpdateForced = wasUpdateForced,
+      loadCommentError = lastLoadCommentError,
     )
 
     postData.postValue(postDataValue)
@@ -985,6 +990,7 @@ class PostViewModel @Inject constructor(
     val isCommentsLoaded: Boolean,
     val commentPath: String?,
     val wasUpdateForced: Boolean,
+    val loadCommentError: Throwable?,
   )
 
   sealed interface ListView {

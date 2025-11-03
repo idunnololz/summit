@@ -1148,6 +1148,7 @@ class PostFragment :
           isCommentsLoaded = false,
           commentPath = null,
           wasUpdateForced = false,
+          loadCommentError = null,
         ),
       )
       onMainListingItemRetrieved(post)

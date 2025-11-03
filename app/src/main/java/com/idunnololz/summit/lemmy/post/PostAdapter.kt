@@ -1300,10 +1300,10 @@ class PostAdapter(
     }
 
     if (!isLoaded || !rawData.isCommentsLoaded) {
-      finalItems += listOf(ProgressOrErrorItem())
+      finalItems += ProgressOrErrorItem(rawData.loadCommentError)
     } else {
       if (commentItems.isEmpty() && !isEmbedded) {
-        finalItems += listOf(Item.NoCommentsItem(postView.post))
+        finalItems += Item.NoCommentsItem(postView.post)
       }
     }
 

@@ -430,8 +430,8 @@ class CommunityFragment :
             read = true,
           )
         },
-        onLoadPage = {
-          viewModel.fetchPage(it)
+        onLoadPage = { pageIndex, force ->
+          viewModel.fetchPage(pageIndex = pageIndex, force = force)
         },
         onLinkClick = { accountId, url, text, linkType ->
           onLinkClick(url, text, linkType)
@@ -731,6 +731,8 @@ class CommunityFragment :
       requireActivity().onBackPressedDispatcher
         .addCallback(viewLifecycleOwner, onBackPressedHandler)
 
+      blockingView.visibility = View.INVISIBLE
+
       slidingPaneController = SlidingPaneController(
         fragment = this@CommunityFragment,
         slidingPaneLayout = slidingPaneLayout,
@@ -793,10 +795,12 @@ class CommunityFragment :
 
         panelSlideListener = object : SlidingPaneLayout.PanelSlideListener {
           override fun onPanelSlide(panel: View, slideOffset: Float) {
+            Log.d("HAHA", "onPanelSlide(): $slideOffset")
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE
               )
+              blockingView.visibility = View.VISIBLE
             }
           }
 
@@ -805,6 +809,7 @@ class CommunityFragment :
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE
               )
+              blockingView.visibility = View.INVISIBLE
             }
           }
 
@@ -813,6 +818,7 @@ class CommunityFragment :
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.UNLOCKED
               )
+              blockingView.visibility = View.INVISIBLE
             }
           }
 

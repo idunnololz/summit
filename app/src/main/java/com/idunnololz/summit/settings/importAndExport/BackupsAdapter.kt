@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.databinding.BackupItemBinding
+import com.idunnololz.summit.databinding.EmptyItemBinding
 import com.idunnololz.summit.util.PrettyPrintStyles
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.tsToConcise
@@ -17,6 +18,7 @@ class BackupsAdapter(
     data class BackupItem(
       val backupInfo: SettingsBackupManager.BackupInfo,
     ) : Item
+    data object EmptyItem: Item
   }
 
   private val adapterHelper = AdapterHelper<Item>(
@@ -26,6 +28,7 @@ class BackupsAdapter(
           is Item.BackupItem ->
             oldItem.backupInfo.file.path ==
               (newItem as Item.BackupItem).backupInfo.file.path
+          Item.EmptyItem -> true
         }
     },
   ).apply {
@@ -37,6 +40,7 @@ class BackupsAdapter(
         onBackupClick(item.backupInfo)
       }
     }
+    addItemType(Item.EmptyItem::class, EmptyItemBinding::inflate) { _, _, _ -> }
   }
 
   var backupData: List<SettingsBackupManager.BackupInfo> = listOf()
@@ -51,7 +55,13 @@ class BackupsAdapter(
   }
 
   private fun updateItems() {
-    val newItems = backupData.map { Item.BackupItem(it) }
+    val newItems = mutableListOf<Item>()
+
+    backupData.mapTo(newItems) { Item.BackupItem(it) }
+
+    if (backupData.isEmpty()) {
+      newItems += Item.EmptyItem
+    }
 
     adapterHelper.setItems(newItems, this)
   }

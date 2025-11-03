@@ -205,29 +205,47 @@ class ImageViewerActivity :
       binding.dummyImageView.visibility = View.VISIBLE
       binding.imageView.visibility = View.INVISIBLE
     }
-    window.sharedElementEnterTransition.addListener(
-      object : Transition.TransitionListener {
-        override fun onTransitionStart(p0: Transition?) {
-        }
+    if (args.transitionName != null) {
+      window.sharedElementEnterTransition.addListener(
+        object : Transition.TransitionListener {
+          override fun onTransitionStart(p0: Transition?) {
+          }
 
-        override fun onTransitionEnd(p0: Transition?) {
+          override fun onTransitionEnd(p0: Transition?) {
+            onSharedElementEnterTransitionEnd()
+
+            binding.imageView.postDelayed(
+              {
+                toggleImageQuality(useHd = true)
+              },
+              50
+            )
+          }
+
+          override fun onTransitionCancel(p0: Transition?) {
+          }
+
+          override fun onTransitionPause(p0: Transition?) {
+          }
+
+          override fun onTransitionResume(p0: Transition?) {
+          }
+        },
+      )
+    } else {
+      binding.imageView.post(
+        {
           onSharedElementEnterTransitionEnd()
 
-          binding.imageView.postDelayed({
-            toggleImageQuality(useHd = true)
-          }, 50)
+          binding.imageView.postDelayed(
+            {
+              toggleImageQuality(useHd = true)
+            },
+            50
+          )
         }
-
-        override fun onTransitionCancel(p0: Transition?) {
-        }
-
-        override fun onTransitionPause(p0: Transition?) {
-        }
-
-        override fun onTransitionResume(p0: Transition?) {
-        }
-      },
-    )
+      )
+    }
     window.sharedElementExitTransition.addListener(
       object : Transition.TransitionListener {
         override fun onTransitionStart(p0: Transition?) {
@@ -275,6 +293,11 @@ class ImageViewerActivity :
         }
       }
     }
+  }
+
+  override fun onEnterAnimationComplete() {
+    super.onEnterAnimationComplete()
+
   }
 
   private fun toggleImageQuality(useHd: Boolean = false) {

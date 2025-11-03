@@ -85,6 +85,10 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
         override fun onPageSelected(position: Int) {
           super.onPageSelected(position)
 
+          if (pagerAdapter.items.isEmpty()) {
+            return
+          }
+
           val item = pagerAdapter.items[position]
 
           if (item is PostAdapter.Item.PostItem) {

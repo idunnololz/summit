@@ -1578,7 +1578,16 @@ class LemmyApiClient @Inject constructor(
     }
     apiInfo.value = StatefulData.Loading()
 
-    val currentFetchApiInfoJob = fetchApiInfoJob
+    var currentFetchApiInfoJob = fetchApiInfoJob
+
+    if (currentFetchApiInfoJob != null &&
+      currentFetchApiInfoJob.isCompleted &&
+      currentFetchApiInfoJob.await().isFailure) {
+
+      fetchApiInfoJob = null
+      currentFetchApiInfoJob = null
+    }
+
     val fetchApiInfoJob = if (fetchApiInfoInstance == instance && currentFetchApiInfoJob != null) {
       currentFetchApiInfoJob
     } else {
@@ -1643,15 +1652,7 @@ class LemmyApiClient @Inject constructor(
       }
     },
     { exception ->
-      val handler = object : InvocationHandler {
-        override fun invoke(proxy: Any?, method: Method?, args: Array<out Any?>?): Any? =
-          throw exception
-      }
-      Proxy.newProxyInstance(
-        LemmyLikeApi::class.java.classLoader,
-        arrayOf(LemmyLikeApi::class.java),
-        handler,
-      ) as LemmyLikeApi
+      ErrorApiAdapter(instance = instance, error = exception)
     },
   )
 }

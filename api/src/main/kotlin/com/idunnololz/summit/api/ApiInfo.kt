@@ -28,6 +28,16 @@ data class ApiInfo(
         ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
       }
-    null -> false
+    null ->
+      when (apiFeature) {
+        ApiFeature.Reports -> false
+        ApiFeature.Register -> false
+        ApiFeature.Downvoted -> false
+        ApiFeature.UploadsList -> false
+        ApiFeature.Downvote -> downvoteAllowed
+        ApiFeature.SearchAll -> false
+        ApiFeature.SearchComments -> false
+        ApiFeature.GetCommunitiesAll -> false
+      }
   }
 }

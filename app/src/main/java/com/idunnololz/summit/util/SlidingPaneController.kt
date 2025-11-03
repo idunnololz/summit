@@ -204,18 +204,12 @@ class SlidingPaneController(
         if (id == args.id) {
           openPostInternal(
             args = null,
+            removeLastPostFragment = false,
             itemRef = Either.Left(PostRef(instance, id)),
             postFragmentOverride = lastPostFragment,
           )
           onPostOpen.invoke(accountId, post)
           return
-        } else {
-          this.lastPostFragment = null
-          childFragmentManager.commit(allowStateLoss = true) {
-            // Apparently we don't need to call attach before remove
-            // attach(lastPostFragment)
-            remove(lastPostFragment)
-          }
         }
       }
     } catch (_: Exception) {
@@ -233,6 +227,7 @@ class SlidingPaneController(
         videoState = videoState,
         accountId = accountId ?: 0L,
       ),
+      removeLastPostFragment = true,
       itemRef = Either.Left(PostRef(instance, id)),
     )
 
@@ -241,7 +236,7 @@ class SlidingPaneController(
 
   fun openComment(instance: String, commentId: CommentId) {
     openPostInternal(
-      PostFragmentArgs(
+      args = PostFragmentArgs(
         instance = instance,
         id = 0,
         isPreview = isPreview,
@@ -249,12 +244,14 @@ class SlidingPaneController(
         currentCommunity = null,
         isSinglePage = false,
       ),
-      Either.Right(CommentRef(instance, commentId)),
+      removeLastPostFragment = false,
+      itemRef = Either.Right(CommentRef(instance, commentId)),
     )
   }
 
   private fun openPostInternal(
     args: PostFragmentArgs?,
+    removeLastPostFragment: Boolean,
     itemRef: Either<PostRef, CommentRef>? = null,
     postFragmentOverride: PostFragment? = null,
   ) {
@@ -263,7 +260,18 @@ class SlidingPaneController(
       return
     }
 
+    val lastPostFragment = lastPostFragment
+
     activeOpenPostJob = fragment.lifecycleScope.launch(Dispatchers.Main) {
+      if (removeLastPostFragment && lastPostFragment != null) {
+        this@SlidingPaneController.lastPostFragment = null
+        childFragmentManager.commit(allowStateLoss = true) {
+          // Apparently we don't need to call attach before remove
+          // attach(lastPostFragment)
+          remove(lastPostFragment)
+        }
+      }
+
       val fragment =
         postFragmentOverride
           ?: if (useSwipeBetweenPosts) {

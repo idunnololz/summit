@@ -21,6 +21,8 @@ import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
+import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -68,11 +70,8 @@ class DraftsDialogFragment :
 
   override fun onStart() {
     super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-      }
+    dialog?.window?.let { window ->
+      WindowCompat.setDecorFitsSystemWindows(window, false)
     }
   }
 
@@ -94,6 +93,10 @@ class DraftsDialogFragment :
     val context = requireContext()
 
     viewModel.draftType = args.draftType
+
+    requireMainActivity().apply {
+      insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.root)
+    }
 
     binding.toolbar.title = getString(R.string.drafts)
     binding.toolbar.setNavigationIcon(R.drawable.baseline_close_24)

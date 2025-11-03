@@ -149,8 +149,8 @@ class PersonPostsFragment :
         )
       },
       onPostRead = { _, _ -> },
-      onLoadPage = {
-        viewModel.fetchPage(it)
+      onLoadPage = { pageIndex, force ->
+        viewModel.fetchPage(pageIndex, force)
       },
       onLinkClick = { accountId, url, text, linkType ->
         onLinkClick(url, text, linkType)

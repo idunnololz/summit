@@ -72,6 +72,11 @@
             android:layout_gravity="end"
             android:visibility="gone"
             android:translationZ="20dp"/>
+
+        <com.idunnololz.summit.view.BlockingTouchView
+            android:id="@+id/blocking_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.fragment.app.FragmentContainerView

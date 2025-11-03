@@ -75,7 +75,7 @@ class PostListAdapter(
   ) -> Unit,
   private val onShowMoreActions: (accountId: Long?, PostView) -> Unit,
   private val onPostRead: (accountId: Long?, PostView) -> Unit,
-  private val onLoadPage: (Int) -> Unit,
+  private val onLoadPage: (Int, force: Boolean) -> Unit,
   private val onLinkClick: (
     accountId: Long?,
     url: String,
@@ -424,7 +424,7 @@ class PostListAdapter(
           postListEngine.setPageItemLoading(item.pageToLoad)
           onItemsChanged()
 
-          onLoadPage(item.pageToLoad)
+          onLoadPage(item.pageToLoad, true)
         }
       }
 
@@ -446,7 +446,7 @@ class PostListAdapter(
         fun loadPage() {
           b.loadingView.visibility = View.VISIBLE
           b.loadMoreText.visibility = View.GONE
-          onLoadPage(item.pageToLoad)
+          onLoadPage(item.pageToLoad, false)
         }
 
         b.loadMoreText.setOnClickListener {

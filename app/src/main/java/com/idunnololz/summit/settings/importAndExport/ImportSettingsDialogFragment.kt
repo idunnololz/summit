@@ -198,7 +198,11 @@ class ImportSettingsDialogFragment :
             dialog.dismiss()
           },
         ).apply {
-          backupData = backups
+          backupData = backups.sortedByDescending { it.file.lastModified() }
+
+          recyclerView.post {
+            root.requestLayout()
+          }
         }
         setHasFixedSize(true)
         layoutManager = LinearLayoutManager(context)
@@ -225,7 +229,7 @@ class ImportSettingsDialogFragment :
       show()
 
       val width = ViewGroup.LayoutParams.MATCH_PARENT
-      val height = ViewGroup.LayoutParams.WRAP_CONTENT
+      val height = ViewGroup.LayoutParams.MATCH_PARENT
 
       val window = checkNotNull(window)
       window.setLayout(width, height)

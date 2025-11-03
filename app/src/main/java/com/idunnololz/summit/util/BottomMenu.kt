@@ -66,7 +66,14 @@ class BottomMenu(
       close()
     }
 
+  private var onInsetsChanged: () -> Unit = {}
+
   var onClose: (() -> Unit)? = null
+
+
+  private val insetsObserver = Observer<ActivityInsets> {
+    onInsetsChanged()
+  }
 
   fun setTitle(@StringRes title: Int) {
     this.title = context.getString(title)
@@ -166,10 +173,15 @@ class BottomMenu(
     bottomSheetContainer: ViewGroup,
     expandFully: Boolean,
     handleBackPress: Boolean = true,
+    handleInsets: Boolean = true,
     onBackPressedDispatcher: OnBackPressedDispatcher =
       bottomMenuContainer.onBackPressedDispatcher,
     avatarHelper: AvatarHelper? = null,
   ) {
+    if (handleInsets) {
+      bottomMenuContainer.insets.observeForever(insetsObserver)
+    }
+
     parent = bottomSheetContainer
 
     adapter.avatarHelper = avatarHelper
@@ -184,6 +196,16 @@ class BottomMenu(
     val rootView = binding.root
     val bottomSheet = binding.bottomSheet
     val recyclerView = binding.recyclerView
+
+    if (handleInsets) {
+      onInsetsChanged = a@{
+        val bottomInset = bottomMenuContainer.insets.value?.bottomInset ?: return@a
+        recyclerView.updatePadding(bottom = bottomInset)
+      }
+      onInsetsChanged()
+    } else {
+      onInsetsChanged = {}
+    }
 
     bottomSheetView = bottomSheet
 
@@ -233,6 +255,7 @@ class BottomMenu(
                 parent = null
                 onBackPressedCallback.remove()
                 bottomSheetContainer.removeView(rootView)
+                bottomMenuContainer.insets.removeObserver(insetsObserver)
 
                 onClose?.invoke()
               }
