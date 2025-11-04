@@ -731,8 +731,6 @@ class CommunityFragment :
       requireActivity().onBackPressedDispatcher
         .addCallback(viewLifecycleOwner, onBackPressedHandler)
 
-      blockingView.visibility = View.INVISIBLE
-
       slidingPaneController = SlidingPaneController(
         fragment = this@CommunityFragment,
         slidingPaneLayout = slidingPaneLayout,
@@ -800,7 +798,6 @@ class CommunityFragment :
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE
               )
-              blockingView.visibility = View.VISIBLE
             }
           }
 
@@ -809,7 +806,6 @@ class CommunityFragment :
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE
               )
-              blockingView.visibility = View.INVISIBLE
             }
           }
 
@@ -818,7 +814,6 @@ class CommunityFragment :
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.UNLOCKED
               )
-              blockingView.visibility = View.INVISIBLE
             }
           }
 
