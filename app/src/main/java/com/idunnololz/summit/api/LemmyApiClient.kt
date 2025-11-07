@@ -1614,7 +1614,7 @@ class LemmyApiClient @Inject constructor(
     )
 
     return newApi(instance, result).also {
-      if (!Proxy.isProxyClass(it::class.java)) {
+      if (it !is ErrorApiAdapter) {
         apis[instance] = it
       }
     }
