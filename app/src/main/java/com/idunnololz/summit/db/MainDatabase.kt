@@ -100,8 +100,9 @@ private const val TAG = "MainDatabase"
     AutoMigration(from = 45, to = 46),
     AutoMigration(from = 46, to = 47),
     AutoMigration(from = 47, to = 48),
+    AutoMigration(from = 49, to = 50),
   ],
-  version = 49,
+  version = 50,
   exportSchema = true,
 )
 @TypeConverters(

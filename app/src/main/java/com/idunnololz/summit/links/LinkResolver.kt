@@ -111,7 +111,7 @@ class LinkResolver @Inject constructor(
         communityName = communityName.trimEnd { it == '.' }
 
         return if (communityName.count { c -> c == '@' } == 1) {
-          val (community, instance) = url.substring(1).split("@", limit = 2)
+          val (community, instance) = communityName.split("@", limit = 2)
           CommunityRef.CommunityRefByName(community, instance)
         } else {
           CommunityRef.CommunityRefByName(communityName, instance)
@@ -124,7 +124,7 @@ class LinkResolver @Inject constructor(
         personName = personName.trimEnd { it == '.' }
 
         return if (personName.count { c -> c == '@' } == 1) {
-          val (personName, instance) = url.substring(1).split("@", limit = 2)
+          val (personName, instance) = personName.split("@", limit = 2)
           PersonRef.PersonRefByName(personName, instance)
         } else {
           PersonRef.PersonRefByName(personName, instance)

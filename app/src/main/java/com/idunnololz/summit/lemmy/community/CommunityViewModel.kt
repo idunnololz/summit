@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
@@ -60,6 +61,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -73,7 +75,7 @@ class CommunityViewModel @Inject constructor(
   private val accountManager: AccountManager,
   private val userCommunitiesManager: UserCommunitiesManager,
   private val accountInfoManager: AccountInfoManager,
-  private val postReadManager: PostReadManager,
+  override val postReadManager: PostReadManager,
   private val preferenceManager: PreferenceManager,
   private val state: SavedStateHandle,
   val hiddenPostsManager: HiddenPostsManager,
@@ -114,14 +116,7 @@ class CommunityViewModel @Inject constructor(
   private val postsRepository = postsRepositoryFactory.create(state)
   private var pagePositions = arrayListOf<PageScrollState>()
 
-  val currentCommunityRef = state.getLiveData<CommunityRef?>("currentCommunityRef")
-  private val communityRefChangeObserver = Observer<CommunityRef?> {
-    it ?: return@Observer
-
-    recentCommunityManager.addRecentCommunityVisited(it)
-    updateSortOrder()
-    loadCommunityInfo()
-  }
+  val currentCommunityRef = state.getMutableStateFlow<CommunityRef?>("currentCommunityRef", null)
 
   val loadedPostsData = StatefulLiveData<PostUpdateInfo>()
   private val personRefOfLastAccountPreferencesLoaded = state.getLiveData<PersonRef?>(
@@ -156,9 +151,16 @@ class CommunityViewModel @Inject constructor(
   val currentAccount = MutableLiveData<AccountView?>(null)
   val onHidePost = MutableLiveData<HiddenPostEntry>(null)
 
-  val hideReadMode = state.getLiveData("_isHideReadEnabled", HideReadMode.Off)
-
   var preferences: Preferences = preferenceManager.currentPreferences
+
+  val hideReadMode = state.getLiveData(
+    "_isHideReadEnabled",
+    if (preferences.hideReadByDefault) {
+      HideReadMode.On
+    } else {
+      HideReadMode.Off
+    },
+  )
 
   private var fetchingPages = mutableSetOf<Int>()
   val postListEngine = postListEngineFactory.create(
@@ -209,7 +211,18 @@ class CommunityViewModel @Inject constructor(
       }
     }
 
-    currentCommunityRef.observeForever(communityRefChangeObserver)
+    viewModelScope.launch {
+      currentCommunityRef
+        .drop(1) // so we only get changes and not the initial value (null)
+        .collect {
+          it ?: return@collect
+
+          recentCommunityManager.addRecentCommunityVisited(it)
+          updateSortOrder()
+          loadCommunityInfo()
+          registerHiddenPostObserver()
+        }
+    }
 
     accountManager.addOnAccountChangedListener(onAccountChangeListener)
 
@@ -274,9 +287,7 @@ class CommunityViewModel @Inject constructor(
       }
     }
 
-    if (currentCommunityRef.isInitialized) {
-      registerHiddenPostObserver()
-    }
+    registerHiddenPostObserver()
   }
 
   private suspend fun onPostReadChanged() {
@@ -688,10 +699,10 @@ class CommunityViewModel @Inject constructor(
 
     initialPageFetched.value = false
 
-    currentCommunityRef.value = communityRefSafe
+    if (currentCommunityRef.value != communityRefSafe) {
+      currentCommunityRef.value = communityRefSafe
+    }
     postsRepository.setCommunity(communityRef)
-
-    registerHiddenPostObserver()
   }
 
   private fun restorePostListEngineIfNeeded() {
@@ -738,6 +749,8 @@ class CommunityViewModel @Inject constructor(
   }
 
   private fun registerHiddenPostObserver() {
+    currentCommunityRef.value ?: return
+
     Log.d(TAG, "Registering hidden post observer!")
     hiddenPostObserverJob?.cancel()
 
@@ -921,7 +934,6 @@ class CommunityViewModel @Inject constructor(
   }
 
   override fun onCleared() {
-    currentCommunityRef.removeObserver(communityRefChangeObserver)
     accountManager.removeOnAccountChangedListener(onAccountChangeListener)
 
     super.onCleared()

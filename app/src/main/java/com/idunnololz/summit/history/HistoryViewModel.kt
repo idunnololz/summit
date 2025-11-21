@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 class HistoryViewModel @Inject constructor(
   private val apiClient: LemmyApiClient,
   private val historyManager: HistoryManager,
+  override val postReadManager: PostReadManager,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 

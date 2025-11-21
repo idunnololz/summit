@@ -73,7 +73,6 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
           showNotificationBarBg()
         }
         InboxTabbedFragment::class -> {
-          showNavBar()
           showNotificationBarBg()
         }
         ActionsTabbedFragment::class -> {

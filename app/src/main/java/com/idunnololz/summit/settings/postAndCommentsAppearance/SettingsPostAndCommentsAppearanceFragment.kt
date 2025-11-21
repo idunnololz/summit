@@ -376,6 +376,7 @@ class SettingsPostAndCommentsAppearanceFragment : BaseSettingsFragment() {
           instance = "https://fake.instance",
           isPostLocked = false,
           isUpdating = false,
+          isNewComment = false,
           highlight = false,
           highlightForever = false,
           highlightTintColor = null,

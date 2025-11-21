@@ -58,6 +58,7 @@ import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.Utils
+import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.count
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.recyclerView.ViewBindingViewHolder
@@ -150,6 +151,7 @@ class PostAdapter(
       val currentMatch: QueryResult?,
       val screenshotMode: Boolean,
       val commentHeaderInfo: CommentHeaderInfo,
+      val isNewComment: Boolean,
     ) : Item(
       "comment_${comment.comment.id}",
     ),
@@ -173,6 +175,7 @@ class PostAdapter(
       val query: String?,
       val currentMatch: QueryResult?,
       val screenshotMode: Boolean,
+      val isNewComment: Boolean,
     ) : Item(
       "comment_${comment.comment.id}",
     ),
@@ -321,6 +324,16 @@ class PostAdapter(
     }
 
   var hideNonNativeInstanceWarning = false
+
+  var highlightCommentsAfterTs: Long? = null
+    set(value) {
+      if (value == field) {
+        return
+      }
+      field = value
+
+      refreshItems()
+    }
 
   override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
     is HeaderItem -> R.layout.post_header_item
@@ -622,6 +635,7 @@ class PostAdapter(
             accountId = accountId,
             isDeleting = item.isDeleting,
             isRemoved = item.isRemoved,
+            isNewComment = item.isNewComment,
             content = item.content,
             contentSpannable = contentCache[k],
             instance = instance,
@@ -688,6 +702,7 @@ class PostAdapter(
             highlightForever = highlightForever,
             highlightTintColor = highlightTintColor,
             isUpdating = item.isUpdating,
+            isNewComment = item.isNewComment,
             commentView = item.comment,
             instance = instance,
             accountId = accountId,
@@ -720,6 +735,7 @@ class PostAdapter(
           baseDepth = item.baseDepth,
           depth = item.depth,
           maxDepth = maxDepth,
+          isNewComment = item.isNewComment,
           onTap = {
             showFilteredComment(item)
           },
@@ -1053,10 +1069,10 @@ class PostAdapter(
     absolutionPositionToTopLevelCommentPosition: MutableList<Int>,
   ): List<Item>? {
     val rawData = rawData
-    val oldItems = items
     val query = query
     val currentMatch = currentMatch
     val error = error
+    val highlightCommentsAfterTs = highlightCommentsAfterTs
 
     if (error != null) {
       val finalItems = mutableListOf<Item>()
@@ -1177,6 +1193,9 @@ class PostAdapter(
             lastTopLevelCommentPosition++
           }
 
+          val isNewComment = highlightCommentsAfterTs != null &&
+            highlightCommentsAfterTs < dateStringToTs(commentView.commentView.comment.published)
+
           finalItems +=
             if (show) {
               Item.VisibleCommentItem(
@@ -1195,9 +1214,7 @@ class PostAdapter(
                 isUpdating = commentView.pendingCommentView != null,
                 isDeleting = isDeleting,
                 isRemoved = commentView.isRemoved,
-                isActionsExpanded = actionExpandedComments.contains(
-                  commentId,
-                ),
+                isActionsExpanded = actionExpandedComments.contains(commentId),
                 isHighlighted = rawData.selectedCommentId == commentId,
                 query = query,
                 currentMatch = if (currentMatch?.targetId == commentId) {
@@ -1207,6 +1224,7 @@ class PostAdapter(
                 },
                 screenshotMode = screenshotMode,
                 commentHeaderInfo = commentView.commentHeaderInfo,
+                isNewComment = isNewComment,
               )
             } else {
               Item.FilteredCommentItem(
@@ -1234,7 +1252,8 @@ class PostAdapter(
                 } else {
                   null
                 },
-                screenshotMode,
+                screenshotMode = screenshotMode,
+                isNewComment = isNewComment,
               )
             }
           absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition

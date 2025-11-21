@@ -11,6 +11,7 @@ import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.account.toPersonRef
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -46,6 +47,7 @@ class PersonTabbedViewModel @Inject constructor(
   private val commentListEngineFactory: CommentListEngine.Factory,
   private val postListEngineFactory: PostListEngine.Factory,
   private val savedStateHandle: SavedStateHandle,
+  override val postReadManager: PostReadManager,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 

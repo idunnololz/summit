@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.idunnololz.summit.R
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.FragmentHistoryBinding
 import com.idunnololz.summit.databinding.HistoryEntryItemBinding
@@ -68,6 +69,9 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
 
   @Inject
   lateinit var linkResolver: LinkResolver
+
+  @Inject
+  lateinit var postReadManager: PostReadManager
 
   private var slidingPaneController: SlidingPaneController? = null
 

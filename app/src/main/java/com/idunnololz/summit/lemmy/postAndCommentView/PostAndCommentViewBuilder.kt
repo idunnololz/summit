@@ -222,6 +222,7 @@ class PostAndCommentViewBuilder @Inject constructor(
   private var useCondensedTypefaceForCommentHeaders: Boolean = preferences.useCondensedTypefaceForCommentHeaders
   private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
   private var showCrossPostsInPost: Boolean = preferences.showCrossPostsInPost
+  private var wrapCommentHeader: Boolean = preferences.wrapCommentHeader
 
   private val viewRecycler: ViewRecycler<View> = ViewRecycler()
 
@@ -292,6 +293,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     commentsShowInlineMediaAsLinks = preferences.commentsShowInlineMediaAsLinks
     postQuickActions = preferences.postQuickActions
       ?: PostQuickActionsSettings()
+    wrapCommentHeader = preferences.wrapCommentHeader
 
     postInListUiConfig = preferences.getPostInListUiConfig()
   }
@@ -500,7 +502,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
     }
 
-    commentButton.isEnabled = !postView.post.locked
+    commentButton.isEnabled = !postView.post.locked || isUserMod
     commentButton.setOnClickListener {
       onAddCommentClick(Either.Left(postView))
     }
@@ -795,6 +797,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     instance: String,
     isPostLocked: Boolean,
     isUpdating: Boolean,
+    isNewComment: Boolean,
     highlight: Boolean,
     highlightForever: Boolean,
     highlightTintColor: Int?,
@@ -888,7 +891,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       showUpvotePercentage = showCommentUpvotePercentage,
       useMultilineHeader = useMultilineHeader,
       useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
-      wrapHeader = commentHeaderLayout == CommentHeaderLayoutId.Wrap,
+      wrapHeader = commentHeaderLayout == CommentHeaderLayoutId.Wrap || wrapCommentHeader,
       isCurrentUser = if (indicateCurrentUser) {
         currentUser?.id == commentView.creator.id &&
           currentUser?.instance == commentView.creator.instance
@@ -1133,7 +1136,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     } else {
       highlightBg.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
     }
-    highlightComment(highlight, highlightForever, highlightBg)
+    highlightComment(
+      isCommentHighlighted = highlight,
+      highlightForever = highlightForever,
+      isNewComment = isNewComment,
+      bg = highlightBg
+    )
 
     if (tapCommentToCollapse) {
       holder.root.setOnClickListener {
@@ -1210,6 +1218,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlightForever: Boolean,
     highlightTintColor: Int?,
     isUpdating: Boolean,
+    isNewComment: Boolean,
     commentView: CommentView,
     instance: String,
     accountId: Long?,
@@ -1279,7 +1288,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     } else {
       highlightBg.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
     }
-    highlightComment(highlight, highlightForever, highlightBg)
+    highlightComment(
+      isCommentHighlighted = highlight,
+      highlightForever = highlightForever,
+      isNewComment = isNewComment,
+      bg = highlightBg
+    )
 
     if (isUpdating) {
       progressBar.visibility = View.VISIBLE
@@ -1393,7 +1407,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     } else {
       highlightBg.backgroundTintList = ColorStateList.valueOf(highlightTintColor)
     }
-    highlightComment(highlight, highlightForever, highlightBg)
+    highlightComment(
+      isCommentHighlighted = highlight,
+      highlightForever = highlightForever,
+      isNewComment = false,
+      bg = highlightBg
+    )
 
     root.tag = ThreadLinesData(
       depth = depth,
@@ -1429,7 +1448,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
     overlay.visibility = View.GONE
 
-    highlightComment(highlight, highlightForever, highlightBg)
+    highlightComment(
+      isCommentHighlighted = highlight,
+      highlightForever = highlightForever,
+      isNewComment = false,
+      bg = highlightBg
+    )
 
     root.tag = ThreadLinesData(
       depth = depth,
@@ -2392,9 +2416,16 @@ class PostAndCommentViewBuilder @Inject constructor(
     depth: Int,
     baseDepth: Int,
     maxDepth: Int,
+    isNewComment: Boolean,
     onTap: () -> Unit,
   ) = with(b) {
     threadLinesSpacer.updateThreadSpacer(depth, baseDepth, maxDepth)
+
+    highlightBg.visibility = if (isNewComment) {
+      View.VISIBLE
+    } else {
+      View.GONE
+    }
 
     b.root.setOnClickListener {
       onTap()
@@ -2515,14 +2546,30 @@ class PostAndCommentViewBuilder @Inject constructor(
   private fun highlightComment(
     isCommentHighlighted: Boolean,
     highlightForever: Boolean,
+    isNewComment: Boolean,
     bg: View,
   ) {
-    if (highlightForever) {
-      bg.visibility = View.VISIBLE
-      bg.clearAnimation()
-    } else if (isCommentHighlighted) {
-      bg.visibility = View.VISIBLE
+    var highlight = isNewComment
+    var playAnimation = false
 
+    bg.isActivated = isNewComment
+
+    if (highlightForever) {
+      highlight = true
+    } else if (isCommentHighlighted) {
+      highlight = true
+
+      playAnimation = true
+    }
+
+    if (highlight) {
+      bg.isEnabled = true
+      bg.visibility = View.VISIBLE
+    } else {
+      bg.visibility = View.GONE
+    }
+
+    if (playAnimation) {
       val animation = AlphaAnimation(0f, 0.9f)
       animation.repeatCount = 5
       animation.repeatMode = Animation.REVERSE
@@ -2531,7 +2578,6 @@ class PostAndCommentViewBuilder @Inject constructor(
 
       bg.startAnimation(animation)
     } else {
-      bg.visibility = View.GONE
       bg.clearAnimation()
     }
   }

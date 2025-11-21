@@ -61,4 +61,7 @@
     <color name="colorSpoilerRevealed">@color/white10</color>
     <!-- Important theme colors end -->
 
+    <color name="highlightSecondary">#18fdff00</color>
+    <color name="highlightSecondaryStrong">#28fdff00</color>
+
 </resources>

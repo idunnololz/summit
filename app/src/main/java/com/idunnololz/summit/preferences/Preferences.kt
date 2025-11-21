@@ -77,6 +77,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_DUPLICATE_POSTS_ON_READ
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_HEADER_BANNER_IF_NO_BANNER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_POST_SCORES
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_READ_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIGHLIGHT_NEW_COMMENTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_AUTO_MARK_AS_READ
@@ -174,6 +176,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_VIDEO_PLAYER_ROTATIO
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WRAP_COMMENT_HEADER
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
 import com.idunnololz.summit.settings.navigation.NavBarConfig
 import com.idunnololz.summit.util.AnimationsHelper
@@ -526,6 +529,9 @@ class Preferences(
   var commentHeaderLayout: Int
     by intPreference(KEY_COMMENT_HEADER_LAYOUT, CommentHeaderLayoutId.SingleLine)
 
+  var wrapCommentHeader: Boolean
+    by booleanPreference(KEY_WRAP_COMMENT_HEADER, true)
+
   var navigationRailMode: Int
     by intPreference(KEY_NAVIGATION_RAIL_MODE, NavigationRailModeId.ManualOff)
 
@@ -568,7 +574,7 @@ class Preferences(
     by longPreference(KEY_NOTIFICATIONS_CHECK_INTERVAL_MS, 1000L * 60L * 15L)
 
   var homeFabQuickAction: Int
-    by intPreference(KEY_HOME_FAB_QUICK_ACTION, HomeFabQuickActionIds.None)
+    by intPreference(KEY_HOME_FAB_QUICK_ACTION, HomeFabQuickActionIds.HideRead)
 
   var showEditedDate: Boolean
     by booleanPreference(KEY_SHOW_EDITED_DATE, true)
@@ -705,9 +711,12 @@ class Preferences(
     by booleanPreference(KEY_INBOX_AUTO_MARK_AS_READ, false)
   var markAsReadOnHidePost
     by booleanPreference(KEY_MARK_AS_READ_ON_HIDE_POST, false)
-
   var stringForNullScore
     by stringPreference(KEY_STRING_FOR_NULL_SCORE, null)
+  var hideReadByDefault
+    by booleanPreference(KEY_HIDE_READ_BY_DEFAULT, false)
+  var highlightNewComments
+    by booleanPreference(KEY_HIGHLIGHT_NEW_COMMENTS, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

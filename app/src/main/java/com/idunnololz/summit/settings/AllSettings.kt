@@ -67,6 +67,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_COMMENT_SCORES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_DUPLICATE_POSTS_ON_READ
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_HEADER_BANNER_IF_NO_BANNER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_POST_SCORES
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_READ_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIGHLIGHT_NEW_COMMENTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
@@ -148,6 +150,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTON_NA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT_THRESHOLD_MS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WRAP_COMMENT_HEADER
 import com.idunnololz.summit.preferences.UserAgentChoiceIds
 import com.idunnololz.summit.settings.SettingPath.getPageName
 import com.idunnololz.summit.settings.misc.DisplayInstanceOptions
@@ -934,6 +937,12 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.restore_browsing_sessions_desc),
     relatedKeys = listOf(KEY_RESTORE_BROWSING_SESSIONS),
   )
+  val hideReadByDefault = OnOffSettingItem(
+    null,
+    context.getString(R.string.hide_read_by_default),
+    null,
+    relatedKeys = listOf(KEY_HIDE_READ_BY_DEFAULT),
+  )
 }
 
 class PostAndCommentsSettings @Inject constructor(
@@ -1070,6 +1079,12 @@ class PostAndCommentsSettings @Inject constructor(
     ),
     relatedKeys = listOf(KEY_POST_AND_COMMENTS_UI_CONFIG),
   )
+  val wrapCommentHeader = OnOffSettingItem(
+    null,
+    context.getString(R.string.wrap_comment_header),
+    context.getString(R.string.wrap_comment_header_desc),
+    relatedKeys = listOf(KEY_WRAP_COMMENT_HEADER),
+  )
   val customizeCommentQuickActions = BasicSettingItem(
     null,
     context.getString(R.string.customize_comment_quick_actions),
@@ -1169,6 +1184,12 @@ class PostAndCommentsSettings @Inject constructor(
     context.getString(R.string.show_navigation_bar_on_post),
     null,
     relatedKeys = listOf(KEY_SHOW_NAVIGATION_BAR_ON_POST),
+  )
+  val highlightNewComments = OnOffSettingItem(
+    null,
+    context.getString(R.string.highlight_new_comments),
+    null,
+    relatedKeys = listOf(KEY_HIGHLIGHT_NEW_COMMENTS),
   )
 }
 

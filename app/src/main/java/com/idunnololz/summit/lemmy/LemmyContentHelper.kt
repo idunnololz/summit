@@ -73,6 +73,7 @@ import com.idunnololz.summit.view.LoadingView
 import java.io.File
 import androidx.core.net.toUri
 import javax.inject.Inject
+import androidx.core.view.isEmpty
 
 class LemmyContentHelper(
   private val context: Context,
@@ -573,13 +574,14 @@ class LemmyContentHelper(
 
     val stateBuilder = RecycledState.Builder()
 
-    if (fullContentContainerView.childCount == 0) return stateBuilder.build()
+    if (fullContentContainerView.isEmpty()) return stateBuilder.build()
 
-    for (i in 0 until fullContentContainerView.childCount) {
-      val c = fullContentContainerView.getChildAt(0)
+    for (i in fullContentContainerView.childCount - 1 downTo 0 ) {
+      val c = fullContentContainerView.getChildAt(i)
       val viewId = c.getTag(R.id.view_type) as Int
 
-      if (viewId == R.layout.full_content_video_view) {
+      if (viewId == R.layout.full_content_video_view ||
+        viewId == R.layout.full_content_embedded_video_view) {
         val playerView = c.findViewById<CustomPlayerView>(R.id.player_view)
         stateBuilder.setVideoState(playerView?.getVideoState())
 
@@ -589,7 +591,7 @@ class LemmyContentHelper(
       }
 
       if (recycle) {
-        fullContentContainerView.removeViewAt(0)
+        fullContentContainerView.removeViewAt(i)
         viewRecycler.addRecycledView(c, viewId)
       }
     }

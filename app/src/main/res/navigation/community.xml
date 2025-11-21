@@ -130,6 +130,10 @@
             android:name="is_in_view_pager"
             android:defaultValue="false"
             app:argType="boolean"/>
+        <argument
+            android:name="last_read_ts"
+            android:defaultValue="0L"
+            app:argType="long"/>
         <action
             android:id="@+id/action_postFragment_to_communityFragment"
             app:destination="@id/communityFragment" />

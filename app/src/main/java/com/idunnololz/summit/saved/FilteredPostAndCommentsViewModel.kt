@@ -11,6 +11,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.key
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ApiFeature
@@ -48,6 +49,7 @@ class FilteredPostAndCommentsViewModel @Inject constructor(
   private val savedManager: SavedManager,
   private val commentListEngineFactory: CommentListEngine.Factory,
   private val postListEngineFactory: PostListEngine.Factory,
+  override val postReadManager: PostReadManager,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 

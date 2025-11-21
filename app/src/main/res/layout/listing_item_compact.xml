@@ -5,22 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <View
+        android:id="@+id/highlight_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorHighlight"/>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
         android:paddingBottom="@dimen/padding_half">
-
-        <View
-            android:id="@+id/highlight_bg"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@color/colorHighlight"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
 
         <View
             android:id="@+id/theme_color_bar"

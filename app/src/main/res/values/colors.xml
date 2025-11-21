@@ -27,6 +27,8 @@
     <color name="colorSurface">@color/white</color>
     <color name="colorSurfaceDarker">#F1F2F3</color>
     <color name="colorLink">#0079d3</color>
+    <color name="highlightSecondary">#1Aff9a00</color>
+    <color name="highlightSecondaryStrong">#2Aff9a00</color>
 
     <color name="card_background_color">#f0f1f2</color>
 

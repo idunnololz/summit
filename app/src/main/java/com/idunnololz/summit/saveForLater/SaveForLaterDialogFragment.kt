@@ -14,9 +14,12 @@ import coil3.imageLoader
 import coil3.load
 import coil3.memory.MemoryCache
 import com.idunnololz.summit.R
+import com.idunnololz.summit.databinding.DialogFragmentFontPickerBinding
 import com.idunnololz.summit.databinding.DialogFragmentSaveForLaterBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
+import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.PrettyPrintUtils.humanReadableByteCountSi
 import com.idunnololz.summit.util.setupBottomSheetAndShow
 import com.idunnololz.summit.util.tsToShortDate
@@ -24,30 +27,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLaterBinding>() {
+class SaveForLaterDialogFragment :
+  BaseBottomSheetDialogFragment<DialogFragmentSaveForLaterBinding>(),
+  FullscreenDialogFragment {
 
   private val args by navArgs<SaveForLaterDialogFragmentArgs>()
 
   @Inject
   lateinit var saveForLaterManager: SaveForLaterManager
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-  }
-
-  override fun onStart() {
-    super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        window.setBackgroundDrawable(null)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.setWindowAnimations(R.style.BottomSheetAnimations)
-      }
-    }
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -63,24 +50,6 @@ class SaveForLaterDialogFragment : BaseDialogFragment<DialogFragmentSaveForLater
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    setupBottomSheetAndShow(
-      bottomSheet = binding.bottomSheet,
-      bottomSheetContainerInner = binding.bottomSheetContainerInner,
-      overlay = binding.overlay,
-      onClose = {
-        dismiss()
-      },
-    )
-
-    requireMainActivity().apply {
-      insets.observe(viewLifecycleOwner) { insets ->
-        binding.bottomSheet.updatePadding(bottom = insets.bottomInset)
-        binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-          topMargin = insets.topInset
-        }
-      }
-    }
 
     loadSaveSlots()
   }

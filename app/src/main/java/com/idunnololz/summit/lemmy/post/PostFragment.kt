@@ -448,7 +448,7 @@ class PostFragment :
           instance = getInstance(),
           accountId = accountId,
           revealAll = args.reveal || !preferences.blurNsfwPosts,
-          useFooter = false,
+          useFooter = true,
           isEmbedded = false,
           videoState = args.videoState,
           autoCollapseCommentThreshold = preferences.autoCollapseCommentThreshold,
@@ -598,6 +598,12 @@ class PostFragment :
         ).apply {
           stateRestorationPolicy =
             RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+          if (args.lastReadTs > 0L && preferences.highlightNewComments) {
+            highlightCommentsAfterTs = args.lastReadTs
+          } else {
+            highlightCommentsAfterTs = null
+          }
         }
       }
 
@@ -1087,7 +1093,6 @@ class PostFragment :
         insetViewExceptTopAutomaticallyByPadding(
           lifecycleOwner = viewLifecycleOwner,
           rootView = binding.recyclerView,
-          additionalPaddingBottom = context.getDimen(R.dimen.footer_spacer_height),
         )
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
         insetViewAutomaticallyByPadding(

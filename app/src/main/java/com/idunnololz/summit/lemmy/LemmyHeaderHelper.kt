@@ -268,8 +268,11 @@ class LemmyHeaderHelper @AssistedInject constructor(
         currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
       }
       currentTextView.isSingleLine = false
-      headerContainer.multiline = false
-    } else if (useMultilineHeader) {
+    } else {
+      currentTextView.isSingleLine = true
+    }
+
+    if (useMultilineHeader) {
       currentTextView.movementMethod = makeMovementMethod(
         instance = instance,
         onPageClick = onPageClick,
@@ -277,14 +280,12 @@ class LemmyHeaderHelper @AssistedInject constructor(
         onLinkLongClick = onLinkLongClick,
       )
       currentTextView.text = sb
-      currentTextView.isSingleLine = true
 //            currentTextView.setSingleLineAvoidingRelayout(true)
       headerContainer.multiline = true
 
       currentTextView = headerContainer.textView2
       sb = SpannableStringBuilder()
     } else {
-      currentTextView.isSingleLine = true
       headerContainer.multiline = false
     }
 
@@ -746,12 +747,13 @@ class LemmyHeaderHelper @AssistedInject constructor(
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
       }
-      headerContainer.multiline = false
-    } else if (useMultilineHeader) {
-      currentTextView.isSingleLine = true
-      headerContainer.multiline = true
     } else {
       currentTextView.isSingleLine = true
+    }
+
+    if (useMultilineHeader) {
+      headerContainer.multiline = true
+    } else {
       headerContainer.multiline = false
     }
 

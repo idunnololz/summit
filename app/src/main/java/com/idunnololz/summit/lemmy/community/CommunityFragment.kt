@@ -793,7 +793,6 @@ class CommunityFragment :
 
         panelSlideListener = object : SlidingPaneLayout.PanelSlideListener {
           override fun onPanelSlide(panel: View, slideOffset: Float) {
-            Log.d("HAHA", "onPanelSlide(): $slideOffset")
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE
@@ -1209,16 +1208,18 @@ class CommunityFragment :
     runOnReady {
       val customAppBarController = communityAppBarController ?: return@runOnReady
 
-      viewModel.currentCommunityRef.observe(viewLifecycleOwner) {
-        customAppBarController.setCommunity(it)
+      viewLifecycleOwner.lifecycleScope.launch {
+        viewModel.currentCommunityRef.collect {
+          customAppBarController.setCommunity(it)
 
-        val tab = args.tab
-        if (tab != null) {
-          viewModel.updateTab(tab, it)
+          val tab = args.tab
+          if (tab != null) {
+            viewModel.updateTab(tab, it)
+          }
+
+          // Apply per-community settings
+          onSelectedLayoutChanged()
         }
-
-        // Apply per-community settings
-        onSelectedLayoutChanged()
       }
 
       customAppBarController.setIsInfinity(viewModel.infinity)

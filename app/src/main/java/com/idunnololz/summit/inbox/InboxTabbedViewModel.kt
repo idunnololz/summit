@@ -11,6 +11,7 @@ import arrow.core.Either
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.fullName
 import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.inbox.inbox.InboxFragment
 import com.idunnololz.summit.inbox.inbox.InboxFragmentArgs
 import com.idunnololz.summit.inbox.inbox.getName
@@ -29,6 +30,7 @@ class InboxTabbedViewModel @Inject constructor(
   private val accountManager: AccountManager,
   private val accountInfoManager: AccountInfoManager,
   private val notificationsManager: NotificationsManager,
+  override val postReadManager: PostReadManager,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 

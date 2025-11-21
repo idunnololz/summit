@@ -2323,6 +2323,10 @@
     <string name="completed_ts_format">Completed %1$s</string>
     <string name="show_url_domain">Show URL domain</string>
     <string name="show_url_domain_desc">Only works for some layouts.</string>
+    <string name="wrap_comment_header">Wrap comment header</string>
+    <string name="wrap_comment_header_desc">When enabled, comment headers will wrap if they are too wide to display on a single line.</string>
+    <string name="hide_read_by_default">Hide read by default</string>
+    <string name="highlight_new_comments">Highlight new comments</string>
 
 
     <!-- uCrop string resource end -->

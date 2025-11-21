@@ -137,6 +137,10 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
             .actionSettingCommentListFragmentToCustomQuickActionsFragment()
           findNavController().navigateSafe(directions)
         },
+        settings.highlightNewComments.asOnOffSwitch(
+          { preferences.highlightNewComments },
+          { preferences.highlightNewComments = it },
+        )
       ),
     ),
 
@@ -163,6 +167,10 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
               preferences.commentHeaderLayout = it
             },
           ),
+        settings.wrapCommentHeader.asOnOffSwitch(
+          { preferences.wrapCommentHeader },
+          { preferences.wrapCommentHeader = it },
+        )
       ),
     ),
     *if (args.account != null) {

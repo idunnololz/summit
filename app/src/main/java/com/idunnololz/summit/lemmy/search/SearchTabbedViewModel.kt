@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
@@ -30,6 +31,7 @@ class SearchTabbedViewModel @Inject constructor(
   private val apiClient: AccountAwareLemmyClient,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val savedStateHandle: SavedStateHandle,
+  override val postReadManager: PostReadManager,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 

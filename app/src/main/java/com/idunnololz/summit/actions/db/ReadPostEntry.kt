@@ -14,4 +14,6 @@ class ReadPostEntry(
   val postKey: String,
   @ColumnInfo(name = "read")
   val read: Boolean,
+  @ColumnInfo(name = "read_ts")
+  val readTs: Long?,
 ) : Parcelable

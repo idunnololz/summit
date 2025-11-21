@@ -245,6 +245,10 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
         { preferences.restoreBrowsingSessions },
         { preferences.restoreBrowsingSessions = it },
       ),
+      settings.hideReadByDefault.asOnOffSwitch(
+        { preferences.hideReadByDefault },
+        { preferences.hideReadByDefault = it },
+      ),
       SettingModelItem.SubgroupItem(
         getString(R.string.posts_feed_header),
         listOf(

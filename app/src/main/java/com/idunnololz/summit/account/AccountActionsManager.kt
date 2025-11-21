@@ -314,10 +314,12 @@ class AccountActionsManager @Inject constructor(
         }
         is ActionInfo.MarkPostAsReadActionInfo -> {
           coroutineScope.launch {
-            postReadManager.delete(
-              action.info.postRef.instance,
-              action.info.postRef.id,
-            )
+            if (action.info.read) {
+              postReadManager.delete(
+                action.info.postRef.instance,
+                action.info.postRef.id,
+              )
+            }
             onCommentActionChanged.emit(Unit)
           }
         }

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.WindowCompat
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.fragment.navArgs
+import coil3.asImage
 import coil3.load
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.idunnololz.summit.R
@@ -14,39 +15,27 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.databinding.DialogFragmentReceiveFileBinding
+import com.idunnololz.summit.databinding.DialogFragmentVideoInfoBinding
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.saveForLater.SaveForLaterDialogFragment
 import com.idunnololz.summit.saveForLater.SaveForLaterDialogFragmentArgs
+import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
 import com.idunnololz.summit.util.BaseDialogFragment
+import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.setupBottomSheetAndShow
+import com.idunnololz.summit.util.shimmer.newShimmerDrawableSquare
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBinding>() {
+class ReceiveFileDialogFragment :
+  BaseBottomSheetDialogFragment<DialogFragmentReceiveFileBinding>(),
+  FullscreenDialogFragment {
 
   private val args by navArgs<ReceiveFileDialogFragmentArgs>()
 
   @Inject
   lateinit var accountManager: AccountManager
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-  }
-
-  override fun onStart() {
-    super.onStart()
-    val dialog = dialog
-    if (dialog != null) {
-      dialog.window?.let { window ->
-        window.setBackgroundDrawable(null)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.setWindowAnimations(R.style.BottomSheetAnimations)
-      }
-    }
-  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -63,30 +52,12 @@ class ReceiveFileDialogFragment : BaseDialogFragment<DialogFragmentReceiveFileBi
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    setupBottomSheetAndShow(
-      bottomSheet = binding.bottomSheet,
-      bottomSheetContainerInner = binding.bottomSheetContainerInner,
-      overlay = binding.overlay,
-      onClose = {
-        dismiss()
-      },
-      expandFully = true,
-    )
-
-    requireMainActivity().apply {
-      insets.observe(viewLifecycleOwner) { insets ->
-        binding.bottomSheetContainerInner.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-          topMargin = insets.topInset
-        }
-      }
-    }
+    val context = requireContext()
 
     with(binding) {
       preview.load(args.fileUri) {
+        placeholder(newShimmerDrawableSquare(context).asImage())
         listener { request, result ->
-          BottomSheetBehavior.from(bottomSheet).apply {
-            state = BottomSheetBehavior.STATE_EXPANDED
-          }
         }
       }
 

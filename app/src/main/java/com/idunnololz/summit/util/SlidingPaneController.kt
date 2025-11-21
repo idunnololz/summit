@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import arrow.core.Either
 import com.idunnololz.summit.R
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.emptyScreen.EmptyScreenFragment
@@ -49,6 +50,7 @@ class SlidingPaneController(
 ) {
 
   interface PostViewPagerViewModel {
+    val postReadManager: PostReadManager
     var lastSelectedItem: Either<PostRef, CommentRef>?
   }
 
@@ -216,6 +218,8 @@ class SlidingPaneController(
       // do nothing
     }
 
+    val postReadInfo = viewModel.postReadManager.getPostReadInfo(instance, id)
+
     openPostInternal(
       args = PostFragmentArgs(
         instance = instance,
@@ -226,6 +230,11 @@ class SlidingPaneController(
         currentCommunity = currentCommunity,
         videoState = videoState,
         accountId = accountId ?: 0L,
+        lastReadTs = if (postReadInfo?.read == true || post?.read == true) {
+          postReadInfo?.ts ?: (System.currentTimeMillis() - (15 * 60 * 1000))
+        } else {
+          0L
+        },
       ),
       removeLastPostFragment = true,
       itemRef = Either.Left(PostRef(instance, id)),
