@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -220,7 +221,7 @@ class LemmyHeaderView : FrameLayout {
           val lp = child.getLayoutParams() as LayoutParams
           maxWidth = max(
             maxWidth,
-            child.getMeasuredWidth() + lp.leftMargin + lp.rightMargin,
+            child.getMeasuredWidth() + lp.marginStart + lp.marginEnd,
           )
           maxHeight = max(
             maxHeight,
@@ -238,7 +239,7 @@ class LemmyHeaderView : FrameLayout {
       }
 
       // Account for padding too
-      maxWidth += paddingLeft + paddingRight
+      maxWidth += paddingStart + paddingEnd
       maxHeight += paddingTop + paddingBottom
 
 
@@ -274,7 +275,7 @@ class LemmyHeaderView : FrameLayout {
 
       fun getViewWidth(view: View): Int {
         val layoutParams = view.layoutParams as LayoutParams
-        return view.measuredWidth + layoutParams.leftMargin + layoutParams.rightMargin
+        return view.measuredWidth + layoutParams.marginStart + layoutParams.marginEnd
       }
 
       if (textView1.visibility != View.GONE) {
@@ -369,7 +370,7 @@ class LemmyHeaderView : FrameLayout {
           start -= child.measuredWidth - layoutParams.rightMargin
         }
       } else {
-        var start = paddingLeft
+        var start = paddingStart
         for (child in children) {
           if (child.visibility == View.GONE) continue
 
@@ -379,7 +380,7 @@ class LemmyHeaderView : FrameLayout {
               layoutParams.topMargin
             ) - layoutParams.bottomMargin
 
-          start += layoutParams.leftMargin
+          start += layoutParams.marginStart
           child.layout(
             start,
             childTop,
@@ -392,7 +393,7 @@ class LemmyHeaderView : FrameLayout {
     } else {
       // multiline
 
-      var start = paddingLeft
+      var start = paddingStart
       val iconImageView = iconImageView
 
       if (iconImageView != null && iconImageView.visibility != View.GONE) {
@@ -404,14 +405,14 @@ class LemmyHeaderView : FrameLayout {
 //            layoutParams.topMargin
 //          ) - layoutParams.bottomMargin
 
-        start += layoutParams.leftMargin
+        start += layoutParams.marginStart
         child.layout(
           start,
           childTop,
           start + child.measuredWidth,
           childTop + child.measuredHeight,
         )
-        start += child.measuredWidth + layoutParams.rightMargin
+        start += child.measuredWidth + layoutParams.marginEnd
       }
 
       val textChildrenTotalHeight =
@@ -427,9 +428,9 @@ class LemmyHeaderView : FrameLayout {
             layoutParams.topMargin
           ) - layoutParams.bottomMargin
         child.layout(
-          start + layoutParams.leftMargin,
+          start + layoutParams.marginStart,
           top,
-          start + layoutParams.leftMargin + child.measuredWidth,
+          start + layoutParams.marginStart + child.measuredWidth,
           top + child.measuredHeight,
         )
         top += child.measuredHeight + marginBetweenLines
@@ -438,20 +439,20 @@ class LemmyHeaderView : FrameLayout {
         val child = textView2
         val layoutParams = child.layoutParams as LayoutParams
         child.layout(
-          start + layoutParams.leftMargin,
+          start + layoutParams.marginStart,
           top + layoutParams.topMargin,
-          start + child.measuredWidth + layoutParams.leftMargin,
+          start + child.measuredWidth + layoutParams.marginStart,
           top + child.measuredHeight,
         )
-        start += child.measuredWidth + layoutParams.leftMargin
+        start += child.measuredWidth + layoutParams.marginStart
       }
       run {
         val child = textView3
         val layoutParams = child.layoutParams as LayoutParams
         child.layout(
-          start + layoutParams.leftMargin,
+          start + layoutParams.marginStart,
           top + layoutParams.topMargin,
-          start + child.measuredWidth + layoutParams.leftMargin,
+          start + child.measuredWidth + layoutParams.marginStart,
           top + child.measuredHeight,
         )
       }

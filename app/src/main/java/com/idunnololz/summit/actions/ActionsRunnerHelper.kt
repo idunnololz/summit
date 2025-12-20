@@ -154,7 +154,7 @@ class ActionsRunnerHelper @Inject constructor(
         return result.fold(
           onSuccess = {
             PendingActionsManager.ActionExecutionResult.Success(
-              LemmyActionResult.CommentLemmyActionResult(),
+              LemmyActionResult.CommentLemmyActionResult(it, actionInfo.parentId),
             )
           },
           onFailure = {
@@ -198,7 +198,7 @@ class ActionsRunnerHelper @Inject constructor(
         return result.fold(
           onSuccess = {
             PendingActionsManager.ActionExecutionResult.Success(
-              LemmyActionResult.DeleteCommentLemmyActionResult(),
+              LemmyActionResult.DeleteCommentLemmyActionResult(it),
             )
           },
           onFailure = {

@@ -11,6 +11,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.lemmy.LemmyTextHelper
+import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.preferences.GlobalLayoutModes
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.settings.BaseSettingsFragment
@@ -49,6 +50,9 @@ class SettingsMiscFragment :
 
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
+
+  @Inject
+  lateinit var recentCommunityManager: RecentCommunityManager
 
   private val restartAppDialogLauncher = newAlertDialogLauncher("restart_app") {
     if (it.isOk) {
@@ -258,6 +262,16 @@ class SettingsMiscFragment :
         getCurrentValue = { GlobalSettings.stringForUnknownScore },
         fragmentManager = childFragmentManager,
         showResetButton = true,
+      ),
+      settings.saveRecentCommunities.asOnOffSwitch(
+        { preferences.saveRecentCommunities },
+        {
+          preferences.saveRecentCommunities = it
+
+          if (!preferences.saveRecentCommunities) {
+            recentCommunityManager.clear()
+          }
+        },
       ),
       *if (BuildConfig.DEBUG) {
         arrayOf(

@@ -153,6 +153,7 @@ class MultiCommunityDataSource(
     sortType: SortType?,
     page: Int,
     force: Boolean,
+    showRead: Boolean?,
   ): Result<List<FetchedPost>> = withContext(Dispatchers.Default) {
     if (force) {
       reset()

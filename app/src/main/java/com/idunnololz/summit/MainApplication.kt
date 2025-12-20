@@ -18,6 +18,8 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
 import coil3.transition.CrossfadeTransition
+import com.idunnololz.summit.localTracking.TrackedAction
+import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -34,6 +36,9 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -98,6 +103,10 @@ class MainApplication :
     Utils.openExternalLinksInBrowser = preferences.openLinksInExternalApp
     Utils.defaultWebApp = preferences.defaultWebApp
     notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
+
+//    val barr = Cbor.encodeToByteArray(TrackingEvent(10, 20, 3000, 45534, TrackedAction.UPVOTE))
+//    Log.d("HAHA", "barr: ${barr.size} ${barr.toHexString()}")
+//    Log.d("HAHA", "back: ${Cbor.decodeFromByteArray<TrackingEvent>(barr)}")
 
     SingletonImageLoader.setSafe {
       ImageLoader.Builder(context)

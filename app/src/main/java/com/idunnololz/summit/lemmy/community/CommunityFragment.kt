@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +20,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.LinearSmoothScroller.SNAP_TO_START
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
@@ -85,6 +89,7 @@ import com.idunnololz.summit.lemmy.utils.setupDecoratorsForPostList
 import com.idunnololz.summit.lemmy.utils.showHelpAndFeedbackOptions
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.main.CommunityAppBarController
 import com.idunnololz.summit.main.MainFragment
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -100,6 +105,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
+import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
@@ -120,6 +126,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
+/**
+ * This is really the "PostFeedFragment"...
+ */
 @AndroidEntryPoint
 class CommunityFragment :
   BaseFragment<FragmentCommunityBinding>(),
@@ -184,6 +193,9 @@ class CommunityFragment :
   @Inject
   lateinit var lemmyTextHelper: LemmyTextHelper
 
+  @Inject
+  lateinit var tracker: LocalTracker
+
   lateinit var preferences: Preferences
 
   private var slidingPaneController: SlidingPaneController? = null
@@ -195,6 +207,7 @@ class CommunityFragment :
   private var swipeActionCallback: LemmySwipeActionCallback? = null
   private var itemTouchHelper: ItemTouchHelper? = null
   private var onScrollMarkPostAsReadScrollListener: OnScrollMarkPostAsReadScrollListener? = null
+  private var smoothScroller: SmoothScroller? = null
 
   private val onBackPressedHandler = object : OnBackPressedCallback(false) {
     override fun handleOnBackPressed() {
@@ -531,6 +544,18 @@ class CommunityFragment :
 
     val context = requireContext()
 
+    smoothScroller = object : LinearSmoothScroller(context) {
+      override fun getVerticalSnapPreference(): Int = SNAP_TO_START
+
+      override fun calculateDtToFit(
+        viewStart: Int,
+        viewEnd: Int,
+        boxStart: Int,
+        boxEnd: Int,
+        snapPreference: Int,
+      ): Int = boxStart - viewStart + (getMainActivity()?.insets?.value?.topInset ?: 0)
+    }
+
     with(binding) {
       var job: Job? = null
       viewLifecycleOwner.lifecycleScope.launch {
@@ -724,6 +749,11 @@ class CommunityFragment :
             true
           }
 
+          HomeFabQuickActionIds.RefreshPostFeed -> {
+            swipeRefreshLayout.isRefreshing = true
+            true
+          }
+
           else -> false
         }
       }
@@ -824,6 +854,64 @@ class CommunityFragment :
 
         init()
       }
+
+      if (preferences.useVolumeButtonsOnPostFeed) {
+        requireSummitActivity().keyPressRegistrationManager.register(
+          viewLifecycleOwner,
+          object : KeyPressRegistrationManager.OnKeyPressHandler {
+            override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+              if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                goDownABit()
+
+                return true
+              } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                goUpABit()
+
+                return true
+              }
+
+              return false
+            }
+          },
+        )
+      }
+    }
+  }
+
+  private fun getVisibleFeedViewPort(): Int {
+    return binding.recyclerView.height -
+      (communityAppBarController?.appBarRoot?.height ?: 0) -
+      (getMainActivity()?.getBottomNavHeight() ?: 0)
+  }
+
+  private fun goDownABit() {
+    (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+      communityAppBarController?.setExpanded(false)
+
+      val firstPos = it.findFirstCompletelyVisibleItemPosition()
+      val lastPos = it.findLastCompletelyVisibleItemPosition()
+
+      if (firstPos == lastPos || lastPos == -1) {
+        // If the current item is really big, just scroll by some amount...
+        binding.recyclerView.smoothScrollBy(
+          0,
+          (getVisibleFeedViewPort() - Utils.convertDpToPixel(48f)).toInt()
+        )
+      } else {
+        smoothScroller?.targetPosition = lastPos + 1
+        it.startSmoothScroll(smoothScroller)
+      }
+    }
+  }
+
+  private fun goUpABit() {
+    (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
+      communityAppBarController?.setExpanded(true)
+
+      binding.recyclerView.smoothScrollBy(
+        0,
+        -((getVisibleFeedViewPort() - Utils.convertDpToPixel(48f)).toInt())
+      )
     }
   }
 
@@ -999,12 +1087,7 @@ class CommunityFragment :
               Snackbar
                 .make(
                   coordinatorLayout,
-                  getString(
-                    R.string.posts_hidden_format,
-                    PrettyPrintUtils.defaultDecimalFormat.format(
-                      it.data.hideReadCount,
-                    ),
-                  ),
+                  getString(R.string.read_posts_hidden),
                   Snackbar.LENGTH_LONG,
                 )
                 .show()

@@ -16,6 +16,7 @@ interface PostsDataSource {
     sortType: SortType? = null,
     page: Int,
     force: Boolean,
+    showRead: Boolean?,
   ): Result<List<FetchedPost>>
 }
 
@@ -30,19 +31,20 @@ class SinglePostsDataSource @AssistedInject constructor(
     fun create(communityName: String?, listingType: ListingType?): SinglePostsDataSource
   }
 
-  override suspend fun fetchPosts(sortType: SortType?, page: Int, force: Boolean) = apiClient
+  override suspend fun fetchPosts(sortType: SortType?, page: Int, force: Boolean, showRead: Boolean?) = apiClient
     .fetchPosts(
-      if (communityName == null) {
+      communityIdOrName = if (communityName == null) {
         null
       } else {
         Either.Right(communityName)
       },
-      sortType,
-      listingType ?: ListingType.All,
-      page.toLemmyPageIndex(),
+      sortType = sortType,
+      listingType = listingType ?: ListingType.All,
+      page = page.toLemmyPageIndex(),
       cursor = null,
-      DEFAULT_PAGE_SIZE,
-      force,
+      limit = DEFAULT_PAGE_SIZE,
+      force = force,
+      showRead = showRead,
     )
     .map {
       it.posts.map { FetchedPost(it, Source.StandardSource()) }

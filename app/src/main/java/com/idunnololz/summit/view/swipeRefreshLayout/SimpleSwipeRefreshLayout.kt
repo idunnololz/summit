@@ -348,13 +348,20 @@ abstract class SimpleSwipeRefreshLayout :
       duration = ROLL_BACK_DURATION
       interpolator = DecelerateInterpolator(2f)
       addUpdateListener {
-        positionChildren(triggerOffset * animatedValue as Float, contentOffsetY)
+        val value = animatedValue as Float
+//        positionChildren(triggerOffset * value, contentOffsetY)
+
+        indicatorOffsetY = triggerOffset * value
+        move()
       }
       addListener(
         object : AnimatorListenerAdapter() {
           override fun onAnimationEnd(animation: Animator) {
-            indicatorOffsetY = triggerOffset
+            indicatorOffsetY = triggerOffset + 1
             contentOffsetY = 0f
+
+//            currentState = State.ROLLING
+            onAnimateToFinalPosition()
           }
         },
       )

@@ -54,6 +54,9 @@ import com.idunnololz.summit.lemmy.actions.getAllFailedActions
 import com.idunnololz.summit.lemmy.userTags.UserTagConverters
 import com.idunnololz.summit.lemmy.userTags.UserTagEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
+import com.idunnololz.summit.localTracking.TrackingEvent
+import com.idunnololz.summit.localTracking.TrackingEventEntry
+import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.templates.db.TemplateConverters
 import com.idunnololz.summit.templates.db.TemplateEntry
 import com.idunnololz.summit.templates.db.TemplatesDao
@@ -86,6 +89,7 @@ private const val TAG = "MainDatabase"
     TextEmojiEntry::class,
     UserTagEntry::class,
     TemplateEntry::class,
+    TrackingEventEntry::class,
   ],
   autoMigrations = [
     AutoMigration(from = 20, to = 21),
@@ -101,8 +105,9 @@ private const val TAG = "MainDatabase"
     AutoMigration(from = 46, to = 47),
     AutoMigration(from = 47, to = 48),
     AutoMigration(from = 49, to = 50),
+    AutoMigration(from = 50, to = 51),
   ],
-  version = 50,
+  version = 51,
   exportSchema = true,
 )
 @TypeConverters(
@@ -126,6 +131,7 @@ abstract class MainDatabase : RoomDatabase() {
   abstract fun textEmojiDao(): TextEmojiDao
   abstract fun userTagsDao(): UserTagsDao
   abstract fun templatesDao(): TemplatesDao
+  abstract fun trackingEventsDao(): TrackingEventsDao
 
   companion object {
 
@@ -182,6 +188,15 @@ abstract class MainDatabase : RoomDatabase() {
         .addMigrations(MIGRATION_40_41)
         .addMigrations(MIGRATION_44_45)
         .addMigrations(MIGRATION_48_49(json))
+        .addMigrations(object : Migration(50, 51) {
+          override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS tracking_events;")
+            db.execSQL(
+              "CREATE TABLE IF NOT EXISTS `tracking_events` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `ts` INTEGER NOT NULL, `event` BLOB NOT NULL)",
+            )
+          }
+        })
+
         .build()
     }
   }
@@ -296,7 +311,6 @@ val MIGRATION_38_39 = object : Migration(38, 39) {
       val data = cursor.getString(1)
 
       val draftData = json.decodeFromString<DraftData>(data)
-        ?: continue
       val accountId = draftData.accountId
       val accountInstance = draftData.accountInstance
 

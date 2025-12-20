@@ -92,6 +92,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_VIDEO_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LAST_ACCOUNT_NOTIFICATION_ID
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LEFT_HAND_MODE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCAL_TRACKING_ENABLED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
@@ -130,6 +131,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RESTORE_BROWSING_SES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_DRAFTS_AUTOMATICALLY
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_RECENT_COMMUNITIES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SCREENSHOT_WATERMARK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SCREENSHOT_WIDTH_DP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SEARCH_HOME_CONFIG
@@ -172,6 +174,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_PER_COMMUNITY_SE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_PREDICTIVE_BACK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTON_NAVIGATION
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTONS_ON_POST_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_VIDEO_PLAYER_ROTATION_LOCKED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -717,6 +720,12 @@ class Preferences(
     by booleanPreference(KEY_HIDE_READ_BY_DEFAULT, false)
   var highlightNewComments
     by booleanPreference(KEY_HIGHLIGHT_NEW_COMMENTS, true)
+  var useVolumeButtonsOnPostFeed
+    by booleanPreference(KEY_USE_VOLUME_BUTTONS_ON_POST_FEED, false)
+  var saveRecentCommunities
+    by booleanPreference(KEY_SAVE_RECENT_COMMUNITIES, true)
+  var localTrackingEnabled
+    by booleanPreference(KEY_LOCAL_TRACKING_ENABLED, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

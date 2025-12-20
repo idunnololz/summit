@@ -55,7 +55,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
   }
 
   companion object {
-    private val TAG = "LemmyHeaderHelper"
+    private const val TAG = "LemmyHeaderHelper"
 
     const val NEW_PERSON_DURATION = 30 * 24 * 60 * 60 * 1000L
 
@@ -285,6 +285,16 @@ class LemmyHeaderHelper @AssistedInject constructor(
 
       currentTextView = headerContainer.textView2
       sb = SpannableStringBuilder()
+
+      if (wrapHeader) {
+        currentTextView.isSingleLine = false
+        currentTextView.maxLines = 2
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+        }
+      } else {
+        currentTextView.isSingleLine = true
+      }
     } else {
       headerContainer.multiline = false
     }

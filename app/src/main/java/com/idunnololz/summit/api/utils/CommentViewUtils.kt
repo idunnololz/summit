@@ -9,6 +9,9 @@ fun Comment.getDepth(): Int {
   return Integer.max(depth, 0)
 }
 
+fun Comment.parentId(): Long? =
+  path.split(".").last().toLongOrNull()
+
 fun CommentView.getDepth(): Int = comment.getDepth()
 
 fun CommentView.getUniqueKey(): String = "comment_${comment.id}"

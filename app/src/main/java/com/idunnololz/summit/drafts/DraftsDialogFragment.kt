@@ -62,12 +62,6 @@ class DraftsDialogFragment :
     }
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-  }
-
   override fun onStart() {
     super.onStart()
     dialog?.window?.let { window ->

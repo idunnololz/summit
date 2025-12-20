@@ -212,6 +212,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
               .actionYouFragmentToActions()
             findNavController().navigateSafe(direction)
           }
+          R.id.local_stats -> {
+            val direction = YouFragmentDirections
+              .actionYouFragmentToLocalStatsFragment()
+            findNavController().navigateSafe(direction)
+          }
         }
       }
 
@@ -548,6 +553,11 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
           } else {
             actionErrorsCount
           },
+        )
+        newItems += Item.MenuItem(
+          itemId = R.id.local_stats,
+          iconRes = R.drawable.outline_bar_chart_24,
+          text = R.string.local_account_stats,
         )
         newItems += Item.FooterItem
       }

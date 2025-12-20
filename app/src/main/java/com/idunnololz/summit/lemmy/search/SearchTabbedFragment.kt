@@ -27,6 +27,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.ApiFeature
+import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
@@ -183,14 +184,21 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
 
     val personFilter = args.personFilter
     val communityFilter = args.communityFilter
+    val listingTypeFilter = args.listingTypeFilter
 
     if (!isOnViewCreatedCalled && savedInstanceState == null) {
       viewModel.setSortType(args.sortType)
     }
-    viewModel.setCurrentPersonFilter(personFilter)
-    viewModel.setCurrentCommunityFilter(communityFilter)
+
+    viewModel.currentCommunityFilter.value = communityFilter
     viewModel.nextCommunityFilter.value = communityFilter
+
+    viewModel.currentPersonFilter.value = personFilter
     viewModel.nextPersonFilter.value = personFilter
+
+    viewModel.currentListingTypeFilter.value = listingTypeFilter
+    viewModel.nextListingTypeFilter.value = listingTypeFilter
+
     if (args.query.isNotBlank()) {
       binding.searchEditText.setText(args.query)
       performSearch()
@@ -246,6 +254,10 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
       readonlyFilterByCommunity.setOnClickListener {
         viewModel.showSearch.value = true
         filterByCommunity.performClick()
+      }
+      readonlyFilterBySpecial.setOnClickListener {
+        viewModel.showSearch.value = true
+        filterBySpecial.performClick()
       }
 
       if (viewPager.adapter == null) {
@@ -429,6 +441,13 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
           }
         }
       }
+      viewModel.nextListingTypeFilter.observe(viewLifecycleOwner) {
+        binding.filterBySpecial.let { chip ->
+          chip.isCloseIconVisible = it != null
+
+          chip.text = it.getName(context)
+        }
+      }
 
       if (viewModel.currentQueryFlow.value.isNotBlank()) {
         hideSearch(animate = false)
@@ -453,6 +472,19 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
         }
         it.setOnCloseIconClickListener {
           viewModel.nextPersonFilter.value = null
+        }
+      }
+      binding.filterBySpecial.let {
+        it.setOnClickListener {
+          showListingTypePicker(
+            curValue = viewModel.currentListingTypeFilter.value,
+            onValueSelected = {
+              viewModel.nextListingTypeFilter.value = it
+            }
+          )
+        }
+        it.setOnCloseIconClickListener {
+          viewModel.nextListingTypeFilter.value = null
         }
       }
     }
@@ -549,10 +581,11 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
     val queryString = query?.toString() ?: ""
 
     val directions = SearchTabbedFragmentDirections.actionSearchFragmentSelf(
-      queryString,
-      viewModel.currentSortTypeFlow.value,
-      viewModel.nextPersonFilter.value,
-      viewModel.nextCommunityFilter.value,
+      query = queryString,
+      sortType = viewModel.currentSortTypeFlow.value,
+      personFilter = viewModel.nextPersonFilter.value,
+      communityFilter = viewModel.nextCommunityFilter.value,
+      listingTypeFilter = viewModel.nextListingTypeFilter.value ?: ListingType.All,
     )
     findNavController().navigateSafe(directions)
   }
@@ -591,4 +624,77 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
   fun closePost(postFragment: Fragment) {
     slidingPaneController?.closePost(postFragment)
   }
+}
+
+fun ListingType?.getName(context: Context) =
+  when (this) {
+    ListingType.All -> context.getString(R.string.all)
+    ListingType.Local -> context.getString(R.string.local)
+    ListingType.Subscribed -> context.getString(R.string.subscribed)
+    ListingType.ModeratorView -> context.getString(R.string.moderator_view)
+    null -> context.getString(R.string.other_filters)
+  }
+
+fun BaseFragment<*>.showListingTypePicker(
+  curValue: ListingType?,
+  onValueSelected: (ListingType) -> Unit,
+) {
+  val activity = getSummitActivity() ?: return
+
+  val bottomMenu = BottomMenu(activity)
+    .apply {
+      val idToChoice = mutableMapOf<Int, ListingType>()
+
+      for ((index, listingType) in ListingType.entries.withIndex()) {
+        when (listingType) {
+          ListingType.All ->
+            addRawItem(
+              BottomMenu.MenuItem.ActionItem(
+                id = index,
+                title = getString(R.string.all),
+                description = null,
+              ),
+            )
+          ListingType.Local ->
+            addRawItem(
+              BottomMenu.MenuItem.ActionItem(
+                id = index,
+                title = getString(R.string.local),
+                description = getString(R.string.local_search_desc),
+              ),
+            )
+          ListingType.Subscribed ->
+            addRawItem(
+              BottomMenu.MenuItem.ActionItem(
+                id = index,
+                title = getString(R.string.subscribed),
+                description = getString(R.string.subscribed_search_desc),
+              ),
+            )
+          ListingType.ModeratorView ->
+            addRawItem(
+              BottomMenu.MenuItem.ActionItem(
+                id = index,
+                title = getString(R.string.moderator_view),
+                description = getString(R.string.moderator_view_search_desc),
+              ),
+            )
+        }
+
+        idToChoice[index] = listingType
+
+        if (curValue == null && listingType == ListingType.All) {
+          setChecked(index)
+        } else if (curValue == listingType) {
+          setChecked(index)
+        }
+      }
+
+      setTitle(R.string.other_filters)
+
+      setOnMenuItemClickListener {
+        onValueSelected(requireNotNull(idToChoice[it.id]))
+      }
+    }
+  activity.showBottomMenu(bottomMenu)
 }

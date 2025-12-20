@@ -158,6 +158,7 @@ class AccountAwareLemmyClient @Inject constructor(
     force: Boolean,
     upvotedOnly: Boolean? = null,
     downvotedOnly: Boolean? = null,
+    showRead: Boolean? = null,
     account: Account? = accountForInstance(),
   ): Result<GetPostsResponse> = apiClient.fetchPosts(
     account = account,
@@ -179,6 +180,7 @@ class AccountAwareLemmyClient @Inject constructor(
     cursor = cursor,
     upvotedOnly = upvotedOnly,
     downvotedOnly = downvotedOnly,
+    show_read = showRead,
     force = force,
   ).autoSignOut(account)
 

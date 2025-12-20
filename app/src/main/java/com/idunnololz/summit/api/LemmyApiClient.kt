@@ -234,6 +234,7 @@ class LemmyApiClient @Inject constructor(
     limit: Int? = null,
     upvotedOnly: Boolean? = null,
     downvotedOnly: Boolean? = null,
+    show_read: Boolean? = null,
     force: Boolean,
   ): Result<GetPostsResponse> {
     val communityId = communityIdOrName?.fold({ it }, { null })
@@ -251,6 +252,7 @@ class LemmyApiClient @Inject constructor(
         liked_only = upvotedOnly,
         disliked_only = downvotedOnly,
         auth = account?.jwt,
+        show_read = show_read,
       )
 
     return onApiClient {

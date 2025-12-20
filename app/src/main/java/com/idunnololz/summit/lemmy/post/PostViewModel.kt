@@ -40,8 +40,11 @@ import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toApiSortOrder
+import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.toVotableRef
+import com.idunnololz.summit.localTracking.LocalTracker
+import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
@@ -71,6 +74,7 @@ class PostViewModel @Inject constructor(
   private val contentFiltersManager: ContentFiltersManager,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   val queryMatchHelper: QueryMatchHelper,
+  private val tracker: LocalTracker,
 ) : ViewModel() {
 
   companion object {
@@ -122,6 +126,7 @@ class PostViewModel @Inject constructor(
 
   private val additionalLoadedCommentIds = mutableSetOf<CommentId>()
   private val removedCommentIds = mutableSetOf<CommentId>()
+  private val visitTracked = state.getMutableStateFlow("visitTracked", false)
 
   /**
    * This is used for the edge case where a comment is fully loaded and some of it's direct
@@ -337,6 +342,8 @@ class PostViewModel @Inject constructor(
       }
 
       this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view ?: postView
+
+      trackVisitIfNeeded()
 
       this@PostViewModel.postView?.let {
         postRef = PostRef(instance = apiInstance, id = it.post.id)
@@ -1102,6 +1109,24 @@ class PostViewModel @Inject constructor(
 
     onPostOrCommentRefChange.postValue(postOrCommentRef)
     fetchPostData()
+  }
+
+  private fun trackVisitIfNeeded() {
+    val postView = postView ?: return
+
+    if (!visitTracked.value) {
+      visitTracked.value = true
+
+      tracker.trackEvent(
+        instanceId = postView.community.instance_id.toLong(),
+        communityRef = postView.community.toCommunityRef(),
+        postId = postView.post.id.toLong(),
+        commentId = null,
+        targetUserId = postView.post.creator_id,
+        action = TrackedAction.VIEW,
+        nsfw = postView.post.nsfw || postView.community.nsfw,
+      )
+    }
   }
 
   class ObjectResolverFailedException : Exception()

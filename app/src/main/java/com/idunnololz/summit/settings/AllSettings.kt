@@ -111,6 +111,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RESTORE_BROWSING_SES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_RETAIN_LAST_POST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_ROTATE_INSTANCE_ON_UPLOAD_FAIL
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_DRAFTS_AUTOMATICALLY
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SAVE_RECENT_COMMUNITIES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SEARCH_HOME_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHAKE_TO_SEND_FEEDBACK
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_SHOW_COMMENT_UPVOTE_PERCENTAGE
@@ -146,6 +147,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_MULTILINE_POST_H
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_PREDICTIVE_BACK
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTONS_ON_POST_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -873,6 +875,7 @@ class PostsFeedSettings @Inject constructor(
       HomeFabQuickActionIds.HideRead to context.getString(R.string.hide_read),
       HomeFabQuickActionIds.ToggleNsfwMode to context.getString(R.string.toggle_nsfw),
       HomeFabQuickActionIds.ToggleHideReadMode to context.getString(R.string.toggle_hide_read_mode),
+      HomeFabQuickActionIds.RefreshPostFeed to context.getString(R.string.refresh_post_feed),
     ).toOptions(default = HomeFabQuickActionIds.None),
     relatedKeys = listOf(KEY_HOME_FAB_QUICK_ACTION),
   )
@@ -943,6 +946,13 @@ class PostsFeedSettings @Inject constructor(
     null,
     relatedKeys = listOf(KEY_HIDE_READ_BY_DEFAULT),
   )
+  val useVolumeButtonsOnPostFeed = OnOffSettingItem(
+    null,
+    context.getString(R.string.use_volume_buttons_on_post_feed),
+    context.getString(R.string.use_volume_buttons_on_post_feed_desc),
+    relatedKeys = listOf(KEY_USE_VOLUME_BUTTONS_ON_POST_FEED),
+  )
+
 }
 
 class PostAndCommentsSettings @Inject constructor(
@@ -2079,6 +2089,10 @@ class MiscSettings @Inject constructor(
   val stringForNullScore = TextValueSettingItem(
     title = context.getString(R.string.symbol_for_unknown_score),
     relatedKeys = listOf(KEY_STRING_FOR_NULL_SCORE),
+  )
+  val saveRecentCommunities = OnOffSettingItem(
+    title = context.getString(R.string.save_recent_communities),
+    relatedKeys = listOf(KEY_SAVE_RECENT_COMMUNITIES),
   )
 }
 

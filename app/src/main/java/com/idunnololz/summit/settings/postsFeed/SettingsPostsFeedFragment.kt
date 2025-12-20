@@ -249,6 +249,10 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
         { preferences.hideReadByDefault },
         { preferences.hideReadByDefault = it },
       ),
+      settings.useVolumeButtonsOnPostFeed.asOnOffSwitch(
+        { preferences.useVolumeButtonsOnPostFeed },
+        { preferences.useVolumeButtonsOnPostFeed = it },
+      ),
       SettingModelItem.SubgroupItem(
         getString(R.string.posts_feed_header),
         listOf(

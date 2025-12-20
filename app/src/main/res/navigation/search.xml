@@ -46,6 +46,10 @@
             app:argType="com.idunnololz.summit.lemmy.search.SearchTabbedViewModel$CommunityFilter"
             app:nullable="true"
             android:defaultValue="@null" />
+        <argument
+            android:name="listingTypeFilter"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.ListingType"
+            android:defaultValue="All" />
     </fragment>
 
 </navigation>

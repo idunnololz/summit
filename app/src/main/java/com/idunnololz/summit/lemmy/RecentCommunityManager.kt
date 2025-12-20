@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.core.content.edit
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.localTracking.LocalTracker
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.StateSharedPreference
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,8 +19,10 @@ import kotlinx.serialization.json.Json
 @Singleton
 class RecentCommunityManager @Inject constructor(
   @StateSharedPreference private val statePreferences: SharedPreferences,
+  private val preferences: Preferences,
   private val lemmyApiClientFactory: LemmyApiClient.Factory,
   private val coroutineScopeFactory: CoroutineScopeFactory,
+  private val tracker: LocalTracker,
   private val json: Json,
 ) {
   companion object {
@@ -76,7 +80,10 @@ class RecentCommunityManager @Inject constructor(
       return
     }
 
-    val cache = this
+    if (!preferences.saveRecentCommunities) {
+      return
+    }
+
     val key = communityRef.getKey()
     Log.d(TAG, "Add recent community: $key type: ${this.prefKey}")
 
@@ -185,6 +192,13 @@ class RecentCommunityManager @Inject constructor(
         )
       }
     }
+  }
+
+  fun clear() {
+    val recents = recentCommunities.getRecentsOrLoad()
+
+    recents.clear()
+    recentCommunities.saveChangedAsync()
   }
 
   @Serializable

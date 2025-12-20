@@ -13,4 +13,5 @@ data class GetPosts(
   val disliked_only: Boolean? = null,
   val auth: String? = null,
   val cursor: String? = null,
+  val show_read: Boolean? = null,
 )

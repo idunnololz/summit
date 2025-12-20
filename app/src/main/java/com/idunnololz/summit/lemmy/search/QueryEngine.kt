@@ -165,6 +165,7 @@ class QueryEngine(
 
   private var personIdFilter: Long? = null
   private var communityIdFilter: Int? = null
+  private var listingTypeFilter: ListingType? = null
 
   private val trigram = NGram(3)
 
@@ -186,6 +187,17 @@ class QueryEngine(
       return
     }
     communityIdFilter = communityId
+
+    reset()
+
+    performQuery(0, force = false)
+  }
+
+  fun setListingTypeFilter(listingType: ListingType?) {
+    if (listingTypeFilter == listingType) {
+      return
+    }
+    listingTypeFilter = listingType
 
     reset()
 
@@ -255,7 +267,7 @@ class QueryEngine(
           communityId = communityIdFilter,
           communityName = null,
           sortType = currentSortType,
-          listingType = ListingType.All,
+          listingType = listingTypeFilter ?: ListingType.All,
           searchType = type,
           page = pageIndex.toLemmyPageIndex(),
           query = currentQuery,

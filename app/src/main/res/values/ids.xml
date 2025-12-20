@@ -314,4 +314,7 @@
     <item name="less_dark_background_theme" type="id" />
     <item name="community_admin_tools" type="id" />
     <item name="pa_hide_post" type="id" />
+    <item name="view_in_link_editor" type="id" />
+    <item name="text_change_listener" type="id" />
+    <item name="local_stats" type="id" />
 </resources>

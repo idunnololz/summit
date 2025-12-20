@@ -19,6 +19,7 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.AccountSubscription
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.SummitServerClient
+import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.search.SearchTabbedViewModel.CommunityFilter
@@ -60,8 +61,11 @@ class SearchHomeViewModel @Inject constructor(
   val currentQueryFlow = MutableStateFlow<String>("")
   val currentSortTypeFlow = MutableStateFlow<SortType>(SortType.Active)
   val currentQueryLiveData = currentQueryFlow.asLiveData()
+
   val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
   val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
+  val nextListingTypeFilter = MutableLiveData<ListingType?>(null)
+
   val setCommunityResult = StatefulLiveData<Unit>()
 
   var subscriptionCommunities: List<AccountSubscription> = listOf()

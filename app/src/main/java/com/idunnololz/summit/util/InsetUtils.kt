@@ -95,11 +95,16 @@ fun InsetsProvider.insetViewAutomaticallyByPadding(
   lifecycleOwner: LifecycleOwner,
   rootView: View,
   additionalPaddingBottom: Int = 0,
+  applyTopInset: Boolean = true,
 ) {
   insets.observe(lifecycleOwner) { insets ->
     rootView.setPadding(
       insets.leftInset,
-      insets.topInset,
+      if (applyTopInset) {
+        insets.topInset
+      } else {
+        0
+      },
       insets.rightInset,
       insets.bottomInset + additionalPaddingBottom,
     )

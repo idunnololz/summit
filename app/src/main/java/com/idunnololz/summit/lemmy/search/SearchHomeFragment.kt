@@ -40,6 +40,7 @@ import com.idunnololz.summit.account.info.instance
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.alert.newAlertDialogLauncher
+import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.summit.TrendingCommunityData
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentSearchHomeBinding
@@ -360,6 +361,12 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
           }
         }
       }
+      viewModel.nextListingTypeFilter.observe(viewLifecycleOwner) {
+        binding.filterBySpecial.let { chip ->
+          chip.isCloseIconVisible = it != null
+          chip.text = it.getName(context)
+        }
+      }
       filterByCommunity.let {
         it.setOnClickListener {
           CommunityPickerDialogFragment.show(childFragmentManager)
@@ -374,6 +381,19 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
         }
         it.setOnCloseIconClickListener {
           viewModel.nextPersonFilter.value = null
+        }
+      }
+      filterBySpecial.let {
+        it.setOnClickListener {
+          showListingTypePicker(
+            curValue = viewModel.nextListingTypeFilter.value,
+            onValueSelected = {
+              viewModel.nextListingTypeFilter.value = it
+            }
+          )
+        }
+        it.setOnCloseIconClickListener {
+          viewModel.nextListingTypeFilter.value = null
         }
       }
 
@@ -575,10 +595,11 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
 
   private fun launchSearch(query: String) {
     val directions = SearchHomeFragmentDirections.actionSearchHomeFragmentToSearchFragment(
-      query,
-      viewModel.currentSortTypeFlow.value,
-      viewModel.nextPersonFilter.value,
-      viewModel.nextCommunityFilter.value,
+      query = query,
+      sortType = viewModel.currentSortTypeFlow.value,
+      personFilter = viewModel.nextPersonFilter.value,
+      communityFilter = viewModel.nextCommunityFilter.value,
+      listingTypeFilter = viewModel.nextListingTypeFilter.value ?: ListingType.All
     )
     findNavController().navigateSafe(directions)
   }

@@ -1,6 +1,6 @@
 package com.idunnololz.summit.account
 
-const val GUEST_ACCOUNT_ID = 0L
+const val GUEST_ACCOUNT_ID = -1L
 
 sealed interface GuestOrUserAccount {
   val instance: String

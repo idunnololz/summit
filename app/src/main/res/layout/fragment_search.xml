@@ -94,7 +94,14 @@
                                 android:id="@+id/readonly_filter_by_creator"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/padding_half"
                                 android:text="@string/filter_by_creator"/>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/readonly_filter_by_special"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/other_filters"/>
                         </LinearLayout>
                     </HorizontalScrollView>
                 </LinearLayout>
@@ -187,6 +194,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/filter_by_creator"
+                            android:layout_marginStart="@dimen/padding_half"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/filter_by_special"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/other_filters"
                             android:layout_marginStart="@dimen/padding_half"/>
                     </LinearLayout>
                 </HorizontalScrollView>

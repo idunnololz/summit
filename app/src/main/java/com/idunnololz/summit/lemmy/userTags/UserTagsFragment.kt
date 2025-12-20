@@ -59,13 +59,11 @@ class UserTagsFragment : BaseFragment<FragmentUserTagsBinding>() {
       requireSummitActivity().apply {
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
 
-        requireSummitActivity().apply {
-          insetViewAutomaticallyByPaddingAndNavUi(
-            viewLifecycleOwner,
-            root,
-            applyTopInset = false,
-          )
-        }
+        insetViewAutomaticallyByPaddingAndNavUi(
+          viewLifecycleOwner,
+          root,
+          applyTopInset = false,
+        )
       }
 
       val adapter = UserTagsAdapter(

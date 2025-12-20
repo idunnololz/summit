@@ -68,6 +68,7 @@ import com.idunnololz.summit.lemmy.post.PostFragmentArgs
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.getFeedbackScreenshotFile
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
+import com.idunnololz.summit.linkEditor.LinkEditorDialogFragment
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkFixer
 import com.idunnololz.summit.links.LinkResolver
@@ -1160,5 +1161,9 @@ class MainActivity : SummitActivity() {
 
       PostFeedbackDialogFragment.show(supportFragmentManager)
     }
+  }
+
+  fun openLinkEditor(url: String) {
+    LinkEditorDialogFragment.show(supportFragmentManager, url)
   }
 }

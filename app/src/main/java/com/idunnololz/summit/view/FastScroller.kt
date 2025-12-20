@@ -281,7 +281,6 @@ class FastScroller : LinearLayout {
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    Log.d(TAG, "onLayout")
     super.onLayout(changed, l, t, r, b)
 
     if (!isHandleInitialized) {

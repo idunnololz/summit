@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -52,14 +53,17 @@ class SearchTabbedViewModel @Inject constructor(
 
   val currentQueryFlow = MutableStateFlow<String>("")
   val currentSortTypeFlow = savedStateHandle.getStateFlow(KEY_CURRENT_SORT_TYPE, SortType.Active)
+
   val currentPersonFilter = MutableStateFlow<PersonFilter?>(null)
-  val currentCommunityFilter = MutableStateFlow<CommunityFilter?>(null)
   val nextPersonFilter = MutableLiveData<PersonFilter?>(null)
+
+  val currentCommunityFilter = MutableStateFlow<CommunityFilter?>(null)
   val nextCommunityFilter = MutableLiveData<CommunityFilter?>(null)
 
+  val currentListingTypeFilter = MutableStateFlow<ListingType?>(null)
+  val nextListingTypeFilter = MutableLiveData<ListingType?>(null)
+
   val currentQueryLiveData = currentQueryFlow.asLiveData()
-  val currentPersonFilterLiveData = currentPersonFilter.asLiveData()
-  val currentCommunityFilterLiveData = currentCommunityFilter.asLiveData()
 
   init {
     queryEnginesByType[SearchType.All] = QueryEngine(
@@ -119,17 +123,10 @@ class SearchTabbedViewModel @Inject constructor(
         queryEnginesByType[currentType]?.setCommunityFilter(it?.communityId)
       }
     }
-  }
-
-  fun setCurrentPersonFilter(personFilter: PersonFilter?) {
     viewModelScope.launch {
-      currentPersonFilter.value = personFilter
-    }
-  }
-
-  fun setCurrentCommunityFilter(communityFilter: CommunityFilter?) {
-    viewModelScope.launch {
-      currentCommunityFilter.value = communityFilter
+      currentListingTypeFilter.collect {
+        queryEnginesByType[currentType]?.setListingTypeFilter(it)
+      }
     }
   }
 
@@ -146,6 +143,7 @@ class SearchTabbedViewModel @Inject constructor(
       setSortType(currentSortTypeFlow.value)
       setPersonFilter(currentPersonFilter.value?.personRef?.id)
       setCommunityFilter(currentCommunityFilter.value?.communityId)
+      setListingTypeFilter(currentListingTypeFilter.value)
 
       // Set query must be last to avoid race conditions
       setQuery(currentQueryFlow.value)

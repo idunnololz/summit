@@ -68,10 +68,10 @@ class ClientFactory @Inject constructor(
     }
 
     return when (preferences.userAgentChoice) {
-      UserAgentChoiceIds.UNSET,
       UserAgentChoiceIds.LEGACY_USER_AGENT,
       ->
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:$FIREFOX_VERSION) Gecko/20100101 Firefox/$FIREFOX_VERSION"
+      UserAgentChoiceIds.UNSET,
       UserAgentChoiceIds.NEW_USER_AGENT ->
         "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL}; $purposeString) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/$CHROME_VERSION Mobile Safari/$SAFARI_VERSION SummitForLemmyAndroid"
       UserAgentChoiceIds.NEW_USER_AGENT_2 ->

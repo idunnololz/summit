@@ -2122,6 +2122,7 @@
     <string name="display_deleted_posts">Display deleted posts</string>
     <string name="registration_applications">Registration applications</string>
     <string name="registration_application">Registration application</string>
+    <string name="read_posts_hidden">Read posts hidden.</string>
 
     <string name="ic_rotate_left_24">Rotate counter clockwise</string>
     <string name="ic_rotate_right_24">Rotate</string>
@@ -2327,6 +2328,18 @@
     <string name="wrap_comment_header_desc">When enabled, comment headers will wrap if they are too wide to display on a single line.</string>
     <string name="hide_read_by_default">Hide read by default</string>
     <string name="highlight_new_comments">Highlight new comments</string>
+    <string name="refresh_post_feed">Refresh post feed</string>
+    <string name="view_in_link_editor">View in link editor</string>
+    <string name="link_editor">Link editor</string>
+    <string name="other_filters">Other filters</string>
+    <string name="moderator_view">Moderator view</string>
+    <string name="local_search_desc">Only searches communities on your instance.</string>
+    <string name="subscribed_search_desc">Only search communities you are subscribed to.</string>
+    <string name="moderator_view_search_desc">Only search communities you are a moderator of.</string>
+    <string name="use_volume_buttons_on_post_feed">Volume buttons navigation</string>
+    <string name="use_volume_buttons_on_post_feed_desc">When enabled, pressing up or down on the volume rocker will scroll up and down on the post feed.</string>
+    <string name="save_recent_communities">Remember recent communities</string>
+    <string name="local_account_stats">Local account stats</string>
 
 
     <!-- uCrop string resource end -->

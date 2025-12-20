@@ -367,6 +367,9 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_youFragment_to_localStatsFragment"
+            app:destination="@id/localStatsFragment" />
     </fragment>
     <fragment
         android:id="@+id/hiddenPostsFragment2"
@@ -450,4 +453,8 @@
             app:argType="com.idunnololz.summit.actions.ui.Action" />
     </fragment>
     <action android:id="@+id/action_global_actionDetailsFragment2" app:destination="@id/actionDetailsFragment2"/>
+    <fragment
+        android:id="@+id/localStatsFragment"
+        android:name="com.idunnololz.summit.localTracking.screen.LocalStatsFragment"
+        android:label="LocalStatsFragment" />
 </navigation>

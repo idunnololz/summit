@@ -7,7 +7,7 @@ exifinterface = "1.4.1"
 hilt = "2.57.1"
 javaStringSimilarity = "2.0.0"
 kotlin = "2.2.10"
-kotlinxSerializationJson = "1.9.0"
+kotlinxSerialization = "1.9.0"
 ksp = "2.2.10-2.0.2"
 kotlinx = "1.10.2"
 navigation = "2.9.3"
@@ -29,7 +29,8 @@ desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref 
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-serialization-cbor = { module = "org.jetbrains.kotlinx:kotlinx-serialization-cbor", version.ref = "kotlinxSerialization" }
 slidingpanelayout = { module = "androidx.slidingpanelayout:slidingpanelayout", version = "1.2.0" }
 interpolator = { module = "androidx.interpolator:interpolator", version = "1.0.0" }
 

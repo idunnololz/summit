@@ -43,6 +43,8 @@ import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toEither
 import com.idunnololz.summit.lemmy.toUrl
 import com.idunnololz.summit.lemmy.utils.getSortOrderForCommunity
+import com.idunnololz.summit.localTracking.LocalTracker
+import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
@@ -88,6 +90,7 @@ class CommunityViewModel @Inject constructor(
   val basePreferences: Preferences,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val postListEngineFactory: PostListEngine.Factory,
+  private val tracker: LocalTracker,
 ) : ViewModel(),
   SlidingPaneController.PostViewPagerViewModel {
 
@@ -221,6 +224,23 @@ class CommunityViewModel @Inject constructor(
           updateSortOrder()
           loadCommunityInfo()
           registerHiddenPostObserver()
+        }
+    }
+
+    viewModelScope.launch {
+      currentCommunityRef
+        .collect {
+          it ?: return@collect
+
+          tracker.trackEvent(
+            instanceId = 0,
+            communityRef = it,
+            postId = null,
+            commentId = null,
+            targetUserId = null,
+            action = TrackedAction.VIEW,
+            nsfw = false
+          )
         }
     }
 

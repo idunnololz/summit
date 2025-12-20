@@ -209,8 +209,6 @@ class AddOrEditPostFragment :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setStyle(STYLE_NO_TITLE, R.style.Theme_App_DialogFullscreen)
-
     childFragmentManager.setFragmentResultListener(
       AddLinkDialogFragment.REQUEST_KEY,
       this,

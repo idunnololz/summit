@@ -264,7 +264,7 @@ sealed interface ActionInfo : Parcelable {
   }
 }
 
-interface LemmyActionResult<T : ActionInfo, R> {
+sealed interface LemmyActionResult<T : ActionInfo, R> {
 
   val result: R
 
@@ -272,14 +272,13 @@ interface LemmyActionResult<T : ActionInfo, R> {
     override val result: Either<PostView, CommentView>,
   ) : LemmyActionResult<ActionInfo.VoteActionInfo, Either<PostView, CommentView>>
 
-  class CommentLemmyActionResult : LemmyActionResult<ActionInfo.CommentActionInfo, Unit> {
-    override val result = Unit
-  }
+  class CommentLemmyActionResult(
+    override val result: CommentView,
+    val parentId: CommentId?,
+  ) : LemmyActionResult<ActionInfo.CommentActionInfo, CommentView>
 
-  class DeleteCommentLemmyActionResult :
-    LemmyActionResult<ActionInfo.DeleteCommentActionInfo, Unit> {
-    override val result = Unit
-  }
+  class DeleteCommentLemmyActionResult(override val result: CommentView) :
+    LemmyActionResult<ActionInfo.DeleteCommentActionInfo, CommentView>
 
   class EditLemmyActionResult : LemmyActionResult<ActionInfo.EditCommentActionInfo, Unit> {
     override val result = Unit

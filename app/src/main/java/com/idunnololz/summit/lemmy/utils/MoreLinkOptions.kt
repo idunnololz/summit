@@ -351,6 +351,11 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
         R.string.preview_link,
         R.drawable.baseline_preview_24,
       )
+      addItemWithIcon(
+        R.id.view_in_link_editor,
+        R.string.view_in_link_editor,
+        R.drawable.baseline_edit_24,
+      )
     }
 
     setOnMenuItemClickListener {
@@ -560,6 +565,9 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
           )
         }
       }
+    }
+    R.id.view_in_link_editor -> {
+      mainActivity?.openLinkEditor(url)
     }
   }
 }

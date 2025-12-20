@@ -481,6 +481,7 @@ class PostsRepository @AssistedInject constructor(
       sortType = sortType,
       page = pageIndex,
       force = force,
+      showRead = !hideRead,
     )
     val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
     val account = accountManager.currentAccount.asAccount

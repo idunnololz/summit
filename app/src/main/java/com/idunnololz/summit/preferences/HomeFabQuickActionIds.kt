@@ -8,4 +8,5 @@ object HomeFabQuickActionIds {
   const val HideRead: HomeFabQuickActionId = 2
   const val ToggleNsfwMode: HomeFabQuickActionId = 3
   const val ToggleHideReadMode: HomeFabQuickActionId = 4
+  const val RefreshPostFeed: HomeFabQuickActionId = 5
 }

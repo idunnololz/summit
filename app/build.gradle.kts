@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 36
-    versionCode = 302
-    versionName = "1.73.0"
+    versionCode = 303
+    versionName = "1.74.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -186,6 +186,7 @@ dependencies {
   coreLibraryDesugaring(libs.desugar.jdk.libs)
 
   implementation(libs.kotlinx.serialization.json)
+  implementation(libs.kotlinx.serialization.cbor)
   implementation(libs.commonmark)
   implementation(libs.asynclayoutinflater)
 

@@ -34,12 +34,13 @@ class ModeratedCommunitiesDataSource(
     sortType: SortType?,
     page: Int,
     force: Boolean,
+    showRead: Boolean?,
   ): Result<List<FetchedPost>> = getDataSource().fold(
     onSuccess = {
       if (it.sourcesCount == 0) {
         Result.failure(NoModeratedCommunitiesException())
       } else {
-        it.fetchPosts(sortType, page, force)
+        it.fetchPosts(sortType, page, force, showRead = showRead)
       }
     },
     onFailure = {
