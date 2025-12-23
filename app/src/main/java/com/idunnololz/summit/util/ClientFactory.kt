@@ -58,7 +58,6 @@ class ClientFactory @Inject constructor(
 
     if (purpose == Purpose.BrowserLike) {
       return when (preferences.userAgentChoice) {
-        UserAgentChoiceIds.UNSET,
         UserAgentChoiceIds.LEGACY_USER_AGENT,
         ->
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$CHROME_VERSION Safari/$SAFARI_VERSION"
