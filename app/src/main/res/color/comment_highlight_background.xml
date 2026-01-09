@@ -3,9 +3,18 @@
     <item
         android:state_activated="true"
         android:state_enabled="true"
-        android:color="@color/highlightSecondary"/>
+        android:color="@color/highlightSecondary"
+        android:drawable="@color/highlightSecondary"/>
 
-    <item android:state_activated="true" android:color="@color/highlightSecondary"/>
-    <item android:state_enabled="true" android:color="@color/colorHighlight"/>
-    <item android:color="@color/transparent"/>
+    <item
+        android:state_activated="true"
+        android:color="@color/highlightSecondary"
+        android:drawable="@color/highlightSecondary"/>
+    <item
+        android:state_enabled="true"
+        android:color="@color/colorHighlight"
+        android:drawable="@color/colorHighlight"/>
+    <item
+        android:color="@color/transparent"
+        android:drawable="@color/transparent"/>
 </selector>

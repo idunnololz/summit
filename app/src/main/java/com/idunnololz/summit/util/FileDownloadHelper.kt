@@ -26,6 +26,7 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import okio.source
+import androidx.core.net.toUri
 
 @Singleton
 class FileDownloadHelper @Inject constructor(
@@ -57,7 +58,7 @@ class FileDownloadHelper @Inject constructor(
 
     val uriOrFilePath: String
     val outputStream: OutputStream? = if (downloadDirectory != null) {
-      val oldParentUri = Uri.parse(downloadDirectory)
+      val oldParentUri = downloadDirectory.toUri()
       val id = DocumentsContract.getTreeDocumentId(oldParentUri)
       val parentFolderUri =
         DocumentsContract.buildChildDocumentsUriUsingTree(oldParentUri, id)

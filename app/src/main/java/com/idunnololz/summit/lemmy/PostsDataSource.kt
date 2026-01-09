@@ -1,7 +1,9 @@
 package com.idunnololz.summit.lemmy
 
+import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
@@ -49,4 +51,127 @@ class SinglePostsDataSource @AssistedInject constructor(
     .map {
       it.posts.map { FetchedPost(it, Source.StandardSource()) }
     }
+}
+
+class CursorBackedSinglePostsDataSource @AssistedInject constructor(
+  @Assisted private val communityName: String?,
+  @Assisted private val listingType: ListingType?,
+  private val apiClient: AccountAwareLemmyClient,
+) : PostsDataSource {
+
+  companion object {
+    private const val TAG = "CursorBackedSinglePostsDataSource"
+  }
+
+  @AssistedFactory
+  interface Factory {
+    fun create(
+      communityName: String?,
+      listingType: ListingType?
+    ): CursorBackedSinglePostsDataSource
+  }
+
+  private var cursorIds = listOf<String?>("0")
+
+  override suspend fun fetchPosts(
+    sortType: SortType?,
+    page: Int,
+    force: Boolean,
+    showRead: Boolean?,
+  ): Result<List<FetchedPost>> {
+    Log.d(TAG, "fetchPosts - page: $page")
+
+    buildCursorIds(
+      sortType = sortType,
+      page = page,
+      force = force,
+      showRead = showRead,
+    ).onFailure {
+      return Result.failure(it)
+    }
+
+    return _fetchPosts(
+        sortType = sortType,
+        page = page,
+        force = force,
+        showRead = showRead,
+      )
+      .onSuccess {
+        cursorIds += it.next_page
+      }
+      .map {
+        it.posts.map { FetchedPost(it, Source.StandardSource()) }
+      }
+  }
+
+  private suspend fun buildCursorIds(
+    sortType: SortType?,
+    page: Int,
+    force: Boolean,
+    showRead: Boolean?,
+  ): Result<Unit> {
+    if (cursorIds.size > page) {
+      return Result.success(Unit)
+    }
+
+    Log.d(TAG, "cursor index outside of current range, fetching more cursors...")
+
+    while (cursorIds.size <= page) {
+      _fetchPosts(
+        sortType = sortType,
+        page = cursorIds.lastIndex,
+        force = force,
+        showRead = showRead,
+      ).fold(
+        {
+          cursorIds += it.next_page
+        },
+        {
+          return Result.failure(it)
+        }
+      )
+    }
+
+    return Result.success(Unit)
+  }
+
+  private suspend fun _fetchPosts(
+    sortType: SortType?,
+    page: Int,
+    force: Boolean,
+    showRead: Boolean?,
+  ): Result<GetPostsResponse> {
+    if (page > 0 && cursorIds[page] == null) {
+      return Result.success(GetPostsResponse(listOf(), null))
+    }
+
+    val pageIndex = if (page == 0) {
+      page.toLemmyPageIndex()
+    } else {
+      null
+    }
+    val cursor = if (page == 0) {
+      null
+    } else {
+      cursorIds[page]
+    }
+
+    Log.d(TAG, "_fetchPosts - ${pageIndex} ${cursor}")
+
+    return apiClient
+      .fetchPosts(
+        communityIdOrName = if (communityName == null) {
+          null
+        } else {
+          Either.Right(communityName)
+        },
+        sortType = sortType,
+        listingType = listingType ?: ListingType.All,
+        page = pageIndex,
+        cursor = cursor,
+        limit = DEFAULT_PAGE_SIZE,
+        force = force,
+        showRead = showRead,
+      )
+  }
 }

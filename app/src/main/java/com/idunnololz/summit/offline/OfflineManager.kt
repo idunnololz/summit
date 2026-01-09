@@ -230,7 +230,12 @@ class OfflineManager @Inject constructor(
       }
     }
     val extension = if (baseUrl.lastIndexOf(".") != -1) {
-      baseUrl.substring(baseUrl.lastIndexOf("."))
+      val possibleExtension = baseUrl.substring(baseUrl.lastIndexOf("."))
+      if (possibleExtension.contains("/")) {
+        ""
+      } else {
+        possibleExtension
+      }
     } else {
       ""
     }
@@ -382,7 +387,7 @@ class OfflineManager @Inject constructor(
 
       if (response.code == 200) {
         destFile.sink().buffer().use { sink ->
-          response.body?.source()?.let {
+          response.body.source().let {
             sink.writeAll(it)
           }
           sink.close()

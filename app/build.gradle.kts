@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 36
-    versionCode = 304
-    versionName = "1.74.1"
+    versionCode = 305
+    versionName = "1.75.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -189,6 +189,8 @@ dependencies {
   implementation(libs.kotlinx.serialization.cbor)
   implementation(libs.commonmark)
   implementation(libs.asynclayoutinflater)
+
+  implementation("com.github.awxkee:avif-coder-coil:2.1.4")
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

@@ -18,6 +18,7 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
 import coil3.transition.CrossfadeTransition
+import com.github.awxkee.avifcoil.decoder.HeifDecoder
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.notifications.NotificationsUpdater
@@ -131,6 +132,9 @@ class MainApplication :
               },
             ),
           )
+          if (SDK_INT >= 24) {
+            add(HeifDecoder.Factory())
+          }
         }
         .apply {
           if (BuildConfig.DEBUG) {

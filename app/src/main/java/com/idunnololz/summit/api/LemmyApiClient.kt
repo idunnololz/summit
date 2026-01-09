@@ -141,9 +141,6 @@ import com.idunnololz.summit.util.guessMimeType
 import com.idunnololz.summit.util.retry
 import java.io.BufferedInputStream
 import java.io.InputStream
-import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Method
-import java.lang.reflect.Proxy
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Deferred
@@ -248,6 +245,7 @@ class LemmyApiClient @Inject constructor(
         type_ = listingType,
         page = page,
         cursor = cursor,
+        page_cursor = cursor,
         limit = limit,
         liked_only = upvotedOnly,
         disliked_only = downvotedOnly,

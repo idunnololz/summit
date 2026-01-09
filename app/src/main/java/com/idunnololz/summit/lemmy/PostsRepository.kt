@@ -40,7 +40,7 @@ class PostsRepository @AssistedInject constructor(
   private val postReadManager: PostReadManager,
   private val hiddenPostsManager: HiddenPostsManager,
   private val contentFiltersManager: ContentFiltersManager,
-  private val singlePostsDataSourceFactory: SinglePostsDataSource.Factory,
+  private val singlePostsDataSourceFactory: CursorBackedSinglePostsDataSource.Factory,
   private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
   private val accountManager: AccountManager,
   private val preferences: Preferences,

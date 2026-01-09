@@ -253,6 +253,21 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
   if ((c1 == 0x64) && (c2 == 0x6E) && (c3 == 0x73) && (c4 == 0x2E)) {
     return "audio/basic" // .au format, little endian
   }
+  if (
+    c1 == 0 &&
+    c2 == 0 &&
+    c3 == 0 &&
+    // No idea what c4 is but it seems to vary
+    c5 == 'f'.code &&
+    c6 == 't'.code &&
+    c7 == 'y'.code &&
+    c8 == 'p'.code &&
+    c9 == 'a'.code &&
+    c10 == 'v'.code &&
+    c11 == 'i'.code &&
+    c12 == 'f'.code) {
+    return "image/avif"
+  }
   return if ((c1 == 'R'.code) && (c2 == 'I'.code) && (c3 == 'F'.code) && (c4 == 'F'.code)) {
     /* I don't know if this is official but evidence
      * suggests that .wav files start with "RIFF" - brown
