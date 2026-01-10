@@ -120,7 +120,7 @@ import java.io.InputStream
 class ErrorApiAdapter(
   override val instance: String,
   var error: Throwable,
-  var apiInfo: ApiInfo = ApiInfo(null, true)
+  var apiInfo: ApiInfo = ApiInfo(null, null, true)
 ) : LemmyLikeApi {
   override suspend fun getSite(
     authorization: String?,

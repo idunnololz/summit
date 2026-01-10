@@ -116,6 +116,7 @@ class SiteBackendHelper @Inject constructor(
 
               return@withContext Result.success(
                 ApiInfo(
+                  instance = instance,
                   backendType = ApiType.PieFedAlpha,
                   downvoteAllowed = site?.site?.enableDownvotes != false,
                 ),
@@ -135,6 +136,7 @@ class SiteBackendHelper @Inject constructor(
 
               return@withContext Result.success(
                 ApiInfo(
+                  instance = instance,
                   backendType = ApiType.LemmyV3,
                   downvoteAllowed = site?.site_view?.local_site?.enable_downvotes != false,
                 ),
@@ -148,7 +150,11 @@ class SiteBackendHelper @Inject constructor(
         if (homePageJob.await().isSuccess) {
           Log.d(TAG, "instance: $instance is not a lemmy site")
 
-          return@withContext Result.success(ApiInfo(backendType = null, downvoteAllowed = true))
+          return@withContext Result.success(ApiInfo(
+            instance = null,
+            backendType = null,
+            downvoteAllowed = true
+          ))
         }
 
         // All 3 network calls failed. This likely means either the site is down or we are down.

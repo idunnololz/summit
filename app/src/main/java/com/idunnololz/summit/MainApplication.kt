@@ -18,9 +18,6 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.transitionFactory
 import coil3.svg.SvgDecoder
 import coil3.transition.CrossfadeTransition
-import com.github.awxkee.avifcoil.decoder.HeifDecoder
-import com.idunnololz.summit.localTracking.TrackedAction
-import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.notifications.NotificationsUpdater
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
@@ -37,9 +34,6 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
-import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -132,9 +126,9 @@ class MainApplication :
               },
             ),
           )
-          if (SDK_INT >= 24) {
-            add(HeifDecoder.Factory())
-          }
+//          if (SDK_INT >= 24) {
+//            add(HeifDecoder.Factory())
+//          }
         }
         .apply {
           if (BuildConfig.DEBUG) {

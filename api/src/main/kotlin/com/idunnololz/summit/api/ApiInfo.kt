@@ -1,6 +1,7 @@
 package com.idunnololz.summit.api
 
 data class ApiInfo(
+  val instance: String?,
   val backendType: ApiType?,
   val downvoteAllowed: Boolean,
 ) {
@@ -16,7 +17,12 @@ data class ApiInfo(
         ApiFeature.SearchAll -> true
         ApiFeature.SearchComments -> true
         ApiFeature.GetCommunitiesAll -> true
-        ApiFeature.GetPostsByCursor -> true
+        ApiFeature.GetPostsByCursor ->
+          if (instance == "sh.itjust.works") {
+            false
+          } else {
+            true
+          }
       }
     ApiType.PieFedAlpha ->
       when (apiFeature) {
