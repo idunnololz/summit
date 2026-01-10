@@ -79,7 +79,7 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
     force: Boolean,
     showRead: Boolean?,
   ): Result<List<FetchedPost>> {
-    Log.d(TAG, "fetchPosts - page: $page")
+    Log.d(TAG, "fetchPosts - page: $page cursors: ${cursorIds.size}")
 
     buildCursorIds(
       sortType = sortType,
@@ -97,7 +97,16 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
         showRead = showRead,
       )
       .onSuccess {
-        cursorIds += it.next_page
+        if (page + 1 == cursorIds.size) {
+          cursorIds += it.next_page
+        } else {
+          if (cursorIds[page + 1] != it.next_page) {
+            Log.d(TAG, "inconsistency cursor ids... wiping cached cursor ids")
+
+            cursorIds = cursorIds.take(page + 1)
+            cursorIds += it.next_page
+          }
+        }
       }
       .map {
         it.posts.map { FetchedPost(it, Source.StandardSource()) }

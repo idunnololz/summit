@@ -7,6 +7,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -40,7 +41,8 @@ class PostsRepository @AssistedInject constructor(
   private val postReadManager: PostReadManager,
   private val hiddenPostsManager: HiddenPostsManager,
   private val contentFiltersManager: ContentFiltersManager,
-  private val singlePostsDataSourceFactory: CursorBackedSinglePostsDataSource.Factory,
+  private val indexBackedSinglePostsDataSourceFactory: SinglePostsDataSource.Factory,
+  private val cursorBackedSinglePostsDataSourceFactory: CursorBackedSinglePostsDataSource.Factory,
   private val multiCommunityDataSourceFactory: MultiCommunityDataSource.Factory,
   private val accountManager: AccountManager,
   private val preferences: Preferences,
@@ -65,10 +67,7 @@ class PostsRepository @AssistedInject constructor(
     val isDuplicatePost: Boolean,
   )
 
-  private var currentDataSource: PostsDataSource = singlePostsDataSourceFactory.create(
-    communityName = null,
-    listingType = ListingType.All,
-  )
+  private var currentDataSource: PostsDataSource? = null
 
   private var allPosts = listOf<PostData>()
   private var seenPosts = mutableSetOf<String>()
@@ -273,24 +272,22 @@ class PostsRepository @AssistedInject constructor(
 
     when (communityRef) {
       is CommunityRef.Local -> {
-        currentDataSource = singlePostsDataSourceFactory.create(
+        postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+        if (communityRef.instance != null) {
+          apiClient.changeInstance(communityRef.instance)
+        } else {
+          apiClient.defaultInstance()
+        }
+
+        // newDataSource() must be called after instance change
+        currentDataSource = newDataSource(
           communityName = null,
           listingType = ListingType.Local,
         )
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        if (communityRef.instance != null) {
-          apiClient.changeInstance(communityRef.instance)
-        } else {
-          apiClient.defaultInstance()
-        }
       }
 
       is CommunityRef.All -> {
-        currentDataSource = singlePostsDataSourceFactory.create(
-          communityName = null,
-          listingType = ListingType.All,
-        )
         postsPerPage = DEFAULT_POSTS_PER_PAGE
 
         if (communityRef.instance != null) {
@@ -298,16 +295,24 @@ class PostsRepository @AssistedInject constructor(
         } else {
           apiClient.defaultInstance()
         }
+
+        // newDataSource() must be called after instance change
+        currentDataSource = newDataSource(
+          communityName = null,
+          listingType = ListingType.All,
+        )
       }
 
       is CommunityRef.Subscribed -> {
-        currentDataSource = singlePostsDataSourceFactory.create(
-          communityName = null,
-          listingType = ListingType.Subscribed,
-        )
         postsPerPage = DEFAULT_POSTS_PER_PAGE
 
         apiClient.defaultInstance()
+
+        // newDataSource() must be called after instance change
+        currentDataSource = newDataSource(
+          communityName = null,
+          listingType = ListingType.Subscribed,
+        )
       }
 
       is CommunityRef.AllSubscribed -> {
@@ -323,13 +328,15 @@ class PostsRepository @AssistedInject constructor(
       }
 
       is CommunityRef.CommunityRefByName -> {
-        currentDataSource = singlePostsDataSourceFactory.create(
-          communityName = communityRef.getServerId(apiClient.instance),
-          listingType = ListingType.All,
-        )
         postsPerPage = DEFAULT_POSTS_PER_PAGE
 
         apiClient.defaultInstance()
+
+        // newDataSource() must be called after instance change
+        currentDataSource = newDataSource(
+          communityName = communityRef.getServerId(apiClient.instance),
+          listingType = ListingType.All,
+        )
       }
       is CommunityRef.MultiCommunity -> {
         currentDataSource = multiCommunityDataSourceFactory.create(
@@ -341,23 +348,27 @@ class PostsRepository @AssistedInject constructor(
         apiClient.defaultInstance()
       }
       is CommunityRef.ModeratedCommunities -> {
-        currentDataSource = singlePostsDataSourceFactory.create(
+        postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+        apiClient.defaultInstance()
+
+        // newDataSource() must be called after instance change
+        currentDataSource = newDataSource(
           communityName = null,
           listingType = ListingType.ModeratorView,
         )
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        apiClient.defaultInstance()
       }
       null,
       -> {
-        currentDataSource = singlePostsDataSourceFactory.create(
-          communityName = null,
-          listingType = ListingType.All,
-        )
         postsPerPage = DEFAULT_POSTS_PER_PAGE
 
         apiClient.defaultInstance()
+
+        // newDataSource() must be called after instance change
+        currentDataSource = newDataSource(
+          communityName = null,
+          listingType = ListingType.All,
+        )
       }
     }
 
@@ -465,7 +476,11 @@ class PostsRepository @AssistedInject constructor(
     sortType: SortType,
     force: Boolean,
   ): Result<Boolean> {
-    val currentDataSource = currentDataSource
+    if (currentDataSource == null) {
+      setCommunity(null)
+    }
+
+    val currentDataSource = requireNotNull(currentDataSource)
 
     var force = force
 
@@ -657,6 +672,17 @@ class PostsRepository @AssistedInject constructor(
     currentPageInternal = minPageInternal
 
     Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allPosts.size}")
+  }
+
+  private suspend fun newDataSource(
+    communityName: String?,
+    listingType: ListingType?
+  ): PostsDataSource {
+    return if (apiClient.supportsFeature(ApiFeature.GetPostsByCursor).getOrNull() == true) {
+      cursorBackedSinglePostsDataSourceFactory.create(communityName, listingType)
+    } else {
+      indexBackedSinglePostsDataSourceFactory.create(communityName, listingType)
+    }
   }
 
   class PageResult(

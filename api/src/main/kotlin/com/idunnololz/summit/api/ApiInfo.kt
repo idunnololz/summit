@@ -16,6 +16,7 @@ data class ApiInfo(
         ApiFeature.SearchAll -> true
         ApiFeature.SearchComments -> true
         ApiFeature.GetCommunitiesAll -> true
+        ApiFeature.GetPostsByCursor -> true
       }
     ApiType.PieFedAlpha ->
       when (apiFeature) {
@@ -27,6 +28,7 @@ data class ApiInfo(
         ApiFeature.SearchAll -> false
         ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
+        ApiFeature.GetPostsByCursor -> false
       }
     null ->
       when (apiFeature) {
@@ -38,6 +40,7 @@ data class ApiInfo(
         ApiFeature.SearchAll -> false
         ApiFeature.SearchComments -> false
         ApiFeature.GetCommunitiesAll -> false
+        ApiFeature.GetPostsByCursor -> false
       }
   }
 }

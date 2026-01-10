@@ -23,4 +23,6 @@ enum class ApiFeature {
 
   // Whether the server supports GetCommunities with the ALL type.
   GetCommunitiesAll,
+
+  GetPostsByCursor,
 }
