@@ -2340,6 +2340,8 @@
     <string name="use_volume_buttons_on_post_feed_desc">When enabled, pressing up or down on the volume rocker will scroll up and down on the post feed.</string>
     <string name="save_recent_communities">Remember recent communities</string>
     <string name="local_account_stats">Local account stats</string>
+    <string name="use_cursors_when_loading_post_feed">Use cursors when loading the post feed</string>
+    <string name="use_cursors_when_loading_post_feed_desc">"Normally, posts are fetched using a page index. Eg. to get the 2nd page of posts, the app will ask the server for page 2 directly. When using cursors the app instead uses a special token to request for posts. The token acts like a bookmark where in the feed the posts were last loaded from. "</string>
 
 
     <!-- uCrop string resource end -->

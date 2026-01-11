@@ -17,12 +17,7 @@ data class ApiInfo(
         ApiFeature.SearchAll -> true
         ApiFeature.SearchComments -> true
         ApiFeature.GetCommunitiesAll -> true
-        ApiFeature.GetPostsByCursor ->
-          if (instance == "sh.itjust.works") {
-            false
-          } else {
-            true
-          }
+        ApiFeature.GetPostsByCursor -> true
       }
     ApiType.PieFedAlpha ->
       when (apiFeature) {

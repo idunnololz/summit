@@ -273,6 +273,10 @@ class SettingsMiscFragment :
           }
         },
       ),
+      settings.useCursorsWhenLoadingPostFeed.asOnOffSwitch(
+        { preferences.useCursorsWhenLoadingPostFeed },
+        { preferences.useCursorsWhenLoadingPostFeed = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

@@ -138,6 +138,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CURSORS_WHEN_LOADING_POST_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_FIREBASE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_GESTURE_ACTIONS
@@ -2093,6 +2094,11 @@ class MiscSettings @Inject constructor(
   val saveRecentCommunities = OnOffSettingItem(
     title = context.getString(R.string.save_recent_communities),
     relatedKeys = listOf(KEY_SAVE_RECENT_COMMUNITIES),
+  )
+  val useCursorsWhenLoadingPostFeed = OnOffSettingItem(
+    title = context.getString(R.string.use_cursors_when_loading_post_feed),
+    description = context.getString(R.string.use_cursors_when_loading_post_feed_desc),
+    relatedKeys = listOf(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED),
   )
 }
 

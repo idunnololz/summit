@@ -164,6 +164,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USER_AGENT_CHOICE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BOTTOM_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CURSORS_WHEN_LOADING_POST_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CUSTOM_NAV_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_FIREBASE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_GESTURE_ACTIONS
@@ -726,6 +727,8 @@ class Preferences(
     by booleanPreference(KEY_SAVE_RECENT_COMMUNITIES, true)
   var localTrackingEnabled
     by booleanPreference(KEY_LOCAL_TRACKING_ENABLED, false)
+  var useCursorsWhenLoadingPostFeed
+    by booleanPreference(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
