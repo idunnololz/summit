@@ -181,8 +181,8 @@ class PostsRepository @AssistedInject constructor(
     endReached = false
   }
 
-  suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> =
-    withContext(serialContext) {
+  suspend fun getPage(pageIndex: Int, force: Boolean = false): Result<PageResult> {
+    return withContext(serialContext) {
       mutex.withLock {
         val startIndex = pageIndex * postsPerPage
         val endIndex = startIndex + postsPerPage
@@ -247,6 +247,7 @@ class PostsRepository @AssistedInject constructor(
         )
       }
     }
+  }
 
   val communityInstance: String
     get() =
@@ -267,112 +268,119 @@ class PostsRepository @AssistedInject constructor(
   val apiInstanceFlow
     get() = apiClient.instanceFlow
 
-  suspend fun setCommunity(communityRef: CommunityRef?) = withContext(serialContext) {
-    this@PostsRepository.communityRef = communityRef ?: CommunityRef.All()
+  suspend fun setCommunity(communityRef: CommunityRef?) {
+    withContext(serialContext) {
+      mutex.withLock {
+        this@PostsRepository.communityRef = communityRef ?: CommunityRef.All()
 
-    when (communityRef) {
-      is CommunityRef.Local -> {
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
+        when (communityRef) {
+          is CommunityRef.Local -> {
+            postsPerPage = DEFAULT_POSTS_PER_PAGE
 
-        if (communityRef.instance != null) {
-          apiClient.changeInstance(communityRef.instance)
-        } else {
-          apiClient.defaultInstance()
+            if (communityRef.instance != null) {
+              apiClient.changeInstance(communityRef.instance)
+            } else {
+              apiClient.defaultInstance()
+            }
+
+            // newDataSource() must be called after instance change
+            currentDataSource = newDataSource(
+              communityName = null,
+              listingType = ListingType.Local,
+            )
+          }
+
+          is CommunityRef.All -> {
+            postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+            if (communityRef.instance != null) {
+              apiClient.changeInstance(communityRef.instance)
+            } else {
+              apiClient.defaultInstance()
+            }
+
+            // newDataSource() must be called after instance change
+            currentDataSource = newDataSource(
+              communityName = null,
+              listingType = ListingType.All,
+            )
+          }
+
+          is CommunityRef.Subscribed -> {
+            postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+            apiClient.defaultInstance()
+
+            // newDataSource() must be called after instance change
+            currentDataSource = newDataSource(
+              communityName = null,
+              listingType = ListingType.Subscribed,
+            )
+          }
+
+          is CommunityRef.AllSubscribed -> {
+            val allAccounts = accountManager.getAccounts()
+
+            currentDataSource = multiCommunityDataSourceFactory.createForSubscriptions(
+              apiInstance,
+              allAccounts,
+            )
+            postsPerPage = 15
+
+            apiClient.defaultInstance()
+          }
+
+          is CommunityRef.CommunityRefByName -> {
+            postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+            apiClient.defaultInstance()
+
+            // newDataSource() must be called after instance change
+            currentDataSource = newDataSource(
+              communityName = communityRef.getServerId(apiClient.instance),
+              listingType = ListingType.All,
+            )
+          }
+
+          is CommunityRef.MultiCommunity -> {
+            currentDataSource = multiCommunityDataSourceFactory.create(
+              apiClient.instance,
+              communityRef.communities,
+            )
+            postsPerPage = 15
+
+            apiClient.defaultInstance()
+          }
+
+          is CommunityRef.ModeratedCommunities -> {
+            postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+            apiClient.defaultInstance()
+
+            // newDataSource() must be called after instance change
+            currentDataSource = newDataSource(
+              communityName = null,
+              listingType = ListingType.ModeratorView,
+            )
+          }
+
+          null,
+            -> {
+            postsPerPage = DEFAULT_POSTS_PER_PAGE
+
+            apiClient.defaultInstance()
+
+            // newDataSource() must be called after instance change
+            currentDataSource = newDataSource(
+              communityName = null,
+              listingType = ListingType.All,
+            )
+          }
         }
 
-        // newDataSource() must be called after instance change
-        currentDataSource = newDataSource(
-          communityName = null,
-          listingType = ListingType.Local,
-        )
-      }
-
-      is CommunityRef.All -> {
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        if (communityRef.instance != null) {
-          apiClient.changeInstance(communityRef.instance)
-        } else {
-          apiClient.defaultInstance()
-        }
-
-        // newDataSource() must be called after instance change
-        currentDataSource = newDataSource(
-          communityName = null,
-          listingType = ListingType.All,
-        )
-      }
-
-      is CommunityRef.Subscribed -> {
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        apiClient.defaultInstance()
-
-        // newDataSource() must be called after instance change
-        currentDataSource = newDataSource(
-          communityName = null,
-          listingType = ListingType.Subscribed,
-        )
-      }
-
-      is CommunityRef.AllSubscribed -> {
-        val allAccounts = accountManager.getAccounts()
-
-        currentDataSource = multiCommunityDataSourceFactory.createForSubscriptions(
-          apiInstance,
-          allAccounts,
-        )
-        postsPerPage = 15
-
-        apiClient.defaultInstance()
-      }
-
-      is CommunityRef.CommunityRefByName -> {
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        apiClient.defaultInstance()
-
-        // newDataSource() must be called after instance change
-        currentDataSource = newDataSource(
-          communityName = communityRef.getServerId(apiClient.instance),
-          listingType = ListingType.All,
-        )
-      }
-      is CommunityRef.MultiCommunity -> {
-        currentDataSource = multiCommunityDataSourceFactory.create(
-          apiClient.instance,
-          communityRef.communities,
-        )
-        postsPerPage = 15
-
-        apiClient.defaultInstance()
-      }
-      is CommunityRef.ModeratedCommunities -> {
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        apiClient.defaultInstance()
-
-        // newDataSource() must be called after instance change
-        currentDataSource = newDataSource(
-          communityName = null,
-          listingType = ListingType.ModeratorView,
-        )
-      }
-      null,
-      -> {
-        postsPerPage = DEFAULT_POSTS_PER_PAGE
-
-        apiClient.defaultInstance()
-
-        // newDataSource() must be called after instance change
-        currentDataSource = newDataSource(
-          communityName = null,
-          listingType = ListingType.All,
-        )
+        reset()
       }
     }
-
-    reset()
   }
 
   suspend fun resetCacheForCommunity() = withContext(serialContext) {
@@ -477,7 +485,7 @@ class PostsRepository @AssistedInject constructor(
     force: Boolean,
   ): Result<Boolean> {
     if (currentDataSource == null) {
-      setCommunity(null)
+      return Result.failure(NoCommunitySetException())
     }
 
     val currentDataSource = requireNotNull(currentDataSource)
@@ -698,3 +706,4 @@ class PostsRepository @AssistedInject constructor(
 class LoadNsfwCommunityWhenNsfwDisabled : RuntimeException()
 class FilterTooAggressiveException : RuntimeException()
 class ContentTypeFilterTooAggressiveException : RuntimeException()
+class NoCommunitySetException : RuntimeException()
