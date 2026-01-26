@@ -79,7 +79,7 @@ sealed interface SettingModelItem {
     val icon: Int,
     val clickable: Boolean,
     val getCurrentValue: () -> String?,
-    val onValueChanged: SettingsAdapter.() -> Unit,
+    val onValueChanged: (SettingsAdapter.() -> Unit)?,
     val onLongClick: (() -> Unit)? = null,
   ) : SettingModelItem
 
@@ -558,6 +558,7 @@ class SettingsAdapter(
         b.desc.isEnabled = true
         b.value.isEnabled = true
         b.root.isEnabled = true
+
         if (item.clickable) {
           b.root.setOnClickListener {
             findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
@@ -566,23 +567,29 @@ class SettingsAdapter(
 
             onValueChanged()
           }
-          if (item.longClickable != null) {
+          if (item.longClickable) {
             b.root.setOnLongClickListener {
               findSettingModel<SettingModelItem.CustomItem>(item.setting.id)
                 ?.onLongClick
                 ?.invoke()
               true
             }
+          } else {
+            b.root.isLongClickable = false
           }
         } else {
           b.root.isClickable = false
-          b.root.setOnClickListener(null)
+          b.root.isFocusable = false
         }
       } else {
         b.title.isEnabled = false
         b.desc.isEnabled = false
         b.value.isEnabled = false
         b.root.isEnabled = false
+
+        b.root.isClickable = false
+        b.root.isFocusable = false
+        b.root.setOnClickListener(null)
       }
 
       highlightItem(

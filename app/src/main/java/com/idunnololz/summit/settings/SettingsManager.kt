@@ -42,7 +42,7 @@ data class TextOnlySettingItem(
 ) : SettingItem()
 
 /**
- * This is not a real setting item. Its purpose is to describe a setting pager.
+ * This is not a real setting item. Its purpose is to describe a setting page.
  */
 @Parcelize
 data class DescriptionSettingItem(

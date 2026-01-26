@@ -77,6 +77,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY_PAGE_INDICA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_URLS_IN_PRIVATE_MESSAGES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LEFT_HAND_MODE
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCAL_TRACKING_ENABLED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOCK_BOTTOM_BAR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LOOP_VIDEO_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_MARK_AS_READ_ON_HIDE_POST
@@ -274,6 +275,9 @@ object SettingPath {
     InboxSettings::class ->
       context.getString(R.string.inbox_settings)
 
+    LocalTrackingEventsSettings::class ->
+      context.getString(R.string.local_tracking_events)
+
     else -> error("No name for $this")
   }
 
@@ -425,6 +429,11 @@ class MainSettings @Inject constructor(
     R.drawable.outline_apps_24,
     context.getString(R.string.default_apps),
     context.getString(R.string.default_apps_desc),
+  )
+  val localTrackingEventsSettings = BasicSettingItem(
+    R.drawable.outline_analytics_24,
+    context.getString(R.string.local_tracking_events),
+    context.getString(R.string.local_tracking_events_desc),
   )
 }
 
@@ -2319,6 +2328,12 @@ class ImportAndExportSettings @Inject constructor(
     null,
   )
 
+  val copySettingsForDebugging = BasicSettingItem(
+    R.drawable.outline_bug_report_24,
+    context.getString(R.string.copy_settings_for_debugging),
+    null,
+  )
+
   override val parents: List<KClass<out SearchableSettings>> = listOf(
     MainSettings::class,
   )
@@ -2606,6 +2621,38 @@ class DefaultAppsSettings @Inject constructor(
   )
 }
 
+class LocalTrackingEventsSettings @Inject constructor(
+  @ActivityContext private val context: Context,
+) : SearchableSettings {
+
+  val localTrackingEvents = OnOffSettingItem(
+    null,
+    context.getString(R.string.local_tracking_events),
+    relatedKeys = listOf(KEY_LOCAL_TRACKING_ENABLED),
+  )
+
+  val totalEventsRecorded = BasicSettingItem(
+    null,
+    context.getString(R.string.total_events_recorded),
+    "-",
+  )
+
+  val sizeOnDiskRecorded = BasicSettingItem(
+    null,
+    context.getString(R.string.local_tracking_size_on_disk),
+    "-",
+  )
+
+  val clearLocalTrackingEvents = BasicSettingItem(
+    null,
+    context.getString(R.string.clear_local_tracking_events_data),
+  )
+
+  override val parents: List<KClass<out SearchableSettings>> = listOf(
+    MainSettings::class,
+  )
+}
+
 class AllSettings @Inject constructor(
   @ActivityContext private val context: Context,
   mainSettings: MainSettings,
@@ -2634,6 +2681,7 @@ class AllSettings @Inject constructor(
   videoPlayerSettings: VideoPlayerSettings,
   defaultAppsSettings: DefaultAppsSettings,
   inboxSettings: InboxSettings,
+  localTrackingEventsSettings: LocalTrackingEventsSettings,
 ) {
   val allSearchableSettings: List<SearchableSettings> = listOf(
     mainSettings,
@@ -2662,6 +2710,7 @@ class AllSettings @Inject constructor(
     videoPlayerSettings,
     defaultAppsSettings,
     inboxSettings,
+    localTrackingEventsSettings,
   )
 
   init {

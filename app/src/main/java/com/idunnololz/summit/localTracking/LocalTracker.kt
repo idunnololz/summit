@@ -21,20 +21,24 @@ import kotlinx.serialization.encodeToByteArray
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val TAG = "LocalTracker"
+
+interface OnTrackingEventListener {
+  fun onDeleteAll()
+}
+
 @Singleton
 class LocalTracker @Inject constructor(
   private val accountManager: AccountManager,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val perAccountLocalTrackerFactory: PerAccountLocalTracker.Factory,
   private val pendingActionsManager: PendingActionsManager,
+  private val trackingEventsDao: TrackingEventsDao,
 ) {
-
-  companion object {
-    private const val TAG = "LocalTracker"
-  }
 
   private val coroutineScope = coroutineScopeFactory.create()
   private var currentTracker: PerAccountLocalTracker? = null
+  private var listeners: List<OnTrackingEventListener> = listOf()
 
   init {
     pendingActionsManager.addActionCompleteListener(object : PendingActionsManager.OnActionChangedListener {
@@ -127,11 +131,16 @@ class LocalTracker @Inject constructor(
 
     })
 
-    coroutineScope.apply {
-      launch {
-        accountManager.currentAccount.collect {
-          currentTracker = perAccountLocalTrackerFactory.create(it.id)
-        }
+    coroutineScope.launch {
+      accountManager.currentAccount.collect {
+        currentTracker = perAccountLocalTrackerFactory.create(
+          it.id,
+          object : OnTrackingEventListener {
+            override fun onDeleteAll() {
+              listeners.forEach { it.onDeleteAll() }
+            }
+          }
+        )
       }
     }
   }
@@ -157,10 +166,27 @@ class LocalTracker @Inject constructor(
       nsfw = nsfw,
     )
   }
+
+  fun clearLocalTrackingData() {
+    currentTracker?.clearLocalTrackingData()
+  }
+
+  fun registerOnTrackingEventListener(
+    l: OnTrackingEventListener
+  ) {
+    listeners += l
+  }
+
+  fun unregisterOnTrackingEventListener(
+    l: OnTrackingEventListener
+  ) {
+    listeners -= l
+  }
 }
 
 class PerAccountLocalTracker @AssistedInject constructor(
   @Assisted private val userId: Long,
+  @Assisted private val listener: OnTrackingEventListener,
   private val trackingEventsDao: TrackingEventsDao,
   private val coroutineScopeFactory: CoroutineScopeFactory,
   private val preferences: Preferences,
@@ -168,7 +194,7 @@ class PerAccountLocalTracker @AssistedInject constructor(
 
   @AssistedFactory
   interface Factory {
-    fun create(userId: Long): PerAccountLocalTracker
+    fun create(userId: Long, listener: OnTrackingEventListener): PerAccountLocalTracker
   }
 
   private val coroutineScope = coroutineScopeFactory.create()
@@ -184,6 +210,7 @@ class PerAccountLocalTracker @AssistedInject constructor(
     nsfw: Boolean,
   ) {
     if (!preferences.localTrackingEnabled) {
+      Log.d(TAG, "Local tracking off. Ignoring event.")
       return
     }
 
@@ -212,4 +239,10 @@ class PerAccountLocalTracker @AssistedInject constructor(
     }
   }
 
+  fun clearLocalTrackingData() {
+    coroutineScope.launch {
+      trackingEventsDao.deleteAll()
+      listener.onDeleteAll()
+    }
+  }
 }

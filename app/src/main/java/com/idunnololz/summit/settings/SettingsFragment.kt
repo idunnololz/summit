@@ -300,6 +300,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
               findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
             }
 
+            is LocalTrackingEventsSettings -> {
+              val directions = SettingsFragmentDirections
+                .actionSettingsFragmentToSettingsLocalTrackingEventsFragment()
+              findNavController().navigate(directions.actionId, Bundle().addSettingReference(it))
+            }
+
             null -> {
               // do nothing
             }
@@ -341,6 +347,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         "downloads" -> {
           launchDownloadsSettings()
         }
+        "local_tracking_events" -> {
+          launchLocalTrackingEventsSettings()
+        }
       }
     }
   }
@@ -369,6 +378,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
   private fun launchDownloadsSettings() {
     val directions = SettingsFragmentDirections
       .actionSettingsFragmentToSettingDownloadsFragment()
+    findNavController().navigateSafe(directions)
+  }
+
+  private fun launchLocalTrackingEventsSettings() {
+    val directions = SettingsFragmentDirections
+      .actionSettingsFragmentToSettingsLocalTrackingEventsFragment()
     findNavController().navigateSafe(directions)
   }
 
@@ -540,6 +555,9 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             val directions = SettingsFragmentDirections
               .actionSettingsFragmentToSettingsDefaultAppsFragment()
             findNavController().navigateSafe(directions)
+          },
+          settings.localTrackingEventsSettings.asCustomItem {
+            launchLocalTrackingEventsSettings()
           },
           settings.backupAndRestoreSettings.asCustomItem {
             val directions = SettingsFragmentDirections

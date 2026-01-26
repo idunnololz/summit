@@ -72,7 +72,7 @@ class SettingsHiddenPostsFragment : BaseSettingsFragment() {
           defaultDecimalFormat.format(count ?: 0),
           defaultDecimalFormat.format(hiddenPostsManager.hiddenPostsLimit),
         ),
-      ).asCustomItem { },
+      ).asCustomItem(),
       settings.resetHiddenPosts.asCustomItem {
         lifecycleScope.launch {
           val count = withContext(Dispatchers.Default) {

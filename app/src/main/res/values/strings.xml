@@ -2342,6 +2342,19 @@
     <string name="local_account_stats">Local account stats</string>
     <string name="use_cursors_when_loading_post_feed">Use cursors when loading the post feed</string>
     <string name="use_cursors_when_loading_post_feed_desc">"Normally, posts are fetched using a page index. Eg. to get the 2nd page of posts, the app will ask the server for page 2 directly. When using cursors the app instead uses a special token to request for posts. The token acts like a bookmark where in the feed the posts were last loaded from. "</string>
+    <string name="copy_settings_for_debugging">Copy settings for debugging</string>
+    <string name="local_tracking_events">Local tracking events</string>
+    <string name="local_tracking_events_desc">Manage local tracking events</string>
+    <string name="frequented_communities">Frequented communities</string>
+    <string name="favorite_communities">Favorite communities</string>
+    <string name="user_interactions">Top user interactions</string>
+    <string name="total_events_recorded">Total events recorded</string>
+    <string name="local_events_settings">Local events settings</string>
+    <string name="warn_local_tracking_disabled">Local tracking is currently disabled. Account stats shown will not be up to date.</string>
+    <string name="local_tracking_size_on_disk">Tracking events disk usage</string>
+    <string name="clear_local_tracking_events_data">Clear local tracking events data</string>
+    <string name="delete_all_local_tracking_data">Delete all local tracking data?</string>
+    <string name="no_data">No data</string>
 
 
     <!-- uCrop string resource end -->

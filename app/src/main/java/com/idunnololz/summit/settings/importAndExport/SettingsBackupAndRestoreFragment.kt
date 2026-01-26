@@ -1,16 +1,28 @@
 package com.idunnololz.summit.settings.importAndExport
 
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.idunnololz.summit.R
+import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.ImportAndExportSettings
 import com.idunnololz.summit.settings.SettingModelItem
+import com.idunnololz.summit.settings.importAndExport.ExportSettingsViewModel.BackupOption.SaveInternal
 import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,6 +59,84 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
     }
   }
 
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val context = requireContext()
+
+    with(binding) {
+      exportSettingsViewModel.backupFile.observe(viewLifecycleOwner) {
+        when (it) {
+          is StatefulData.Error -> {
+            loadingView.hideAll()
+            launchAlertDialog("error_generating_backup") {
+              messageResId = R.string.error_generating_backup
+            }
+          }
+          is StatefulData.Loading -> {
+            loadingView.showProgressBar()
+          }
+          is StatefulData.NotStarted -> {}
+          is StatefulData.Success -> {
+            loadingView.hideAll()
+
+            when (it.data.config.backupOption) {
+              ExportSettingsViewModel.BackupOption.Share -> {
+                if (!isAdded) return@observe
+
+                val sendIntent = Intent().apply {
+                  putExtra(
+                    Intent.EXTRA_STREAM,
+                    it.data.uri,
+                  )
+                  action = Intent.ACTION_SEND
+                  type = "application/lol-catalyst-backup"
+                }
+
+                startActivity(
+                  Intent.createChooser(
+                    sendIntent,
+                    getString(R.string.share_backup),
+                  ),
+                )
+              }
+              ExportSettingsViewModel.BackupOption.Save -> {
+                Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
+                  .show()
+              }
+
+              ExportSettingsViewModel.BackupOption.Copy -> {
+                lifecycleScope.launch {
+                  val text = context.contentResolver.openInputStream(it.data.uri)
+                    ?.use {
+                      it.bufferedReader().readText()
+                    }
+
+                  if (text != null) {
+                    withContext(Dispatchers.Main) {
+                      Utils.copyToClipboard(context, text)
+                    }
+                  } else {
+                    withContext(Dispatchers.Main) {
+                      launchAlertDialog("error_generating_backup") {
+                        messageResId = R.string.error_generating_backup
+                      }
+                    }
+                  }
+                }
+              }
+
+              SaveInternal -> {
+                Toast.makeText(context, R.string.settings_saved, Toast.LENGTH_LONG)
+                  .show()
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   override fun generateData(): List<SettingModelItem> = listOf(
     settings.importSettings.asCustomItem {
       ImportSettingsDialogFragment.show(childFragmentManager)
@@ -71,6 +161,17 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
       val direction = SettingsBackupAndRestoreFragmentDirections
         .actionSettingBackupAndRestoreFragmentToViewCurrentSettingsFragment()
       findNavController().navigateSafe(direction)
+    },
+
+    SettingModelItem.DividerItem(R.id.divider0),
+    settings.copySettingsForDebugging.asCustomItem {
+      exportSettingsViewModel.createBackupAndSave(
+        ExportSettingsViewModel.BackupConfig(
+          backupOption =  ExportSettingsViewModel.BackupOption.Copy,
+          includeDatabase = false,
+          dest = null,
+        ),
+      )
     },
   )
 }

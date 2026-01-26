@@ -210,6 +210,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_settingsInboxFragment"
             app:destination="@id/settingsInboxFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_settingsLocalTrackingEventsFragment"
+            app:destination="@id/settingsLocalTrackingEventsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingAboutFragment"
@@ -529,4 +532,8 @@
         android:id="@+id/settingsInboxFragment"
         android:name="com.idunnololz.summit.settings.inbox.SettingsInboxFragment"
         android:label="SettingsInboxFragment" />
+    <fragment
+        android:id="@+id/settingsLocalTrackingEventsFragment"
+        android:name="com.idunnololz.summit.settings.localTrackingEvents.SettingsLocalTrackingEventsFragment"
+        android:label="SettingsLocalTrackingEventsFragment" />
 </navigation>

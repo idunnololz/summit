@@ -43,12 +43,10 @@ class SettingsDownloadsFragment : BaseSettingsFragment() {
       { getCurrentDownloadDirectory() },
       { openDocumentTreeLauncher.launch(null) },
     ),
-    settings.resetDownloadDirectory.asCustomItem(
-      {
-        preferences.reset(KEY_DOWNLOAD_DIRECTORY)
-        refresh()
-      },
-    ),
+    settings.resetDownloadDirectory.asCustomItem {
+      preferences.reset(KEY_DOWNLOAD_DIRECTORY)
+      refresh()
+    },
   )
 
   private fun getCurrentDownloadDirectory(): String {

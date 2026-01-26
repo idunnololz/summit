@@ -726,7 +726,7 @@ class Preferences(
   var saveRecentCommunities
     by booleanPreference(KEY_SAVE_RECENT_COMMUNITIES, true)
   var localTrackingEnabled
-    by booleanPreference(KEY_LOCAL_TRACKING_ENABLED, false)
+    by booleanPreference(KEY_LOCAL_TRACKING_ENABLED, true)
   var useCursorsWhenLoadingPostFeed
     by booleanPreference(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED, false)
 

@@ -52,6 +52,16 @@ fun DescriptionSettingItem.asCustomItem(): SettingModelItem.CustomItem =
     onValueChanged = { },
   )
 
+fun BasicSettingItem.asCustomItem(): SettingModelItem.CustomItem = SettingModelItem.CustomItem(
+  setting = this,
+  title = this.title,
+  description = this.description,
+  icon = this.icon ?: 0,
+  clickable = false,
+  getCurrentValue = { null },
+  onValueChanged = null,
+)
+
 fun BasicSettingItem.asCustomItem(
   onValueChanged: (BasicSettingItem) -> Unit,
 ): SettingModelItem.CustomItem = SettingModelItem.CustomItem(

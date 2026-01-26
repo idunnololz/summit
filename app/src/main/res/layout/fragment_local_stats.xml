@@ -44,17 +44,6 @@
                 android:clipToPadding="false"/>
         </com.idunnololz.summit.view.swipeRefreshLayout.SwipeRefreshLayout>
 
-        <TextView
-            android:id="@+id/stats"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:textAppearance="?textAppearanceBodyMedium"
-            android:scrollbars = "vertical"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
         <com.idunnololz.summit.view.LoadingView
             android:id="@+id/loading_view"
             android:layout_width="wrap_content"

@@ -57,6 +57,11 @@ abstract class SummitActivity :
     currentNavController?.navigateSafe(direction)
   }
 
+  fun showLocalTrackingEventsSettings() {
+    val direction = MainDirections.actionGlobalSettingsFragment("local_tracking_events")
+    currentNavController?.navigateSafe(direction)
+  }
+
   fun showCommunities(instance: String) {
     val directions = MainDirections.actionGlobalCommunitiesFragment(instance)
     currentNavController?.navigateSafe(directions)

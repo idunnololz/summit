@@ -99,10 +99,10 @@ fun BaseFragment<*>.setupForFragment(t: KClass<*>, animate: Boolean) {
           navBarController.showBottomNav()
           hideNotificationBarBg()
         }
-        else ->
-          throw RuntimeException(
-            "No setup instructions for type: ${t.java.canonicalName}",
-          )
+        else -> {
+          navBarController.showBottomNav()
+          showNotificationBarBg()
+        }
       }
     }
   }
