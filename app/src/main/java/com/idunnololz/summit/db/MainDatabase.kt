@@ -57,6 +57,9 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsDao
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventEntry
 import com.idunnololz.summit.localTracking.TrackingEventsDao
+import com.idunnololz.summit.localTracking.community.CommunityStatEntry
+import com.idunnololz.summit.localTracking.community.CommunityStatEntryConverters
+import com.idunnololz.summit.localTracking.community.CommunityTrackerDao
 import com.idunnololz.summit.templates.db.TemplateConverters
 import com.idunnololz.summit.templates.db.TemplateEntry
 import com.idunnololz.summit.templates.db.TemplatesDao
@@ -90,6 +93,7 @@ private const val TAG = "MainDatabase"
     UserTagEntry::class,
     TemplateEntry::class,
     TrackingEventEntry::class,
+    CommunityStatEntry::class,
   ],
   autoMigrations = [
     AutoMigration(from = 20, to = 21),
@@ -106,14 +110,16 @@ private const val TAG = "MainDatabase"
     AutoMigration(from = 47, to = 48),
     AutoMigration(from = 49, to = 50),
     AutoMigration(from = 50, to = 51),
+    AutoMigration(from = 51, to = 52),
   ],
-  version = 51,
+  version = 52,
   exportSchema = true,
 )
 @TypeConverters(
   HistoryConverters::class,
   DraftConverters::class,
   TemplateConverters::class,
+  CommunityStatEntryConverters::class,
 )
 abstract class MainDatabase : RoomDatabase() {
 
@@ -132,6 +138,7 @@ abstract class MainDatabase : RoomDatabase() {
   abstract fun userTagsDao(): UserTagsDao
   abstract fun templatesDao(): TemplatesDao
   abstract fun trackingEventsDao(): TrackingEventsDao
+  abstract fun communityTrackerDao(): CommunityTrackerDao
 
   companion object {
 
@@ -170,6 +177,7 @@ abstract class MainDatabase : RoomDatabase() {
         .addTypeConverter(UserTagConverters(json))
         .addTypeConverter(TemplateConverters(json))
         .addTypeConverter(FilterEntryConverters(json))
+        .addTypeConverter(CommunityStatEntryConverters(json))
         .addMigrations(MIGRATION_19_20)
         .addMigrations(MIGRATION_21_22)
         .addMigrations(MIGRATION_22_24)
@@ -188,15 +196,8 @@ abstract class MainDatabase : RoomDatabase() {
         .addMigrations(MIGRATION_40_41)
         .addMigrations(MIGRATION_44_45)
         .addMigrations(MIGRATION_48_49(json))
-        .addMigrations(object : Migration(50, 51) {
-          override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL("DROP TABLE IF EXISTS tracking_events;")
-            db.execSQL(
-              "CREATE TABLE IF NOT EXISTS `tracking_events` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `ts` INTEGER NOT NULL, `event` BLOB NOT NULL)",
-            )
-          }
-        })
-
+        .addMigrations(MIGRATION_50_51)
+        .addMigrations(MIGRATION_51_52)
         .build()
     }
   }
@@ -426,6 +427,30 @@ fun MIGRATION_48_49(json: Json) =
           cv
         )
       }
+    }
+  }
+
+val MIGRATION_50_51 =
+  object : Migration(50, 51) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("DROP TABLE IF EXISTS tracking_events;")
+      db.execSQL(
+        "CREATE TABLE IF NOT EXISTS `tracking_events` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `ts` INTEGER NOT NULL, `event` BLOB NOT NULL)",
+      )
+    }
+  }
+
+val MIGRATION_51_52 =
+  object : Migration(51, 52) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+      db.execSQL("DROP TABLE IF EXISTS tracking_events;")
+      db.execSQL("DROP TABLE IF EXISTS community_tracker;")
+      db.execSQL(
+        "CREATE TABLE IF NOT EXISTS `tracking_events` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `ts` INTEGER NOT NULL, `event_action` TEXT NOT NULL DEFAULT 'VIEW', `event` BLOB NOT NULL)",
+      )
+      db.execSQL(
+        "CREATE TABLE IF NOT EXISTS `community_tracker` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `lastUpdateTs` INTEGER NOT NULL, `createdTs` INTEGER NOT NULL, `communityRef` TEXT NOT NULL, `icon` TEXT, `hits` INTEGER NOT NULL, `lastMetadataUpdateTs` INTEGER NOT NULL, `mau` INTEGER)",
+      )
     }
   }
 

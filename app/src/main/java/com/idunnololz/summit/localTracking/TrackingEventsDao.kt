@@ -16,12 +16,14 @@ interface TrackingEventsDao {
   @Query("SELECT * FROM tracking_events")
   suspend fun getAll(): List<TrackingEventEntry>
 
+  @Query("SELECT * FROM tracking_events WHERE event_action = :action")
+  suspend fun getEventsWithAction(action: TrackedAction): List<TrackingEventEntry>
+
   @Query("SELECT COUNT(id) FROM tracking_events")
   fun getCount(): Int
 
   @RawQuery
   fun getTableSize(query: RoomRawQuery): Long
-
 
   @Query("DELETE FROM tracking_events")
   suspend fun deleteAll()

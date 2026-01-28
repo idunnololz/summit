@@ -2,6 +2,7 @@ package com.idunnololz.summit.settings.localTrackingEvents
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.OnTrackingEventListener
 import com.idunnololz.summit.localTracking.TrackingEventsDao
@@ -32,6 +33,8 @@ class SettingsLocalTrackingEventsViewModel @Inject constructor(
         load()
       }
     }
+
+    override fun onViewCommunity(communityRef: CommunityRef) {}
   }
 
   init {

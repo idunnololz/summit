@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.AccountView
@@ -23,6 +24,9 @@ import com.idunnololz.summit.lemmy.instance
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.links.ApiFeatureHelper
+import com.idunnololz.summit.localTracking.community.CommunityTracker
+import com.idunnololz.summit.main.CommunitySelectorController.RawCommunityData
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.Event
@@ -49,6 +53,8 @@ class MainActivityViewModel @Inject constructor(
   val communitySelectorControllerFactory: CommunitySelectorController.Factory,
   val userCommunitiesManager: UserCommunitiesManager,
   val postReadManager: PostReadManager,
+  private val preferences: Preferences,
+  private val communityTracker: CommunityTracker,
 ) : ViewModel() {
 
   companion object {
@@ -56,7 +62,7 @@ class MainActivityViewModel @Inject constructor(
   }
   private val readyCount = MutableStateFlow<Int>(0)
 
-  val communities = StatefulLiveData<List<CommunityView>>()
+  val communities = StatefulLiveData<List<RawCommunityData>>()
   val currentAccount = MutableLiveData<AccountView?>(null)
   val unreadCount = accountInfoManager.unreadCount.asLiveData()
   val newActionErrorsCount = pendingActionsManager.numNewFailedActionsFlow.asLiveData()
@@ -155,32 +161,66 @@ class MainActivityViewModel @Inject constructor(
           directoryHelper.cleanup()
         }
       }
+
+      launch {
+        preferences.onPreferenceChangeFlow.collect {
+          withContext(Dispatchers.Main) {
+            loadCommunities()
+          }
+        }
+      }
     }
   }
 
   fun loadCommunities() {
     communities.setIsLoading()
-    viewModelScope.launch(Dispatchers.Default) {
-      val supportsGetCommunitiesAll = apiFeatureHelper.instanceSupportsFeatureAsync(
-        instance = apiClient.instance,
-        feature = ApiFeature.GetCommunitiesAll,
-        defaultValue = true,
-      )
 
-      if (supportsGetCommunitiesAll) {
-        apiClient.fetchCommunitiesWithRetry(
-          sortType = SortType.TopAll,
-          listingType = ListingType.All,
-        )
-      } else {
-        apiClient.fetchCommunitiesWithRetry(
-          sortType = SortType.Hot,
-          listingType = ListingType.All,
-        )
-      }.onSuccess {
-        communities.postValue(it)
-      }.onFailure {
-        communities.postError(it)
+    viewModelScope.launch(Dispatchers.Default) {
+
+      when (preferences.communitySelectorCommunitiesList) {
+        R.id.community_selector_community_list_frequented_communities -> {
+          communities.postValue(
+            communityTracker.getCommunityStats().map {
+              RawCommunityData(
+                communityRef = it.communityRef,
+                icon = it.icon,
+                mau = it.mau,
+              )
+            }
+          )
+
+        }
+        else -> {
+          val supportsGetCommunitiesAll = apiFeatureHelper.instanceSupportsFeatureAsync(
+            instance = apiClient.instance,
+            feature = ApiFeature.GetCommunitiesAll,
+            defaultValue = true,
+          )
+
+          if (supportsGetCommunitiesAll) {
+            apiClient.fetchCommunitiesWithRetry(
+              sortType = SortType.TopAll,
+              listingType = ListingType.All,
+            )
+          } else {
+            apiClient.fetchCommunitiesWithRetry(
+              sortType = SortType.Hot,
+              listingType = ListingType.All,
+            )
+          }.onSuccess {
+            communities.postValue(
+              it.map {
+                RawCommunityData(
+                  it.community.toCommunityRef(),
+                  it.community.icon,
+                  it.counts.users_active_month,
+                )
+              }
+            )
+          }.onFailure {
+            communities.postError(it)
+          }
+        }
       }
     }
   }

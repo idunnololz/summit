@@ -146,6 +146,7 @@ class MainApplication :
 
     hiltEntryPoint.accountInfoManager().init()
     hiltEntryPoint.conversationsManager().init()
+    hiltEntryPoint.communityTracker().init()
 
     if (preferences.useFirebase) {
       SentryAndroid.init(this) { options ->

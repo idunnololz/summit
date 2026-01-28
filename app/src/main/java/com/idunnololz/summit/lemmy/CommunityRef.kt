@@ -165,6 +165,7 @@ sealed interface CommunityRef :
       }
     is AllSubscribed -> context.getString(R.string.all_subscribed)
   }
+
   fun getLocalizedFullNameSpannable(context: Context): Spannable {
     val text = when (this) {
       is Local ->

@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 36
-    versionCode = 309
-    versionName = "1.75.4"
+    versionCode = 310
+    versionName = "1.76.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -176,6 +176,7 @@ dependencies {
   // Tried to switch to KSP + Dagger/Hilt but the build performance was terrible. Specifically
   // for incremental builds. Make sure to test this when switching to KSP again in the future.
   kapt(libs.hilt.android.compiler)
+  kapt("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0-Beta1")
 
   implementation(libs.process.phoenix)
 

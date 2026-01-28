@@ -2355,6 +2355,8 @@
     <string name="clear_local_tracking_events_data">Clear local tracking events data</string>
     <string name="delete_all_local_tracking_data">Delete all local tracking data?</string>
     <string name="no_data">No data</string>
+    <string name="community_selector_communities_list">Community list to show</string>
+    <string name="communities_list_settings">Communities list settings</string>
 
 
     <!-- uCrop string resource end -->

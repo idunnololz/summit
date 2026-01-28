@@ -317,4 +317,7 @@
     <item name="view_in_link_editor" type="id" />
     <item name="text_change_listener" type="id" />
     <item name="local_stats" type="id" />
+
+    <item name="community_selector_community_list_top_communities" type="id" />
+    <item name="community_selector_community_list_frequented_communities" type="id" />
 </resources>

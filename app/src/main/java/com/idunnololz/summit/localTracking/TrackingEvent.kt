@@ -14,6 +14,10 @@ class TrackingEventEntry(
   val id: Long,
   val userId: Long,
   val ts: Long,
+
+  @ColumnInfo(name = "event_action", defaultValue = "VIEW")
+  val action: TrackedAction = TrackedAction.VIEW,
+
   /**
    * What this filter is for. Eg. post list, comments, etc.
    */

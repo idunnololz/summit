@@ -17,6 +17,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,6 +26,7 @@ private const val TAG = "LocalTracker"
 
 interface OnTrackingEventListener {
   fun onDeleteAll()
+  fun onViewCommunity(communityRef: CommunityRef)
 }
 
 @Singleton
@@ -139,6 +141,10 @@ class LocalTracker @Inject constructor(
             override fun onDeleteAll() {
               listeners.forEach { it.onDeleteAll() }
             }
+
+            override fun onViewCommunity(communityRef: CommunityRef) {
+              listeners.forEach { it.onViewCommunity(communityRef) }
+            }
           }
         )
       }
@@ -182,6 +188,10 @@ class LocalTracker @Inject constructor(
   ) {
     listeners -= l
   }
+
+  suspend fun getEvents(action: TrackedAction) =
+    trackingEventsDao.getEventsWithAction(action)
+      .map { Cbor.decodeFromByteArray<TrackingEvent>(it.trackingEventCbor) }
 }
 
 class PerAccountLocalTracker @AssistedInject constructor(
@@ -233,9 +243,14 @@ class PerAccountLocalTracker @AssistedInject constructor(
           id = 0,
           ts = System.currentTimeMillis(),
           userId = userId,
+          action = action,
           trackingEventCbor = encoded,
         )
       )
+
+      if (action == TrackedAction.VIEW && communityRef != null && postId == null && commentId == null) {
+        listener.onViewCommunity(communityRef)
+      }
     }
   }
 

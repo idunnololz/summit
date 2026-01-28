@@ -285,6 +285,13 @@ class SettingsAdapter(
 
         onValueChanged()
       }
+      b.root.setOnClickListener {
+        findSettingModel<SettingModelItem.RadioGroupItem>(setting.id)
+          ?.onValueChanged
+          ?.invoke(option.id)
+
+        onValueChanged()
+      }
 
       if (item.isEnabled) {
         b.title.isEnabled = true

@@ -892,6 +892,7 @@ class MainActivity : SummitActivity() {
         context = this,
         viewModel = viewModel,
         viewLifecycleOwner = this,
+        fragmentManager = supportFragmentManager,
       ).also {
         it.setup(this, binding.root)
 

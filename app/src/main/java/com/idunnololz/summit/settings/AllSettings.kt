@@ -46,6 +46,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENT_GESTURE_ACTI
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENT_GESTURE_ACTION_COLOR_3
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENT_GESTURE_SIZE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMENT_SHOW_UP_AND_DOWN_VOTES
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMUNITY_SELECTOR_COMMUNITIES_LIST
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_COMMENTS_SORT_ORDER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_DEFAULT_COMMUNITY_SORT_ORDER
@@ -277,6 +278,9 @@ object SettingPath {
 
     LocalTrackingEventsSettings::class ->
       context.getString(R.string.local_tracking_events)
+
+    CommunitySelectorCommunitiesListSettings::class ->
+      context.getString(R.string.communities_list_settings)
 
     else -> error("No name for $this")
   }
@@ -2570,6 +2574,34 @@ class SearchHomeSettings @Inject constructor(
   )
 }
 
+class CommunitySelectorCommunitiesListSettings @Inject constructor(
+  @ActivityContext private val context: Context,
+) : SearchableSettings {
+
+  val communitySelectorCommunitiesList = RadioGroupSettingItem(
+    0,
+    context.getString(R.string.community_selector_communities_list),
+    null,
+    listOf(
+      RadioGroupSettingItem.RadioGroupOption(
+        R.id.community_selector_community_list_top_communities,
+        context.getString(R.string.top_communities),
+        null,
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        R.id.community_selector_community_list_frequented_communities,
+        context.getString(R.string.frequented_communities),
+        null,
+      ),
+    ),
+    relatedKeys = listOf(KEY_COMMUNITY_SELECTOR_COMMUNITIES_LIST),
+  )
+
+  override val parents: List<KClass<out SearchableSettings>> = listOf(
+    MainSettings::class,
+  )
+}
+
 class VideoPlayerSettings @Inject constructor(
   @ActivityContext private val context: Context,
 ) : SearchableSettings {
@@ -2682,6 +2714,7 @@ class AllSettings @Inject constructor(
   defaultAppsSettings: DefaultAppsSettings,
   inboxSettings: InboxSettings,
   localTrackingEventsSettings: LocalTrackingEventsSettings,
+  communitySelectorCommunitiesListSettings: CommunitySelectorCommunitiesListSettings,
 ) {
   val allSearchableSettings: List<SearchableSettings> = listOf(
     mainSettings,
@@ -2711,6 +2744,7 @@ class AllSettings @Inject constructor(
     defaultAppsSettings,
     inboxSettings,
     localTrackingEventsSettings,
+    communitySelectorCommunitiesListSettings,
   )
 
   init {

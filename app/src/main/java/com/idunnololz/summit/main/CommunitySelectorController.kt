@@ -15,6 +15,7 @@ import android.widget.EditText
 import androidx.annotation.DrawableRes
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,6 +37,7 @@ import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
+import com.idunnololz.summit.databinding.CommunitySelectorCommunitiesHeaderItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorCurrentCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySelectorGroupItemBinding
@@ -52,6 +54,7 @@ import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.appendNameWithInstance
 import com.idunnololz.summit.lemmy.toCommunityRef
+import com.idunnololz.summit.main.editCommunitiesList.SettingsCommunitiesListDialogFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.StatefulData
@@ -59,7 +62,6 @@ import com.idunnololz.summit.util.StringSearchUtils
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.runAfterLayout
 import com.idunnololz.summit.util.ext.setup
-import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByMargins
 import com.idunnololz.summit.util.newBottomSheetPredictiveBackBackPressHandler
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.toErrorMessage
@@ -81,6 +83,7 @@ class CommunitySelectorController @AssistedInject constructor(
   @Assisted private val context: Context,
   @Assisted private val viewModel: MainActivityViewModel,
   @Assisted private val viewLifecycleOwner: LifecycleOwner,
+  @Assisted private val fragmentManager: FragmentManager,
   private val accountManager: AccountManager,
   private val accountInfoManager: AccountInfoManager,
   private val lemmyApiClient: AccountAwareLemmyClient,
@@ -101,6 +104,7 @@ class CommunitySelectorController @AssistedInject constructor(
       context: Context,
       viewModel: MainActivityViewModel,
       viewLifecycleOwner: LifecycleOwner,
+      fragmentManager: FragmentManager,
     ): CommunitySelectorController
   }
 
@@ -119,6 +123,9 @@ class CommunitySelectorController @AssistedInject constructor(
     preferences = preferences,
     onCurrentInstanceClick = {
       onChangeInstanceClick?.invoke()
+    },
+    onEditCommunitiesListClick = {
+      SettingsCommunitiesListDialogFragment.show(fragmentManager)
     },
   )
 
@@ -307,7 +314,7 @@ class CommunitySelectorController @AssistedInject constructor(
     binding.recyclerView.adapter = null
   }
 
-  fun setCommunities(communities: StatefulData<List<CommunityView>>) {
+  fun setCommunities(communities: StatefulData<List<RawCommunityData>>) {
     when (communities) {
       is StatefulData.Error -> {}
       is StatefulData.Loading -> {}
@@ -375,15 +382,21 @@ class CommunitySelectorController @AssistedInject constructor(
       val stillLoading: Boolean = false,
     ) : Item(text)
 
+    class CommunitiesHeaderItem(
+      val text: String,
+      val stillLoading: Boolean = false,
+    ) : Item(text)
+
     class NoResultsItem(
       val text: String,
     ) : Item(text)
 
     class CommunityChildItem(
       val text: CharSequence,
-      val community: CommunityView,
-      val monthlyActiveUsers: Int,
-    ) : Item(community.community.name)
+      val communityRef: CommunityRef,
+      val monthlyActiveUsers: Int?,
+      val icon: String?,
+    ) : Item(communityRef.getKey())
 
     class StaticChildItem(
       val text: String,
@@ -401,12 +414,19 @@ class CommunitySelectorController @AssistedInject constructor(
     data object BottomSpacer : Item("bottom_spacer:")
   }
 
+  data class RawCommunityData(
+    val communityRef: CommunityRef,
+    val icon: String?,
+    val mau: Int?,
+  )
+
   private inner class CommunitiesAdapter(
     private val onCurrentInstanceClick: () -> Unit,
     private val preferences: Preferences,
+    private val onEditCommunitiesListClick: () -> Unit,
   ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var rawData: List<CommunityView> = listOf()
+    private var rawData: List<RawCommunityData> = listOf()
     private var serverResultsInProgress = false
     private var serverQueryResults: List<CommunityView> = listOf()
 
@@ -435,6 +455,7 @@ class CommunitySelectorController @AssistedInject constructor(
           is Item.LoadingItem -> true
           is Item.CurrentCommunity -> old == new
           is Item.CurrentInstance -> old == new
+          is Item.CommunitiesHeaderItem -> true
           Item.BottomSpacer -> true
         }
       },
@@ -611,23 +632,43 @@ class CommunitySelectorController @AssistedInject constructor(
       }
 
       addItemType(
+        clazz = Item.CommunitiesHeaderItem::class,
+        inflateFn = CommunitySelectorCommunitiesHeaderItemBinding::inflate
+      ) { item, b, h ->
+        b.titleTextView.text = item.text
+
+        if (item.stillLoading) {
+          b.progressBar.visibility = View.VISIBLE
+        } else {
+          b.progressBar.visibility = View.GONE
+        }
+        b.edit.setOnClickListener {
+          onEditCommunitiesListClick()
+        }
+      }
+
+      addItemType(
         clazz = Item.CommunityChildItem::class,
         inflateFn = CommunitySelectorCommunityItemBinding::inflate,
       ) { item, b, h ->
-        val community = item.community
-
-        avatarHelper.loadCommunityIcon(b.icon, community.community)
+        avatarHelper.loadCommunityIcon(b.icon, item.communityRef, item.icon)
 
         b.title.text = item.text
 
-        val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
-        @Suppress("SetTextI18n")
-        b.monthlyActives.text = context.getString(R.string.mau_format, mauString)
+        if (item.monthlyActiveUsers != null) {
+          b.monthlyActives.visibility = View.VISIBLE
+
+          val mauString = LemmyUtils.abbrevNumber(item.monthlyActiveUsers.toLong())
+          @Suppress("SetTextI18n")
+          b.monthlyActives.text = context.getString(R.string.mau_format, mauString)
+        } else {
+          b.monthlyActives.visibility = View.GONE
+        }
 
         h.itemView.setOnClickListener {
           onCommunitySelectedListener?.invoke(
             this@CommunitySelectorController,
-            community.community.toCommunityRef(),
+            item.communityRef,
           )
         }
       }
@@ -862,38 +903,57 @@ class CommunitySelectorController @AssistedInject constructor(
         addRecentItems(query)
 
         if (preferences.communitySelectorShowCommunitySuggestions) {
-          newItems.add(Item.GroupHeaderItem(context.getString(R.string.top_communities)))
+          when (preferences.communitySelectorCommunitiesList) {
+            R.id.community_selector_community_list_frequented_communities -> {
+              newItems.add(
+                Item.CommunitiesHeaderItem(context.getString(R.string.frequented_communities)))
 
-          val filteredPopularCommunities = rawData.filter {
-            query.isNullOrBlank() ||
-              it.community.name.contains(
-                query,
-                ignoreCase = true,
-              )
-          }
-
-          filteredPopularCommunities
-            .sortedByDescending { it.counts.users_active_month }
-            .mapTo(newItems) {
-              Item.CommunityChildItem(
-                text = SpannableStringBuilder().apply {
-                  appendNameWithInstance(
-                    context,
-                    it.community.name,
-                    it.community.instance,
+              val filteredPopularCommunities = rawData.filter {
+                query.isNullOrBlank() ||
+                  it.communityRef.getLocalizedFullName(context).contains(
+                    query,
+                    ignoreCase = true,
                   )
-                },
-                community = it,
-                monthlyActiveUsers = it.counts.users_active_month,
-              ).also {
-                communityRefs.add(
-                  CommunityRef.CommunityRefByName(
-                    name = it.community.community.name,
-                    instance = it.community.community.instance,
-                  ),
-                )
               }
+
+              filteredPopularCommunities
+                .sortedByDescending { it.mau }
+                .mapTo(newItems) {
+                  Item.CommunityChildItem(
+                    text = it.communityRef.getLocalizedFullNameSpannable(context),
+                    communityRef = it.communityRef,
+                    monthlyActiveUsers = it.mau,
+                    icon = it.icon,
+                  ).also {
+                    communityRefs.add(it.communityRef)
+                  }
+                }
             }
+            else -> {
+              newItems.add(Item.CommunitiesHeaderItem(context.getString(R.string.top_communities)))
+
+              val filteredPopularCommunities = rawData.filter {
+                query.isNullOrBlank() ||
+                  it.communityRef.getLocalizedFullName(context).contains(
+                    query,
+                    ignoreCase = true,
+                  )
+              }
+
+              filteredPopularCommunities
+                .sortedByDescending { it.mau }
+                .mapTo(newItems) {
+                  Item.CommunityChildItem(
+                    text = it.communityRef.getLocalizedFullNameSpannable(context),
+                    communityRef = it.communityRef,
+                    monthlyActiveUsers = it.mau,
+                    icon = it.icon,
+                  ).also {
+                    communityRefs.add(it.communityRef)
+                  }
+                }
+            }
+          }
         }
       }
 
@@ -914,18 +974,14 @@ class CommunitySelectorController @AssistedInject constructor(
                   it.community.instance,
                 )
               },
-              community = it,
+              communityRef = it.community.toCommunityRef(),
               monthlyActiveUsers = it.counts.users_active_month,
+              icon = it.community.icon,
             )
           }
           .filter {
-            !communityRefs.contains(
-              CommunityRef.CommunityRefByName(
-                it.community.community.name,
-                it.community.community.instance,
-              ),
-            ) &&
-              it.community.community.name.contains(query, ignoreCase = true)
+            !communityRefs.contains(it.communityRef) &&
+              it.communityRef.getKey().contains(query, ignoreCase = true)
           }
 
         newItems.sortByDescending { StringSearchUtils.similarity(query, getText(it)) }
@@ -975,7 +1031,7 @@ class CommunitySelectorController @AssistedInject constructor(
       refreshItems(cb)
     }
 
-    fun setData(newData: List<CommunityView>) {
+    fun setData(newData: List<RawCommunityData>) {
       rawData = newData
 
       refreshItems({})

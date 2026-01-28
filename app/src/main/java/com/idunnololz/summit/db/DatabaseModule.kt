@@ -16,6 +16,7 @@ import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
 import com.idunnololz.summit.localTracking.TrackingEventsDao
+import com.idunnololz.summit.localTracking.community.CommunityTrackerDao
 import com.idunnololz.summit.templates.db.TemplatesDao
 import com.idunnololz.summit.user.UserCommunitiesDao
 import dagger.Module
@@ -82,6 +83,9 @@ class DatabaseModule {
 
   @Provides
   fun provideTrackingEventsDao(db: MainDatabase): TrackingEventsDao = db.trackingEventsDao()
+
+  @Provides
+  fun provideCommunityTrackerDao(db: MainDatabase): CommunityTrackerDao = db.communityTrackerDao()
 
   @Provides
   @Singleton

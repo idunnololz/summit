@@ -729,6 +729,8 @@ class Preferences(
     by booleanPreference(KEY_LOCAL_TRACKING_ENABLED, true)
   var useCursorsWhenLoadingPostFeed
     by booleanPreference(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED, false)
+  var communitySelectorCommunitiesList
+    by intPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, R.id.community_selector_community_list_top_communities)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]
