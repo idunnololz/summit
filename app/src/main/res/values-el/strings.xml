@@ -1516,4 +1516,5 @@
     <string name="refresh_post_feed">Ανανέωση ροής αναρτήσεων</string>
     <string name="link_editor">Συντάκτης συνδέσμων</string>
     <string name="use_volume_buttons_on_post_feed">Πλοήγηση με κουμπιά έντασης ήχου</string>
+    <string name="use_cursors_when_loading_post_feed">Χρήση δεικτών κατά την φόρτωση ροής αναρτήσεων</string>
 </resources>
