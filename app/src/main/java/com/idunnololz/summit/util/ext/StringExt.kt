@@ -1,5 +1,7 @@
 package com.idunnololz.summit.util.ext
 
+import androidx.core.text.BidiFormatter
+
 fun String.count(element: String): Int {
   var count = 0
 
@@ -14,3 +16,6 @@ fun String.count(element: String): Int {
 
   return count
 }
+
+fun String.toBidiSafe(): String =
+  BidiFormatter.getInstance().unicodeWrap(this)

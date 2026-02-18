@@ -24,6 +24,7 @@ import androidx.viewbinding.ViewBinding
 import coil3.asImage
 import coil3.dispose
 import coil3.load
+import coil3.request.allowHardware
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.AlertDialogFragment
@@ -394,6 +395,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
 
         if (isInitialRender) {
           serverIcon.load(scene.site.icon) {
+            allowHardware(false)
             placeholder(newShimmerDrawableSquare(context).asImage())
           }
           serverName.text = scene.site.name
@@ -426,6 +428,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
       is SignUpScene.AnswerForm -> with(currentBinding as SignUpAnswerFormBinding) {
         val localSite = scene.site.localSite
         serverIcon.load(scene.site.icon) {
+          allowHardware(false)
           placeholder(newShimmerDrawableSquare(context).asImage())
         }
         serverName.text = scene.site.name
@@ -486,6 +489,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
       }
       is SignUpScene.CaptchaForm -> with(currentBinding as SignUpCaptchaFormBinding) {
         serverIcon.load(scene.site.icon) {
+          allowHardware(false)
           placeholder(newShimmerDrawableSquare(context).asImage())
         }
         serverName.text = scene.site.name
@@ -519,10 +523,13 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
               scene.captchaError.toErrorMessage(context)
           }
         } else if (scene.captchaImage == null) {
-          captchaImage.load(shimmerDrawable)
+          captchaImage.load(shimmerDrawable) {
+            allowHardware(false)
+          }
         } else if (captchaImage.tag != scene.captchaUuid) {
           captchaImage.tag = scene.captchaUuid
           captchaImage.load(scene.captchaImage) {
+            allowHardware(false)
             placeholder(shimmerDrawable.asImage())
           }
         }
@@ -589,6 +596,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
         currentBinding as SignUpSubmitApplicationBinding,
       ) {
         serverIconExpanded.load(scene.site.icon) {
+          allowHardware(false)
           placeholder(newShimmerDrawableSquare(context).asImage())
         }
 
@@ -620,6 +628,7 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
         )
 
         serverIconExpanded.load(scene.site.icon) {
+          allowHardware(false)
           placeholder(newShimmerDrawableSquare(context).asImage())
         }
 

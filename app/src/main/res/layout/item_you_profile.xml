@@ -12,7 +12,6 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginStart="@dimen/padding"
-        android:layout_marginTop="@dimen/padding"
         android:foreground="@drawable/account_ripple"
         android:background="?backgroundColor"
         android:scaleType="centerCrop"

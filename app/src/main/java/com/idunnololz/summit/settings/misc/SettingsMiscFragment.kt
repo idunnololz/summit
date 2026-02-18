@@ -277,6 +277,10 @@ class SettingsMiscFragment :
         { preferences.useCursorsWhenLoadingPostFeed },
         { preferences.useCursorsWhenLoadingPostFeed = it },
       ),
+      settings.imageViewerControlStyle.asSingleChoiceSelectorItem(
+        { preferences.imageViewerControlStyle },
+        { preferences.imageViewerControlStyle = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

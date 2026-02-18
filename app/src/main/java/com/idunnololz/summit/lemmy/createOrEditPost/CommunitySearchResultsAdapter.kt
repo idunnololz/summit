@@ -10,6 +10,7 @@ import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.CommunitySearchResultCommunityItemBinding
 import com.idunnololz.summit.databinding.CommunitySearchResultSuggestionItemBinding
+import com.idunnololz.summit.databinding.DummyTopItemBinding
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchHeaderBinding
 import com.idunnololz.summit.databinding.ItemCommunitySearchNoResultsBinding
@@ -29,6 +30,8 @@ class CommunitySearchResultsAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   private sealed interface Item {
+
+    data object TopItem : Item
 
     data class GroupHeaderItem(
       val text: String,
@@ -64,6 +67,7 @@ class CommunitySearchResultsAdapter(
     areItemsTheSame = { old, new ->
       old::class == new::class &&
         when (old) {
+          is Item.TopItem -> true
           is Item.GroupHeaderItem -> {
             old.text == (new as Item.GroupHeaderItem).text
           }
@@ -79,6 +83,10 @@ class CommunitySearchResultsAdapter(
         }
     },
   ).apply {
+    addItemType(
+      clazz = Item.TopItem::class,
+      inflateFn = DummyTopItemBinding::inflate,
+    ) { item, b, _ -> }
     addItemType(
       clazz = Item.GroupHeaderItem::class,
       inflateFn = ItemCommunitySearchHeaderBinding::inflate,

@@ -36,6 +36,7 @@ import com.idunnololz.summit.account.AccountImageGenerator
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.isCommunityBlocked
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.accountUi.SignInNavigator
@@ -1201,6 +1202,12 @@ class CommunityFragment :
             }
 
             PostGestureAction.Reply -> {
+              if (moreActionsHelper.accountManager.currentAccount.value.isGuestAccount) {
+                PreAuthDialogFragment.newInstance()
+                  .show(childFragmentManager, "asdf")
+                return@LemmySwipeActionCallback
+              }
+
               slidingPaneController?.openPost(
                 instance = fetchedPost.source.instance ?: viewModel.apiInstance,
                 id = postView.post.id,
@@ -1378,7 +1385,13 @@ class CommunityFragment :
     findNavController().navigateSafe(direction)
   }
 
-  override fun proceedAnyways(tag: Int) {}
+  override fun proceedAnyways(tag: Int) {
+    when (tag) {
+      R.id.action_add_comment -> {
+
+      }
+    }
+  }
 
   fun getPost(postId: Int): PostView? {
     return viewModel.postListEngine.getFetchedPost(postId)

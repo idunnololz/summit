@@ -1,6 +1,7 @@
 package com.idunnololz.summit.avatar
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
@@ -11,6 +12,7 @@ import coil3.load
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.transformations
+import coil3.toBitmap
 import coil3.transform.CircleCropTransformation
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountImageGenerator
@@ -41,13 +43,14 @@ class AvatarHelper @Inject constructor(
 
   private val coroutineScope = coroutineScopeFactory.create()
 
-  fun loadAvatar(imageView: ImageView, person: Person) {
+  fun loadAvatar(imageView: ImageView, person: Person, onLoaded: (Bitmap) -> Unit = {}) {
     loadAvatar(
       imageView = imageView,
       imageUrl = person.avatar,
       personName = person.name,
       personId = person.id,
       personInstance = person.instance,
+      onLoaded = onLoaded,
     )
   }
 
@@ -79,6 +82,7 @@ class AvatarHelper @Inject constructor(
     personName: String,
     personId: PersonId,
     personInstance: String,
+    onLoaded: (Bitmap) -> Unit = {},
   ) {
     (imageView.getTag(R.id.generate_profile_icon_job) as Job?)?.cancel()
 
@@ -90,6 +94,8 @@ class AvatarHelper @Inject constructor(
           personInstance,
         )
 
+        onLoaded(d.bitmap)
+
         withContext(Dispatchers.Main) {
           imageView.dispose()
           imageView.setImageDrawable(d)
@@ -100,6 +106,12 @@ class AvatarHelper @Inject constructor(
       imageView.load(imageUrl) {
         placeholder(newShimmerDrawableSquare(context).asImage())
         allowHardware(false)
+
+        listener(
+          onSuccess = { _, result ->
+            onLoaded(result.image.toBitmap())
+          }
+        )
       }
     }
   }

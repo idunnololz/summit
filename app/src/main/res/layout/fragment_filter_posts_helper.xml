@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceTitleLarge"
+        android:text="@string/filter_posts_by_keyword"
+        android:layout_margin="@dimen/dialog_padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodyMedium"
+        android:text="@string/filter_posts_helper_desc"
+        android:layout_margin="@dimen/dialog_padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
+
+    <TextView
+        android:id="@+id/post_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dialog_padding"
+        android:textAppearance="?textAppearanceBodyLarge"
+        android:fontFamily="monospace"
+        android:background="?colorSurfaceContainerHigh"
+        android:layout_marginTop="@dimen/padding"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/body"/>
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?textAppearanceBodySmall"
+        android:text="@string/hint_tap_to_select_words"
+        android:layout_marginTop="@dimen/padding"
+        android:layout_marginHorizontal="@dimen/dialog_padding"
+        android:layout_marginBottom="@dimen/dialog_padding"
+        android:textColor="@color/text_color_faint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_content"
+        app:layout_constraintBottom_toTopOf="@+id/positive_button" />
+
+    <Button
+        android:id="@+id/filter_button"
+        android:text="@string/view_filters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?attr/borderlessButtonStyle"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/negative_button"
+        app:layout_constraintTop_toTopOf="@+id/positive_button"
+        app:layout_constraintBottom_toBottomOf="@+id/positive_button"/>
+
+    <Button
+        android:id="@+id/negative_button"
+        android:text="@string/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?attr/borderlessButtonStyle"
+        app:layout_constraintEnd_toStartOf="@+id/positive_button"
+        app:layout_constraintTop_toTopOf="@+id/positive_button"
+        app:layout_constraintBottom_toBottomOf="@+id/positive_button"/>
+
+    <Button
+        android:id="@+id/positive_button"
+        android:text="@string/add_filters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/padding_half"
+        style="?attr/borderlessButtonStyle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

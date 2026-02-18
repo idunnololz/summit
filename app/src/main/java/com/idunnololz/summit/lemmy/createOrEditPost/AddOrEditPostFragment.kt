@@ -704,7 +704,7 @@ class AddOrEditPostFragment :
       )
       communitySuggestionsRecyclerView.apply {
         adapter = this@AddOrEditPostFragment.adapter
-        setHasFixedSize(true)
+        setHasFixedSize(false)
         setup(animationsHelper)
         layoutManager = LinearLayoutManager(context)
       }
@@ -1273,6 +1273,9 @@ class AddOrEditPostFragment :
     binding.communitySuggestionsRecyclerView.alpha = 0f
     binding.communitySuggestionsRecyclerView.animate()
       .alpha(1f)
+    binding.communitySuggestionsRecyclerView.post {
+      binding.communitySuggestionsRecyclerView.smoothScrollToPosition(0)
+    }
 
     binding.postBodyToolbar.visibility = View.INVISIBLE
   }

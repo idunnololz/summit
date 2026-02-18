@@ -16,6 +16,7 @@ import com.idunnololz.summit.preferences.GestureSwipeDirectionIds
 import com.idunnololz.summit.preferences.GlobalFontColorId
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
+import com.idunnololz.summit.preferences.ImageViewerControlStyleIds
 import com.idunnololz.summit.preferences.InboxFabActionId
 import com.idunnololz.summit.preferences.InboxLayoutId
 import com.idunnololz.summit.preferences.NavRailGravityIds
@@ -2112,6 +2113,24 @@ class MiscSettings @Inject constructor(
     title = context.getString(R.string.use_cursors_when_loading_post_feed),
     description = context.getString(R.string.use_cursors_when_loading_post_feed_desc),
     relatedKeys = listOf(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED),
+  )
+  val imageViewerControlStyle = RadioGroupSettingItem(
+    null,
+    context.getString(R.string.image_viewer_control_style),
+    context.getString(R.string.image_viewer_control_style_desc),
+    listOf(
+      RadioGroupSettingItem.RadioGroupOption(
+        ImageViewerControlStyleIds.DEFAULT,
+        context.getString(R.string._default),
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        ImageViewerControlStyleIds.SINGLE_TAP_TO_CLOSE,
+        context.getString(R.string.single_tap_to_close),
+      ),
+    ),
+    relatedKeys = listOf(
+      KEY_ANIMATION_LEVEL,
+    ),
   )
 }
 

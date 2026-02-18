@@ -16,13 +16,17 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.idunnololz.summit.R
+import com.idunnololz.summit.SettingsDirections
 import com.idunnololz.summit.databinding.FragmentSettingsBinding
 import com.idunnololz.summit.databinding.SettingSearchResultItemBinding
+import com.idunnololz.summit.filterLists.ContentTypeIds
+import com.idunnololz.summit.filterLists.FilterTypeIds
 import com.idunnololz.summit.lemmy.search.SearchHomeConfigDialogFragment
 import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.editCommunitiesList.SettingsCommunitiesListDialogFragment
 import com.idunnololz.summit.settings.SettingPath.getPageName
+import com.idunnololz.summit.settings.postAndComments.SettingsPostAndCommentsFragmentDirections
 import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
@@ -340,6 +344,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
   private fun handleLinkIfNeeded() {
     val link = args.link
+
     if (link != null && !handledLink) {
       handledLink = true
 
@@ -354,6 +359,23 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         }
         "local_tracking_events" -> {
           launchLocalTrackingEventsSettings()
+        }
+        "post_keyword_filters" -> {
+          val direction = SettingsDirections
+            .actionGlobalSettingsFilterListFragment(
+              contentType = ContentTypeIds.PostListType,
+              filterType = FilterTypeIds.KeywordFilter,
+              title = getString(R.string.keyword_filters),
+              supportPredictiveBack = false,
+            )
+          findNavController().navigateSafe(
+            direction,
+            NavOptions.Builder()
+              .apply {
+                setPopUpTo(R.id.settingsFragment, true)
+              }
+              .build(),
+          )
         }
       }
     }

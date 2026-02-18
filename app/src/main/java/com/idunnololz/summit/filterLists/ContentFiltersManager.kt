@@ -10,7 +10,6 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.set
-import kotlin.text.contains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,10 +57,10 @@ class ContentFiltersManager @Inject constructor(
     val commentListFilters = mutableListOf<FilterEntry>()
     for (filter in filters) {
       when (filter.contentType) {
-        ContentTypes.PostListType -> {
+        ContentTypeIds.PostListType -> {
           postListFilters.add(filter)
         }
-        ContentTypes.CommentListType -> {
+        ContentTypeIds.CommentListType -> {
           commentListFilters.add(filter)
         }
       }
@@ -78,19 +77,19 @@ class ContentFiltersManager @Inject constructor(
   fun testPostView(postView: PostView): Boolean =
     postListFilters.patternByType.any { (type, pattern) ->
       when (type) {
-        FilterTypes.KeywordFilter -> {
+        FilterTypeIds.KeywordFilter -> {
           pattern.matcher(postView.post.name).find()
         }
-        FilterTypes.InstanceFilter -> {
+        FilterTypeIds.InstanceFilter -> {
           pattern.matcher(postView.community.instance).find()
         }
-        FilterTypes.CommunityFilter -> {
+        FilterTypeIds.CommunityFilter -> {
           pattern.matcher(postView.community.name).find()
         }
-        FilterTypes.UserFilter -> {
+        FilterTypeIds.UserFilter -> {
           pattern.matcher(postView.creator.name).find()
         }
-        FilterTypes.UrlFilter -> {
+        FilterTypeIds.UrlFilter -> {
           val url = postView.post.url
           if (url != null) {
             pattern.matcher(url).find()
@@ -109,13 +108,13 @@ class ContentFiltersManager @Inject constructor(
   fun testCommentView(commentView: CommentView): Boolean =
     commentListFilters.patternByType.any { (type, pattern) ->
       when (type) {
-        FilterTypes.KeywordFilter -> {
+        FilterTypeIds.KeywordFilter -> {
           pattern.matcher(commentView.comment.content).find()
         }
-        FilterTypes.InstanceFilter -> {
+        FilterTypeIds.InstanceFilter -> {
           pattern.matcher(commentView.creator.instance).find()
         }
-        FilterTypes.UserFilter -> {
+        FilterTypeIds.UserFilter -> {
           pattern.matcher(commentView.creator.name).find()
         }
         else -> false
@@ -124,10 +123,10 @@ class ContentFiltersManager @Inject constructor(
 
   fun getFilters(contentTypeId: ContentTypeId, filterTypeId: FilterTypeId): List<FilterEntry> =
     when (contentTypeId) {
-      ContentTypes.PostListType -> {
+      ContentTypeIds.PostListType -> {
         postListFilters.filters.filter { it.filterType == filterTypeId }
       }
-      ContentTypes.CommentListType -> {
+      ContentTypeIds.CommentListType -> {
         commentListFilters.filters.filter { it.filterType == filterTypeId }
       }
       else -> listOf()
@@ -175,11 +174,11 @@ class ContentFiltersManager @Inject constructor(
 
       val patternByType = mutableMapOf<Int, Pattern>()
       listOf(
-        FilterTypes.KeywordFilter,
-        FilterTypes.InstanceFilter,
-        FilterTypes.CommunityFilter,
-        FilterTypes.UserFilter,
-        FilterTypes.UrlFilter,
+        FilterTypeIds.KeywordFilter,
+        FilterTypeIds.InstanceFilter,
+        FilterTypeIds.CommunityFilter,
+        FilterTypeIds.UserFilter,
+        FilterTypeIds.UrlFilter,
       ).forEach { filterType ->
         val regex = typeToRegex[filterType]
         if (regex != null) {

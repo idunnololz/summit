@@ -91,6 +91,7 @@ class LocalStatsViewModel @Inject constructor(
               (userInteractions[trackingEvent.targetUserId] ?: 0) + 1
           }
           TrackedAction.DELETE_REPLY -> {}
+          TrackedAction.POST -> {}
         }
       }
 
@@ -104,9 +105,11 @@ class LocalStatsViewModel @Inject constructor(
         Model(
           events = events.size,
           mostVisitedCommunities = mostVisitedCommunities.entries
-            .sortedByDescending { it.value },
+            .sortedByDescending { it.value }
+            .take(10),
           favoriteCommunities = mostVisitedCommunitiesByPost.entries
-            .sortedByDescending { it.value },
+            .sortedByDescending { it.value }
+            .take(10),
           userInteractions = topUserInteractions
             .map {
               val key = it.key

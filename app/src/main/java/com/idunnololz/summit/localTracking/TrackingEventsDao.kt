@@ -19,6 +19,9 @@ interface TrackingEventsDao {
   @Query("SELECT * FROM tracking_events WHERE event_action = :action")
   suspend fun getEventsWithAction(action: TrackedAction): List<TrackingEventEntry>
 
+  @Query("SELECT * FROM tracking_events WHERE event_action = :action LIMIT :limit")
+  suspend fun getEventsWithActionWithLimit(action: TrackedAction, limit: Int): List<TrackingEventEntry>
+
   @Query("SELECT COUNT(id) FROM tracking_events")
   fun getCount(): Int
 

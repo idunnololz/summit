@@ -57,6 +57,11 @@ abstract class SummitActivity :
     currentNavController?.navigateSafe(direction)
   }
 
+  fun showPostsKeywordFilters() {
+    val direction = MainDirections.actionGlobalSettingsFragment("post_keyword_filters")
+    currentNavController?.navigateSafe(direction)
+  }
+
   fun showLocalTrackingEventsSettings() {
     val direction = MainDirections.actionGlobalSettingsFragment("local_tracking_events")
     currentNavController?.navigateSafe(direction)

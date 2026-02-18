@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,8 +43,15 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
   @Inject
   lateinit var animationsHelper: AnimationsHelper
 
+  private val predictiveBackBlocker = object : OnBackPressedCallback(true) {
+    override fun handleOnBackPressed() {
+      findNavController().navigateUp()
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
 
     childFragmentManager.setFragmentResultListener(
       AddOrEditFilterDialogFragment.REQUEST_KEY,
@@ -79,6 +88,13 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
       requireSummitActivity().apply {
         setupForFragment<SettingsFragment>(animate = false)
         insetViewAutomaticallyByPadding(viewLifecycleOwner, coordinatorLayout)
+      }
+
+      if (!args.supportPredictiveBack) {
+        requireActivity().onBackPressedDispatcher.addCallback(
+          viewLifecycleOwner,
+          predictiveBackBlocker,
+        )
       }
 
       setupToolbar(toolbar, args.title)

@@ -320,4 +320,5 @@
 
     <item name="community_selector_community_list_top_communities" type="id" />
     <item name="community_selector_community_list_frequented_communities" type="id" />
+    <item name="hide_posts_like_this" type="id" />
 </resources>

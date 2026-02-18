@@ -18,6 +18,7 @@ import coil3.load
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
@@ -68,6 +69,7 @@ import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.setup
+import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupToolbar
@@ -454,8 +456,8 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
 
           avatarHelper.loadAvatar(profileIcon, person)
 
-          val displayName = person.display_name
-            ?: person.name
+          val displayName = (person.display_name
+            ?: person.name).toBidiSafe()
 
           name.text = displayName
           subtitle.text = buildSpannedString {
@@ -711,7 +713,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
             }
           },
           onAddCommentClick = { postOrComment ->
-            if (viewModel.accountManager.currentAccount.value == null) {
+            if (viewModel.accountManager.currentAccount.value.isGuestAccount) {
               PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                 .show(childFragmentManager, "asdf")
               return@PostAdapter

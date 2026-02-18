@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "9.0.0"
+androidGradlePlugin = "9.0.1"
 arrowCore = "2.2.1.1"
 datastorePreferences = "1.1.7"
 desugar_jdk_libs = "2.1.5"
@@ -20,7 +20,8 @@ work = "2.10.3"
 coil = "3.3.0"
 retrofit = "3.0.0"
 jetbrainsKotlinJvm = "2.3.0"
-commonmark = "0.13.0" # DO NOT BUMP THIS PAST 0.13.0
+commonmark = "0.13.0"
+paletteKtx = "1.0.0" # DO NOT BUMP THIS PAST 0.13.0
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -110,6 +111,7 @@ commonmark-strikethrough = { module = "com.atlassian.commonmark:commonmark-ext-g
 commonmark-table = { module = "com.atlassian.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark"}
 
 tools-patreon = { module = "com.patreon:patreon", version = "0.4.2" }
+palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -123,4 +125,4 @@ navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navi
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "13.0.0" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
-sentry = { id = "io.sentry.android.gradle", version = "5.9.0"}
+sentry = { id = "io.sentry.android.gradle", version = "6.0.0"}

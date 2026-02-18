@@ -177,7 +177,10 @@ class PieFedApiAlphaAdapter(
     return headers
   }
 
-  fun <T> T.serializeToMap(): Map<String, String> = convert()
+  fun <T> T.serializeToMap(): Map<String, String> {
+    val result: Map<String, String> = convert()
+    return result.filterKeys { it != "auth" }
+  }
 
   // convert an object of type I to type O
   private inline fun <I, reified O> I.convert(): O {

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/padding"
-    android:layout_marginVertical="@dimen/padding_half">
+    android:layout_marginVertical="@dimen/padding_half"
+    app:cardBackgroundColor="?colorSurface">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -36,21 +37,6 @@
             app:layout_constraintTop_toBottomOf="@+id/banner"
             app:layout_constraintBottom_toBottomOf="@+id/banner"
             app:layout_constraintStart_toStartOf="parent"/>
-
-        <com.google.android.material.imageview.ShapeableImageView
-            style="@style/RoundImageView"
-            android:id="@+id/more_button"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="@dimen/padding"
-            android:layout_marginEnd="@dimen/padding"
-            android:layout_marginTop="@dimen/padding"
-            android:background="?colorSurface"
-            android:src="@drawable/baseline_more_vert_24"
-            android:scaleType="center"
-            app:tint="?colorControlNormal"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
             android:id="@+id/overtext"
@@ -134,6 +120,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            style="@style/RoundImageView"
+            android:id="@+id/more_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="@dimen/padding"
+            android:layout_marginTop="@dimen/padding"
+            android:background="?selectableItemBackground"
+            android:src="@drawable/baseline_more_horiz_24"
+            android:scaleType="center"
+            app:tint="?colorControlNormal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -32,6 +32,7 @@ import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.setup
+import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
@@ -218,7 +219,7 @@ class ViewVotesFragment :
                 ?: person.name
             } else {
               person.name
-            },
+            }.toBidiSafe(),
             instance = postInstance,
             url = LinkUtils.getLinkForPerson(person.toPersonRef()),
           )

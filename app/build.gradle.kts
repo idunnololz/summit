@@ -23,8 +23,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 21
     targetSdk = 36
-    versionCode = 311
-    versionName = "1.76.2"
+    versionCode = 312
+    versionName = "1.77.0"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -140,6 +140,7 @@ dependencies {
 
   implementation(libs.room.runtime)
   implementation(libs.room.ktx)
+  implementation(libs.palette.ktx)
   ksp(libs.room.compiler)
 
   implementation(libs.window)

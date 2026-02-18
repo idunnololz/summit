@@ -2357,6 +2357,21 @@
     <string name="no_data">No data</string>
     <string name="community_selector_communities_list">Community list to show</string>
     <string name="communities_list_settings">Communities list settings</string>
+    <string name="image_viewer_control_style">Image viewer control style</string>
+    <string name="image_viewer_control_style_desc">Choose what taps and gestures do in the image viewer</string>
+    <string name="single_tap_to_close">Single tap to close</string>
+    <string name="show_labels">Show labels</string>
+    <string name="spoiler">Spoiler</string>
+    <string name="hide_posts_like_this">Hide posts like this…</string>
+    <string name="filter_posts">Filter posts</string>
+    <string name="filter_posts_helper_desc">Select the words you want to filter below.\n\nPosts containing the selected words will no longer appear in your post feed.</string>
+    <string name="view_filters">View filters</string>
+    <string name="add_filters">Add filters</string>
+    <string name="filters_added">Filters added!</string>
+    <string name="filter_posts_by_keyword">Filter posts by keyword</string>
+    <string name="hint_tap_to_select_words">(Tap to select words)</string>
+
+    <string name="account_created_on_format">Account created %1$s (cake day in %2$s days)</string>
 
 
     <!-- uCrop string resource end -->

@@ -17,6 +17,10 @@ import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
+import org.commonmark.node.BlockQuote
+import org.commonmark.node.CustomBlock
+import org.commonmark.node.FencedCodeBlock
+import org.commonmark.parser.Parser
 import java.util.regex.Pattern
 
 abstract class DetailsClickableSpan : ClickableSpan()
@@ -35,48 +39,72 @@ class DetailsEndSpan
 
 private const val TAG = "SpoilerPlugin"
 
+class SpoilerNode(
+  private val delimiter: String,
+) : CustomBlock() {
+}
+
 class SpoilerPlugin : AbstractMarkwonPlugin() {
 
   companion object {
     private const val SPOILER_START_REGEX = "(:::\\s*spoiler\\s+)(.*)\n?"
     private const val SPOILER_END_REGEX = ":::(?!\\s*spoiler)"
+
+
+    private const val COLLAPSED_ARROW = "▶ "
+    private const val EXPANDED_ARROW  = "▼ "
   }
 
   private val spoilerStartMatcher = Pattern.compile(SPOILER_START_REGEX)
   private val spoilerEndMatcher = Pattern.compile(SPOILER_END_REGEX)
 
-  override fun configure(registry: MarkwonPlugin.Registry) {
-    registry.require(CorePlugin::class.java) {
-      it.addOnTextAddedListener(object : CorePlugin.OnTextAddedListener {
-        override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
-          val startMatcher = spoilerStartMatcher.matcher(text)
-          val endMatcher = spoilerEndMatcher.matcher(text)
+  override fun configureParser(builder: Parser.Builder) {
+    builder.customBlockParserFactory(SpoilerBlockParser.SpoilerBlockParserFactory())
+  }
 
-          while (startMatcher.find()) {
-            val spoilerTitle = startMatcher.group(2)!!
-            visitor.builder().setSpan(
-              DetailsStartSpan(visitor.configuration().theme(), spoilerTitle),
-              start + startMatcher.start(),
-              start + startMatcher.end(2),
-              Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
-            )
-          }
-          while (endMatcher.find()) {
-            visitor.builder().apply {
-              if (start + 4 >= this.length) {
-                append(" ")
-              }
-              setSpan(
-                DetailsEndSpan(),
-                start + endMatcher.start(),
-                start + endMatcher.end() + 1,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
-              )
-            }
-          }
+  override fun configureVisitor(builder: MarkwonVisitor.Builder) {
+    super.configureVisitor(builder)
+
+    builder.on<SpoilerBlock?>(
+      SpoilerBlock::class.java,
+      MarkwonVisitor.NodeVisitor<SpoilerBlock?> { visitor, spoilerBlock ->
+
+        val builder = visitor.builder()
+
+        val headerStart = builder.length
+        val titleNode = spoilerBlock.titleNode
+        if (titleNode != null) {
+          visitor.visitChildren(titleNode)
         }
-      })
-    }
+        val headerEnd = builder.length
+
+        visitor.visitChildren(spoilerBlock)
+        visitor.ensureNewLine()
+
+        builder.setSpan(
+          DetailsStartSpan(
+            visitor.configuration().theme(),
+            builder.subSequence(headerStart, headerEnd)
+          ),
+          headerStart,
+          headerEnd,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
+        )
+
+        builder.apply {
+          val start = builder.length
+          append(" ")
+          setSpan(
+            DetailsEndSpan(),
+            start,
+            start + 1,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE or Spanned.SPAN_PRIORITY,
+          )
+        }
+
+        visitor.ensureNewLine()
+      },
+    )
   }
 
   override fun afterSetText(textView: TextView) {
@@ -121,9 +149,13 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         // The space at the end is necessary for the lengths to be the same
         // This reduces complexity as else it would need complex logic to determine the replacement length
         val spoilerTitle = if (detailsStartSpan.isExpanded) {
-          "${detailsStartSpan.title} ▲\n"
+          SpannableStringBuilder()
+            .append(detailsStartSpan.title)
+            .append(" ▲\n")
         } else {
-          "${detailsStartSpan.title} ▼\n"
+          SpannableStringBuilder()
+            .append(detailsStartSpan.title)
+            .append(" ▼\n")
         }
 
         if (detailsStartSpan.spoilerText == null) {

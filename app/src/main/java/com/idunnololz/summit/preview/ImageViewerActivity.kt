@@ -273,6 +273,7 @@ class ImageViewerActivity :
       }
     }
 
+    binding.imageView.controlStyle = preferences.imageViewerControlStyle
     binding.toolbar.setNavigationOnClickListener {
       supportFinishAfterTransition()
     }
@@ -553,7 +554,7 @@ class ImageViewerActivity :
 
     binding.imageView.callback = object : GalleryImageView.Callback {
       override fun toggleUi() {
-        this@ImageViewerActivity.togggleUi()
+        this@ImageViewerActivity.toggleUi()
       }
 
       override fun showUi() {
@@ -594,12 +595,16 @@ class ImageViewerActivity :
 
         return false
       }
+
+      override fun close() {
+        supportFinishAfterTransition()
+      }
     }
 
     loadImageFromUrl(url)
   }
 
-  private fun togggleUi() {
+  private fun toggleUi() {
     if (showingUi) {
       hideUi()
     } else {

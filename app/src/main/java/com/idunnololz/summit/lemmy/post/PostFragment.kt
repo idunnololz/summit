@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.account.loadProfileImageOrDefault
 import com.idunnololz.summit.accountUi.AccountsAndSettingsDialogFragment
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
@@ -307,7 +308,7 @@ class PostFragment :
               },
             )
           }.show()
-        } catch (e: IOException) { /* do nothing */ }
+        } catch (_: IOException) { /* do nothing */ }
       }
     }
 
@@ -866,7 +867,7 @@ class PostFragment :
   }
 
   private fun onAddCommentClick(postOrComment: Either<PostView, CommentView>) {
-    if (accountManager.currentAccount.value == null) {
+    if (accountManager.currentAccount.value.isGuestAccount) {
       PreAuthDialogFragment.newInstance(R.id.action_add_comment)
         .show(childFragmentManager, "asdf")
       return
@@ -1307,6 +1308,12 @@ class PostFragment :
             }
 
             CommentGestureAction.Reply -> {
+              if (moreActionsHelper.accountManager.currentAccount.value.isGuestAccount) {
+                PreAuthDialogFragment.newInstance(R.id.action_add_comment)
+                  .show(childFragmentManager, "asdf")
+                return@LemmySwipeActionCallback
+              }
+
               AddOrEditCommentFragment.showReplyDialog(
                 instance = getInstance(),
                 postOrCommentView = Either.Right(commentView),
@@ -1368,7 +1375,7 @@ class PostFragment :
       }
 
       PostGestureAction.Reply -> {
-        if (accountManager.currentAccount.value == null) {
+        if (accountManager.currentAccount.value.isGuestAccount) {
           PreAuthDialogFragment.newInstance(R.id.action_add_comment)
             .show(childFragmentManager, "asdf")
           return

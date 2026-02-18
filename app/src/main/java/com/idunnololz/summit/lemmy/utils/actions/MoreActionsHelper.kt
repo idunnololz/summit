@@ -8,6 +8,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.actions.SavedManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.AccountInstanceMismatchException
@@ -47,6 +48,7 @@ import okio.source
 @Singleton
 class MoreActionsHelperManager @Inject constructor(
   @ApplicationContext private val context: Context,
+  private val postReadManager: PostReadManager,
   private val lemmyApiClientFactory: AccountAwareLemmyClient.Factory,
   private val accountManager: AccountManager,
   private val accountInfoManager: AccountInfoManager,
@@ -85,6 +87,7 @@ class MoreActionsHelperManager @Inject constructor(
     accountManager = accountManager,
     accountInfoManager = accountInfoManager,
     accountActionsManager = accountActionsManager,
+    postReadManager = postReadManager,
     hiddenPostsManager = hiddenPostsManager,
     savedManager = savedManager,
     videoDownloadManager = videoDownloadManager,
@@ -104,6 +107,7 @@ class MoreActionsHelper(
   val accountManager: AccountManager,
   val accountInfoManager: AccountInfoManager,
   val accountActionsManager: AccountActionsManager,
+  val postReadManager: PostReadManager,
   private val hiddenPostsManager: HiddenPostsManager,
   private val savedManager: SavedManager,
   private val videoDownloadManager: VideoDownloadManager,

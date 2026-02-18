@@ -23,6 +23,8 @@ import com.idunnololz.summit.drafts.DraftsManager
 import com.idunnololz.summit.lemmy.RecentCommunityManager
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.links.LinkMetadataHelper
+import com.idunnololz.summit.localTracking.LocalTracker
+import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +46,7 @@ class AddOrEditPostViewModel @Inject constructor(
   private val linkMetadataHelper: LinkMetadataHelper,
   val draftsManager: DraftsManager,
   private val recentCommunityManager: RecentCommunityManager,
+  private val localTracker: LocalTracker,
 ) : ViewModel() {
 
   companion object {
@@ -162,6 +165,16 @@ class AddOrEditPostViewModel @Inject constructor(
 
       result
         .onSuccess {
+          localTracker.trackEvent(
+            instanceId = it.community.instance_id.toLong(),
+            communityRef = it.community.toCommunityRef(),
+            postId = it.post.id.toLong(),
+            commentId = null,
+            targetUserId = null,
+            action = TrackedAction.POST,
+            nsfw = it.post.nsfw,
+          )
+
           createOrEditPostResult.postValue(it)
         }
         .onFailure {

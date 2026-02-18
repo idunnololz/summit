@@ -555,7 +555,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
           },
           onAddCommentClick = { postOrComment ->
-            if (viewModel.accountManager.currentAccount.value == null) {
+            if (viewModel.accountManager.currentAccount.value.isGuestAccount) {
               PreAuthDialogFragment.newInstance(R.id.action_add_comment)
                 .show(childFragmentManager, "asdf")
               return@PostAdapter

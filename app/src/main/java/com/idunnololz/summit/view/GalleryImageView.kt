@@ -14,6 +14,8 @@ import android.view.ScaleGestureDetector
 import android.view.animation.DecelerateInterpolator
 import androidx.core.view.ScaleGestureDetectorCompat
 import com.google.android.material.imageview.ShapeableImageView
+import com.idunnololz.summit.preferences.ImageViewerControlStyleId
+import com.idunnololz.summit.preferences.ImageViewerControlStyleIds
 import com.idunnololz.summit.util.Utils
 import kotlin.math.abs
 import kotlin.math.max
@@ -43,12 +45,15 @@ class GalleryImageView : ShapeableImageView {
      * @return true if overscroll should be kept
      */
     fun overScrollEnd(): Boolean
+
+    fun close()
   }
 
   private var detector: GestureDetector
   private var scaleDetector: ScaleGestureDetector
   private val _matrix: Matrix = Matrix()
   private val _matrixArr = FloatArray(9)
+  var controlStyle: ImageViewerControlStyleId = ImageViewerControlStyleIds.DEFAULT
 
   /**
    * Minimum zoom possible. This is variable and depends on the size of the image.
@@ -219,34 +224,42 @@ class GalleryImageView : ShapeableImageView {
     detector.setOnDoubleTapListener(
       object : GestureDetector.OnDoubleTapListener {
         override fun onDoubleTap(e: MotionEvent): Boolean {
-          e.let {
-            // Store quick scale params. This will become either a double tap zoom or a
-            // quick scale depending on whether the user swipes.
+          if (controlStyle == ImageViewerControlStyleIds.SINGLE_TAP_TO_CLOSE) {
+            callback?.toggleUi()
+          } else {
+            e.let {
+              // Store quick scale params. This will become either a double tap zoom or a
+              // quick scale depending on whether the user swipes.
 
-            // Store quick scale params. This will become either a double tap zoom or a
-            // quick scale depending on whether the user swipes.
+              // Store quick scale params. This will become either a double tap zoom or a
+              // quick scale depending on whether the user swipes.
 //                        vCenterStart = PointF(e.x, e.y)
 //                        vTranslateStart = PointF(vTranslate.x, vTranslate.y)
-            startZoom = curZoom
-            isQuickScaling = true
-            isZooming = true
-            quickScaleLastDistance = -1f
-            quickScaleCenter.set(it.x, it.y)
+              startZoom = curZoom
+              isQuickScaling = true
+              isZooming = true
+              quickScaleLastDistance = -1f
+              quickScaleCenter.set(it.x, it.y)
 //                        quickScaleSCenter = viewToSourceCoord(vCenterStart)
 //                        quickScaleVStart = PointF(e.x, e.y)
-            quickScaleVLastPoint.set(quickScaleCenter.x, quickScaleCenter.y)
-            quickScaleMoved = false
-            // We need to get events in onTouchEvent after this.
+              quickScaleVLastPoint.set(quickScaleCenter.x, quickScaleCenter.y)
+              quickScaleMoved = false
+              // We need to get events in onTouchEvent after this.
 //                        zoomInToAnimated(it.x, it.y)
+            }
+            // We need to get events in onTouchEvent after this.
           }
-          // We need to get events in onTouchEvent after this.
           return false
         }
 
         override fun onDoubleTapEvent(e: MotionEvent): Boolean = true
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-          callback?.toggleUi()
+          if (controlStyle == ImageViewerControlStyleIds.SINGLE_TAP_TO_CLOSE) {
+            callback?.close()
+          } else {
+            callback?.toggleUi()
+          }
           return true
         }
       },

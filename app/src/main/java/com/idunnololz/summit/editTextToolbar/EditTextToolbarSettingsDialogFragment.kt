@@ -16,6 +16,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.databinding.DialogFragmentEditTextToolbarSettingsBinding
 import com.idunnololz.summit.databinding.TextFieldToolbarOptionItemBinding
+import com.idunnololz.summit.databinding.TextFieldToolbarShowLabelsItemBinding
 import com.idunnololz.summit.preferences.TextFieldToolbarSettings
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment
@@ -115,12 +116,20 @@ class EditTextToolbarSettingsDialogFragment :
         ?: TextFieldToolbarSettings()
       val shownOptions = textFieldToolbarSettings.toolbarOptions
       val data = ToolbarData(
-        options = shownOptions,
-        hiddenOptions = TextFieldToolbarOption.entries.filter {
-          !shownOptions.contains(
-            it,
+        showLabels = textFieldToolbarSettings.showLabels,
+        options = shownOptions.map {
+          TextFieldToolbarOptionData(
+            option = it,
+            visible = !textFieldToolbarSettings.hiddenOptions.contains(it),
           )
-        },
+        } + TextFieldToolbarOption.entries
+          .filter { !shownOptions.contains(it) }
+          .map {
+            TextFieldToolbarOptionData(
+              option = it,
+              visible = false,
+            )
+          },
       )
 
       val adapter = ReorderableListAdapter(data)
@@ -145,11 +154,17 @@ class EditTextToolbarSettingsDialogFragment :
         textFieldToolbarManager.updateToolbarSettings(
           currentSettings.copy(
             useCustomToolbar = true,
-            toolbarOptions = adapter.items.map {
-              when (it) {
-                is Item.ToolbarItem -> it.option
-              }
-            },
+            toolbarOptions = adapter.items
+              .filterIsInstance<Item.ToolbarItem>()
+              .map { it.option.option },
+            hiddenOptions = adapter.items
+              .filterIsInstance<Item.ToolbarItem>()
+              .filter { !it.option.visible }
+              .map { it.option.option },
+            showLabels = adapter.items
+              .filterIsInstance<Item.ShowLabelsItem>()
+              .firstOrNull()
+              ?.showLabels == true
           ),
         )
         dismiss()
@@ -170,13 +185,22 @@ class EditTextToolbarSettingsDialogFragment :
 
   sealed interface Item {
     data class ToolbarItem(
-      val option: TextFieldToolbarOption,
+      val option: TextFieldToolbarOptionData,
+    ) : Item
+
+    data class ShowLabelsItem(
+      val showLabels: Boolean,
     ) : Item
   }
 
   data class ToolbarData(
-    val options: List<TextFieldToolbarOption>,
-    val hiddenOptions: List<TextFieldToolbarOption>,
+    val showLabels: Boolean,
+    val options: List<TextFieldToolbarOptionData>,
+  )
+
+  data class TextFieldToolbarOptionData(
+    val option: TextFieldToolbarOption,
+    val visible: Boolean,
   )
 
   private class ReorderableListAdapter(
@@ -193,6 +217,8 @@ class EditTextToolbarSettingsDialogFragment :
           when (old) {
             is Item.ToolbarItem ->
               old == new
+
+            is Item.ShowLabelsItem -> true
           }
       },
     )
@@ -229,16 +255,64 @@ class EditTextToolbarSettingsDialogFragment :
 
       adapterHelper.apply {
         addItemType(
+          Item.ShowLabelsItem::class,
+          TextFieldToolbarShowLabelsItemBinding::inflate,
+        ) { item, b, h ->
+          b.showLabels.isChecked = item.showLabels
+          b.showLabels.setOnCheckedChangeListener { _, isChecked ->
+            this@ReorderableListAdapter.items = this@ReorderableListAdapter.items.map {
+              when (it) {
+                is Item.ShowLabelsItem -> {
+                  Item.ShowLabelsItem(isChecked)
+                }
+                is Item.ToolbarItem -> it
+              }
+            }
+          }
+        }
+        addItemType(
           Item.ToolbarItem::class,
           TextFieldToolbarOptionItemBinding::inflate,
         ) { item, b, h ->
           b.name.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            item.option.icon,
+            item.option.option.icon,
             0,
             0,
             0,
           )
-          b.name.setText(item.option.title)
+          b.name.setText(item.option.option.title)
+          if (item.option.visible) {
+            b.visible.setImageResource(R.drawable.baseline_visibility_24)
+            b.name.alpha = 1f
+            b.visible.alpha = 1f
+            b.dragRegion.alpha = 1f
+          } else {
+            b.visible.setImageResource(R.drawable.baseline_visibility_off_24)
+            b.name.alpha = 0.5f
+            b.visible.alpha = 0.5f
+            b.dragRegion.alpha = 0.5f
+          }
+          b.visible.setOnClickListener {
+            this@ReorderableListAdapter.items = this@ReorderableListAdapter.items.map {
+              when (it) {
+                is Item.ToolbarItem -> {
+                  if (it.option.option == item.option.option) {
+                    item.copy(
+                      option = item.option.copy(
+                        visible = !item.option.visible
+                      )
+                    )
+                  } else {
+                    it
+                  }
+                }
+                else -> it
+              }
+            }
+            adapterHelper.setItems(this@ReorderableListAdapter.items, this@ReorderableListAdapter)
+
+            changed.value = true
+          }
 
           b.dragRegion.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -251,11 +325,14 @@ class EditTextToolbarSettingsDialogFragment :
     }
 
     private fun refreshItems() {
-      items = data.options.map {
-        Item.ToolbarItem(it)
-      } + data.hiddenOptions.map {
+      val items = mutableListOf<Item>()
+
+      items.add(Item.ShowLabelsItem(data.showLabels))
+      data.options.mapTo(items) {
         Item.ToolbarItem(it)
       }
+
+      this.items = items
 
       adapterHelper.setItems(items, this)
     }

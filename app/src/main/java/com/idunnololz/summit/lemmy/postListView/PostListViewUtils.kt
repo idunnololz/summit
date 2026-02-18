@@ -4,9 +4,12 @@ import androidx.fragment.app.FragmentManager
 import arrow.core.Either
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
+import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
 import com.idunnololz.summit.lemmy.comment.PreviewCommentDialogFragment
@@ -125,7 +128,9 @@ fun BaseFragment<*>.showMorePostOptions(
       R.drawable.baseline_hide_24,
     )
 
-    if (postView.read) {
+    if (postView.read ||
+      moreActionsHelper.postReadManager.isPostRead(instance, postView.post.id) == true) {
+
       addItemWithIcon(
         R.id.pa_mark_post_as_unread,
         getString(R.string.mark_as_unread),
@@ -211,6 +216,11 @@ fun BaseFragment<*>.showMorePostOptions(
       getString(R.string.block_this_instance_format, postView.instance),
       R.drawable.baseline_public_off_24,
     )
+    addItemWithIcon(
+      R.id.hide_posts_like_this,
+      getString(R.string.hide_posts_like_this),
+      R.drawable.outline_visibility_off_24
+    )
     addDivider()
 //        addItemWithIcon(
 //            R.id.switch_account_temp,
@@ -265,7 +275,7 @@ fun BaseFragment<*>.createPostActionHandler(
 
   when (id) {
     R.id.pa_reply -> {
-      if (moreActionsHelper.accountManager.currentAccount.value == null) {
+      if (moreActionsHelper.accountManager.currentAccount.value.isGuestAccount) {
         PreAuthDialogFragment.newInstance(R.id.action_add_comment)
           .show(childFragmentManager, "PreAuthDialogFragment")
         return@a
@@ -358,6 +368,12 @@ fun BaseFragment<*>.createPostActionHandler(
               appendLine()
               appendLine("Thumbnail url:")
               appendLine(postView.post.thumbnail_url ?: "")
+              appendLine()
+              appendLine("Author:")
+              appendLine(postView.creator.display_name + " (${postView.creator.name})")
+              appendLine()
+              appendLine("AP ID:")
+              appendLine(postView.post.ap_id)
             },
             true,
           ).toBundle()
@@ -470,6 +486,9 @@ fun BaseFragment<*>.createPostActionHandler(
         filterByMod = null,
         filterByUser = postView.creator.toPersonRef(),
       )
+    }
+    R.id.hide_posts_like_this -> {
+      FilterPostsHelperFragment.show(childFragmentManager, postView)
     }
   }
 }

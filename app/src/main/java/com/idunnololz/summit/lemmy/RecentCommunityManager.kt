@@ -46,9 +46,6 @@ class RecentCommunityManager @Inject constructor(
   private val recentCommunitiesPostedTo =
     RecentCommunityCache(PREF_KEY_RECENT_COMMUNITIES_POSTED_TO)
 
-  init {
-  }
-
   fun getRecentCommunitiesVisited(): List<CommunityHistoryEntry> =
     recentCommunities.getRecentsOrLoad()
       .values

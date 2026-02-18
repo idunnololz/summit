@@ -303,6 +303,10 @@
         <argument
             android:name="title"
             app:argType="string" />
+        <argument
+            android:name="support_predictive_back"
+            app:argType="boolean"
+            android:defaultValue="true"/>
     </fragment>
     <fragment
         android:id="@+id/settingsPostAndCommentsFragment"
@@ -536,4 +540,5 @@
         android:id="@+id/settingsLocalTrackingEventsFragment"
         android:name="com.idunnololz.summit.settings.localTrackingEvents.SettingsLocalTrackingEventsFragment"
         android:label="SettingsLocalTrackingEventsFragment" />
+    <action android:id="@+id/action_global_settingsFilterListFragment" app:destination="@id/settingsFilterListFragment"/>
 </navigation>

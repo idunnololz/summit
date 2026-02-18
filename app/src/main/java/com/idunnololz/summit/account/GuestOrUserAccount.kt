@@ -21,5 +21,8 @@ val GuestOrUserAccount.key
 val GuestOrUserAccount.asAccount: Account?
   get() = this as? Account
 
+/**
+ * Returns true if the guest account is selected or if the user is not logged in on any account.
+ */
 val GuestOrUserAccount.isGuestAccount: Boolean
   get() = this is GuestAccount

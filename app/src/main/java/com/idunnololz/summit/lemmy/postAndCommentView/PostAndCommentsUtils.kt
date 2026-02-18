@@ -7,6 +7,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.info.isMod
+import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -305,7 +306,7 @@ fun BaseFragment<*>.createCommentActionHandler(
       ModActionsDialogFragment.show(commentView, childFragmentManager)
     }
     R.id.ca_reply -> {
-      if (moreActionsHelper.accountManager.currentAccount.value == null) {
+      if (moreActionsHelper.accountManager.currentAccount.value.isGuestAccount) {
         PreAuthDialogFragment.newInstance(R.id.action_add_comment)
           .show(childFragmentManager, "PreAuthDialogFragment")
         return@outer

@@ -10,8 +10,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.filterLists.ContentTypes
-import com.idunnololz.summit.filterLists.FilterTypes
+import com.idunnololz.summit.filterLists.ContentTypeIds
+import com.idunnololz.summit.filterLists.FilterTypeIds
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.idToSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
@@ -281,8 +281,8 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
               settings.keywordFilters.asCustomItem {
                 val direction = SettingsPostsFeedFragmentDirections
                   .actionSettingsContentFragmentToSettingsFilterListFragment(
-                    ContentTypes.PostListType,
-                    FilterTypes.KeywordFilter,
+                    ContentTypeIds.PostListType,
+                    FilterTypeIds.KeywordFilter,
                     getString(R.string.keyword_filters),
                   )
                 findNavController().navigateSafe(direction)
@@ -290,8 +290,8 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
               settings.instanceFilters.asCustomItem {
                 val direction = SettingsPostsFeedFragmentDirections
                   .actionSettingsContentFragmentToSettingsFilterListFragment(
-                    ContentTypes.PostListType,
-                    FilterTypes.InstanceFilter,
+                    ContentTypeIds.PostListType,
+                    FilterTypeIds.InstanceFilter,
                     getString(R.string.instance_filters),
                   )
                 findNavController().navigateSafe(direction)
@@ -299,8 +299,8 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
               settings.communityFilters.asCustomItem {
                 val direction = SettingsPostsFeedFragmentDirections
                   .actionSettingsContentFragmentToSettingsFilterListFragment(
-                    ContentTypes.PostListType,
-                    FilterTypes.CommunityFilter,
+                    ContentTypeIds.PostListType,
+                    FilterTypeIds.CommunityFilter,
                     getString(R.string.community_filters),
                   )
                 findNavController().navigateSafe(direction)
@@ -308,8 +308,8 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
               settings.userFilters.asCustomItem {
                 val direction = SettingsPostsFeedFragmentDirections
                   .actionSettingsContentFragmentToSettingsFilterListFragment(
-                    ContentTypes.PostListType,
-                    FilterTypes.UserFilter,
+                    ContentTypeIds.PostListType,
+                    FilterTypeIds.UserFilter,
                     getString(R.string.user_filters),
                   )
                 findNavController().navigateSafe(direction)
@@ -317,8 +317,8 @@ class SettingsPostsFeedFragment : BaseSettingsFragment() {
               settings.urlFilters.asCustomItem {
                 val direction = SettingsPostsFeedFragmentDirections
                   .actionSettingsContentFragmentToSettingsFilterListFragment(
-                    ContentTypes.PostListType,
-                    FilterTypes.UrlFilter,
+                    ContentTypeIds.PostListType,
+                    FilterTypeIds.UrlFilter,
                     getString(R.string.url_filters),
                   )
                 findNavController().navigateSafe(direction)

@@ -81,6 +81,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIDE_READ_BY_DEFAULT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HIGHLIGHT_NEW_COMMENTS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_HOME_FAB_QUICK_ACTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IMAGE_PREVIEW_HIDE_UI_BY_DEFAULT
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IMAGE_VIEWER_CONTROL_STYLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_AUTO_MARK_AS_READ
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_FAB_ACTION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_LAYOUT
@@ -731,6 +732,8 @@ class Preferences(
     by booleanPreference(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED, false)
   var communitySelectorCommunitiesList
     by intPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, R.id.community_selector_community_list_top_communities)
+  var imageViewerControlStyle
+    by intPreference(KEY_IMAGE_VIEWER_CONTROL_STYLE, ImageViewerControlStyleIds.DEFAULT)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

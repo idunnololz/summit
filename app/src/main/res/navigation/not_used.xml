@@ -479,4 +479,12 @@ safeargs.
             android:name="url"
             app:argType="string" />
     </fragment>
+    <dialog
+        android:id="@+id/filterPostsHelperFragment"
+        android:name="com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment"
+        android:label="FilterPostsHelperFragment" >
+        <argument
+            android:name="postView"
+            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView" />
+    </dialog>
 </navigation>

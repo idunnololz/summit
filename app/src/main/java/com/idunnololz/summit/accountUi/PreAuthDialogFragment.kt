@@ -22,6 +22,7 @@ class PreAuthDialogFragment : BaseDialogFragment<DialogFragmentPreAuthBinding>()
   }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    super.onCreateDialog(savedInstanceState)
     val context = requireContext()
     val builder: AlertDialog.Builder = MaterialAlertDialogBuilder(context)
 

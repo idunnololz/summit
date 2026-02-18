@@ -10,6 +10,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import androidx.core.content.ContextCompat
+import androidx.core.text.BidiFormatter
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.ModlogActionType
 import com.idunnololz.summit.api.dto.lemmy.Person
@@ -20,6 +21,7 @@ import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.dateStringToTs
 import com.idunnololz.summit.util.ext.appendLink
+import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.video.VideoSizeHint
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -31,7 +33,7 @@ object LemmyUtils {
 
   private var compactDecimalFormat: DecimalFormat? = null
 
-  fun formatAuthor(author: String): String = "@%s".format(author)
+  fun formatAuthor(author: String): String = "@%s".format(author.toBidiSafe())
 
   fun abbrevScore(number: Long?): String = abbrevNumber(number, stringForUnknownScore)
 

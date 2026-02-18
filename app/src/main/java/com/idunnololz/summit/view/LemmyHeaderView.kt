@@ -133,6 +133,7 @@ class LemmyHeaderView : FrameLayout {
     )
     ellipsize = TextUtils.TruncateAt.END
     gravity = Gravity.CENTER_VERTICAL
+    textDirection = View.TEXT_DIRECTION_INHERIT
 
     return this
   }

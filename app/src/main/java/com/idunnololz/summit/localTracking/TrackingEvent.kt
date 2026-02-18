@@ -48,4 +48,5 @@ enum class TrackedAction {
   VIEW,
   REPLY,
   DELETE_REPLY,
+  POST,
 }

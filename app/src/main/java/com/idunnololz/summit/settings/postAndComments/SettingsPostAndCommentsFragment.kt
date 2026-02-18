@@ -4,8 +4,8 @@ import androidx.annotation.IdRes
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.idunnololz.summit.R
-import com.idunnololz.summit.filterLists.ContentTypes
-import com.idunnololz.summit.filterLists.FilterTypes
+import com.idunnololz.summit.filterLists.ContentTypeIds
+import com.idunnololz.summit.filterLists.FilterTypeIds
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
 import com.idunnololz.summit.lemmy.toApiSortOrder
 import com.idunnololz.summit.lemmy.toId
@@ -183,8 +183,8 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
             settings.keywordFilters.asCustomItem {
               val direction = SettingsPostAndCommentsFragmentDirections
                 .actionSettingCommentListFragmentToSettingsFilterListFragment(
-                  ContentTypes.CommentListType,
-                  FilterTypes.KeywordFilter,
+                  ContentTypeIds.CommentListType,
+                  FilterTypeIds.KeywordFilter,
                   getString(R.string.keyword_filters),
                 )
               findNavController().navigateSafe(direction)
@@ -192,8 +192,8 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
             settings.instanceFilters.asCustomItem {
               val direction = SettingsPostAndCommentsFragmentDirections
                 .actionSettingCommentListFragmentToSettingsFilterListFragment(
-                  ContentTypes.CommentListType,
-                  FilterTypes.InstanceFilter,
+                  ContentTypeIds.CommentListType,
+                  FilterTypeIds.InstanceFilter,
                   getString(R.string.instance_filters),
                 )
               findNavController().navigateSafe(direction)
@@ -201,8 +201,8 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
             settings.userFilters.asCustomItem {
               val direction = SettingsPostAndCommentsFragmentDirections
                 .actionSettingCommentListFragmentToSettingsFilterListFragment(
-                  ContentTypes.CommentListType,
-                  FilterTypes.UserFilter,
+                  ContentTypeIds.CommentListType,
+                  FilterTypeIds.UserFilter,
                   getString(R.string.user_filters),
                 )
               findNavController().navigateSafe(direction)

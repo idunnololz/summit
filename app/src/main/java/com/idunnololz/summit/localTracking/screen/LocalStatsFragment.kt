@@ -38,6 +38,7 @@ import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.StatefulData
+import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
@@ -286,7 +287,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
         }
       ) { item, b, h ->
         if (item.person != null) {
-          b.title.text = "${item.person.display_name ?: item.person.name}@${item.person.instance}"
+          b.title.text = "${(item.person.display_name ?: item.person.name).toBidiSafe()}@${item.person.instance}"
           b.card.setOnClickListener { onPersonClick(item.person.toPersonRef()) }
         } else {
           b.title.text = context.getString(R.string.unknown)

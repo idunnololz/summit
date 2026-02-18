@@ -61,7 +61,7 @@ data class FilterEntryOptions(
 
 typealias FilterTypeId = Int
 
-object FilterTypes {
+object FilterTypeIds {
   const val KeywordFilter = 1
   const val InstanceFilter = 2
   const val CommunityFilter = 3
@@ -71,7 +71,7 @@ object FilterTypes {
 
 typealias ContentTypeId = Int
 
-object ContentTypes {
+object ContentTypeIds {
   const val PostListType = 1
   const val CommentListType = 2
 }

@@ -1,5 +1,8 @@
 package com.idunnololz.summit.lemmy.person
 
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.Spannable
 import android.transition.TransitionManager
@@ -17,8 +20,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.palette.graphics.Palette
 import coil3.load
 import coil3.request.allowHardware
+import coil3.toBitmap
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
@@ -62,6 +67,7 @@ import com.idunnololz.summit.util.ext.getDimenFromAttribute
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
 import com.idunnololz.summit.util.tsToConcise
@@ -471,12 +477,13 @@ class PersonTabbedFragment :
 
       fab.show()
 
-      val displayName = person.display_name
-        ?: person.name
+      val displayName = (person.display_name
+        ?: person.name).toBidiSafe()
 
       title.text = displayName
 
       val bannerUrl = person.banner
+      banner.imageTintList = null
       if (bannerUrl != null) {
         bannerDummy.setOnClickListener {
           getMainActivity()?.openImage(
@@ -492,13 +499,26 @@ class PersonTabbedFragment :
             allowHardware(false)
           }
         }
-      } else {
-        banner.load("file:///android_asset/banner_placeholder.svg") {
-          allowHardware(false)
-        }
-        bannerDummy.setOnClickListener(null)
       }
-      avatarHelper.loadAvatar(profileIcon, person)
+      avatarHelper.loadAvatar(profileIcon, person) { bitmap ->
+        if (bannerUrl == null) {
+          banner.load("file:///android_asset/banner_placeholder.svg") {
+            allowHardware(false)
+            listener(
+              onSuccess = { _, _ ->
+                Palette.Builder(bitmap).generate { palette ->
+                  val accentColor = palette?.vibrantSwatch?.rgb
+                  if (accentColor != null) {
+                    banner.imageTintList = ColorStateList.valueOf(accentColor)
+                    banner.imageTintMode = PorterDuff.Mode.MULTIPLY
+                  }
+                }
+              }
+            )
+          }
+          bannerDummy.setOnClickListener(null)
+        }
+      }
       val avatarUrl = person.avatar
       if (avatarUrl.isNullOrBlank()) {
         profileIcon.setOnClickListener {
@@ -547,7 +567,7 @@ class PersonTabbedFragment :
         null,
       )
       cakeDate.text =
-        getString(R.string.cake_day_on_format, dateStr, defaultDecimalFormat.format(daysBetween))
+        getString(R.string.account_created_on_format, dateStr, defaultDecimalFormat.format(daysBetween))
       cakeDate.visibility = View.VISIBLE
 
       val personCreationTs = dateStringToTs(person.published)

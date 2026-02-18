@@ -22,4 +22,6 @@ data class TextFieldToolbarSettings(
     TextFieldToolbarOption.Image,
     TextFieldToolbarOption.LinkApp,
   ),
+  val hiddenOptions: List<TextFieldToolbarOption> = listOf(),
+  val showLabels: Boolean = false,
 )

@@ -15,7 +15,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.viewbinding.ViewBinding
 import com.idunnololz.summit.R
+import com.idunnololz.summit.databinding.TextFieldToolbarItem2Binding
 import com.idunnololz.summit.databinding.TextFieldToolbarItemBinding
 import com.idunnololz.summit.databinding.TextFormatToolbarBinding
 import com.idunnololz.summit.emoji.EmojiPopupWindow
@@ -65,54 +67,105 @@ class TextFieldToolbarManager @Inject constructor(
 
       container.orientation = LinearLayout.HORIZONTAL
       for (option in textFieldToolbarSettings.toolbarOptions) {
-        val b = TextFieldToolbarItemBinding
-          .inflate(layoutInflater, container, true)
-        b.image.setImageResource(option.icon)
-        b.image.contentDescription = context.getString(option.title)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          b.image.tooltipText = context.getString(option.title)
+        if (option in textFieldToolbarSettings.hiddenOptions) {
+          continue
         }
+
+        val imageView: ImageView
+        var textView: TextView? = null
+        val b: ViewBinding
+
+        if (textFieldToolbarSettings.showLabels) {
+          b = TextFieldToolbarItem2Binding.inflate(layoutInflater, container, true)
+          imageView = b.image
+          textView = b.text
+        } else {
+          b = TextFieldToolbarItemBinding.inflate(layoutInflater, container, true)
+          imageView = b.image
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            imageView.tooltipText = context.getString(option.title)
+          }
+        }
+        imageView.setImageResource(option.icon)
+        imageView.contentDescription = context.getString(option.title)
 
         when (option) {
-          TextFieldToolbarOption.Preview ->
-            preview = b.image
-          TextFieldToolbarOption.Drafts ->
-            drafts = b.image
-          TextFieldToolbarOption.TextEmojisField ->
-            textEmojis = b.image
-          TextFieldToolbarOption.Spoiler ->
-            spoiler = b.image
-          TextFieldToolbarOption.Bold ->
-            bold = b.image
-          TextFieldToolbarOption.Italic ->
-            italic = b.image
-          TextFieldToolbarOption.Strikethrough ->
-            strikethrough = b.image
-          TextFieldToolbarOption.Quote ->
-            quote = b.image
-          TextFieldToolbarOption.Link ->
-            link = b.image
-          TextFieldToolbarOption.BulletedList ->
-            bulletedList = b.image
-          TextFieldToolbarOption.NumberedList ->
-            numberedList = b.image
-          TextFieldToolbarOption.Sarcasm ->
-            spongebob = b.image
-          TextFieldToolbarOption.Image ->
-            image = b.image
-          TextFieldToolbarOption.LinkApp ->
-            linkApp = b.image
+          TextFieldToolbarOption.Preview -> {
+            preview = b.root
+            textView?.text = context.getString(R.string.preview)
+          }
+          TextFieldToolbarOption.Drafts -> {
+            drafts = b.root
+            textView?.text = context.getString(R.string.drafts)
+          }
+          TextFieldToolbarOption.TextEmojisField -> {
+            textEmojis = b.root
+            textView?.text = context.getString(R.string.text_emojis)
+          }
+          TextFieldToolbarOption.Spoiler -> {
+            spoiler = b.root
+            textView?.text = context.getString(R.string.spoiler)
+          }
+          TextFieldToolbarOption.Bold -> {
+            bold = b.root
+            textView?.text = context.getString(R.string.bold)
+          }
+          TextFieldToolbarOption.Italic -> {
+            italic = b.root
+            textView?.text = context.getString(R.string.italic)
+          }
+          TextFieldToolbarOption.Strikethrough -> {
+            strikethrough = b.root
+            textView?.text = context.getString(R.string.strikethrough)
+          }
+          TextFieldToolbarOption.Quote -> {
+            quote = b.root
+            textView?.text = context.getString(R.string.quote)
+          }
+          TextFieldToolbarOption.Link -> {
+            link = b.root
+            textView?.text = context.getString(R.string.link)
+          }
+          TextFieldToolbarOption.BulletedList -> {
+            bulletedList = b.root
+            textView?.text = context.getString(R.string.bulleted_list)
+          }
+          TextFieldToolbarOption.NumberedList -> {
+            numberedList = b.root
+            textView?.text = context.getString(R.string.numbered_list)
+          }
+          TextFieldToolbarOption.Sarcasm -> {
+            spongebob = b.root
+            textView?.text = context.getString(R.string.sarcasm)
+          }
+          TextFieldToolbarOption.Image -> {
+            image = b.root
+            textView?.text = context.getString(R.string.images)
+          }
+          TextFieldToolbarOption.LinkApp -> {
+            linkApp = b.root
+            textView?.text = context.getString(R.string.add_link_to_app)
+          }
         }
       }
 
-      val b = TextFieldToolbarItemBinding
-        .inflate(layoutInflater, container, true)
-      b.image.setImageResource(R.drawable.baseline_settings_24)
-      b.image.contentDescription = context.getString(R.string.settings)
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        b.image.tooltipText = context.getString(R.string.settings)
+      val b: ViewBinding
+      val imageView: ImageView
+
+      if (textFieldToolbarSettings.showLabels) {
+        b = TextFieldToolbarItem2Binding.inflate(layoutInflater, container, true)
+        imageView = b.image
+        b.text.text = context.getString(R.string.settings)
+      } else {
+        b = TextFieldToolbarItemBinding.inflate(layoutInflater, container, true)
+        imageView = b.image
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          imageView.tooltipText = context.getString(R.string.settings)
+        }
       }
-      val settings: View = b.image
+      imageView.setImageResource(R.drawable.baseline_settings_24)
+      imageView.contentDescription = context.getString(R.string.settings)
+      val settings: View = b.root
 
       parentView.addView(container)
 
