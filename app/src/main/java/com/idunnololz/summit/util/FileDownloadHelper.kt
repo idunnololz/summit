@@ -27,6 +27,7 @@ import okio.buffer
 import okio.sink
 import okio.source
 import androidx.core.net.toUri
+import com.idunnololz.summit.lemmy.CommunityRef
 
 @Singleton
 class FileDownloadHelper @Inject constructor(
@@ -39,8 +40,43 @@ class FileDownloadHelper @Inject constructor(
     private const val TAG = "FileDownloadHelper"
   }
 
+//  private fun getDownloadDirectory(
+//    context: Context,
+//    downloadContext: FileDownloadContext,
+//  ): String =
+//    if (preferences.useCommunityDownloadFolder) {
+//      val communityName = downloadContext.communityRef?.getName(context)
+//
+//      File(preferences.downloadDirectory, communityName)
+//    } else {
+//      preferences.downloadDirectory
+//    }
+
+  private fun getDownloadSubFolderPath(
+    context: Context,
+    downloadDirectory: String,
+    downloadContext: FileDownloadContext?,
+  ): String {
+    return if (preferences.useCommunityDownloadFolder) {
+      buildString {
+        append(downloadDirectory)
+        if (!downloadDirectory.endsWith(File.separator)) {
+          append(File.separator)
+        }
+        append(context.getString(R.string.app_name))
+        append(File.separator)
+        downloadContext?.communityRef?.getLocalizedFullName(context)?.let {
+          append(it)
+        }
+      }
+    } else {
+      downloadDirectory
+    }
+  }
+
   suspend fun downloadFile(
     c: Context,
+    downloadContext: FileDownloadContext?,
     destFileName: String,
     url: String?,
     cacheFile: File? = null,
@@ -49,6 +85,7 @@ class FileDownloadHelper @Inject constructor(
     val downloadDirectory = preferences.downloadDirectory
     val useCustomDownloadDirectory = downloadDirectory != null
     val context = c.applicationContext
+
     val mimeType = mimeType
       ?: MimeTypeMap.getSingleton()
         .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(url))
@@ -58,7 +95,8 @@ class FileDownloadHelper @Inject constructor(
 
     val uriOrFilePath: String
     val outputStream: OutputStream? = if (downloadDirectory != null) {
-      val oldParentUri = downloadDirectory.toUri()
+      val oldParentUri =
+        getDownloadSubFolderPath(context, downloadDirectory, downloadContext).toUri()
       val id = DocumentsContract.getTreeDocumentId(oldParentUri)
       val parentFolderUri =
         DocumentsContract.buildChildDocumentsUriUsingTree(oldParentUri, id)
@@ -93,6 +131,13 @@ class FileDownloadHelper @Inject constructor(
         )
         put(MediaStore.Downloads.MIME_TYPE, mimeType)
         put(MediaStore.Downloads.IS_PENDING, 1)
+        put(MediaStore.Downloads.RELATIVE_PATH,
+          getDownloadSubFolderPath(
+            context = context,
+            downloadDirectory = Environment.DIRECTORY_DOWNLOADS,
+            downloadContext = downloadContext
+          )
+        )
       }
 
       // Insert into the database

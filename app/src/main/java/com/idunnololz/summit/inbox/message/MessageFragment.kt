@@ -165,10 +165,22 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           inboxItem.title,
           args.instance,
           onImageClick = { url ->
-            getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+            getMainActivity()?.openImage(
+              sharedElement = null,
+              appBar = binding.appBar,
+              title = null,
+              url = url,
+              mimeType = null,
+              downloadContext = null
+            )
           },
           onVideoClick = { url ->
-            getMainActivity()?.openVideo(url, VideoType.Unknown, null)
+            getMainActivity()?.openVideo(
+              url = url,
+              videoType = VideoType.Unknown,
+              videoState = null,
+              downloadContext = null
+            )
           },
           onPageClick = { url, pageRef ->
             getMainActivity()?.launchPage(pageRef, url = url)
@@ -177,7 +189,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             onLinkClick(url, text, linkType)
           },
           onLinkLongClick = { url, text ->
-            getMainActivity()?.showMoreLinkOptions(url, text)
+            getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
           },
         )
       }
@@ -199,10 +211,22 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       inboxItem.content,
       args.instance,
       onImageClick = { url ->
-        getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+        getMainActivity()?.openImage(
+          sharedElement = null,
+          appBar = binding.appBar,
+          title = null,
+          url = url,
+          mimeType = null,
+          downloadContext = null,
+        )
       },
       onVideoClick = { url ->
-        getMainActivity()?.openVideo(url, VideoType.Unknown, null)
+        getMainActivity()?.openVideo(
+          url = url,
+          videoType = VideoType.Unknown,
+          videoState = null,
+          downloadContext = null
+        )
       },
       onPageClick = { url, pageRef ->
         getMainActivity()?.launchPage(pageRef, url = url)
@@ -211,7 +235,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         onLinkClick(url, text, linkType)
       },
       onLinkLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+        getMainActivity()?.showMoreLinkOptions(
+          url = url,
+          text = text,
+          downloadContext = null,
+        )
       },
     )
 
@@ -569,10 +597,22 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             )
           },
           onImageClick = { _, view, url ->
-            getMainActivity()?.openImage(view, binding.appBar, null, url, null)
+            getMainActivity()?.openImage(
+              sharedElement = view,
+              appBar = binding.appBar,
+              title = null,
+              url = url,
+              mimeType = null,
+              downloadContext = null,
+            )
           },
-          onVideoClick = { url, videoType, state ->
-            getMainActivity()?.openVideo(url, videoType, state)
+          onVideoClick = { _, url, videoType, state ->
+            getMainActivity()?.openVideo(
+              url = url,
+              videoType = videoType,
+              videoState = state,
+              downloadContext = null
+            )
           },
           onVideoLongClickListener = { url ->
             showMoreVideoOptions(
@@ -611,8 +651,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           onLinkClick = { url, text, linkType ->
             onLinkClick(url, text, linkType)
           },
-          onLinkLongClick = { url, text ->
-            getMainActivity()?.showMoreLinkOptions(url, text)
+          onLinkLongClick = { _, url, text ->
+            getMainActivity()?.showMoreLinkOptions(
+              url = url,
+              text = text,
+              downloadContext = null,
+            )
           },
           switchToNativeInstance = {},
           onCrossPostsClick = {},

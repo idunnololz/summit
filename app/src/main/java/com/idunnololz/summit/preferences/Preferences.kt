@@ -164,6 +164,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USER_AGENT_CHOICE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BOTTOM_NAV_BAR
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_COMMUNITY_DOWNLOAD_FOLDER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CURSORS_WHEN_LOADING_POST_FEED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CUSTOM_NAV_BAR
@@ -601,6 +602,9 @@ class Preferences(
     by booleanPreference(KEY_UPLOAD_IMAGES_TO_IMGUR, false)
   var displayDeletedPosts: Int
     by intPreference(KEY_DISPLAY_DELETED_POSTS, ALWAYS_HIDE_DELETED_POSTS)
+  var useCommunityDownloadFolder: Boolean
+    by booleanPreference(KEY_USE_COMMUNITY_DOWNLOAD_FOLDER, false)
+
 
   var animationLevel: AnimationsHelper.AnimationLevel
     get() = AnimationsHelper.AnimationLevel.parse(

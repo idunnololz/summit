@@ -367,7 +367,7 @@ class SettingsAdapter(
           }
         }
         onLinkLongClickListener = DefaultLinkLongClickListener(context) { url, text ->
-          getSummitActivity().showMoreLinkOptions(url, text)
+          getSummitActivity().showMoreLinkOptions(url = url, text = text, downloadContext = null)
         }
       }
 

@@ -105,6 +105,10 @@
             android:defaultValue="@null"
             app:nullable="true"
             app:argType="com.idunnololz.summit.video.VideoState"/>
+        <argument
+            android:name="downloadContext"
+            app:argType="com.idunnololz.summit.util.FileDownloadContext"
+            app:nullable="true" />
     </fragment>
     <action android:id="@+id/action_global_videoViewerFragment" app:destination="@id/videoViewerFragment"/>
     <fragment
@@ -154,6 +158,10 @@
         <argument
             android:name="transitionName"
             app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="downloadContext"
+            app:argType="com.idunnololz.summit.util.FileDownloadContext"
             app:nullable="true" />
     </activity>
     <fragment

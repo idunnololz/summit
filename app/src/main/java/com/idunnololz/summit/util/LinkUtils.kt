@@ -91,13 +91,18 @@ sealed interface AdvancedLink {
   ) : AdvancedLink
 }
 
-fun SummitActivity.showMoreLinkOptions(url: String, text: String?) {
+fun SummitActivity.showMoreLinkOptions(
+  url: String,
+  text: String?,
+  downloadContext: FileDownloadContext?,
+) {
   showAdvancedLinkOptions(
     url = url,
     moreActionsHelper = moreActionsHelper,
     fragmentManager = supportFragmentManager,
     linkResolver = linkResolver,
     textOrFileName = text,
+    downloadContext = downloadContext,
   )
 }
 

@@ -58,17 +58,23 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
       val adapter = ActionsAdapter(
         context = context,
         lemmyTextHelper = lemmyTextHelper,
-        onImageClick = { postView, sharedElementView, url ->
+        onImageClick = { sharedElementView, url ->
           getMainActivity()?.openImage(
             sharedElement = sharedElementView,
             appBar = null,
             title = null,
+            downloadContext = null,
             url = url,
             mimeType = null,
           )
         },
         onVideoClick = { url, videoType, state ->
-          getMainActivity()?.openVideo(url, videoType, state)
+          getMainActivity()?.openVideo(
+            url = url,
+            videoType = videoType,
+            videoState = state,
+            downloadContext = null
+          )
         },
         onPageClick = { url, pageRef ->
           getMainActivity()?.launchPage(pageRef, url = url)
@@ -77,7 +83,7 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
           onLinkClick(url, text, linkType)
         },
         onLinkLongClick = { url, text ->
-          getMainActivity()?.showMoreLinkOptions(url, text)
+          getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
         },
         onActionClick = {
           viewModel.markActionAsSeen(it)

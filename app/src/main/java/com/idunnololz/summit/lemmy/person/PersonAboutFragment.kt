@@ -114,10 +114,16 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
           title = null,
           url = url,
           mimeType = null,
+          downloadContext = null,
         )
       },
       onVideoClick = { url ->
-        getMainActivity()?.openVideo(url, VideoType.Unknown, null)
+        getMainActivity()?.openVideo(
+          url = url,
+          videoType = VideoType.Unknown,
+          videoState = null,
+          downloadContext = null
+        )
       },
       onPageClick = { url, pageRef ->
         getMainActivity()?.launchPage(pageRef, url = url)
@@ -126,7 +132,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
         onLinkClick(url, text, linkType)
       },
       onLinkLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+        getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
       },
     )
 

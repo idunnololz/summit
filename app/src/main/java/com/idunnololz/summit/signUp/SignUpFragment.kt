@@ -723,7 +723,11 @@ class SignUpFragment : BaseFragment<FragmentSignUpBinding>() {
                 return@DefaultLinkLongClickListener
               }
 
-              getMainActivity()?.showMoreLinkOptions(url, text)
+              getMainActivity()?.showMoreLinkOptions(
+                url = url,
+                text = text,
+                downloadContext = null,
+              )
             }
             onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
               override fun onClick(

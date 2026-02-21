@@ -115,11 +115,12 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
             }
           } else {
             getMainActivity()?.openImage(
-              profileIcon,
-              toolbar,
-              account.name,
-              url,
-              null,
+              sharedElement = profileIcon,
+              appBar = toolbar,
+              title = account.name,
+              url = url,
+              mimeType = null,
+              downloadContext = null,
             )
           }
         },

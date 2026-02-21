@@ -337,7 +337,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
-    onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onVideoClick: (Either<PostView, CommentView>, url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -479,7 +479,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           onImageClick(Either.Left(postView), null, it)
         },
         onVideoClick = { url ->
-          onVideoClick(url, VideoType.Unknown, null)
+          onVideoClick(Either.Left(postView), url, VideoType.Unknown, null)
         },
         onPageClick = onPageClick,
         onLinkClick = onLinkClick,
@@ -549,7 +549,9 @@ class PostAndCommentViewBuilder @Inject constructor(
       onImageClickListener = { url ->
         onImageClick(Either.Left(postView), null, url)
       },
-      onVideoClickListener = onVideoClick,
+      onVideoClickListener = { url, videoType, videoState ->
+        onVideoClick(Either.Left(postView), url, videoType, videoState)
+      },
       onVideoLongClickListener = onVideoLongClickListener,
       onRevealContentClickedFn = onRevealContentClickedFn,
       onItemClickListener = {},
@@ -806,7 +808,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlightTextData: HighlightTextData?,
     commentHeaderInfo: CommentHeaderInfo,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
-    onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onVideoClick: (Either<PostView, CommentView>, url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     collapseSection: (position: Int) -> Unit,
     toggleActionsExpanded: () -> Unit,
@@ -956,7 +958,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           onImageClick(Either.Right(commentView), null, it)
         },
         onVideoClick = { url ->
-          onVideoClick(url, VideoType.Unknown, null)
+          onVideoClick(Either.Right(commentView), url, VideoType.Unknown, null)
         },
         onPageClick = onPageClick,
         onLinkClick = onLinkClick,
@@ -1349,7 +1351,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlightForever: Boolean,
     highlightTintColor: Int?,
     onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
-    onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onVideoClick: (Either<PostView, CommentView>?, url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
@@ -1388,7 +1390,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         onImageClick(null, null, it)
       },
       onVideoClick = { url ->
-        onVideoClick(url, VideoType.Unknown, null)
+        onVideoClick(null, url, VideoType.Unknown, null)
       },
       onPageClick = onPageClick,
       onLinkClick = onLinkClick,

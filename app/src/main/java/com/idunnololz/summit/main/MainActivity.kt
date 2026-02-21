@@ -86,6 +86,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.SummitActivity
@@ -1036,6 +1037,7 @@ class MainActivity : SummitActivity() {
     title: String?,
     url: String,
     mimeType: String?,
+    downloadContext: FileDownloadContext?,
     urlAlt: String?,
     mimeTypeAlt: String?,
   ) {
@@ -1053,6 +1055,7 @@ class MainActivity : SummitActivity() {
       urlAlt = urlAlt,
       mimeTypeAlt = mimeTypeAlt,
       transitionName = transitionName,
+      downloadContext = downloadContext,
     )
 
     if (transitionName != null) {

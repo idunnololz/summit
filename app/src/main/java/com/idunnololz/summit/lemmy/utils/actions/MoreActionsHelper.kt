@@ -31,6 +31,7 @@ import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.video.VideoDownloadManager
@@ -406,7 +407,10 @@ class MoreActionsHelper(
     }
   }
 
-  fun downloadVideo(url: String) {
+  fun downloadVideo(
+    url: String,
+    downloadContext: FileDownloadContext? = null,
+  ) {
     downloadVideoResult.setIsLoading()
 
     coroutineScope.launch {
@@ -415,6 +419,7 @@ class MoreActionsHelper(
           fileDownloadHelper
             .downloadFile(
               c = context,
+              downloadContext = downloadContext,
               destFileName = file.name,
               url = url,
               cacheFile = file,
@@ -455,7 +460,12 @@ class MoreActionsHelper(
     )
   }
 
-  fun downloadImage(destFileName: String, url: String, mimeType: String? = null) {
+  fun downloadImage(
+    destFileName: String,
+    url: String,
+    mimeType: String? = null,
+    downloadContext: FileDownloadContext? = null,
+  ) {
     offlineManager.fetchImage(
       url = url,
       listener = {
@@ -464,6 +474,7 @@ class MoreActionsHelper(
             fileDownloadHelper
               .downloadFile(
                 c = context,
+                downloadContext = downloadContext,
                 destFileName = destFileName,
                 url = url,
                 cacheFile = it,

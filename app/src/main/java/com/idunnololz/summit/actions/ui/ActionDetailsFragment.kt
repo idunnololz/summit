@@ -114,12 +114,18 @@ class ActionDetailsFragment :
             sharedElement = null,
             appBar = null,
             title = null,
+            downloadContext = null,
             url = url,
             mimeType = null,
           )
         },
         onVideoClick = { url ->
-          getMainActivity()?.openVideo(url, VideoType.Unknown, null)
+          getMainActivity()?.openVideo(
+            url = url,
+            videoType = VideoType.Unknown,
+            videoState = null,
+            downloadContext = null
+          )
         },
         onPageClick = { url, pageRef ->
           getMainActivity()?.launchPage(pageRef, url = url)
@@ -128,7 +134,7 @@ class ActionDetailsFragment :
           onLinkClick(url, text, linkType)
         },
         onLinkLongClick = { url, text ->
-          getMainActivity()?.showMoreLinkOptions(url, text)
+          getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
         },
         onRetryClick = {
           viewModel.retryAction(args.action)

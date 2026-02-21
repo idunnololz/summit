@@ -29,6 +29,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
+import com.idunnololz.summit.util.toFileDownloadContext
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -102,10 +103,16 @@ class PersonPostsFragment :
           url = url,
           mimeType = null,
           urlAlt = altUrl,
+          downloadContext = postView.toFileDownloadContext(),
         )
       },
-      onVideoClick = { url, videoType, state ->
-        getMainActivity()?.openVideo(url, videoType, state)
+      onVideoClick = { postView, url, videoType, state ->
+        getMainActivity()?.openVideo(
+          url = url,
+          videoType = videoType,
+          videoState = state,
+          downloadContext = postView.toFileDownloadContext(),
+        )
       },
       onVideoLongClickListener = { url ->
         showMoreVideoOptions(
@@ -155,8 +162,8 @@ class PersonPostsFragment :
       onLinkClick = { accountId, url, text, linkType ->
         onLinkClick(url, text, linkType)
       },
-      onLinkLongClick = { accountId, url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+      onLinkLongClick = { postView, accountId, url, text ->
+        getMainActivity()?.showMoreLinkOptions(url, text, postView.toFileDownloadContext())
       },
       onPostActionClick = { postView, actionId ->
         createPostActionHandler(

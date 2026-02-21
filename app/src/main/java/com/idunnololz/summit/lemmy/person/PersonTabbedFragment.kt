@@ -487,11 +487,12 @@ class PersonTabbedFragment :
       if (bannerUrl != null) {
         bannerDummy.setOnClickListener {
           getMainActivity()?.openImage(
-            banner,
-            null,
-            personRef.fullName,
-            bannerUrl,
-            null,
+            sharedElement = banner,
+            appBar = null,
+            title = personRef.fullName,
+            url = bannerUrl,
+            mimeType = null,
+            downloadContext = null,
           )
         }
         offlineManager.fetchImage(banner, bannerUrl) {
@@ -536,6 +537,7 @@ class PersonTabbedFragment :
             title = person.fullName,
             url = avatarUrl,
             mimeType = null,
+            downloadContext = null,
           )
         }
       }

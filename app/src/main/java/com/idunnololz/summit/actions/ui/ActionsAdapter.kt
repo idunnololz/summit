@@ -24,7 +24,7 @@ import com.idunnololz.summit.video.VideoState
 class ActionsAdapter(
   private val context: Context,
   private val lemmyTextHelper: LemmyTextHelper,
-  private val onImageClick: (String, View?, String) -> Unit,
+  private val onImageClick: (View?, String) -> Unit,
   private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
   private val onPageClick: (url: String, PageRef) -> Unit,
   private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -219,7 +219,7 @@ class ActionsAdapter(
         actionDesc,
         account?.instance ?: "lemmy.world",
         onImageClick = {
-          onImageClick("", null, it)
+          onImageClick(null, it)
         },
         onVideoClick = {
           onVideoClick(it, VideoType.Unknown, null)

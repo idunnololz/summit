@@ -99,7 +99,11 @@ class ViewVotesFragment :
           getMainActivity()?.launchPage(it)
         },
         onPersonLongClick = {
-          getMainActivity()?.showMoreLinkOptions(LinkUtils.getLinkForPerson(it), null)
+          getMainActivity()?.showMoreLinkOptions(
+            url = LinkUtils.getLinkForPerson(it),
+            text = null,
+            downloadContext = null
+          )
         },
       )
 

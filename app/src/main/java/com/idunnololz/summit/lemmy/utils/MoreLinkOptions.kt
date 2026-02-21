@@ -21,6 +21,7 @@ import com.idunnololz.summit.main.MainActivity
 import com.idunnololz.summit.util.AdvancedLink
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.BottomMenuContainer
+import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.UrlUtils
 import com.idunnololz.summit.util.Utils
@@ -33,6 +34,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
   linkResolver: LinkResolver,
   textOrFileName: String? = null,
   mimeType: String? = null,
+  downloadContext: FileDownloadContext? = null,
 ): BottomMenu {
   val context = this.context
   val instance = moreActionsHelper.apiInstance
@@ -365,6 +367,7 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
         fragmentManager = fragmentManager,
         textOrFileName = textOrFileName,
         mimeType = mimeType,
+        downloadContext = downloadContext,
       )(it.id)
     }
   }
@@ -380,12 +383,14 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   linkResolver: LinkResolver,
   textOrFileName: String? = null,
   mimeType: String? = null,
+  downloadContext: FileDownloadContext? = null,
 ): (Int) -> Unit = createImageOrLinkActionsHandler(
   advancedLink = LinkUtils.analyzeLink(url, moreActionsHelper.apiInstance, linkResolver),
   moreActionsHelper = moreActionsHelper,
   fragmentManager = fragmentManager,
   textOrFileName = textOrFileName,
   mimeType = mimeType,
+  downloadContext = downloadContext,
 )
 
 fun BottomMenuContainer.createImageOrLinkActionsHandler(
@@ -394,6 +399,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
   fragmentManager: FragmentManager,
   textOrFileName: String? = null,
   mimeType: String? = null,
+  downloadContext: FileDownloadContext? = null,
 ): (Int) -> Unit = a@{ id: Int ->
 
   val mainActivity = this as? MainActivity
@@ -424,6 +430,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         title = null,
         url = url,
         mimeType = mimeType,
+        downloadContext = downloadContext,
       )
     }
     R.id.download -> {
@@ -431,6 +438,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         destFileName = fileName,
         url = url,
         mimeType = mimeType,
+        downloadContext = downloadContext,
       )
     }
     R.id.copy_link -> {

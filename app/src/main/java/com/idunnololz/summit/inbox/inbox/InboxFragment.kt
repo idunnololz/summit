@@ -511,12 +511,18 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
           sharedElement = null,
           appBar = binding.appBar,
           title = null,
+          downloadContext = null,
           url = url,
           mimeType = null,
         )
       },
       onVideoClick = { url, videoType, state ->
-        getMainActivity()?.openVideo(url, videoType, state)
+        getMainActivity()?.openVideo(
+          url = url,
+          videoType = videoType,
+          videoState = state,
+          downloadContext = null
+        )
       },
       onMarkAsRead = { view, inboxItem, read ->
         viewModel.markAsRead(inboxItem, read)
@@ -595,7 +601,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
         onLinkClick(url, text, linkType)
       },
       onLinkLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+        getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
       },
       onApproveClick = { id ->
         viewModel.approveRegistrationApplication(

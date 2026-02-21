@@ -319,7 +319,7 @@ class GalleryImageView : ShapeableImageView {
       if (isQuickScaling) {
         // One finger zoom
         // Stole Google's Magical Formula™ to make sure it feels the exact same
-        var dist: Float = Math.abs(quickScaleCenter.y - event.y) * 2 + quickScaleThreshold
+        val dist: Float = Math.abs(quickScaleCenter.y - event.y) * 2 + quickScaleThreshold
         if (quickScaleLastDistance == -1f) {
           quickScaleLastDistance = dist
         }

@@ -52,7 +52,12 @@ fun BaseActivity.onLinkClick(
       if (uri.host.equals("loops.video", ignoreCase = true) &&
         uri.path?.startsWith("/v/", ignoreCase = true) == true
       ) {
-        openVideo(url, VideoType.Unknown, null)
+        openVideo(
+          url = url,
+          videoType = VideoType.Unknown,
+          videoState = null,
+          downloadContext = null
+        )
         return
       }
     }

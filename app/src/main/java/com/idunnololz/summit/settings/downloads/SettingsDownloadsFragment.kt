@@ -14,6 +14,7 @@ import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.DownloadSettings
 import com.idunnololz.summit.settings.SettingModelItem
 import com.idunnololz.summit.settings.util.asCustomItem
+import com.idunnololz.summit.settings.util.asOnOffSwitch
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -42,6 +43,10 @@ class SettingsDownloadsFragment : BaseSettingsFragment() {
     settings.downloadDirectory.asCustomItem(
       { getCurrentDownloadDirectory() },
       { openDocumentTreeLauncher.launch(null) },
+    ),
+    settings.useCommunityDownloadFolder.asOnOffSwitch(
+      { preferences.useCommunityDownloadFolder },
+      { preferences.useCommunityDownloadFolder = it }
     ),
     settings.resetDownloadDirectory.asCustomItem {
       preferences.reset(KEY_DOWNLOAD_DIRECTORY)

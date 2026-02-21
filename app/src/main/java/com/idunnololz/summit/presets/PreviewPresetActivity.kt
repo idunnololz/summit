@@ -52,6 +52,7 @@ import com.idunnololz.summit.preferences.SharedPreferencesManager
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.DirectoryHelper
+import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.SummitActivity
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
@@ -370,13 +371,13 @@ class PreviewPresetActivity : SummitActivity() {
     preferMainFragment: Boolean,
     url: String,
   ) {
-    TODO("Not yet implemented")
+    error("Unsupported operation")
   }
 
   override fun showCommunitySelector(
     currentCommunityRef: CommunityRef?,
   ): CommunitySelectorController {
-    TODO("Not yet implemented")
+    error("Unsupported operation")
   }
 
   override fun openImage(
@@ -385,14 +386,15 @@ class PreviewPresetActivity : SummitActivity() {
     title: String?,
     url: String,
     mimeType: String?,
+    downloadContext: FileDownloadContext?,
     urlAlt: String?,
     mimeTypeAlt: String?,
   ) {
-    TODO("Not yet implemented")
+    error("Unsupported operation")
   }
 
   override fun showCommunityInfo(communityRef: CommunityRef) {
-    TODO("Not yet implemented")
+    error("Unsupported operation")
   }
 
   private fun newDevicePreview(

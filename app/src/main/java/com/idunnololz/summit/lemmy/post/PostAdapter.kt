@@ -89,7 +89,7 @@ class PostAdapter(
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
   private val onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
-  private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
+  private val onVideoClick: (Either<PostView, CommentView>?, String, VideoType, VideoState?) -> Unit,
   private val onVideoLongClickListener: (url: String) -> Unit,
   private val onPageClick: (url: String, PageRef) -> Unit,
   private val onPostActionClick: (PostView, String, actionId: Int) -> Unit,
@@ -98,7 +98,7 @@ class PostAdapter(
   private val onLoadPost: (PostId, force: Boolean) -> Unit,
   private val onLoadCommentPath: (String) -> Unit,
   private val onLinkClick: (url: String, text: String?, linkContext: LinkContext) -> Unit,
-  private val onLinkLongClick: (url: String, text: String?) -> Unit,
+  private val onLinkLongClick: (Either<PostView, CommentView>?, url: String, text: String?) -> Unit,
   private val switchToNativeInstance: (instance: String) -> Unit,
   private val onCrossPostsClick: () -> Unit,
   private val onPendingCommentActionInfoClick: (actionId: Long) -> Unit,
@@ -442,7 +442,7 @@ class PostAdapter(
             onImageClick
           }
           val onVideoClick = if (isScreenshotting) {
-            { _, _, _ -> }
+            { _, _, _, _ -> }
           } else {
             onVideoClick
           }
@@ -492,7 +492,9 @@ class PostAdapter(
             onSignInRequired = onSignInRequired,
             onInstanceMismatch = onInstanceMismatch,
             onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick,
+            onLinkLongClick = { url, text ->
+              onLinkLongClick(Either.Left(post), url, text)
+            },
             screenshotConfig = screenshotConfig,
             onTextBound = {
               contentCache[k] = it
@@ -540,7 +542,7 @@ class PostAdapter(
           onImageClick
         }
         val onVideoClick = if (isScreenshotting) {
-          { _, _, _ -> }
+          { _, _, _, _ -> }
         } else {
           onVideoClick
         }
@@ -592,7 +594,9 @@ class PostAdapter(
           onSignInRequired = onSignInRequired,
           onInstanceMismatch = onInstanceMismatch,
           onLinkClick = onLinkClick,
-          onLinkLongClick = onLinkLongClick,
+          onLinkLongClick = { url, text ->
+            onLinkLongClick(Either.Left(post), url, text)
+          },
           screenshotConfig = screenshotConfig,
           onTextBound = {
             contentCache[k] = it
@@ -668,7 +672,9 @@ class PostAdapter(
             onCommentActionClick = { commentView, actionId ->
               onCommentActionClick(commentView, item.id, actionId)
             },
-            onLinkLongClick = onLinkLongClick,
+            onLinkLongClick = { url, text ->
+              onLinkLongClick(Either.Right(item.comment), url, text)
+            },
             onSignInRequired = onSignInRequired,
             onLinkClick = onLinkClick,
             onInstanceMismatch = onInstanceMismatch,
@@ -711,7 +717,9 @@ class PostAdapter(
             commentHeaderInfo = item.commentHeaderInfo,
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick,
+            onLinkLongClick = { url, text ->
+              onLinkLongClick(Either.Right(item.comment), url, text)
+            },
           )
 
           updateScreenshotMode(
@@ -765,7 +773,9 @@ class PostAdapter(
             onVideoClick = onVideoClick,
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick,
+            onLinkLongClick = { url, text ->
+              onLinkLongClick(null, url, text)
+            },
             collapseSection = ::collapseSection,
             onPendingCommentActionInfoClick = onPendingCommentActionInfoClick,
           )

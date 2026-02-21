@@ -361,7 +361,13 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
       getString(R.string.error_unsupported_video_type),
       getString(R.string.more_actions),
       {
-        showMoreVideoOptions(url, args.url, moreActionsHelper, childFragmentManager)
+        showMoreVideoOptions(
+          url = url,
+          originalUrl = args.url,
+          moreActionsHelper = moreActionsHelper,
+          fragmentManager = childFragmentManager,
+          downloadContext = args.downloadContext
+        )
       },
     )
   }
@@ -373,7 +379,13 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
     videoType: VideoType,
   ) {
     binding.playerView.findViewById<ImageButton>(R.id.exo_more).setOnClickListener {
-      showMoreVideoOptions(url, originalUrl, moreActionsHelper, childFragmentManager)
+      showMoreVideoOptions(
+        url = url,
+        originalUrl = originalUrl,
+        moreActionsHelper = moreActionsHelper,
+        fragmentManager = childFragmentManager,
+        downloadContext = args.downloadContext
+      )
     }
   }
 

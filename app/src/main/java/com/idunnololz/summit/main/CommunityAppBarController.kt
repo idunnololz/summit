@@ -477,6 +477,7 @@ class CommunityAppBarController(
               title = null,
               url = bannerUrl,
               mimeType = null,
+              downloadContext = null,
             )
           }
         }
@@ -491,6 +492,7 @@ class CommunityAppBarController(
               title = null,
               url = iconUrl,
               mimeType = null,
+              downloadContext = null,
             )
           }
         }
@@ -747,10 +749,16 @@ class CommunityAppBarController(
             title = null,
             url = url,
             mimeType = null,
+            downloadContext = null,
           )
         },
         onVideoClick = { url ->
-          summitActivity.openVideo(url, VideoType.Unknown, null)
+          summitActivity.openVideo(
+            url = url,
+            videoType = VideoType.Unknown,
+            videoState = null,
+            downloadContext = null
+          )
         },
         onPageClick = { url, pageRef ->
           summitActivity.launchPage(pageRef, url = url)
@@ -759,7 +767,7 @@ class CommunityAppBarController(
           baseFragment.onLinkClick(url, text, linkType)
         },
         onLinkLongClick = { url, text ->
-          summitActivity.showMoreLinkOptions(url, text)
+          summitActivity.showMoreLinkOptions(url, text, null)
         },
       )
       if (expandDescription.value) {

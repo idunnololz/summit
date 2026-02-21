@@ -87,6 +87,7 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
@@ -107,6 +108,7 @@ import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
 import com.idunnololz.summit.util.toErrorMessage
+import com.idunnololz.summit.util.toFileDownloadContext
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
 import javax.inject.Inject
@@ -481,10 +483,16 @@ class PostFragment :
               ),
               url = url,
               mimeType = null,
+              downloadContext = postOrCommentView?.toFileDownloadContext(),
             )
           },
-          onVideoClick = { url, videoType, state ->
-            getMainActivity()?.openVideo(url, videoType, state)
+          onVideoClick = { postOrCommentView, url, videoType, state ->
+            getMainActivity()?.openVideo(
+              url = url,
+              videoType = videoType,
+              videoState = state,
+              downloadContext = postOrCommentView?.toFileDownloadContext(),
+            )
           },
           onVideoLongClickListener = { url ->
             showMoreVideoOptions(
@@ -538,8 +546,12 @@ class PostFragment :
           onLinkClick = { url, text, linkType ->
             onLinkClick(url, text, linkType)
           },
-          onLinkLongClick = { url, text ->
-            getMainActivity()?.showMoreLinkOptions(url, text)
+          onLinkLongClick = { postOrCommentView, url, text ->
+            getMainActivity()?.showMoreLinkOptions(
+              url = url,
+              text = text,
+              downloadContext = postOrCommentView?.toFileDownloadContext()
+            )
           },
           switchToNativeInstance = {
             viewModel.switchToNativeInstance()

@@ -32,6 +32,7 @@ import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
+import com.idunnololz.summit.util.toFileDownloadContext
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -99,17 +100,23 @@ class PersonCommentsFragment :
           view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
         }
       },
-      onImageClick = { view, url ->
+      onImageClick = { commentView, view, url ->
         getMainActivity()?.openImage(
           sharedElement = view,
           appBar = parentFragment.binding.appBar,
           title = null,
           url = url,
           mimeType = null,
+          downloadContext = commentView.toFileDownloadContext(),
         )
       },
-      onVideoClick = { url, videoType, state ->
-        getMainActivity()?.openVideo(url, videoType, state)
+      onVideoClick = { commentView, url, videoType, state ->
+        getMainActivity()?.openVideo(
+          url = url,
+          videoType = videoType,
+          videoState = state,
+          downloadContext = commentView.toFileDownloadContext()
+        )
       },
       onPageClick = { url, pageRef ->
         getMainActivity()?.launchPage(pageRef, url = url)
@@ -126,8 +133,12 @@ class PersonCommentsFragment :
       onLinkClick = { url, text, linkType ->
         onLinkClick(url, text, linkType)
       },
-      onLinkLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+      onLinkLongClick = { commentView, url, text ->
+        getMainActivity()?.showMoreLinkOptions(
+          url = url,
+          text = text,
+          downloadContext = commentView.toFileDownloadContext(),
+        )
       },
     ).apply {
       stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY

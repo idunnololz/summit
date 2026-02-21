@@ -327,7 +327,7 @@ class MainFragment :
         getMainActivity()?.showBottomMenu(bottomMenu)
       },
       onLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+        getMainActivity()?.showMoreLinkOptions(url, text, null)
       },
     )
 

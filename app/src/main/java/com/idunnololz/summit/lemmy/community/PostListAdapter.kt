@@ -60,7 +60,7 @@ class PostListAdapter(
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
-  private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
+  private val onVideoClick: (PostView, String, VideoType, VideoState?) -> Unit,
   private val onVideoLongClickListener: (url: String) -> Unit,
   private val onPageClick: (accountId: Long?, url: String, PageRef) -> Unit,
   private val onItemClick: (
@@ -82,7 +82,7 @@ class PostListAdapter(
     text: String?,
     linkContext: LinkContext,
   ) -> Unit,
-  private val onLinkLongClick: (accountId: Long?, url: String, text: String?) -> Unit,
+  private val onLinkLongClick: (PostView, accountId: Long?, url: String, text: String?) -> Unit,
   private val onPostActionClick: (PostView, actionId: Int) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -267,7 +267,9 @@ class PostListAdapter(
               notifyItemChanged(h.absoluteAdapterPosition)
             },
             onImageClick = onImageClick,
-            onVideoClick = onVideoClick,
+            onVideoClick = { url, videoType, videoState ->
+              onVideoClick(item.fetchedPost.postView, url, videoType, videoState)
+            },
             onVideoLongClickListener = onVideoLongClickListener,
             onPageClick = onPageClick,
             onItemClick = onItemClick,
@@ -280,7 +282,9 @@ class PostListAdapter(
               clearHighlight()
             },
             onLinkClick = onLinkClick,
-            onLinkLongClick = onLinkLongClick,
+            onLinkLongClick = { accountId, url, text ->
+              onLinkLongClick(item.fetchedPost.postView, accountId, url, text)
+            },
             onPostActionClick = { postView, actionId ->
               onPostActionClick(postView, actionId)
             },
@@ -374,7 +378,9 @@ class PostListAdapter(
           },
           onImageClick = onImageClick,
           onShowMoreOptions = onShowMoreActions,
-          onVideoClick = onVideoClick,
+          onVideoClick = { url, videoType, videoState ->
+            onVideoClick(item.fetchedPost.postView, url, videoType, videoState)
+          },
           onVideoLongClickListener = onVideoLongClickListener,
           onPageClick = onPageClick,
           onItemClick = onItemClick,
@@ -386,7 +392,9 @@ class PostListAdapter(
             clearHighlight()
           },
           onLinkClick = onLinkClick,
-          onLinkLongClick = onLinkLongClick,
+          onLinkLongClick = { accountId, url, text ->
+            onLinkLongClick(item.fetchedPost.postView, accountId, url, text)
+          },
           onPostActionClick = { postView, actionId ->
             onPostActionClick(postView, actionId)
           },

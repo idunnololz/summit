@@ -50,15 +50,15 @@ class CommentListAdapter(
   private val lemmyTextHelper: LemmyTextHelper,
   private val linkResolver: LinkResolver,
   private val onLoadPage: (Int) -> Unit,
-  private val onImageClick: (View?, String) -> Unit,
-  private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
+  private val onImageClick: (CommentView, View?, String) -> Unit,
+  private val onVideoClick: (CommentView, String, VideoType, VideoState?) -> Unit,
   private val onPageClick: (url: String, PageRef) -> Unit,
   private val onCommentClick: (CommentRef) -> Unit,
   private val onCommentActionClick: (View, CommentView, actionId: Int) -> Unit,
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
-  private val onLinkLongClick: (url: String, text: String) -> Unit,
+  private val onLinkLongClick: (CommentView, url: String, text: String) -> Unit,
 ) : Adapter<ViewHolder>() {
 
   sealed interface Item {
@@ -176,7 +176,12 @@ class CommentListAdapter(
         )
       }
       b.postInfo.movementMethod = CustomLinkMovementMethod().apply {
-        onLinkLongClickListener = DefaultLinkLongClickListener(context, onLinkLongClick)
+        onLinkLongClickListener = DefaultLinkLongClickListener(
+          context,
+          { url, text ->
+            onLinkLongClick(item.commentView, url, text)
+          }
+        )
         onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
           override fun onClick(
             textView: TextView,
@@ -203,21 +208,25 @@ class CommentListAdapter(
           commentHeaderInfo = item.commentHeaderInfo,
           onPageClick = onPageClick,
           onLinkClick = onLinkClick,
-          onLinkLongClick = onLinkLongClick,
+          onLinkLongClick = { url, text ->
+            onLinkLongClick(item.commentView, url, text)
+          },
         )
       lemmyTextHelper.bindText(
         textView = b.text,
         text = item.commentView.comment.content,
         instance = item.instance,
         onImageClick = {
-          onImageClick(null, it)
+          onImageClick(item.commentView, null, it)
         },
         onVideoClick = {
-          onVideoClick(it, VideoType.Unknown, null)
+          onVideoClick(item.commentView, it, VideoType.Unknown, null)
         },
         onPageClick = onPageClick,
         onLinkClick = onLinkClick,
-        onLinkLongClick = onLinkLongClick,
+        onLinkLongClick = { url, text ->
+          onLinkLongClick(item.commentView, url, text)
+        },
       )
 
       val scoreCount: TextView? = viewHolder.qaScoreCount

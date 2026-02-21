@@ -446,6 +446,7 @@ class ImageViewerActivity :
         fragmentManager = supportFragmentManager,
         textOrFileName = args.mimeType,
         linkResolver = linkResolver,
+        downloadContext = args.downloadContext,
       )(R.id.share_image)
     }
     binding.downloadButton.setOnClickListener {
@@ -456,6 +457,7 @@ class ImageViewerActivity :
         fragmentManager = supportFragmentManager,
         textOrFileName = args.mimeType,
         linkResolver = linkResolver,
+        downloadContext = args.downloadContext,
       )(R.id.download)
     }
     binding.infoButton.setOnClickListener {

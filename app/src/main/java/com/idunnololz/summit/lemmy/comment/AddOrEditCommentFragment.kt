@@ -1038,7 +1038,7 @@ class AddOrEditCommentFragment :
         onImageClick = { _, view, url ->
           showError()
         },
-        onVideoClick = { url, videoType, state ->
+        onVideoClick = { _, url, videoType, state ->
           showError()
         },
         onVideoLongClickListener = { url ->
@@ -1061,7 +1061,7 @@ class AddOrEditCommentFragment :
         onLinkClick = { url, text, linkType ->
           showError()
         },
-        onLinkLongClick = { url, text ->
+        onLinkLongClick = { _, _, _ ->
           showError()
         },
         switchToNativeInstance = {},

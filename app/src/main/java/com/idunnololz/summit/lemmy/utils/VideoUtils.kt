@@ -11,6 +11,7 @@ import com.idunnololz.summit.links.LinkPreviewDialogFragment
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.FileDownloadHelper
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -23,6 +24,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
   originalUrl: String,
   moreActionsHelper: MoreActionsHelper,
   fragmentManager: FragmentManager,
+  downloadContext: FileDownloadContext? = null,
 ): BottomMenu? {
   if (!isBindingAvailable()) return null
 
@@ -58,7 +60,7 @@ fun BaseFragment<*>.showMoreVideoOptions(
     setOnMenuItemClickListener {
       when (it.id) {
         R.id.download -> {
-          moreActionsHelper.downloadVideo(url)
+          moreActionsHelper.downloadVideo(url, downloadContext = downloadContext)
         }
         R.id.video_details -> {
           VideoInfoDialogFragment.show(fragmentManager, originalUrl)

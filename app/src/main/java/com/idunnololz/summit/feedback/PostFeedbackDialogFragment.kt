@@ -374,6 +374,7 @@ class PostFeedbackDialogFragment :
             title = null,
             url = Uri.fromFile(feedbackScreenshotFile).toString(),
             mimeType = null,
+            downloadContext = null,
             urlAlt = null,
             mimeTypeAlt = null,
           )

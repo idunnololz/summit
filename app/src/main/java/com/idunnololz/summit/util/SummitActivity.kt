@@ -37,8 +37,18 @@ abstract class SummitActivity :
     navBarController.hideNavBar()
   }
 
-  fun openVideo(url: String, videoType: VideoType, videoState: VideoState?) {
-    val direction = MainDirections.actionGlobalVideoViewerFragment(url, videoType, videoState)
+  fun openVideo(
+    url: String,
+    videoType: VideoType,
+    videoState: VideoState?,
+    downloadContext: FileDownloadContext?,
+  ) {
+    val direction = MainDirections.actionGlobalVideoViewerFragment(
+      url = url,
+      videoType = videoType,
+      downloadContext = downloadContext,
+      videoState = videoState
+    )
     currentNavController?.navigateSafe(direction)
   }
 
@@ -152,6 +162,7 @@ abstract class SummitActivity :
     title: String?,
     url: String,
     mimeType: String?,
+    downloadContext: FileDownloadContext?,
     urlAlt: String? = null,
     mimeTypeAlt: String? = null,
   )

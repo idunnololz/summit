@@ -182,10 +182,16 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           title = imageName,
           url = url,
           mimeType = null,
+          downloadContext = null,
         )
       },
       onVideoClick = { url, videoType, state ->
-        getMainActivity()?.openVideo(url, videoType, state)
+        getMainActivity()?.openVideo(
+          url = url,
+          videoType = videoType,
+          videoState = state,
+          downloadContext = null
+        )
       },
       onPageClick = { url, pageRef ->
         getMainActivity()?.launchPage(pageRef, url = url)
@@ -194,7 +200,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
         onLinkClick(url, text, linkType)
       },
       onLinkLongClick = { url, text ->
-        getMainActivity()?.showMoreLinkOptions(url, text)
+        getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
       },
       onCommunityInfoClick = { communityRef ->
         getMainActivity()?.showCommunityInfo(communityRef)
@@ -415,11 +421,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
         icon.setOnClickListener {
           getMainActivity()?.openImage(
-            icon,
-            toolbar,
-            null,
-            data.iconUrl,
-            null,
+            sharedElement = icon,
+            appBar = toolbar,
+            title = null,
+            url = data.iconUrl,
+            mimeType = null,
+            downloadContext = null,
           )
         }
       } else {
@@ -441,11 +448,12 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
 
         banner.setOnClickListener {
           getMainActivity()?.openImage(
-            banner,
-            null,
-            args.communityRef.getName(context),
-            data.bannerUrl,
-            null,
+            sharedElement = banner,
+            appBar = null,
+            title = args.communityRef.getName(context),
+            url = data.bannerUrl,
+            mimeType = null,
+            downloadContext = null,
           )
         }
       } else {

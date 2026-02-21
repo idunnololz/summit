@@ -77,6 +77,7 @@ import com.idunnololz.summit.util.isLoading
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
+import com.idunnololz.summit.util.toFileDownloadContext
 import com.idunnololz.summit.video.VideoState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -147,14 +148,33 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         onLoadPage = {
           queryEngine?.performQuery(it, force = false)
         },
-        onImageClick = { view, url ->
-          getMainActivity()?.openImage(view, parentFragment.binding.appBar, null, url, null)
+        onImageClick = { commentView, view, url ->
+          getMainActivity()?.openImage(
+            sharedElement = view,
+            appBar = parentFragment.binding.appBar,
+            title = null,
+            url = url,
+            mimeType = null,
+            downloadContext = commentView.toFileDownloadContext(),
+          )
         },
-        onPostImageClick = { _, _, view, url ->
-          getMainActivity()?.openImage(view, null, null, url, null)
+        onPostImageClick = { _, postView, view, url ->
+          getMainActivity()?.openImage(
+            sharedElement = view,
+            appBar = null,
+            title = null,
+            url = url,
+            mimeType = null,
+            downloadContext = postView.toFileDownloadContext(),
+          )
         },
         onVideoClick = { url, videoType, state ->
-          getMainActivity()?.openVideo(url, videoType, state)
+          getMainActivity()?.openVideo(
+            url = url,
+            videoType = videoType,
+            videoState = state,
+            downloadContext = null
+          )
         },
         onVideoLongClickListener = { url ->
           showMoreVideoOptions(
@@ -217,7 +237,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           onLinkClick(url, text, linkType)
         },
         onLinkLongClick = { url, text ->
-          getMainActivity()?.showMoreLinkOptions(url, text)
+          getMainActivity()?.showMoreLinkOptions(url, text, null)
         },
         onCommentClick = {
           parentFragment.slidingPaneController?.openComment(
@@ -358,7 +378,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     private val avatarHelper: AvatarHelper,
     private val linkResolver: LinkResolver,
     private val onLoadPage: (Int) -> Unit,
-    private val onImageClick: (View?, String) -> Unit,
+    private val onImageClick: (CommentView, View?, String) -> Unit,
     private val onPostImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
     private val onVideoClick: (
       url: String,
@@ -528,7 +548,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           text = item.commentView.comment.content,
           instance = item.instance,
           onImageClick = {
-            onImageClick(null, it)
+            onImageClick(item.commentView, null, it)
           },
           onPageClick = onPageClick,
           onVideoClick = {

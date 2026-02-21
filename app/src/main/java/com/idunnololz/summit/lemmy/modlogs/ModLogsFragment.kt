@@ -165,7 +165,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           onLinkClick(url, text, linkContext)
         },
         onLinkLongClick = { url: String, text: String ->
-          getMainActivity()?.showMoreLinkOptions(url, text)
+          getMainActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
         },
         onFilterBannerClick = {
           showFilterDialog()

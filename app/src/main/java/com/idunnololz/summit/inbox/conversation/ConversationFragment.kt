@@ -155,10 +155,22 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
         lemmyTextHelper = lemmyTextHelper,
         showMediaAsLinks = preferences.inlineUrlsInPrivateMessages,
         onImageClick = { url ->
-          getMainActivity()?.openImage(null, binding.appBar, null, url, null)
+          getMainActivity()?.openImage(
+            sharedElement = null,
+            appBar = binding.appBar,
+            title = null,
+            downloadContext = null,
+            url = url,
+            mimeType = null
+          )
         },
         onVideoClick = { url, videoType, state ->
-          getMainActivity()?.openVideo(url, videoType, state)
+          getMainActivity()?.openVideo(
+            url = url,
+            videoType = videoType,
+            videoState = state,
+            downloadContext = null
+          )
         },
         onPageClick = { url, pageRef ->
           getMainActivity()?.launchPage(pageRef, url = url)
@@ -167,7 +179,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
           onLinkClick(url, text, linkType)
         },
         onLinkLongClick = { url, text ->
-          getSummitActivity()?.showMoreLinkOptions(url, text)
+          getSummitActivity()?.showMoreLinkOptions(url = url, text = text, downloadContext = null)
         },
         onMessageLongClick = { message ->
           val bottomMenu = BottomMenu(context).apply {

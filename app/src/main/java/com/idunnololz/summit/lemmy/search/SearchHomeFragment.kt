@@ -424,7 +424,7 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
         },
         onCommunityLongClick = { view, community ->
           val url = community.toUrl(viewModel.apiInstance)
-          getMainActivity()?.showMoreLinkOptions(url, null)
+          getMainActivity()?.showMoreLinkOptions(url = url, text = null, downloadContext = null)
         },
         onSettingsClick = { view ->
           SearchHomeConfigDialogFragment.show(
