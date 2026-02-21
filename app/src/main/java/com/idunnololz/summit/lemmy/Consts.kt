@@ -35,5 +35,6 @@ object Consts {
     "piefed.ca",
     "piefed.zip",
     "feddit.online",
+    "fedinsfw.app",
   )
 }

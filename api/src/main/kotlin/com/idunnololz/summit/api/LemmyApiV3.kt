@@ -94,6 +94,7 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.HeaderMap
@@ -665,6 +666,9 @@ interface LemmyApiV3 {
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
   ): Call<ListMediaResponse>
+
+//  @DELETE("account")
+//  fun deleteAccount()
 
   @GET
   fun deleteMedia(@Url url: String, @HeaderMap headers: Map<String, String>): Call<Unit>

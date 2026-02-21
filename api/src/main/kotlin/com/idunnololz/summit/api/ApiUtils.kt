@@ -80,7 +80,7 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
     }
 
     if (errMsg?.equals("incorrect_login", ignoreCase = true) == true) {
-      return Result.failure(ClientApiException(errMsg, errorCode))
+      return Result.failure(IncorrectLoginException())
     }
 
     if (errorCode == 401) {

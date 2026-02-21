@@ -60,7 +60,11 @@ class LoginViewModel @Inject constructor(
         if (error is NotAuthenticatedException) {
           error = IncorrectLoginException()
         } else {
-          Sentry.captureException(RuntimeException("Unable to login.", error))
+          if (error is IncorrectLoginException) {
+
+          } else {
+            Sentry.captureException(RuntimeException("Unable to login.", error))
+          }
         }
 
         accountLiveData.postError(error)
@@ -78,6 +82,8 @@ class LoginViewModel @Inject constructor(
           accountLiveData.postValue(it)
         }
         .onFailure {
+          Sentry.captureException(RuntimeException("Unable to login during step 2.", it))
+
           accountLiveData.postError(it)
         }
     }
