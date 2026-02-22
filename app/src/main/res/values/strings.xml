@@ -2374,6 +2374,7 @@
     <string name="account_created_on_format">Account created %1$s (cake day in %2$s days)</string>
     <string name="use_community_download_folder">Use community download folder</string>
     <string name="use_community_download_folder_desc">When enabled, files will be downloaded to a subfolder based on the community. Eg. an image from c/cats will be saved to Downloads/cats</string>
+    <string name="use_bundled_avif_decoder">Use bundled AVIF decoder</string>
 
 
     <!-- uCrop string resource end -->

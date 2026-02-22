@@ -20,8 +20,9 @@ work = "2.10.3"
 coil = "3.3.0"
 retrofit = "3.0.0"
 jetbrainsKotlinJvm = "2.3.0"
-commonmark = "0.13.0"
-paletteKtx = "1.0.0" # DO NOT BUMP THIS PAST 0.13.0
+commonmark = "0.13.0" # DO NOT BUMP THIS PAST 0.13.0
+paletteKtx = "1.0.0"
+avif = "1.3.0.841110fd"
 
 [libraries]
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrowCore" }
@@ -112,6 +113,8 @@ commonmark-table = { module = "com.atlassian.commonmark:commonmark-ext-gfm-table
 
 tools-patreon = { module = "com.patreon:patreon", version = "0.4.2" }
 palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
+
+avif = { module = "org.aomedia.avif.android:avif", version.ref = "avif" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

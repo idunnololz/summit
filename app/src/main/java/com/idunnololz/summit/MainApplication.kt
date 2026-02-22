@@ -23,6 +23,7 @@ import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
 import com.idunnololz.summit.util.AnimationUtils.IMAGE_LOAD_CROSS_FADE_DURATION_MS
+import com.idunnololz.summit.util.coil.AvifDecoder
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.coil.BetterDebugLogger
 import com.idunnololz.summit.util.coil3.video.VideoFrameDecoder
@@ -126,9 +127,7 @@ class MainApplication :
               },
             ),
           )
-//          if (SDK_INT >= 24) {
-//            add(HeifDecoder.Factory())
-//          }
+          add(AvifDecoder.Factory(preferences))
         }
         .apply {
           if (BuildConfig.DEBUG) {

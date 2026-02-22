@@ -31,21 +31,21 @@ import com.google.gson.annotations.SerializedName
 data class LocalUser(
 
   @SerializedName("default_listing_type")
-  val defaultListingType: ListingType,
+  val defaultListingType: ListingType?,
 
   @SerializedName("default_sort_type")
-  val defaultSortType: SortType,
+  val defaultSortType: SortType?,
 
   @SerializedName("show_bot_accounts")
-  val showBotAccounts: kotlin.Boolean,
+  val showBotAccounts: kotlin.Boolean?,
 
   @SerializedName("show_nsfw")
-  val showNsfw: kotlin.Boolean,
+  val showNsfw: kotlin.Boolean?,
 
   @SerializedName("show_read_posts")
-  val showReadPosts: kotlin.Boolean,
+  val showReadPosts: kotlin.Boolean?,
 
   @SerializedName("show_scores")
-  val showScores: kotlin.Boolean,
+  val showScores: kotlin.Boolean?,
 
 )

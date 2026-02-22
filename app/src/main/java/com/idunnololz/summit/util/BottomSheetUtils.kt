@@ -1,6 +1,10 @@
 package com.idunnololz.summit.util
 
 import android.view.View
+import android.view.View.OVER_SCROLL_NEVER
+import android.widget.FrameLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 fun setupBottomSheetAndShow(
@@ -64,5 +68,26 @@ fun setupBottomSheetAndShow(
       )
     },
     100,
+  )
+}
+
+fun fixBottomSheetFling(
+  bottomSheetBehavior: BottomSheetBehavior<FrameLayout>,
+  recyclerView: RecyclerView,
+) {
+  recyclerView.isNestedScrollingEnabled = false
+  recyclerView.overScrollMode = OVER_SCROLL_NEVER
+
+  recyclerView.addOnScrollListener(
+    object : RecyclerView.OnScrollListener() {
+      override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+        super.onScrolled(recyclerView, dx, dy)
+
+        val position = (recyclerView.layoutManager as? LinearLayoutManager)
+          ?.findFirstCompletelyVisibleItemPosition()
+
+        bottomSheetBehavior.isDraggable = position == 0
+      }
+    },
   )
 }

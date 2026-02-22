@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.api.IncorrectLoginException
 import com.idunnololz.summit.api.LemmyApiClient
+import com.idunnololz.summit.api.NoInternetException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,7 +61,7 @@ class LoginViewModel @Inject constructor(
         if (error is NotAuthenticatedException) {
           error = IncorrectLoginException()
         } else {
-          if (error is IncorrectLoginException) {
+          if (error is IncorrectLoginException || error is NoInternetException) {
 
           } else {
             Sentry.captureException(RuntimeException("Unable to login.", error))

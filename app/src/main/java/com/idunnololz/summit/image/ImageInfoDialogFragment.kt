@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentImageInfoBinding
 import com.idunnololz.summit.databinding.ImageInfoInfoItemBinding
@@ -23,6 +24,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.fixBottomSheetFling
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -76,6 +78,10 @@ class ImageInfoDialogFragment :
 //            toolbar.setNavigationIconTint(
 //                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
 //            )
+
+      (dialog as? BottomSheetDialog)?.behavior?.let { behavior ->
+        fixBottomSheetFling(behavior, recyclerView)
+      }
 
       val adapter = ImageInfoAdapter(context)
 

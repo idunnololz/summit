@@ -29,10 +29,11 @@ This is the repository that contains the source code of Summit for Lemmy.
 4. Merge latest translations to main. (https://github.com/idunnololz/summit)
 5. Pull latest translations on local.
 6. Check patreon and update patreon list.
-7. Bump version code and string.
-8. Create a release build.
-9. Add to play store.
-10. Commit & tag release.
+7. Check and update instances list.
+8. Bump version code and string.
+9. Create a release build.
+10. Add to play store.
+11. Commit & tag release.
 
 ### Update translation credit
 
@@ -67,3 +68,7 @@ Compare-Object -ReferenceObject $dir1 -DifferenceObject $dir2
 ## Update Patreon supporters
 
 `./gradlew :tools:patreon`
+
+## Update instance stats
+
+`./gradlew :tools:instances`

@@ -164,6 +164,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_UPVOTE_COLOR
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USER_AGENT_CHOICE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BLACK_THEME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BOTTOM_NAV_BAR
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_BUNDLED_AVIF_DECODER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_COMMUNITY_DOWNLOAD_FOLDER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CONDENSED_FOR_COMMENT_HEADERS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_CURSORS_WHEN_LOADING_POST_FEED
@@ -738,6 +739,8 @@ class Preferences(
     by intPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, R.id.community_selector_community_list_top_communities)
   var imageViewerControlStyle
     by intPreference(KEY_IMAGE_VIEWER_CONTROL_STYLE, ImageViewerControlStyleIds.DEFAULT)
+  var useBundledAvifDecoder
+    by booleanPreference(KEY_USE_BUNDLED_AVIF_DECODER, true)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

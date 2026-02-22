@@ -74,6 +74,7 @@ import java.io.File
 import androidx.core.net.toUri
 import javax.inject.Inject
 import androidx.core.view.isEmpty
+import coil3.size.Scale
 
 class LemmyContentHelper(
   private val context: Context,

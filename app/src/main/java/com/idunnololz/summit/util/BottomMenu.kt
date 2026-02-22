@@ -284,27 +284,6 @@ class BottomMenu(
     }
   }
 
-  private fun fixBottomSheetFling(
-    bottomSheetBehavior: BottomSheetBehavior<FrameLayout>,
-    recyclerView: RecyclerView,
-  ) {
-    recyclerView.isNestedScrollingEnabled = false
-    recyclerView.overScrollMode = OVER_SCROLL_NEVER
-
-    recyclerView.addOnScrollListener(
-      object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-          super.onScrolled(recyclerView, dx, dy)
-
-          val position = (recyclerView.layoutManager as? LinearLayoutManager)
-            ?.findFirstCompletelyVisibleItemPosition()
-
-          bottomSheetBehavior.isDraggable = position == 0
-        }
-      },
-    )
-  }
-
   fun close(): Boolean {
     if (parent != null) {
       bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN

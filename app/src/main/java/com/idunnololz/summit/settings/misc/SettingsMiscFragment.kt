@@ -6,6 +6,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import coil3.imageLoader
 import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
@@ -280,6 +281,13 @@ class SettingsMiscFragment :
       settings.imageViewerControlStyle.asSingleChoiceSelectorItem(
         { preferences.imageViewerControlStyle },
         { preferences.imageViewerControlStyle = it },
+      ),
+      settings.useBundledAvifDecoder.asOnOffSwitch(
+        { preferences.useBundledAvifDecoder },
+        {
+          context.imageLoader.memoryCache?.clear()
+          preferences.useBundledAvifDecoder = it
+        },
       ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
