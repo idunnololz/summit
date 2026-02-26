@@ -1,5 +1,6 @@
 package com.idunnololz.tools
 
+import java.io.File
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -10,8 +11,6 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.HeaderMap
 import retrofit2.http.QueryMap
-import java.io.File
-
 
 object UpdateInstanceData {
 
@@ -34,7 +33,8 @@ object UpdateInstanceData {
       println("${it.baseurl} - ${it.counts.usersActiveMonth}")
     }
 
-    val instancesFile = File("app/src/main/java/com/idunnololz/summit/util/consts/LemmyInstances.kt")
+    val instancesFile =
+      File("app/src/main/java/com/idunnololz/summit/util/consts/LemmyInstances.kt")
     instancesFile.parentFile.mkdirs()
     instancesFile.outputStream().bufferedWriter().use {
       it.appendLine("package com.idunnololz.summit.util.consts")
@@ -208,5 +208,4 @@ interface LemmyVerseApi {
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
   ): Call<List<InstanceStat>>
-
 }

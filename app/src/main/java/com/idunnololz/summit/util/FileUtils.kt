@@ -265,7 +265,8 @@ private fun guessContentTypeFromStream(inputStream: InputStream): String? {
     c9 == 'a'.code &&
     c10 == 'v'.code &&
     c11 == 'i'.code &&
-    c12 == 'f'.code) {
+    c12 == 'f'.code
+  ) {
     return "image/avif"
   }
   return if ((c1 == 'R'.code) && (c2 == 'I'.code) && (c3 == 'F'.code) && (c4 == 'F'.code)) {

@@ -8,12 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import androidx.core.view.WindowCompat
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil3.asImage
 import coil3.dispose
@@ -22,15 +18,12 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentChooseSavedImageBinding
 import com.idunnololz.summit.databinding.SaveSlotBinding
 import com.idunnololz.summit.util.BaseBottomSheetDialogFragment
-import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.PrettyPrintUtils.humanReadableByteCountSi
-import com.idunnololz.summit.util.setupBottomSheetAndShow
 import com.idunnololz.summit.util.shimmer.newShimmerDrawable16to9
 import com.idunnololz.summit.util.tsToShortDate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 

@@ -352,7 +352,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
                 url = url,
                 videoType = VideoType.Unknown,
                 videoState = null,
-                downloadContext = null
+                downloadContext = null,
               )
             },
             onPageClick = { url, pageRef ->
@@ -365,7 +365,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               getSummitActivity()?.showMoreLinkOptions(
                 url = url,
                 text = text,
-                downloadContext = null
+                downloadContext = null,
               )
             },
           )
@@ -472,8 +472,10 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
 
           avatarHelper.loadAvatar(profileIcon, person)
 
-          val displayName = (person.display_name
-            ?: person.name).toBidiSafe()
+          val displayName = (
+            person.display_name
+              ?: person.name
+            ).toBidiSafe()
 
           name.text = displayName
           subtitle.text = buildSpannedString {
@@ -757,7 +759,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               url = url,
               videoType = videoType,
               videoState = state,
-              downloadContext = null
+              downloadContext = null,
             )
           },
           onVideoLongClickListener = { url ->

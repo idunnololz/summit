@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.lemmy.CommunityRef
 
 @Dao

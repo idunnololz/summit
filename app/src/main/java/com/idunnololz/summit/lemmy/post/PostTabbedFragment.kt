@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -154,9 +153,7 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
 //    outState.remove("android:support:fragments")
   }
 
-  fun getPost(postId: Int): PostView? {
-    return getViewModel()?.postListEngine?.getFetchedPost(postId)
-  }
+  fun getPost(postId: Int): PostView? = getViewModel()?.postListEngine?.getFetchedPost(postId)
 
   private fun getViewModel() = (parentFragment as? CommunityFragment)?.viewModel
 

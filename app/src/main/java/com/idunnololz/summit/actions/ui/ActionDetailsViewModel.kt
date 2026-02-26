@@ -6,10 +6,8 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.ActionsRunnerHelper
 import com.idunnololz.summit.actions.PendingActionsManager
 import com.idunnololz.summit.api.LemmyApiClient
-import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
-import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyAction
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

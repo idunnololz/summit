@@ -33,7 +33,12 @@ class SinglePostsDataSource @AssistedInject constructor(
     fun create(communityName: String?, listingType: ListingType?): SinglePostsDataSource
   }
 
-  override suspend fun fetchPosts(sortType: SortType?, page: Int, force: Boolean, showRead: Boolean?) = apiClient
+  override suspend fun fetchPosts(
+    sortType: SortType?,
+    page: Int,
+    force: Boolean,
+    showRead: Boolean?,
+  ) = apiClient
     .fetchPosts(
       communityIdOrName = if (communityName == null) {
         null
@@ -65,10 +70,7 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
 
   @AssistedFactory
   interface Factory {
-    fun create(
-      communityName: String?,
-      listingType: ListingType?
-    ): CursorBackedSinglePostsDataSource
+    fun create(communityName: String?, listingType: ListingType?): CursorBackedSinglePostsDataSource
   }
 
   private var cursorIds = listOf<String?>("0")
@@ -91,11 +93,11 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
     }
 
     return _fetchPosts(
-        sortType = sortType,
-        page = page,
-        force = force,
-        showRead = showRead,
-      )
+      sortType = sortType,
+      page = page,
+      force = force,
+      showRead = showRead,
+    )
       .onSuccess {
         if (page + 1 == cursorIds.size) {
           cursorIds += it.next_page
@@ -137,7 +139,7 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
         },
         {
           return Result.failure(it)
-        }
+        },
       )
     }
 
@@ -165,7 +167,7 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
       cursorIds[page]
     }
 
-    Log.d(TAG, "_fetchPosts - ${pageIndex} ${cursor}")
+    Log.d(TAG, "_fetchPosts - $pageIndex $cursor")
 
     return apiClient
       .fetchPosts(

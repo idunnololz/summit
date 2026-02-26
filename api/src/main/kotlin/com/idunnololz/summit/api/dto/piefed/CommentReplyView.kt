@@ -16,6 +16,7 @@
 package com.idunnololz.summit.api.dto.piefed
 
 import com.google.gson.annotations.SerializedName
+import com.idunnololz.summit.api.dto.piefed.models.Post
 
 /**
  *

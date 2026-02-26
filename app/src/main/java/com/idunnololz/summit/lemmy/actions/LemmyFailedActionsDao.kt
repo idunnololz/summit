@@ -127,28 +127,26 @@ class LemmyActionFailureException(
   "LemmyAction failed. Cause: ${reason::class.qualifiedName}. Details: $reason",
 )
 
-
-fun LemmyActionFailureReason?.toText(context: Context) =
-  when (this) {
-    is LemmyActionFailureReason.AccountNotFoundError ->
-      "There was an authentication issue."
-    LemmyActionFailureReason.ActionOverwritten ->
-      "An action performed after this one overrode this action."
-    LemmyActionFailureReason.NoInternetError ->
-      "Network issues were encountered."
-    LemmyActionFailureReason.DeserializationError ->
-      "Deserialization error."
-    is LemmyActionFailureReason.RateLimit ->
-      "Rate limit errors were encountered."
-    LemmyActionFailureReason.ServerError ->
-      "There was an error on the server side."
-    is LemmyActionFailureReason.TooManyRequests ->
-        "This client was blocked by the server for issuing too many requests."
-    is LemmyActionFailureReason.UnknownError ->
-        "Unknown error. Code '${this.errorCode}'. " +
-          "Key '${this.errorMessage}'."
-    LemmyActionFailureReason.ConnectionError ->
-      context.getString(R.string.error_network)
-    null ->
-      context.getString(R.string.error_unknown)
-  }
+fun LemmyActionFailureReason?.toText(context: Context) = when (this) {
+  is LemmyActionFailureReason.AccountNotFoundError ->
+    "There was an authentication issue."
+  LemmyActionFailureReason.ActionOverwritten ->
+    "An action performed after this one overrode this action."
+  LemmyActionFailureReason.NoInternetError ->
+    "Network issues were encountered."
+  LemmyActionFailureReason.DeserializationError ->
+    "Deserialization error."
+  is LemmyActionFailureReason.RateLimit ->
+    "Rate limit errors were encountered."
+  LemmyActionFailureReason.ServerError ->
+    "There was an error on the server side."
+  is LemmyActionFailureReason.TooManyRequests ->
+    "This client was blocked by the server for issuing too many requests."
+  is LemmyActionFailureReason.UnknownError ->
+    "Unknown error. Code '${this.errorCode}'. " +
+      "Key '${this.errorMessage}'."
+  LemmyActionFailureReason.ConnectionError ->
+    context.getString(R.string.error_network)
+  null ->
+    context.getString(R.string.error_unknown)
+}

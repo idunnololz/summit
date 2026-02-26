@@ -2,7 +2,6 @@ package com.idunnololz.summit.localTracking.screen
 
 import android.content.Context
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -14,7 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.CornerTreatment
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.utils.instance
@@ -33,7 +31,6 @@ import com.idunnololz.summit.databinding.LocalStatsWarningItemBinding
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.toPersonRef
-import com.idunnololz.summit.lemmy.toUri
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -134,10 +131,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       }
 
       toolbar.addMenuProvider(object : MenuProvider {
-        override fun onCreateMenu(
-          menu: Menu,
-          menuInflater: MenuInflater,
-        ) {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
           menuInflater.inflate(R.menu.menu_local_stats, menu)
         }
 
@@ -149,7 +143,6 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
           }
           return true
         }
-
       })
     }
   }
@@ -188,21 +181,21 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       data object HeaderItem : Item
 
       data class StatSummaryItem(
-        val events: Int
+        val events: Int,
       ) : Item
 
       data class SectionTitleItem(
-        val title: String
+        val title: String,
       ) : Item
 
       data class CommunityStat(
         val communityRef: CommunityRef?,
-        val value: Int
+        val value: Int,
       ) : Item
 
       data class PersonStat(
         val person: Person?,
-        val value: Int
+        val value: Int,
       ) : Item
 
       data object SpaceItem : Item
@@ -218,23 +211,24 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
 
     private val adapterHelper = AdapterHelper<Item>(
       { old, new ->
-        old::class == new::class && when (old) {
-          is Item.CommunityStat ->
-            old.communityRef == (new as Item.CommunityStat).communityRef
-          is Item.PersonStat ->
-            old.person == (new as Item.PersonStat).person
-          is Item.SectionTitleItem ->
-            old.title == (new as Item.SectionTitleItem).title
-          is Item.StatSummaryItem ->
-            true
-          Item.StatEndItem -> false
-          Item.SpaceItem -> false
-          Item.FooterItem -> true
-          Item.LocalTrackingDisabledWarningItem -> true
-          Item.HeaderItem -> true
-          Item.NoDataItem -> false
-        }
-      }
+        old::class == new::class &&
+          when (old) {
+            is Item.CommunityStat ->
+              old.communityRef == (new as Item.CommunityStat).communityRef
+            is Item.PersonStat ->
+              old.person == (new as Item.PersonStat).person
+            is Item.SectionTitleItem ->
+              old.title == (new as Item.SectionTitleItem).title
+            is Item.StatSummaryItem ->
+              true
+            Item.StatEndItem -> false
+            Item.SpaceItem -> false
+            Item.FooterItem -> true
+            Item.LocalTrackingDisabledWarningItem -> true
+            Item.HeaderItem -> true
+            Item.NoDataItem -> false
+          }
+      },
     ).apply {
       addItemType(
         clazz = Item.HeaderItem::class,
@@ -242,7 +236,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       ) { _, _, _ -> }
       addItemType(
         clazz = Item.StatSummaryItem::class,
-        inflateFn = LocalStatsSummaryItemBinding::inflate
+        inflateFn = LocalStatsSummaryItemBinding::inflate,
       ) { item, b, h ->
         b.stat.text = PrettyPrintUtils.defaultDecimalFormat.format(item.events)
       }
@@ -254,7 +248,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
             setBottomLeftCorner(CornerFamily.CUT, 0f)
             setBottomRightCorner(CornerFamily.CUT, 0f)
           }.build()
-        }
+        },
       ) { item, b, h ->
         b.title.text = item.title
       }
@@ -265,7 +259,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
           b.card.shapeAppearanceModel = b.card.shapeAppearanceModel.toBuilder().apply {
             setAllCorners(CornerFamily.CUT, 0f)
           }.build()
-        }
+        },
       ) { item, b, h ->
 
         if (item.communityRef != null) {
@@ -284,10 +278,11 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
           b.card.shapeAppearanceModel = b.card.shapeAppearanceModel.toBuilder().apply {
             setAllCorners(CornerFamily.CUT, 0f)
           }.build()
-        }
+        },
       ) { item, b, h ->
         if (item.person != null) {
-          b.title.text = "${(item.person.display_name ?: item.person.name).toBidiSafe()}@${item.person.instance}"
+          b.title.text =
+            "${(item.person.display_name ?: item.person.name).toBidiSafe()}@${item.person.instance}"
           b.card.setOnClickListener { onPersonClick(item.person.toPersonRef()) }
         } else {
           b.title.text = context.getString(R.string.unknown)
@@ -303,7 +298,7 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
             setTopLeftCorner(CornerFamily.CUT, 0f)
             setTopRightCorner(CornerFamily.CUT, 0f)
           }.build()
-        }
+        },
       ) { item, b, h -> }
       addItemType(
         clazz = Item.FooterItem::class,
@@ -326,23 +321,15 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
       ) { item, b, h -> }
     }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int,
-    ): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun onBindViewHolder(
-      holder: RecyclerView.ViewHolder,
-      position: Int,
-    ) =
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     private fun refresh() {
       val data = model ?: return
@@ -394,6 +381,5 @@ class LocalStatsFragment : BaseFragment<FragmentLocalStatsBinding>() {
 
       adapterHelper.setItems(newItems, this)
     }
-
   }
 }

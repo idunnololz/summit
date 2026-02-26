@@ -164,7 +164,7 @@ class EditTextToolbarSettingsDialogFragment :
             showLabels = adapter.items
               .filterIsInstance<Item.ShowLabelsItem>()
               .firstOrNull()
-              ?.showLabels == true
+              ?.showLabels == true,
           ),
         )
         dismiss()
@@ -299,8 +299,8 @@ class EditTextToolbarSettingsDialogFragment :
                   if (it.option.option == item.option.option) {
                     item.copy(
                       option = item.option.copy(
-                        visible = !item.option.visible
-                      )
+                        visible = !item.option.visible,
+                      ),
                     )
                   } else {
                     it

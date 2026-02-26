@@ -6,13 +6,11 @@ import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.extractor.TrackOutput
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -61,7 +59,7 @@ class LinkEditorViewModel @Inject constructor(
           parts += LinkPart.QueryParam(
             internalKey = id++,
             key = it,
-            value = uri.getQueryParameter(it) ?: ""
+            value = uri.getQueryParameter(it) ?: "",
           )
         }
         uri.fragment?.let {
@@ -69,7 +67,7 @@ class LinkEditorViewModel @Inject constructor(
         }
 
         data.postValue(
-          LinkEditorModel(parts)
+          LinkEditorModel(parts),
         )
       } catch (e: Exception) {
         data.postError(e)
@@ -92,5 +90,4 @@ class LinkEditorViewModel @Inject constructor(
       }
       .toString()
   }
-
 }

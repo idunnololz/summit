@@ -709,13 +709,12 @@ class MainActivity : SummitActivity() {
       withContext(Dispatchers.Main) {
         alertDialog?.dismiss()
 
-
         when (fixPageRefResult) {
           is LinkFixer.FixPageRefResult.Success -> {
             launchPageInternal(
               page = fixPageRefResult.pageRef,
               switchToNativeInstance = switchToNativeInstance,
-              preferMainFragment = preferMainFragment
+              preferMainFragment = preferMainFragment,
             )
           }
           is LinkFixer.FixPageRefResult.InvalidFedInstance -> {
@@ -726,7 +725,7 @@ class MainActivity : SummitActivity() {
                 fragmentManager = supportFragmentManager,
                 url = url,
                 text = null,
-                linkContext = LinkContext.Text
+                linkContext = LinkContext.Text,
               )
             }
           }
@@ -845,7 +844,7 @@ class MainActivity : SummitActivity() {
         }
       } else {
         val direction = MainDirections.actionGlobalActionDetailsFragment2(
-          action.toAction()
+          action.toAction(),
         )
         currentNavController?.navigateSafe(direction)
       }

@@ -169,7 +169,7 @@ class FilteredPostsFragment :
         getMainActivity()?.showMoreLinkOptions(
           url = url,
           text = text,
-          downloadContext = postView.toFileDownloadContext()
+          downloadContext = postView.toFileDownloadContext(),
         )
       },
       onPostActionClick = { postView, actionId ->

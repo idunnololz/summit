@@ -29,7 +29,9 @@ class LinkFixer @Inject constructor(
   }
 
   private var knownInstances: Set<String> = initialKnownInstances()
+
   @Volatile private var notAnInstance: Set<String> = setOf()
+
   @Volatile private var hostToInstance: Map<String, String> = mapOf()
 
   private val coroutineScope = coroutineScopeFactory.create()
@@ -37,9 +39,15 @@ class LinkFixer @Inject constructor(
   sealed interface FixPageRefResult {
     val pageRef: PageRef
 
-    class Success(override val pageRef: PageRef): FixPageRefResult
-    class InvalidFedInstance(override val pageRef: PageRef): FixPageRefResult
-    class NoInformation(override val pageRef: PageRef): FixPageRefResult
+    class Success(
+      override val pageRef: PageRef,
+    ) : FixPageRefResult
+    class InvalidFedInstance(
+      override val pageRef: PageRef,
+    ) : FixPageRefResult
+    class NoInformation(
+      override val pageRef: PageRef,
+    ) : FixPageRefResult
   }
 
   init {
@@ -106,7 +114,8 @@ class LinkFixer @Inject constructor(
 
     return@a when (pageRef) {
       is CommentRef,
-      is PostRef -> {
+      is PostRef,
+      -> {
         FixPageRefResult.Success(pageRef)
       }
       is CommunityRef.CommunityRefByName -> {
@@ -123,7 +132,7 @@ class LinkFixer @Inject constructor(
               // Do not blacklist instance just in case the mention has a typo or something...
               // notAnInstance += instance
               FixPageRefResult.InvalidFedInstance(pageRef)
-            }
+            },
           )
       }
       is PersonRef -> {
@@ -142,11 +151,12 @@ class LinkFixer @Inject constructor(
                   // Do not blacklist instance just in case the mention has a typo or something...
                   // notAnInstance += instance
                   FixPageRefResult.InvalidFedInstance(pageRef)
-                }
+                },
               )
           }
           is PersonRef.PersonRefById,
-          is PersonRef.PersonRefComplete -> {
+          is PersonRef.PersonRefComplete,
+          -> {
             FixPageRefResult.Success(pageRef)
           }
         }
@@ -154,7 +164,8 @@ class LinkFixer @Inject constructor(
       is CommunityRef.Local,
       is CommunityRef.All,
       is CommunityRef.ModeratedCommunities,
-      is CommunityRef.Subscribed -> {
+      is CommunityRef.Subscribed,
+      -> {
         checkIfValidInstance(instance)
         if (knownInstances.contains(hostToInstance[instance] ?: instance)) {
           FixPageRefResult.Success(pageRef)
@@ -163,7 +174,8 @@ class LinkFixer @Inject constructor(
         }
       }
       is CommunityRef.MultiCommunity,
-      is CommunityRef.AllSubscribed ->
+      is CommunityRef.AllSubscribed,
+      ->
         FixPageRefResult.Success(pageRef)
     }
   }
@@ -210,8 +222,7 @@ class LinkFixer @Inject constructor(
     is PostRef -> this.copy(instance = newInstance)
   }
 
-  private fun initialKnownInstances() =
-    LEMMY_INSTANCES.toSet() +
+  private fun initialKnownInstances() = LEMMY_INSTANCES.toSet() +
     setOf(
       // piefed
       "piefed.social",

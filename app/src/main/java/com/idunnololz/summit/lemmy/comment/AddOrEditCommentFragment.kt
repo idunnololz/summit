@@ -75,6 +75,7 @@ import com.idunnololz.summit.util.ext.getSelectedText
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -632,7 +633,7 @@ class AddOrEditCommentFragment :
             ),
           ) + it.map { language ->
             LanguageOption(
-              name = language.name,
+              name = language.name.toBidiSafe(),
               language = language,
             )
           }

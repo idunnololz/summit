@@ -389,7 +389,7 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
             curValue = viewModel.nextListingTypeFilter.value,
             onValueSelected = {
               viewModel.nextListingTypeFilter.value = it
-            }
+            },
           )
         }
         it.setOnCloseIconClickListener {
@@ -599,7 +599,7 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
       sortType = viewModel.currentSortTypeFlow.value,
       personFilter = viewModel.nextPersonFilter.value,
       communityFilter = viewModel.nextCommunityFilter.value,
-      listingTypeFilter = viewModel.nextListingTypeFilter.value ?: ListingType.All
+      listingTypeFilter = viewModel.nextListingTypeFilter.value ?: ListingType.All,
     )
     findNavController().navigateSafe(directions)
   }

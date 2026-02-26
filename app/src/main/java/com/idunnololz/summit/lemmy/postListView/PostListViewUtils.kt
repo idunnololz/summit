@@ -6,7 +6,6 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment
@@ -129,8 +128,8 @@ fun BaseFragment<*>.showMorePostOptions(
     )
 
     if (postView.read ||
-      moreActionsHelper.postReadManager.isPostRead(instance, postView.post.id) == true) {
-
+      moreActionsHelper.postReadManager.isPostRead(instance, postView.post.id) == true
+    ) {
       addItemWithIcon(
         R.id.pa_mark_post_as_unread,
         getString(R.string.mark_as_unread),
@@ -219,7 +218,7 @@ fun BaseFragment<*>.showMorePostOptions(
     addItemWithIcon(
       R.id.hide_posts_like_this,
       getString(R.string.hide_posts_like_this),
-      R.drawable.outline_visibility_off_24
+      R.drawable.outline_visibility_off_24,
     )
     addDivider()
 //        addItemWithIcon(

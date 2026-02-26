@@ -2,7 +2,6 @@ package com.idunnololz.summit.util.coil
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.core.graphics.createBitmap
@@ -27,17 +26,17 @@ import coil3.util.component1
 import coil3.util.component2
 import coil3.util.toSoftware
 import com.idunnololz.summit.preferences.Preferences
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.runInterruptible
 import okio.Buffer
 import okio.ByteString.Companion.encodeUtf8
 import okio.ForwardingSource
 import okio.Source
 import okio.buffer
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.nio.ByteBuffer
-import java.util.concurrent.atomic.AtomicReference
 
 class AvifDecoder(
   private val source: SourceFetchResult,
@@ -66,13 +65,16 @@ class AvifDecoder(
       BitmapFactory.decodeStream(
         safeBufferedSource.peek().inputStream(),
         null,
-        boundsOptions
+        boundsOptions,
       )
       safeSource.exception?.let { throw it }
     } else {
       val info = org.aomedia.avif.android.AvifDecoder.Info()
       val success = org.aomedia.avif.android.AvifDecoder.getInfo(
-        byteBuffer, byteBuffer.remaining(), info)
+        byteBuffer,
+        byteBuffer.remaining(),
+        info,
+      )
 
       if (!success) {
         error("Requested to decode byte buffer which cannot be handled by AvifDecoder")
@@ -86,7 +88,7 @@ class AvifDecoder(
     val exifData = ExifUtils.getExifData(
       mimeType = boundsOptions.outMimeType,
       source = safeBufferedSource,
-      strategy = exifOrientationStrategy
+      strategy = exifOrientationStrategy,
     )
     safeSource.exception?.let { throw it }
 
@@ -112,7 +114,9 @@ class AvifDecoder(
 
     safeBufferedSource.use {
       org.aomedia.avif.android.AvifDecoder.decode(
-        byteBuffer, byteBuffer.remaining(), bitmap,
+        byteBuffer,
+        byteBuffer.remaining(),
+        bitmap,
       )
 
       return@runInterruptible DecodeResult(
@@ -144,9 +148,7 @@ class AvifDecoder(
     return rewind(ByteBuffer.allocateDirect(bytes.size).put(bytes))
   }
 
-  private fun rewind(buffer: ByteBuffer): ByteBuffer {
-    return buffer.position(0) as ByteBuffer
-  }
+  private fun rewind(buffer: ByteBuffer): ByteBuffer = buffer.position(0) as ByteBuffer
 
   /** Compute and set [BitmapFactory.Options.inPreferredConfig]. */
   @OptIn(InternalCoilApi::class)
@@ -217,7 +219,9 @@ class AvifDecoder(
     return scale
   }
 
-  class Factory(private val preferences: Preferences) : Decoder.Factory {
+  class Factory(
+    private val preferences: Preferences,
+  ) : Decoder.Factory {
     override fun create(
       result: SourceFetchResult,
       options: Options,
@@ -236,7 +240,9 @@ class AvifDecoder(
           source = result,
           options = options,
         )
-      } else null
+      } else {
+        null
+      }
     }
 
     companion object {
@@ -253,7 +259,9 @@ class AvifDecoder(
     }
   }
 
-  private class ExceptionCatchingSource(delegate: Source) : ForwardingSource(delegate) {
+  private class ExceptionCatchingSource(
+    delegate: Source,
+  ) : ForwardingSource(delegate) {
 
     var exception: Exception? = null
       private set

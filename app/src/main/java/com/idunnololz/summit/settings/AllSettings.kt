@@ -76,6 +76,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IMAGE_PREVIEW_HIDE_U
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_IMAGE_MAX_HEIGHT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_URLS_IN_PRIVATE_MESSAGES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IS_NOTIFICATIONS_ON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_LEFT_HAND_MODE
@@ -969,7 +970,6 @@ class PostsFeedSettings @Inject constructor(
     context.getString(R.string.use_volume_buttons_on_post_feed_desc),
     relatedKeys = listOf(KEY_USE_VOLUME_BUTTONS_ON_POST_FEED),
   )
-
 }
 
 class PostAndCommentsSettings @Inject constructor(
@@ -2137,6 +2137,13 @@ class MiscSettings @Inject constructor(
   val useBundledAvifDecoder = OnOffSettingItem(
     title = context.getString(R.string.use_bundled_avif_decoder),
     relatedKeys = listOf(KEY_USE_BUNDLED_AVIF_DECODER),
+  )
+  val inlineImageMaxHeight = SliderSettingItem(
+    title = context.getString(R.string.inline_image_max_height),
+    minValue = 0f,
+    maxValue = 2000f,
+    stepSize = 50f,
+    relatedKeys = listOf(KEY_INLINE_IMAGE_MAX_HEIGHT),
   )
 }
 

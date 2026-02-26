@@ -38,7 +38,7 @@ data class TrackingEvent(
   val targetUserId: Long?,
   val action: TrackedAction,
   val nsfw: Boolean,
-): Parcelable
+) : Parcelable
 
 enum class TrackedAction {
   UPVOTE,

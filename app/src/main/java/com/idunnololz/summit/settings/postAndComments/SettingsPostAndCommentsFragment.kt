@@ -140,7 +140,7 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
         settings.highlightNewComments.asOnOffSwitch(
           { preferences.highlightNewComments },
           { preferences.highlightNewComments = it },
-        )
+        ),
       ),
     ),
 
@@ -170,7 +170,7 @@ class SettingsPostAndCommentsFragment : BaseSettingsFragment() {
         settings.wrapCommentHeader.asOnOffSwitch(
           { preferences.wrapCommentHeader },
           { preferences.wrapCommentHeader = it },
-        )
+        ),
       ),
     ),
     *if (args.account != null) {

@@ -262,8 +262,8 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
           viewModel.currentPostUiConfig.copy(showUrlDomain = it)
 
         updateRendering()
-      }
-    )
+      },
+    ),
   )
 
   private var lastH = listOf<ListingItemViewHolder>()

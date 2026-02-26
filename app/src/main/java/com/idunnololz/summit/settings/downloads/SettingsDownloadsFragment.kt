@@ -46,7 +46,7 @@ class SettingsDownloadsFragment : BaseSettingsFragment() {
     ),
     settings.useCommunityDownloadFolder.asOnOffSwitch(
       { preferences.useCommunityDownloadFolder },
-      { preferences.useCommunityDownloadFolder = it }
+      { preferences.useCommunityDownloadFolder = it },
     ),
     settings.resetDownloadDirectory.asCustomItem {
       preferences.reset(KEY_DOWNLOAD_DIRECTORY)

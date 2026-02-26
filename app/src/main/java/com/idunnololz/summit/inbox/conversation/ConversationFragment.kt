@@ -161,7 +161,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             title = null,
             downloadContext = null,
             url = url,
-            mimeType = null
+            mimeType = null,
           )
         },
         onVideoClick = { url, videoType, state ->
@@ -169,7 +169,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             url = url,
             videoType = videoType,
             videoState = state,
-            downloadContext = null
+            downloadContext = null,
           )
         },
         onPageClick = { url, pageRef ->

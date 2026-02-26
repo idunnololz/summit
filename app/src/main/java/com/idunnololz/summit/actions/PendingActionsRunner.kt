@@ -10,12 +10,12 @@ import com.idunnololz.summit.actions.PendingActionsManager.ActionExecutionResult
 import com.idunnololz.summit.connectivity.ConnectivityChangedWorker
 import com.idunnololz.summit.lemmy.RateLimitManager
 import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.AccountNotFoundError
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.RateLimit
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason.TooManyRequests
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

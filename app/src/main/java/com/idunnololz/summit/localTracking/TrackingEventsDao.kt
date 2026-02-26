@@ -20,7 +20,10 @@ interface TrackingEventsDao {
   suspend fun getEventsWithAction(action: TrackedAction): List<TrackingEventEntry>
 
   @Query("SELECT * FROM tracking_events WHERE event_action = :action LIMIT :limit")
-  suspend fun getEventsWithActionWithLimit(action: TrackedAction, limit: Int): List<TrackingEventEntry>
+  suspend fun getEventsWithActionWithLimit(
+    action: TrackedAction,
+    limit: Int,
+  ): List<TrackingEventEntry>
 
   @Query("SELECT COUNT(id) FROM tracking_events")
   fun getCount(): Int
@@ -32,10 +35,9 @@ interface TrackingEventsDao {
   suspend fun deleteAll()
 }
 
-fun TrackingEventsDao.getTableSize() =
-  getTableSize(
-    RoomRawQuery(
-      sql = "SELECT SUM(\"pgsize\") FROM \"dbstat\" WHERE name='tracking_events';",
-      onBindStatement = { },
-    ),
-  )
+fun TrackingEventsDao.getTableSize() = getTableSize(
+  RoomRawQuery(
+    sql = "SELECT SUM(\"pgsize\") FROM \"dbstat\" WHERE name='tracking_events';",
+    onBindStatement = { },
+  ),
+)

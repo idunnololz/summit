@@ -20,10 +20,10 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
@@ -167,7 +167,7 @@ class SettingsBackupAndRestoreFragment : BaseSettingsFragment() {
     settings.copySettingsForDebugging.asCustomItem {
       exportSettingsViewModel.createBackupAndSave(
         ExportSettingsViewModel.BackupConfig(
-          backupOption =  ExportSettingsViewModel.BackupOption.Copy,
+          backupOption = ExportSettingsViewModel.BackupOption.Copy,
           includeDatabase = false,
           dest = null,
         ),

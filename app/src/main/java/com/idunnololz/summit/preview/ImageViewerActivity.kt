@@ -218,7 +218,7 @@ class ImageViewerActivity :
               {
                 toggleImageQuality(useHd = true)
               },
-              50
+              50,
             )
           }
 
@@ -241,9 +241,9 @@ class ImageViewerActivity :
             {
               toggleImageQuality(useHd = true)
             },
-            50
+            50,
           )
-        }
+        },
       )
     }
     window.sharedElementExitTransition.addListener(
@@ -298,7 +298,6 @@ class ImageViewerActivity :
 
   override fun onEnterAnimationComplete() {
     super.onEnterAnimationComplete()
-
   }
 
   private fun toggleImageQuality(useHd: Boolean = false) {

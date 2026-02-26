@@ -1582,8 +1582,8 @@ class LemmyApiClient @Inject constructor(
 
     if (currentFetchApiInfoJob != null &&
       currentFetchApiInfoJob.isCompleted &&
-      currentFetchApiInfoJob.await().isFailure) {
-
+      currentFetchApiInfoJob.await().isFailure
+    ) {
       fetchApiInfoJob = null
       currentFetchApiInfoJob = null
     }

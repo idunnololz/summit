@@ -26,7 +26,6 @@ import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.main.editCommunitiesList.SettingsCommunitiesListDialogFragment
 import com.idunnololz.summit.settings.SettingPath.getPageName
-import com.idunnololz.summit.settings.postAndComments.SettingsPostAndCommentsFragmentDirections
 import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment

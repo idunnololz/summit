@@ -14,26 +14,23 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class FileDownloadContext(
   val communityRef: CommunityRef?,
-): Parcelable
+) : Parcelable
 
-fun PostView.toFileDownloadContext() =
-  FileDownloadContext(
-    community.toCommunityRef(),
-  )
+fun PostView.toFileDownloadContext() = FileDownloadContext(
+  community.toCommunityRef(),
+)
 
-fun CommentView.toFileDownloadContext() =
-  FileDownloadContext(
-    community.toCommunityRef(),
-  )
+fun CommentView.toFileDownloadContext() = FileDownloadContext(
+  community.toCommunityRef(),
+)
 
-fun Either<PostView, CommentView>.toFileDownloadContext() =
-  FileDownloadContext(
-    fold(
-      {
-        it.community.toCommunityRef()
-      },
-      {
-        it.community.toCommunityRef()
-      }
-    ),
-  )
+fun Either<PostView, CommentView>.toFileDownloadContext() = FileDownloadContext(
+  fold(
+    {
+      it.community.toCommunityRef()
+    },
+    {
+      it.community.toCommunityRef()
+    },
+  ),
+)

@@ -1,6 +1,6 @@
 package com.idunnololz.summit.api.utils
 
-import android.net.Uri
+import androidx.core.net.toUri
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -75,8 +75,8 @@ fun PostView.getVideoInfo(embedded: Boolean = false): VideoSizeHint? {
   var url: String = originalUrl
 
   try {
-    val uri = Uri.parse(url)
-    if (uri.host == "redgifs.com") {
+    val uri = url.toUri()
+    if (uri.host == "redgifs.com" || uri.host == "www.redgifs.com") {
       val pathSegments = uri.pathSegments
       if (pathSegments.getOrNull(0) == "watch") {
         val videoKey = pathSegments.getOrNull(1)
@@ -143,4 +143,4 @@ fun PostView.getDominantType(): PostType {
 }
 
 val PostView.instance: String
-  get() = Uri.parse(this.post.ap_id).host ?: this.community.instance
+  get() = this.post.ap_id.toUri().host ?: this.community.instance

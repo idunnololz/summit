@@ -37,7 +37,6 @@ import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.spToPx
-import com.idunnololz.summit.util.ext.toBidiSafe
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

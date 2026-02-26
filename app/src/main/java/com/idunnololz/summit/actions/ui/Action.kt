@@ -2,13 +2,10 @@ package com.idunnololz.summit.actions.ui
 
 import android.content.Context
 import android.os.Parcelable
-import androidx.room.ColumnInfo
 import com.idunnololz.summit.R
 import com.idunnololz.summit.actions.ui.ActionDetails.*
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.ActionStatus
-import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
 import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import kotlinx.parcelize.Parcelize
@@ -26,26 +23,26 @@ data class Action(
   val completedTs: Long? = null,
 ) : Parcelable
 
-fun LemmyAction.toAction() =
-  Action(
-    id = this.id,
-    info = this.info,
-    ts = this.ts,
-    creationTs = this.creationTs,
-    details =
-      when (this.status) {
-        null,
-        ActionStatus.Pending -> ActionDetails.PendingDetails
-        ActionStatus.Errored -> FailureDetails(
-          this.error,
-        )
-        ActionStatus.Completed -> ActionDetails.SuccessDetails
-      },
-    seen = this.seen ?: false,
-    failedTs = this.failedTs,
-    error = this.error,
-    completedTs = this.completedTs,
-  )
+fun LemmyAction.toAction() = Action(
+  id = this.id,
+  info = this.info,
+  ts = this.ts,
+  creationTs = this.creationTs,
+  details =
+  when (this.status) {
+    null,
+    ActionStatus.Pending,
+    -> ActionDetails.PendingDetails
+    ActionStatus.Errored -> FailureDetails(
+      this.error,
+    )
+    ActionStatus.Completed -> ActionDetails.SuccessDetails
+  },
+  seen = this.seen ?: false,
+  failedTs = this.failedTs,
+  error = this.error,
+  completedTs = this.completedTs,
+)
 
 fun ActionInfo.getActionName(context: Context) = when (this) {
   is ActionInfo.CommentActionInfo ->

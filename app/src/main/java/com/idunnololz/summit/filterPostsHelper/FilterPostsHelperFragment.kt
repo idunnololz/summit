@@ -81,7 +81,12 @@ class FilterPostsHelperFragment : BaseDialogFragment<FragmentFilterPostsHelperBi
           val s = length
           append(token)
           val e = length
-          val span = SelectableSpan(token, linkResolver, context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary))
+          val span =
+            SelectableSpan(
+              token,
+              linkResolver,
+              context.getColorFromAttribute(androidx.appcompat.R.attr.colorPrimary),
+            )
           spans += span
           setSpan(span, s, e, SPAN_EXCLUSIVE_EXCLUSIVE)
           append(" ")
@@ -115,7 +120,7 @@ class FilterPostsHelperFragment : BaseDialogFragment<FragmentFilterPostsHelperBi
     }
   }
 
-  private class CustomMovementMethod() : LinkMovementMethod() {
+  private class CustomMovementMethod : LinkMovementMethod() {
 
     private val touchedLineBounds = RectF()
     private var isUrlHighlighted = false
@@ -445,5 +450,4 @@ class FilterPostsHelperFragment : BaseDialogFragment<FragmentFilterPostsHelperBi
       }
     }
   }
-
 }

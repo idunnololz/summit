@@ -88,6 +88,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INBOX_LAYOUT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INDICATE_CONTENT_FROM_CURRENT_USER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INFINITY_PAGE_INDICATOR
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_IMAGE_MAX_HEIGHT
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_URLS_IN_PRIVATE_MESSAGES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_INLINE_VIDEO_DEFAULT_VOLUME
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_IS_NOTIFICATIONS_ON
@@ -177,8 +178,8 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_MULTILINE_POST_H
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_PER_COMMUNITY_SETTINGS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_POSTS_FEED_HEADER
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_PREDICTIVE_BACK
-import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTONS_ON_POST_FEED
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_USE_VOLUME_BUTTON_NAVIGATION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_VIDEO_PLAYER_ROTATION_LOCKED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_NEW_PERSON
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_WARN_REPLY_TO_OLD_CONTENT
@@ -606,7 +607,6 @@ class Preferences(
   var useCommunityDownloadFolder: Boolean
     by booleanPreference(KEY_USE_COMMUNITY_DOWNLOAD_FOLDER, false)
 
-
   var animationLevel: AnimationsHelper.AnimationLevel
     get() = AnimationsHelper.AnimationLevel.parse(
       sharedPreferences.getInt(
@@ -736,11 +736,16 @@ class Preferences(
   var useCursorsWhenLoadingPostFeed
     by booleanPreference(KEY_USE_CURSORS_WHEN_LOADING_POST_FEED, false)
   var communitySelectorCommunitiesList
-    by intPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, R.id.community_selector_community_list_top_communities)
+    by intPreference(
+      KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS,
+      R.id.community_selector_community_list_top_communities,
+    )
   var imageViewerControlStyle
     by intPreference(KEY_IMAGE_VIEWER_CONTROL_STYLE, ImageViewerControlStyleIds.DEFAULT)
   var useBundledAvifDecoder
     by booleanPreference(KEY_USE_BUNDLED_AVIF_DECODER, true)
+  var inlineImageMaxHeight
+    by intPreference(KEY_INLINE_IMAGE_MAX_HEIGHT, 0)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

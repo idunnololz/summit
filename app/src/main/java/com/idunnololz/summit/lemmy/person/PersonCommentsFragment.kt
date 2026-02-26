@@ -115,7 +115,7 @@ class PersonCommentsFragment :
           url = url,
           videoType = videoType,
           videoState = state,
-          downloadContext = commentView.toFileDownloadContext()
+          downloadContext = commentView.toFileDownloadContext(),
         )
       },
       onPageClick = { url, pageRef ->

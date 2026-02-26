@@ -47,7 +47,7 @@ abstract class SummitActivity :
       url = url,
       videoType = videoType,
       downloadContext = downloadContext,
-      videoState = videoState
+      videoState = videoState,
     )
     currentNavController?.navigateSafe(direction)
   }

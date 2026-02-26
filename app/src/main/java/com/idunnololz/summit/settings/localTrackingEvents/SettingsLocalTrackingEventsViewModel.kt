@@ -9,10 +9,10 @@ import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.getTableSize
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @HiltViewModel
 class SettingsLocalTrackingEventsViewModel @Inject constructor(

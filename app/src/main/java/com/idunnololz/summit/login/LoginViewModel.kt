@@ -12,7 +12,6 @@ import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
-import io.sentry.SentryLogLevel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -62,7 +61,6 @@ class LoginViewModel @Inject constructor(
           error = IncorrectLoginException()
         } else {
           if (error is IncorrectLoginException || error is NoInternetException) {
-
           } else {
             Sentry.captureException(RuntimeException("Unable to login.", error))
           }

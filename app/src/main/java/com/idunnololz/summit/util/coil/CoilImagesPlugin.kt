@@ -12,6 +12,7 @@ import coil3.asDrawable
 import coil3.request.Disposable
 import coil3.request.ImageRequest
 import coil3.size.Dimension
+import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.Utils
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonConfiguration
@@ -26,6 +27,7 @@ import org.commonmark.node.Image
 
 class CoilImagesPlugin(
   private val context: Context,
+  private val preferences: Preferences,
   coilStore: CoilStore,
   imageLoader: ImageLoader,
 ) : AbstractMarkwonPlugin() {
@@ -36,7 +38,7 @@ class CoilImagesPlugin(
   }
 
   private val coilAsyncDrawableLoader: CoilAsyncDrawableLoader =
-    CoilAsyncDrawableLoader(context, coilStore, imageLoader)
+    CoilAsyncDrawableLoader(context, coilStore, imageLoader, preferences)
 
   override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
     builder.setFactory(Image::class.java, ImageSpanFactory())
@@ -58,6 +60,7 @@ class CoilImagesPlugin(
     private val context: Context,
     private val coilStore: CoilStore,
     private val imageLoader: ImageLoader,
+    private val preferences: Preferences,
   ) : AsyncDrawableLoader() {
 
     private val cache: MutableMap<AsyncDrawable, Disposable?> = HashMap(2)
@@ -92,7 +95,14 @@ class CoilImagesPlugin(
           if (drawable.imageText?.startsWith("emoji", ignoreCase = true) == true) {
             size(Utils.convertDpToPixel(24f).toInt(), Utils.convertDpToPixel(24f).toInt())
           } else {
-            size(Dimension.Pixels(drawable.lastKnownCanvasWidth), Dimension.Undefined)
+            size(
+              Dimension.Pixels(drawable.lastKnownCanvasWidth),
+              if (preferences.inlineImageMaxHeight == 0) {
+                Dimension.Undefined
+              } else {
+                Dimension.Pixels(preferences.inlineImageMaxHeight)
+              },
+            )
           }
         }
         .build()

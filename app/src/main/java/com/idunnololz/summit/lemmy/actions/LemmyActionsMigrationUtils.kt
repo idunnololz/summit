@@ -1,12 +1,11 @@
 package com.idunnololz.summit.lemmy.actions
 
 import androidx.room.util.getColumnIndexOrThrow
-import androidx.sqlite.SQLiteStatement
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 fun getAllFailedActions(
   db: SupportSQLiteDatabase,
-  converters: LemmyActionConverters
+  converters: LemmyActionConverters,
 ): List<OldLemmyFailedAction> {
   val _sql = "SELECT * FROM lemmy_failed_actions"
   return db.query(_sql).let { _connection ->
@@ -37,7 +36,9 @@ fun getAllFailedActions(
         val _tmp_1: LemmyActionFailureReason? =
           converters.stringToLemmyActionFailureReason(_tmp)
         if (_tmp_1 == null) {
-          error("Expected NON-NULL 'com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason', but it was NULL.")
+          error(
+            "Expected NON-NULL 'com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason', but it was NULL.",
+          )
         } else {
           _tmpError = _tmp_1
         }
@@ -62,7 +63,15 @@ fun getAllFailedActions(
         }
         _tmpSeen = _tmp_3?.let { it != 0 }
         _item =
-          OldLemmyFailedAction(_tmpId,_tmpTs,_tmpCreationTs,_tmpFailedTs,_tmpError,_tmpInfo,_tmpSeen)
+          OldLemmyFailedAction(
+            _tmpId,
+            _tmpTs,
+            _tmpCreationTs,
+            _tmpFailedTs,
+            _tmpError,
+            _tmpInfo,
+            _tmpSeen,
+          )
         _result.add(_item)
       }
       _result
@@ -74,7 +83,7 @@ fun getAllFailedActions(
 
 fun getAllCompletedActions(
   db: SupportSQLiteDatabase,
-  converters: LemmyActionConverters
+  converters: LemmyActionConverters,
 ): List<OldLemmyCompletedAction> {
   val _sql = "SELECT * FROM lemmy_completed_actions"
   return db.query(_sql).let { _connection ->
@@ -105,7 +114,7 @@ fun getAllCompletedActions(
         } else {
           _tmpInfo = converters.stringToActionInfo(_tmp)
         }
-        _item = OldLemmyCompletedAction(_tmpId,_tmpTs,_tmpCreationTs,_tmpInfo)
+        _item = OldLemmyCompletedAction(_tmpId, _tmpTs, _tmpCreationTs, _tmpInfo)
         _result.add(_item)
       }
       _result

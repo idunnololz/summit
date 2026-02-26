@@ -7,11 +7,10 @@ import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * IMPORTANT: Pending comments are any comment actions that are in the pending or failed state.
@@ -63,10 +62,7 @@ class PendingCommentsManager @Inject constructor(
     idToPendingCommentView.remove(pendingCommentView.id)
   }
 
-  fun onCommentActionFailed(
-    id: Long,
-    reason: LemmyActionFailureReason,
-  ) {
+  fun onCommentActionFailed(id: Long, reason: LemmyActionFailureReason) {
     idToPendingCommentView[id]?.error = reason
   }
 

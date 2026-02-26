@@ -1,6 +1,7 @@
 package com.idunnololz.summit.links
 
 import android.content.Context
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewAllLinks
@@ -11,7 +12,6 @@ import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BaseDialogFragment
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.Utils
-import androidx.core.net.toUri
 
 fun BaseFragment<*>.onLinkClick(url: String, text: String?, linkContext: LinkContext) {
   getBaseActivity()?.onLinkClick(
@@ -56,7 +56,7 @@ fun BaseActivity.onLinkClick(
           url = url,
           videoType = VideoType.Unknown,
           videoState = null,
-          downloadContext = null
+          downloadContext = null,
         )
         return
       }

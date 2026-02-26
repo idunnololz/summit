@@ -120,371 +120,301 @@ import java.io.InputStream
 class ErrorApiAdapter(
   override val instance: String,
   var error: Throwable,
-  var apiInfo: ApiInfo = ApiInfo(null, null, true)
+  var apiInfo: ApiInfo = ApiInfo(null, null, true),
 ) : LemmyLikeApi {
   override suspend fun getSite(
     authorization: String?,
     args: GetSite,
     force: Boolean,
-  ): Result<GetSiteResponse> =
-    Result.failure(error)
+  ): Result<GetSiteResponse> = Result.failure(error)
 
   override suspend fun getPosts(
     authorization: String?,
     args: GetPosts,
     force: Boolean,
-  ): Result<GetPostsResponse> =
-    Result.failure(error)
+  ): Result<GetPostsResponse> = Result.failure(error)
 
   override suspend fun getPost(
     authorization: String?,
     args: GetPost,
     force: Boolean,
-  ): Result<GetPostResponse> =
-    Result.failure(error)
+  ): Result<GetPostResponse> = Result.failure(error)
 
-  override suspend fun login(args: Login): Result<LoginResponse> =
-    Result.failure(error)
+  override suspend fun login(args: Login): Result<LoginResponse> = Result.failure(error)
 
   override suspend fun likePost(
     authorization: String?,
     args: CreatePostLike,
-  ): Result<PostResponse> =
-    Result.failure(error)
+  ): Result<PostResponse> = Result.failure(error)
 
   override suspend fun likeComment(
     authorization: String?,
     args: CreateCommentLike,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
   override suspend fun listCommentVotes(
     authorization: String?,
     args: ListCommentLikes,
     force: Boolean,
-  ): Result<ListCommentLikesResponse> =
-    Result.failure(error)
+  ): Result<ListCommentLikesResponse> = Result.failure(error)
 
   override suspend fun listPostVotes(
     authorization: String?,
     args: ListPostLikes,
     force: Boolean,
-  ): Result<ListPostLikesResponse> =
-    Result.failure(error)
+  ): Result<ListPostLikesResponse> = Result.failure(error)
 
   override suspend fun createComment(
     authorization: String?,
     args: CreateComment,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
   override suspend fun editComment(
     authorization: String?,
     args: EditComment,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
   override suspend fun deleteComment(
     authorization: String?,
     args: DeleteComment,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
-  override suspend fun savePost(
-    authorization: String?,
-    args: SavePost,
-  ): Result<PostResponse> =
+  override suspend fun savePost(authorization: String?, args: SavePost): Result<PostResponse> =
     Result.failure(error)
 
   override suspend fun markPostAsRead(
     authorization: String?,
     args: MarkPostAsRead,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun saveComment(
     authorization: String?,
     args: SaveComment,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
   override suspend fun getComments(
     authorization: String?,
     args: GetComments,
     force: Boolean,
-  ): Result<GetCommentsResponse> =
-    Result.failure(error)
+  ): Result<GetCommentsResponse> = Result.failure(error)
 
   override suspend fun distinguishComment(
     authorization: String?,
     args: DistinguishComment,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
   override suspend fun removeComment(
     authorization: String?,
     args: RemoveComment,
-  ): Result<CommentResponse> =
-    Result.failure(error)
+  ): Result<CommentResponse> = Result.failure(error)
 
   override suspend fun getCommunity(
     authorization: String?,
     args: GetCommunity,
     force: Boolean,
-  ): Result<GetCommunityResponse> =
-    Result.failure(error)
+  ): Result<GetCommunityResponse> = Result.failure(error)
 
   override suspend fun createCommunity(
     authorization: String?,
     args: CreateCommunity,
-  ): Result<CommunityResponse> =
-    Result.failure(error)
+  ): Result<CommunityResponse> = Result.failure(error)
 
   override suspend fun updateCommunity(
     authorization: String?,
     args: EditCommunity,
-  ): Result<CommunityResponse> =
-    Result.failure(error)
+  ): Result<CommunityResponse> = Result.failure(error)
 
   override suspend fun deleteCommunity(
     authorization: String?,
     args: DeleteCommunity,
-  ): Result<CommunityResponse> =
-    Result.failure(error)
+  ): Result<CommunityResponse> = Result.failure(error)
 
   override suspend fun getCommunityList(
     authorization: String?,
     args: ListCommunities,
     force: Boolean,
-  ): Result<ListCommunitiesResponse> =
-    Result.failure(error)
+  ): Result<ListCommunitiesResponse> = Result.failure(error)
 
   override suspend fun getPersonDetails(
     authorization: String?,
     args: GetPersonDetails,
     force: Boolean,
-  ): Result<GetPersonDetailsResponse> =
-    Result.failure(error)
+  ): Result<GetPersonDetailsResponse> = Result.failure(error)
 
   override suspend fun changePassword(
     authorization: String?,
     args: ChangePassword,
-  ): Result<LoginResponse> =
-    Result.failure(error)
+  ): Result<LoginResponse> = Result.failure(error)
 
   override suspend fun getReplies(
     authorization: String?,
     args: GetReplies,
     force: Boolean,
-  ): Result<GetRepliesResponse> =
-    Result.failure(error)
+  ): Result<GetRepliesResponse> = Result.failure(error)
 
   override suspend fun markCommentReplyAsRead(
     authorization: String?,
     args: MarkCommentReplyAsRead,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun markPersonMentionAsRead(
     authorization: String?,
     args: MarkPersonMentionAsRead,
-  ): Result<PersonMentionResponse> =
-    Result.failure(error)
+  ): Result<PersonMentionResponse> = Result.failure(error)
 
   override suspend fun markPrivateMessageAsRead(
     authorization: String?,
     args: MarkPrivateMessageAsRead,
-  ): Result<PrivateMessageResponse> =
-    Result.failure(error)
+  ): Result<PrivateMessageResponse> = Result.failure(error)
 
   override suspend fun markAllAsRead(
     authorization: String?,
     args: MarkAllAsRead,
-  ): Result<GetRepliesResponse> =
-    Result.failure(error)
+  ): Result<GetRepliesResponse> = Result.failure(error)
 
   override suspend fun getPersonMentions(
     authorization: String?,
     args: GetPersonMentions,
     force: Boolean,
-  ): Result<GetPersonMentionsResponse> =
-    Result.failure(error)
+  ): Result<GetPersonMentionsResponse> = Result.failure(error)
 
   override suspend fun getPrivateMessages(
     authorization: String?,
     args: GetPrivateMessages,
     force: Boolean,
-  ): Result<PrivateMessagesResponse> =
-    Result.failure(error)
+  ): Result<PrivateMessagesResponse> = Result.failure(error)
 
   override suspend fun getPrivateMessageReports(
     authorization: String?,
     args: ListPrivateMessageReports,
     force: Boolean,
-  ): Result<ListPrivateMessageReportsResponse> =
-    Result.failure(error)
+  ): Result<ListPrivateMessageReportsResponse> = Result.failure(error)
 
   override suspend fun createPrivateMessageReport(
     authorization: String?,
     args: CreatePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> =
-    Result.failure(error)
+  ): Result<PrivateMessageReportResponse> = Result.failure(error)
 
   override suspend fun resolvePrivateMessageReport(
     authorization: String?,
     args: ResolvePrivateMessageReport,
-  ): Result<PrivateMessageReportResponse> =
-    Result.failure(error)
+  ): Result<PrivateMessageReportResponse> = Result.failure(error)
 
   override suspend fun getPostReports(
     authorization: String?,
     args: ListPostReports,
     force: Boolean,
-  ): Result<ListPostReportsResponse> =
-    Result.failure(error)
+  ): Result<ListPostReportsResponse> = Result.failure(error)
 
   override suspend fun resolvePostReport(
     authorization: String?,
     args: ResolvePostReport,
-  ): Result<PostReportResponse> =
-    Result.failure(error)
+  ): Result<PostReportResponse> = Result.failure(error)
 
   override suspend fun getCommentReports(
     authorization: String?,
     args: ListCommentReports,
     force: Boolean,
-  ): Result<ListCommentReportsResponse> =
-    Result.failure(error)
+  ): Result<ListCommentReportsResponse> = Result.failure(error)
 
   override suspend fun resolveCommentReport(
     authorization: String?,
     args: ResolveCommentReport,
-  ): Result<CommentReportResponse> =
-    Result.failure(error)
+  ): Result<CommentReportResponse> = Result.failure(error)
 
   override suspend fun createPrivateMessage(
     authorization: String?,
     args: CreatePrivateMessage,
-  ): Result<PrivateMessageResponse> =
-    Result.failure(error)
+  ): Result<PrivateMessageResponse> = Result.failure(error)
 
   override suspend fun getUnreadCount(
     authorization: String?,
     args: GetUnreadCount,
     force: Boolean,
-  ): Result<GetUnreadCountResponse> =
-    Result.failure(error)
+  ): Result<GetUnreadCountResponse> = Result.failure(error)
 
   override suspend fun getReportCount(
     authorization: String?,
     args: GetReportCount,
     force: Boolean,
-  ): Result<GetReportCountResponse> =
-    Result.failure(error)
+  ): Result<GetReportCountResponse> = Result.failure(error)
 
   override suspend fun followCommunity(
     authorization: String?,
     args: FollowCommunity,
-  ): Result<CommunityResponse> =
-    Result.failure(error)
+  ): Result<CommunityResponse> = Result.failure(error)
 
   override suspend fun banUserFromCommunity(
     authorization: String?,
     args: BanFromCommunity,
-  ): Result<BanFromCommunityResponse> =
-    Result.failure(error)
+  ): Result<BanFromCommunityResponse> = Result.failure(error)
 
   override suspend fun modUser(
     authorization: String?,
     args: AddModToCommunity,
-  ): Result<AddModToCommunityResponse> =
+  ): Result<AddModToCommunityResponse> = Result.failure(error)
+
+  override suspend fun createPost(authorization: String?, args: CreatePost): Result<PostResponse> =
     Result.failure(error)
 
-  override suspend fun createPost(
-    authorization: String?,
-    args: CreatePost,
-  ): Result<PostResponse> =
+  override suspend fun editPost(authorization: String?, args: EditPost): Result<PostResponse> =
     Result.failure(error)
 
-  override suspend fun editPost(
-    authorization: String?,
-    args: EditPost,
-  ): Result<PostResponse> =
-    Result.failure(error)
-
-  override suspend fun deletePost(
-    authorization: String?,
-    args: DeletePost,
-  ): Result<PostResponse> =
+  override suspend fun deletePost(authorization: String?, args: DeletePost): Result<PostResponse> =
     Result.failure(error)
 
   override suspend fun featurePost(
     authorization: String?,
     args: FeaturePost,
-  ): Result<PostResponse> =
+  ): Result<PostResponse> = Result.failure(error)
+
+  override suspend fun lockPost(authorization: String?, args: LockPost): Result<PostResponse> =
     Result.failure(error)
 
-  override suspend fun lockPost(
-    authorization: String?,
-    args: LockPost,
-  ): Result<PostResponse> =
-    Result.failure(error)
-
-  override suspend fun removePost(
-    authorization: String?,
-    args: RemovePost,
-  ): Result<PostResponse> =
+  override suspend fun removePost(authorization: String?, args: RemovePost): Result<PostResponse> =
     Result.failure(error)
 
   override suspend fun search(
     authorization: String?,
     args: Search,
     force: Boolean,
-  ): Result<SearchResponse> =
-    Result.failure(error)
+  ): Result<SearchResponse> = Result.failure(error)
 
   override suspend fun getSiteMetadata(
     authorization: String?,
     args: GetSiteMetadata,
     force: Boolean,
-  ): Result<GetSiteMetadataResponse> =
-    Result.failure(error)
+  ): Result<GetSiteMetadataResponse> = Result.failure(error)
 
   override suspend fun createCommentReport(
     authorization: String?,
     args: CreateCommentReport,
-  ): Result<CommentReportResponse> =
-    Result.failure(error)
+  ): Result<CommentReportResponse> = Result.failure(error)
 
   override suspend fun createPostReport(
     authorization: String?,
     args: CreatePostReport,
-  ): Result<PostReportResponse> =
-    Result.failure(error)
+  ): Result<PostReportResponse> = Result.failure(error)
 
   override suspend fun blockPerson(
     authorization: String?,
     args: BlockPerson,
-  ): Result<BlockPersonResponse> =
-    Result.failure(error)
+  ): Result<BlockPersonResponse> = Result.failure(error)
 
   override suspend fun blockCommunity(
     authorization: String?,
     args: BlockCommunity,
-  ): Result<BlockCommunityResponse> =
-    Result.failure(error)
+  ): Result<BlockCommunityResponse> = Result.failure(error)
 
   override suspend fun blockInstance(
     authorization: String?,
     args: BlockInstance,
-  ): Result<BlockInstanceResponse> =
-    Result.failure(error)
+  ): Result<BlockInstanceResponse> = Result.failure(error)
 
   override suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Result<LoginResponse> =
-    Result.failure(error)
+  ): Result<LoginResponse> = Result.failure(error)
 
   override suspend fun uploadImage(
     authorization: String?,
@@ -492,102 +422,83 @@ class ErrorApiAdapter(
     fileName: String,
     imageIs: InputStream,
     mimeType: String?,
-  ): Result<UploadImageResult> =
-    Result.failure(error)
+  ): Result<UploadImageResult> = Result.failure(error)
 
   override suspend fun resolveObject(
     authorization: String?,
     args: ResolveObject,
     force: Boolean,
-  ): Result<ResolveObjectResponse> =
-    Result.failure(error)
+  ): Result<ResolveObjectResponse> = Result.failure(error)
 
   override suspend fun banUserFromSite(
     authorization: String?,
     args: BanPerson,
-  ): Result<BanPersonResponse> =
-    Result.failure(error)
+  ): Result<BanPersonResponse> = Result.failure(error)
 
   override suspend fun removeCommunity(
     authorization: String?,
     args: RemoveCommunity,
-  ): Result<CommunityResponse> =
-    Result.failure(error)
+  ): Result<CommunityResponse> = Result.failure(error)
 
   override suspend fun hideCommunity(
     authorization: String?,
     args: HideCommunity,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun purgePerson(
     authorization: String?,
     args: PurgePerson,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun purgeCommunity(
     authorization: String?,
     args: PurgeCommunity,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun purgePost(
     authorization: String?,
     args: PurgePost,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun purgeComment(
     authorization: String?,
     args: PurgeComment,
-  ): Result<SuccessResponse> =
-    Result.failure(error)
+  ): Result<SuccessResponse> = Result.failure(error)
 
   override suspend fun getRegistrationApplicationsCount(
     authorization: String?,
     args: GetUnreadRegistrationApplicationCount,
     force: Boolean,
-  ): Result<GetUnreadRegistrationApplicationCountResponse> =
-    Result.failure(error)
+  ): Result<GetUnreadRegistrationApplicationCountResponse> = Result.failure(error)
 
   override suspend fun listRegistrationApplications(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> =
-    Result.failure(error)
+  ): Result<ListRegistrationApplicationsResponse> = Result.failure(error)
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse> =
-    Result.failure(error)
+  ): Result<RegistrationApplicationResponse> = Result.failure(error)
 
   override suspend fun getModLogs(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> =
-    Result.failure(error)
+  ): Result<GetModlogResponse> = Result.failure(error)
 
-  override suspend fun register(args: Register): Result<LoginResponse> =
-    Result.failure(error)
+  override suspend fun register(args: Register): Result<LoginResponse> = Result.failure(error)
 
-  override suspend fun getCaptcha(): Result<GetCaptchaResponse> =
-    Result.failure(error)
+  override suspend fun getCaptcha(): Result<GetCaptchaResponse> = Result.failure(error)
 
   override suspend fun listMedia(
     authorization: String?,
     args: ListMedia,
     force: Boolean,
-  ): Result<ListMediaResponse> =
-    Result.failure(error)
+  ): Result<ListMediaResponse> = Result.failure(error)
 
-  override suspend fun deleteMedia(
-    authorization: String?,
-    args: DeleteImage,
-  ): Result<Unit> =
+  override suspend fun deleteMedia(authorization: String?, args: DeleteImage): Result<Unit> =
     Result.failure(error)
 
   override fun supportsFeature(apiFeature: ApiFeature): Boolean =

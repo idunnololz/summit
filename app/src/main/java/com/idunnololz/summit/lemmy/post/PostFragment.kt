@@ -87,14 +87,12 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.focusAndShowKeyboard
-import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
@@ -550,7 +548,7 @@ class PostFragment :
             getMainActivity()?.showMoreLinkOptions(
               url = url,
               text = text,
-              downloadContext = postOrCommentView?.toFileDownloadContext()
+              downloadContext = postOrCommentView?.toFileDownloadContext(),
             )
           },
           switchToNativeInstance = {

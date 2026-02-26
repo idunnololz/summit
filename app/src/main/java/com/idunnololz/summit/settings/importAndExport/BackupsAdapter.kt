@@ -18,7 +18,7 @@ class BackupsAdapter(
     data class BackupItem(
       val backupInfo: SettingsBackupManager.BackupInfo,
     ) : Item
-    data object EmptyItem: Item
+    data object EmptyItem : Item
   }
 
   private val adapterHelper = AdapterHelper<Item>(

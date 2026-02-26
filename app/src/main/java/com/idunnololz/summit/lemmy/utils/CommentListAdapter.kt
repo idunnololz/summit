@@ -180,7 +180,7 @@ class CommentListAdapter(
           context,
           { url, text ->
             onLinkLongClick(item.commentView, url, text)
-          }
+          },
         )
         onLinkClickListener = object : CustomLinkMovementMethod.OnLinkClickListener {
           override fun onClick(

@@ -12,8 +12,6 @@ import com.idunnololz.summit.history.HistoryDao
 import com.idunnololz.summit.inbox.db.ConversationEntriesDao
 import com.idunnololz.summit.inbox.db.InboxEntriesDao
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
 import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.community.CommunityTrackerDao

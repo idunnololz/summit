@@ -9,9 +9,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import androidx.sqlite.SQLiteStatement
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountDao
 import com.idunnololz.summit.account.info.AccountInfo
@@ -38,23 +36,17 @@ import com.idunnololz.summit.inbox.db.ConversationEntry
 import com.idunnololz.summit.inbox.db.InboxEntriesDao
 import com.idunnololz.summit.inbox.db.InboxEntry
 import com.idunnololz.summit.inbox.db.InboxEntryConverters
-import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.ActionStatus
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionConverters
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
 import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
 import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
-import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyAction
-import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
-import com.idunnololz.summit.lemmy.actions.LemmyActionsDao_Impl
 import com.idunnololz.summit.lemmy.actions.getAllCompletedActions
 import com.idunnololz.summit.lemmy.actions.getAllFailedActions
 import com.idunnololz.summit.lemmy.userTags.UserTagConverters
 import com.idunnololz.summit.lemmy.userTags.UserTagEntry
 import com.idunnololz.summit.lemmy.userTags.UserTagsDao
-import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventEntry
 import com.idunnololz.summit.localTracking.TrackingEventsDao
 import com.idunnololz.summit.localTracking.community.CommunityStatEntry
@@ -359,76 +351,78 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
   }
 }
 
-fun MIGRATION_48_49(json: Json) =
-  object : Migration(48, 49) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-      val lemmyActionConverters = LemmyActionConverters(json)
-      val allFailedActions = getAllFailedActions(db, lemmyActionConverters)
-      val allCompletedActions = getAllCompletedActions(db, lemmyActionConverters)
+fun MIGRATION_48_49(json: Json) = object : Migration(48, 49) {
+  override fun migrate(db: SupportSQLiteDatabase) {
+    val lemmyActionConverters = LemmyActionConverters(json)
+    val allFailedActions = getAllFailedActions(db, lemmyActionConverters)
+    val allCompletedActions = getAllCompletedActions(db, lemmyActionConverters)
 
-      val lemmyActionsToMigrate = mutableListOf<LemmyAction>()
+    val lemmyActionsToMigrate = mutableListOf<LemmyAction>()
 
-      allFailedActions.mapTo(lemmyActionsToMigrate) {
-        LemmyAction(
-          id = 0L,
-          ts = it.ts,
-          creationTs = it.creationTs,
-          info = it.info,
-          failedTs = it.ts,
-          error = it.error,
-          seen = it.seen,
-          completedTs = null,
-          status = ActionStatus.Errored,
-        )
+    allFailedActions.mapTo(lemmyActionsToMigrate) {
+      LemmyAction(
+        id = 0L,
+        ts = it.ts,
+        creationTs = it.creationTs,
+        info = it.info,
+        failedTs = it.ts,
+        error = it.error,
+        seen = it.seen,
+        completedTs = null,
+        status = ActionStatus.Errored,
+      )
+    }
+    allCompletedActions.mapTo(lemmyActionsToMigrate) {
+      LemmyAction(
+        id = 0L,
+        ts = it.ts,
+        creationTs = it.creationTs,
+        info = it.info,
+        failedTs = null,
+        error = null,
+        seen = null,
+        completedTs = it.ts,
+        status = ActionStatus.Completed,
+      )
+    }
+
+    Log.d(TAG, "Migrating ${lemmyActionsToMigrate.size} actions")
+
+    lemmyActionsToMigrate.forEach {
+      val cv = ContentValues()
+      cv.put("ts", it.ts)
+      cv.put("cts", it.creationTs)
+      if (it.info != null) {
+        cv.put("info", lemmyActionConverters.actionInfoToString(it.info))
       }
-      allCompletedActions.mapTo(lemmyActionsToMigrate) {
-        LemmyAction(
-          id = 0L,
-          ts = it.ts,
-          creationTs = it.creationTs,
-          info = it.info,
-          failedTs = null,
-          error = null,
-          seen = null,
-          completedTs = it.ts,
-          status = ActionStatus.Completed,
-        )
+
+      cv.put("fts", it.failedTs)
+      if (it.error != null) {
+        cv.put("error", lemmyActionConverters.lemmyActionFailureReasonToString(it.error))
       }
-
-      Log.d(TAG, "Migrating ${lemmyActionsToMigrate.size} actions")
-
-      lemmyActionsToMigrate.forEach {
-        val cv = ContentValues()
-        cv.put("ts", it.ts)
-        cv.put("cts", it.creationTs)
-        if (it.info != null) {
-          cv.put("info", lemmyActionConverters.actionInfoToString(it.info))
-        }
-
-        cv.put("fts", it.failedTs)
-        if (it.error != null) {
-          cv.put("error", lemmyActionConverters.lemmyActionFailureReasonToString(it.error))
-        }
-        cv.put("seen", it.seen)
-        cv.put("cots", it.completedTs)
-        if (it.status != null) {
-          // Convert the enum to strings. This is for (1) parity with Room conversion code and (2)
-          // this keeps the code from breaking due to R8/refactoring
-          cv.put("status", when (it.status) {
+      cv.put("seen", it.seen)
+      cv.put("cots", it.completedTs)
+      if (it.status != null) {
+        // Convert the enum to strings. This is for (1) parity with Room conversion code and (2)
+        // this keeps the code from breaking due to R8/refactoring
+        cv.put(
+          "status",
+          when (it.status) {
             ActionStatus.Pending -> "Pending"
             ActionStatus.Errored -> "Errored"
             ActionStatus.Completed -> "Completed"
-          })
-        }
-
-        db.insert(
-          "lemmy_actions",
-          android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE,
-          cv
+          },
         )
       }
+
+      db.insert(
+        "lemmy_actions",
+        android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE,
+        cv,
+      )
     }
   }
+}
 
 val MIGRATION_50_51 =
   object : Migration(50, 51) {

@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy.person
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.Spannable
@@ -23,7 +22,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.palette.graphics.Palette
 import coil3.load
 import coil3.request.allowHardware
-import coil3.toBitmap
 import com.google.android.material.tabs.TabLayoutMediator
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.AccountManager
@@ -41,7 +39,6 @@ import com.idunnololz.summit.lemmy.LemmyHeaderHelper.Companion.NEW_PERSON_DURATI
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.comment.AddOrEditCommentFragment
-import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.post.PostFragmentDirections
 import com.idunnololz.summit.lemmy.toPersonRef
@@ -57,6 +54,7 @@ import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
@@ -477,8 +475,10 @@ class PersonTabbedFragment :
 
       fab.show()
 
-      val displayName = (person.display_name
-        ?: person.name).toBidiSafe()
+      val displayName = (
+        person.display_name
+          ?: person.name
+        ).toBidiSafe()
 
       title.text = displayName
 
@@ -514,7 +514,7 @@ class PersonTabbedFragment :
                     banner.imageTintMode = PorterDuff.Mode.MULTIPLY
                   }
                 }
-              }
+              },
             )
           }
           bannerDummy.setOnClickListener(null)
@@ -569,7 +569,11 @@ class PersonTabbedFragment :
         null,
       )
       cakeDate.text =
-        getString(R.string.account_created_on_format, dateStr, defaultDecimalFormat.format(daysBetween))
+        getString(
+          R.string.account_created_on_format,
+          dateStr,
+          defaultDecimalFormat.format(daysBetween),
+        )
       cakeDate.visibility = View.VISIBLE
 
       val personCreationTs = dateStringToTs(person.published)

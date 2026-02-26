@@ -11,7 +11,6 @@ import com.idunnololz.summit.databinding.PendingActionItemBinding
 import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
-import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.toText
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.links.LinkContext

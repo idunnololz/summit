@@ -73,7 +73,7 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
             url = url,
             videoType = videoType,
             videoState = state,
-            downloadContext = null
+            downloadContext = null,
           )
         },
         onPageClick = { url, pageRef ->

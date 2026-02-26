@@ -5,11 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingActionsManager
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
-import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -91,14 +89,13 @@ class ActionsViewModel @Inject constructor(
       return
     }
 
-    fun List<Action>.markActionAsSeen() =
-      map {
-        if (it.id == action.id) {
-          it.copy(seen = true)
-        } else {
-          it
-        }
+    fun List<Action>.markActionAsSeen() = map {
+      if (it.id == action.id) {
+        it.copy(seen = true)
+      } else {
+        it
       }
+    }
 
     val newValue = value.copy(
       pendingActions = value.pendingActions.markActionAsSeen(),

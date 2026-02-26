@@ -263,11 +263,13 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
-    super.onSaveInstanceState(outState)
-
-    binding.playerView.player?.let { player ->
-      outState.putParcelable(SIS_VIDEO_STATE, player.getVideoState())
+    if (isBindingAvailable()) {
+      binding.playerView.player?.let { player ->
+        outState.putParcelable(SIS_VIDEO_STATE, player.getVideoState())
+      }
     }
+
+    super.onSaveInstanceState(outState)
   }
 
   private fun loadVideo(
@@ -366,7 +368,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
           originalUrl = args.url,
           moreActionsHelper = moreActionsHelper,
           fragmentManager = childFragmentManager,
-          downloadContext = args.downloadContext
+          downloadContext = args.downloadContext,
         )
       },
     )
@@ -384,7 +386,7 @@ class VideoViewerFragment : BaseFragment<FragmentVideoViewerBinding>() {
         originalUrl = originalUrl,
         moreActionsHelper = moreActionsHelper,
         fragmentManager = childFragmentManager,
-        downloadContext = args.downloadContext
+        downloadContext = args.downloadContext,
       )
     }
   }

@@ -24,6 +24,7 @@ import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.settings.util.asCustomItemWithTextEditorDialog
 import com.idunnololz.summit.settings.util.asOnOffSwitch
 import com.idunnololz.summit.settings.util.asSingleChoiceSelectorItem
+import com.idunnololz.summit.settings.util.asSliderItem
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -287,6 +288,20 @@ class SettingsMiscFragment :
         {
           context.imageLoader.memoryCache?.clear()
           preferences.useBundledAvifDecoder = it
+        },
+      ),
+      settings.inlineImageMaxHeight.asSliderItem(
+        { preferences.inlineImageMaxHeight.toFloat() },
+        {
+          context.imageLoader.memoryCache?.clear()
+          preferences.inlineImageMaxHeight = it.toInt()
+        },
+        {
+          if (it == 0f) {
+            context.getString(R.string.no_limit)
+          } else {
+            it.toString()
+          }
         },
       ),
       *if (BuildConfig.DEBUG) {

@@ -407,10 +407,7 @@ class MoreActionsHelper(
     }
   }
 
-  fun downloadVideo(
-    url: String,
-    downloadContext: FileDownloadContext? = null,
-  ) {
+  fun downloadVideo(url: String, downloadContext: FileDownloadContext? = null) {
     downloadVideoResult.setIsLoading()
 
     coroutineScope.launch {

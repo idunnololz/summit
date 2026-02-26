@@ -1,17 +1,13 @@
 package com.idunnololz.summit.settings.localTrackingEvents
 
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.idunnololz.summit.R
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.LocalTrackingEventsSettings
-import com.idunnololz.summit.settings.PostAndCommentsSettings
 import com.idunnololz.summit.settings.SettingModelItem
-import com.idunnololz.summit.settings.postAndComments.SettingsPostAndCommentsFragmentArgs
 import com.idunnololz.summit.settings.util.asCustomItem
 import com.idunnololz.summit.settings.util.asOnOffMasterSwitch
 import com.idunnololz.summit.util.PrettyPrintUtils
@@ -57,12 +53,12 @@ class SettingsLocalTrackingEventsFragment : BaseSettingsFragment() {
       settings.totalEventsRecorded.copy(
         description = data?.totalEvents?.let {
           PrettyPrintUtils.defaultDecimalFormat.format(it)
-        } ?: "-"
+        } ?: "-",
       ).asCustomItem(),
       settings.sizeOnDiskRecorded.copy(
         description = data?.totalTableSize?.let {
           fileSizeToHumanReadableString(it.toDouble(), PrettyPrintUtils.defaultDecimalFormat)
-        } ?: "-"
+        } ?: "-",
       ).asCustomItem(),
       settings.clearLocalTrackingEvents.asCustomItem {
         MaterialAlertDialogBuilder(requireContext())

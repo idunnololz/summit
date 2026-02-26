@@ -6,7 +6,6 @@ import com.idunnololz.summit.actions.db.PostReadDao
 import com.idunnololz.summit.actions.db.ReadPostEntry
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.lemmy.PostRef
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,8 +35,9 @@ class PostReadManager @Inject constructor(
   val postReadChanged = MutableSharedFlow<Unit>()
 
   private val readPosts = object : LinkedHashMap<String, PostReadInfo>() {
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, PostReadInfo>?): Boolean =
-      size > MAX_READ_POST_LIMIT
+    override fun removeEldestEntry(
+      eldest: MutableMap.MutableEntry<String, PostReadInfo>?,
+    ): Boolean = size > MAX_READ_POST_LIMIT
   }
 
   init {
@@ -87,11 +87,13 @@ class PostReadManager @Inject constructor(
     coroutineScope.launch {
       postReadChanged.emit(Unit)
 
-      postReadDao.insert(ReadPostEntry(
-        postKey = key,
-        read = read,
-        readTs = readInfo.ts
-      ))
+      postReadDao.insert(
+        ReadPostEntry(
+          postKey = key,
+          read = read,
+          readTs = readInfo.ts,
+        ),
+      )
     }
   }
 

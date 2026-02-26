@@ -171,7 +171,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               title = null,
               url = url,
               mimeType = null,
-              downloadContext = null
+              downloadContext = null,
             )
           },
           onVideoClick = { url ->
@@ -179,7 +179,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               url = url,
               videoType = VideoType.Unknown,
               videoState = null,
-              downloadContext = null
+              downloadContext = null,
             )
           },
           onPageClick = { url, pageRef ->
@@ -225,7 +225,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           url = url,
           videoType = VideoType.Unknown,
           videoState = null,
-          downloadContext = null
+          downloadContext = null,
         )
       },
       onPageClick = { url, pageRef ->
@@ -611,7 +611,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               url = url,
               videoType = videoType,
               videoState = state,
-              downloadContext = null
+              downloadContext = null,
             )
           },
           onVideoLongClickListener = { url ->

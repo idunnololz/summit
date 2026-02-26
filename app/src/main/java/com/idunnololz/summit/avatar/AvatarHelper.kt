@@ -110,7 +110,7 @@ class AvatarHelper @Inject constructor(
         listener(
           onSuccess = { _, result ->
             onLoaded(result.image.toBitmap())
-          }
+          },
         )
       }
     }

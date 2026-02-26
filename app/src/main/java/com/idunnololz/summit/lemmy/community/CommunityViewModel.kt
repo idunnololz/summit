@@ -4,10 +4,8 @@ import android.app.Application
 import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
@@ -239,7 +237,7 @@ class CommunityViewModel @Inject constructor(
             commentId = null,
             targetUserId = null,
             action = TrackedAction.VIEW,
-            nsfw = false
+            nsfw = false,
           )
         }
     }

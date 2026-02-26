@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewbinding.ViewBinding
 import coil3.load
-import com.google.android.material.slider.Slider
 import com.idunnololz.summit.databinding.GenericSpaceFooterItemBinding
 import com.idunnololz.summit.databinding.ItemGenericHeaderBinding
 import com.idunnololz.summit.databinding.RadioGroupOptionSettingItemBinding
@@ -106,6 +105,7 @@ sealed interface SettingModelItem {
     override val setting: com.idunnololz.summit.settings.SliderSettingItem,
     val getCurrentValue: () -> Float,
     val onValueChanged: (Float) -> Unit,
+    val valueToLabel: ((Float) -> String)? = null,
   ) : SettingModelItem
 
   data class DividerItem(
@@ -196,6 +196,7 @@ class SettingsAdapter(
       override val setting: SliderSettingItem,
       override val isEnabled: Boolean,
       val value: Float,
+      val showValueLabel: Boolean,
     ) : Item
 
     data object HeaderItem : Item {
@@ -609,32 +610,38 @@ class SettingsAdapter(
       clazz = Item.SliderItem::class,
       inflateFn = SettingSliderItemBinding::inflate,
       onViewCreated = {
-        it.slider.addOnSliderTouchListener(
-          object : Slider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: Slider) {}
+        it.slider.addOnChangeListener { slider, value, fromUser ->
+          if (!fromUser) return@addOnChangeListener
 
-            override fun onStopTrackingTouch(slider: Slider) {
-              val setting = it.root.tag as? SliderSettingItem ?: return
-              findSettingModel<SettingModelItem.SliderSettingItem>(setting.id)
-                ?.onValueChanged
-                ?.invoke(slider.value)
+          val setting = it.root.tag as? SliderSettingItem ?: return@addOnChangeListener
 
-              onValueChanged()
-            }
-          },
-        )
+          findSettingModel<SettingModelItem.SliderSettingItem>(setting.id)?.apply {
+            onValueChanged.invoke(value)
+            it.value.text = valueToLabel?.invoke(value)
+          }
+
+          onValueChanged()
+        }
       },
     ) { item, b, h ->
       b.root.tag = null
 
       val setting = item.setting
       b.title.text = setting.title
-      b.slider.valueFrom = setting.minValue
-      b.slider.valueTo = setting.maxValue
+
+      if (b.slider.valueFrom != setting.minValue) {
+        b.slider.valueFrom = setting.minValue
+      }
+      if (b.slider.valueTo != setting.maxValue) {
+        b.slider.valueTo = setting.maxValue
+      }
 
       val stepSize = setting.stepSize
       if (stepSize != null) {
-        b.slider.stepSize = stepSize
+        if (b.slider.stepSize != stepSize) {
+          b.slider.stepSize = stepSize
+        }
+
         b.slider.value =
           ((item.value / stepSize).toInt() * b.slider.stepSize)
             .coerceIn(setting.minValue, setting.maxValue)
@@ -644,6 +651,8 @@ class SettingsAdapter(
 
       // Prevent auto state restoration since multiple checkboxes can have the same id
       b.slider.isSaveEnabled = false
+      b.value.text = findSettingModel<SettingModelItem.SliderSettingItem>(setting.id)
+        ?.valueToLabel?.invoke(item.value)
 
       b.root.tag = setting
 
@@ -653,6 +662,12 @@ class SettingsAdapter(
       } else {
         b.title.isEnabled = false
         b.slider.isEnabled = false
+      }
+
+      if (item.showValueLabel) {
+        b.value.visibility = View.VISIBLE
+      } else {
+        b.value.visibility = View.GONE
       }
 
       highlightItem(
@@ -790,6 +805,7 @@ class SettingsAdapter(
             setting = item.setting,
             isEnabled = item.setting.isEnabled && masterSwitchEnabled,
             value = item.getCurrentValue(),
+            showValueLabel = item.valueToLabel != null,
           )
         }
         is SettingModelItem.DividerItem -> {

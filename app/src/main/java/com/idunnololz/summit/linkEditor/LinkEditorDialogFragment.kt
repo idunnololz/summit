@@ -1,12 +1,9 @@
 package com.idunnololz.summit.linkEditor
 
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,9 +14,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.DialogFragmentLinkEditorBinding
 import com.idunnololz.summit.databinding.LinkPartBinding
 import com.idunnololz.summit.databinding.LinkPartParamBinding
-import com.idunnololz.summit.feedback.PostFeedbackDialogFragment
 import com.idunnololz.summit.util.BaseDialogFragment
-import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
@@ -32,7 +27,8 @@ import com.idunnololz.summit.util.setupToolbar
 import kotlinx.coroutines.launch
 
 // clean up https://lemmy.zip/api/v3/image_proxy?url=https%3A%2F%2Feurope.pub%2Fapi%2Fv3%2Fimage_proxy%3Furl%3Dhttps%253A%252F%252Flemmy.ml%252Fpictrs%252Fimage%252F288a95d3-b040-475c-9b8c-6fe4fe14fcac.png
-class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBinding>(),
+class LinkEditorDialogFragment :
+  BaseDialogFragment<DialogFragmentLinkEditorBinding>(),
   FullscreenDialogFragment {
 
   companion object {
@@ -78,7 +74,7 @@ class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBind
       val adapter = LinkDataAdapter(
         onPartsChanged = {
           viewModel.onPartsChanged(it)
-        }
+        },
       )
       recyclerView.setHasFixedSize(true)
       recyclerView.layoutManager = LinearLayoutManager(context)
@@ -87,8 +83,8 @@ class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBind
       recyclerView.addItemDecoration(
         VerticalSpaceItemDecoration(
           verticalSpaceHeight = Utils.convertDpToPixel(1f).toInt(),
-          hasStartAndEndSpace = false
-        )
+          hasStartAndEndSpace = false,
+        ),
       )
       setupToolbar(toolbar, getString(R.string.link_editor))
 
@@ -104,7 +100,7 @@ class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBind
         }
       }
       viewModel.data.observe(viewLifecycleOwner) {
-        when(it) {
+        when (it) {
           is StatefulData.Error -> loadingView.showDefaultErrorMessageFor(it.error)
           is StatefulData.Loading -> loadingView.showProgressBar()
           is StatefulData.NotStarted -> loadingView.hideAll()
@@ -129,7 +125,7 @@ class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBind
     private val adapterHelper = AdapterHelper<LinkPart>(
       { old, new ->
         isSamePart(old, new)
-      }
+      },
     ).apply {
       addItemType(LinkPart.Authority::class, LinkPartBinding::inflate) { item, b, h ->
         b.label.setText("authority")
@@ -192,23 +188,15 @@ class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBind
         refreshItems()
       }
 
-    override fun getItemViewType(position: Int): Int =
-      adapterHelper.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = adapterHelper.getItemViewType(position)
 
-    override fun onCreateViewHolder(
-      parent: ViewGroup,
-      viewType: Int,
-    ): RecyclerView.ViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
       adapterHelper.onCreateViewHolder(parent, viewType)
 
-    override fun onBindViewHolder(
-      holder: RecyclerView.ViewHolder,
-      position: Int,
-    ) =
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
       adapterHelper.onBindViewHolder(holder, position)
 
-    override fun getItemCount(): Int =
-      adapterHelper.itemCount
+    override fun getItemCount(): Int = adapterHelper.itemCount
 
     private fun refreshItems() {
       val data = data ?: return
@@ -227,8 +215,8 @@ class LinkEditorDialogFragment : BaseDialogFragment<DialogFragmentLinkEditorBind
       }
     }
 
-    private fun isSamePart(old: LinkPart, new: LinkPart) =
-      old::class == new::class && when (old) {
+    private fun isSamePart(old: LinkPart, new: LinkPart) = old::class == new::class &&
+      when (old) {
         is LinkPart.Authority -> true
         is LinkPart.Fragment -> true
         is LinkPart.Path -> true

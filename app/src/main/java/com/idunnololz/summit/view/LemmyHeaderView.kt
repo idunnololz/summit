@@ -6,26 +6,25 @@ import android.graphics.Typeface
 import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.children
+import androidx.core.view.size
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import com.google.android.material.R
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.AbsoluteCornerSize
+import com.idunnololz.summit.R as R2
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getTextSizeFromTextAppearance
 import com.idunnololz.summit.util.ext.spToPx
 import kotlin.math.max
-import com.idunnololz.summit.R as R2
-import androidx.core.view.size
 
 class LemmyHeaderView : FrameLayout {
 
@@ -193,7 +192,7 @@ class LemmyHeaderView : FrameLayout {
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     // We only support match parent width...
     if (multiline) {
-      ///
+      // /
 
       val count = size
 
@@ -243,11 +242,9 @@ class LemmyHeaderView : FrameLayout {
       maxWidth += paddingStart + paddingEnd
       maxHeight += paddingTop + paddingBottom
 
-
       // Check against our minimum height and width
       maxHeight = max(maxHeight, getSuggestedMinimumHeight())
       maxWidth = max(maxWidth, getSuggestedMinimumWidth())
-
 
       // Check against our foreground's minimum height and width
       val drawable = getForeground()
@@ -259,12 +256,13 @@ class LemmyHeaderView : FrameLayout {
       setMeasuredDimension(
         resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
         resolveSizeAndState(
-          maxHeight, heightMeasureSpec,
+          maxHeight,
+          heightMeasureSpec,
           childState shl MEASURED_HEIGHT_STATE_SHIFT,
         ),
       )
 
-      ///
+      // /
 
       val iconImageView = iconImageView
       var totalTextHeight = 0
@@ -333,11 +331,11 @@ class LemmyHeaderView : FrameLayout {
 
     val lp = iconImageView.getLayoutParams() as LayoutParams
     return MeasureSpec.makeMeasureSpec(
-      MeasureSpec.getSize(widthMeasureSpec)
-        - iconImageView.measuredWidth
-        - lp.leftMargin
-        - lp.rightMargin,
-      MeasureSpec.getMode(widthMeasureSpec)
+      MeasureSpec.getSize(widthMeasureSpec) -
+        iconImageView.measuredWidth -
+        lp.leftMargin -
+        lp.rightMargin,
+      MeasureSpec.getMode(widthMeasureSpec),
     )
   }
 

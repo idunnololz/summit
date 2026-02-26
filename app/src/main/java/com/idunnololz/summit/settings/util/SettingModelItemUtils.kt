@@ -223,8 +223,10 @@ fun ImageValueSettingItem.asImageValueItem(
 fun SliderSettingItem.asSliderItem(
   getCurrentValue: () -> Float,
   onValueChanged: (Float) -> Unit,
+  valueToLabel: ((Float) -> String)? = null,
 ): SettingModelItem.SliderSettingItem = SettingModelItem.SliderSettingItem(
   this,
   getCurrentValue,
   onValueChanged,
+  valueToLabel,
 )

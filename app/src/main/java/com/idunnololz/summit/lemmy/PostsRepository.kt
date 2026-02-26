@@ -365,7 +365,7 @@ class PostsRepository @AssistedInject constructor(
           }
 
           null,
-            -> {
+          -> {
             postsPerPage = DEFAULT_POSTS_PER_PAGE
 
             apiClient.defaultInstance()
@@ -684,15 +684,15 @@ class PostsRepository @AssistedInject constructor(
 
   private suspend fun newDataSource(
     communityName: String?,
-    listingType: ListingType?
-  ): PostsDataSource {
-    return if (apiClient.supportsFeature(ApiFeature.GetPostsByCursor).getOrNull() == true &&
-      preferences.useCursorsWhenLoadingPostFeed) {
+    listingType: ListingType?,
+  ): PostsDataSource =
+    if (apiClient.supportsFeature(ApiFeature.GetPostsByCursor).getOrNull() == true &&
+      preferences.useCursorsWhenLoadingPostFeed
+    ) {
       cursorBackedSinglePostsDataSourceFactory.create(communityName, listingType)
     } else {
       indexBackedSinglePostsDataSourceFactory.create(communityName, listingType)
     }
-  }
 
   class PageResult(
     val posts: List<LocalPostView>,

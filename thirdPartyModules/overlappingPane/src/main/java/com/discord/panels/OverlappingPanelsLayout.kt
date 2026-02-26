@@ -6,22 +6,21 @@ import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.text.layoutDirection
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.idunnololz.overlappingpane.R
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import androidx.core.text.layoutDirection
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 /**
  * This ViewGroup assumes that there are exactly three child views. The first one
@@ -147,21 +146,21 @@ open class OverlappingPanelsLayout : FrameLayout {
     val locale = LocaleProvider.getPrimaryLocale(context)
     isLeftToRight = locale?.layoutDirection == View.LAYOUT_DIRECTION_LTR
 
-    ViewCompat.setOnApplyWindowInsetsListener(this, object : androidx.core.view.OnApplyWindowInsetsListener {
-      override fun onApplyWindowInsets(
-        v: View,
-        insets: WindowInsetsCompat,
-      ): WindowInsetsCompat {
-        val systemGestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+    ViewCompat.setOnApplyWindowInsetsListener(
+      this,
+      object : androidx.core.view.OnApplyWindowInsetsListener {
+        override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
+          val systemGestureInsets = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
 
-        systemGestureRegion.top = systemGestureInsets.top
-        systemGestureRegion.bottom = systemGestureInsets.bottom
-        systemGestureRegion.left = systemGestureInsets.left
-        systemGestureRegion.right = systemGestureInsets.right
+          systemGestureRegion.top = systemGestureInsets.top
+          systemGestureRegion.bottom = systemGestureInsets.bottom
+          systemGestureRegion.left = systemGestureInsets.left
+          systemGestureRegion.right = systemGestureInsets.right
 
-        return insets
-      }
-    })
+          return insets
+        }
+      },
+    )
 
     val configuration = ViewConfiguration.get(context)
     scrollingSlopPx = configuration.scaledTouchSlop.toFloat()

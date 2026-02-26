@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import arrow.core.Either
+import arrow.core.Either.*
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
@@ -89,7 +90,12 @@ class PostAdapter(
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
   private val onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
-  private val onVideoClick: (Either<PostView, CommentView>?, String, VideoType, VideoState?) -> Unit,
+  private val onVideoClick: (
+    Either<PostView, CommentView>?,
+    String,
+    VideoType,
+    VideoState?,
+  ) -> Unit,
   private val onVideoLongClickListener: (url: String) -> Unit,
   private val onPageClick: (url: String, PageRef) -> Unit,
   private val onPostActionClick: (PostView, String, actionId: Int) -> Unit,
@@ -109,6 +115,8 @@ class PostAdapter(
   private sealed class Item(
     open val id: String,
   ) {
+
+    data object FirstItem : Item("first!")
 
     data class NotNativeInstanceItem(
       val accountInstance: String,
@@ -359,6 +367,7 @@ class PostAdapter(
     is Item.NotNativeInstanceItem -> R.layout.post_not_native_instance_item
     is Item.NoCommentsItem -> R.layout.post_no_comments_item
     is Item.ViewParentComments -> R.layout.item_post_view_parent_comments
+    Item.FirstItem -> R.layout.item_generic_header
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -595,7 +604,7 @@ class PostAdapter(
           onInstanceMismatch = onInstanceMismatch,
           onLinkClick = onLinkClick,
           onLinkLongClick = { url, text ->
-            onLinkLongClick(Either.Left(post), url, text)
+            onLinkLongClick(Left(post), url, text)
           },
           screenshotConfig = screenshotConfig,
           onTextBound = {
@@ -673,7 +682,7 @@ class PostAdapter(
               onCommentActionClick(commentView, item.id, actionId)
             },
             onLinkLongClick = { url, text ->
-              onLinkLongClick(Either.Right(item.comment), url, text)
+              onLinkLongClick(Right(item.comment), url, text)
             },
             onSignInRequired = onSignInRequired,
             onLinkClick = onLinkClick,
@@ -718,7 +727,7 @@ class PostAdapter(
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
             onLinkLongClick = { url, text ->
-              onLinkLongClick(Either.Right(item.comment), url, text)
+              onLinkLongClick(Right(item.comment), url, text)
             },
           )
 
@@ -900,7 +909,7 @@ class PostAdapter(
         val b = holder.getBinding<PostNoCommentsItemBinding>()
 
         b.addCommentButton.setOnClickListener {
-          onAddCommentClick(Either.Left(item.postView))
+          onAddCommentClick(Left(item.postView))
         }
       }
       is Item.ViewParentComments -> {
@@ -910,6 +919,8 @@ class PostAdapter(
           onLoadCommentPath(item.commentPath)
         }
       }
+
+      Item.FirstItem -> {}
     }
   }
 
@@ -1086,6 +1097,7 @@ class PostAdapter(
 
     if (error != null) {
       val finalItems = mutableListOf<Item>()
+      finalItems += Item.FirstItem
       rawData?.postListView?.let {
         finalItems += HeaderItem(
           postView = it.post,
@@ -1111,6 +1123,7 @@ class PostAdapter(
     rawData ?: return null
 
     val finalItems = mutableListOf<Item>()
+    finalItems += Item.FirstItem
 
     val changed = if (autoCollapseComments) {
       autoCollapseComments(rawData.commentTree)
@@ -1400,6 +1413,7 @@ class PostAdapter(
       is Item.NotNativeInstanceItem -> false
       is Item.NoCommentsItem -> false
       is Item.ViewParentComments -> false
+      Item.FirstItem -> false
     }
   }
 
@@ -1502,6 +1516,7 @@ class PostAdapter(
       is Item.NotNativeInstanceItem,
       is Item.NoCommentsItem,
       is Item.ViewParentComments,
+      Item.FirstItem,
       -> {}
     }
 
@@ -1524,6 +1539,7 @@ class PostAdapter(
       is Item.NotNativeInstanceItem,
       is Item.NoCommentsItem,
       is Item.ViewParentComments,
+      Item.FirstItem,
       -> {}
     }
 
@@ -1556,6 +1572,7 @@ class PostAdapter(
       is Item.NotNativeInstanceItem,
       is Item.NoCommentsItem,
       is Item.ViewParentComments,
+      Item.FirstItem,
       -> null
     }
 
@@ -1624,7 +1641,7 @@ class PostAdapter(
       autoCollapseComments = false,
       collapsedItemIds = setOf(),
       topLevelCommentIndices = topLevelCommentIndices,
-      absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
+      absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition,
     ) ?: return null
     val finalQuery = this.query ?: return null
 
@@ -1689,6 +1706,7 @@ class PostAdapter(
         is Item.ViewAllComments -> {}
         is Item.NoCommentsItem -> {}
         is Item.ViewParentComments -> {}
+        Item.FirstItem -> {}
       }
     }
 

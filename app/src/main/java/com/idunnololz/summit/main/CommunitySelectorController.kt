@@ -633,7 +633,7 @@ class CommunitySelectorController @AssistedInject constructor(
 
       addItemType(
         clazz = Item.CommunitiesHeaderItem::class,
-        inflateFn = CommunitySelectorCommunitiesHeaderItemBinding::inflate
+        inflateFn = CommunitySelectorCommunitiesHeaderItemBinding::inflate,
       ) { item, b, h ->
         b.titleTextView.text = item.text
 
@@ -906,7 +906,8 @@ class CommunitySelectorController @AssistedInject constructor(
           when (preferences.communitySelectorCommunitiesList) {
             R.id.community_selector_community_list_frequented_communities -> {
               newItems.add(
-                Item.CommunitiesHeaderItem(context.getString(R.string.frequented_communities)))
+                Item.CommunitiesHeaderItem(context.getString(R.string.frequented_communities)),
+              )
 
               val filteredPopularCommunities = rawData.filter {
                 query.isNullOrBlank() ||

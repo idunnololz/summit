@@ -28,6 +28,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.view.HapticFeedbackConstantsCompat
+import androidx.core.view.isNotEmpty
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.TextViewCompat
@@ -45,6 +46,9 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.info.AccountInfo
+import com.idunnololz.summit.account.info.AccountInfoManager
+import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PostView
@@ -71,6 +75,7 @@ import com.idunnololz.summit.lemmy.LemmyTextHelper
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PostHeaderInfo
+import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.post.ThreadLinesData
@@ -109,6 +114,7 @@ import com.idunnololz.summit.util.ViewRecycler
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
+import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.getDrawableCompat
 import com.idunnololz.summit.util.ext.getResIdFromAttribute
@@ -126,13 +132,6 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import androidx.core.view.isNotEmpty
-import com.idunnololz.summit.account.info.AccountInfo
-import com.idunnololz.summit.account.info.AccountInfoManager
-import com.idunnololz.summit.account.info.isMod
-import com.idunnololz.summit.actions.ui.ActionDetailsFragment
-import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
-import com.idunnololz.summit.util.ext.getColorStateListFromAttribute
 
 typealias FindMatchFn = (QueryMatchHelper.QueryResult) -> Int?
 
@@ -337,7 +336,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
-    onVideoClick: (Either<PostView, CommentView>, url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onVideoClick: (
+      Either<PostView, CommentView>,
+      url: String,
+      videoType: VideoType,
+      videoState: VideoState?,
+    ) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
@@ -808,7 +812,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlightTextData: HighlightTextData?,
     commentHeaderInfo: CommentHeaderInfo,
     onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
-    onVideoClick: (Either<PostView, CommentView>, url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onVideoClick: (
+      Either<PostView, CommentView>,
+      url: String,
+      videoType: VideoType,
+      videoState: VideoState?,
+    ) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     collapseSection: (position: Int) -> Unit,
     toggleActionsExpanded: () -> Unit,
@@ -1142,7 +1151,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       isCommentHighlighted = highlight,
       highlightForever = highlightForever,
       isNewComment = isNewComment,
-      bg = highlightBg
+      bg = highlightBg,
     )
 
     if (tapCommentToCollapse) {
@@ -1294,7 +1303,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       isCommentHighlighted = highlight,
       highlightForever = highlightForever,
       isNewComment = isNewComment,
-      bg = highlightBg
+      bg = highlightBg,
     )
 
     if (isUpdating) {
@@ -1351,7 +1360,12 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlightForever: Boolean,
     highlightTintColor: Int?,
     onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
-    onVideoClick: (Either<PostView, CommentView>?, url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
+    onVideoClick: (
+      Either<PostView, CommentView>?,
+      url: String,
+      videoType: VideoType,
+      videoState: VideoState?,
+    ) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
     onLinkLongClick: (url: String, text: String) -> Unit,
@@ -1374,7 +1388,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       statusIndicator.visibility = View.VISIBLE
 
       statusIndicator.imageTintList = ColorStateList.valueOf(
-        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError)
+        context.getColorFromAttribute(androidx.appcompat.R.attr.colorError),
       )
       statusIndicator.setImageResource(R.drawable.outline_info_18)
       statusIndicator.setOnClickListener {
@@ -1413,7 +1427,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       isCommentHighlighted = highlight,
       highlightForever = highlightForever,
       isNewComment = false,
-      bg = highlightBg
+      bg = highlightBg,
     )
 
     root.tag = ThreadLinesData(
@@ -1454,7 +1468,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       isCommentHighlighted = highlight,
       highlightForever = highlightForever,
       isNewComment = false,
-      bg = highlightBg
+      bg = highlightBg,
     )
 
     root.tag = ThreadLinesData(
@@ -2037,7 +2051,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     )
     setBackgroundResource(selectableItemBackgroundBorderless)
     imageTintList = context.getColorStateListFromAttribute(
-      androidx.appcompat.R.attr.colorControlNormal)
+      androidx.appcompat.R.attr.colorControlNormal,
+    )
   }
 
   fun ensureCommentsActionButtons(

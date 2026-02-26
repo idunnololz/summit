@@ -10,9 +10,9 @@ import com.idunnololz.summit.lemmy.utils.stateStorage.GlobalStateStorage
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.OnTrackingEventListener
 import com.idunnololz.summit.localTracking.TrackedAction
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.launch
 
 @Singleton
 class CommunityTracker @Inject constructor(
@@ -104,15 +104,20 @@ class CommunityTracker @Inject constructor(
         is CommunityRef.All -> {}
         is CommunityRef.AllSubscribed -> {}
         is CommunityRef.CommunityRefByName -> {
-          if (System.currentTimeMillis() - entry.lastMetadataUpdateTs < MIN_METADATA_UPDATE_TIME_MS) {
+          if (System.currentTimeMillis() - entry.lastMetadataUpdateTs <
+            MIN_METADATA_UPDATE_TIME_MS
+          ) {
             Log.d(TAG, "Community ${entry.communityRef} data is up to date already.")
             return@launch
           }
 
           accountAwareLemmyClient
             .fetchCommunityWithRetry(
-              Either.Right(entry.communityRef.getServerId(accountAwareLemmyClient.apiClient.instance)),
-              false)
+              Either.Right(
+                entry.communityRef.getServerId(accountAwareLemmyClient.apiClient.instance),
+              ),
+              false,
+            )
             .onSuccess {
               Log.d(TAG, "Community ${entry.communityRef} data updated.")
               communityTrackerDao.insert(
@@ -120,7 +125,7 @@ class CommunityTracker @Inject constructor(
                   icon = it.community_view.community.icon,
                   lastMetadataUpdateTs = System.currentTimeMillis(),
                   mau = it.community_view.counts.users_active_month,
-                )
+                ),
               )
             }
         }
@@ -132,7 +137,5 @@ class CommunityTracker @Inject constructor(
     }
   }
 
-  suspend fun getCommunityStats(): List<CommunityStatEntry> {
-    return communityTrackerDao.getTop1000()
-  }
+  suspend fun getCommunityStats(): List<CommunityStatEntry> = communityTrackerDao.getTop1000()
 }

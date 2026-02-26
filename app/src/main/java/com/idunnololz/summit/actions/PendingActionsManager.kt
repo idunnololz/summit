@@ -6,14 +6,10 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
 import com.idunnololz.summit.lemmy.actions.ActionStatus
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
 import com.idunnololz.summit.lemmy.actions.LemmyActionsDao
-import com.idunnololz.summit.lemmy.actions.OldLemmyCompletedAction
-import com.idunnololz.summit.lemmy.actions.LemmyCompletedActionsDao
-import com.idunnololz.summit.lemmy.actions.OldLemmyFailedAction
-import com.idunnololz.summit.lemmy.actions.LemmyFailedActionsDao
-import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import java.util.*
 import javax.inject.Inject
@@ -129,18 +125,15 @@ class PendingActionsManager @Inject constructor(
     }
   }
 
-  suspend fun getAllCompletedActions(): List<LemmyAction> =
-    actionsDao.getAllCompletedActions()
+  suspend fun getAllCompletedActions(): List<LemmyAction> = actionsDao.getAllCompletedActions()
 
-  suspend fun getAllFailedActions(): List<LemmyAction> =
-    actionsDao.getAllFailedActions()
+  suspend fun getAllFailedActions(): List<LemmyAction> = actionsDao.getAllFailedActions()
 
   inline fun <reified T : ActionInfo> getPendingActionInfo(): List<T> =
     getAllPendingActions().map { it.info }.filterIsInstance<T>()
 
-  suspend fun findActionById(actionId: Long): LemmyAction? {
-    return actionsDao.getActionById(actionId).firstOrNull()
-  }
+  suspend fun findActionById(actionId: Long): LemmyAction? =
+    actionsDao.getActionById(actionId).firstOrNull()
 
   /**
    * @param dir 1 for like, 0 for unvote, -1 for dislike
@@ -268,16 +261,14 @@ class PendingActionsManager @Inject constructor(
     onActionChangedListeners.remove(l)
   }
 
-  private suspend fun notifyActionComplete(
-    action: LemmyAction,
-    result: LemmyActionResult<*, *>,
-  ) = withContext(
-    Dispatchers.Main,
-  ) {
-    for (onActionCompleteListener in onActionChangedListeners) {
-      onActionCompleteListener.onActionComplete(action, result)
+  private suspend fun notifyActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>) =
+    withContext(
+      Dispatchers.Main,
+    ) {
+      for (onActionCompleteListener in onActionChangedListeners) {
+        onActionCompleteListener.onActionComplete(action, result)
+      }
     }
-  }
 
   private suspend fun notifyActionAdded(action: LemmyAction) = withContext(
     Dispatchers.Main,
@@ -287,14 +278,12 @@ class PendingActionsManager @Inject constructor(
     }
   }
 
-  private suspend fun notifyActionFailed(
-    action: LemmyAction,
-    reason: LemmyActionFailureReason,
-  ) = withContext(Dispatchers.Main) {
-    for (onActionCompleteListener in onActionChangedListeners) {
-      onActionCompleteListener.onActionFailed(action, reason)
+  private suspend fun notifyActionFailed(action: LemmyAction, reason: LemmyActionFailureReason) =
+    withContext(Dispatchers.Main) {
+      for (onActionCompleteListener in onActionChangedListeners) {
+        onActionCompleteListener.onActionFailed(action, reason)
+      }
     }
-  }
 
   private suspend fun notifyActionDeleted(action: LemmyAction) = withContext(Dispatchers.Main) {
     for (onActionCompleteListener in onActionChangedListeners) {
@@ -412,18 +401,17 @@ class PendingActionsManager @Inject constructor(
     ) : ActionExecutionResult()
   }
 
-  private fun LemmyAction.toLemmyFailedAction(
-    error: LemmyActionFailureReason,
-  ): LemmyAction = this.copy(
-    seen = false,
-    failedTs = System.currentTimeMillis(),
-    error = error,
-    status = ActionStatus.Errored,
-  )
+  private fun LemmyAction.toLemmyFailedAction(error: LemmyActionFailureReason): LemmyAction =
+    this.copy(
+      seen = false,
+      failedTs = System.currentTimeMillis(),
+      error = error,
+      status = ActionStatus.Errored,
+    )
 
   private fun LemmyAction.toLemmyCompletedAction(): LemmyAction = this.copy(
     completedTs = System.currentTimeMillis(),
-    status = ActionStatus.Completed
+    status = ActionStatus.Completed,
   )
 
   suspend fun deleteCompletedActions() {

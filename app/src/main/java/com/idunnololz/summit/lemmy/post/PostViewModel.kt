@@ -286,164 +286,21 @@ class PostViewModel @Inject constructor(
     Log.d(
       TAG,
       "fetchPostData(): fetchPostData = $fetchPostData " +
-        "fetchCommentData = $fetchCommentData force = $force"
+        "fetchCommentData = $fetchCommentData force = $force",
     )
 
     postOrCommentRef ?: return null
 
     postData.setIsLoading()
 
-    val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
-
     return viewModelScope.launch(Dispatchers.Default) {
-      mutex.withLock {
-        if (switchToNativeInstance) {
-          switchAccountState.postIsLoading(context.getString(R.string.switching_instance))
-
-          val result = translatePostToCurrentInstance()
-
-          result
-            .onSuccess {
-              switchAccountState.postIdle()
-            }
-            .onFailure {
-              switchAccountState.postError(it)
-            }
-        }
-
-        val postOrCommentRef = postOrCommentRef ?: return@launch
-
-        lemmyApiClient.changeInstance(
-          postOrCommentRef
-            .fold(
-              { it.instance },
-              { it.instance },
-            ),
-        )
-
-        val apiInstance = lemmyApiClient.instance
-        val postResult: Result<GetPostResponse?> =
-          if (!markPostAsRead) {
-            Result.failure(RuntimeException("Can't fetch post or else it will be marked as read!"))
-          } else if (fetchPostData) {
-            postOrCommentRef
-              .fold(
-                {
-                  lemmyApiClient.fetchPostWithRetry(Either.Left(it.id), force)
-                },
-                {
-                  lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
-                },
-              )
-          } else {
-            Result.success(this@PostViewModel.getPostResponse)
-          }
-
-        this@PostViewModel.getPostResponse = if (force) {
-          postResult.getOrNull()
-        } else {
-          postResult.getOrNull()
-            ?: this@PostViewModel.getPostResponse
-        }
-
-        this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view ?: postView
-
-        trackVisitIfNeeded()
-
-        this@PostViewModel.postView?.let {
-          postRef = PostRef(instance = apiInstance, id = it.post.id)
-        }
-        updateData(wasUpdateForced = false)
-
-        val commentsResult = if (fetchCommentData) {
-          postOrCommentRef
-            .fold(
-              {
-                commentsFetcher.fetchCommentsWithRetry(
-                  id = Either.Left(it.id),
-                  sort = sortOrder,
-                  maxDepth = initialMaxDepth,
-                  force = force,
-                )
-              },
-              {
-                commentsFetcher.fetchCommentsWithRetry(
-                  id = Either.Right(it.id),
-                  sort = sortOrder,
-                  maxDepth = initialMaxDepth,
-                  force = force,
-                )
-              },
-            )
-        } else {
-          Result.success(this@PostViewModel.comments)
-        }
-        val newComments = commentsResult.getOrNull()
-        lastLoadCommentError = commentsResult.exceptionOrNull()
-        this@PostViewModel.comments = newComments ?: this@PostViewModel.comments
-
-        invalidateSupplementaryComments(newComments)
-
-        if (force) {
-          additionalLoadedCommentIds.forEach {
-            fetchMoreCommentsInternal(
-              parentId = it,
-              sortOrder = sortOrder,
-              maxDepth = null,
-              force = force,
-            )
-          }
-        }
-
-        updatePendingCommentsInternal(postOrCommentRef, sortOrder, true)
-
-        val post = postResult.getOrNull()
-        val comments = commentsResult.getOrNull()
-        val postView = post?.post_view ?: postView
-
-        if (postView != null) {
-          if (markPostAsRead) {
-            markPostAsRead(postView)
-          }
-          if (force) {
-            accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
-          }
-        }
-
-        if (force) {
-          if (comments != null && fetchCommentData) {
-            comments.forEach {
-              accountActionsManager.setScore(it.toVotableRef(), it.counts.score)
-            }
-          }
-          if (postView != null && fetchPostData) {
-            accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
-          }
-        }
-
-        if (post == null || comments == null) {
-          // see if we can recover gracefully
-
-          if ((postView != null || comments != null) && !force) {
-            // lets recover!
-            updateData(wasUpdateForced = force)
-          } else {
-            postResult
-              .onFailure {
-                postData.postError(it)
-              }
-              .onSuccess {}
-
-            commentsResult
-              .onFailure {
-                postData.postError(it)
-              }
-              .onSuccess {}
-          }
-        } else {
-          updateData(wasUpdateForced = force)
-        }
-      }
+      _fetchPostData(
+        fetchPostData,
+        fetchCommentData,
+        force,
+        switchToNativeInstance,
+        markPostAsRead,
+      )
     }
   }
 
@@ -576,43 +433,48 @@ class PostViewModel @Inject constructor(
 
     unauthedApiClient.changeInstance(instance)
 
-    val linkToResolve = postOrCommentRef
-      .fold(
-        {
-          unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
-            .fold(
-              onSuccess = {
-                Result.success(it.post_view.post.ap_id)
-              },
-              onFailure = {
-                Result.failure(it)
-              },
-            )
-        },
-        { commentRef ->
-          unauthedApiClient
-            .fetchComments(
-              null,
-              id = Either.Right(commentRef.id),
-              sort = CommentSortType.Top,
-              force = false,
-              maxDepth = 0,
-            )
-            .fold(
-              onSuccess = {
-                val url = it.firstOrNull { it.comment.id == commentRef.id }?.comment?.ap_id
-                if (url != null) {
-                  Result.success(url)
-                } else {
-                  Result.failure(ObjectResolverFailedException())
-                }
-              },
-              onFailure = {
-                Result.failure(it)
-              },
-            )
-        },
-      )
+    val postView = postView
+    val linkToResolve = if (postView != null) {
+      Result.success(postView.post.ap_id)
+    } else {
+      postOrCommentRef
+        .fold(
+          {
+            unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
+              .fold(
+                onSuccess = {
+                  Result.success(it.post_view.post.ap_id)
+                },
+                onFailure = {
+                  Result.failure(it)
+                },
+              )
+          },
+          { commentRef ->
+            unauthedApiClient
+              .fetchComments(
+                null,
+                id = Either.Right(commentRef.id),
+                sort = CommentSortType.Top,
+                force = false,
+                maxDepth = 0,
+              )
+              .fold(
+                onSuccess = {
+                  val url = it.firstOrNull { it.comment.id == commentRef.id }?.comment?.ap_id
+                  if (url != null) {
+                    Result.success(url)
+                  } else {
+                    Result.failure(ObjectResolverFailedException())
+                  }
+                },
+                onFailure = {
+                  Result.failure(it)
+                },
+              )
+          },
+        )
+    }
 
     return linkToResolve
       .fold(
@@ -643,18 +505,12 @@ class PostViewModel @Inject constructor(
           if (newPostOrCommentRef != null) {
             updatePostOrCommentRef(newPostOrCommentRef)
 
-            if (!isNativePost) {
-              comments = null
-              pendingComments = null
-              supplementaryComments.clear()
-              newlyPostedCommentId = null
-              additionalLoadedCommentIds.clear()
-              removedCommentIds.clear()
-            }
-
-            withContext(Dispatchers.Main) {
-              fetchPostData(fetchPostData = true, force = true)
-            }?.join()
+            comments = null
+            pendingComments = null
+            supplementaryComments.clear()
+            newlyPostedCommentId = null
+            additionalLoadedCommentIds.clear()
+            removedCommentIds.clear()
           }
 
           Result.success(Unit)
@@ -830,9 +686,7 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  private suspend fun updateData(
-    wasUpdateForced: Boolean,
-  ) = withContext(Dispatchers.Default) {
+  private suspend fun updateData(wasUpdateForced: Boolean) = withContext(Dispatchers.Default) {
     Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
 
     val context = ContextCompat.getContextForLanguage(context)
@@ -1132,6 +986,175 @@ class PostViewModel @Inject constructor(
         action = TrackedAction.VIEW,
         nsfw = postView.post.nsfw || postView.community.nsfw,
       )
+    }
+  }
+
+  private suspend fun _fetchPostData(
+    fetchPostData: Boolean = true,
+    fetchCommentData: Boolean = true,
+    force: Boolean = false,
+    switchToNativeInstance: Boolean = false,
+    markPostAsRead: Boolean = true,
+  ) {
+    mutex.withLock {
+      var fetchPostData = fetchPostData
+      var force = force
+      val sortOrder = requireNotNull(commentsSortOrderLiveData.value).toApiSortOrder()
+      var translatePostToCurrentInstanceResult: Result<Unit>? = null
+
+      if (switchToNativeInstance) {
+        switchAccountState.postIsLoading(context.getString(R.string.switching_instance))
+
+        translatePostToCurrentInstanceResult = translatePostToCurrentInstance()
+
+        translatePostToCurrentInstanceResult
+          .onSuccess {
+            fetchPostData = true
+            force = true
+          }
+          .onFailure {
+            switchAccountState.postError(it)
+            return@withLock
+          }
+      }
+
+      val postOrCommentRef = postOrCommentRef ?: return
+
+      lemmyApiClient.changeInstance(
+        postOrCommentRef
+          .fold(
+            { it.instance },
+            { it.instance },
+          ),
+      )
+
+      val apiInstance = lemmyApiClient.instance
+      val postResult: Result<GetPostResponse?> =
+        if (!markPostAsRead) {
+          Result.failure(RuntimeException("Can't fetch post or else it will be marked as read!"))
+        } else if (fetchPostData) {
+          postOrCommentRef
+            .fold(
+              {
+                lemmyApiClient.fetchPostWithRetry(Either.Left(it.id), force)
+              },
+              {
+                lemmyApiClient.fetchPostWithRetry(Either.Right(it.id), force)
+              },
+            )
+        } else {
+          Result.success(this@PostViewModel.getPostResponse)
+        }
+
+      this@PostViewModel.getPostResponse = if (force) {
+        postResult.getOrNull()
+      } else {
+        postResult.getOrNull()
+          ?: this@PostViewModel.getPostResponse
+      }
+
+      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view ?: postView
+
+      trackVisitIfNeeded()
+
+      this@PostViewModel.postView?.let {
+        postRef = PostRef(instance = apiInstance, id = it.post.id)
+      }
+      updateData(wasUpdateForced = false)
+
+      val commentsResult = if (fetchCommentData) {
+        postOrCommentRef
+          .fold(
+            {
+              commentsFetcher.fetchCommentsWithRetry(
+                id = Either.Left(it.id),
+                sort = sortOrder,
+                maxDepth = initialMaxDepth,
+                force = force,
+              )
+            },
+            {
+              commentsFetcher.fetchCommentsWithRetry(
+                id = Either.Right(it.id),
+                sort = sortOrder,
+                maxDepth = initialMaxDepth,
+                force = force,
+              )
+            },
+          )
+      } else {
+        Result.success(this@PostViewModel.comments)
+      }
+      val newComments = commentsResult.getOrNull()
+      lastLoadCommentError = commentsResult.exceptionOrNull()
+      this@PostViewModel.comments = newComments ?: this@PostViewModel.comments
+
+      invalidateSupplementaryComments(newComments)
+
+      if (force) {
+        additionalLoadedCommentIds.forEach {
+          fetchMoreCommentsInternal(
+            parentId = it,
+            sortOrder = sortOrder,
+            maxDepth = null,
+            force = force,
+          )
+        }
+      }
+
+      updatePendingCommentsInternal(postOrCommentRef, sortOrder, true)
+
+      val post = postResult.getOrNull()
+      val comments = commentsResult.getOrNull()
+      val postView = post?.post_view ?: postView
+
+      if (postView != null) {
+        if (markPostAsRead) {
+          markPostAsRead(postView)
+        }
+        if (force) {
+          accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
+        }
+      }
+
+      if (force) {
+        if (comments != null && fetchCommentData) {
+          comments.forEach {
+            accountActionsManager.setScore(it.toVotableRef(), it.counts.score)
+          }
+        }
+        if (postView != null && fetchPostData) {
+          accountActionsManager.setScore(postView.toVotableRef(), postView.counts.score)
+        }
+      }
+
+      if (post == null || comments == null) {
+        // see if we can recover gracefully
+
+        if ((postView != null || comments != null) && !force) {
+          // lets recover!
+          updateData(wasUpdateForced = force)
+        } else {
+          postResult
+            .onFailure {
+              postData.postError(it)
+            }
+            .onSuccess {}
+
+          commentsResult
+            .onFailure {
+              postData.postError(it)
+            }
+            .onSuccess {}
+        }
+      } else {
+        updateData(wasUpdateForced = force)
+      }
+
+      translatePostToCurrentInstanceResult
+        ?.onSuccess {
+          switchAccountState.postIdle()
+        }
     }
   }
 

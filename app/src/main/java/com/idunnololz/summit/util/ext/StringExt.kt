@@ -17,5 +17,4 @@ fun String.count(element: String): Int {
   return count
 }
 
-fun String.toBidiSafe(): String =
-  BidiFormatter.getInstance().unicodeWrap(this)
+fun String.toBidiSafe(): String = BidiFormatter.getInstance().unicodeWrap(this)

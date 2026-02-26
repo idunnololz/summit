@@ -10,6 +10,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.core.net.toUri
 import com.idunnololz.summit.R
 import com.idunnololz.summit.network.BrowserLikeAuthed
 import com.idunnololz.summit.preferences.Preferences
@@ -26,8 +27,6 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import okio.source
-import androidx.core.net.toUri
-import com.idunnololz.summit.lemmy.CommunityRef
 
 @Singleton
 class FileDownloadHelper @Inject constructor(
@@ -56,22 +55,20 @@ class FileDownloadHelper @Inject constructor(
     context: Context,
     downloadDirectory: String,
     downloadContext: FileDownloadContext?,
-  ): String {
-    return if (preferences.useCommunityDownloadFolder) {
-      buildString {
-        append(downloadDirectory)
-        if (!downloadDirectory.endsWith(File.separator)) {
-          append(File.separator)
-        }
-        append(context.getString(R.string.app_name))
+  ): String = if (preferences.useCommunityDownloadFolder) {
+    buildString {
+      append(downloadDirectory)
+      if (!downloadDirectory.endsWith(File.separator)) {
         append(File.separator)
-        downloadContext?.communityRef?.getLocalizedFullName(context)?.let {
-          append(it)
-        }
       }
-    } else {
-      downloadDirectory
+      append(context.getString(R.string.app_name))
+      append(File.separator)
+      downloadContext?.communityRef?.getLocalizedFullName(context)?.let {
+        append(it)
+      }
     }
+  } else {
+    downloadDirectory
   }
 
   suspend fun downloadFile(
@@ -131,12 +128,13 @@ class FileDownloadHelper @Inject constructor(
         )
         put(MediaStore.Downloads.MIME_TYPE, mimeType)
         put(MediaStore.Downloads.IS_PENDING, 1)
-        put(MediaStore.Downloads.RELATIVE_PATH,
+        put(
+          MediaStore.Downloads.RELATIVE_PATH,
           getDownloadSubFolderPath(
             context = context,
             downloadDirectory = Environment.DIRECTORY_DOWNLOADS,
-            downloadContext = downloadContext
-          )
+            downloadContext = downloadContext,
+          ),
         )
       }
 

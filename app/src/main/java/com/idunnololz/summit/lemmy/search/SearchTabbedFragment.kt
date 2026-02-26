@@ -31,7 +31,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.databinding.FragmentSearchBinding
 import com.idunnololz.summit.lemmy.CommunityRef
-import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.lemmy.communityPicker.CommunityPickerDialogFragment
 import com.idunnololz.summit.lemmy.personPicker.PersonPickerDialogFragment
 import com.idunnololz.summit.lemmy.toApiSortOrder
@@ -49,6 +48,7 @@ import com.idunnololz.summit.search.SuggestionProvider
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
@@ -480,7 +480,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
             curValue = viewModel.currentListingTypeFilter.value,
             onValueSelected = {
               viewModel.nextListingTypeFilter.value = it
-            }
+            },
           )
         }
         it.setOnCloseIconClickListener {
@@ -626,14 +626,13 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
   }
 }
 
-fun ListingType?.getName(context: Context) =
-  when (this) {
-    ListingType.All -> context.getString(R.string.all)
-    ListingType.Local -> context.getString(R.string.local)
-    ListingType.Subscribed -> context.getString(R.string.subscribed)
-    ListingType.ModeratorView -> context.getString(R.string.moderator_view)
-    null -> context.getString(R.string.other_filters)
-  }
+fun ListingType?.getName(context: Context) = when (this) {
+  ListingType.All -> context.getString(R.string.all)
+  ListingType.Local -> context.getString(R.string.local)
+  ListingType.Subscribed -> context.getString(R.string.subscribed)
+  ListingType.ModeratorView -> context.getString(R.string.moderator_view)
+  null -> context.getString(R.string.other_filters)
+}
 
 fun BaseFragment<*>.showListingTypePicker(
   curValue: ListingType?,

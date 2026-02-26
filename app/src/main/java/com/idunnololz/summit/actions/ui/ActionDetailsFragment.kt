@@ -3,7 +3,6 @@ package com.idunnololz.summit.actions.ui
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.telecom.Call
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +34,6 @@ import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.FullscreenDialogFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getColorFromAttribute
@@ -44,14 +42,12 @@ import com.idunnololz.summit.util.getColorWithAlpha
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.showMoreLinkOptions
-import com.idunnololz.summit.util.tsToConcise
 import com.idunnololz.summit.util.tsToFullDateTime
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ActionDetailsFragment :
-  BaseFragment<DialogFragmentActionDetailsBinding>() {
+class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>() {
 
   private val args: ActionDetailsFragmentArgs by navArgs()
   private val viewModel: ActionDetailsViewModel by viewModels()
@@ -124,7 +120,7 @@ class ActionDetailsFragment :
             url = url,
             videoType = VideoType.Unknown,
             videoState = null,
-            downloadContext = null
+            downloadContext = null,
           )
         },
         onPageClick = { url, pageRef ->
@@ -320,13 +316,17 @@ class ActionDetailsFragment :
               )
             b.status.text = context.getString(R.string.failed)
             b.subtitle.text = buildString {
-              appendLine(context.getString(
-                R.string.created_ts_format,
-                tsToFullDateTime(item.action.creationTs))
+              appendLine(
+                context.getString(
+                  R.string.created_ts_format,
+                  tsToFullDateTime(item.action.creationTs),
+                ),
               )
-              append(context.getString(
-                R.string.failed_ts_format,
-                tsToFullDateTime(item.action.failedTs ?: item.action.ts))
+              append(
+                context.getString(
+                  R.string.failed_ts_format,
+                  tsToFullDateTime(item.action.failedTs ?: item.action.ts),
+                ),
               )
             }
           }
@@ -340,9 +340,11 @@ class ActionDetailsFragment :
               )
             b.status.text = context.getString(R.string.pending)
             b.subtitle.text = buildString {
-              append(context.getString(
-                R.string.created_ts_format,
-                tsToFullDateTime(item.action.creationTs))
+              append(
+                context.getString(
+                  R.string.created_ts_format,
+                  tsToFullDateTime(item.action.creationTs),
+                ),
               )
             }
           }
@@ -356,13 +358,17 @@ class ActionDetailsFragment :
               )
             b.status.text = context.getString(R.string.success)
             b.subtitle.text = buildString {
-              appendLine(context.getString(
-                R.string.created_ts_format,
-                tsToFullDateTime(item.action.creationTs))
+              appendLine(
+                context.getString(
+                  R.string.created_ts_format,
+                  tsToFullDateTime(item.action.creationTs),
+                ),
               )
-              append(context.getString(
-                R.string.completed_ts_format,
-                tsToFullDateTime(item.action.completedTs ?: item.action.ts))
+              append(
+                context.getString(
+                  R.string.completed_ts_format,
+                  tsToFullDateTime(item.action.completedTs ?: item.action.ts),
+                ),
               )
             }
           }
@@ -495,11 +501,13 @@ class ActionDetailsFragment :
 
       when (val details = data.details) {
         is ActionDetails.FailureDetails -> {
-          items.add(Item.TextFieldItem(
-            context.getString(R.string.error_reason),
-            details.reason.toText(context),
-            null,
-          ))
+          items.add(
+            Item.TextFieldItem(
+              context.getString(R.string.error_reason),
+              details.reason.toText(context),
+              null,
+            ),
+          )
         }
         ActionDetails.PendingDetails -> {}
         ActionDetails.SuccessDetails -> {}

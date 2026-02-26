@@ -1,7 +1,6 @@
 package com.idunnololz.summit.lemmy
 
 import android.content.Context
-import android.net.Uri
 import android.text.Spanned
 import android.text.TextUtils
 import android.util.Log
@@ -17,7 +16,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.net.toUri
 import androidx.core.view.get
+import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
 import arrow.core.Either
 import coil3.Image
@@ -71,10 +72,6 @@ import com.idunnololz.summit.view.CustomPlayerView
 import com.idunnololz.summit.view.LinearLayoutWithFadingEdge
 import com.idunnololz.summit.view.LoadingView
 import java.io.File
-import androidx.core.net.toUri
-import javax.inject.Inject
-import androidx.core.view.isEmpty
-import coil3.size.Scale
 
 class LemmyContentHelper(
   private val context: Context,
@@ -577,12 +574,13 @@ class LemmyContentHelper(
 
     if (fullContentContainerView.isEmpty()) return stateBuilder.build()
 
-    for (i in fullContentContainerView.childCount - 1 downTo 0 ) {
+    for (i in fullContentContainerView.childCount - 1 downTo 0) {
       val c = fullContentContainerView.getChildAt(i)
       val viewId = c.getTag(R.id.view_type) as Int
 
       if (viewId == R.layout.full_content_video_view ||
-        viewId == R.layout.full_content_embedded_video_view) {
+        viewId == R.layout.full_content_embedded_video_view
+      ) {
         val playerView = c.findViewById<CustomPlayerView>(R.id.player_view)
         stateBuilder.setVideoState(playerView?.getVideoState())
 

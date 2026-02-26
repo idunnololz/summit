@@ -359,6 +359,7 @@ class LemmyTextHelper @Inject constructor(
           usePlugin(
             CoilImagesPlugin(
               context,
+              preferences,
               object : CoilStore {
                 override fun load(drawable: AsyncDrawable): ImageRequest =
                   ImageRequest.Builder(context)

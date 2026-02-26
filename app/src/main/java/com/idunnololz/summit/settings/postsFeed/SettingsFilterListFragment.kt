@@ -52,7 +52,6 @@ class SettingsFilterListFragment : BaseFragment<FragmentSettingsFilterListBindin
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-
     childFragmentManager.setFragmentResultListener(
       AddOrEditFilterDialogFragment.REQUEST_KEY,
       this,

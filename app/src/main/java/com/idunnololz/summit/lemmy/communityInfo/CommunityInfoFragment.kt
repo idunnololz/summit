@@ -190,7 +190,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           url = url,
           videoType = videoType,
           videoState = state,
-          downloadContext = null
+          downloadContext = null,
         )
       },
       onPageClick = { url, pageRef ->

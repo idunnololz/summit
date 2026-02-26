@@ -37,11 +37,11 @@ import com.idunnololz.summit.api.dto.piefed.MyUserInfo
 import com.idunnololz.summit.api.dto.piefed.Person
 import com.idunnololz.summit.api.dto.piefed.PersonAggregates
 import com.idunnololz.summit.api.dto.piefed.PersonBlockView
-import com.idunnololz.summit.api.dto.piefed.Post
 import com.idunnololz.summit.api.dto.piefed.PostAggregates
 import com.idunnololz.summit.api.dto.piefed.Site
 import com.idunnololz.summit.api.dto.piefed.SortType
 import com.idunnololz.summit.api.dto.piefed.SubscribedType
+import com.idunnololz.summit.api.dto.piefed.models.Post
 
 internal fun com.idunnololz.summit.api.dto.piefed.PersonView.toPersonView(): PersonView =
   PersonView(
@@ -148,7 +148,7 @@ internal fun Post.toPost(): com.idunnololz.summit.api.dto.lemmy.Post =
     removed = this.removed,
     locked = this.locked,
     published = this.published,
-    updated = this.updated ?: this.editedAt,
+    updated = this.updated,
     deleted = this.deleted,
     nsfw = this.nsfw,
     embed_title = null,
@@ -156,7 +156,11 @@ internal fun Post.toPost(): com.idunnololz.summit.api.dto.lemmy.Post =
     thumbnail_url = this.thumbnailUrl,
     ap_id = this.apId,
     local = this.local,
-    embed_video_url = null,
+    embed_video_url = if (this.postType == Post.PostType.Video) {
+      this.url
+    } else {
+      null
+    },
     language_id = this.languageId,
     featured_community = this.sticky,
     featured_local = false,

@@ -521,7 +521,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
           url = url,
           videoType = videoType,
           videoState = state,
-          downloadContext = null
+          downloadContext = null,
         )
       },
       onMarkAsRead = { view, inboxItem, read ->

@@ -176,7 +176,6 @@ class MainActivityViewModel @Inject constructor(
     communities.setIsLoading()
 
     viewModelScope.launch(Dispatchers.Default) {
-
       when (preferences.communitySelectorCommunitiesList) {
         R.id.community_selector_community_list_frequented_communities -> {
           communities.postValue(
@@ -186,9 +185,8 @@ class MainActivityViewModel @Inject constructor(
                 icon = it.icon,
                 mau = it.mau,
               )
-            }
+            },
           )
-
         }
         else -> {
           val supportsGetCommunitiesAll = apiFeatureHelper.instanceSupportsFeatureAsync(
@@ -215,7 +213,7 @@ class MainActivityViewModel @Inject constructor(
                   it.community.icon,
                   it.counts.users_active_month,
                 )
-              }
+              },
             )
           }.onFailure {
             communities.postError(it)

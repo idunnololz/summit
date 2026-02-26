@@ -1,11 +1,9 @@
 package com.idunnololz.summit.util.markwon
 
-import android.util.Log
 import org.commonmark.node.Block
 import org.commonmark.node.CustomBlock
 import org.commonmark.node.Node
 import org.commonmark.node.Paragraph
-import org.commonmark.node.Text
 import org.commonmark.parser.InlineParser
 import org.commonmark.parser.block.AbstractBlockParser
 import org.commonmark.parser.block.AbstractBlockParserFactory
@@ -19,7 +17,9 @@ class SpoilerBlock : CustomBlock() {
   var titleNode: Node? = null
 }
 
-class SpoilerBlockParser(private val title: String) : AbstractBlockParser() {
+class SpoilerBlockParser(
+  private val title: String,
+) : AbstractBlockParser() {
 
   private val block = SpoilerBlock().also { it.title = title }
   private var closed = false

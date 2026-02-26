@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
-import com.discord.panels.PanelState
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.idunnololz.summit.R
@@ -106,10 +105,8 @@ import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
-import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.LinkUtils
-import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.SharedElementTransition
 import com.idunnololz.summit.util.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
@@ -405,7 +402,7 @@ class CommunityFragment :
             url = url,
             videoType = videoType,
             videoState = state,
-            downloadContext = postView.toFileDownloadContext()
+            downloadContext = postView.toFileDownloadContext(),
           )
         },
         onVideoLongClickListener = { url ->
@@ -462,7 +459,7 @@ class CommunityFragment :
           getMainActivity()?.showMoreLinkOptions(
             url = url,
             text = text,
-            downloadContext = postView.toFileDownloadContext()
+            downloadContext = postView.toFileDownloadContext(),
           )
         },
         onPostActionClick = { postView, actionId ->
@@ -668,53 +665,53 @@ class CommunityFragment :
       }
 
       communityAppBarController.setup(
-          communitySelectedListener = { controller, communityRef ->
-            val action =
-              CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
-                communityRef = communityRef,
-                tab = args.tab,
-              )
-            findNavController().navigate(action)
-            Utils.hideKeyboard(activity)
-            controller.hide()
-          },
-          onAccountClick = {
-            AccountsAndSettingsDialogFragment.newInstance()
-              .showAllowingStateLoss(
-                childFragmentManager,
-                "AccountsDialogFragment",
-              )
-          },
-          onSortOrderClick = {
-            getMainActivity()?.showBottomMenu(getSortByMenu())
-          },
-          onChangeInstanceClick = {
-            InstancePickerDialogFragment.show(childFragmentManager)
-          },
-          onCommunityLongClick = { communityRef, text ->
-            val url = communityRef?.toUrl(viewModel.apiInstance)
-            if (url != null) {
-              getMainActivity()?.showMoreLinkOptions(
-                url = url,
-                text = text,
-                downloadContext = null,
-              )
-              true
-            } else {
-              false
-            }
-          },
-          onHideReadOnClick = {
-            createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
-              R.id.hide_read_off,
+        communitySelectedListener = { controller, communityRef ->
+          val action =
+            CommunityFragmentDirections.actionCommunityFragmentSwitchCommunity(
+              communityRef = communityRef,
+              tab = args.tab,
             )
-          },
-          onHideReadOnLongClick = {
-            launchAlertDialog("hide_read_on") {
-              titleResId = R.string.hide_read_on
-              messageResId = R.string.hide_read_on_desc
-            }
-          },
+          findNavController().navigate(action)
+          Utils.hideKeyboard(activity)
+          controller.hide()
+        },
+        onAccountClick = {
+          AccountsAndSettingsDialogFragment.newInstance()
+            .showAllowingStateLoss(
+              childFragmentManager,
+              "AccountsDialogFragment",
+            )
+        },
+        onSortOrderClick = {
+          getMainActivity()?.showBottomMenu(getSortByMenu())
+        },
+        onChangeInstanceClick = {
+          InstancePickerDialogFragment.show(childFragmentManager)
+        },
+        onCommunityLongClick = { communityRef, text ->
+          val url = communityRef?.toUrl(viewModel.apiInstance)
+          if (url != null) {
+            getMainActivity()?.showMoreLinkOptions(
+              url = url,
+              text = text,
+              downloadContext = null,
+            )
+            true
+          } else {
+            false
+          }
+        },
+        onHideReadOnClick = {
+          createMoreMenuActionHandler(context, viewModel.currentCommunityRef.value)(
+            R.id.hide_read_off,
+          )
+        },
+        onHideReadOnLongClick = {
+          launchAlertDialog("hide_read_on") {
+            titleResId = R.string.hide_read_on
+            messageResId = R.string.hide_read_on_desc
+          }
+        },
       )
 
       runAfterLayout {
@@ -842,7 +839,7 @@ class CommunityFragment :
           override fun onPanelSlide(panel: View, slideOffset: Float) {
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
-                OverlappingPanelsLayout.LockState.CLOSE
+                OverlappingPanelsLayout.LockState.CLOSE,
               )
             }
           }
@@ -850,7 +847,7 @@ class CommunityFragment :
           override fun onPanelOpened(panel: View) {
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
-                OverlappingPanelsLayout.LockState.CLOSE
+                OverlappingPanelsLayout.LockState.CLOSE,
               )
             }
           }
@@ -858,11 +855,10 @@ class CommunityFragment :
           override fun onPanelClosed(panel: View) {
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
-                OverlappingPanelsLayout.LockState.UNLOCKED
+                OverlappingPanelsLayout.LockState.UNLOCKED,
               )
             }
           }
-
         }
 
         viewModel.hideReadMode.observe(viewLifecycleOwner) {
@@ -895,11 +891,9 @@ class CommunityFragment :
     }
   }
 
-  private fun getVisibleFeedViewPort(): Int {
-    return binding.recyclerView.height -
-      (communityAppBarController?.appBarRoot?.height ?: 0) -
-      (getMainActivity()?.getBottomNavHeight() ?: 0)
-  }
+  private fun getVisibleFeedViewPort(): Int = binding.recyclerView.height -
+    (communityAppBarController?.appBarRoot?.height ?: 0) -
+    (getMainActivity()?.getBottomNavHeight() ?: 0)
 
   private fun goDownABit() {
     (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
@@ -912,7 +906,7 @@ class CommunityFragment :
         // If the current item is really big, just scroll by some amount...
         binding.recyclerView.smoothScrollBy(
           0,
-          (getVisibleFeedViewPort() - Utils.convertDpToPixel(48f)).toInt()
+          (getVisibleFeedViewPort() - Utils.convertDpToPixel(48f)).toInt(),
         )
       } else {
         smoothScroller?.targetPosition = lastPos + 1
@@ -927,7 +921,7 @@ class CommunityFragment :
 
       binding.recyclerView.smoothScrollBy(
         0,
-        -((getVisibleFeedViewPort() - Utils.convertDpToPixel(48f)).toInt())
+        -((getVisibleFeedViewPort() - Utils.convertDpToPixel(48f)).toInt()),
       )
     }
   }
@@ -1404,14 +1398,11 @@ class CommunityFragment :
   override fun proceedAnyways(tag: Int) {
     when (tag) {
       R.id.action_add_comment -> {
-
       }
     }
   }
 
-  fun getPost(postId: Int): PostView? {
-    return viewModel.postListEngine.getFetchedPost(postId)
-  }
+  fun getPost(postId: Int): PostView? = viewModel.postListEngine.getFetchedPost(postId)
 
   private fun updateHistory() {
     if (!isBindingAvailable()) return

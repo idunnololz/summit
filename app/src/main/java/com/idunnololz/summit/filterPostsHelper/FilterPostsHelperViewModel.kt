@@ -25,7 +25,7 @@ class FilterPostsHelperViewModel @Inject constructor(
           filter = it,
           isRegex = false,
           options = null,
-        )
+        ),
       )
     }
   }

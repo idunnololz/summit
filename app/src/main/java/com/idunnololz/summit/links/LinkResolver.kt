@@ -1,13 +1,12 @@
 package com.idunnololz.summit.links
 
-import android.net.Uri
+import androidx.core.net.toUri
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PageRef
 import com.idunnololz.summit.lemmy.PersonRef
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.util.dagger.json
-import androidx.core.net.toUri
 import javax.inject.Inject
 import javax.inject.Singleton
 

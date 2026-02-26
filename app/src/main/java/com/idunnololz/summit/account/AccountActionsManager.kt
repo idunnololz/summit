@@ -32,10 +32,10 @@ import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.actions.ActionInfo
+import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureException
 import com.idunnololz.summit.lemmy.actions.LemmyActionFailureReason
 import com.idunnololz.summit.lemmy.actions.LemmyActionResult
-import com.idunnololz.summit.lemmy.actions.LemmyAction
 import com.idunnololz.summit.lemmy.utils.VotableRef
 import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
@@ -560,7 +560,8 @@ class AccountActionsManager @Inject constructor(
     return Result.success(Unit)
   }
 
-  suspend fun getPendingComments(postRef: PostRef) = pendingCommentsManager.getPendingComments(postRef)
+  suspend fun getPendingComments(postRef: PostRef) =
+    pendingCommentsManager.getPendingComments(postRef)
 
   fun removePendingComment(pendingComment: PendingCommentView) {
     pendingCommentsManager.removePendingComment(pendingComment)

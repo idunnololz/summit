@@ -102,7 +102,7 @@ class ViewVotesFragment :
           getMainActivity()?.showMoreLinkOptions(
             url = LinkUtils.getLinkForPerson(it),
             text = null,
-            downloadContext = null
+            downloadContext = null,
           )
         },
       )

@@ -107,7 +107,9 @@ data class LemmyAction(
 )
 
 enum class ActionStatus {
-  Pending, Errored, Completed
+  Pending,
+  Errored,
+  Completed,
 }
 
 @ProvidedTypeConverter
@@ -277,8 +279,9 @@ sealed interface LemmyActionResult<T : ActionInfo, R> {
     val parentId: CommentId?,
   ) : LemmyActionResult<ActionInfo.CommentActionInfo, CommentView>
 
-  class DeleteCommentLemmyActionResult(override val result: CommentView) :
-    LemmyActionResult<ActionInfo.DeleteCommentActionInfo, CommentView>
+  class DeleteCommentLemmyActionResult(
+    override val result: CommentView,
+  ) : LemmyActionResult<ActionInfo.DeleteCommentActionInfo, CommentView>
 
   class EditLemmyActionResult : LemmyActionResult<ActionInfo.EditCommentActionInfo, Unit> {
     override val result = Unit

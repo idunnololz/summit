@@ -14,13 +14,13 @@ import com.idunnololz.summit.preferences.Preferences
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "LocalTracker"
 
@@ -46,15 +46,9 @@ class LocalTracker @Inject constructor(
     pendingActionsManager.addActionCompleteListener(object : PendingActionsManager.OnActionChangedListener {
       override fun onActionAdded(action: LemmyAction) {}
 
-      override fun onActionFailed(
-        action: LemmyAction,
-        reason: LemmyActionFailureReason,
-      ) {}
+      override fun onActionFailed(action: LemmyAction, reason: LemmyActionFailureReason) {}
 
-      override fun onActionComplete(
-        action: LemmyAction,
-        result: LemmyActionResult<*, *>,
-      ) {
+      override fun onActionComplete(action: LemmyAction, result: LemmyActionResult<*, *>) {
         when (result) {
           is LemmyActionResult.CommentLemmyActionResult -> {
             trackEvent(
@@ -130,7 +124,6 @@ class LocalTracker @Inject constructor(
       }
 
       override fun onActionDeleted(action: LemmyAction) {}
-
     })
 
     coroutineScope.launch {
@@ -145,7 +138,7 @@ class LocalTracker @Inject constructor(
             override fun onViewCommunity(communityRef: CommunityRef) {
               listeners.forEach { it.onViewCommunity(communityRef) }
             }
-          }
+          },
         )
       }
     }
@@ -160,7 +153,10 @@ class LocalTracker @Inject constructor(
     action: TrackedAction,
     nsfw: Boolean,
   ) {
-    Log.d(TAG, "event: ${action} ${instanceId}i $communityRef ${postId}p ${commentId}c ${targetUserId}t nsfw: ${nsfw}")
+    Log.d(
+      TAG,
+      "event: $action ${instanceId}i $communityRef ${postId}p ${commentId}c ${targetUserId}t nsfw: $nsfw",
+    )
 
     currentTracker?.trackEvent(
       instanceId = instanceId,
@@ -177,21 +173,16 @@ class LocalTracker @Inject constructor(
     currentTracker?.clearLocalTrackingData()
   }
 
-  fun registerOnTrackingEventListener(
-    l: OnTrackingEventListener
-  ) {
+  fun registerOnTrackingEventListener(l: OnTrackingEventListener) {
     listeners += l
   }
 
-  fun unregisterOnTrackingEventListener(
-    l: OnTrackingEventListener
-  ) {
+  fun unregisterOnTrackingEventListener(l: OnTrackingEventListener) {
     listeners -= l
   }
 
-  suspend fun getEvents(action: TrackedAction) =
-    trackingEventsDao.getEventsWithAction(action)
-      .map { Cbor.decodeFromByteArray<TrackingEvent>(it.trackingEventCbor) }
+  suspend fun getEvents(action: TrackedAction) = trackingEventsDao.getEventsWithAction(action)
+    .map { Cbor.decodeFromByteArray<TrackingEvent>(it.trackingEventCbor) }
 }
 
 class PerAccountLocalTracker @AssistedInject constructor(
@@ -245,10 +236,14 @@ class PerAccountLocalTracker @AssistedInject constructor(
           userId = userId,
           action = action,
           trackingEventCbor = encoded,
-        )
+        ),
       )
 
-      if (action == TrackedAction.VIEW && communityRef != null && postId == null && commentId == null) {
+      if (action == TrackedAction.VIEW &&
+        communityRef != null &&
+        postId == null &&
+        commentId == null
+      ) {
         listener.onViewCommunity(communityRef)
       }
     }

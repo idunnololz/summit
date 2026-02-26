@@ -585,7 +585,11 @@ class MainFragment :
   private fun getCurrentFragment(): Fragment? {
     val currentFragment = binding.innerNavHostContainer.getFragment<Fragment>()
     return if (currentFragment is NavHostFragment) {
-      currentFragment.childFragmentManager.fragments.getOrNull(0)
+      try {
+        currentFragment.childFragmentManager.fragments.getOrNull(0)
+      } catch (_: Exception) {
+        null
+      }
     } else {
       null
     }

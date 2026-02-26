@@ -11,17 +11,13 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper
 import com.idunnololz.summit.util.crashLogger.crashLogger
 import io.noties.markwon.AbstractMarkwonPlugin
-import io.noties.markwon.MarkwonPlugin
 import io.noties.markwon.MarkwonVisitor
-import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.BlockQuoteSpan
 import io.noties.markwon.image.AsyncDrawableScheduler
-import org.commonmark.node.BlockQuote
-import org.commonmark.node.CustomBlock
-import org.commonmark.node.FencedCodeBlock
-import org.commonmark.parser.Parser
 import java.util.regex.Pattern
+import org.commonmark.node.CustomBlock
+import org.commonmark.parser.Parser
 
 abstract class DetailsClickableSpan : ClickableSpan()
 
@@ -41,8 +37,7 @@ private const val TAG = "SpoilerPlugin"
 
 class SpoilerNode(
   private val delimiter: String,
-) : CustomBlock() {
-}
+) : CustomBlock()
 
 class SpoilerPlugin : AbstractMarkwonPlugin() {
 
@@ -50,9 +45,8 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
     private const val SPOILER_START_REGEX = "(:::\\s*spoiler\\s+)(.*)\n?"
     private const val SPOILER_END_REGEX = ":::(?!\\s*spoiler)"
 
-
     private const val COLLAPSED_ARROW = "▶ "
-    private const val EXPANDED_ARROW  = "▼ "
+    private const val EXPANDED_ARROW = "▼ "
   }
 
   private val spoilerStartMatcher = Pattern.compile(SPOILER_START_REGEX)
@@ -84,7 +78,7 @@ class SpoilerPlugin : AbstractMarkwonPlugin() {
         builder.setSpan(
           DetailsStartSpan(
             visitor.configuration().theme(),
-            builder.subSequence(headerStart, headerEnd)
+            builder.subSequence(headerStart, headerEnd),
           ),
           headerStart,
           headerEnd,
