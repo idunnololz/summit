@@ -264,7 +264,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       if (currentTextView.maxLines != 2) {
         currentTextView.maxLines = 2
       }
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
       }
       currentTextView.isSingleLine = false
@@ -289,7 +289,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
       if (wrapHeader) {
         currentTextView.isSingleLine = false
         currentTextView.maxLines = 2
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
           currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
         }
       } else {
@@ -754,7 +754,7 @@ class LemmyHeaderHelper @AssistedInject constructor(
     if (wrapHeader) {
       currentTextView.isSingleLine = false
       currentTextView.maxLines = 2
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         currentTextView.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
       }
     } else {

@@ -25,14 +25,15 @@ class TemplatesAdapter(
     data object AddTemplateItem : Item
   }
 
-  private val adapterHelper = AdapterHelper<Item>({ old, new ->
-    when (old) {
-      is Item.TemplateItem ->
-        old.template.id == (new as Item.TemplateItem).template.id
-      Item.AddTemplateItem -> true
-      Item.EmptyTemplateItem -> true
-    }
-  }).apply {
+  private val adapterHelper = AdapterHelper<Item>(
+    areItemsTheSame = { old, new ->
+      old::class == new::class && when (old) {
+        is Item.TemplateItem -> old.template.id == (new as Item.TemplateItem).template.id
+        Item.AddTemplateItem -> true
+        Item.EmptyTemplateItem -> true
+      }
+    },
+  ).apply {
     addItemType(
       clazz = Item.TemplateItem::class,
       inflateFn = TemplateItemTemplateItemBinding::inflate,

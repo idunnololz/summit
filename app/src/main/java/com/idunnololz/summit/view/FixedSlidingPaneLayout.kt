@@ -9,6 +9,8 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.customview.widget.ViewDragHelper
 import androidx.slidingpanelayout.widget.SlidingPaneLayout
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
 import kotlin.math.max
 
 class FixedSlidingPaneLayout : SlidingPaneLayout {
@@ -18,6 +20,8 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
   }
 
   var isSwipeEnabled: Boolean = true
+  private val smoothSlideToFn: Method?
+  private val onPanelDragged: Method?
 
   // We only construct a drag helper to get the width of the drag region.
   private val dragHelper = ViewDragHelper.create(
@@ -35,6 +39,30 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
     attrs,
     defStyle,
   )
+
+  init {
+    smoothSlideToFn = try {
+      val method = SlidingPaneLayout::class.java.getDeclaredMethod(
+        "smoothSlideTo",
+        Float::class.javaPrimitiveType,
+        Int::class.javaPrimitiveType,
+      )
+      method.isAccessible = true
+      method
+    } catch (_: Exception) {
+      null
+    }
+    onPanelDragged = try {
+      val method = SlidingPaneLayout::class.java.getDeclaredMethod(
+        "onPanelDragged",
+        Int::class.javaPrimitiveType,
+      )
+      method.isAccessible = true
+      method
+    } catch (_: Exception) {
+      null
+    }
+  }
 
   override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
     if (!isSwipeEnabled) return false
@@ -80,6 +108,14 @@ class FixedSlidingPaneLayout : SlidingPaneLayout {
       return true
     }
     return super.onTouchEvent(ev)
+  }
+
+  fun smoothSlideTo(offset: Float) {
+    smoothSlideToFn?.invoke(this, offset, 0)
+  }
+
+  fun onPanelDragged(offset: Int) {
+    onPanelDragged?.invoke(this, offset)
   }
 
   private fun getSystemGestureInsets(): Insets? {

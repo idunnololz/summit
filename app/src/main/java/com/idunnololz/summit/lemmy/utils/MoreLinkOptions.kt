@@ -431,6 +431,7 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         url = url,
         mimeType = mimeType,
         downloadContext = downloadContext,
+        peek = false,
       )
     }
     R.id.download -> {

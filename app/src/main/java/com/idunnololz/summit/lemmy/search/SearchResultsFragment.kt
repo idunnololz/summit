@@ -53,6 +53,7 @@ import com.idunnololz.summit.lemmy.postAndCommentView.GeneralQuickActionsViewHol
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
+import com.idunnololz.summit.lemmy.postListView.OnImageClickCallback
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.toCommunityRef
@@ -148,7 +149,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         onLoadPage = {
           queryEngine?.performQuery(it, force = false)
         },
-        onImageClick = { commentView, view, url ->
+        onImageClick = { commentView, view, url, peek ->
           getMainActivity()?.openImage(
             sharedElement = view,
             appBar = parentFragment.binding.appBar,
@@ -156,9 +157,10 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             url = url,
             mimeType = null,
             downloadContext = commentView.toFileDownloadContext(),
+            peek = peek,
           )
         },
-        onPostImageClick = { _, postView, view, url ->
+        onPostImageClick = { _, postView, view, url, peek ->
           getMainActivity()?.openImage(
             sharedElement = view,
             appBar = null,
@@ -166,6 +168,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             url = url,
             mimeType = null,
             downloadContext = postView.toFileDownloadContext(),
+            peek = peek,
           )
         },
         onVideoClick = { url, videoType, state ->
@@ -378,8 +381,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     private val avatarHelper: AvatarHelper,
     private val linkResolver: LinkResolver,
     private val onLoadPage: (Int) -> Unit,
-    private val onImageClick: (CommentView, View?, String) -> Unit,
-    private val onPostImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
+    private val onImageClick: (CommentView, View?, String, peek: Boolean) -> Unit,
+    private val onPostImageClick: OnImageClickCallback,
     private val onVideoClick: (
       url: String,
       videoType: VideoType,
@@ -480,6 +483,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           vh = viewHolder,
           root = viewHolder.root,
           isSaved = item.commentView.saved,
+          canEdit = false,
         )
 
         b.postInfo.text = buildSpannedString {
@@ -547,8 +551,8 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           textView = b.text,
           text = item.commentView.comment.content,
           instance = item.instance,
-          onImageClick = {
-            onImageClick(item.commentView, null, it)
+          onImageClick = { url, peek ->
+            onImageClick(item.commentView, null, url, peek)
           },
           onPageClick = onPageClick,
           onVideoClick = {

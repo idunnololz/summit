@@ -107,7 +107,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
       instance = parentFragment.viewModel.instance,
       lemmyTextHelper = lemmyTextHelper,
       avatarHelper = avatarHelper,
-      onImageClick = { url ->
+      onImageClick = { url, peek ->
         getMainActivity()?.openImage(
           sharedElement = null,
           appBar = parentFragment.binding.appBar,
@@ -115,6 +115,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
           url = url,
           mimeType = null,
           downloadContext = null,
+          peek = peek,
         )
       },
       onVideoClick = { url ->
@@ -151,7 +152,7 @@ class PersonAboutFragment : BaseFragment<FragmentPersonAboutBinding>() {
     private val instance: String,
     private val lemmyTextHelper: LemmyTextHelper,
     private val avatarHelper: AvatarHelper,
-    private val onImageClick: (url: String) -> Unit,
+    private val onImageClick: (url: String, peek: Boolean) -> Unit,
     private val onVideoClick: (url: String) -> Unit,
     private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,

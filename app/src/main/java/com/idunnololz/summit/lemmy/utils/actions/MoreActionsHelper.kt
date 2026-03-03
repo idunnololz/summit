@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.utils.actions
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager

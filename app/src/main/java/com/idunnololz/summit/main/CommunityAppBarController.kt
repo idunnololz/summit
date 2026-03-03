@@ -478,6 +478,7 @@ class CommunityAppBarController(
               url = bannerUrl,
               mimeType = null,
               downloadContext = null,
+              peek = false,
             )
           }
         }
@@ -493,6 +494,7 @@ class CommunityAppBarController(
               url = iconUrl,
               mimeType = null,
               downloadContext = null,
+              peek = false,
             )
           }
         }
@@ -742,7 +744,7 @@ class CommunityAppBarController(
         textView = vh.body,
         text = body,
         instance = communityInfoViewModel.instance,
-        onImageClick = { url ->
+        onImageClick = { url, peek ->
           summitActivity.openImage(
             sharedElement = null,
             appBar = appBarRoot,
@@ -750,6 +752,7 @@ class CommunityAppBarController(
             url = url,
             mimeType = null,
             downloadContext = null,
+            peek = peek,
           )
         },
         onVideoClick = { url ->

@@ -822,7 +822,7 @@ class ModLogsFragment : BaseFragment<FragmentModLogsBinding>() {
           textView = b.title,
           text = description,
           instance = instance,
-          onImageClick = {},
+          onImageClick = { _, _ -> },
           onVideoClick = {},
           onPageClick = { url, pageRef ->
             onPageClick(url, pageRef)

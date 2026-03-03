@@ -12,6 +12,7 @@ object CommentQuickActionIds {
   const val OpenComment: CommentQuickActionId = 7
   const val ViewSource: CommentQuickActionId = 8
   const val DetailedView: CommentQuickActionId = 9
+  const val EditComment: CommentQuickActionId = 10
 
   const val More: CommentQuickActionId = 999
 
@@ -25,6 +26,7 @@ object CommentQuickActionIds {
     OpenComment,
     ViewSource,
     DetailedView,
+    EditComment,
     More,
 //                CommentQuickActionId.More, More isn't optional...
   )

@@ -39,6 +39,7 @@ import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
 import com.idunnololz.summit.lemmy.multicommunity.accountId
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
+import com.idunnololz.summit.lemmy.postListView.OnImageClickCallback
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.nsfwMode.NsfwModeManager
@@ -58,7 +59,7 @@ class PostListAdapter(
   private val onPrevClick: () -> Unit,
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
-  private val onImageClick: (accountId: Long?, PostView, View?, String) -> Unit,
+  private val onImageClick: OnImageClickCallback,
   private val onVideoClick: (PostView, String, VideoType, VideoState?) -> Unit,
   private val onVideoLongClickListener: (url: String) -> Unit,
   private val onPageClick: (accountId: Long?, url: String, PageRef) -> Unit,

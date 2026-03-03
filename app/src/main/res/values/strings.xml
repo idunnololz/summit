@@ -2376,6 +2376,12 @@
     <string name="use_community_download_folder_desc">When enabled, files will be downloaded to a subfolder based on the community. Eg. an image from c/cats will be saved to Downloads/cats</string>
     <string name="use_bundled_avif_decoder">Use bundled AVIF decoder</string>
     <string name="inline_image_max_height">Inline image max height</string>
+    <string name="read_post_style">Read post style</string>
+    <string name="read_post_style_desc">Choose how a read post is indicated</string>
+    <string name="dim_title">Dim title</string>
+    <string name="dim_content">Dim content</string>
+    <string name="never_indicate_posts_as_read">Never indicate posts as read</string>
+    <string name="peek_images_on_long_press">Peek images on long press</string>
 
 
     <!-- uCrop string resource end -->

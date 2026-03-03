@@ -91,7 +91,7 @@ class FilteredCommentsFragment :
           )
         }
       },
-      onImageClick = { commentView, view, url ->
+      onImageClick = { commentView, view, url, peek ->
         getMainActivity()?.openImage(
           sharedElement = view,
           appBar = parentFragment.binding.appBar,
@@ -99,6 +99,7 @@ class FilteredCommentsFragment :
           url = url,
           mimeType = null,
           downloadContext = commentView.toFileDownloadContext(),
+          peek = peek,
         )
       },
       onVideoClick = { commentView, url, videoType, state ->

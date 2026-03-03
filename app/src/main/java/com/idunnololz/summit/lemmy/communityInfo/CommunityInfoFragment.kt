@@ -175,7 +175,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
       preferences = preferences,
       lemmyTextHelper = lemmyTextHelper,
       avatarHelper = avatarHelper,
-      onImageClick = { imageName, sharedElementView, url ->
+      onImageClick = { imageName, sharedElementView, url, peek ->
         getMainActivity()?.openImage(
           sharedElement = sharedElementView,
           appBar = binding.appBar,
@@ -183,6 +183,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           url = url,
           mimeType = null,
           downloadContext = null,
+          peek = peek,
         )
       },
       onVideoClick = { url, videoType, state ->
@@ -427,6 +428,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             url = data.iconUrl,
             mimeType = null,
             downloadContext = null,
+            peek = false,
           )
         }
       } else {
@@ -454,6 +456,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
             url = data.bannerUrl,
             mimeType = null,
             downloadContext = null,
+            peek = false,
           )
         }
       } else {
@@ -710,7 +713,7 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
     private val preferences: Preferences,
     private val lemmyTextHelper: LemmyTextHelper,
     private val avatarHelper: AvatarHelper,
-    private val onImageClick: (String, View?, String) -> Unit,
+    private val onImageClick: (String, View?, String, peek: Boolean) -> Unit,
     private val onVideoClick: (String, VideoType, VideoState?) -> Unit,
     private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -922,8 +925,8 @@ class CommunityInfoFragment : BaseFragment<FragmentCommunityInfoBinding>() {
           textView = b.text,
           text = item.content,
           instance = instance,
-          onImageClick = {
-            onImageClick("", null, it)
+          onImageClick = { url, peek ->
+            onImageClick("", null, url, peek)
           },
           onVideoClick = {
             onVideoClick(it, VideoType.Unknown, null)

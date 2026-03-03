@@ -506,7 +506,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
       avatarHelper = avatarHelper,
       lemmyTextHelper = lemmyTextHelper,
       preferences = preferences,
-      onImageClick = { url ->
+      onImageClick = { url, peek ->
         getMainActivity()?.openImage(
           sharedElement = null,
           appBar = binding.appBar,
@@ -514,6 +514,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
           downloadContext = null,
           url = url,
           mimeType = null,
+          peek = peek,
         )
       },
       onVideoClick = { url, videoType, state ->
@@ -714,7 +715,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
     private val avatarHelper: AvatarHelper,
     private val lemmyTextHelper: LemmyTextHelper,
     private val preferences: Preferences,
-    private val onImageClick: (String) -> Unit,
+    private val onImageClick: (String, peek: Boolean) -> Unit,
     private val onVideoClick: (
       url: String,
       videoType: VideoType,
@@ -900,8 +901,8 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
             ?: conversation.content
             ?: "",
           instance = instance,
-          onImageClick = {
-            onImageClick(it)
+          onImageClick = { url, peek ->
+            onImageClick(url, peek)
           },
           onVideoClick = { url ->
             onVideoClick(url, VideoType.Unknown, null)

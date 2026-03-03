@@ -5,6 +5,7 @@ import com.idunnololz.summit.BuildConfig
 import com.idunnololz.summit.R
 import com.idunnololz.summit.cache.CachePolicy
 import com.idunnololz.summit.lemmy.community.CommunityLayout
+import com.idunnololz.summit.lemmy.postListView.ReadPostStyleIds
 import com.idunnololz.summit.links.PreviewLinkOptions
 import com.idunnololz.summit.links.PreviewLinkOptions.PreviewTextLinks
 import com.idunnololz.summit.preferences.ColorSchemes
@@ -92,6 +93,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OP_TAG_STYLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PARSE_MARKDOWN_IN_POST_TITLES
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PEEK_IMAGES_ON_LONG_PRESS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PERF_DELAY_WHEN_LOADING_DATA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_FAB_QUICK_ACTION
@@ -1626,10 +1628,24 @@ class PostsFeedAppearanceSettings @Inject constructor(
       2000 to "2000",
     ).toOptions(-1),
   )
-  val dimReadPosts = OnOffSettingItem(
-    null,
-    context.getString(R.string.dim_read_posts),
-    context.getString(R.string.dim_read_posts_desc),
+  val readPostStyle = RadioGroupSettingItem(
+    icon = null,
+    title = context.getString(R.string.read_post_style),
+    description = context.getString(R.string.read_post_style_desc),
+    options = listOf(
+      RadioGroupSettingItem.RadioGroupOption(
+        ReadPostStyleIds.DIM_TITLE,
+        context.getString(R.string.dim_title),
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        ReadPostStyleIds.DIM_CONTENT,
+        context.getString(R.string.dim_content),
+      ),
+      RadioGroupSettingItem.RadioGroupOption(
+        ReadPostStyleIds.NONE,
+        context.getString(R.string.never_indicate_posts_as_read),
+      ),
+    ),
   )
   val preferTextPreviewIcon = OnOffSettingItem(
     null,
@@ -2144,6 +2160,10 @@ class MiscSettings @Inject constructor(
     maxValue = 2000f,
     stepSize = 50f,
     relatedKeys = listOf(KEY_INLINE_IMAGE_MAX_HEIGHT),
+  )
+  val peekImagesOnLongPress = OnOffSettingItem(
+    title = context.getString(R.string.peek_images_on_long_press),
+    relatedKeys = listOf(KEY_PEEK_IMAGES_ON_LONG_PRESS),
   )
 }
 

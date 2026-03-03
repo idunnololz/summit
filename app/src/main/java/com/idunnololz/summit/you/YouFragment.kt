@@ -121,6 +121,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
               url = url,
               mimeType = null,
               downloadContext = null,
+              peek = false,
             )
           }
         },

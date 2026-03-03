@@ -154,7 +154,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
         instance = args.instance,
         lemmyTextHelper = lemmyTextHelper,
         showMediaAsLinks = preferences.inlineUrlsInPrivateMessages,
-        onImageClick = { url ->
+        onImageClick = { url, peek ->
           getMainActivity()?.openImage(
             sharedElement = null,
             appBar = binding.appBar,
@@ -162,6 +162,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
             downloadContext = null,
             url = url,
             mimeType = null,
+            peek = peek,
           )
         },
         onVideoClick = { url, videoType, state ->
@@ -360,7 +361,7 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
     private val instance: String,
     private val lemmyTextHelper: LemmyTextHelper,
     private val showMediaAsLinks: Boolean,
-    private val onImageClick: (String) -> Unit,
+    private val onImageClick: (String, peek: Boolean) -> Unit,
     private val onVideoClick: (
       url: String,
       videoType: VideoType,
@@ -411,8 +412,8 @@ class ConversationFragment : BaseFragment<FragmentConversationBinding>() {
           text = item.messageItem.content,
           instance = instance,
           showMediaAsLinks = showMediaAsLinks,
-          onImageClick = {
-            onImageClick(it)
+          onImageClick = { url, peek ->
+            onImageClick(url, peek)
           },
           onVideoClick = { url ->
             onVideoClick(url, VideoType.Unknown, null)

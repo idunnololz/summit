@@ -22,7 +22,8 @@ data class PostInListUiConfig(
   val contentMaxLines: Int = -1,
   val contentMaxHeightDp: Int = -1,
   val showCommunityIcon: Boolean = true,
-  val dimReadPosts: Boolean? = null,
+//  val dimReadPosts: Boolean? = null,
+  val readPostStyle: Int? = -1,
   val showTextPreviewIcon: Boolean? = null,
   // Only works with some layouts.
   val showUrlDomain: Boolean? = null,
@@ -95,58 +96,58 @@ fun CommunityLayout.getDefaultPostUiConfig(): PostInListUiConfig = when (this) {
       imageWidthPercent = 0.2f,
       headerTextSizeSp = 12f,
       footerTextSizeSp = 12f,
-      dimReadPosts = false,
+      readPostStyle = ReadPostStyleIds.DIM_TITLE,
     )
   CommunityLayout.List ->
     PostInListUiConfig(
       imageWidthPercent = 0.2f,
-      dimReadPosts = false,
+      readPostStyle = ReadPostStyleIds.DIM_TITLE,
     )
   CommunityLayout.ListWithCards ->
     PostInListUiConfig(
       imageWidthPercent = 0.2f,
-      dimReadPosts = false,
+      readPostStyle = ReadPostStyleIds.DIM_TITLE,
     )
   CommunityLayout.FullWithCards ->
     PostInListUiConfig(
       imageWidthPercent = 0.2f,
-      dimReadPosts = true,
+      readPostStyle = ReadPostStyleIds.DIM_CONTENT,
     )
   CommunityLayout.LargeList ->
     PostInListUiConfig(
       imageWidthPercent = 1f,
-      dimReadPosts = true,
+      readPostStyle = ReadPostStyleIds.DIM_CONTENT,
     )
   CommunityLayout.Card ->
     PostInListUiConfig(
       imageWidthPercent = 1f,
-      dimReadPosts = true,
+      readPostStyle = ReadPostStyleIds.DIM_CONTENT,
     )
   CommunityLayout.Card2 ->
     PostInListUiConfig(
       imageWidthPercent = 1f,
-      dimReadPosts = true,
+      readPostStyle = ReadPostStyleIds.DIM_CONTENT,
     )
   CommunityLayout.Card3 ->
     PostInListUiConfig(
       titleTextSizeSp = 16f,
       imageWidthPercent = 1f,
-      dimReadPosts = true,
+      readPostStyle = ReadPostStyleIds.DIM_CONTENT,
     )
   CommunityLayout.Full ->
     PostInListUiConfig(
       imageWidthPercent = 0.2f,
-      dimReadPosts = true,
+      readPostStyle = ReadPostStyleIds.DIM_CONTENT,
     )
   CommunityLayout.SmartList ->
     PostInListUiConfig(
       imageWidthPercent = 0.2f,
-      dimReadPosts = false,
+      readPostStyle = ReadPostStyleIds.DIM_TITLE,
       fullImageWidthWhenFullWidthLayout = true,
     )
 }
 
-val CommunityLayout.defaultDimReadPosts
+val CommunityLayout.defaultReadPostStyle
   get() =
     when (this) {
       CommunityLayout.Compact,
@@ -154,11 +155,11 @@ val CommunityLayout.defaultDimReadPosts
       CommunityLayout.ListWithCards,
       CommunityLayout.FullWithCards,
       CommunityLayout.SmartList,
-      -> false
+      -> ReadPostStyleIds.DIM_TITLE
       CommunityLayout.LargeList,
       CommunityLayout.Card,
       CommunityLayout.Card2,
       CommunityLayout.Card3,
       CommunityLayout.Full,
-      -> true
+      -> ReadPostStyleIds.DIM_CONTENT
     }

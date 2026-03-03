@@ -107,6 +107,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINKS_IN_APP
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OPEN_LINK_WHEN_THUMBNAIL_TAPPED
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_OP_TAG_STYLE
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PARSE_MARKDOWN_IN_POST_TITLES
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PEEK_IMAGES_ON_LONG_PRESS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PERF_DELAY_WHEN_LOADING_DATA
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POSTS_IN_FEED_QUICK_ACTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_AND_COMMENTS_UI_CONFIG
@@ -746,6 +747,8 @@ class Preferences(
     by booleanPreference(KEY_USE_BUNDLED_AVIF_DECODER, true)
   var inlineImageMaxHeight
     by intPreference(KEY_INLINE_IMAGE_MAX_HEIGHT, 0)
+  var peekImagesOnLongPress
+    by booleanPreference(KEY_PEEK_IMAGES_ON_LONG_PRESS, false)
 
   suspend fun getOfflinePostCount(): Int =
     context.offlineModeDataStore.data.first()[intPreferencesKey("offlinePostCount")]

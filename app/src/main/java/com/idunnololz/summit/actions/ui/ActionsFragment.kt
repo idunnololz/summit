@@ -58,7 +58,7 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
       val adapter = ActionsAdapter(
         context = context,
         lemmyTextHelper = lemmyTextHelper,
-        onImageClick = { sharedElementView, url ->
+        onImageClick = { sharedElementView, url, peek ->
           getMainActivity()?.openImage(
             sharedElement = sharedElementView,
             appBar = null,
@@ -66,6 +66,7 @@ class ActionsFragment : BaseFragment<FragmentActionsBinding>() {
             downloadContext = null,
             url = url,
             mimeType = null,
+            peek = peek,
           )
         },
         onVideoClick = { url, videoType, state ->

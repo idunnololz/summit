@@ -109,6 +109,9 @@ import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
+typealias OnImageClickCallback =
+    (accountId: Long?, PostView, sharedElementView: View?, imageUrl: String, peek: Boolean) -> Unit
+
 @FragmentScoped
 class PostListViewBuilder @Inject constructor(
   private val fragment: Fragment,
@@ -179,7 +182,7 @@ class PostListViewBuilder @Inject constructor(
   private var indicateCurrentUser: Boolean =
     preferences.indicatePostsAndCommentsCreatedByCurrentUser
   private var showEditedDate: Boolean = preferences.showEditedDate
-  private var dimReadPosts: Boolean? = postUiConfig.dimReadPosts
+  private var readPostStyle: Int? = postUiConfig.readPostStyle
   private var autoPlayVideos: Boolean = preferences.autoPlayVideos
   private var parseMarkdownInPostTitles: Boolean = preferences.parseMarkdownInPostTitles
   private var hapticsOnActions: Boolean = preferences.hapticsOnActions
@@ -190,6 +193,7 @@ class PostListViewBuilder @Inject constructor(
   private var openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
   private var showPostType = preferences.showPostType
   private val paddingIcon = Utils.convertDpToPixel(12f).toInt()
+  private var peekImagesOnLongPress = preferences.peekImagesOnLongPress
 
   private val normalTextColor = ContextCompat.getColor(context, R.color.colorText)
 
@@ -251,7 +255,7 @@ class PostListViewBuilder @Inject constructor(
     textSizeMultiplier = postUiConfig.textSizeMultiplier
     contentMaxLines = postUiConfig.contentMaxLines
     contentMaxHeightDp = postUiConfig.contentMaxHeightDp
-    dimReadPosts = postUiConfig.dimReadPosts
+    readPostStyle = postUiConfig.readPostStyle
     postHorizontalMarginDp = postUiConfig.horizontalMarginDp
     postVerticalMarginDp = postUiConfig.verticalMarginDp
     showTextPreviewIcon = postUiConfig.showTextPreviewIcon ?: true
@@ -279,6 +283,7 @@ class PostListViewBuilder @Inject constructor(
     postsInFeedQuickActions = generateQuickActions()
     openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
     showPostType = preferences.showPostType
+    peekImagesOnLongPress = preferences.peekImagesOnLongPress
   }
 
   /**
@@ -302,7 +307,7 @@ class PostListViewBuilder @Inject constructor(
     isDuplicatePost: Boolean,
     postHeaderInfo: PostHeaderInfo,
     onRevealContentClickedFn: () -> Unit,
-    onImageClick: (accountId: Long?, PostView, sharedElementView: View?, String) -> Unit,
+    onImageClick: OnImageClickCallback,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
     onPageClick: (accountId: Long?, url: String, PageRef) -> Unit,
@@ -1077,11 +1082,11 @@ class PostListViewBuilder @Inject constructor(
             )
           }
 
-          fun showImageOrVideo() {
+          fun showImageOrVideo(peek: Boolean) {
             if (urlVideo) {
               onVideoClick(imageUrl, VideoType.Mp4, null)
             } else {
-              onImageClick(accountId, postView, imageView, imageUrl)
+              onImageClick(accountId, postView, imageView, imageUrl, peek)
             }
           }
 
@@ -1114,7 +1119,7 @@ class PostListViewBuilder @Inject constructor(
           if (fullContentContainerView != null && !openLinkWhenThumbnailTapped) {
             imageView.setOnClickListener {
               if (singleTapToViewImage) {
-                showImageOrVideo()
+                showImageOrVideo(peek = false)
               } else {
                 toggleItem(fetchedPost)
               }
@@ -1124,7 +1129,7 @@ class PostListViewBuilder @Inject constructor(
               if (url != null && (postType == PostType.Text || postType == PostType.Link)) {
                 onLinkClick(accountId, url, null, LinkContext.Rich)
               } else {
-                showImageOrVideo()
+                showImageOrVideo(peek = false)
               }
             }
           }
@@ -1134,7 +1139,7 @@ class PostListViewBuilder @Inject constructor(
               if (singleTapToViewImage) {
                 toggleItem(fetchedPost)
               } else {
-                showImageOrVideo()
+                showImageOrVideo(peekImagesOnLongPress)
               }
               true
             }
@@ -1170,10 +1175,10 @@ class PostListViewBuilder @Inject constructor(
             contentMaxHeightDp = contentMaxHeightDp,
             autoPlayVideos = autoPlayVideos,
             onFullImageViewClickListener = { v, url ->
-              onImageClick(accountId, postView, v, url)
+              onImageClick(accountId, postView, v, url, false)
             },
-            onImageClickListener = {
-              onImageClick(accountId, postView, null, it)
+            onImageClickListener = { url, peek ->
+              onImageClick(accountId, postView, null, url, peek)
             },
             onVideoClickListener = onVideoClick,
             onVideoLongClickListener = onVideoLongClickListener,
@@ -1282,8 +1287,8 @@ class PostListViewBuilder @Inject constructor(
           },
           instance,
           showMediaAsLinks = true,
-          onImageClick = {
-            onImageClick(accountId, postView, null, it)
+          onImageClick = { url, peek ->
+            onImageClick(accountId, postView, null, url, peek)
           },
           onVideoClick = {
             onVideoClick(it, VideoType.Unknown, null)
@@ -1303,31 +1308,37 @@ class PostListViewBuilder @Inject constructor(
       }
 
       val renderAsRead = (postView.read || isDuplicatePost) && !alwaysRenderAsUnread
-      val dimReadPosts = dimReadPosts
-        ?: rawBinding.communityLayout?.defaultDimReadPosts
-        ?: true
-      if (dimReadPosts) {
-        if (renderAsRead) {
-          if (themeManager.isLightTheme) {
-            contentView.alpha = 0.5f
-            title.alpha = 0.5f
+      val readPostStyle = readPostStyle
+        ?: rawBinding.communityLayout?.defaultReadPostStyle
+      when (readPostStyle) {
+        ReadPostStyleIds.DIM_CONTENT -> {
+          if (renderAsRead) {
+            if (themeManager.isLightTheme) {
+              contentView.alpha = 0.5f
+              title.alpha = 0.5f
+            } else {
+              contentView.alpha = 0.6f
+              title.alpha = 0.66f
+            }
           } else {
-            contentView.alpha = 0.6f
-            title.alpha = 0.66f
+            contentView.alpha = 1f
+            title.alpha = 1f
           }
-        } else {
+        }
+        ReadPostStyleIds.NONE -> {
           contentView.alpha = 1f
           title.alpha = 1f
         }
-      } else {
-        if (renderAsRead) {
-          if (themeManager.isLightTheme) {
-            title.alpha = 0.41f
+        else -> {
+          if (renderAsRead) {
+            if (themeManager.isLightTheme) {
+              title.alpha = 0.41f
+            } else {
+              title.alpha = 0.66f
+            }
           } else {
-            title.alpha = 0.66f
+            title.alpha = 1f
           }
-        } else {
-          title.alpha = 1f
         }
       }
 

@@ -337,14 +337,15 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
             text = reportItem.reportedContent,
             instance = viewModel.apiInstance,
             showMediaAsLinks = true,
-            onImageClick = {
+            onImageClick = { url, peek ->
               getMainActivity()?.openImage(
                 sharedElement = null,
                 appBar = binding.appBar,
                 title = null,
-                url = it,
+                url = url,
                 mimeType = null,
                 downloadContext = null,
+                peek = peek,
               )
             },
             onVideoClick = { url ->
@@ -744,7 +745,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               accountId = null,
             )
           },
-          onImageClick = { _, view, url ->
+          onImageClick = { _, view, url, peek ->
             getMainActivity()?.openImage(
               sharedElement = view,
               appBar = binding.appBar,
@@ -752,6 +753,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               url = url,
               mimeType = null,
               downloadContext = null,
+              peek = peek,
             )
           },
           onVideoClick = { _, url, videoType, state ->

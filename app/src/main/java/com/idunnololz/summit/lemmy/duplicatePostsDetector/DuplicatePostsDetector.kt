@@ -2,6 +2,8 @@ package com.idunnololz.summit.lemmy.duplicatePostsDetector
 
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountManager
+import com.idunnololz.summit.account.AccountManager.OnAccountChangedListener
+import com.idunnololz.summit.account.GuestOrUserAccount
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -37,10 +39,12 @@ class DuplicatePostsDetector @Inject constructor(
       }
     }
     coroutineScope.launch {
-      accountManager.currentAccount.collect {
-        currentDuplicatePostsDetector =
-          (it as? Account)?.getDuplicatePostsDetector()
-      }
+      accountManager.addOnAccountChangedListener(object : OnAccountChangedListener {
+        override suspend fun onAccountChanged(newAccount: GuestOrUserAccount?) {
+          currentDuplicatePostsDetector =
+            (newAccount as? Account)?.getDuplicatePostsDetector()
+        }
+      })
     }
   }
 

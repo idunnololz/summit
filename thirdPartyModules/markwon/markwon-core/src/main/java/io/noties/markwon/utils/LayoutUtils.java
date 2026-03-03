@@ -19,7 +19,7 @@ public abstract class LayoutUtils {
     ) {
 
         final int bottom = layout.getLineBottom(line);
-        final boolean lastLineSpacingNotAdded = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        final boolean lastLineSpacingNotAdded = true;
         final boolean isSpanLastLine = line == (layout.getLineCount() - 1);
 
         final int lineBottom;

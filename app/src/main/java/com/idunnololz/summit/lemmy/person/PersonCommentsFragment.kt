@@ -100,7 +100,7 @@ class PersonCommentsFragment :
           view.performHapticFeedbackCompat(HapticFeedbackConstantsCompat.CONFIRM)
         }
       },
-      onImageClick = { commentView, view, url ->
+      onImageClick = { commentView, view, url, peek ->
         getMainActivity()?.openImage(
           sharedElement = view,
           appBar = parentFragment.binding.appBar,
@@ -108,6 +108,7 @@ class PersonCommentsFragment :
           url = url,
           mimeType = null,
           downloadContext = commentView.toFileDownloadContext(),
+          peek = peek,
         )
       },
       onVideoClick = { commentView, url, videoType, state ->

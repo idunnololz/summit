@@ -122,6 +122,60 @@
                 </com.google.android.material.button.MaterialButtonGroup>
             </FrameLayout>
 
+            <FrameLayout
+                android:id="@+id/peek_bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorOverlay"
+                android:layout_marginBottom="@dimen/padding"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/peek_bottom_bar_actions_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageButton
+                        android:id="@+id/peek_expand"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="16dp"
+                        android:src="@drawable/baseline_expand_content_24"
+                        android:background="@drawable/peek_action_background"
+
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/peek_share"
+                        app:layout_constraintHorizontal_chainStyle="spread"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <ImageButton
+                        android:id="@+id/peek_share"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="16dp"
+                        android:src="@drawable/baseline_share_24"
+                        android:background="@drawable/peek_action_background"
+
+                        app:layout_constraintStart_toEndOf="@+id/peek_expand"
+                        app:layout_constraintEnd_toStartOf="@+id/peek_copy"
+                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"/>
+
+                    <ImageButton
+                        android:id="@+id/peek_copy"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="16dp"
+                        android:src="@drawable/baseline_content_copy_24"
+                        android:background="@drawable/peek_action_background"
+
+                        app:layout_constraintStart_toEndOf="@+id/peek_share"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.appbar.AppBarLayout

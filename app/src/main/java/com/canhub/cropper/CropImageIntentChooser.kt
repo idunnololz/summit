@@ -201,8 +201,7 @@ internal class CropImageIntentChooser(
      * question](http://stackoverflow.com/questions/32789027/android-m-camera-intent-permission-bug).
    */
   private fun isExplicitCameraPermissionRequired(context: Context): Boolean =
-    SDK_INT >= Build.VERSION_CODES.M &&
-      hasCameraPermissionInManifest(context) &&
+    hasCameraPermissionInManifest(context) &&
       context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
 
   /**

@@ -313,39 +313,37 @@ class PostFragment :
     }
 
     if (!args.isSinglePage) {
-      val predictiveBackMargin = resources.getDimensionPixelSize(
-        R.dimen.predictive_back_margin,
-      )
-      var initialTouchY = -1f
-
       requireSummitActivity().onBackPressedDispatcher
         .addCallback(
           this,
           object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+              (parentFragment as? CommunityFragment)?.apply {
+                unlockNavBar()
+              }
               goBack()
             }
 
-            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
-              val background = binding.root
-              val progress = gestureInterpolator.getInterpolation(backEvent.progress)
+            override fun handleOnBackStarted(backEvent: BackEventCompat) {
+              super.handleOnBackStarted(backEvent)
 
-              if (initialTouchY < 0f) {
-                initialTouchY = backEvent.touchY
+              (parentFragment as? CommunityFragment)?.apply {
+                lockNavBar()
+                setPanelOffset(0.25f)
               }
-              // See the motion spec about the calculations below.
-              // https://developer.android.com/design/ui/mobile/guides/patterns/predictive-back#motion-specs
-
-              // Shift horizontally.
-              val maxTranslationX = predictiveBackMargin
-              background.translationX = progress * maxTranslationX
             }
 
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {}
+
             override fun handleOnBackCancelled() {
-              val background = binding.root
-              initialTouchY = -1f
-              background.run {
-                translationX = 0f
+              (parentFragment as? CommunityFragment)?.apply {
+                setPanelOffset(0f)
+                binding.root.postDelayed(
+                  {
+                    unlockNavBar()
+                  },
+                  200
+                )
               }
             }
           },
@@ -467,7 +465,7 @@ class PostFragment :
           onAddCommentClick = { postOrComment ->
             onAddCommentClick(postOrComment)
           },
-          onImageClick = { postOrCommentView, imageView, url ->
+          onImageClick = { postOrCommentView, imageView, url, peek ->
             getMainActivity()?.openImage(
               sharedElement = imageView,
               appBar = binding.appBar,
@@ -482,6 +480,7 @@ class PostFragment :
               url = url,
               mimeType = null,
               downloadContext = postOrCommentView?.toFileDownloadContext(),
+              peek = peek,
             )
           },
           onVideoClick = { postOrCommentView, url, videoType, state ->
@@ -1026,6 +1025,7 @@ class PostFragment :
       val curPos = it.getFirstVisibleItem()
 
       val pos = adapter?.getPrevTopLevelCommentPosition(curPos)
+
       if (pos != null) {
         smoothScroller?.targetPosition = pos
         it.startSmoothScroll(smoothScroller)

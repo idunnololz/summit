@@ -262,16 +262,9 @@ class VideoFrameDecoder(
         setDataSource(source.file().toFile().path)
       }
 
-      SDK_INT >= 23 -> {
+      else -> {
         val handle = source.fileSystem.openReadOnly(source.file())
         setDataSource(FileHandleMediaDataSource(handle))
-      }
-
-      else -> {
-        error(
-          "Unable to read ${source.file()} as a custom file system " +
-            "(${source.fileSystem}) is used and the device is API 22 or earlier.",
-        )
       }
     }
   }

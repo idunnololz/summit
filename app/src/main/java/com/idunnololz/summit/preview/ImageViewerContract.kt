@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.CallSuper
 
-class ImageViewerContract : ActivityResultContract<ImageViewerActivityArgs, Int?>() {
+class ImageViewerContract : ActivityResultContract<ImageViewerActivityArgs, ImageViewerResult?>() {
   @CallSuper
   override fun createIntent(context: Context, input: ImageViewerActivityArgs): Intent {
     val intent = Intent(context, ImageViewerActivity::class.java).apply {
@@ -17,7 +17,8 @@ class ImageViewerContract : ActivityResultContract<ImageViewerActivityArgs, Int?
   final override fun getSynchronousResult(
     context: Context,
     input: ImageViewerActivityArgs,
-  ): SynchronousResult<Int?>? = null
+  ): SynchronousResult<ImageViewerResult?>? = null
 
-  final override fun parseResult(resultCode: Int, intent: Intent?): Int? = resultCode
+  final override fun parseResult(resultCode: Int, intent: Intent?): ImageViewerResult? =
+    intent?.toImageViewerResult()
 }

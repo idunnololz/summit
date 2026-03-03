@@ -493,6 +493,7 @@ class PersonTabbedFragment :
             url = bannerUrl,
             mimeType = null,
             downloadContext = null,
+            peek = false,
           )
         }
         offlineManager.fetchImage(banner, bannerUrl) {
@@ -538,6 +539,7 @@ class PersonTabbedFragment :
             url = avatarUrl,
             mimeType = null,
             downloadContext = null,
+            peek = false,
           )
         }
       }

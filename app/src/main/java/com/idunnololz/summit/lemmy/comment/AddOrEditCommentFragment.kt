@@ -1036,7 +1036,7 @@ class AddOrEditCommentFragment :
         onAddCommentClick = { postOrComment ->
           showError()
         },
-        onImageClick = { _, view, url ->
+        onImageClick = { _, _, _, _ ->
           showError()
         },
         onVideoClick = { _, url, videoType, state ->

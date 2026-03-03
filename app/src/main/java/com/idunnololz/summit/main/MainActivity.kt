@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
@@ -76,9 +77,10 @@ import com.idunnololz.summit.links.ResolvingLinkDialog
 import com.idunnololz.summit.links.onLinkClick
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preferences.ThemeManager
-import com.idunnololz.summit.preview.ImageViewerActivity.Companion.ErrorCustomDownloadLocation
 import com.idunnololz.summit.preview.ImageViewerActivityArgs
 import com.idunnololz.summit.preview.ImageViewerContract
+import com.idunnololz.summit.preview.ImageViewerResult
+import com.idunnololz.summit.preview.PeekImageManager
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragment
 import com.idunnololz.summit.receiveFIle.ReceiveFileDialogFragmentArgs
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -90,6 +92,7 @@ import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.SharedElementNames
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.SummitActivity
+import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.launchChangelog
 import com.idunnololz.summit.video.ExoPlayerManagerManager
@@ -191,17 +194,27 @@ class MainActivity : SummitActivity() {
   @Inject
   lateinit var pendingActionsManager: PendingActionsManager
 
+  @Inject
+  lateinit var peekImageManager: PeekImageManager
+
   private val imageViewerLauncher = registerForActivityResult(
     ImageViewerContract(),
-  ) { resultCode ->
-    // Handle the returned Uri
-
-    if (resultCode == ErrorCustomDownloadLocation) {
-      lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.RESUMED) {
-          showDownloadsSettings()
+  ) { result ->
+    when (result) {
+      is ImageViewerResult.CopyImage -> {
+        Utils.copyToClipboard(context, result.url)
+      }
+      is ImageViewerResult.ShareImage -> {
+        moreActionsHelper.downloadAndShareImage(result.url)
+      }
+      ImageViewerResult.ErrorCustomDownloadLocation -> {
+        lifecycleScope.launch {
+          repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            showDownloadsSettings()
+          }
         }
       }
+      null -> {}
     }
   }
 
@@ -1030,6 +1043,26 @@ class MainActivity : SummitActivity() {
     currentBottomMenu = bottomMenu
   }
 
+  override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+    val isPeeking = peekImageManager.peekStatus is PeekImageManager.PeekStatus.Started
+
+    if (!isPeeking) {
+      return super.dispatchTouchEvent(ev)
+    }
+
+    when (ev?.action) {
+      MotionEvent.ACTION_UP,
+      MotionEvent.ACTION_CANCEL -> {
+        peekImageManager.onStopPeek()
+      }
+      MotionEvent.ACTION_MOVE -> {
+        peekImageManager.onPeek(ev.x.toInt(), ev.y.toInt())
+      }
+    }
+
+    return true
+  }
+
   override fun openImage(
     sharedElement: View?,
     appBar: View?,
@@ -1037,11 +1070,14 @@ class MainActivity : SummitActivity() {
     url: String,
     mimeType: String?,
     downloadContext: FileDownloadContext?,
+    peek: Boolean,
     urlAlt: String?,
     mimeTypeAlt: String?,
   ) {
     val transitionName =
-      if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Extras)) {
+      if (peek) {
+        null
+      } else if (animationsHelper.shouldAnimate(AnimationsHelper.AnimationLevel.Extras)) {
         sharedElement?.transitionName
       } else {
         null
@@ -1055,7 +1091,12 @@ class MainActivity : SummitActivity() {
       mimeTypeAlt = mimeTypeAlt,
       transitionName = transitionName,
       downloadContext = downloadContext,
+      peek = peek,
     )
+
+    if (peek) {
+      peekImageManager.onPeek(-1, -1)
+    }
 
     if (transitionName != null) {
       val sharedElements = mutableListOf<Pair<View, String>>()

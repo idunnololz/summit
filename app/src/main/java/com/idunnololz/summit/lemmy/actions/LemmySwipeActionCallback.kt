@@ -8,8 +8,11 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.view.MotionEvent
 import androidx.annotation.ColorInt
 import androidx.core.view.HapticFeedbackConstantsCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -64,37 +67,69 @@ class LemmySwipeActionCallback(
 
   private var gestureStartTs = 0L
   private var startDx = 0f
+  private var startX = 0f
   private var dragEventCount = 0
   private var isDragging = false
 
   private var gestureInsetLeft = 0
-  private var gestureInsetRight = 0
+  private var gestureInsetRight = Int.MAX_VALUE
 
   private val expandDrawable = context.getDrawableCompat(R.drawable.baseline_unfold_more_24)!!
-
-  fun setGestureInsets(left: Int, right: Int) {
-    gestureInsetLeft = left
-    gestureInsetRight = right
-  }
 
   private fun ViewHolder.isSwipeEnabled() =
     this.itemView.getTag(R.id.swipe_enabled) as? Boolean != false
 
   private fun ViewHolder.isSwipeable() = this.itemView.getTag(R.id.swipeable) as? Boolean == true
 
+  init {
+    ViewCompat.setOnApplyWindowInsetsListener(recyclerView) { _, insets ->
+      val windowGestureRegion = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+      gestureInsetLeft = windowGestureRegion.left
+      gestureInsetRight = recyclerView.resources.displayMetrics.widthPixels -
+        windowGestureRegion.right
+
+      insets
+    }
+    recyclerView.requestApplyInsets()
+    recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+      override fun onInterceptTouchEvent(
+        rv: RecyclerView,
+        e: MotionEvent,
+      ): Boolean {
+        startX = e.x
+        return false
+      }
+
+      override fun onTouchEvent(
+        rv: RecyclerView,
+        e: MotionEvent,
+      ) {
+      }
+
+      override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+      }
+
+    })
+  }
+
   override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int =
     if (viewHolder.isSwipeable()) {
-      when (swipeDirection) {
-        GestureSwipeDirectionIds.RIGHT ->
-          makeMovementFlags(0, ItemTouchHelper.RIGHT)
-        GestureSwipeDirectionIds.ANY ->
-          makeMovementFlags(
-            0,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
-          )
+      if (startX < gestureInsetLeft || startX > gestureInsetRight) {
+        0
+      } else {
+        when (swipeDirection) {
+          GestureSwipeDirectionIds.RIGHT ->
+            makeMovementFlags(0, ItemTouchHelper.RIGHT)
+
+          GestureSwipeDirectionIds.ANY ->
+            makeMovementFlags(
+              0,
+              ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
+            )
 //                GestureSwipeDirectionIds.LEFT,
-        else ->
-          makeMovementFlags(0, ItemTouchHelper.LEFT)
+          else ->
+            makeMovementFlags(0, ItemTouchHelper.LEFT)
+        }
       }
     } else {
       0

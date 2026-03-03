@@ -275,7 +275,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
           textView = title,
           text = o.content.title,
           instance = args.instance,
-          onImageClick = { url ->
+          onImageClick = { url, peek ->
 //                    getMainActivity()?.openImage(null, binding.appBar, null, url, null)
           },
           onVideoClick = { url ->
@@ -301,7 +301,7 @@ class ContentDetailsDialogFragment : BaseDialogFragment<DialogFragmentCommentDet
           textView = text,
           text = o.content.content,
           instance = args.instance,
-          onImageClick = { url ->
+          onImageClick = { url, peek ->
 //                    getMainActivity()?.openImage(null, binding.appBar, null, url, null)
           },
           onVideoClick = { url ->

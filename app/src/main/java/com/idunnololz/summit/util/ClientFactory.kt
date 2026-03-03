@@ -37,11 +37,12 @@ class ClientFactory @Inject constructor(
     private const val SAFARI_VERSION = "537.36"
 
     // https://www.whatismybrowser.com/guides/the-latest-user-agent/firefox
-    private const val FIREFOX_VERSION = "141.0"
+    private const val FIREFOX_VERSION = "148.0"
   }
 
   enum class Purpose {
     LemmyApiClient,
+    LemmyApiClientUnauthed,
     SummitApiClient,
     BrowserLike,
     BrowserLikeUnauthed,
@@ -49,7 +50,8 @@ class ClientFactory @Inject constructor(
 
   private fun getUserAgent(purpose: Purpose): String {
     val purposeString = when (purpose) {
-      Purpose.LemmyApiClient -> "lac"
+      Purpose.LemmyApiClient,
+         Purpose.LemmyApiClientUnauthed -> "lac"
       Purpose.SummitApiClient -> "sac"
       Purpose.BrowserLike,
       Purpose.BrowserLikeUnauthed,
@@ -184,7 +186,7 @@ class ClientFactory @Inject constructor(
           loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
           addInterceptor(loggingInterceptor)
         }
-        if (purpose != Purpose.BrowserLikeUnauthed) {
+        if (purpose != Purpose.BrowserLikeUnauthed && purpose != Purpose.LemmyApiClientUnauthed) {
           addNetworkInterceptor {
             val requestBuilder = it.request().newBuilder()
             val account = accountManager.currentAccount.asAccount
@@ -206,7 +208,6 @@ class ClientFactory @Inject constructor(
       .connectTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
-      .enableTls12()
       .build()
 
     return okHttpClient

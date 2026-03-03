@@ -163,6 +163,7 @@ abstract class SummitActivity :
     url: String,
     mimeType: String?,
     downloadContext: FileDownloadContext?,
+    peek: Boolean,
     urlAlt: String? = null,
     mimeTypeAlt: String? = null,
   )

@@ -30,7 +30,7 @@ internal class PinchDetector(
 
   private val detector = ScaleGestureDetector(context, this)
   init {
-    if (Build.VERSION.SDK_INT >= 19) detector.isQuickScaleEnabled = false
+    detector.isQuickScaleEnabled = false
   }
 
   /** Point holding a [AbsolutePan] coordinate */

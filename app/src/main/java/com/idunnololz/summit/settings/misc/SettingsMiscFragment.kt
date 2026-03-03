@@ -304,6 +304,10 @@ class SettingsMiscFragment :
           }
         },
       ),
+      settings.peekImagesOnLongPress.asOnOffSwitch(
+        { preferences.peekImagesOnLongPress },
+        { preferences.peekImagesOnLongPress = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

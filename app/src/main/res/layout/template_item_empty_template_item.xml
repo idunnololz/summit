@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?textAppearanceBodyMedium"
         android:text="@string/template_empty_desc"
+        android:paddingBottom="@dimen/padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

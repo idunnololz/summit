@@ -72,11 +72,8 @@ class ChooseDefaultAppBottomSheetFragment :
     val intent = args.intent
     val pm = context.packageManager
     val options: List<ResolveInfo> =
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-      } else {
-        pm.queryIntentActivities(intent, 0)
-      }.mapNotNull { it }
+      pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+        .mapNotNull { it }
 
     with(binding) {
       recyclerView.adapter = ResolveInfoAdapter(

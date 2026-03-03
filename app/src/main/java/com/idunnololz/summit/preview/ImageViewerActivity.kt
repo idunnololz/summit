@@ -5,12 +5,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Transition
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.SystemBarStyle
@@ -19,6 +21,7 @@ import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navArgs
 import coil3.Image
@@ -56,17 +59,20 @@ import com.idunnololz.summit.util.Size
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.crashLogger.crashLogger
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.getDimen
 import com.idunnololz.summit.util.ext.showAboveCutout
 import com.idunnololz.summit.util.imgur.ImgurPageParser
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.view.GalleryImageView
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlinx.coroutines.launch
+import androidx.core.graphics.drawable.toDrawable
 
 @AndroidEntryPoint
 class ImageViewerActivity :
@@ -82,13 +88,18 @@ class ImageViewerActivity :
     private const val EXIT_OFFSET_DP = 60f
 
     private const val MAX_BITMAP_SIZE = 100 * 1024 * 1024 // 100 MB
-
-    const val ErrorCustomDownloadLocation = 1234
   }
 
   private val args: ImageViewerActivityArgs by navArgs()
 
-  private val viewModel: ImageViewerViewModel by viewModels()
+  private val viewModel: ImageViewerViewModel by viewModels(
+    extrasProducer = {
+      defaultViewModelCreationExtras
+        .withCreationCallback<ImageViewerViewModel.Factory> { factory ->
+          factory.create(args)
+        }
+    },
+  )
 
   private var currentBottomMenu: BottomMenu? = null
 
@@ -113,6 +124,11 @@ class ImageViewerActivity :
 
   @Inject
   lateinit var linkResolver: LinkResolver
+
+  @Inject
+  lateinit var peekImageManager: PeekImageManager
+
+  private var isImageLoaded = false
 
   override val context: Context
     get() = this
@@ -197,7 +213,6 @@ class ImageViewerActivity :
 
     window.sharedElementEnterTransition = SharedElementTransition()
     window.sharedElementReturnTransition = SharedElementTransition()
-//        window.sharedElementsUseOverlay = false
 
     if (savedInstanceState != null) {
       onSharedElementEnterTransitionEnd()
@@ -294,6 +309,58 @@ class ImageViewerActivity :
         }
       }
     }
+
+    if (viewModel.peek) {
+      val tempArr = IntArray(2)
+      lifecycleScope.launch {
+        peekImageManager.peekStatusFlow.collect { peekStatus ->
+          when (peekStatus) {
+            is PeekImageManager.PeekStatus.Idle -> {
+              val selectedAction =
+                binding.peekBottomBarActionsContainer.children.firstOrNull { it.isSelected }?.id
+
+              when (selectedAction) {
+                R.id.peek_expand -> {
+                  binding.bottomBar.visibility = View.VISIBLE
+                  binding.peekBottomBar.visibility = View.GONE
+                  binding.root.setBackgroundColor(getColorFromAttribute(com.google.android.material.R.attr.backgroundColor))
+                  viewModel.peek = false
+                }
+                R.id.peek_share -> {
+                  setResult(RESULT_OK, ImageViewerResult.ShareImage(args.url).toIntent())
+                  finish()
+                }
+                R.id.peek_copy -> {
+                  setResult(RESULT_OK, ImageViewerResult.CopyImage(args.url).toIntent())
+                  finish()
+                }
+                else -> {
+                  finish()
+                }
+              }
+            }
+            is PeekImageManager.PeekStatus.Started -> {
+              binding.peekBottomBarActionsContainer.children.forEach {
+                it.getLocationOnScreen(tempArr)
+
+                if (peekStatus.x > tempArr[0] && peekStatus.x < (tempArr[0] + it.width) &&
+                  peekStatus.y > tempArr[1] && peekStatus.y < (tempArr[1] + it.height)) {
+
+                  it.isSelected = true
+                } else {
+                  it.isSelected = false
+                }
+              }
+            }
+          }
+        }
+      }
+
+      binding.bottomBar.visibility = View.GONE
+      binding.peekBottomBar.visibility = View.VISIBLE
+      binding.root.setBackgroundColor(Color.argb(180, 0, 0, 0))
+      window.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+    }
   }
 
   override fun onEnterAnimationComplete() {
@@ -304,7 +371,6 @@ class ImageViewerActivity :
     val hasAltUrl = !urlAlt.isNullOrBlank()
     if (hasAltUrl && (viewModel.url == args.url || useHd)) {
       viewModel.url = urlAlt
-//      binding.hdButton.setIcon()
       binding.hdButton.setIconResource(R.drawable.baseline_hd_24)
     } else {
       viewModel.url = args.url
@@ -342,7 +408,6 @@ class ImageViewerActivity :
 
     binding.dummyImageView.transitionName = args.transitionName
 
-    binding.loadingView.showProgressBar()
     binding.loadingView.setOnRefreshClickListener {
       val url = viewModel.url ?: return@setOnRefreshClickListener
       loadImage(url)
@@ -350,9 +415,12 @@ class ImageViewerActivity :
 
     loadImage(viewModel.url)
 
-    binding.imageView.postDelayed({
-      startPostponedEnterTransition()
-    }, 50)
+    binding.imageView.postDelayed(
+      {
+        startPostponedEnterTransition()
+      },
+      50,
+    )
 
     if (viewModel.url?.startsWith("file:") == true) {
       binding.bottomBar.visibility = View.GONE
@@ -416,7 +484,7 @@ class ImageViewerActivity :
                     Snackbar.LENGTH_LONG,
                   )
                   .setAction(R.string.downloads_settings) {
-                    setResult(ErrorCustomDownloadLocation)
+                    setResult(RESULT_OK, ImageViewerResult.ErrorCustomDownloadLocation.toIntent())
                     finish()
                   }
                   .setAnchorView(binding.bottomBar)
@@ -493,6 +561,17 @@ class ImageViewerActivity :
   private fun loadImage(url: String?, forceLoadAsImage: Boolean = false) {
     url ?: return
 
+    isImageLoaded = false
+
+    binding.loadingView.postDelayed(
+      {
+        if (!isImageLoaded) {
+          binding.loadingView.showProgressBar()
+        }
+      },
+      100,
+    )
+
     val uri = Uri.parse(url)
     if (uri.host == "imgur.com" &&
       !forceLoadAsImage &&
@@ -504,6 +583,8 @@ class ImageViewerActivity :
         linkFetcher.downloadSite(url)
           .fold(
             onSuccess = { html ->
+              isImageLoaded = true
+
               val previewInfo = ImgurPageParser().parsePage(url, html)
 
               val rootView = binding.root
@@ -525,6 +606,8 @@ class ImageViewerActivity :
               }
             },
             onFailure = {
+              isImageLoaded = true
+
               binding.loadingView.showDefaultErrorMessageFor(it)
             },
           )
@@ -651,6 +734,7 @@ class ImageViewerActivity :
     binding.progressBar.visibility = View.VISIBLE
 
     if (url.startsWith("file:")) {
+      isImageLoaded = true
       binding.progressBar.visibility = View.GONE
       startPostponedEnterTransition()
       binding.loadingView.hideAll()
@@ -675,6 +759,7 @@ class ImageViewerActivity :
               override fun onSuccess(result: Image) {
                 super.onSuccess(result)
 
+                isImageLoaded = true
                 binding.progressBar.visibility = View.GONE
 
                 Log.d(
@@ -739,6 +824,7 @@ class ImageViewerActivity :
 
             listener(
               onError = { _, error ->
+                isImageLoaded = true
                 binding.progressBar.visibility = View.GONE
                 binding.loadingView.showDefaultErrorMessageFor(
                   error.throwable,
@@ -752,10 +838,9 @@ class ImageViewerActivity :
         binding.imageView.context.imageLoader.enqueue(request)
       },
       errorListener = {
+        isImageLoaded = true
         binding.progressBar.visibility = View.GONE
-        binding.loadingView.showDefaultErrorMessageFor(
-          it,
-        )
+        binding.loadingView.showDefaultErrorMessageFor(it)
       },
     )
   }

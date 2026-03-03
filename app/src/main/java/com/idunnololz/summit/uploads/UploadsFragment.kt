@@ -94,6 +94,7 @@ class UploadsFragment : BaseFragment<FragmentUploadsBinding>() {
             url = url,
             mimeType = null,
             downloadContext = null,
+            peek = false,
           )
         },
         onDeleteClick = { image ->

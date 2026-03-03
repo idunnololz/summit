@@ -387,6 +387,7 @@ class PreviewPresetActivity : SummitActivity() {
     url: String,
     mimeType: String?,
     downloadContext: FileDownloadContext?,
+    peek: Boolean,
     urlAlt: String?,
     mimeTypeAlt: String?,
   ) {

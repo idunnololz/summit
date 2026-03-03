@@ -25,6 +25,7 @@ import com.idunnololz.summit.databinding.QuickActionBinding
 import com.idunnololz.summit.databinding.QuickActionsTitleBinding
 import com.idunnololz.summit.preferences.CommentQuickActionId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
+import com.idunnololz.summit.preferences.CommentQuickActionIds.EditComment
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
 import com.idunnololz.summit.settings.SettingsFragment
 import com.idunnololz.summit.util.AnimationsHelper
@@ -318,6 +319,10 @@ class CustomQuickActionsFragment : BaseFragment<FragmentCustomQuickActionsBindin
           CommentQuickActionIds.DetailedView -> {
             icon = R.drawable.baseline_open_in_full_24
             name = context.getString(R.string.detailed_view)
+          }
+          EditComment -> {
+            icon = R.drawable.baseline_edit_24
+            name = context.getString(R.string.edit_comment)
           }
           else -> return null
         }

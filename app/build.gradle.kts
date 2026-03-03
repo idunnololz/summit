@@ -21,7 +21,7 @@ android {
 
   defaultConfig {
     applicationId = "com.idunnololz.summit"
-    minSdk = 21
+    minSdk = 23
     targetSdk = 36
     versionCode = 316
     versionName = "1.78.2"

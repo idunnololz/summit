@@ -50,7 +50,7 @@ class CommentListAdapter(
   private val lemmyTextHelper: LemmyTextHelper,
   private val linkResolver: LinkResolver,
   private val onLoadPage: (Int) -> Unit,
-  private val onImageClick: (CommentView, View?, String) -> Unit,
+  private val onImageClick: (CommentView, View?, String, peek: Boolean) -> Unit,
   private val onVideoClick: (CommentView, String, VideoType, VideoState?) -> Unit,
   private val onPageClick: (url: String, PageRef) -> Unit,
   private val onCommentClick: (CommentRef) -> Unit,
@@ -141,6 +141,7 @@ class CommentListAdapter(
         vh = viewHolder,
         root = viewHolder.root,
         isSaved = item.commentView.saved,
+        canEdit = false,
       )
 
       b.postInfo.text = buildSpannedString {
@@ -216,8 +217,8 @@ class CommentListAdapter(
         textView = b.text,
         text = item.commentView.comment.content,
         instance = item.instance,
-        onImageClick = {
-          onImageClick(item.commentView, null, it)
+        onImageClick = { url, peek ->
+          onImageClick(item.commentView, null, url, peek)
         },
         onVideoClick = {
           onVideoClick(item.commentView, it, VideoType.Unknown, null)

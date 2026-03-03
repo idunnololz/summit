@@ -267,6 +267,7 @@ class CommunitySelectorController @AssistedInject constructor(
       )
     }
 
+    adapter.startLoading()
     bottomSheetBehavior?.addBottomSheetCallback(
       object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet1: View, newState: Int) {
@@ -276,7 +277,7 @@ class CommunitySelectorController @AssistedInject constructor(
             removeView = null
             onBackPressedHandler.remove()
           } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-            adapter.startLoading()
+//            adapter.startLoading()
           }
         }
 
@@ -666,6 +667,7 @@ class CommunitySelectorController @AssistedInject constructor(
         }
 
         h.itemView.setOnClickListener {
+          searchView.setText("")
           onCommunitySelectedListener?.invoke(
             this@CommunitySelectorController,
             item.communityRef,

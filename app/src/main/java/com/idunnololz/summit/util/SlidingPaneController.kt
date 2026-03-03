@@ -61,6 +61,7 @@ class SlidingPaneController(
   private var activeOpenPostJob: Job? = null
   private var activeClosePostJob: Job? = null
   private var lastPostFragment: PostFragment? = null
+  var lockNavBar = false
   var onPageSelectedListener: (isOpen: Boolean) -> Unit = {}
   var onPostOpen: (accountId: Long?, postView: PostView?) -> Unit = { _, _ -> }
   var panelSlideListener: SlidingPaneLayout.PanelSlideListener? = null
@@ -82,10 +83,12 @@ class SlidingPaneController(
         if (slidingPaneLayout.isSlideable) {
           fragment.getMainActivity()?.apply {
             val delta = panelOpenNavBarOpenPercent - panelClosedNavBarOpenPercent
-            setNavUiOpenPercent(
-              panelClosedNavBarOpenPercent + delta * (1f - slideOffset),
-              force = isSlideable,
-            )
+            if (!lockNavBar) {
+              setNavUiOpenPercent(
+                panelClosedNavBarOpenPercent + delta * (1f - slideOffset),
+                force = isSlideable,
+              )
+            }
           }
 
           slidingPaneLayout.getChildAt(0).alpha = 0.5f + (0.5f * slideOffset)

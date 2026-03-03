@@ -85,31 +85,3 @@ val trustManager by lazy {
   trustManagerFactory.trustManagers
     .first { it is X509TrustManager } as X509TrustManager
 }
-
-/**
- * If on [Build.VERSION_CODES.LOLLIPOP] or lower, sets [OkHttpClient.Builder.sslSocketFactory] to an instance of
- * [Tls12SocketFactory] that wraps the default [SSLContext.getSocketFactory] for [TlsVersion.TLS_1_2].
- *
- * Does nothing when called on [Build.VERSION_CODES.LOLLIPOP_MR1] or higher.
- *
- * For some reason, Android supports TLS v1.2 from [Build.VERSION_CODES.JELLY_BEAN], but the spec only has it
- * enabled by default from API [Build.VERSION_CODES.KITKAT]. Furthermore, some devices on
- * [Build.VERSION_CODES.LOLLIPOP] don't have it enabled, despite the spec saying they should.
- *
- * @return the (potentially modified) [OkHttpClient.Builder]
- */
-fun OkHttpClient.Builder.enableTls12(): OkHttpClient.Builder = apply {
-  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1) {
-    try {
-      val sslContext = SSLContext.getInstance(TlsVersion.TLS_1_2.javaName)
-      sslContext.init(null, arrayOf(trustManager), null)
-
-      sslSocketFactory(
-        Tls12SocketFactory(sslContext.socketFactory),
-        trustManager,
-      )
-    } catch (e: Exception) {
-      Log.e("Tls12SocketFactory", "Error while setting TLS 1.2 compatibility", e)
-    }
-  }
-}

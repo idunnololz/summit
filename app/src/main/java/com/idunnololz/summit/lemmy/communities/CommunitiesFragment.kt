@@ -293,7 +293,7 @@ class CommunitiesFragment : BaseFragment<FragmentCommunitiesBinding>() {
             text = description,
             instance = instance,
             highlight = null,
-            onImageClick = {},
+            onImageClick = { _, _ -> },
             onVideoClick = {},
             onPageClick = { _, _ -> },
             onLinkClick = { _, _, _ -> },

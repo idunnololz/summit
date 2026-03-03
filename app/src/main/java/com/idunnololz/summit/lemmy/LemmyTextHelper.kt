@@ -80,7 +80,7 @@ class LemmyTextHelper @Inject constructor(
     spannedText: Spanned? = null,
     highlight: HighlightTextData? = null,
     showMediaAsLinks: Boolean = false,
-    onImageClick: (url: String) -> Unit,
+    onImageClick: (url: String, peek: Boolean) -> Unit,
     onVideoClick: (url: String) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -96,7 +96,7 @@ class LemmyTextHelper @Inject constructor(
           if (isUrlVideo(url)) {
             onVideoClick(url)
           } else if (isUrlImage(url)) {
-            onImageClick(url)
+            onImageClick(url, false)
           } else if (pageRef != null) {
             onPageClick(url, pageRef)
           } else {
@@ -105,12 +105,18 @@ class LemmyTextHelper @Inject constructor(
           return true
         }
       }
-      onLinkLongClickListener = DefaultLinkLongClickListener(textView.context, onLinkLongClick)
+      onLinkLongClickListener = DefaultLinkLongClickListener(textView.context, { url, text ->
+        if (preferences.peekImagesOnLongPress && isUrlImage(url)) {
+          onImageClick(url, true)
+        } else {
+          onLinkLongClick(url, text)
+        }
+      })
       this.onImageClickListener = { url ->
         if (isUrlVideo(url)) {
           onVideoClick(url)
         } else {
-          onImageClick(url)
+          onImageClick(url, false)
         }
       }
     }

@@ -164,7 +164,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           binding.title,
           inboxItem.title,
           args.instance,
-          onImageClick = { url ->
+          onImageClick = { url, peek ->
             getMainActivity()?.openImage(
               sharedElement = null,
               appBar = binding.appBar,
@@ -172,6 +172,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               url = url,
               mimeType = null,
               downloadContext = null,
+              peek = peek,
             )
           },
           onVideoClick = { url ->
@@ -210,7 +211,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
       binding.content,
       inboxItem.content,
       args.instance,
-      onImageClick = { url ->
+      onImageClick = { url, peek ->
         getMainActivity()?.openImage(
           sharedElement = null,
           appBar = binding.appBar,
@@ -218,6 +219,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
           url = url,
           mimeType = null,
           downloadContext = null,
+          peek = peek,
         )
       },
       onVideoClick = { url ->
@@ -596,7 +598,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               accountId = null,
             )
           },
-          onImageClick = { _, view, url ->
+          onImageClick = { _, view, url, peek ->
             getMainActivity()?.openImage(
               sharedElement = view,
               appBar = binding.appBar,
@@ -604,6 +606,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
               url = url,
               mimeType = null,
               downloadContext = null,
+              peek = peek,
             )
           },
           onVideoClick = { _, url, videoType, state ->

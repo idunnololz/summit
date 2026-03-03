@@ -188,11 +188,8 @@ class MainApplication :
     }
     val pm = packageManager
     val options: List<ResolveInfo> =
-      if (SDK_INT >= Build.VERSION_CODES.M) {
-        pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-      } else {
-        pm.queryIntentActivities(intent, 0)
-      }.mapNotNull { it }
+      pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+        .mapNotNull { it }
 
     val option = options.filter {
       it.activityInfo.applicationInfo.packageName == defaultWebApp.packageName

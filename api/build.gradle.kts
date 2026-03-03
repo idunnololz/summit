@@ -10,7 +10,7 @@ android {
   namespace = "com.idunnololz.summit.api"
 
   defaultConfig {
-    minSdk = 21
+    minSdk = 23
 
     consumerProguardFiles("consumer-proguard-rules.txt")
   }

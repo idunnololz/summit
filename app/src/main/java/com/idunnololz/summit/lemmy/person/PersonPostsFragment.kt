@@ -89,7 +89,7 @@ class PersonPostsFragment :
           )
         }
       },
-      onImageClick = { _, postView, sharedElementView, url ->
+      onImageClick = { _, postView, sharedElementView, url, peek ->
         val altUrl = if (url == postView.post.thumbnail_url) {
           postView.post.url
         } else {
@@ -104,6 +104,7 @@ class PersonPostsFragment :
           mimeType = null,
           urlAlt = altUrl,
           downloadContext = postView.toFileDownloadContext(),
+          peek = peek,
         )
       },
       onVideoClick = { postView, url, videoType, state ->

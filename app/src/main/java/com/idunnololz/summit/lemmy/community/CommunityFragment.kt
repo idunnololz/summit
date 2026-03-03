@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -239,8 +240,10 @@ class CommunityFragment :
         when (menuItem.id) {
           R.id.sort_order_top ->
             getMainActivity()?.showBottomMenu(getSortByTopMenu())
+
           R.id.set_default_sort_order ->
             getMainActivity()?.showBottomMenu(getDefaultSortOrderSortByMenu())
+
           else ->
             idToSortOrder(menuItem.id)?.let {
               viewModel.setSortOrder(it)
@@ -273,6 +276,7 @@ class CommunityFragment :
         when (menuItem.id) {
           R.id.sort_order_top ->
             getMainActivity()?.showBottomMenu(getDefaultSortOrderSortByTopMenu())
+
           else ->
             idToSortOrder(menuItem.id)?.let {
               viewModel.setDefaultSortOrder(it)
@@ -374,7 +378,7 @@ class CommunityFragment :
             neutralButtonResId = R.string.go_to_account_instance
           }
         },
-        onImageClick = { accountId, postView, sharedElementView, url ->
+        onImageClick = { accountId, postView, sharedElementView, url, peek ->
           val altUrl = if (url == postView.post.thumbnail_url) {
             postView.post.url
           } else {
@@ -389,6 +393,7 @@ class CommunityFragment :
             mimeType = null,
             urlAlt = altUrl,
             downloadContext = postView.toFileDownloadContext(),
+            peek = peek,
           )
           moreActionsHelper.onPostRead(
             postView = postView,
@@ -845,6 +850,7 @@ class CommunityFragment :
           }
 
           override fun onPanelOpened(panel: View) {
+            lastOffset = 0
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE,
@@ -853,6 +859,7 @@ class CommunityFragment :
           }
 
           override fun onPanelClosed(panel: View) {
+            lastOffset = 0
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.UNLOCKED,
@@ -1352,6 +1359,16 @@ class CommunityFragment :
       }
     }
 
+    if (slidingPaneLayout.isOpen && slidingPaneLayout.isSlideable) {
+      (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
+        OverlappingPanelsLayout.LockState.CLOSE,
+      )
+    } else {
+      (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
+        OverlappingPanelsLayout.LockState.UNLOCKED,
+      )
+    }
+
     runAfterLayout {
       adapter?.contentMaxWidth = binding.recyclerView.width
     }
@@ -1435,6 +1452,7 @@ class CommunityFragment :
 
     return _sortByMenu
   }
+
   private fun getSortByTopMenu(): BottomMenu {
     _sortByTopMenu.setChecked(viewModel.getCurrentSortOrder().toApiSortOrder().toId())
 
@@ -1446,6 +1464,7 @@ class CommunityFragment :
       is CommunitySortOrder.TopOrder -> _defaultSortOrderSortByMenu.setChecked(
         R.id.sort_order_top,
       )
+
       else -> _defaultSortOrderSortByMenu.setChecked(
         viewModel.getCurrentSortOrder().toApiSortOrder().toId(),
       )
@@ -1453,6 +1472,7 @@ class CommunityFragment :
 
     return _defaultSortOrderSortByMenu
   }
+
   private fun getDefaultSortOrderSortByTopMenu(): BottomMenu {
     _defaultSortOrderSortByTopMenu.setChecked(
       viewModel.getCurrentSortOrder().toApiSortOrder().toId(),
@@ -1465,22 +1485,31 @@ class CommunityFragment :
     when (preferences.getPostsLayout()) {
       CommunityLayout.Compact ->
         _layoutSelectorMenu.setChecked(R.id.layout_compact)
+
       CommunityLayout.List ->
         _layoutSelectorMenu.setChecked(R.id.layout_list)
+
       CommunityLayout.LargeList ->
         _layoutSelectorMenu.setChecked(R.id.layout_large_list)
+
       CommunityLayout.Card ->
         _layoutSelectorMenu.setChecked(R.id.layout_card)
+
       CommunityLayout.Card2 ->
         _layoutSelectorMenu.setChecked(R.id.layout_card2)
+
       CommunityLayout.Card3 ->
         _layoutSelectorMenu.setChecked(R.id.layout_card3)
+
       CommunityLayout.Full ->
         _layoutSelectorMenu.setChecked(R.id.layout_full)
+
       CommunityLayout.ListWithCards ->
         _layoutSelectorMenu.setChecked(R.id.layout_list_with_card)
+
       CommunityLayout.FullWithCards ->
         _layoutSelectorMenu.setChecked(R.id.layout_full_with_card)
+
       CommunityLayout.SmartList ->
         _layoutSelectorMenu.setChecked(R.id.layout_smart_list)
     }
@@ -1535,6 +1564,7 @@ class CommunityFragment :
             icon = R.drawable.ic_default_community,
           )
         }
+
         is CommunityRef.ModeratedCommunities -> {
           addItemWithIcon(
             id = R.id.feed_info,
@@ -1542,6 +1572,7 @@ class CommunityFragment :
             icon = R.drawable.baseline_dynamic_feed_24,
           )
         }
+
         is CommunityRef.MultiCommunity -> {
           addItemWithIcon(
             id = R.id.community_info,
@@ -1549,6 +1580,7 @@ class CommunityFragment :
             icon = R.drawable.baseline_dynamic_feed_24,
           )
         }
+
         is CommunityRef.Subscribed -> {
           addItemWithIcon(
             id = R.id.feed_info,
@@ -1556,6 +1588,7 @@ class CommunityFragment :
             icon = R.drawable.baseline_dynamic_feed_24,
           )
         }
+
         is CommunityRef.AllSubscribed -> {
           addItemWithIcon(
             id = R.id.feed_info,
@@ -1563,10 +1596,11 @@ class CommunityFragment :
             icon = R.drawable.baseline_dynamic_feed_24,
           )
         }
+
         is CommunityRef.Local,
         is CommunityRef.All,
         null,
-        -> {
+          -> {
           addItemWithIcon(
             id = R.id.community_info,
             title = R.string.instance_info,
@@ -1627,11 +1661,11 @@ class CommunityFragment :
         addItemWithIcon(
           id = R.id.search,
           title =
-          if (currentCommunityRef is CommunityRef.CommunityRefByName) {
-            getString(R.string.search_in_format, currentCommunityRef.getName(context))
-          } else {
-            getString(R.string.search)
-          },
+            if (currentCommunityRef is CommunityRef.CommunityRefByName) {
+              getString(R.string.search_in_format, currentCommunityRef.getName(context))
+            } else {
+              getString(R.string.search)
+            },
           icon = R.drawable.baseline_search_24,
         )
       }
@@ -1774,6 +1808,7 @@ class CommunityFragment :
 //                                R.drawable.baseline_home_24,
 //                            )
             }
+
             NavBarDestinations.Saved -> {
               addItemWithIcon(
                 R.id.filteredPostsAndCommentsTabbedFragment,
@@ -1781,6 +1816,7 @@ class CommunityFragment :
                 R.drawable.baseline_bookmark_24,
               )
             }
+
             NavBarDestinations.Search -> {
               addItemWithIcon(
                 R.id.searchHomeFragment,
@@ -1788,6 +1824,7 @@ class CommunityFragment :
                 R.drawable.baseline_search_24,
               )
             }
+
             NavBarDestinations.History -> {
               addItemWithIcon(
                 R.id.historyFragment,
@@ -1795,6 +1832,7 @@ class CommunityFragment :
                 R.drawable.baseline_history_24,
               )
             }
+
             NavBarDestinations.Inbox -> {
               addItemWithIcon(
                 R.id.inboxTabbedFragment,
@@ -1802,6 +1840,7 @@ class CommunityFragment :
                 R.drawable.baseline_inbox_24,
               )
             }
+
             NavBarDestinations.You -> {
               addItemWithIcon(
                 R.id.youFragment,
@@ -1809,6 +1848,7 @@ class CommunityFragment :
                 R.drawable.outline_account_circle_24,
               )
             }
+
             NavBarDestinations.Profile -> {
               addItemWithIcon(
                 R.id.personTabbedFragment2,
@@ -1816,6 +1856,7 @@ class CommunityFragment :
                 R.drawable.outline_account_circle_24,
               )
             }
+
             NavBarDestinations.None -> {
             }
           }
@@ -1843,6 +1884,7 @@ class CommunityFragment :
           is CommunityRef.CommunityRefByName -> {
             communityName = currentCommunity.name
           }
+
           is CommunityRef.Local -> {}
           is CommunityRef.Subscribed -> {}
           is CommunityRef.MultiCommunity -> {}
@@ -1857,6 +1899,7 @@ class CommunityFragment :
           communityName = communityName,
         )
       }
+
       R.id.ca_share -> {
         try {
           val sendIntent: Intent = Intent().apply {
@@ -1876,13 +1919,15 @@ class CommunityFragment :
           }
         }
       }
+
       R.id.hide_read_on,
       R.id.hide_read_off,
       R.id.hide_read,
-      -> {
+        -> {
         val anchors = mutableSetOf<Int>()
         val range = (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
-          it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size ?: it.findLastVisibleItemPosition())
+          it.findFirstCompletelyVisibleItemPosition()..(adapter?.items?.size
+            ?: it.findLastVisibleItemPosition())
         }
         range?.mapNotNullTo(anchors) {
           (adapter?.items?.getOrNull(it) as? PostListEngineItem.VisiblePostItem)
@@ -1903,11 +1948,13 @@ class CommunityFragment :
       R.id.sort -> {
         getMainActivity()?.showBottomMenu(getSortByMenu())
       }
+
       R.id.community_admin_tools -> {
         if (currentCommunityRef is CommunityRef.CommunityRefByName) {
           ModActionsDialogFragment.show(currentCommunityRef, childFragmentManager)
         }
       }
+
       R.id.set_as_default -> {
         currentCommunityRef ?: return@a
         viewModel.setDefaultPage(currentCommunityRef)
@@ -1918,13 +1965,14 @@ class CommunityFragment :
           Snackbar.LENGTH_LONG,
         ).show()
       }
+
       R.id.layout -> {
         getMainActivity()?.showBottomMenu(getLayoutMenu())
       }
 
       R.id.feed_info,
       R.id.community_info,
-      -> {
+        -> {
         currentCommunityRef ?: return@a
         getMainActivity()?.showCommunityInfo(currentCommunityRef)
       }
@@ -1941,13 +1989,14 @@ class CommunityFragment :
           when (currentCommunityRef) {
             is CommunityRef.CommunityRefByName ->
               viewModel.postListEngine.getCommunityIcon()
+
             is CommunityRef.All,
             is CommunityRef.Local,
             is CommunityRef.ModeratedCommunities,
             is CommunityRef.MultiCommunity,
             is CommunityRef.Subscribed,
             is CommunityRef.AllSubscribed,
-            -> null
+              -> null
           },
         )
       }
@@ -1974,12 +2023,15 @@ class CommunityFragment :
           userCommunitiesManager.removeCommunity(currentCommunityRef)
         }
       }
+
       R.id.browse_communities -> {
         communityAppBarController?.showCommunitySelector()
       }
+
       R.id.settings -> {
         requireSummitActivity().openSettings()
       }
+
       R.id.create_multi_community -> {
         MultiCommunityEditorDialogFragment.show(
           childFragmentManager,
@@ -1990,31 +2042,39 @@ class CommunityFragment :
           ),
         )
       }
+
       R.id.mainFragment -> {
         getMainActivity()?.navigateTopLevel(actionId)
       }
+
       R.id.filteredPostsAndCommentsTabbedFragment -> {
         getMainActivity()?.navigateTopLevel(actionId)
       }
+
       R.id.searchHomeFragment -> {
         getMainActivity()?.navigateTopLevel(actionId)
       }
+
       R.id.historyFragment -> {
         getMainActivity()?.navigateTopLevel(actionId)
       }
+
       R.id.inboxTabbedFragment -> {
         getMainActivity()?.navigateTopLevel(actionId)
       }
+
       R.id.back_to_the_beginning -> {
         backToBeginning()
       }
+
       R.id.per_community_settings -> {
         currentCommunityRef ?: return@a
         showPerCommunitySettings(currentCommunityRef)
       }
+
       R.id.subscribe,
       R.id.unsubscribe,
-      -> {
+        -> {
         if (currentCommunityRef is CommunityRef.CommunityRefByName) {
           moreActionsHelper.updateSubscription(
             currentCommunityRef,
@@ -2022,10 +2082,11 @@ class CommunityFragment :
           )
         }
       }
+
       R.id.enable_nsfw_mode,
       R.id.disable_nsfw_mode,
       R.id.toggle_nsfw_mode,
-      -> {
+        -> {
         val newValue = if (actionId == R.id.enable_nsfw_mode) {
           true
         } else if (actionId == R.id.disable_nsfw_mode) {
@@ -2039,28 +2100,34 @@ class CommunityFragment :
         adapter?.updateNsfwMode(nsfwModeManager)
         viewModel.recheckNsfwMode()
       }
+
       R.id.make_available_offline -> {
         if (currentCommunityRef != null) {
           MakeOfflineDialogFragment.newInstance(currentCommunityRef)
             .show(childFragmentManager, "MakeOfflineDialogFragment")
         }
       }
+
       R.id.go_to -> {
         GoToDialogFragment.show(childFragmentManager)
       }
+
       R.id.block_community -> {
         if (currentCommunityRef is CommunityRef.CommunityRefByName) {
           moreActionsHelper.blockCommunity(currentCommunityRef, true)
         }
       }
+
       R.id.unblock_community -> {
         if (currentCommunityRef is CommunityRef.CommunityRefByName) {
           moreActionsHelper.blockCommunity(currentCommunityRef, false)
         }
       }
+
       R.id.give_feedback -> {
         showHelpAndFeedbackOptions()
       }
+
       R.id.create_a_new_community -> {
         getMainActivity()?.showCreateCommunityScreen()
       }
@@ -2119,9 +2186,11 @@ class CommunityFragment :
 
             getMainActivity()?.showBottomMenu(layoutMenu, expandFully = false)
           }
+
           R.id.sort_order -> {
             getMainActivity()?.showBottomMenu(getDefaultSortOrderSortByMenu())
           }
+
           R.id.reset_settings -> {
             perCommunityPreferences.setCommunityConfig(currentCommunityRef, null)
             onSelectedLayoutChanged()
@@ -2209,22 +2278,31 @@ class CommunityFragment :
         when (menuItem.id) {
           R.id.layout_compact ->
             onLayoutSelected(CommunityLayout.Compact)
+
           R.id.layout_list ->
             onLayoutSelected(CommunityLayout.List)
+
           R.id.layout_large_list ->
             onLayoutSelected(CommunityLayout.LargeList)
+
           R.id.layout_card ->
             onLayoutSelected(CommunityLayout.Card)
+
           R.id.layout_card2 ->
             onLayoutSelected(CommunityLayout.Card2)
+
           R.id.layout_card3 ->
             onLayoutSelected(CommunityLayout.Card3)
+
           R.id.layout_full ->
             onLayoutSelected(CommunityLayout.Full)
+
           R.id.layout_list_with_card ->
             onLayoutSelected(CommunityLayout.ListWithCards)
+
           R.id.layout_full_with_card ->
             onLayoutSelected(CommunityLayout.FullWithCards)
+
           R.id.layout_smart_list ->
             onLayoutSelected(CommunityLayout.SmartList)
         }
@@ -2274,4 +2352,25 @@ class CommunityFragment :
         perCommunityPreferences.getCommunityConfig(it)
       }?.layout ?: preferences.getPostsLayout()
     }
+
+  private var lastOffset = 0
+  fun setPanelOffset(offset: Float) {
+    if (!isBindingAvailable()) return
+//    if (binding.slidingPaneLayout.isSlideable) {
+//      val diff = offset - lastOffset
+//      (binding.postFragmentContainer.parent as? View)?.offsetLeftAndRight(diff)
+//
+//
+//      lastOffset = offset
+//    }
+    binding.slidingPaneLayout.smoothSlideTo(offset)
+  }
+
+  fun lockNavBar() {
+    slidingPaneController?.lockNavBar = true
+  }
+
+  fun unlockNavBar() {
+    slidingPaneController?.lockNavBar = false
+  }
 }

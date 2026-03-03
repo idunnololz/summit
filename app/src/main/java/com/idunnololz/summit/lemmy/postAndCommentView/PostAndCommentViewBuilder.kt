@@ -97,6 +97,7 @@ import com.idunnololz.summit.links.supportsDownvotes
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.CommentHeaderLayoutId
 import com.idunnololz.summit.preferences.CommentQuickActionIds
+import com.idunnololz.summit.preferences.CommentQuickActionIds.EditComment
 import com.idunnololz.summit.preferences.CommentQuickActionsSettings
 import com.idunnololz.summit.preferences.GlobalFontSizeId
 import com.idunnololz.summit.preferences.PostQuickActionIds
@@ -335,7 +336,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     postHeaderInfo: PostHeaderInfo,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
-    onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
+    onImageClick: (Either<PostView, CommentView>, View?, String, peek: Boolean) -> Unit,
     onVideoClick: (
       Either<PostView, CommentView>,
       url: String,
@@ -355,6 +356,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     val showCommunityIcon = postInListUiConfig.showCommunityIcon
     val useMultilineHeader = showCommunityIcon
     val isUserMod = currentAccountInfo?.isMod(postView.post.community_id) == true
+    val isCurrentUser = currentUser?.id == postView.creator.id &&
+      currentUser?.instance == postView.creator.instance
 
     val viewHolder =
       root.getTag(R.id.view_holder) as? PostViewHolder
@@ -394,6 +397,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         showUpAndDownVotes = postShowUpAndDownVotes,
         actions = listOf(PostQuickActionIds.Voting),
         isSaved = postView.saved,
+        canEdit = isCurrentUser,
         fullWidth = false,
       )
     } else {
@@ -403,6 +407,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         showUpAndDownVotes = postShowUpAndDownVotes,
         actions = postQuickActions.actions + PostQuickActionIds.More,
         isSaved = postView.saved,
+        canEdit = isCurrentUser,
         fullWidth = false,
       )
     }
@@ -423,8 +428,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       useMultilineHeader = useMultilineHeader,
       wrapHeader = useMultilinePostHeaders && !useMultilineHeader,
       isCurrentUser = if (indicateCurrentUser) {
-        currentUser?.id == postView.creator.id &&
-          currentUser?.instance == postView.creator.instance
+        isCurrentUser
       } else {
         false
       },
@@ -479,8 +483,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         } else {
           highlightTextData?.copy(matchIndex = null)
         },
-        onImageClick = {
-          onImageClick(Either.Left(postView), null, it)
+        onImageClick = { url, peek ->
+          onImageClick(Either.Left(postView), null, url, peek)
         },
         onVideoClick = { url ->
           onVideoClick(Either.Left(postView), url, VideoType.Unknown, null)
@@ -548,10 +552,10 @@ class PostAndCommentViewBuilder @Inject constructor(
       screenshotConfig = screenshotConfig,
       contentSpannable = contentSpannable,
       onFullImageViewClickListener = { view, url ->
-        onImageClick(Either.Left(postView), view, url)
+        onImageClick(Either.Left(postView), view, url, false)
       },
-      onImageClickListener = { url ->
-        onImageClick(Either.Left(postView), null, url)
+      onImageClickListener = { url, peek ->
+        onImageClick(Either.Left(postView), null, url, peek)
       },
       onVideoClickListener = { url, videoType, videoState ->
         onVideoClick(Either.Left(postView), url, videoType, videoState)
@@ -811,7 +815,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     isActionsExpanded: Boolean,
     highlightTextData: HighlightTextData?,
     commentHeaderInfo: CommentHeaderInfo,
-    onImageClick: (Either<PostView, CommentView>, View?, String) -> Unit,
+    onImageClick: (Either<PostView, CommentView>, View?, String, peek: Boolean) -> Unit,
     onVideoClick: (
       Either<PostView, CommentView>,
       url: String,
@@ -833,6 +837,8 @@ class PostAndCommentViewBuilder @Inject constructor(
       showProfileIcons || commentHeaderLayout == CommentHeaderLayoutId.Multiline
     val isActionsExpanded = isActionsExpanded || !preferences.hideCommentActions
     val isUserMod = currentAccountInfo?.isMod(commentView.post.community_id) == true
+    val isCurrentUser = currentUser?.id == commentView.creator.id &&
+        currentUser?.instance == commentView.creator.instance
 
     with(holder) {
       if (holder.state.preferUpAndDownVotes != commentShowUpAndDownVotes) {
@@ -872,6 +878,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           vh = this,
           root = root,
           isSaved = commentView.saved,
+          canEdit = isCurrentUser,
           fullWidth = false,
         )
       } else {
@@ -879,6 +886,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           vh = this,
           root = root,
           isSaved = commentView.saved,
+          canEdit = isCurrentUser,
           removeOnly = true,
         )
       }
@@ -904,8 +912,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       useCondensedTypeface = useCondensedTypefaceForCommentHeaders,
       wrapHeader = commentHeaderLayout == CommentHeaderLayoutId.Wrap || wrapCommentHeader,
       isCurrentUser = if (indicateCurrentUser) {
-        currentUser?.id == commentView.creator.id &&
-          currentUser?.instance == commentView.creator.instance
+        isCurrentUser
       } else {
         false
       },
@@ -963,8 +970,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         spannedText = contentSpannable,
         instance = instance,
         highlight = highlightTextData,
-        onImageClick = {
-          onImageClick(Either.Right(commentView), null, it)
+        onImageClick = { url, peek ->
+          onImageClick(Either.Right(commentView), null, url, peek)
         },
         onVideoClick = { url ->
           onVideoClick(Either.Right(commentView), url, VideoType.Unknown, null)
@@ -1359,7 +1366,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     highlight: Boolean,
     highlightForever: Boolean,
     highlightTintColor: Int?,
-    onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
+    onImageClick: (Either<PostView, CommentView>?, View?, String, peek: Boolean) -> Unit,
     onVideoClick: (
       Either<PostView, CommentView>?,
       url: String,
@@ -1400,8 +1407,8 @@ class PostAndCommentViewBuilder @Inject constructor(
       textView = text,
       text = content,
       instance = instance,
-      onImageClick = {
-        onImageClick(null, null, it)
+      onImageClick = { url, peek ->
+        onImageClick(null, null, url, peek)
       },
       onVideoClick = { url ->
         onVideoClick(null, url, VideoType.Unknown, null)
@@ -1485,7 +1492,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     instance: String,
     accountId: PersonId?,
     item: InboxItem,
-    onImageClick: (String) -> Unit,
+    onImageClick: (String, peek: Boolean) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onMarkAsRead: (View, InboxItem, Boolean) -> Unit,
@@ -1700,8 +1707,8 @@ class PostAndCommentViewBuilder @Inject constructor(
       textView = b.title,
       text = title,
       instance = instance,
-      onImageClick = {
-        onImageClick(it)
+      onImageClick = { url, peek ->
+        onImageClick(url, peek)
       },
       onVideoClick = { url ->
         onVideoClick(url, VideoType.Unknown, null)
@@ -1742,8 +1749,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         text = item.content,
         instance = instance,
         showMediaAsLinks = true,
-        onImageClick = {
-          onImageClick(it)
+        onImageClick = { url, peek ->
+          onImageClick(url, peek)
         },
         onVideoClick = { url ->
           onVideoClick(url, VideoType.Unknown, null)
@@ -1808,7 +1815,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     b: InboxListRegistrationApplicationItemBinding,
     instance: String,
     item: InboxItem.RegistrationApplicationInboxItem,
-    onImageClick: (String) -> Unit,
+    onImageClick: (String, peek: Boolean) -> Unit,
     onVideoClick: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onPageClick: (url: String, PageRef) -> Unit,
     onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,
@@ -1915,8 +1922,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         text = context.getString(R.string.reason_format, item.denyReason),
         instance = instance,
         showMediaAsLinks = true,
-        onImageClick = {
-          onImageClick(it)
+        onImageClick = { url, peek ->
+          onImageClick(url, peek)
         },
         onVideoClick = { url ->
           onVideoClick(url, VideoType.Unknown, null)
@@ -1957,8 +1964,8 @@ class PostAndCommentViewBuilder @Inject constructor(
         text = item.content,
         instance = instance,
         showMediaAsLinks = true,
-        onImageClick = {
-          onImageClick(it)
+        onImageClick = { url, peek ->
+          onImageClick(url, peek)
         },
         onVideoClick = { url ->
           onVideoClick(url, VideoType.Unknown, null)
@@ -2059,6 +2066,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     vh: QuickActionsViewHolder,
     root: ViewGroup,
     isSaved: Boolean,
+    canEdit: Boolean,
     removeOnly: Boolean = false,
     fullWidth: Boolean = true,
   ) {
@@ -2069,6 +2077,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       actions = commentQuickActions.actions + CommentQuickActionIds.More,
       removeOnly = removeOnly,
       isSaved = isSaved,
+      canEdit = canEdit,
       fullWidth = fullWidth,
     )
   }
@@ -2079,6 +2088,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     showUpAndDownVotes: Boolean,
     actions: List<Int>,
     isSaved: Boolean,
+    canEdit: Boolean,
     removeOnly: Boolean = false,
     fullWidth: Boolean = true,
   ) {
@@ -2089,6 +2099,13 @@ class PostAndCommentViewBuilder @Inject constructor(
 
     quickActionsBar?.let {
       if (it.parent != null && it.tag == actions && it.getTag(R.id.is_saved) == isSaved) {
+
+        if (actions.contains(R.id.ca_edit_comment)) {
+          it.findViewById<ImageView>(R.id.ca_edit_comment)?.apply {
+            isEnabled = canEdit
+          }
+        }
+
         return
       }
 
@@ -2303,6 +2320,14 @@ class PostAndCommentViewBuilder @Inject constructor(
             setImageResource(R.drawable.baseline_open_in_full_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
+          }
+        }
+        EditComment -> {
+          makeQuickActionButton(R.id.ca_edit_comment).apply {
+            setImageResource(R.drawable.baseline_edit_24)
+            quickActionsBar.addView(this)
+            actionButtons.add(this)
+            isEnabled = canEdit
           }
         }
         PostQuickActionIds.More -> {

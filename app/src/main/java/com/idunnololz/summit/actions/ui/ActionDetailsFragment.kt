@@ -105,7 +105,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
         context = context,
         currentInstance = apiClient.instance,
         lemmyTextHelper = lemmyTextHelper,
-        onImageClick = { url ->
+        onImageClick = { url, peek ->
           getMainActivity()?.openImage(
             sharedElement = null,
             appBar = null,
@@ -113,6 +113,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
             downloadContext = null,
             url = url,
             mimeType = null,
+            peek = peek,
           )
         },
         onVideoClick = { url ->
@@ -242,7 +243,7 @@ class ActionDetailsFragment : BaseFragment<DialogFragmentActionDetailsBinding>()
     private val context: Context,
     private val currentInstance: String,
     private val lemmyTextHelper: LemmyTextHelper,
-    private val onImageClick: (url: String) -> Unit,
+    private val onImageClick: (url: String, peek: Boolean) -> Unit,
     private val onVideoClick: (url: String) -> Unit,
     private val onPageClick: (url: String, PageRef) -> Unit,
     private val onLinkClick: (url: String, text: String, linkContext: LinkContext) -> Unit,

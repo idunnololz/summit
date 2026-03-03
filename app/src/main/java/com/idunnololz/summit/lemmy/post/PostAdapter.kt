@@ -2,6 +2,7 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.text.Spanned
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -89,7 +90,7 @@ class PostAdapter(
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-  private val onImageClick: (Either<PostView, CommentView>?, View?, String) -> Unit,
+  private val onImageClick: (Either<PostView, CommentView>?, View?, String, peek: Boolean) -> Unit,
   private val onVideoClick: (
     Either<PostView, CommentView>?,
     String,
@@ -446,7 +447,7 @@ class PostAdapter(
             contentMaxWidth
           }
           val onImageClick = if (isScreenshotting) {
-            { _, _, _ -> }
+            { _, _, _, _ -> }
           } else {
             onImageClick
           }
@@ -546,7 +547,7 @@ class PostAdapter(
           contentMaxWidth
         }
         val onImageClick = if (isScreenshotting) {
-          { _, _, _ -> }
+          { _, _, _, _ -> }
         } else {
           onImageClick
         }
@@ -1124,6 +1125,7 @@ class PostAdapter(
 
     val finalItems = mutableListOf<Item>()
     finalItems += Item.FirstItem
+    absolutionPositionToTopLevelCommentPosition += -1
 
     val changed = if (autoCollapseComments) {
       autoCollapseComments(rawData.commentTree)
@@ -1151,6 +1153,7 @@ class PostAdapter(
         accountInstance = rawData.accountInstance,
         postInstance = postView.post.instance,
       )
+      absolutionPositionToTopLevelCommentPosition += -1
     }
 
     finalItems += HeaderItem(
@@ -1168,7 +1171,6 @@ class PostAdapter(
       highlight = highlightPostForever,
       postHeaderInfo = postView.postHeaderInfo,
     )
-
     absolutionPositionToTopLevelCommentPosition += -1
 
     if (rawData.isSingleCommentChain) {

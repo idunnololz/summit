@@ -43,13 +43,6 @@ public class PrecomputedTextSetterCompat implements Markwon.TextSetter {
             @NonNull final TextView.BufferType bufferType,
             @NonNull final Runnable onComplete) {
 
-        // insert version check and do not execute on a device < 21
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            // it's still no-op, so there is no need to start background execution
-            applyText(textView, markdown, bufferType, onComplete);
-            return;
-        }
-
         final WeakReference<TextView> reference = new WeakReference<>(textView);
         executor.execute(new Runnable() {
             @Override
@@ -88,12 +81,10 @@ public class PrecomputedTextSetterCompat implements Markwon.TextSetter {
             // please note that text-direction initialization is omitted
             // by default it will be determined by the first locale-specific character
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                // another miss on API surface, this can easily be done by the compat class itself
-                builder
-                        .setBreakStrategy(textView.getBreakStrategy())
-                        .setHyphenationFrequency(textView.getHyphenationFrequency());
-            }
+            // another miss on API surface, this can easily be done by the compat class itself
+            builder
+                    .setBreakStrategy(textView.getBreakStrategy())
+                    .setHyphenationFrequency(textView.getHyphenationFrequency());
 
             params = builder.build();
         }

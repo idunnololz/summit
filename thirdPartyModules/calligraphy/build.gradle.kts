@@ -8,7 +8,7 @@ android {
   namespace = "io.github.inflationx.calligraphy3"
 
   defaultConfig {
-    minSdk = 21
+    minSdk = 23
 
     consumerProguardFiles("consumer-proguard-rules.txt")
   }

@@ -124,7 +124,7 @@ class LemmyContentHelper(
     contentSpannable: Spanned? = null,
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
     onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
-    onImageClickListener: (url: String) -> Unit,
+    onImageClickListener: (url: String, peek: Boolean) -> Unit,
     onVideoClickListener: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
     onItemClickListener: () -> Unit,
@@ -206,7 +206,11 @@ class LemmyContentHelper(
       if (imageUrl != null) {
         fullImageView.visibility = View.VISIBLE
         fullImageView.setOnLongClickListener {
-          onLinkLongClick(imageUrl, null)
+          if (preferences.peekImagesOnLongPress) {
+            onImageClickListener(imageUrl, true)
+          } else {
+            onLinkLongClick(imageUrl, null)
+          }
           true
         }
 
@@ -267,7 +271,7 @@ class LemmyContentHelper(
       imageView.load(null)
 
       if (!previewInfo?.getUrl().isNullOrBlank()) {
-        val url = checkNotNull(previewInfo).getUrl()
+        val url = previewInfo.getUrl()
         offlineManager.fetchImage(imageView, url) {
           offlineManager.getImageSizeHint(it, tempSize)
 
@@ -282,7 +286,11 @@ class LemmyContentHelper(
             onFullImageViewClickListener(it, previewInfo.getUrl())
           }
           imageView.setOnLongClickListener {
-            onLinkLongClick(previewInfo.getUrl(), null)
+            if (preferences.peekImagesOnLongPress) {
+              onImageClickListener(previewInfo.getUrl(), true)
+            } else {
+              onLinkLongClick(previewInfo.getUrl(), null)
+            }
             true
           }
         }
@@ -309,7 +317,7 @@ class LemmyContentHelper(
         if (pageRef != null) {
           onLemmyUrlClick(url, pageRef)
         } else if (isUrlImage(url)) {
-          onImageClickListener(url)
+          onImageClickListener(url, false)
         } else if (uri.path?.endsWith(".gifv") == true ||
           uri.path?.endsWith(".mp4") == true
         ) {
@@ -334,7 +342,7 @@ class LemmyContentHelper(
             onLinkClick(thumbnailUrl, null, LinkContext.Rich)
           }
         } else if (uri.host == "imgur.com") {
-          onImageClickListener(url)
+          onImageClickListener(url, false)
         } else {
           onLinkClick(url, null, LinkContext.Rich)
         }
@@ -367,7 +375,11 @@ class LemmyContentHelper(
       fullImageView.dispose()
       fullImageView.setImageDrawable(null)
       fullImageView.setOnLongClickListener {
-        onLinkLongClick(imageUrl, null)
+        if (preferences.peekImagesOnLongPress) {
+          onImageClickListener(imageUrl, true)
+        } else {
+          onLinkLongClick(imageUrl, null)
+        }
         true
       }
 

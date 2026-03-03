@@ -160,6 +160,9 @@
             app:argType="string"
             app:nullable="true" />
         <argument
+            android:name="peek"
+            app:argType="boolean" />
+        <argument
             android:name="downloadContext"
             app:argType="com.idunnololz.summit.util.FileDownloadContext"
             app:nullable="true" />

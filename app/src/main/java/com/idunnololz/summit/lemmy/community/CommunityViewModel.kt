@@ -192,6 +192,9 @@ class CommunityViewModel @Inject constructor(
 
       preferences = preferenceManager.updateCurrentPreferences(newAccount)
 
+      postListEngine.clear()
+      postListEngine.createItems()
+
       withContext(Dispatchers.Main) {
         recheckPreferences()
         recheckNsfwMode()
@@ -281,8 +284,6 @@ class CommunityViewModel @Inject constructor(
     viewModelScope.launch {
       accountManager.currentAccountOnChange.collect {
         withContext(Dispatchers.Main) {
-          postListEngine.clear()
-          postListEngine.createItems()
           pagePositions.clear()
 
           loadedPostsData.setValue(PostUpdateInfo())

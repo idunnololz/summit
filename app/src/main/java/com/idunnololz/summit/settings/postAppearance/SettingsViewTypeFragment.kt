@@ -21,7 +21,7 @@ import com.idunnololz.summit.databinding.PostAppearanceDemoCardBinding
 import com.idunnololz.summit.lemmy.community.CommunityLayout
 import com.idunnololz.summit.lemmy.postListView.ListingItemViewHolder
 import com.idunnololz.summit.lemmy.postListView.PostListViewBuilder
-import com.idunnololz.summit.lemmy.postListView.defaultDimReadPosts
+import com.idunnololz.summit.lemmy.postListView.defaultReadPostStyle
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.settings.BaseSettingsFragment
 import com.idunnololz.summit.settings.BasicSettingItem
@@ -229,17 +229,15 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
         updateRendering()
       },
     ),
-    settings.dimReadPosts.asOnOffSwitch(
-      {
-        viewModel.currentPostUiConfig.dimReadPosts
-          ?: preferences.getPostsLayout().defaultDimReadPosts
-      },
+    settings.readPostStyle.asSingleChoiceSelectorItem(
+      { viewModel.currentPostUiConfig.readPostStyle
+        ?: preferences.getPostsLayout().defaultReadPostStyle},
       {
         viewModel.currentPostUiConfig =
-          viewModel.currentPostUiConfig.copy(dimReadPosts = it)
+          viewModel.currentPostUiConfig.copy(readPostStyle = it)
 
         updateRendering()
-      },
+      }
     ),
     settings.preferTextPreviewIcon.asOnOffSwitch(
       {
@@ -368,7 +366,7 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
         isDuplicatePost = false,
         postHeaderInfo = fetchedPost.postView.toPostHeaderInfo(context),
         onRevealContentClickedFn = {},
-        onImageClick = { _, _, _, _ -> },
+        onImageClick = { _, _, _, _, _ -> },
         onVideoClick = { _, _, _ -> },
         onVideoLongClickListener = { _ -> },
         onPageClick = { _, _, _ -> },
