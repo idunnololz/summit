@@ -73,6 +73,8 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlinx.coroutines.launch
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
+import com.idunnololz.summit.lemmy.utils.actions.DownloadAndShareFileListener
 
 @AndroidEntryPoint
 class ImageViewerActivity :
@@ -129,6 +131,13 @@ class ImageViewerActivity :
   lateinit var peekImageManager: PeekImageManager
 
   private var isImageLoaded = false
+
+  private val downloadAndShareFileListener = object : DownloadAndShareFileListener {
+    override fun onComplete(fileUri: Uri): Boolean {
+      showShareSheetForImage(this@ImageViewerActivity, fileUri)
+      return true
+    }
+  }
 
   override val context: Context
     get() = this
@@ -293,6 +302,7 @@ class ImageViewerActivity :
       supportFinishAfterTransition()
     }
 
+    moreActionsHelper.addDownloadAndShareFileListener(downloadAndShareFileListener)
     moreActionsHelper.downloadAndShareFile.observe(this) {
       when (it) {
         is StatefulData.Error -> {
@@ -304,9 +314,7 @@ class ImageViewerActivity :
         }
         is StatefulData.Loading -> {}
         is StatefulData.NotStarted -> {}
-        is StatefulData.Success -> {
-          showShareSheetForImage(this, it.data)
-        }
+        is StatefulData.Success -> {}
       }
     }
 
@@ -551,6 +559,7 @@ class ImageViewerActivity :
 
   override fun onDestroy() {
     showSystemUI()
+    moreActionsHelper.removeDownloadAndShareFileListener(downloadAndShareFileListener)
     super.onDestroy()
   }
 
@@ -572,7 +581,7 @@ class ImageViewerActivity :
       100,
     )
 
-    val uri = Uri.parse(url)
+    val uri = url.toUri()
     if (uri.host == "imgur.com" &&
       !forceLoadAsImage &&
       uri.encodedPath?.endsWith(".png") != true

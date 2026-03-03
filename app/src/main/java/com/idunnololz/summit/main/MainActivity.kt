@@ -66,6 +66,7 @@ import com.idunnololz.summit.lemmy.community.CommunityFragmentArgs
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.multicommunity.MultiCommunityEditorDialogFragment
 import com.idunnololz.summit.lemmy.post.PostFragmentArgs
+import com.idunnololz.summit.lemmy.utils.actions.DownloadAndShareFileListener
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.getFeedbackScreenshotFile
 import com.idunnololz.summit.lemmy.utils.showShareSheetForImage
@@ -197,6 +198,13 @@ class MainActivity : SummitActivity() {
   @Inject
   lateinit var peekImageManager: PeekImageManager
 
+  private val downloadAndShareFileListener = object : DownloadAndShareFileListener {
+    override fun onComplete(fileUri: Uri): Boolean {
+      showShareSheetForImage(this@MainActivity, fileUri)
+      return true
+    }
+  }
+
   private val imageViewerLauncher = registerForActivityResult(
     ImageViewerContract(),
   ) { result ->
@@ -231,6 +239,7 @@ class MainActivity : SummitActivity() {
     viewModel.communities.observe(this) {
       communitySelectorController?.setCommunities(it)
     }
+    moreActionsHelper.addDownloadAndShareFileListener(downloadAndShareFileListener)
     moreActionsHelper.downloadAndShareFile.observe(this) {
       if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
         return@observe
@@ -245,9 +254,7 @@ class MainActivity : SummitActivity() {
         }
         is StatefulData.Loading -> {}
         is StatefulData.NotStarted -> {}
-        is StatefulData.Success -> {
-          showShareSheetForImage(this, it.data)
-        }
+        is StatefulData.Success -> {}
       }
     }
 
@@ -461,6 +468,8 @@ class MainActivity : SummitActivity() {
   }
 
   override fun onDestroy() {
+    moreActionsHelper.removeDownloadAndShareFileListener(downloadAndShareFileListener)
+
     super.onDestroy()
 
     exoPlayerManagerManager.destroyAll()

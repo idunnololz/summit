@@ -155,6 +155,8 @@ class MoreActionsHelper(
   val nsfwModeEnabledFlow
     get() = nsfwModeManager.nsfwModeEnabled
 
+  private var downloadAndShareFileListeners = listOf<DownloadAndShareFileListener>()
+
   init {
     if (selectedAccountId != null) {
       apiClient.forceUseAccount(selectedAccountId)
@@ -449,6 +451,7 @@ class MoreActionsHelper(
               }
             }
 
+          dispatchDownloadAndShareFileComplete(fileUri)
           downloadAndShareFile.postValueAndClear(fileUri)
         }
       },
@@ -456,6 +459,22 @@ class MoreActionsHelper(
         downloadAndShareFile.postError(it)
       },
     )
+  }
+
+  fun addDownloadAndShareFileListener(l: DownloadAndShareFileListener) {
+    downloadAndShareFileListeners += l
+  }
+
+  fun removeDownloadAndShareFileListener(l: DownloadAndShareFileListener) {
+    downloadAndShareFileListeners -= l
+  }
+
+  fun dispatchDownloadAndShareFileComplete(fileUri: Uri) {
+    for (l in downloadAndShareFileListeners) {
+      if (l.onComplete(fileUri)) {
+        break
+      }
+    }
   }
 
   fun downloadImage(
