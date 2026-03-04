@@ -6,6 +6,7 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 fun setupBottomSheetAndShow(
   bottomSheet: View,
@@ -69,6 +70,14 @@ fun setupBottomSheetAndShow(
     },
     100,
   )
+}
+
+fun BaseBottomSheetDialogFragment<*>.fixBottomSheetFling(
+  recyclerView: RecyclerView,
+) {
+  (dialog as? BottomSheetDialog)?.behavior?.let { behavior ->
+    fixBottomSheetFling(behavior, recyclerView)
+  }
 }
 
 fun fixBottomSheetFling(

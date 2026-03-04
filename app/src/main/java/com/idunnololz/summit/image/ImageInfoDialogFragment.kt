@@ -79,9 +79,7 @@ class ImageInfoDialogFragment :
 //                context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
 //            )
 
-      (dialog as? BottomSheetDialog)?.behavior?.let { behavior ->
-        fixBottomSheetFling(behavior, recyclerView)
-      }
+      fixBottomSheetFling(recyclerView)
 
       val adapter = ImageInfoAdapter(context)
 

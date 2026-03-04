@@ -22,6 +22,7 @@ import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
 import arrow.core.Either
 import coil3.Image
+import coil3.asImage
 import coil3.dispose
 import coil3.load
 import coil3.memory.MemoryCache
@@ -527,7 +528,12 @@ class LemmyContentHelper(
           bodyTextView.maxLines = contentMaxLines
           bodyTextView.setHorizontallyScrolling(false)
         } else {
-          bodyTextView.maxLines = Integer.MAX_VALUE
+          if (bodyTextView.maxLines != Integer.MAX_VALUE) {
+            bodyTextView.maxLines = Integer.MAX_VALUE
+          }
+        }
+        if (bodyTextView.scrollY != 0) {
+          bodyTextView.scrollY = 0
         }
         bodyTextView.setOnClickListener {
           onItemClickListener()
@@ -760,8 +766,10 @@ class LemmyContentHelper(
         allowHardware(false)
         transitionFactory(NoneTransitionFactory)
 
-        placeholderMemoryCacheKey?.let {
-          placeholderMemoryCacheKey(it)
+        if (placeholderMemoryCacheKey == null) {
+          placeholder(newShimmerDrawable16to9(context).asImage())
+        } else {
+          placeholderMemoryCacheKey(placeholderMemoryCacheKey)
         }
 
         if (blur) {

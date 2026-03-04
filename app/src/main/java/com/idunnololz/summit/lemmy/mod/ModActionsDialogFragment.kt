@@ -48,6 +48,7 @@ import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.StatefulLiveData
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
+import com.idunnololz.summit.util.fixBottomSheetFling
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -166,6 +167,8 @@ class ModActionsDialogFragment :
           )
         dismiss()
       }
+
+      fixBottomSheetFling(recyclerView)
 
       adapter = BottomMenu.BottomMenuAdapter(context).apply {
         title =

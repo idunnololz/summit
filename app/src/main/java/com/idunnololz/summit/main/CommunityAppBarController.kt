@@ -219,7 +219,11 @@ class CommunityAppBarController(
       val realOffset = verticalOffset + restOfAppBarHeight
       val percentShown = 1 - (-realOffset.toFloat() / toolbarHeight)
 
-      this@CommunityAppBarController.percentShown.value = percentShown.coerceIn(0f, 1f)
+      val newPercent = percentShown.coerceIn(0f, 1f)
+
+      if (newPercent != this@CommunityAppBarController.percentShown.value) {
+        this@CommunityAppBarController.percentShown.value = newPercent
+      }
     }
     viewLifecycleOwner.lifecycleScope.launch {
       accountInfoManager.subscribedCommunities.collect {

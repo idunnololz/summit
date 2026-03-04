@@ -170,7 +170,7 @@ object AnimationUtils {
     }
 
     @JvmOverloads
-    fun hide(animate: Boolean = true, duration: Int = -1) {
+    fun hide(animate: Boolean = true, duration: Int = -1, cb: (() -> Unit)? = null) {
       if (animate) {
         if (animatingOut) {
           return
@@ -193,7 +193,10 @@ object AnimationUtils {
         val animator = view
           .animate()
           .alpha(0f)
-          .withEndAction { view.visibility = hideVisibility }
+          .withEndAction {
+            view.visibility = hideVisibility
+            cb?.invoke()
+          }
         if (duration > 0) {
           animator.duration = duration.toLong()
         }

@@ -19,6 +19,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
@@ -116,7 +117,9 @@ class InboxRepository @Inject constructor(
       while (allItems.size < endIndex) {
         ensureActive()
 
-        val sourceToResult = sources.map { it to it.peekNextItem() }
+        val sourceToResult = sources
+          .map { it to async { it.peekNextItem() } }
+          .map { it.first to it.second.await() }
         val sourceAndError = sourceToResult.firstOrNull { (_, result) -> result.isFailure }
 
         if (sourceAndError != null) {

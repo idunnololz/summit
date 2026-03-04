@@ -2100,10 +2100,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     quickActionsBar?.let {
       if (it.parent != null && it.tag == actions && it.getTag(R.id.is_saved) == isSaved) {
 
-        if (actions.contains(R.id.ca_edit_comment)) {
-          it.findViewById<ImageView>(R.id.ca_edit_comment)?.apply {
-            isEnabled = canEdit
-          }
+        it.findViewById<View>(R.id.ca_edit_comment)?.apply {
+          isEnabled = canEdit
         }
 
         return

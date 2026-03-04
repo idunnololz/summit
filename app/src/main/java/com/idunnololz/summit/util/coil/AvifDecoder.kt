@@ -22,6 +22,7 @@ import coil3.request.colorSpace
 import coil3.request.maxBitmapSize
 import coil3.request.premultipliedAlpha
 import coil3.size.Precision
+import coil3.size.Size
 import coil3.util.component1
 import coil3.util.component2
 import coil3.util.toSoftware
@@ -50,6 +51,7 @@ class AvifDecoder(
     private const val BUFFER_SIZE = 16384
     private val BUFFER_REF = AtomicReference<ByteArray>()
     private const val MIME_TYPE_JPEG = "image/jpeg"
+    private val MAX_SIZE = Size(1920, 1920)
   }
 
   override suspend fun decode(): DecodeResult? = runInterruptible {
@@ -108,7 +110,7 @@ class AvifDecoder(
     val dstWidth = (srcWidth * scale).toInt()
     val dstHeight = (srcHeight * scale).toInt()
 
-    Log.d(TAG, "image out: $dstWidth x $dstHeight scale: $scale")
+    Log.d(TAG, "image out: $dstWidth x $dstHeight scale: $scale. Target size: ${options.size}")
 
     val bitmap = createBitmap(dstWidth, dstHeight)
 
@@ -206,11 +208,12 @@ class AvifDecoder(
 
     // Calculate the image's density scaling multiple.
     var scale = DecodeUtils.computeSizeMultiplier(
-      srcWidth = srcWidth / inSampleSize.toDouble(),
-      srcHeight = srcHeight / inSampleSize.toDouble(),
+      srcWidth = srcWidth.toDouble(),
+      srcHeight = srcHeight.toDouble(),
       dstWidth = dstWidth.toDouble(),
       dstHeight = dstHeight.toDouble(),
       scale = options.scale,
+      maxSize = MAX_SIZE,
     )
     if (options.precision == Precision.INEXACT) {
       scale = scale.coerceAtMost(1.0)
