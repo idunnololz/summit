@@ -63,7 +63,7 @@ Compare-Object -ReferenceObject $dir1 -DifferenceObject $dir2
 
 ## Dependency updates
 
-`./gradlew --no-parallel dependencyUpdates -Drevision=release`
+`./gradlew dependencyUpdates --no-parallel -Drevision=release`
 
 ## Update Patreon supporters
 

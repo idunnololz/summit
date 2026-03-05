@@ -11,6 +11,7 @@ plugins {
   alias(libs.plugins.kotlin.plugin.serialization) apply false
   alias(libs.plugins.versions)
   alias(libs.plugins.sentry) apply false
+  alias(libs.plugins.legacy.kapt) apply false
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {

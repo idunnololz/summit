@@ -1,14 +1,14 @@
 [versions]
-androidGradlePlugin = "9.0.1"
-arrowCore = "2.2.1.1"
+androidGradlePlugin = "9.1.0"
+arrowCore = "2.2.2"
 datastorePreferences = "1.2.0"
 desugar_jdk_libs = "2.1.5"
 exifinterface = "1.4.2"
-hilt = "2.57.1"
+hilt = "2.59.2"
 javaStringSimilarity = "2.0.0"
 kotlin = "2.3.10"
 kotlinxSerialization = "1.10.0"
-ksp = "2.3.2"
+ksp = "2.3.6"
 kotlinx = "1.10.2"
 navigation = "2.9.7"
 room = "2.8.4"
@@ -125,7 +125,8 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android-extensions = { id = "org.jetbrains.kotlin.android.extensions", version.ref = "kotlin" }
 navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "13.0.0" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "14.0.1" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 versions = { id = "com.github.ben-manes.versions", version = "0.53.0" }
 sentry = { id = "io.sentry.android.gradle", version = "6.1.0"}
+legacy-kapt = { id = "com.android.legacy-kapt", version.ref = "androidGradlePlugin" }

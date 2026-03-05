@@ -5,11 +5,10 @@ import org.jetbrains.kotlin.konan.properties.loadProperties
 
 plugins {
   id("com.android.application")
-  id("org.jetbrains.kotlin.android")
   id("androidx.navigation.safeargs.kotlin")
   id("org.jetbrains.kotlin.plugin.parcelize")
   id("com.google.devtools.ksp")
-  id("kotlin-kapt")
+  alias(libs.plugins.legacy.kapt)
   alias(libs.plugins.sentry)
   alias(libs.plugins.hilt)
   alias(libs.plugins.kotlin.plugin.serialization)
@@ -26,9 +25,6 @@ android {
     versionCode = 319
     versionName = "1.79.2"
 
-    ksp {
-      arg("room.schemaLocation", "$projectDir/schemas")
-    }
     buildConfigField(
       "String",
       "SUMMIT_JWT",
@@ -46,6 +42,15 @@ android {
     debug {
       versionNameSuffix = "-DEBUG"
       applicationIdSuffix = ".debug"
+
+
+//      isMinifyEnabled = true
+//      isDebuggable = false
+//
+//      proguardFiles(
+//        getDefaultProguardFile("proguard-android-optimize.txt"),
+//        "proguard-rules.pro",
+//      )
     }
   }
 
@@ -59,13 +64,18 @@ android {
 
     isCoreLibraryDesugaringEnabled = true
   }
-  kotlin {
-    jvmToolchain(17)
+}
 
-    compilerOptions {
-      freeCompilerArgs.add("-Xannotation-default-target=param-property")
-    }
+kotlin {
+  jvmToolchain(17)
+
+  compilerOptions {
+    freeCompilerArgs.add("-Xannotation-default-target=param-property")
   }
+}
+
+ksp {
+  arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 sentry {
