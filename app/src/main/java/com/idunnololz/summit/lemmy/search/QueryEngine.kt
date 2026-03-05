@@ -153,7 +153,7 @@ class QueryEngine(
     get() = pages.size
   val currentState = MutableStateFlow<StatefulData<Unit>>(StatefulData.NotStarted())
 
-  private var currentQuery: String = ""
+  private var currentQuery: String? = null
   private var currentSortType: SortType = SortType.Active
   private var currentInstance: String = apiClient.instance
 
@@ -204,7 +204,7 @@ class QueryEngine(
     performQuery(0, force = false)
   }
 
-  fun setQuery(query: String) {
+  fun setQuery(query: String?) {
     if (currentQuery == query) {
       return
     }
@@ -248,7 +248,7 @@ class QueryEngine(
 
     val currentQuery = currentQuery
 
-    if (currentQuery.isBlank()) {
+    if (currentQuery == null) {
       return
     }
     coroutineScope.launch {

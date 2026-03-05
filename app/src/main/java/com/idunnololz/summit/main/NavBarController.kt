@@ -341,15 +341,16 @@ class NavBarController(
 
   fun updatePaddingForNavBar(contentContainer: View) {
     if (useNavigationRail) {
-      val width = if (navBarContainer.width == 0) {
-        context.getDimen(
-          com.google.android.material.R.dimen.m3_navigation_rail_default_width,
-        )
-      } else {
-        navBarContainer.width
-      }
+      // We use to just apply the constant com.google.android.material.R.dimen.m3_navigation_rail_default_width
+      // but actually we can't do that because the device might have a notch
 
-      contentContainer.updatePaddingRelative(start = width)
+      if (navBarContainer.isLaidOut) {
+        contentContainer.updatePaddingRelative(start = navBarContainer.width)
+      } else {
+        navBarContainer.post {
+          contentContainer.updatePaddingRelative(start = navBarContainer.width)
+        }
+      }
     } else {
       contentContainer.updatePadding(bottom = bottomNavHeight)
     }

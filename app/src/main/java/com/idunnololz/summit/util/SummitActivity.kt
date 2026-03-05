@@ -129,7 +129,7 @@ abstract class SummitActivity :
 
   abstract fun insetViewAutomaticallyByPaddingAndNavUi(
     lifecycleOwner: LifecycleOwner,
-    rootView: View,
+    view: View,
     applyLeftInset: Boolean = true,
     applyTopInset: Boolean = true,
     applyRightInset: Boolean = true,

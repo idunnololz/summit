@@ -84,7 +84,6 @@ import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.util.AnimationsHelper
-import com.idunnololz.summit.util.BaseDialogFragment.Companion.gestureInterpolator
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.KeyPressRegistrationManager
@@ -100,7 +99,6 @@ import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
-import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
@@ -311,8 +309,49 @@ class PostFragment :
         } catch (_: IOException) { /* do nothing */ }
       }
     }
+  }
+
+  private fun goBack() {
+    when (val fragment = requireParentFragment()) {
+      is CommunityFragment -> {
+        fragment.closePost(this@PostFragment)
+      }
+      is PersonTabbedFragment -> {
+        fragment.closePost(this@PostFragment)
+      }
+      is FilteredPostsAndCommentsTabbedFragment -> {
+        fragment.closePost(this@PostFragment)
+      }
+      is SearchTabbedFragment -> {
+        fragment.closePost(this@PostFragment)
+      }
+      is HistoryFragment -> {
+        fragment.closePost(this@PostFragment)
+      }
+      is PostTabbedFragment -> {
+        fragment.closePost(this@PostFragment)
+      }
+    }
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View {
+    setBinding(FragmentPostBinding.inflate(inflater, container, false))
+
+    return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    val initialPost = getInitialPostView()
 
     if (!args.isSinglePage) {
+      // DO NOT add back press dispatchers in Fragment.onCreate(). For some reason it doesn't work
+      // when the activity is killed and recreated. 
       requireSummitActivity().onBackPressedDispatcher
         .addCallback(
           this,
@@ -362,54 +401,8 @@ class PostFragment :
         screenshotModeBackPressHandler,
       )
     }
-  }
-
-  private fun goBack() {
-    when (val fragment = requireParentFragment()) {
-      is CommunityFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is PersonTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is FilteredPostsAndCommentsTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is SearchTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is HistoryFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is PostTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-    }
-  }
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?,
-  ): View {
-    setBinding(FragmentPostBinding.inflate(inflater, container, false))
-
-    return binding.root
-  }
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-
-    val initialPost = getInitialPostView()
 
     with(binding) {
-      requireSummitActivity().apply {
-        insetViewExceptBottomAutomaticallyByPadding(
-          viewLifecycleOwner,
-          binding.findInPageToolbar,
-        )
-      }
-
       fun onMoreClick() {
         val data = viewModel.postData.valueOrNull
         val postView = data?.postListView?.post ?: initialPost
@@ -1085,10 +1078,10 @@ class PostFragment :
     val context = requireContext()
 
     requireSummitActivity().apply {
-      if (preferences.showNavigationBarOnPost) {
+      if (preferences.showNavigationBarOnPost || args.isSinglePage) {
         insetViewAutomaticallyByPaddingAndNavUi(
           lifecycleOwner = viewLifecycleOwner,
-          rootView = binding.recyclerView,
+          view = binding.recyclerView,
           applyTopInset = false,
         )
         insetViewAutomaticallyByMarginsAndNavUi(
@@ -1098,7 +1091,7 @@ class PostFragment :
         )
         insetViewAutomaticallyByPaddingAndNavUi(
           lifecycleOwner = viewLifecycleOwner,
-          rootView = binding.fabSnackbarCoordinatorLayout,
+          view = binding.fabSnackbarCoordinatorLayout,
         )
       } else {
         insetViewExceptTopAutomaticallyByPadding(
@@ -1423,13 +1416,7 @@ class PostFragment :
 
     if (args.isSinglePage) {
       requireSummitActivity().apply {
-        if (!navBarController.useNavigationRail) {
-          if (preferences.showNavigationBarOnPost) {
-            showNavBar()
-          } else {
-            hideNavBar()
-          }
-        }
+        showNavBar()
       }
     }
 

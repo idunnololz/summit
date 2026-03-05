@@ -199,7 +199,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
     viewModel.currentListingTypeFilter.value = listingTypeFilter
     viewModel.nextListingTypeFilter.value = listingTypeFilter
 
-    if (args.query.isNotBlank()) {
+    if (args.query != null) {
       binding.searchEditText.setText(args.query)
       performSearch()
     }
@@ -449,7 +449,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
         }
       }
 
-      if (viewModel.currentQueryFlow.value.isNotBlank()) {
+      if (viewModel.currentQueryFlow.value != null) {
         hideSearch(animate = false)
         viewModel.showSearch.value = false
       }
@@ -606,6 +606,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
   }
 
   private fun saveSuggestion(query: String) {
+    if (query.isBlank()) return
     val context = context ?: return
     val suggestions = SearchRecentSuggestions(
       context,

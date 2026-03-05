@@ -227,7 +227,7 @@ class InboxFragment : BaseFragment<FragmentInboxBinding>() {
 
       insetViewAutomaticallyByPaddingAndNavUi(
         lifecycleOwner = viewLifecycleOwner,
-        rootView = binding.coordinatorLayoutContainer,
+        view = binding.coordinatorLayoutContainer,
         applyTopInset = false,
       )
       insetViewAutomaticallyByPadding(viewLifecycleOwner, binding.startPanel.root)

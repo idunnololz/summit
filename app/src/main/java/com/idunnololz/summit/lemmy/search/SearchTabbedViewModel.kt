@@ -51,7 +51,7 @@ class SearchTabbedViewModel @Inject constructor(
 
   private var currentType: SearchType = SearchType.All
 
-  val currentQueryFlow = MutableStateFlow<String>("")
+  val currentQueryFlow = MutableStateFlow<String?>(null)
   val currentSortTypeFlow = savedStateHandle.getStateFlow(KEY_CURRENT_SORT_TYPE, SortType.Active)
 
   val currentPersonFilter = MutableStateFlow<PersonFilter?>(null)

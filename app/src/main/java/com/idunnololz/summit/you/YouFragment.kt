@@ -80,7 +80,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
       requireSummitActivity().apply {
         insetViewAutomaticallyByPaddingAndNavUi(
           lifecycleOwner = viewLifecycleOwner,
-          rootView = binding.recyclerView,
+          view = binding.recyclerView,
           applyTopInset = false,
         )
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)

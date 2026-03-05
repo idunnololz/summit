@@ -161,6 +161,7 @@ class AddOrEditUserTagDialogFragment : BaseDialogFragment<DialogFragmentAddOrEdi
       }
       viewTags.setOnClickListener {
         requireMainActivity().openAllUserTagsFragment()
+        dismiss()
       }
 
       positiveButton.setOnClickListener {

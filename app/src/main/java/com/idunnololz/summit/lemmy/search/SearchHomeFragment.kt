@@ -223,7 +223,7 @@ class SearchHomeFragment : BaseFragment<FragmentSearchHomeBinding>() {
     requireSummitActivity().apply {
       insetViewAutomaticallyByPaddingAndNavUi(
         lifecycleOwner = viewLifecycleOwner,
-        rootView = binding.contentContainer,
+        view = binding.contentContainer,
         applyTopInset = false,
       )
       insetViewAutomaticallyByMarginsAndNavUi(

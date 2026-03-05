@@ -325,13 +325,13 @@ class PreviewPresetActivity : SummitActivity() {
 
   override fun insetViewAutomaticallyByPaddingAndNavUi(
     lifecycleOwner: LifecycleOwner,
-    rootView: View,
+    view: View,
     applyLeftInset: Boolean,
     applyTopInset: Boolean,
     applyRightInset: Boolean,
     applyBottomInset: Boolean,
   ) {
-    insetViewAutomaticallyByPadding(lifecycleOwner, rootView, 0)
+    insetViewAutomaticallyByPadding(lifecycleOwner, view, 0)
   }
 
   override fun insetViewAutomaticallyByMarginsAndNavUi(

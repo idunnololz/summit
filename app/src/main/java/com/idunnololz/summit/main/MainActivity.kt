@@ -944,39 +944,39 @@ class MainActivity : SummitActivity() {
 
   override fun insetViewAutomaticallyByPaddingAndNavUi(
     lifecycleOwner: LifecycleOwner,
-    rootView: View,
+    view: View,
     applyLeftInset: Boolean,
     applyTopInset: Boolean,
     applyRightInset: Boolean,
     applyBottomInset: Boolean,
   ) {
     insets.observe(lifecycleOwner) {
-      rootView.post {
+      view.post {
         var bottomPadding = getBottomNavHeight()
         if (bottomPadding == 0) {
           bottomPadding = it.bottomInset
         }
 
-        rootView.setPadding(
+        view.setPadding(
           if (applyLeftInset) {
             navBarController.newLeftInset
           } else {
-            rootView.paddingLeft
+            view.paddingLeft
           },
           if (applyTopInset) {
             it.topInset
           } else {
-            rootView.paddingTop
+            view.paddingTop
           },
           if (applyRightInset) {
             navBarController.newRightInset
           } else {
-            rootView.paddingRight
+            view.paddingRight
           },
           if (applyBottomInset) {
             bottomPadding
           } else {
-            rootView.paddingBottom
+            view.paddingBottom
           },
         )
       }
