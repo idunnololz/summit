@@ -154,7 +154,7 @@ fun SpannableStringBuilder.appendNameWithInstance(
 }
 
 fun Person.getAccountAgeString(): String {
-  val ts = dateStringToTs(published)
+  val ts = published?.let { dateStringToTs(it) } ?: 0
   val accountCreationTime = LocalDateTime
     .ofEpochSecond(ts / 1000, 0, ZoneOffset.UTC)
     .toLocalDate()
@@ -184,7 +184,7 @@ fun Person.getAccountAgeString(): String {
 }
 
 fun Person.isCakeDay(): Boolean {
-  val ts = dateStringToTs(published)
+  val ts = published?.let { dateStringToTs(it) } ?: 0
   val accountCreationTime = LocalDateTime
     .ofEpochSecond(ts / 1000, 0, ZoneOffset.UTC)
     .toLocalDate()

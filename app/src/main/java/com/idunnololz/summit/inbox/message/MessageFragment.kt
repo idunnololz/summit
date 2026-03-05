@@ -209,7 +209,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
     lemmyTextHelper.bindText(
       binding.content,
-      inboxItem.content,
+      inboxItem.content ?: "",
       args.instance,
       onImageClick = { url, peek ->
         getMainActivity()?.openImage(

@@ -498,7 +498,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
             }
           }
 
-          val personCreationTs = dateStringToTs(person.published)
+          val personCreationTs = person.published?.let { dateStringToTs(it) } ?: 0
           val isPersonNew =
             System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
 
@@ -599,7 +599,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
                 append(
                   context.getString(
                     R.string.new_account_desc_format,
-                    tsToConcise(context, person.published),
+                    person.published?.let { tsToConcise(context, it) } ?: "…",
                   ),
                 )
                 val e = length

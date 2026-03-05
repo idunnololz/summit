@@ -1746,7 +1746,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     } else {
       lemmyTextHelper.bindText(
         textView = b.content,
-        text = item.content,
+        text = item.content ?: "",
         instance = instance,
         showMediaAsLinks = true,
         onImageClick = { url, peek ->

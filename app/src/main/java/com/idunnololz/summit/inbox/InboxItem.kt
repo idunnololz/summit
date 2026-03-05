@@ -53,7 +53,7 @@ sealed interface InboxItem :
   val authorInstance: String
   val authorAvatar: String?
   val title: String
-  val content: String
+  val content: String?
   val lastUpdate: String
   override val lastUpdateTs: Long
   val score: Int?
@@ -353,7 +353,7 @@ sealed interface InboxItem :
     override val authorInstance: String,
     override val authorAvatar: String?,
     override val title: String,
-    override val content: String,
+    override val content: String?,
     override val lastUpdate: String,
     override val lastUpdateTs: Long,
     override val score: Int?,

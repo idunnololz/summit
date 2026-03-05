@@ -51,7 +51,8 @@ fun PostView.toPostHeaderInfo(context: Context) = PostHeaderInfo(
 )
 
 private fun getNewUserTsString(context: Context, person: Person): String? {
-  val personCreationTs = dateStringToTs(person.published)
+  val published = person.published ?: return null
+  val personCreationTs = dateStringToTs(published)
   val isPersonNew =
     System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
 
@@ -59,5 +60,5 @@ private fun getNewUserTsString(context: Context, person: Person): String? {
     return null
   }
 
-  return tsToConcise(context, person.published)
+  return tsToConcise(context, published)
 }

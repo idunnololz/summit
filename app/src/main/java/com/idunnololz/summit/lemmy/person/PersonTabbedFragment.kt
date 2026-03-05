@@ -545,8 +545,9 @@ class PersonTabbedFragment :
       }
       name.text = displayName
 
+      val published = person.published
       val dateTime = LocalDateTime.ofEpochSecond(
-        dateStringToTs(person.published) / 1000,
+        (published?.let { dateStringToTs(it) } ?: 0) / 1000,
         0,
         ZoneOffset.UTC,
       )
@@ -578,7 +579,8 @@ class PersonTabbedFragment :
         )
       cakeDate.visibility = View.VISIBLE
 
-      val personCreationTs = dateStringToTs(person.published)
+      published
+      val personCreationTs = published?.let { dateStringToTs(it) } ?: 0
       val isPersonNew =
         System.currentTimeMillis() - personCreationTs < NEW_PERSON_DURATION
       body.text = buildSpannedString {
@@ -598,12 +600,12 @@ class PersonTabbedFragment :
           appendLine()
           appendLine()
         }
-        if (isPersonNew) {
+        if (isPersonNew && published != null) {
           val s = length
           append(
             context.getString(
               R.string.new_account_desc_format,
-              tsToConcise(context, person.published),
+              tsToConcise(context, published),
             ),
           )
           val e = length

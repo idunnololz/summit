@@ -240,7 +240,7 @@ class NotificationsManager @Inject constructor(
         nextNotificationId++
 
         val title: String = inboxItem.title
-        val body: String = inboxItem.content
+        val body: String? = inboxItem.content
         val authorAvatar: String? = inboxItem.authorAvatar
 
         notificationSummaryInfo.addLine(title)

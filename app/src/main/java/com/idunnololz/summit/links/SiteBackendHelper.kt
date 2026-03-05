@@ -111,7 +111,7 @@ class SiteBackendHelper @Inject constructor(
               Log.d(TAG, "instance: $instance is type alpha")
               val site = gson.fromJson(
                 result.getOrNull(),
-                com.idunnololz.summit.api.dto.piefed.GetSiteResponse::class.java,
+                com.idunnololz.summit.api.dto.piefed.models.GetSiteResponse::class.java,
               )
 
               return@withContext Result.success(
