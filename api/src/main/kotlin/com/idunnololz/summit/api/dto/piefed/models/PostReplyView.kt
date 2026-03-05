@@ -7,110 +7,107 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Comment
 import com.idunnololz.summit.api.dto.piefed.models.CommentAggregates
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.Post
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param activityAlert
- * @param bannedFromCommunity
- * @param comment
- * @param counts
- * @param creator
- * @param creatorBannedFromCommunity
- * @param creatorBlocked
- * @param creatorIsAdmin
- * @param creatorIsModerator
- * @param saved
- * @param community
- * @param post
+ * @param activityAlert 
+ * @param bannedFromCommunity 
+ * @param comment 
+ * @param counts 
+ * @param creator 
+ * @param creatorBannedFromCommunity 
+ * @param creatorBlocked 
+ * @param creatorIsAdmin 
+ * @param creatorIsModerator 
+ * @param saved 
+ * @param community 
+ * @param post 
  * @param subscribed Indicates whether auth'ed user is subscribed to the community this comment is in or not.
- * @param myVote
- * @param canAuthUserModerate
- * @param replies
+ * @param myVote 
+ * @param canAuthUserModerate 
+ * @param replies 
  */
 
-data class PostReplyView(
 
-  @SerializedName("activity_alert")
-  val activityAlert: kotlin.Boolean,
+data class PostReplyView (
 
-  @SerializedName("banned_from_community")
-  val bannedFromCommunity: kotlin.Boolean,
+    @SerializedName("activity_alert")
+    val activityAlert: kotlin.Boolean,
 
-  @SerializedName("comment")
-  val comment: Comment,
+    @SerializedName("banned_from_community")
+    val bannedFromCommunity: kotlin.Boolean,
 
-  @SerializedName("counts")
-  val counts: CommentAggregates,
+    @SerializedName("comment")
+    val comment: Comment,
 
-  @SerializedName("creator")
-  val creator: Person,
+    @SerializedName("counts")
+    val counts: CommentAggregates,
 
-  @SerializedName("creator_banned_from_community")
-  val creatorBannedFromCommunity: kotlin.Boolean,
+    @SerializedName("creator")
+    val creator: Person,
 
-  @SerializedName("creator_blocked")
-  val creatorBlocked: kotlin.Boolean,
+    @SerializedName("creator_banned_from_community")
+    val creatorBannedFromCommunity: kotlin.Boolean,
 
-  @SerializedName("creator_is_admin")
-  val creatorIsAdmin: kotlin.Boolean,
+    @SerializedName("creator_blocked")
+    val creatorBlocked: kotlin.Boolean,
 
-  @SerializedName("creator_is_moderator")
-  val creatorIsModerator: kotlin.Boolean,
+    @SerializedName("creator_is_admin")
+    val creatorIsAdmin: kotlin.Boolean,
 
-  @SerializedName("saved")
-  val saved: kotlin.Boolean,
+    @SerializedName("creator_is_moderator")
+    val creatorIsModerator: kotlin.Boolean,
 
-  @SerializedName("community")
-  val community: Community? = null,
+    @SerializedName("saved")
+    val saved: kotlin.Boolean,
 
-  @SerializedName("post")
-  val post: Post? = null,
+    @SerializedName("community")
+    val community: Community? = null,
 
-  /* Indicates whether auth'ed user is subscribed to the community this comment is in or not. */
-  @SerializedName("subscribed")
-  val subscribed: PostReplyView.Subscribed? = null,
+    @SerializedName("post")
+    val post: Post? = null,
 
-  @SerializedName("my_vote")
-  val myVote: kotlin.Int? = null,
+    /* Indicates whether auth'ed user is subscribed to the community this comment is in or not. */
+    @SerializedName("subscribed")
+    val subscribed: PostReplyView.Subscribed? = null,
 
-  @SerializedName("can_auth_user_moderate")
-  val canAuthUserModerate: kotlin.Boolean? = null,
+    @SerializedName("my_vote")
+    val myVote: kotlin.Int? = null,
 
-  @SerializedName("replies")
-  val replies: kotlin.collections.List<PostReplyView>? = null,
+    @SerializedName("can_auth_user_moderate")
+    val canAuthUserModerate: kotlin.Boolean? = null,
+
+    @SerializedName("replies")
+    val replies: kotlin.collections.List<PostReplyView>? = null
 
 ) {
 
-  /**
-   * Indicates whether auth'ed user is subscribed to the community this comment is in or not.
-   *
-   * Values: Subscribed,NotSubscribed,Pending
-   */
-  enum class Subscribed(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Subscribed")
-    Subscribed("Subscribed"),
+    /**
+     * Indicates whether auth'ed user is subscribed to the community this comment is in or not.
+     *
+     * Values: Subscribed,NotSubscribed,Pending
+     */
+    enum class Subscribed(val value: kotlin.String) {
+        @SerializedName(value = "Subscribed") Subscribed("Subscribed"),
+        @SerializedName(value = "NotSubscribed") NotSubscribed("NotSubscribed"),
+        @SerializedName(value = "Pending") Pending("Pending");
+    }
 
-    @SerializedName(value = "NotSubscribed")
-    NotSubscribed("NotSubscribed"),
-
-    @SerializedName(value = "Pending")
-    Pending("Pending"),
-  }
 }
+

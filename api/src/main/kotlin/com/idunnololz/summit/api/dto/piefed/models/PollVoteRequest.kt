@@ -7,30 +7,36 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param postId
+ * @param postId 
  * @param choiceId Must have a length of 1 for a poll in single vote mode.
  */
 
-data class PollVoteRequest(
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+data class PollVoteRequest (
 
-  /* Must have a length of 1 for a poll in single vote mode. */
-  @SerializedName("choice_id")
-  val choiceId: kotlin.collections.List<kotlin.Int>,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-)
+    /* Must have a length of 1 for a poll in single vote mode. */
+    @SerializedName("choice_id")
+    val choiceId: kotlin.collections.List<kotlin.Int>
+
+) {
+
+
+}
+

@@ -7,33 +7,39 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param postId
- * @param replyCount
- * @param communityName
+ * @param postId 
+ * @param replyCount 
+ * @param communityName 
  */
 
-data class MiniCrossPosts(
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int? = null,
+data class MiniCrossPosts (
 
-  @SerializedName("reply_count")
-  val replyCount: kotlin.Int? = null,
+    @SerializedName("post_id")
+    val postId: kotlin.Int? = null,
 
-  @SerializedName("community_name")
-  val communityName: kotlin.String? = null,
+    @SerializedName("reply_count")
+    val replyCount: kotlin.Int? = null,
 
-)
+    @SerializedName("community_name")
+    val communityName: kotlin.String? = null
+
+) {
+
+
+}
+

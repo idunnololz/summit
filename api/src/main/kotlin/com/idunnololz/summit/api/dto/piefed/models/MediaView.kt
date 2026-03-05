@@ -7,29 +7,35 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param url
- * @param name
+ * @param url 
+ * @param name 
  */
 
-data class MediaView(
 
-  @SerializedName("url")
-  val url: kotlin.String? = null,
+data class MediaView (
 
-  @SerializedName("name")
-  val name: kotlin.String? = null,
+    @SerializedName("url")
+    val url: kotlin.String? = null,
 
-)
+    @SerializedName("name")
+    val name: kotlin.String? = null
+
+) {
+
+
+}
+

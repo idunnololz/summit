@@ -7,25 +7,31 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param blocked
+ * @param blocked 
  */
 
-data class BlockInstanceResponse(
 
-  @SerializedName("blocked")
-  val blocked: kotlin.Boolean,
+data class BlockInstanceResponse (
 
-)
+    @SerializedName("blocked")
+    val blocked: kotlin.Boolean
+
+) {
+
+
+}
+

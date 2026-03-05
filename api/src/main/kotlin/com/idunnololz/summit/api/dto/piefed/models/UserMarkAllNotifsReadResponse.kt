@@ -7,25 +7,31 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param markAllNotificationsAsRead
+ * @param markAllNotificationsAsRead 
  */
 
-data class UserMarkAllNotifsReadResponse(
 
-  @SerializedName("mark_all_notifications_as_read")
-  val markAllNotificationsAsRead: kotlin.String,
+data class UserMarkAllNotifsReadResponse (
 
-)
+    @SerializedName("mark_all_notifications_as_read")
+    val markAllNotificationsAsRead: kotlin.String
+
+) {
+
+
+}
+

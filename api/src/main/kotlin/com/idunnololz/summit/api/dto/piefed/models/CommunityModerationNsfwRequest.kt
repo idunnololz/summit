@@ -7,29 +7,35 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param postId
- * @param nsfwStatus
+ * @param postId 
+ * @param nsfwStatus 
  */
 
-data class CommunityModerationNsfwRequest(
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+data class CommunityModerationNsfwRequest (
 
-  @SerializedName("nsfw_status")
-  val nsfwStatus: kotlin.Boolean,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-)
+    @SerializedName("nsfw_status")
+    val nsfwStatus: kotlin.Boolean
+
+) {
+
+
+}
+

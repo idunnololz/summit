@@ -7,64 +7,70 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.PostEvent
 import com.idunnololz.summit.api.dto.piefed.models.PostPoll
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param title
- * @param communityId
+ * @param title 
+ * @param communityId 
  * @param altText Will be used for image posts or link posts that point to images
- * @param body
- * @param url
- * @param nsfw
- * @param aiGenerated
- * @param languageId
- * @param event
- * @param poll
+ * @param body 
+ * @param url 
+ * @param nsfw 
+ * @param aiGenerated 
+ * @param languageId 
+ * @param event 
+ * @param poll 
  */
 
-data class CreatePostRequest(
 
-  @SerializedName("title")
-  val title: kotlin.String,
+data class CreatePostRequest (
 
-  @SerializedName("community_id")
-  val communityId: kotlin.Int,
+    @SerializedName("title")
+    val title: kotlin.String,
 
-  /* Will be used for image posts or link posts that point to images */
-  @SerializedName("alt_text")
-  val altText: kotlin.String? = null,
+    @SerializedName("community_id")
+    val communityId: kotlin.Int,
 
-  @SerializedName("body")
-  val body: kotlin.String? = null,
+    /* Will be used for image posts or link posts that point to images */
+    @SerializedName("alt_text")
+    val altText: kotlin.String? = null,
 
-  @SerializedName("url")
-  val url: kotlin.String? = null,
+    @SerializedName("body")
+    val body: kotlin.String? = null,
 
-  @SerializedName("nsfw")
-  val nsfw: kotlin.Boolean? = null,
+    @SerializedName("url")
+    val url: kotlin.String? = null,
 
-  @SerializedName("ai_generated")
-  val aiGenerated: kotlin.Boolean? = null,
+    @SerializedName("nsfw")
+    val nsfw: kotlin.Boolean? = null,
 
-  @SerializedName("language_id")
-  val languageId: kotlin.Int? = null,
+    @SerializedName("ai_generated")
+    val aiGenerated: kotlin.Boolean? = null,
 
-  @SerializedName("event")
-  val event: PostEvent? = null,
+    @SerializedName("language_id")
+    val languageId: kotlin.Int? = null,
 
-  @SerializedName("poll")
-  val poll: PostPoll? = null,
+    @SerializedName("event")
+    val event: PostEvent? = null,
 
-)
+    @SerializedName("poll")
+    val poll: PostPoll? = null
+
+) {
+
+
+}
+

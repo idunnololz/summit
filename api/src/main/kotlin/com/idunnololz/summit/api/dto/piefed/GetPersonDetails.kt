@@ -39,7 +39,7 @@ data class GetPersonDetails(
   val username: kotlin.String? = null,
 
   @SerializedName("sort")
-  val sort: SortType? = null,
+  val sort: SortApiAlphaUserGet? = null,
 
   @SerializedName("page")
   val page: kotlin.Int? = null,

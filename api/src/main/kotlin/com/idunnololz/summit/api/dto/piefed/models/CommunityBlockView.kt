@@ -7,31 +7,37 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.Person
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param community
- * @param person
+ * @param community 
+ * @param person 
  */
 
-data class CommunityBlockView(
 
-  @SerializedName("community")
-  val community: Community? = null,
+data class CommunityBlockView (
 
-  @SerializedName("person")
-  val person: Person? = null,
+    @SerializedName("community")
+    val community: Community? = null,
 
-)
+    @SerializedName("person")
+    val person: Person? = null
+
+) {
+
+
+}
+

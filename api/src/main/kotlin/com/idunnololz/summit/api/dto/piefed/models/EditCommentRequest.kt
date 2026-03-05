@@ -7,38 +7,44 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param body
- * @param commentId
- * @param languageId
+ * @param body 
+ * @param commentId 
+ * @param languageId 
  * @param distinguished Visibly mark reply as from a moderator in the web UI
  */
 
-data class EditCommentRequest(
 
-  @SerializedName("body")
-  val body: kotlin.String,
+data class EditCommentRequest (
 
-  @SerializedName("comment_id")
-  val commentId: kotlin.Int,
+    @SerializedName("body")
+    val body: kotlin.String,
 
-  @SerializedName("language_id")
-  val languageId: kotlin.Int? = null,
+    @SerializedName("comment_id")
+    val commentId: kotlin.Int,
 
-  /* Visibly mark reply as from a moderator in the web UI */
-  @SerializedName("distinguished")
-  val distinguished: kotlin.Boolean? = false,
+    @SerializedName("language_id")
+    val languageId: kotlin.Int? = null,
 
-)
+    /* Visibly mark reply as from a moderator in the web UI */
+    @SerializedName("distinguished")
+    val distinguished: kotlin.Boolean? = false
+
+) {
+
+
+}
+

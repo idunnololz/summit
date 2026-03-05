@@ -2051,6 +2051,1171 @@
           "result"
         ]
       },
+      "ModRemovePost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "post_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "removed": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "id",
+          "mod_person_id",
+          "post_id",
+          "removed",
+          "when_"
+        ]
+      },
+      "ModRemovePostView": {
+        "type": "object",
+        "properties": {
+          "mod_remove_post": {
+            "$ref": "#/components/schemas/ModRemovePost"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "post": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Post"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_remove_post"
+        ]
+      },
+      "ModLockPost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "post_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "id",
+          "locked",
+          "mod_person_id",
+          "post_id",
+          "when_"
+        ]
+      },
+      "ModLockPostView": {
+        "type": "object",
+        "properties": {
+          "mod_lock_post": {
+            "$ref": "#/components/schemas/ModLockPost"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "post": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Post"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_lock_post"
+        ]
+      },
+      "ModFeaturePost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "post_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "featured": {
+            "type": "boolean"
+          },
+          "is_featured_community": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "featured",
+          "id",
+          "is_featured_community",
+          "mod_person_id",
+          "post_id",
+          "when_"
+        ]
+      },
+      "ModFeaturePostView": {
+        "type": "object",
+        "properties": {
+          "mod_feature_post": {
+            "$ref": "#/components/schemas/ModFeaturePost"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "post": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Post"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_feature_post"
+        ]
+      },
+      "ModRemoveComment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "comment_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "removed": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "comment_id",
+          "id",
+          "mod_person_id",
+          "removed",
+          "when_"
+        ]
+      },
+      "ModRemoveCommentView": {
+        "type": "object",
+        "properties": {
+          "mod_remove_comment": {
+            "$ref": "#/components/schemas/ModRemoveComment"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Comment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commenter": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "post": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Post"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_remove_comment"
+        ]
+      },
+      "ModRemoveCommunity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "community_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "removed": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "community_id",
+          "id",
+          "mod_person_id",
+          "removed",
+          "when_"
+        ]
+      },
+      "ModRemoveCommunityView": {
+        "type": "object",
+        "properties": {
+          "mod_remove_community": {
+            "$ref": "#/components/schemas/ModRemoveCommunity"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_remove_community"
+        ]
+      },
+      "ModBanFromCommunity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "other_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "community_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "banned": {
+            "type": "boolean"
+          },
+          "expires": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "banned",
+          "community_id",
+          "id",
+          "mod_person_id",
+          "other_person_id",
+          "when_"
+        ]
+      },
+      "ModBanFromCommunityView": {
+        "type": "object",
+        "properties": {
+          "mod_ban_from_community": {
+            "$ref": "#/components/schemas/ModBanFromCommunity"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "banned_person": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_ban_from_community"
+        ]
+      },
+      "ModBan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "other_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "banned": {
+            "type": "boolean"
+          },
+          "expires": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "banned",
+          "id",
+          "mod_person_id",
+          "other_person_id",
+          "when_"
+        ]
+      },
+      "ModBanView": {
+        "type": "object",
+        "properties": {
+          "mod_ban": {
+            "$ref": "#/components/schemas/ModBan"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "banned_person": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_ban"
+        ]
+      },
+      "ModAddCommunity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "other_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "community_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "removed": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "community_id",
+          "id",
+          "mod_person_id",
+          "other_person_id",
+          "removed",
+          "when_"
+        ]
+      },
+      "ModAddCommunityView": {
+        "type": "object",
+        "properties": {
+          "mod_add_community": {
+            "$ref": "#/components/schemas/ModAddCommunity"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Community"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "modded_person": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_add_community"
+        ]
+      },
+      "ModTransferCommunity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "other_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "community_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "community_id",
+          "id",
+          "mod_person_id",
+          "other_person_id",
+          "when_"
+        ]
+      },
+      "ModTransferCommunityView": {
+        "type": "object",
+        "properties": {
+          "mod_transfer_community": {
+            "$ref": "#/components/schemas/ModTransferCommunity"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "community": {
+            "$ref": "#/components/schemas/Community"
+          },
+          "modded_person": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "community",
+          "mod_transfer_community"
+        ]
+      },
+      "ModAdd": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "other_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "removed": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "id",
+          "mod_person_id",
+          "other_person_id",
+          "removed",
+          "when_"
+        ]
+      },
+      "ModAddView": {
+        "type": "object",
+        "properties": {
+          "mod_add": {
+            "$ref": "#/components/schemas/ModAdd"
+          },
+          "moderator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "modded_person": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Person"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "mod_add"
+        ]
+      },
+      "AdminPurgePerson": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "admin_person_id": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "admin_person_id",
+          "id",
+          "when_"
+        ]
+      },
+      "AdminPurgePersonView": {
+        "type": "object",
+        "properties": {
+          "admin_purge_person": {
+            "$ref": "#/components/schemas/AdminPurgePerson"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/Person"
+          }
+        },
+        "required": [
+          "admin_purge_person"
+        ]
+      },
+      "AdminPurgeCommunity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "admin_person_id": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "admin_person_id",
+          "id",
+          "when_"
+        ]
+      },
+      "AdminPurgeCommunityView": {
+        "type": "object",
+        "properties": {
+          "admin_purge_community": {
+            "$ref": "#/components/schemas/AdminPurgeCommunity"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/Person"
+          }
+        },
+        "required": [
+          "admin_purge_community"
+        ]
+      },
+      "AdminPurgePost": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "admin_person_id": {
+            "type": "integer"
+          },
+          "community_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "admin_person_id",
+          "community_id",
+          "id",
+          "when_"
+        ]
+      },
+      "AdminPurgePostView": {
+        "type": "object",
+        "properties": {
+          "admin_purge_post": {
+            "$ref": "#/components/schemas/AdminPurgePost"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "community": {
+            "$ref": "#/components/schemas/Community"
+          }
+        },
+        "required": [
+          "admin_purge_post",
+          "community"
+        ]
+      },
+      "AdminPurgeComment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "admin_person_id": {
+            "type": "integer"
+          },
+          "post_id": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "admin_person_id",
+          "id",
+          "post_id",
+          "when_"
+        ]
+      },
+      "AdminPurgeCommentView": {
+        "type": "object",
+        "properties": {
+          "admin_purge_comment": {
+            "$ref": "#/components/schemas/AdminPurgeComment"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "post": {
+            "$ref": "#/components/schemas/Post"
+          }
+        },
+        "required": [
+          "admin_purge_comment",
+          "post"
+        ]
+      },
+      "ModHideCommunity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "community_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "mod_person_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "when_": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          }
+        },
+        "required": [
+          "community_id",
+          "hidden",
+          "id",
+          "mod_person_id",
+          "when_"
+        ]
+      },
+      "ModHideCommunityView": {
+        "type": "object",
+        "properties": {
+          "mod_hide_community": {
+            "$ref": "#/components/schemas/ModHideCommunity"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "community": {
+            "$ref": "#/components/schemas/Community"
+          }
+        },
+        "required": [
+          "community",
+          "mod_hide_community"
+        ]
+      },
+      "GetModLogResponse": {
+        "type": "object",
+        "properties": {
+          "removed_posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModRemovePostView"
+            }
+          },
+          "locked_posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModLockPostView"
+            }
+          },
+          "featured_posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModFeaturePostView"
+            }
+          },
+          "removed_comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModRemoveCommentView"
+            }
+          },
+          "removed_communities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModRemoveCommunityView"
+            }
+          },
+          "banned_from_community": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModBanFromCommunityView"
+            }
+          },
+          "banned": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModBanView"
+            }
+          },
+          "added_to_community": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModAddCommunityView"
+            }
+          },
+          "transferred_to_community": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModTransferCommunityView"
+            }
+          },
+          "added": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModAddView"
+            }
+          },
+          "admin_purged_persons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPurgePersonView"
+            }
+          },
+          "admin_purged_communities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPurgeCommunityView"
+            }
+          },
+          "admin_purged_posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPurgePostView"
+            }
+          },
+          "admin_purged_comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPurgeCommentView"
+            }
+          },
+          "hidden_communities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModHideCommunityView"
+            }
+          }
+        },
+        "required": [
+          "added",
+          "added_to_community",
+          "admin_purged_comments",
+          "admin_purged_communities",
+          "admin_purged_persons",
+          "admin_purged_posts",
+          "banned",
+          "banned_from_community",
+          "featured_posts",
+          "hidden_communities",
+          "locked_posts",
+          "removed_comments",
+          "removed_communities",
+          "removed_posts",
+          "transferred_to_community"
+        ]
+      },
       "GetCommunityResponse": {
         "type": "object",
         "properties": {
@@ -5532,6 +6697,133 @@
           "Misc"
         ],
         "summary": "Suggest people and communities while users type."
+      }
+    },
+    "/api/alpha/modlog": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mod_person_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "community_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "type_",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "All",
+                "ModRemovePost",
+                "ModLockPost",
+                "ModFeaturePost",
+                "ModRemoveComment",
+                "ModRemoveCommunity",
+                "ModBanFromCommunity",
+                "ModAddCommunity",
+                "ModTransferCommunity",
+                "ModAdd",
+                "ModBan",
+                "ModHideCommunity",
+                "AdminPurgePerson",
+                "AdminPurgeCommunity",
+                "AdminPurgePost",
+                "AdminPurgeComment"
+              ]
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "other_person_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "post_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "comment_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetModLogResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Get modlog."
       }
     },
     "/api/alpha/community": {

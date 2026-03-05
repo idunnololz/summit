@@ -7,29 +7,35 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param commentId
- * @param deleted
+ * @param commentId 
+ * @param deleted 
  */
 
-data class DeleteCommentRequest(
 
-  @SerializedName("comment_id")
-  val commentId: kotlin.Int,
+data class DeleteCommentRequest (
 
-  @SerializedName("deleted")
-  val deleted: kotlin.Boolean,
+    @SerializedName("comment_id")
+    val commentId: kotlin.Int,
 
-)
+    @SerializedName("deleted")
+    val deleted: kotlin.Boolean
+
+) {
+
+
+}
+

@@ -7,36 +7,42 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.LocalUser
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.PersonAggregates
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param counts
- * @param localUser
- * @param person
+ * @param counts 
+ * @param localUser 
+ * @param person 
  */
 
-data class LocalUserView(
 
-  @SerializedName("counts")
-  val counts: PersonAggregates,
+data class LocalUserView (
 
-  @SerializedName("local_user")
-  val localUser: LocalUser,
+    @SerializedName("counts")
+    val counts: PersonAggregates,
 
-  @SerializedName("person")
-  val person: Person,
+    @SerializedName("local_user")
+    val localUser: LocalUser,
 
-)
+    @SerializedName("person")
+    val person: Person
+
+) {
+
+
+}
+

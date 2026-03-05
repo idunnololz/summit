@@ -7,29 +7,35 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param privateMessageId
- * @param read
+ * @param privateMessageId 
+ * @param read 
  */
 
-data class MarkPrivateMessageAsReadRequest(
 
-  @SerializedName("private_message_id")
-  val privateMessageId: kotlin.Int,
+data class MarkPrivateMessageAsReadRequest (
 
-  @SerializedName("read")
-  val read: kotlin.Boolean,
+    @SerializedName("private_message_id")
+    val privateMessageId: kotlin.Int,
 
-)
+    @SerializedName("read")
+    val read: kotlin.Boolean
+
+) {
+
+
+}
+

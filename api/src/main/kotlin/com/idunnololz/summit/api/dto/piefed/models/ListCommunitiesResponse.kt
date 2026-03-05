@@ -7,30 +7,36 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param communities
- * @param nextPage
+ * @param communities 
+ * @param nextPage 
  */
 
-data class ListCommunitiesResponse(
 
-  @SerializedName("communities")
-  val communities: kotlin.collections.List<CommunityView>,
+data class ListCommunitiesResponse (
 
-  @SerializedName("next_page")
-  val nextPage: kotlin.String? = null,
+    @SerializedName("communities")
+    val communities: kotlin.collections.List<CommunityView>,
 
-)
+    @SerializedName("next_page")
+    val nextPage: kotlin.String? = null
+
+) {
+
+
+}
+

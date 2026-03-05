@@ -7,38 +7,44 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param personId
- * @param banIpAddress
- * @param purgeContent
+ * @param personId 
+ * @param banIpAddress 
+ * @param purgeContent 
  * @param reason Note to add to modlog
  */
 
-data class UserBanRequest(
 
-  @SerializedName("person_id")
-  val personId: kotlin.Int,
+data class UserBanRequest (
 
-  @SerializedName("ban_ip_address")
-  val banIpAddress: kotlin.Boolean?,
+    @SerializedName("person_id")
+    val personId: kotlin.Int,
 
-  @SerializedName("purge_content")
-  val purgeContent: kotlin.Boolean?,
+    @SerializedName("ban_ip_address")
+    val banIpAddress: kotlin.Boolean?,
 
-  /* Note to add to modlog */
-  @SerializedName("reason")
-  val reason: kotlin.String?,
+    @SerializedName("purge_content")
+    val purgeContent: kotlin.Boolean?,
 
-)
+    /* Note to add to modlog */
+    @SerializedName("reason")
+    val reason: kotlin.String?
+
+) {
+
+
+}
+

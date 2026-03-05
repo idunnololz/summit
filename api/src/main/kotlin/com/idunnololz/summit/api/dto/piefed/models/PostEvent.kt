@@ -7,83 +7,89 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param start
- * @param end
- * @param timezone
- * @param maxAttendees
- * @param participantCount
- * @param full
- * @param onlineLink
+ * @param start 
+ * @param end 
+ * @param timezone 
+ * @param maxAttendees 
+ * @param participantCount 
+ * @param full 
+ * @param onlineLink 
  * @param joinMode free, restricted, external, invite
- * @param externalParticipationUrl
- * @param anonymousParticipation
- * @param online
- * @param buyTicketsLink
- * @param eventFeeCurrency
- * @param eventFeeAmount
+ * @param externalParticipationUrl 
+ * @param anonymousParticipation 
+ * @param online 
+ * @param buyTicketsLink 
+ * @param eventFeeCurrency 
+ * @param eventFeeAmount 
  * @param location JSON object containing location details
  */
 
-data class PostEvent(
 
-  @SerializedName("start")
-  val start: kotlin.String,
+data class PostEvent (
 
-  @SerializedName("end")
-  val end: kotlin.String? = null,
+    @SerializedName("start")
+    val start: kotlin.String,
 
-  @SerializedName("timezone")
-  val timezone: kotlin.String? = null,
+    @SerializedName("end")
+    val end: kotlin.String? = null,
 
-  @SerializedName("max_attendees")
-  val maxAttendees: kotlin.Int? = 0,
+    @SerializedName("timezone")
+    val timezone: kotlin.String? = null,
 
-  @SerializedName("participant_count")
-  val participantCount: kotlin.Int? = 0,
+    @SerializedName("max_attendees")
+    val maxAttendees: kotlin.Int? = 0,
 
-  @SerializedName("full")
-  val full: kotlin.Boolean? = false,
+    @SerializedName("participant_count")
+    val participantCount: kotlin.Int? = 0,
 
-  @SerializedName("online_link")
-  val onlineLink: kotlin.String? = null,
+    @SerializedName("full")
+    val full: kotlin.Boolean? = false,
 
-  /* free, restricted, external, invite */
-  @SerializedName("join_mode")
-  val joinMode: kotlin.String? = null,
+    @SerializedName("online_link")
+    val onlineLink: kotlin.String? = null,
 
-  @SerializedName("external_participation_url")
-  val externalParticipationUrl: kotlin.String? = null,
+    /* free, restricted, external, invite */
+    @SerializedName("join_mode")
+    val joinMode: kotlin.String? = null,
 
-  @SerializedName("anonymous_participation")
-  val anonymousParticipation: kotlin.Boolean? = false,
+    @SerializedName("external_participation_url")
+    val externalParticipationUrl: kotlin.String? = null,
 
-  @SerializedName("online")
-  val online: kotlin.Boolean? = false,
+    @SerializedName("anonymous_participation")
+    val anonymousParticipation: kotlin.Boolean? = false,
 
-  @SerializedName("buy_tickets_link")
-  val buyTicketsLink: kotlin.String? = null,
+    @SerializedName("online")
+    val online: kotlin.Boolean? = false,
 
-  @SerializedName("event_fee_currency")
-  val eventFeeCurrency: kotlin.String? = null,
+    @SerializedName("buy_tickets_link")
+    val buyTicketsLink: kotlin.String? = null,
 
-  @SerializedName("event_fee_amount")
-  val eventFeeAmount: java.math.BigDecimal? = java.math.BigDecimal("0"),
+    @SerializedName("event_fee_currency")
+    val eventFeeCurrency: kotlin.String? = null,
 
-  /* JSON object containing location details */
-  @SerializedName("location")
-  val location: kotlin.Any? = null,
+    @SerializedName("event_fee_amount")
+    val eventFeeAmount: java.math.BigDecimal? = java.math.BigDecimal("0"),
 
-)
+    /* JSON object containing location details */
+    @SerializedName("location")
+    val location: kotlin.Any? = null
+
+) {
+
+
+}
+

@@ -7,65 +7,71 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param communityId
- * @param title
- * @param bannerUrl
- * @param description
- * @param discussionLanguages
- * @param iconUrl
- * @param localOnly
- * @param nsfw
- * @param restrictedToMods
- * @param questionAnswer
- * @param rules
+ * @param communityId 
+ * @param title 
+ * @param bannerUrl 
+ * @param description 
+ * @param discussionLanguages 
+ * @param iconUrl 
+ * @param localOnly 
+ * @param nsfw 
+ * @param restrictedToMods 
+ * @param questionAnswer 
+ * @param rules 
  */
 
-data class EditCommunityRequest(
 
-  @SerializedName("community_id")
-  val communityId: kotlin.Int,
+data class EditCommunityRequest (
 
-  @SerializedName("title")
-  val title: kotlin.String? = null,
+    @SerializedName("community_id")
+    val communityId: kotlin.Int,
 
-  @SerializedName("banner_url")
-  val bannerUrl: kotlin.String? = null,
+    @SerializedName("title")
+    val title: kotlin.String? = null,
 
-  @SerializedName("description")
-  val description: kotlin.String? = null,
+    @SerializedName("banner_url")
+    val bannerUrl: kotlin.String? = null,
 
-  @SerializedName("discussion_languages")
-  val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
+    @SerializedName("description")
+    val description: kotlin.String? = null,
 
-  @SerializedName("icon_url")
-  val iconUrl: kotlin.String? = null,
+    @SerializedName("discussion_languages")
+    val discussionLanguages: kotlin.collections.List<kotlin.Int>? = null,
 
-  @SerializedName("local_only")
-  val localOnly: kotlin.Boolean? = null,
+    @SerializedName("icon_url")
+    val iconUrl: kotlin.String? = null,
 
-  @SerializedName("nsfw")
-  val nsfw: kotlin.Boolean? = null,
+    @SerializedName("local_only")
+    val localOnly: kotlin.Boolean? = null,
 
-  @SerializedName("restricted_to_mods")
-  val restrictedToMods: kotlin.Boolean? = null,
+    @SerializedName("nsfw")
+    val nsfw: kotlin.Boolean? = null,
 
-  @SerializedName("question_answer")
-  val questionAnswer: kotlin.Boolean? = null,
+    @SerializedName("restricted_to_mods")
+    val restrictedToMods: kotlin.Boolean? = null,
 
-  @SerializedName("rules")
-  val rules: kotlin.String? = null,
+    @SerializedName("question_answer")
+    val questionAnswer: kotlin.Boolean? = null,
 
-)
+    @SerializedName("rules")
+    val rules: kotlin.String? = null
+
+) {
+
+
+}
+

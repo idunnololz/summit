@@ -414,7 +414,7 @@ class ErrorApiAdapter(
   override suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Result<LoginResponse> = Result.failure(error)
+  ): Result<Unit> = Result.failure(error)
 
   override suspend fun uploadImage(
     authorization: String?,

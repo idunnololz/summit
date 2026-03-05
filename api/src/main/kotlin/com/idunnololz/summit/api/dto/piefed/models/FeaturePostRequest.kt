@@ -7,49 +7,48 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param postId
- * @param featured
- * @param featureType
+ * @param postId 
+ * @param featured 
+ * @param featureType 
  */
 
-data class FeaturePostRequest(
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+data class FeaturePostRequest (
 
-  @SerializedName("featured")
-  val featured: kotlin.Boolean,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-  @SerializedName("feature_type")
-  val featureType: FeaturePostRequest.FeatureType? = FeatureType.Community,
+    @SerializedName("featured")
+    val featured: kotlin.Boolean,
+
+    @SerializedName("feature_type")
+    val featureType: FeaturePostRequest.FeatureType? = FeatureType.Community
 
 ) {
 
-  /**
-   *
-   *
-   * Values: Community,Local
-   */
-  enum class FeatureType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Community")
-    Community("Community"),
+    /**
+     * 
+     *
+     * Values: Community,Local
+     */
+    enum class FeatureType(val value: kotlin.String) {
+        @SerializedName(value = "Community") Community("Community"),
+        @SerializedName(value = "Local") Local("Local");
+    }
 
-    @SerializedName(value = "Local")
-    Local("Local"),
-  }
 }
+

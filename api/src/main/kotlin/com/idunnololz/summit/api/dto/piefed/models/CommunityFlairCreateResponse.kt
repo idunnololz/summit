@@ -7,52 +7,58 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param id
- * @param communityId
- * @param flairTitle
+ * @param id 
+ * @param communityId 
+ * @param flairTitle 
  * @param textColor Hex color code for the text of the flair
  * @param backgroundColor Hex color code for the background of the flair
- * @param blurImages
+ * @param blurImages 
  * @param apId Legacy tags that existed prior to 1.2 and some tags for remote communities might not have a defined ap_id
  */
 
-data class CommunityFlairCreateResponse(
 
-  @SerializedName("id")
-  val id: kotlin.Int,
+data class CommunityFlairCreateResponse (
 
-  @SerializedName("community_id")
-  val communityId: kotlin.Int,
+    @SerializedName("id")
+    val id: kotlin.Int,
 
-  @SerializedName("flair_title")
-  val flairTitle: kotlin.String,
+    @SerializedName("community_id")
+    val communityId: kotlin.Int,
 
-  /* Hex color code for the text of the flair */
-  @SerializedName("text_color")
-  val textColor: kotlin.String,
+    @SerializedName("flair_title")
+    val flairTitle: kotlin.String,
 
-  /* Hex color code for the background of the flair */
-  @SerializedName("background_color")
-  val backgroundColor: kotlin.String,
+    /* Hex color code for the text of the flair */
+    @SerializedName("text_color")
+    val textColor: kotlin.String,
 
-  @SerializedName("blur_images")
-  val blurImages: kotlin.Boolean,
+    /* Hex color code for the background of the flair */
+    @SerializedName("background_color")
+    val backgroundColor: kotlin.String,
 
-  /* Legacy tags that existed prior to 1.2 and some tags for remote communities might not have a defined ap_id */
-  @SerializedName("ap_id")
-  val apId: kotlin.String?,
+    @SerializedName("blur_images")
+    val blurImages: kotlin.Boolean,
 
-)
+    /* Legacy tags that existed prior to 1.2 and some tags for remote communities might not have a defined ap_id */
+    @SerializedName("ap_id")
+    val apId: kotlin.String?
+
+) {
+
+
+}
+

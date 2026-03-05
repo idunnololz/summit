@@ -7,37 +7,43 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param postId
- * @param score
- * @param `private`
- * @param emoji
+ * @param postId 
+ * @param score 
+ * @param `private` 
+ * @param emoji 
  */
 
-data class LikePostRequest(
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+data class LikePostRequest (
 
-  @SerializedName("score")
-  val score: kotlin.Int,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-  @SerializedName("private")
-  val `private`: kotlin.Boolean? = null,
+    @SerializedName("score")
+    val score: kotlin.Int,
 
-  @SerializedName("emoji")
-  val emoji: kotlin.String? = null,
+    @SerializedName("private")
+    val `private`: kotlin.Boolean? = null,
 
-)
+    @SerializedName("emoji")
+    val emoji: kotlin.String? = null
+
+) {
+
+
+}
+

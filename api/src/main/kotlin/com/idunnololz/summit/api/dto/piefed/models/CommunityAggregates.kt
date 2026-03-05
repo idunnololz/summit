@@ -7,61 +7,67 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param id
- * @param postCount
- * @param postReplyCount
- * @param published
- * @param subscriptionsCount
- * @param totalSubscriptionsCount
- * @param activeDaily
- * @param activeWeekly
- * @param activeMonthly
- * @param active6monthly
+ * @param id 
+ * @param postCount 
+ * @param postReplyCount 
+ * @param published 
+ * @param subscriptionsCount 
+ * @param totalSubscriptionsCount 
+ * @param activeDaily 
+ * @param activeWeekly 
+ * @param activeMonthly 
+ * @param active6monthly 
  */
 
-data class CommunityAggregates(
 
-  @SerializedName("id")
-  val id: kotlin.Int,
+data class CommunityAggregates (
 
-  @SerializedName("post_count")
-  val postCount: kotlin.Int,
+    @SerializedName("id")
+    val id: kotlin.Int,
 
-  @SerializedName("post_reply_count")
-  val postReplyCount: kotlin.Int,
+    @SerializedName("post_count")
+    val postCount: kotlin.Int,
 
-  @SerializedName("published")
-  val published: kotlin.String,
+    @SerializedName("post_reply_count")
+    val postReplyCount: kotlin.Int,
 
-  @SerializedName("subscriptions_count")
-  val subscriptionsCount: kotlin.Int,
+    @SerializedName("published")
+    val published: kotlin.String,
 
-  @SerializedName("total_subscriptions_count")
-  val totalSubscriptionsCount: kotlin.Int,
+    @SerializedName("subscriptions_count")
+    val subscriptionsCount: kotlin.Int,
 
-  @SerializedName("active_daily")
-  val activeDaily: kotlin.Int? = null,
+    @SerializedName("total_subscriptions_count")
+    val totalSubscriptionsCount: kotlin.Int,
 
-  @SerializedName("active_weekly")
-  val activeWeekly: kotlin.Int? = null,
+    @SerializedName("active_daily")
+    val activeDaily: kotlin.Int? = null,
 
-  @SerializedName("active_monthly")
-  val activeMonthly: kotlin.Int? = null,
+    @SerializedName("active_weekly")
+    val activeWeekly: kotlin.Int? = null,
 
-  @SerializedName("active_6monthly")
-  val active6monthly: kotlin.Int? = null,
+    @SerializedName("active_monthly")
+    val activeMonthly: kotlin.Int? = null,
 
-)
+    @SerializedName("active_6monthly")
+    val active6monthly: kotlin.Int? = null
+
+) {
+
+
+}
+

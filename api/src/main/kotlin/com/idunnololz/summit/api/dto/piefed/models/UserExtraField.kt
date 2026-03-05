@@ -7,33 +7,39 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param id
- * @param label
- * @param text
+ * @param id 
+ * @param label 
+ * @param text 
  */
 
-data class UserExtraField(
 
-  @SerializedName("id")
-  val id: kotlin.Int,
+data class UserExtraField (
 
-  @SerializedName("label")
-  val label: kotlin.String,
+    @SerializedName("id")
+    val id: kotlin.Int,
 
-  @SerializedName("text")
-  val text: kotlin.String,
+    @SerializedName("label")
+    val label: kotlin.String,
 
-)
+    @SerializedName("text")
+    val text: kotlin.String
+
+) {
+
+
+}
+

@@ -7,33 +7,39 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param commentCount
- * @param personId
- * @param postCount
+ * @param commentCount 
+ * @param personId 
+ * @param postCount 
  */
 
-data class PersonAggregates(
 
-  @SerializedName("comment_count")
-  val commentCount: kotlin.Int,
+data class PersonAggregates (
 
-  @SerializedName("person_id")
-  val personId: kotlin.Int,
+    @SerializedName("comment_count")
+    val commentCount: kotlin.Int,
 
-  @SerializedName("post_count")
-  val postCount: kotlin.Int,
+    @SerializedName("person_id")
+    val personId: kotlin.Int,
 
-)
+    @SerializedName("post_count")
+    val postCount: kotlin.Int
+
+) {
+
+
+}
+

@@ -487,7 +487,7 @@ interface LemmyLikeApi : ApiCompat {
   suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Result<LoginResponse>
+  ): Result<Unit>
 
   /**
    * Upload an image.

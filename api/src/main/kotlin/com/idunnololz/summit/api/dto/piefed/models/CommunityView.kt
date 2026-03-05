@@ -7,67 +7,64 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.CommunityAggregates
 import com.idunnololz.summit.api.dto.piefed.models.CommunityFlair
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param activityAlert
- * @param blocked
- * @param community
- * @param counts
- * @param subscribed
- * @param flairList
+ * @param activityAlert 
+ * @param blocked 
+ * @param community 
+ * @param counts 
+ * @param subscribed 
+ * @param flairList 
  */
 
-data class CommunityView(
 
-  @SerializedName("activity_alert")
-  val activityAlert: kotlin.Boolean,
+data class CommunityView (
 
-  @SerializedName("blocked")
-  val blocked: kotlin.Boolean,
+    @SerializedName("activity_alert")
+    val activityAlert: kotlin.Boolean,
 
-  @SerializedName("community")
-  val community: Community,
+    @SerializedName("blocked")
+    val blocked: kotlin.Boolean,
 
-  @SerializedName("counts")
-  val counts: CommunityAggregates,
+    @SerializedName("community")
+    val community: Community,
 
-  @SerializedName("subscribed")
-  val subscribed: CommunityView.Subscribed? = null,
+    @SerializedName("counts")
+    val counts: CommunityAggregates,
 
-  @SerializedName("flair_list")
-  val flairList: kotlin.collections.List<CommunityFlair>? = null,
+    @SerializedName("subscribed")
+    val subscribed: CommunityView.Subscribed? = null,
+
+    @SerializedName("flair_list")
+    val flairList: kotlin.collections.List<CommunityFlair>? = null
 
 ) {
 
-  /**
-   *
-   *
-   * Values: Subscribed,NotSubscribed,Pending
-   */
-  enum class Subscribed(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Subscribed")
-    Subscribed("Subscribed"),
+    /**
+     * 
+     *
+     * Values: Subscribed,NotSubscribed,Pending
+     */
+    enum class Subscribed(val value: kotlin.String) {
+        @SerializedName(value = "Subscribed") Subscribed("Subscribed"),
+        @SerializedName(value = "NotSubscribed") NotSubscribed("NotSubscribed"),
+        @SerializedName(value = "Pending") Pending("Pending");
+    }
 
-    @SerializedName(value = "NotSubscribed")
-    NotSubscribed("NotSubscribed"),
-
-    @SerializedName(value = "Pending")
-    Pending("Pending"),
-  }
 }
+

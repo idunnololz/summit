@@ -7,36 +7,42 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
- *
+ * 
  *
  * @param id Pass an id of an existing extra field with null/missing/empty label or text to remove a field. Pass an id of an existing extra field with both label and text to edit an existing extra field.
  * @param label Pass a label and text without an id to create a new extra field.
  * @param text Pass a label and text without an id to create a new extra field.
  */
 
-data class NewUserExtraField(
 
-  /* Pass an id of an existing extra field with null/missing/empty label or text to remove a field. Pass an id of an existing extra field with both label and text to edit an existing extra field. */
-  @SerializedName("id")
-  val id: kotlin.Int? = null,
+data class NewUserExtraField (
 
-  /* Pass a label and text without an id to create a new extra field. */
-  @SerializedName("label")
-  val label: kotlin.String? = null,
+    /* Pass an id of an existing extra field with null/missing/empty label or text to remove a field. Pass an id of an existing extra field with both label and text to edit an existing extra field. */
+    @SerializedName("id")
+    val id: kotlin.Int? = null,
 
-  /* Pass a label and text without an id to create a new extra field. */
-  @SerializedName("text")
-  val text: kotlin.String? = null,
+    /* Pass a label and text without an id to create a new extra field. */
+    @SerializedName("label")
+    val label: kotlin.String? = null,
 
-)
+    /* Pass a label and text without an id to create a new extra field. */
+    @SerializedName("text")
+    val text: kotlin.String? = null
+
+) {
+
+
+}
+

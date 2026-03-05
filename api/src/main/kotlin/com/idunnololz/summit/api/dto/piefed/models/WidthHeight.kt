@@ -7,29 +7,35 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param width
- * @param height
+ * @param width 
+ * @param height 
  */
 
-data class WidthHeight(
 
-  @SerializedName("width")
-  val width: kotlin.Int? = null,
+data class WidthHeight (
 
-  @SerializedName("height")
-  val height: kotlin.Int? = null,
+    @SerializedName("width")
+    val width: kotlin.Int? = null,
 
-)
+    @SerializedName("height")
+    val height: kotlin.Int? = null
+
+) {
+
+
+}
+

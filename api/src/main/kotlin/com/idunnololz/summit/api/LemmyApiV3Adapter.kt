@@ -549,8 +549,9 @@ class LemmyApiV3Adapter(
   override suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Result<LoginResponse> =
+  ): Result<Unit> =
     retrofitErrorHandler { api.saveUserSettings(generateHeaders(authorization, false), args) }
+      .map { Unit }
 
   override suspend fun uploadImage(
     authorization: String?,

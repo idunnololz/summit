@@ -7,26 +7,32 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.PersonView
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param personView
+ * @param personView 
  */
 
-data class UserSetNoteResponse(
 
-  @SerializedName("person_view")
-  val personView: PersonView? = null,
+data class UserSetNoteResponse (
 
-)
+    @SerializedName("person_view")
+    val personView: PersonView? = null
+
+) {
+
+
+}
+

@@ -7,70 +7,63 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 import com.idunnololz.summit.api.dto.piefed.models.PersonView
 import com.idunnololz.summit.api.dto.piefed.models.PostView
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param communities
- * @param posts
- * @param users
- * @param comments
- * @param type
+ * @param communities 
+ * @param posts 
+ * @param users 
+ * @param comments 
+ * @param type 
  */
 
-data class SearchResponse(
 
-  @SerializedName("communities")
-  val communities: kotlin.collections.List<CommunityView>,
+data class SearchResponse (
 
-  @SerializedName("posts")
-  val posts: kotlin.collections.List<PostView>,
+    @SerializedName("communities")
+    val communities: kotlin.collections.List<CommunityView>,
 
-  @SerializedName("users")
-  val users: kotlin.collections.List<PersonView>,
+    @SerializedName("posts")
+    val posts: kotlin.collections.List<PostView>,
 
-  @SerializedName("comments")
-  val comments: kotlin.collections.List<CommentView>,
+    @SerializedName("users")
+    val users: kotlin.collections.List<PersonView>,
 
-  @SerializedName("type_")
-  val type: SearchResponse.Type? = null,
+    @SerializedName("comments")
+    val comments: kotlin.collections.List<CommentView>,
+
+    @SerializedName("type_")
+    val type: SearchResponse.Type? = null
 
 ) {
 
-  /**
-   *
-   *
-   * Values: Communities,Posts,Users,Url,Comments
-   */
-  enum class Type(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Communities")
-    Communities("Communities"),
+    /**
+     * 
+     *
+     * Values: Communities,Posts,Users,Url,Comments
+     */
+    enum class Type(val value: kotlin.String) {
+        @SerializedName(value = "Communities") Communities("Communities"),
+        @SerializedName(value = "Posts") Posts("Posts"),
+        @SerializedName(value = "Users") Users("Users"),
+        @SerializedName(value = "Url") Url("Url"),
+        @SerializedName(value = "Comments") Comments("Comments");
+    }
 
-    @SerializedName(value = "Posts")
-    Posts("Posts"),
-
-    @SerializedName(value = "Users")
-    Users("Users"),
-
-    @SerializedName(value = "Url")
-    Url("Url"),
-
-    @SerializedName(value = "Comments")
-    Comments("Comments"),
-  }
 }
+

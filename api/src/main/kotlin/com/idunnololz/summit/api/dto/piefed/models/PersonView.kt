@@ -7,39 +7,45 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.PersonAggregates
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param activityAlert
- * @param counts
- * @param isAdmin
- * @param person
+ * @param activityAlert 
+ * @param counts 
+ * @param isAdmin 
+ * @param person 
  */
 
-data class PersonView(
 
-  @SerializedName("activity_alert")
-  val activityAlert: kotlin.Boolean,
+data class PersonView (
 
-  @SerializedName("counts")
-  val counts: PersonAggregates,
+    @SerializedName("activity_alert")
+    val activityAlert: kotlin.Boolean,
 
-  @SerializedName("is_admin")
-  val isAdmin: kotlin.Boolean,
+    @SerializedName("counts")
+    val counts: PersonAggregates,
 
-  @SerializedName("person")
-  val person: Person,
+    @SerializedName("is_admin")
+    val isAdmin: kotlin.Boolean,
 
-)
+    @SerializedName("person")
+    val person: Person
+
+) {
+
+
+}
+

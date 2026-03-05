@@ -7,30 +7,36 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param postId
+ * @param postId 
  * @param flairIdList A list of all the flair id to assign to the post. Either pass an empty list or null to remove flair
  */
 
-data class PostSetFlairRequest(
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+data class PostSetFlairRequest (
 
-  /* A list of all the flair id to assign to the post. Either pass an empty list or null to remove flair */
-  @SerializedName("flair_id_list")
-  val flairIdList: kotlin.collections.List<kotlin.Int>? = null,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-)
+    /* A list of all the flair id to assign to the post. Either pass an empty list or null to remove flair */
+    @SerializedName("flair_id_list")
+    val flairIdList: kotlin.collections.List<kotlin.Int>? = null
+
+) {
+
+
+}
+

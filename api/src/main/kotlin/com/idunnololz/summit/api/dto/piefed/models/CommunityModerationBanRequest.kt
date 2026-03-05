@@ -7,41 +7,47 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param communityId
- * @param reason
- * @param userId
- * @param expiresAt
- * @param permanent
+ * @param communityId 
+ * @param reason 
+ * @param userId 
+ * @param expiresAt 
+ * @param permanent 
  */
 
-data class CommunityModerationBanRequest(
 
-  @SerializedName("community_id")
-  val communityId: kotlin.Int,
+data class CommunityModerationBanRequest (
 
-  @SerializedName("reason")
-  val reason: kotlin.String,
+    @SerializedName("community_id")
+    val communityId: kotlin.Int,
 
-  @SerializedName("user_id")
-  val userId: kotlin.Int,
+    @SerializedName("reason")
+    val reason: kotlin.String,
 
-  @SerializedName("expires_at")
-  val expiresAt: kotlin.String? = null,
+    @SerializedName("user_id")
+    val userId: kotlin.Int,
 
-  @SerializedName("permanent")
-  val permanent: kotlin.Boolean? = null,
+    @SerializedName("expires_at")
+    val expiresAt: kotlin.String? = null,
 
-)
+    @SerializedName("permanent")
+    val permanent: kotlin.Boolean? = null
+
+) {
+
+
+}
+

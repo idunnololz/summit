@@ -7,18 +7,19 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
- *
+ * 
  *
  * @param emailUnread Receive email about missed notifications (if set up by local admin)
  * @param federateVotes If false, votes are only counted on local instance instead of federated remotely
@@ -33,329 +34,217 @@ import com.google.gson.annotations.SerializedName
  * @param showBotAccounts True for any visibility option other than Hide
  * @param showNsfl True for any visibility option other than Hide
  * @param showNsfw True for any visibility option other than Hide
- * @param showReadPosts
- * @param showScores
+ * @param showReadPosts 
+ * @param showScores 
  * @param acceptPrivateMessages Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
- * @param botVisibility
- * @param aiVisibility
+ * @param botVisibility 
+ * @param aiVisibility 
  * @param communityKeywordFilter Filter out communities with these words in their name
- * @param defaultCommentSortType
- * @param defaultListingType
- * @param defaultSortType
- * @param nsflVisibility
- * @param nsfwVisibility
+ * @param defaultCommentSortType 
+ * @param defaultListingType 
+ * @param defaultSortType 
+ * @param nsflVisibility 
+ * @param nsfwVisibility 
  */
 
-data class LocalUser(
 
-  /* Receive email about missed notifications (if set up by local admin) */
-  @SerializedName("email_unread")
-  val emailUnread: kotlin.Boolean,
+data class LocalUser (
 
-  /* If false, votes are only counted on local instance instead of federated remotely */
-  @SerializedName("federate_votes")
-  val federateVotes: kotlin.Boolean,
+    /* Receive email about missed notifications (if set up by local admin) */
+    @SerializedName("email_unread")
+    val emailUnread: kotlin.Boolean,
 
-  /* Automatically follow communities in a subscribed feed */
-  @SerializedName("feed_auto_follow")
-  val feedAutoFollow: kotlin.Boolean,
+    /* If false, votes are only counted on local instance instead of federated remotely */
+    @SerializedName("federate_votes")
+    val federateVotes: kotlin.Boolean,
 
-  /* Automatically leave communities when unsubscribing from a feed. Does not impact communities joined outside of a feed auto-follow. */
-  @SerializedName("feed_auto_leave")
-  val feedAutoLeave: kotlin.Boolean,
+    /* Automatically follow communities in a subscribed feed */
+    @SerializedName("feed_auto_follow")
+    val feedAutoFollow: kotlin.Boolean,
 
-  /* Hide posts from communities marked as low-quality by the local instance admin */
-  @SerializedName("hide_low_quality")
-  val hideLowQuality: kotlin.Boolean,
+    /* Automatically leave communities when unsubscribing from a feed. Does not impact communities joined outside of a feed auto-follow. */
+    @SerializedName("feed_auto_leave")
+    val feedAutoLeave: kotlin.Boolean,
 
-  /* If posts can show up in search results */
-  @SerializedName("indexable")
-  val indexable: kotlin.Boolean,
+    /* Hide posts from communities marked as low-quality by the local instance admin */
+    @SerializedName("hide_low_quality")
+    val hideLowQuality: kotlin.Boolean,
 
-  /* Subscribe to the email newsletter that the local instance admin can send */
-  @SerializedName("newsletter")
-  val newsletter: kotlin.Boolean,
+    /* If posts can show up in search results */
+    @SerializedName("indexable")
+    val indexable: kotlin.Boolean,
 
-  /* Collapse replies with a score at or below this level */
-  @SerializedName("reply_collapse_threshold")
-  val replyCollapseThreshold: kotlin.Int,
+    /* Subscribe to the email newsletter that the local instance admin can send */
+    @SerializedName("newsletter")
+    val newsletter: kotlin.Boolean,
 
-  /* Hide replies with a score at or below this level */
-  @SerializedName("reply_hide_threshold")
-  val replyHideThreshold: kotlin.Int,
+    /* Collapse replies with a score at or below this level */
+    @SerializedName("reply_collapse_threshold")
+    val replyCollapseThreshold: kotlin.Int,
 
-  /* If profile shows up in the user list on the instance */
-  @SerializedName("searchable")
-  val searchable: kotlin.Boolean,
+    /* Hide replies with a score at or below this level */
+    @SerializedName("reply_hide_threshold")
+    val replyHideThreshold: kotlin.Int,
 
-  /* True for any visibility option other than Hide */
-  @SerializedName("show_bot_accounts")
-  val showBotAccounts: kotlin.Boolean,
+    /* If profile shows up in the user list on the instance */
+    @SerializedName("searchable")
+    val searchable: kotlin.Boolean,
 
-  /* True for any visibility option other than Hide */
-  @SerializedName("show_nsfl")
-  val showNsfl: kotlin.Boolean,
+    /* True for any visibility option other than Hide */
+    @SerializedName("show_bot_accounts")
+    val showBotAccounts: kotlin.Boolean,
 
-  /* True for any visibility option other than Hide */
-  @SerializedName("show_nsfw")
-  val showNsfw: kotlin.Boolean,
+    /* True for any visibility option other than Hide */
+    @SerializedName("show_nsfl")
+    val showNsfl: kotlin.Boolean,
 
-  @SerializedName("show_read_posts")
-  val showReadPosts: kotlin.Boolean,
+    /* True for any visibility option other than Hide */
+    @SerializedName("show_nsfw")
+    val showNsfw: kotlin.Boolean,
 
-  @SerializedName("show_scores")
-  val showScores: kotlin.Boolean,
+    @SerializedName("show_read_posts")
+    val showReadPosts: kotlin.Boolean,
 
-  /* Accept private messages from nobody, local users only, \"trusted\" instances, or any instance */
-  @SerializedName("accept_private_messages")
-  val acceptPrivateMessages: LocalUser.AcceptPrivateMessages? = null,
+    @SerializedName("show_scores")
+    val showScores: kotlin.Boolean,
 
-  @SerializedName("bot_visibility")
-  val botVisibility: LocalUser.BotVisibility? = null,
+    /* Accept private messages from nobody, local users only, \"trusted\" instances, or any instance */
+    @SerializedName("accept_private_messages")
+    val acceptPrivateMessages: LocalUser.AcceptPrivateMessages? = null,
 
-  @SerializedName("ai_visibility")
-  val aiVisibility: LocalUser.AiVisibility? = null,
+    @SerializedName("bot_visibility")
+    val botVisibility: LocalUser.BotVisibility? = null,
 
-  /* Filter out communities with these words in their name */
-  @SerializedName("community_keyword_filter")
-  val communityKeywordFilter: kotlin.collections.List<kotlin.String>? = null,
+    @SerializedName("ai_visibility")
+    val aiVisibility: LocalUser.AiVisibility? = null,
 
-  @SerializedName("default_comment_sort_type")
-  val defaultCommentSortType: LocalUser.DefaultCommentSortType? = null,
+    /* Filter out communities with these words in their name */
+    @SerializedName("community_keyword_filter")
+    val communityKeywordFilter: kotlin.collections.List<kotlin.String>? = null,
 
-  @SerializedName("default_listing_type")
-  val defaultListingType: LocalUser.DefaultListingType? = null,
+    @SerializedName("default_comment_sort_type")
+    val defaultCommentSortType: LocalUser.DefaultCommentSortType? = null,
 
-  @SerializedName("default_sort_type")
-  val defaultSortType: LocalUser.DefaultSortType? = null,
+    @SerializedName("default_listing_type")
+    val defaultListingType: LocalUser.DefaultListingType? = null,
 
-  @SerializedName("nsfl_visibility")
-  val nsflVisibility: LocalUser.NsflVisibility? = null,
+    @SerializedName("default_sort_type")
+    val defaultSortType: LocalUser.DefaultSortType? = null,
 
-  @SerializedName("nsfw_visibility")
-  val nsfwVisibility: LocalUser.NsfwVisibility? = null,
+    @SerializedName("nsfl_visibility")
+    val nsflVisibility: LocalUser.NsflVisibility? = null,
+
+    @SerializedName("nsfw_visibility")
+    val nsfwVisibility: LocalUser.NsfwVisibility? = null
 
 ) {
 
-  /**
-   * Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
-   *
-   * Values: None,Local,Trusted,All
-   */
-  enum class AcceptPrivateMessages(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "None")
-    None("None"),
+    /**
+     * Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
+     *
+     * Values: None,Local,Trusted,All
+     */
+    enum class AcceptPrivateMessages(val value: kotlin.String) {
+        @SerializedName(value = "None") None("None"),
+        @SerializedName(value = "Local") Local("Local"),
+        @SerializedName(value = "Trusted") Trusted("Trusted"),
+        @SerializedName(value = "All") All("All");
+    }
+    /**
+     * 
+     *
+     * Values: Show,Blur,Hide,Transparent
+     */
+    enum class BotVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Blur") Blur("Blur"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
+    /**
+     * 
+     *
+     * Values: Show,Hide,Label,Transparent
+     */
+    enum class AiVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Label") Label("Label"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
+    /**
+     * 
+     *
+     * Values: Hot,Top,TopAll,New,Old,Controversial
+     */
+    enum class DefaultCommentSortType(val value: kotlin.String) {
+        @SerializedName(value = "Hot") Hot("Hot"),
+        @SerializedName(value = "Top") Top("Top"),
+        @SerializedName(value = "TopAll") TopAll("TopAll"),
+        @SerializedName(value = "New") New("New"),
+        @SerializedName(value = "Old") Old("Old"),
+        @SerializedName(value = "Controversial") Controversial("Controversial");
+    }
+    /**
+     * 
+     *
+     * Values: All,Local,Subscribed,Popular,Moderating,ModeratorView
+     */
+    enum class DefaultListingType(val value: kotlin.String) {
+        @SerializedName(value = "All") All("All"),
+        @SerializedName(value = "Local") Local("Local"),
+        @SerializedName(value = "Subscribed") Subscribed("Subscribed"),
+        @SerializedName(value = "Popular") Popular("Popular"),
+        @SerializedName(value = "Moderating") Moderating("Moderating"),
+        @SerializedName(value = "ModeratorView") ModeratorView("ModeratorView");
+    }
+    /**
+     * 
+     *
+     * Values: Active,Hot,New,Top,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled,Old,Relevance
+     */
+    enum class DefaultSortType(val value: kotlin.String) {
+        @SerializedName(value = "Active") Active("Active"),
+        @SerializedName(value = "Hot") Hot("Hot"),
+        @SerializedName(value = "New") New("New"),
+        @SerializedName(value = "Top") Top("Top"),
+        @SerializedName(value = "TopHour") TopHour("TopHour"),
+        @SerializedName(value = "TopSixHour") TopSixHour("TopSixHour"),
+        @SerializedName(value = "TopTwelveHour") TopTwelveHour("TopTwelveHour"),
+        @SerializedName(value = "TopDay") TopDay("TopDay"),
+        @SerializedName(value = "TopWeek") TopWeek("TopWeek"),
+        @SerializedName(value = "TopMonth") TopMonth("TopMonth"),
+        @SerializedName(value = "TopThreeMonths") TopThreeMonths("TopThreeMonths"),
+        @SerializedName(value = "TopSixMonths") TopSixMonths("TopSixMonths"),
+        @SerializedName(value = "TopNineMonths") TopNineMonths("TopNineMonths"),
+        @SerializedName(value = "TopYear") TopYear("TopYear"),
+        @SerializedName(value = "TopAll") TopAll("TopAll"),
+        @SerializedName(value = "Scaled") Scaled("Scaled"),
+        @SerializedName(value = "Old") Old("Old"),
+        @SerializedName(value = "Relevance") Relevance("Relevance");
+    }
+    /**
+     * 
+     *
+     * Values: Show,Blur,Hide,Transparent
+     */
+    enum class NsflVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Blur") Blur("Blur"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
+    /**
+     * 
+     *
+     * Values: Show,Blur,Hide,Transparent
+     */
+    enum class NsfwVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Blur") Blur("Blur"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
 
-    @SerializedName(value = "Local")
-    Local("Local"),
-
-    @SerializedName(value = "Trusted")
-    Trusted("Trusted"),
-
-    @SerializedName(value = "All")
-    All("All"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class BotVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Hide,Label,Transparent
-   */
-  enum class AiVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Label")
-    Label("Label"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   *
-   *
-   * Values: Hot,Top,TopAll,New,Old,Controversial
-   */
-  enum class DefaultCommentSortType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Hot")
-    Hot("Hot"),
-
-    @SerializedName(value = "Top")
-    Top("Top"),
-
-    @SerializedName(value = "TopAll")
-    TopAll("TopAll"),
-
-    @SerializedName(value = "New")
-    New("New"),
-
-    @SerializedName(value = "Old")
-    Old("Old"),
-
-    @SerializedName(value = "Controversial")
-    Controversial("Controversial"),
-  }
-
-  /**
-   *
-   *
-   * Values: All,Local,Subscribed,Popular,Moderating,ModeratorView
-   */
-  enum class DefaultListingType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "All")
-    All("All"),
-
-    @SerializedName(value = "Local")
-    Local("Local"),
-
-    @SerializedName(value = "Subscribed")
-    Subscribed("Subscribed"),
-
-    @SerializedName(value = "Popular")
-    Popular("Popular"),
-
-    @SerializedName(value = "Moderating")
-    Moderating("Moderating"),
-
-    @SerializedName(value = "ModeratorView")
-    ModeratorView("ModeratorView"),
-  }
-
-  /**
-   *
-   *
-   * Values: Active,Hot,New,Top,TopHour,TopSixHour,TopTwelveHour,TopDay,TopWeek,TopMonth,TopThreeMonths,TopSixMonths,TopNineMonths,TopYear,TopAll,Scaled,Old,Relevance
-   */
-  enum class DefaultSortType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Active")
-    Active("Active"),
-
-    @SerializedName(value = "Hot")
-    Hot("Hot"),
-
-    @SerializedName(value = "New")
-    New("New"),
-
-    @SerializedName(value = "Top")
-    Top("Top"),
-
-    @SerializedName(value = "TopHour")
-    TopHour("TopHour"),
-
-    @SerializedName(value = "TopSixHour")
-    TopSixHour("TopSixHour"),
-
-    @SerializedName(value = "TopTwelveHour")
-    TopTwelveHour("TopTwelveHour"),
-
-    @SerializedName(value = "TopDay")
-    TopDay("TopDay"),
-
-    @SerializedName(value = "TopWeek")
-    TopWeek("TopWeek"),
-
-    @SerializedName(value = "TopMonth")
-    TopMonth("TopMonth"),
-
-    @SerializedName(value = "TopThreeMonths")
-    TopThreeMonths("TopThreeMonths"),
-
-    @SerializedName(value = "TopSixMonths")
-    TopSixMonths("TopSixMonths"),
-
-    @SerializedName(value = "TopNineMonths")
-    TopNineMonths("TopNineMonths"),
-
-    @SerializedName(value = "TopYear")
-    TopYear("TopYear"),
-
-    @SerializedName(value = "TopAll")
-    TopAll("TopAll"),
-
-    @SerializedName(value = "Scaled")
-    Scaled("Scaled"),
-
-    @SerializedName(value = "Old")
-    Old("Old"),
-
-    @SerializedName(value = "Relevance")
-    Relevance("Relevance"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class NsflVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class NsfwVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
 }
+

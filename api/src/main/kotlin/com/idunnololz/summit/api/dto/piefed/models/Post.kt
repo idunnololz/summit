@@ -7,170 +7,161 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.MiniCrossPosts
 import com.idunnololz.summit.api.dto.piefed.models.PostEvent
 import com.idunnololz.summit.api.dto.piefed.models.PostPoll
 import com.idunnololz.summit.api.dto.piefed.models.Reactions
 import com.idunnololz.summit.api.dto.piefed.models.WidthHeight
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param apId
- * @param communityId
- * @param deleted
- * @param id
- * @param languageId
- * @param local
- * @param locked
- * @param nsfw
- * @param aiGenerated
- * @param published
- * @param removed
- * @param sticky
- * @param instanceSticky
- * @param title
- * @param userId
- * @param altText
- * @param body
- * @param smallThumbnailUrl
- * @param thumbnailUrl
- * @param updated
- * @param url
- * @param imageDetails
- * @param crossPosts
- * @param postType
- * @param tags
- * @param flair
- * @param emojiReactions
- * @param event
- * @param poll
+ * @param apId 
+ * @param communityId 
+ * @param deleted 
+ * @param id 
+ * @param languageId 
+ * @param local 
+ * @param locked 
+ * @param nsfw 
+ * @param aiGenerated 
+ * @param published 
+ * @param removed 
+ * @param sticky 
+ * @param instanceSticky 
+ * @param title 
+ * @param userId 
+ * @param altText 
+ * @param body 
+ * @param smallThumbnailUrl 
+ * @param thumbnailUrl 
+ * @param updated 
+ * @param url 
+ * @param imageDetails 
+ * @param crossPosts 
+ * @param postType 
+ * @param tags 
+ * @param flair 
+ * @param emojiReactions 
+ * @param event 
+ * @param poll 
  */
 
-data class Post(
 
-  @SerializedName("ap_id")
-  val apId: kotlin.String,
+data class Post (
 
-  @SerializedName("community_id")
-  val communityId: kotlin.Int,
+    @SerializedName("ap_id")
+    val apId: kotlin.String,
 
-  @SerializedName("deleted")
-  val deleted: kotlin.Boolean,
+    @SerializedName("community_id")
+    val communityId: kotlin.Int,
 
-  @SerializedName("id")
-  val id: kotlin.Int,
+    @SerializedName("deleted")
+    val deleted: kotlin.Boolean,
 
-  @SerializedName("language_id")
-  val languageId: kotlin.Int,
+    @SerializedName("id")
+    val id: kotlin.Int,
 
-  @SerializedName("local")
-  val local: kotlin.Boolean,
+    @SerializedName("language_id")
+    val languageId: kotlin.Int,
 
-  @SerializedName("locked")
-  val locked: kotlin.Boolean,
+    @SerializedName("local")
+    val local: kotlin.Boolean,
 
-  @SerializedName("nsfw")
-  val nsfw: kotlin.Boolean,
+    @SerializedName("locked")
+    val locked: kotlin.Boolean,
 
-  @SerializedName("ai_generated")
-  val aiGenerated: kotlin.Boolean,
+    @SerializedName("nsfw")
+    val nsfw: kotlin.Boolean,
 
-  @SerializedName("published")
-  val published: kotlin.String,
+    @SerializedName("ai_generated")
+    val aiGenerated: kotlin.Boolean,
 
-  @SerializedName("removed")
-  val removed: kotlin.Boolean,
+    @SerializedName("published")
+    val published: kotlin.String,
 
-  @SerializedName("sticky")
-  val sticky: kotlin.Boolean,
+    @SerializedName("removed")
+    val removed: kotlin.Boolean,
 
-  @SerializedName("instance_sticky")
-  val instanceSticky: kotlin.Boolean,
+    @SerializedName("sticky")
+    val sticky: kotlin.Boolean,
 
-  @SerializedName("title")
-  val title: kotlin.String,
+    @SerializedName("instance_sticky")
+    val instanceSticky: kotlin.Boolean,
 
-  @SerializedName("user_id")
-  val userId: kotlin.Int,
+    @SerializedName("title")
+    val title: kotlin.String,
 
-  @SerializedName("alt_text")
-  val altText: kotlin.String? = null,
+    @SerializedName("user_id")
+    val userId: kotlin.Int,
 
-  @SerializedName("body")
-  val body: kotlin.String? = null,
+    @SerializedName("alt_text")
+    val altText: kotlin.String? = null,
 
-  @SerializedName("small_thumbnail_url")
-  val smallThumbnailUrl: kotlin.String? = null,
+    @SerializedName("body")
+    val body: kotlin.String? = null,
 
-  @SerializedName("thumbnail_url")
-  val thumbnailUrl: kotlin.String? = null,
+    @SerializedName("small_thumbnail_url")
+    val smallThumbnailUrl: kotlin.String? = null,
 
-  @SerializedName("updated")
-  val updated: kotlin.String? = null,
+    @SerializedName("thumbnail_url")
+    val thumbnailUrl: kotlin.String? = null,
 
-  @SerializedName("url")
-  val url: kotlin.String? = null,
+    @SerializedName("updated")
+    val updated: kotlin.String? = null,
 
-  @SerializedName("image_details")
-  val imageDetails: WidthHeight? = null,
+    @SerializedName("url")
+    val url: kotlin.String? = null,
 
-  @SerializedName("cross_posts")
-  val crossPosts: kotlin.collections.List<MiniCrossPosts>? = null,
+    @SerializedName("image_details")
+    val imageDetails: WidthHeight? = null,
 
-  @SerializedName("post_type")
-  val postType: Post.PostType? = null,
+    @SerializedName("cross_posts")
+    val crossPosts: kotlin.collections.List<MiniCrossPosts>? = null,
 
-  @SerializedName("tags")
-  val tags: kotlin.String? = null,
+    @SerializedName("post_type")
+    val postType: Post.PostType? = null,
 
-  @SerializedName("flair")
-  val flair: kotlin.String? = null,
+    @SerializedName("tags")
+    val tags: kotlin.String? = null,
 
-  @SerializedName("emoji_reactions")
-  val emojiReactions: kotlin.collections.List<Reactions>? = null,
+    @SerializedName("flair")
+    val flair: kotlin.String? = null,
 
-  @SerializedName("event")
-  val event: PostEvent? = null,
+    @SerializedName("emoji_reactions")
+    val emojiReactions: kotlin.collections.List<Reactions>? = null,
 
-  @SerializedName("poll")
-  val poll: PostPoll? = null,
+    @SerializedName("event")
+    val event: PostEvent? = null,
+
+    @SerializedName("poll")
+    val poll: PostPoll? = null
 
 ) {
 
-  /**
-   *
-   *
-   * Values: Link,Discussion,Image,Video,Poll,Event
-   */
-  enum class PostType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Link")
-    Link("Link"),
+    /**
+     * 
+     *
+     * Values: Link,Discussion,Image,Video,Poll,Event
+     */
+    enum class PostType(val value: kotlin.String) {
+        @SerializedName(value = "Link") Link("Link"),
+        @SerializedName(value = "Discussion") Discussion("Discussion"),
+        @SerializedName(value = "Image") Image("Image"),
+        @SerializedName(value = "Video") Video("Video"),
+        @SerializedName(value = "Poll") Poll("Poll"),
+        @SerializedName(value = "Event") Event("Event");
+    }
 
-    @SerializedName(value = "Discussion")
-    Discussion("Discussion"),
-
-    @SerializedName(value = "Image")
-    Image("Image"),
-
-    @SerializedName(value = "Video")
-    Video("Video"),
-
-    @SerializedName(value = "Poll")
-    Poll("Poll"),
-
-    @SerializedName(value = "Event")
-    Event("Event"),
-  }
 }
+

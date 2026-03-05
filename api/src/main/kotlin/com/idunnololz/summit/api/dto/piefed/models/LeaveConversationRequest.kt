@@ -7,25 +7,31 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param conversationId
+ * @param conversationId 
  */
 
-data class LeaveConversationRequest(
 
-  @SerializedName("conversation_id")
-  val conversationId: kotlin.Int,
+data class LeaveConversationRequest (
 
-)
+    @SerializedName("conversation_id")
+    val conversationId: kotlin.Int
+
+) {
+
+
+}
+

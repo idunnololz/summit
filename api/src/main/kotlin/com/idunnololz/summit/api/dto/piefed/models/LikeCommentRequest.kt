@@ -7,39 +7,45 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param commentId
+ * @param commentId 
  * @param score -1 to downvote, 1 to upvote, 0 to revert previous vote
  * @param `private` private votes are not federated to other instances
- * @param emoji
+ * @param emoji 
  */
 
-data class LikeCommentRequest(
 
-  @SerializedName("comment_id")
-  val commentId: kotlin.Int,
+data class LikeCommentRequest (
 
-  /* -1 to downvote, 1 to upvote, 0 to revert previous vote */
-  @SerializedName("score")
-  val score: kotlin.Int,
+    @SerializedName("comment_id")
+    val commentId: kotlin.Int,
 
-  /* private votes are not federated to other instances */
-  @SerializedName("private")
-  val `private`: kotlin.Boolean? = false,
+    /* -1 to downvote, 1 to upvote, 0 to revert previous vote */
+    @SerializedName("score")
+    val score: kotlin.Int,
 
-  @SerializedName("emoji")
-  val emoji: kotlin.String? = null,
+    /* private votes are not federated to other instances */
+    @SerializedName("private")
+    val `private`: kotlin.Boolean? = false,
 
-)
+    @SerializedName("emoji")
+    val emoji: kotlin.String? = null
+
+) {
+
+
+}
+

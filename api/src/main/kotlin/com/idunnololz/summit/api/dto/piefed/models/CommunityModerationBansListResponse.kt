@@ -7,30 +7,36 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommunityModerationBanItem
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param items
- * @param nextPage
+ * @param items 
+ * @param nextPage 
  */
 
-data class CommunityModerationBansListResponse(
 
-  @SerializedName("items")
-  val items: kotlin.collections.List<CommunityModerationBanItem>? = null,
+data class CommunityModerationBansListResponse (
 
-  @SerializedName("next_page")
-  val nextPage: kotlin.String? = null,
+    @SerializedName("items")
+    val items: kotlin.collections.List<CommunityModerationBanItem>? = null,
 
-)
+    @SerializedName("next_page")
+    val nextPage: kotlin.String? = null
+
+) {
+
+
+}
+

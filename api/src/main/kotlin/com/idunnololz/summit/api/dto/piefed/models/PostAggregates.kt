@@ -7,53 +7,59 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param comments
- * @param downvotes
- * @param newestCommentTime
- * @param postId
- * @param published
- * @param score
- * @param upvotes
- * @param crossPosts
+ * @param comments 
+ * @param downvotes 
+ * @param newestCommentTime 
+ * @param postId 
+ * @param published 
+ * @param score 
+ * @param upvotes 
+ * @param crossPosts 
  */
 
-data class PostAggregates(
 
-  @SerializedName("comments")
-  val comments: kotlin.Int,
+data class PostAggregates (
 
-  @SerializedName("downvotes")
-  val downvotes: kotlin.Int,
+    @SerializedName("comments")
+    val comments: kotlin.Int,
 
-  @SerializedName("newest_comment_time")
-  val newestCommentTime: kotlin.String,
+    @SerializedName("downvotes")
+    val downvotes: kotlin.Int,
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+    @SerializedName("newest_comment_time")
+    val newestCommentTime: kotlin.String,
 
-  @SerializedName("published")
-  val published: kotlin.String,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-  @SerializedName("score")
-  val score: kotlin.Int,
+    @SerializedName("published")
+    val published: kotlin.String,
 
-  @SerializedName("upvotes")
-  val upvotes: kotlin.Int,
+    @SerializedName("score")
+    val score: kotlin.Int,
 
-  @SerializedName("cross_posts")
-  val crossPosts: kotlin.Int,
+    @SerializedName("upvotes")
+    val upvotes: kotlin.Int,
 
-)
+    @SerializedName("cross_posts")
+    val crossPosts: kotlin.Int
+
+) {
+
+
+}
+

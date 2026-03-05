@@ -7,29 +7,30 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.NewUserExtraField
 
+import com.google.gson.annotations.SerializedName
+
 /**
- *
+ * 
  *
  * @param acceptPrivateMessages Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
  * @param avatar Pass a null value to remove the image
- * @param bio
+ * @param bio 
  * @param bot This user is a bot
- * @param botVisibility
+ * @param botVisibility 
  * @param communityKeywordFilter Filter out communities with these words in their name. Pass null to remove any filters.
  * @param cover Pass a null value to remove the image
- * @param defaultCommentSortType
- * @param defaultSortType
+ * @param defaultCommentSortType 
+ * @param defaultSortType 
  * @param emailUnread Receive email about missed notifications (if set up by local admin)
  * @param extraFields A user can't have more than four total extra fields.
  * @param federateVotes If false, votes are only counted on local instance instead of federated remotely
@@ -43,263 +44,193 @@ import com.idunnololz.summit.api.dto.piefed.models.NewUserExtraField
  * @param genaiVisibility Overrides the show_genai field if provided
  * @param replyCollapseThreshold Collapse replies with a score at or below this level
  * @param replyHideThreshold Hide replies with a score at or below this level
- * @param showNsfw
- * @param showNsfl
- * @param showReadPosts
+ * @param showNsfw 
+ * @param showNsfl 
+ * @param showReadPosts 
  * @param searchable If profile shows up in the user list on the instance
  */
 
-data class UserSaveSettingsRequest(
 
-  /* Accept private messages from nobody, local users only, \"trusted\" instances, or any instance */
-  @SerializedName("accept_private_messages")
-  val acceptPrivateMessages: UserSaveSettingsRequest.AcceptPrivateMessages? = null,
+data class UserSaveSettingsRequest (
 
-  /* Pass a null value to remove the image */
-  @SerializedName("avatar")
-  val avatar: kotlin.String? = null,
+    /* Accept private messages from nobody, local users only, \"trusted\" instances, or any instance */
+    @SerializedName("accept_private_messages")
+    val acceptPrivateMessages: UserSaveSettingsRequest.AcceptPrivateMessages? = null,
 
-  @SerializedName("bio")
-  val bio: kotlin.String? = null,
+    /* Pass a null value to remove the image */
+    @SerializedName("avatar")
+    val avatar: kotlin.String? = null,
 
-  /* This user is a bot */
-  @SerializedName("bot")
-  val bot: kotlin.Boolean? = null,
+    @SerializedName("bio")
+    val bio: kotlin.String? = null,
 
-  @SerializedName("bot_visibility")
-  val botVisibility: UserSaveSettingsRequest.BotVisibility? = null,
+    /* This user is a bot */
+    @SerializedName("bot")
+    val bot: kotlin.Boolean? = null,
 
-  /* Filter out communities with these words in their name. Pass null to remove any filters. */
-  @SerializedName("community_keyword_filter")
-  val communityKeywordFilter: kotlin.collections.List<kotlin.String>? = null,
+    @SerializedName("bot_visibility")
+    val botVisibility: UserSaveSettingsRequest.BotVisibility? = null,
 
-  /* Pass a null value to remove the image */
-  @SerializedName("cover")
-  val cover: kotlin.String? = null,
+    /* Filter out communities with these words in their name. Pass null to remove any filters. */
+    @SerializedName("community_keyword_filter")
+    val communityKeywordFilter: kotlin.collections.List<kotlin.String>? = null,
 
-  @SerializedName("default_comment_sort_type")
-  val defaultCommentSortType: UserSaveSettingsRequest.DefaultCommentSortType? = null,
+    /* Pass a null value to remove the image */
+    @SerializedName("cover")
+    val cover: kotlin.String? = null,
 
-  @SerializedName("default_sort_type")
-  val defaultSortType: UserSaveSettingsRequest.DefaultSortType? = null,
+    @SerializedName("default_comment_sort_type")
+    val defaultCommentSortType: UserSaveSettingsRequest.DefaultCommentSortType? = null,
 
-  /* Receive email about missed notifications (if set up by local admin) */
-  @SerializedName("email_unread")
-  val emailUnread: kotlin.Boolean? = null,
+    @SerializedName("default_sort_type")
+    val defaultSortType: UserSaveSettingsRequest.DefaultSortType? = null,
 
-  /* A user can't have more than four total extra fields. */
-  @SerializedName("extra_fields")
-  val extraFields: kotlin.collections.List<NewUserExtraField>? = null,
+    /* Receive email about missed notifications (if set up by local admin) */
+    @SerializedName("email_unread")
+    val emailUnread: kotlin.Boolean? = null,
 
-  /* If false, votes are only counted on local instance instead of federated remotely */
-  @SerializedName("federate_votes")
-  val federateVotes: kotlin.Boolean? = null,
+    /* A user can't have more than four total extra fields. */
+    @SerializedName("extra_fields")
+    val extraFields: kotlin.collections.List<NewUserExtraField>? = null,
 
-  /* Automatically follow communities in a subscribed feed */
-  @SerializedName("feed_auto_follow")
-  val feedAutoFollow: kotlin.Boolean? = null,
+    /* If false, votes are only counted on local instance instead of federated remotely */
+    @SerializedName("federate_votes")
+    val federateVotes: kotlin.Boolean? = null,
 
-  /* Automatically leave communities when unsubscribing from a feed. Does not impact communities joined outside of a feed auto-follow. */
-  @SerializedName("feed_auto_leave")
-  val feedAutoLeave: kotlin.Boolean? = null,
+    /* Automatically follow communities in a subscribed feed */
+    @SerializedName("feed_auto_follow")
+    val feedAutoFollow: kotlin.Boolean? = null,
 
-  /* Hide posts from communities marked as low-quality by the local instance admin */
-  @SerializedName("hide_low_quality")
-  val hideLowQuality: kotlin.Boolean? = null,
+    /* Automatically leave communities when unsubscribing from a feed. Does not impact communities joined outside of a feed auto-follow. */
+    @SerializedName("feed_auto_leave")
+    val feedAutoLeave: kotlin.Boolean? = null,
 
-  /* If posts can show up in search results */
-  @SerializedName("indexable")
-  val indexable: kotlin.Boolean? = null,
+    /* Hide posts from communities marked as low-quality by the local instance admin */
+    @SerializedName("hide_low_quality")
+    val hideLowQuality: kotlin.Boolean? = null,
 
-  /* Subscribe to the email newsletter that the local instance admin can send */
-  @SerializedName("newsletter")
-  val newsletter: kotlin.Boolean? = null,
+    /* If posts can show up in search results */
+    @SerializedName("indexable")
+    val indexable: kotlin.Boolean? = null,
 
-  /* Overrides the show_nsfl field if provided */
-  @SerializedName("nsfl_visibility")
-  val nsflVisibility: UserSaveSettingsRequest.NsflVisibility? = null,
+    /* Subscribe to the email newsletter that the local instance admin can send */
+    @SerializedName("newsletter")
+    val newsletter: kotlin.Boolean? = null,
 
-  /* Overrides the show_nsfw field if provided */
-  @SerializedName("nsfw_visibility")
-  val nsfwVisibility: UserSaveSettingsRequest.NsfwVisibility? = null,
+    /* Overrides the show_nsfl field if provided */
+    @SerializedName("nsfl_visibility")
+    val nsflVisibility: UserSaveSettingsRequest.NsflVisibility? = null,
 
-  /* Overrides the show_genai field if provided */
-  @SerializedName("genai_visibility")
-  val genaiVisibility: UserSaveSettingsRequest.GenaiVisibility? = null,
+    /* Overrides the show_nsfw field if provided */
+    @SerializedName("nsfw_visibility")
+    val nsfwVisibility: UserSaveSettingsRequest.NsfwVisibility? = null,
 
-  /* Collapse replies with a score at or below this level */
-  @SerializedName("reply_collapse_threshold")
-  val replyCollapseThreshold: kotlin.Int? = null,
+    /* Overrides the show_genai field if provided */
+    @SerializedName("genai_visibility")
+    val genaiVisibility: UserSaveSettingsRequest.GenaiVisibility? = null,
 
-  /* Hide replies with a score at or below this level */
-  @SerializedName("reply_hide_threshold")
-  val replyHideThreshold: kotlin.Int? = null,
+    /* Collapse replies with a score at or below this level */
+    @SerializedName("reply_collapse_threshold")
+    val replyCollapseThreshold: kotlin.Int? = null,
 
-  @SerializedName("show_nsfw")
-  val showNsfw: kotlin.Boolean? = null,
+    /* Hide replies with a score at or below this level */
+    @SerializedName("reply_hide_threshold")
+    val replyHideThreshold: kotlin.Int? = null,
 
-  @SerializedName("show_nsfl")
-  val showNsfl: kotlin.Boolean? = null,
+    @SerializedName("show_nsfw")
+    val showNsfw: kotlin.Boolean? = null,
 
-  @SerializedName("show_read_posts")
-  val showReadPosts: kotlin.Boolean? = null,
+    @SerializedName("show_nsfl")
+    val showNsfl: kotlin.Boolean? = null,
 
-  /* If profile shows up in the user list on the instance */
-  @SerializedName("searchable")
-  val searchable: kotlin.Boolean? = null,
+    @SerializedName("show_read_posts")
+    val showReadPosts: kotlin.Boolean? = null,
+
+    /* If profile shows up in the user list on the instance */
+    @SerializedName("searchable")
+    val searchable: kotlin.Boolean? = null
 
 ) {
 
-  /**
-   * Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
-   *
-   * Values: None,Local,Trusted,All
-   */
-  enum class AcceptPrivateMessages(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "None")
-    None("None"),
+    /**
+     * Accept private messages from nobody, local users only, \"trusted\" instances, or any instance
+     *
+     * Values: None,Local,Trusted,All
+     */
+    enum class AcceptPrivateMessages(val value: kotlin.String) {
+        @SerializedName(value = "None") None("None"),
+        @SerializedName(value = "Local") Local("Local"),
+        @SerializedName(value = "Trusted") Trusted("Trusted"),
+        @SerializedName(value = "All") All("All");
+    }
+    /**
+     * 
+     *
+     * Values: Show,Blur,Hide,Transparent
+     */
+    enum class BotVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Blur") Blur("Blur"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
+    /**
+     * 
+     *
+     * Values: Hot,Top,New,Old
+     */
+    enum class DefaultCommentSortType(val value: kotlin.String) {
+        @SerializedName(value = "Hot") Hot("Hot"),
+        @SerializedName(value = "Top") Top("Top"),
+        @SerializedName(value = "New") New("New"),
+        @SerializedName(value = "Old") Old("Old");
+    }
+    /**
+     * 
+     *
+     * Values: Hot,Top,New,Active,Old,Scaled
+     */
+    enum class DefaultSortType(val value: kotlin.String) {
+        @SerializedName(value = "Hot") Hot("Hot"),
+        @SerializedName(value = "Top") Top("Top"),
+        @SerializedName(value = "New") New("New"),
+        @SerializedName(value = "Active") Active("Active"),
+        @SerializedName(value = "Old") Old("Old"),
+        @SerializedName(value = "Scaled") Scaled("Scaled");
+    }
+    /**
+     * Overrides the show_nsfl field if provided
+     *
+     * Values: Show,Blur,Hide,Transparent
+     */
+    enum class NsflVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Blur") Blur("Blur"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
+    /**
+     * Overrides the show_nsfw field if provided
+     *
+     * Values: Show,Blur,Hide,Transparent
+     */
+    enum class NsfwVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Blur") Blur("Blur"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
+    /**
+     * Overrides the show_genai field if provided
+     *
+     * Values: Show,Hide,Label,Transparent
+     */
+    enum class GenaiVisibility(val value: kotlin.String) {
+        @SerializedName(value = "Show") Show("Show"),
+        @SerializedName(value = "Hide") Hide("Hide"),
+        @SerializedName(value = "Label") Label("Label"),
+        @SerializedName(value = "Transparent") Transparent("Transparent");
+    }
 
-    @SerializedName(value = "Local")
-    Local("Local"),
-
-    @SerializedName(value = "Trusted")
-    Trusted("Trusted"),
-
-    @SerializedName(value = "All")
-    All("All"),
-  }
-
-  /**
-   *
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class BotVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   *
-   *
-   * Values: Hot,Top,New,Old
-   */
-  enum class DefaultCommentSortType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Hot")
-    Hot("Hot"),
-
-    @SerializedName(value = "Top")
-    Top("Top"),
-
-    @SerializedName(value = "New")
-    New("New"),
-
-    @SerializedName(value = "Old")
-    Old("Old"),
-  }
-
-  /**
-   *
-   *
-   * Values: Hot,Top,New,Active,Old,Scaled
-   */
-  enum class DefaultSortType(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Hot")
-    Hot("Hot"),
-
-    @SerializedName(value = "Top")
-    Top("Top"),
-
-    @SerializedName(value = "New")
-    New("New"),
-
-    @SerializedName(value = "Active")
-    Active("Active"),
-
-    @SerializedName(value = "Old")
-    Old("Old"),
-
-    @SerializedName(value = "Scaled")
-    Scaled("Scaled"),
-  }
-
-  /**
-   * Overrides the show_nsfl field if provided
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class NsflVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   * Overrides the show_nsfw field if provided
-   *
-   * Values: Show,Blur,Hide,Transparent
-   */
-  enum class NsfwVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Blur")
-    Blur("Blur"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
-
-  /**
-   * Overrides the show_genai field if provided
-   *
-   * Values: Show,Hide,Label,Transparent
-   */
-  enum class GenaiVisibility(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Show")
-    Show("Show"),
-
-    @SerializedName(value = "Hide")
-    Hide("Hide"),
-
-    @SerializedName(value = "Label")
-    Label("Label"),
-
-    @SerializedName(value = "Transparent")
-    Transparent("Transparent"),
-  }
 }
+

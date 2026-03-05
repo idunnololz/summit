@@ -7,15 +7,14 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.Comment
 import com.idunnololz.summit.api.dto.piefed.models.CommentAggregates
 import com.idunnololz.summit.api.dto.piefed.models.CommentReply
@@ -23,90 +22,88 @@ import com.idunnololz.summit.api.dto.piefed.models.Community
 import com.idunnololz.summit.api.dto.piefed.models.Person
 import com.idunnololz.summit.api.dto.piefed.models.Post
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param activityAlert
- * @param comment
- * @param commentReply
- * @param community
- * @param counts
- * @param creator
- * @param creatorBannedFromCommunity
- * @param creatorBlocked
- * @param creatorIsAdmin
- * @param creatorIsModerator
- * @param myVote
- * @param post
- * @param recipient
- * @param saved
- * @param subscribed
+ * @param activityAlert 
+ * @param comment 
+ * @param commentReply 
+ * @param community 
+ * @param counts 
+ * @param creator 
+ * @param creatorBannedFromCommunity 
+ * @param creatorBlocked 
+ * @param creatorIsAdmin 
+ * @param creatorIsModerator 
+ * @param myVote 
+ * @param post 
+ * @param recipient 
+ * @param saved 
+ * @param subscribed 
  */
 
-data class CommentReplyView(
 
-  @SerializedName("activity_alert")
-  val activityAlert: kotlin.Boolean,
+data class CommentReplyView (
 
-  @SerializedName("comment")
-  val comment: Comment,
+    @SerializedName("activity_alert")
+    val activityAlert: kotlin.Boolean,
 
-  @SerializedName("comment_reply")
-  val commentReply: CommentReply,
+    @SerializedName("comment")
+    val comment: Comment,
 
-  @SerializedName("community")
-  val community: Community,
+    @SerializedName("comment_reply")
+    val commentReply: CommentReply,
 
-  @SerializedName("counts")
-  val counts: CommentAggregates,
+    @SerializedName("community")
+    val community: Community,
 
-  @SerializedName("creator")
-  val creator: Person,
+    @SerializedName("counts")
+    val counts: CommentAggregates,
 
-  @SerializedName("creator_banned_from_community")
-  val creatorBannedFromCommunity: kotlin.Boolean,
+    @SerializedName("creator")
+    val creator: Person,
 
-  @SerializedName("creator_blocked")
-  val creatorBlocked: kotlin.Boolean,
+    @SerializedName("creator_banned_from_community")
+    val creatorBannedFromCommunity: kotlin.Boolean,
 
-  @SerializedName("creator_is_admin")
-  val creatorIsAdmin: kotlin.Boolean,
+    @SerializedName("creator_blocked")
+    val creatorBlocked: kotlin.Boolean,
 
-  @SerializedName("creator_is_moderator")
-  val creatorIsModerator: kotlin.Boolean,
+    @SerializedName("creator_is_admin")
+    val creatorIsAdmin: kotlin.Boolean,
 
-  @SerializedName("my_vote")
-  val myVote: kotlin.Int,
+    @SerializedName("creator_is_moderator")
+    val creatorIsModerator: kotlin.Boolean,
 
-  @SerializedName("post")
-  val post: Post,
+    @SerializedName("my_vote")
+    val myVote: kotlin.Int,
 
-  @SerializedName("recipient")
-  val recipient: Person,
+    @SerializedName("post")
+    val post: Post,
 
-  @SerializedName("saved")
-  val saved: kotlin.Boolean,
+    @SerializedName("recipient")
+    val recipient: Person,
 
-  @SerializedName("subscribed")
-  val subscribed: CommentReplyView.Subscribed? = null,
+    @SerializedName("saved")
+    val saved: kotlin.Boolean,
+
+    @SerializedName("subscribed")
+    val subscribed: CommentReplyView.Subscribed? = null
 
 ) {
 
-  /**
-   *
-   *
-   * Values: Subscribed,NotSubscribed,Pending
-   */
-  enum class Subscribed(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Subscribed")
-    Subscribed("Subscribed"),
+    /**
+     * 
+     *
+     * Values: Subscribed,NotSubscribed,Pending
+     */
+    enum class Subscribed(val value: kotlin.String) {
+        @SerializedName(value = "Subscribed") Subscribed("Subscribed"),
+        @SerializedName(value = "NotSubscribed") NotSubscribed("NotSubscribed"),
+        @SerializedName(value = "Pending") Pending("Pending");
+    }
 
-    @SerializedName(value = "NotSubscribed")
-    NotSubscribed("NotSubscribed"),
-
-    @SerializedName(value = "Pending")
-    Pending("Pending"),
-  }
 }
+

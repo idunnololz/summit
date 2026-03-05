@@ -7,46 +7,52 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityView
 import com.idunnololz.summit.api.dto.piefed.models.FeedView
 import com.idunnololz.summit.api.dto.piefed.models.PersonView
 import com.idunnololz.summit.api.dto.piefed.models.PostView
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param comment
- * @param post
- * @param community
- * @param person
- * @param feed
+ * @param comment 
+ * @param post 
+ * @param community 
+ * @param person 
+ * @param feed 
  */
 
-data class ResolveObjectResponse(
 
-  @SerializedName("comment")
-  val comment: CommentView? = null,
+data class ResolveObjectResponse (
 
-  @SerializedName("post")
-  val post: PostView? = null,
+    @SerializedName("comment")
+    val comment: CommentView? = null,
 
-  @SerializedName("community")
-  val community: CommunityView? = null,
+    @SerializedName("post")
+    val post: PostView? = null,
 
-  @SerializedName("person")
-  val person: PersonView? = null,
+    @SerializedName("community")
+    val community: CommunityView? = null,
 
-  @SerializedName("feed")
-  val feed: FeedView? = null,
+    @SerializedName("person")
+    val person: PersonView? = null,
 
-)
+    @SerializedName("feed")
+    val feed: FeedView? = null
+
+) {
+
+
+}
+

@@ -7,30 +7,36 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param personId
+ * @param personId 
  * @param note Pass a value of null to remove existing note
  */
 
-data class UserSetNoteRequest(
 
-  @SerializedName("person_id")
-  val personId: kotlin.Int,
+data class UserSetNoteRequest (
 
-  /* Pass a value of null to remove existing note */
-  @SerializedName("note")
-  val note: kotlin.String?,
+    @SerializedName("person_id")
+    val personId: kotlin.Int,
 
-)
+    /* Pass a value of null to remove existing note */
+    @SerializedName("note")
+    val note: kotlin.String?
+
+) {
+
+
+}
+

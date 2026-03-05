@@ -7,81 +7,78 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.LanguageView
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param actorId
- * @param name
- * @param allLanguages
- * @param description
- * @param enableDownvotes
- * @param icon
- * @param registrationMode
- * @param sidebar
- * @param sidebarMd
- * @param userCount
+ * @param actorId 
+ * @param name 
+ * @param allLanguages 
+ * @param description 
+ * @param enableDownvotes 
+ * @param icon 
+ * @param registrationMode 
+ * @param sidebar 
+ * @param sidebarMd 
+ * @param userCount 
  */
 
-data class Site(
 
-  @SerializedName("actor_id")
-  val actorId: kotlin.String,
+data class Site (
 
-  @SerializedName("name")
-  val name: kotlin.String,
+    @SerializedName("actor_id")
+    val actorId: kotlin.String,
 
-  @SerializedName("all_languages")
-  val allLanguages: kotlin.collections.List<LanguageView>? = null,
+    @SerializedName("name")
+    val name: kotlin.String,
 
-  @SerializedName("description")
-  val description: kotlin.String? = null,
+    @SerializedName("all_languages")
+    val allLanguages: kotlin.collections.List<LanguageView>? = null,
 
-  @SerializedName("enable_downvotes")
-  val enableDownvotes: kotlin.Boolean? = null,
+    @SerializedName("description")
+    val description: kotlin.String? = null,
 
-  @SerializedName("icon")
-  val icon: kotlin.String? = null,
+    @SerializedName("enable_downvotes")
+    val enableDownvotes: kotlin.Boolean? = null,
 
-  @SerializedName("registration_mode")
-  val registrationMode: Site.RegistrationMode? = null,
+    @SerializedName("icon")
+    val icon: kotlin.String? = null,
 
-  @SerializedName("sidebar")
-  val sidebar: kotlin.String? = null,
+    @SerializedName("registration_mode")
+    val registrationMode: Site.RegistrationMode? = null,
 
-  @SerializedName("sidebar_md")
-  val sidebarMd: kotlin.String? = null,
+    @SerializedName("sidebar")
+    val sidebar: kotlin.String? = null,
 
-  @SerializedName("user_count")
-  val userCount: kotlin.Int? = null,
+    @SerializedName("sidebar_md")
+    val sidebarMd: kotlin.String? = null,
+
+    @SerializedName("user_count")
+    val userCount: kotlin.Int? = null
 
 ) {
 
-  /**
-   *
-   *
-   * Values: Closed,RequireApplication,Open
-   */
-  enum class RegistrationMode(
-    val value: kotlin.String,
-  ) {
-    @SerializedName(value = "Closed")
-    Closed("Closed"),
+    /**
+     * 
+     *
+     * Values: Closed,RequireApplication,Open
+     */
+    enum class RegistrationMode(val value: kotlin.String) {
+        @SerializedName(value = "Closed") Closed("Closed"),
+        @SerializedName(value = "RequireApplication") RequireApplication("RequireApplication"),
+        @SerializedName(value = "Open") Open("Open");
+    }
 
-    @SerializedName(value = "RequireApplication")
-    RequireApplication("RequireApplication"),
-
-    @SerializedName(value = "Open")
-    Open("Open"),
-  }
 }
+

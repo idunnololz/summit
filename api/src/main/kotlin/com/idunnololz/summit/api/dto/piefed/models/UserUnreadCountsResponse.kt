@@ -7,40 +7,46 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
- *
+ * 
  *
  * @param mentions Post and comment mentions
- * @param privateMessages
+ * @param privateMessages 
  * @param replies Replies to posts and comments
  * @param other Any other type of notification (reports, activity alerts, etc.)
  */
 
-data class UserUnreadCountsResponse(
 
-  /* Post and comment mentions */
-  @SerializedName("mentions")
-  val mentions: kotlin.Int,
+data class UserUnreadCountsResponse (
 
-  @SerializedName("private_messages")
-  val privateMessages: kotlin.Int,
+    /* Post and comment mentions */
+    @SerializedName("mentions")
+    val mentions: kotlin.Int,
 
-  /* Replies to posts and comments */
-  @SerializedName("replies")
-  val replies: kotlin.Int,
+    @SerializedName("private_messages")
+    val privateMessages: kotlin.Int,
 
-  /* Any other type of notification (reports, activity alerts, etc.) */
-  @SerializedName("other")
-  val other: kotlin.Int,
+    /* Replies to posts and comments */
+    @SerializedName("replies")
+    val replies: kotlin.Int,
 
-)
+    /* Any other type of notification (reports, activity alerts, etc.) */
+    @SerializedName("other")
+    val other: kotlin.Int
+
+) {
+
+
+}
+

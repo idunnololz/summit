@@ -12,7 +12,7 @@ data class Person(
   val display_name: String? = null,
   val avatar: String? = null,
   val banned: Boolean,
-  val published: String,
+  val published: String?,
   val updated: String? = null,
   val actor_id: String,
   val bio: String? = null,

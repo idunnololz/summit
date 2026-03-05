@@ -7,46 +7,52 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.CommunityModeratorView
 import com.idunnololz.summit.api.dto.piefed.models.PersonView
 import com.idunnololz.summit.api.dto.piefed.models.PostView
 import com.idunnololz.summit.api.dto.piefed.models.Site
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param comments
- * @param moderates
- * @param personView
- * @param posts
- * @param site
+ * @param comments 
+ * @param moderates 
+ * @param personView 
+ * @param posts 
+ * @param site 
  */
 
-data class GetUserResponse(
 
-  @SerializedName("comments")
-  val comments: kotlin.collections.List<CommentView>,
+data class GetUserResponse (
 
-  @SerializedName("moderates")
-  val moderates: kotlin.collections.List<CommunityModeratorView>,
+    @SerializedName("comments")
+    val comments: kotlin.collections.List<CommentView>,
 
-  @SerializedName("person_view")
-  val personView: PersonView,
+    @SerializedName("moderates")
+    val moderates: kotlin.collections.List<CommunityModeratorView>,
 
-  @SerializedName("posts")
-  val posts: kotlin.collections.List<PostView>,
+    @SerializedName("person_view")
+    val personView: PersonView,
 
-  @SerializedName("site")
-  val site: Site? = null,
+    @SerializedName("posts")
+    val posts: kotlin.collections.List<PostView>,
 
-)
+    @SerializedName("site")
+    val site: Site? = null
+
+) {
+
+
+}
+

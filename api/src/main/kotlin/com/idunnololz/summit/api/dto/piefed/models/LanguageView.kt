@@ -7,33 +7,39 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param code
- * @param id
- * @param name
+ * @param code 
+ * @param id 
+ * @param name 
  */
 
-data class LanguageView(
 
-  @SerializedName("code")
-  val code: kotlin.String? = null,
+data class LanguageView (
 
-  @SerializedName("id")
-  val id: kotlin.Int? = null,
+    @SerializedName("code")
+    val code: kotlin.String? = null,
 
-  @SerializedName("name")
-  val name: kotlin.String? = null,
+    @SerializedName("id")
+    val id: kotlin.Int? = null,
 
-)
+    @SerializedName("name")
+    val name: kotlin.String? = null
+
+) {
+
+
+}
+

@@ -7,37 +7,43 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param body
- * @param postId
- * @param parentId
- * @param languageId
+ * @param body 
+ * @param postId 
+ * @param parentId 
+ * @param languageId 
  */
 
-data class CreateCommentRequest(
 
-  @SerializedName("body")
-  val body: kotlin.String,
+data class CreateCommentRequest (
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+    @SerializedName("body")
+    val body: kotlin.String,
 
-  @SerializedName("parent_id")
-  val parentId: kotlin.Int? = null,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-  @SerializedName("language_id")
-  val languageId: kotlin.Int? = null,
+    @SerializedName("parent_id")
+    val parentId: kotlin.Int? = null,
 
-)
+    @SerializedName("language_id")
+    val languageId: kotlin.Int? = null
+
+) {
+
+
+}
+

@@ -7,86 +7,92 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
-import com.google.gson.annotations.SerializedName
 import com.idunnololz.summit.api.dto.piefed.models.LanguageView
 
+import com.google.gson.annotations.SerializedName
+
 /**
+ * 
  *
- *
- * @param language
- * @param nsfw
- * @param newbieFriendly
- * @param name
- * @param elevatorPitch
- * @param description
- * @param about
- * @param sidebar
- * @param logoUrl
- * @param maturity
- * @param tosUrl
- * @param mau
- * @param canMakeCommunities
- * @param defederation
- * @param trusts
- * @param registrationMode
+ * @param language 
+ * @param nsfw 
+ * @param newbieFriendly 
+ * @param name 
+ * @param elevatorPitch 
+ * @param description 
+ * @param about 
+ * @param sidebar 
+ * @param logoUrl 
+ * @param maturity 
+ * @param tosUrl 
+ * @param mau 
+ * @param canMakeCommunities 
+ * @param defederation 
+ * @param trusts 
+ * @param registrationMode 
  */
 
-data class GetSiteInstanceChooserResponse(
 
-  @SerializedName("language")
-  val language: LanguageView,
+data class GetSiteInstanceChooserResponse (
 
-  @SerializedName("nsfw")
-  val nsfw: kotlin.Boolean,
+    @SerializedName("language")
+    val language: LanguageView,
 
-  @SerializedName("newbie_friendly")
-  val newbieFriendly: kotlin.Boolean,
+    @SerializedName("nsfw")
+    val nsfw: kotlin.Boolean,
 
-  @SerializedName("name")
-  val name: kotlin.String,
+    @SerializedName("newbie_friendly")
+    val newbieFriendly: kotlin.Boolean,
 
-  @SerializedName("elevator_pitch")
-  val elevatorPitch: kotlin.String,
+    @SerializedName("name")
+    val name: kotlin.String,
 
-  @SerializedName("description")
-  val description: kotlin.String,
+    @SerializedName("elevator_pitch")
+    val elevatorPitch: kotlin.String,
 
-  @SerializedName("about")
-  val about: kotlin.String,
+    @SerializedName("description")
+    val description: kotlin.String,
 
-  @SerializedName("sidebar")
-  val sidebar: kotlin.String,
+    @SerializedName("about")
+    val about: kotlin.String,
 
-  @SerializedName("logo_url")
-  val logoUrl: kotlin.String,
+    @SerializedName("sidebar")
+    val sidebar: kotlin.String,
 
-  @SerializedName("maturity")
-  val maturity: kotlin.String,
+    @SerializedName("logo_url")
+    val logoUrl: kotlin.String,
 
-  @SerializedName("tos_url")
-  val tosUrl: kotlin.String,
+    @SerializedName("maturity")
+    val maturity: kotlin.String,
 
-  @SerializedName("mau")
-  val mau: kotlin.Int,
+    @SerializedName("tos_url")
+    val tosUrl: kotlin.String,
 
-  @SerializedName("can_make_communities")
-  val canMakeCommunities: kotlin.Boolean,
+    @SerializedName("mau")
+    val mau: kotlin.Int,
 
-  @SerializedName("defederation")
-  val defederation: kotlin.collections.List<kotlin.String>,
+    @SerializedName("can_make_communities")
+    val canMakeCommunities: kotlin.Boolean,
 
-  @SerializedName("trusts")
-  val trusts: kotlin.collections.List<kotlin.String>,
+    @SerializedName("defederation")
+    val defederation: kotlin.collections.List<kotlin.String>,
 
-  @SerializedName("registration_mode")
-  val registrationMode: kotlin.String,
+    @SerializedName("trusts")
+    val trusts: kotlin.collections.List<kotlin.String>,
 
-)
+    @SerializedName("registration_mode")
+    val registrationMode: kotlin.String
+
+) {
+
+
+}
+

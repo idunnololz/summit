@@ -144,8 +144,10 @@ import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SiteAggregates
 import com.idunnololz.summit.api.dto.lemmy.SiteView
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
-import com.idunnololz.summit.api.dto.piefed.CommentView
 import com.idunnololz.summit.api.dto.piefed.GetComment
+import com.idunnololz.summit.api.dto.piefed.models.CommentView
+import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
 import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -277,9 +279,9 @@ class PieFedApiAlphaAdapter(
       .map {
         GetPostResponse(
           post_view = it.postView.toPostView(),
-          community_view = it.communityView.toCommunityView(),
-          moderators = it.moderators.map { it.toCommunityModeratorView() },
-          cross_posts = it.crossPosts.map { it.toPostView() },
+          community_view = it.communityView!!.toCommunityView(),
+          moderators = it.moderators?.map { it.toCommunityModeratorView() } ?: listOf(),
+          cross_posts = it.crossPosts?.map { it.toPostView() } ?: listOf(),
           online = 0,
         )
       }
@@ -288,9 +290,9 @@ class PieFedApiAlphaAdapter(
   override suspend fun login(args: Login): Result<LoginResponse> = retrofitErrorHandler {
     api.login(
       headers = generateHeaders(null, false),
-      form = com.idunnololz.summit.api.dto.piefed.Login(
-        args.username_or_email,
-        args.password,
+      form = UserLoginRequest(
+        username = args.username_or_email,
+        password = args.password,
       ),
     )
   }.map { it.toLoginResponse() }
@@ -371,7 +373,7 @@ class PieFedApiAlphaAdapter(
     val limit = args.limit
     val headers = generateHeaders(authorization = authorization, force = force)
 
-    suspend fun getResult(): Result<com.idunnololz.summit.api.dto.piefed.GetCommentsResponse> {
+    suspend fun getResult(): Result<ListCommentsResponse> {
       if (limit != null) {
         return retrofitErrorHandler {
           api.getComments(
@@ -404,7 +406,7 @@ class PieFedApiAlphaAdapter(
         page++
       }
 
-      return Result.success(com.idunnololz.summit.api.dto.piefed.GetCommentsResponse(comments))
+      return Result.success(ListCommentsResponse(comments))
     }
 
     val result = getResult()
@@ -526,8 +528,9 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: ChangePassword,
   ): Result<LoginResponse> =
-    retrofitErrorHandler { api.changePassword(generateHeaders(authorization, false), args) }
-      .map { it.toLoginResponse() }
+    Result.failure(NotYetImplemented())
+//    retrofitErrorHandler { api.changePassword(generateHeaders(authorization, false), args) }
+//      .map { it.toLoginResponse() }
 
   override suspend fun getReplies(
     authorization: String?,
@@ -654,12 +657,13 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: ResolveCommentReport,
   ): Result<CommentReportResponse> =
-    retrofitErrorHandler { api.resolveCommentReport(generateHeaders(authorization, false), args) }
-      .map {
-        CommentReportResponse(
-          comment_report_view = it.commentReportView.toCommentReportView(),
-        )
-      }
+    Result.failure(NotYetImplemented())
+//    retrofitErrorHandler { api.resolveCommentReport(generateHeaders(authorization, false), args) }
+//      .map {
+//        CommentReportResponse(
+//          comment_report_view = it.commentReportView.toCommentReportView(),
+//        )
+//      }
 
   override suspend fun createPrivateMessage(
     authorization: String?,
@@ -832,9 +836,9 @@ class PieFedApiAlphaAdapter(
   override suspend fun saveUserSettings(
     authorization: String?,
     args: SaveUserSettings,
-  ): Result<LoginResponse> =
+  ): Result<Unit> =
     retrofitErrorHandler { api.saveUserSettings(generateHeaders(authorization, false), args) }
-      .map { it.toLoginResponse() }
+      .map { Unit }
 
   override suspend fun uploadImage(
     authorization: String?,
@@ -949,11 +953,17 @@ class PieFedApiAlphaAdapter(
     force: Boolean,
   ): Result<GetModlogResponse> = retrofitErrorHandler {
     api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+  }.map {
+    TODO()
+//    GetModlogResponse(
+//      removed_posts = it.removedPosts.map { it.toModRemovePostView() }
+//    )
   }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
-    retrofitErrorHandler { api.register(generateHeaders(null, false), args) }
-      .map { it.toLoginResponse() }
+    Result.failure(NotYetImplemented())
+//    retrofitErrorHandler { api.register(generateHeaders(null, false), args) }
+//      .map { it.toLoginResponse() }
 
   override suspend fun getCaptcha(): Result<GetCaptchaResponse> =
     retrofitErrorHandler { api.getCaptcha(generateHeaders(null, false)) }

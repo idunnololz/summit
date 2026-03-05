@@ -7,53 +7,59 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param id
- * @param creatorId
- * @param postId
- * @param originalPostName
- * @param originalPostBody
- * @param reason
- * @param resolved
- * @param published
+ * @param id 
+ * @param creatorId 
+ * @param postId 
+ * @param originalPostName 
+ * @param originalPostBody 
+ * @param reason 
+ * @param resolved 
+ * @param published 
  */
 
-data class PostReport(
 
-  @SerializedName("id")
-  val id: kotlin.Int,
+data class PostReport (
 
-  @SerializedName("creator_id")
-  val creatorId: kotlin.Int,
+    @SerializedName("id")
+    val id: kotlin.Int,
 
-  @SerializedName("post_id")
-  val postId: kotlin.Int,
+    @SerializedName("creator_id")
+    val creatorId: kotlin.Int,
 
-  @SerializedName("original_post_name")
-  val originalPostName: kotlin.String,
+    @SerializedName("post_id")
+    val postId: kotlin.Int,
 
-  @SerializedName("original_post_body")
-  val originalPostBody: kotlin.String,
+    @SerializedName("original_post_name")
+    val originalPostName: kotlin.String,
 
-  @SerializedName("reason")
-  val reason: kotlin.String,
+    @SerializedName("original_post_body")
+    val originalPostBody: kotlin.String,
 
-  @SerializedName("resolved")
-  val resolved: kotlin.Boolean,
+    @SerializedName("reason")
+    val reason: kotlin.String,
 
-  @SerializedName("published")
-  val published: kotlin.String? = null,
+    @SerializedName("resolved")
+    val resolved: kotlin.Boolean,
 
-)
+    @SerializedName("published")
+    val published: kotlin.String? = null
+
+) {
+
+
+}
+

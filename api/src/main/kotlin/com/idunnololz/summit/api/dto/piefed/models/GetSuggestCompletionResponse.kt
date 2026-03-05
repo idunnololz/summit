@@ -7,25 +7,31 @@
  */
 
 @file:Suppress(
-  "ArrayInDataClass",
-  "EnumEntryName",
-  "RemoveRedundantQualifierName",
-  "UnusedImport",
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport"
 )
 
 package com.idunnololz.summit.api.dto.piefed.models
 
+
 import com.google.gson.annotations.SerializedName
 
 /**
+ * 
  *
- *
- * @param result
+ * @param result 
  */
 
-data class GetSuggestCompletionResponse(
 
-  @SerializedName("result")
-  val result: kotlin.collections.List<kotlin.String>,
+data class GetSuggestCompletionResponse (
 
-)
+    @SerializedName("result")
+    val result: kotlin.collections.List<kotlin.String>
+
+) {
+
+
+}
+

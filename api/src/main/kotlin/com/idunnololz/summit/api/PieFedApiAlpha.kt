@@ -9,7 +9,6 @@ import com.idunnololz.summit.api.dto.lemmy.BanPersonResponse
 import com.idunnololz.summit.api.dto.lemmy.BlockCommunity
 import com.idunnololz.summit.api.dto.lemmy.BlockInstance
 import com.idunnololz.summit.api.dto.lemmy.BlockPerson
-import com.idunnololz.summit.api.dto.lemmy.ChangePassword
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentLike
 import com.idunnololz.summit.api.dto.lemmy.CreateCommentReport
 import com.idunnololz.summit.api.dto.lemmy.CreateCommunity
@@ -25,7 +24,6 @@ import com.idunnololz.summit.api.dto.lemmy.EditCommunity
 import com.idunnololz.summit.api.dto.lemmy.FeaturePost
 import com.idunnololz.summit.api.dto.lemmy.FollowCommunity
 import com.idunnololz.summit.api.dto.lemmy.GetCaptchaResponse
-import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetReportCountResponse
 import com.idunnololz.summit.api.dto.lemmy.GetSiteMetadataResponse
 import com.idunnololz.summit.api.dto.lemmy.GetUnreadCountResponse
@@ -50,46 +48,47 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeComment
 import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
-import com.idunnololz.summit.api.dto.lemmy.Register
 import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
-import com.idunnololz.summit.api.dto.lemmy.ResolveCommentReport
 import com.idunnololz.summit.api.dto.lemmy.ResolvePostReport
 import com.idunnololz.summit.api.dto.lemmy.ResolvePrivateMessageReport
 import com.idunnololz.summit.api.dto.lemmy.SaveComment
 import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
-import com.idunnololz.summit.api.dto.piefed.AddModToCommunityResponse
-import com.idunnololz.summit.api.dto.piefed.BlockCommunityResponse
-import com.idunnololz.summit.api.dto.piefed.BlockInstanceResponse
-import com.idunnololz.summit.api.dto.piefed.BlockPersonResponse
-import com.idunnololz.summit.api.dto.piefed.CommentReportResponse
-import com.idunnololz.summit.api.dto.piefed.CommentResponse
-import com.idunnololz.summit.api.dto.piefed.CommunityResponse
-import com.idunnololz.summit.api.dto.piefed.CreateComment
-import com.idunnololz.summit.api.dto.piefed.CreatePost
-import com.idunnololz.summit.api.dto.piefed.EditComment
-import com.idunnololz.summit.api.dto.piefed.EditPost
-import com.idunnololz.summit.api.dto.piefed.GetCommentsResponse
-import com.idunnololz.summit.api.dto.piefed.GetCommunityResponse
-import com.idunnololz.summit.api.dto.piefed.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.piefed.GetPostResponse
-import com.idunnololz.summit.api.dto.piefed.GetPostsResponse
-import com.idunnololz.summit.api.dto.piefed.GetRepliesResponse
-import com.idunnololz.summit.api.dto.piefed.GetSiteResponse
-import com.idunnololz.summit.api.dto.piefed.ListCommunitiesResponse
-import com.idunnololz.summit.api.dto.piefed.Login
-import com.idunnololz.summit.api.dto.piefed.LoginResponse
-import com.idunnololz.summit.api.dto.piefed.PostReportResponse
-import com.idunnololz.summit.api.dto.piefed.PostResponse
-import com.idunnololz.summit.api.dto.piefed.PrivateMessageResponse
-import com.idunnololz.summit.api.dto.piefed.PrivateMessagesResponse
-import com.idunnololz.summit.api.dto.piefed.ResolveObjectResponse
-import com.idunnololz.summit.api.dto.piefed.SearchResponse
-import com.idunnololz.summit.api.dto.piefed.UploadResponse
+import com.idunnololz.summit.api.dto.piefed.models.BlockCommunityResponse
+import com.idunnololz.summit.api.dto.piefed.models.BlockInstanceResponse
+import com.idunnololz.summit.api.dto.piefed.models.CommunityResponse
+import com.idunnololz.summit.api.dto.piefed.models.CreateCommentRequest
+import com.idunnololz.summit.api.dto.piefed.models.CreatePostRequest
+import com.idunnololz.summit.api.dto.piefed.models.EditCommentRequest
+import com.idunnololz.summit.api.dto.piefed.models.EditPostRequest
+import com.idunnololz.summit.api.dto.piefed.models.GetCommentReportResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetCommentResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetCommunityResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetModLogResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetPostResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetSiteResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetUserResponse
+import com.idunnololz.summit.api.dto.piefed.models.ImageUploadResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListCommunitiesResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListPostsResponse
+import com.idunnololz.summit.api.dto.piefed.models.ListPrivateMessagesResponse
+import com.idunnololz.summit.api.dto.piefed.models.ModCommunityResponse
+import com.idunnololz.summit.api.dto.piefed.models.PostReportResponse
+import com.idunnololz.summit.api.dto.piefed.models.PrivateMessageResponse
+import com.idunnololz.summit.api.dto.piefed.models.ResolveObjectResponse
+import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserBlockResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
+import com.idunnololz.summit.api.dto.piefed.models.UserLoginResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserMarkAllReadResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserMentionsResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserRepliesResponse
+import com.idunnololz.summit.api.dto.piefed.models.UserSaveSettingsResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -117,7 +116,7 @@ interface PieFedApiAlpha {
   fun getPosts(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<GetPostsResponse>
+  ): Call<ListPostsResponse>
 
   /**
    * Get / fetch a post.
@@ -132,7 +131,7 @@ interface PieFedApiAlpha {
    * Log into lemmy.
    */
   @POST("user/login")
-  fun login(@HeaderMap headers: Map<String, String>, @Body form: Login): Call<LoginResponse>
+  fun login(@HeaderMap headers: Map<String, String>, @Body form: UserLoginRequest): Call<UserLoginResponse>
 
   /**
    * Like / vote on a post.
@@ -141,7 +140,7 @@ interface PieFedApiAlpha {
   fun likePost(
     @HeaderMap headers: Map<String, String>,
     @Body form: CreatePostLike,
-  ): Call<PostResponse>
+  ): Call<GetPostResponse>
 
   /**
    * Like / vote on a comment.
@@ -150,7 +149,7 @@ interface PieFedApiAlpha {
   fun likeComment(
     @HeaderMap headers: Map<String, String>,
     @Body form: CreateCommentLike,
-  ): Call<CommentResponse>
+  ): Call<GetCommentResponse>
 
   @GET("comment/like/list")
   fun listCommentVotes(
@@ -170,8 +169,8 @@ interface PieFedApiAlpha {
   @POST("comment")
   fun createComment(
     @HeaderMap headers: Map<String, String>,
-    @Body form: CreateComment,
-  ): Call<CommentResponse>
+    @Body form: CreateCommentRequest,
+  ): Call<GetCommentResponse>
 
   /**
    * Edit a comment.
@@ -179,8 +178,8 @@ interface PieFedApiAlpha {
   @PUT("comment")
   fun editComment(
     @HeaderMap headers: Map<String, String>,
-    @Body form: EditComment,
-  ): Call<CommentResponse>
+    @Body form: EditCommentRequest,
+  ): Call<GetCommentResponse>
 
   /**
    * Edit a comment.
@@ -189,7 +188,7 @@ interface PieFedApiAlpha {
   fun getComment(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<CommentResponse>
+  ): Call<GetCommentResponse>
 
   /**
    * Delete a comment.
@@ -198,13 +197,13 @@ interface PieFedApiAlpha {
   fun deleteComment(
     @HeaderMap headers: Map<String, String>,
     @Body form: DeleteComment,
-  ): Call<CommentResponse>
+  ): Call<GetCommentResponse>
 
   /**
    * Save a post.
    */
   @PUT("post/save")
-  fun savePost(@HeaderMap headers: Map<String, String>, @Body form: SavePost): Call<PostResponse>
+  fun savePost(@HeaderMap headers: Map<String, String>, @Body form: SavePost): Call<GetPostResponse>
 
   @POST("post/mark_as_read")
   fun markPostAsRead(
@@ -219,7 +218,7 @@ interface PieFedApiAlpha {
   fun saveComment(
     @HeaderMap headers: Map<String, String>,
     @Body form: SaveComment,
-  ): Call<CommentResponse>
+  ): Call<GetCommentResponse>
 
   /**
    * Get / fetch comments.
@@ -228,19 +227,19 @@ interface PieFedApiAlpha {
   fun getComments(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<GetCommentsResponse>
+  ): Call<ListCommentsResponse>
 
   @POST("comment/distinguish")
   fun distinguishComment(
     @HeaderMap headers: Map<String, String>,
     @Body form: DistinguishComment,
-  ): Call<CommentResponse>
+  ): Call<GetCommentResponse>
 
   @POST("comment/remove")
   fun removeComment(
     @HeaderMap headers: Map<String, String>,
     @Body form: RemoveComment,
-  ): Call<CommentResponse>
+  ): Call<GetCommentResponse>
 
   /**
    * Get / fetch a community.
@@ -294,13 +293,13 @@ interface PieFedApiAlpha {
   fun getPersonDetails(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<GetPersonDetailsResponse>
+  ): Call<GetUserResponse>
 
-  @PUT("user/change_password")
-  fun changePassword(
-    @HeaderMap headers: Map<String, String>,
-    @Body form: ChangePassword,
-  ): Call<LoginResponse>
+//  @PUT("user/change_password")
+//  fun changePassword(
+//    @HeaderMap headers: Map<String, String>,
+//    @Body form: ChangePassword,
+//  ): Call<LoginResponse>
 
   /**
    * Get comment replies.
@@ -309,7 +308,7 @@ interface PieFedApiAlpha {
   fun getReplies(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<GetRepliesResponse>
+  ): Call<UserRepliesResponse>
 
   /**
    * Mark a comment as read.
@@ -345,7 +344,7 @@ interface PieFedApiAlpha {
   fun markAllAsRead(
     @HeaderMap headers: Map<String, String>,
     @Body form: MarkAllAsRead,
-  ): Call<GetRepliesResponse>
+  ): Call<UserMarkAllReadResponse>
 
   /**
    * Get mentions for your user.
@@ -354,7 +353,7 @@ interface PieFedApiAlpha {
   fun getPersonMentions(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<GetRepliesResponse>
+  ): Call<UserMentionsResponse>
 
   /**
    * Get / fetch private messages.
@@ -363,7 +362,7 @@ interface PieFedApiAlpha {
   fun getPrivateMessages(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<PrivateMessagesResponse>
+  ): Call<ListPrivateMessagesResponse>
 
   /**
    * These are instance wide reports that are only visible for instance admins.
@@ -404,11 +403,11 @@ interface PieFedApiAlpha {
     @QueryMap form: Map<String, String>,
   ): Call<ListCommentReportsResponse>
 
-  @PUT("comment/report/resolve")
-  fun resolveCommentReport(
-    @HeaderMap headers: Map<String, String>,
-    @Body resolveCommentReport: ResolveCommentReport,
-  ): Call<CommentReportResponse>
+//  @PUT("comment/report/resolve")
+//  fun resolveCommentReport(
+//    @HeaderMap headers: Map<String, String>,
+//    @Body resolveCommentReport: ResolveCommentReport,
+//  ): Call<CommentReportResponse>
 
   /**
    * Create a private message.
@@ -453,7 +452,7 @@ interface PieFedApiAlpha {
   fun modUser(
     @HeaderMap headers: Map<String, String>,
     @Body modUser: AddModToCommunity,
-  ): Call<AddModToCommunityResponse>
+  ): Call<ModCommunityResponse>
 
   /**
    * Create a post.
@@ -461,14 +460,17 @@ interface PieFedApiAlpha {
   @POST("post")
   fun createPost(
     @HeaderMap headers: Map<String, String>,
-    @Body form: CreatePost,
-  ): Call<PostResponse>
+    @Body form: CreatePostRequest,
+  ): Call<GetPostResponse>
 
   /**
    * Edit a post.
    */
   @PUT("post")
-  fun editPost(@HeaderMap headers: Map<String, String>, @Body form: EditPost): Call<PostResponse>
+  fun editPost(
+    @HeaderMap headers: Map<String, String>,
+    @Body form: EditPostRequest,
+  ): Call<GetPostResponse>
 
   /**
    * Delete a post.
@@ -477,22 +479,25 @@ interface PieFedApiAlpha {
   fun deletePost(
     @HeaderMap headers: Map<String, String>,
     @Body form: DeletePost,
-  ): Call<PostResponse>
+  ): Call<GetPostResponse>
 
   @POST("post/feature")
   fun featurePost(
     @HeaderMap headers: Map<String, String>,
     @Body form: FeaturePost,
-  ): Call<PostResponse>
+  ): Call<GetPostResponse>
 
   @POST("post/lock")
-  fun lockPost(@HeaderMap headers: Map<String, String>, @Body form: LockPost): Call<PostResponse>
+  fun lockPost(
+    @HeaderMap headers: Map<String, String>,
+    @Body form: LockPost,
+  ): Call<GetPostResponse>
 
   @POST("post/remove")
   fun removePost(
     @HeaderMap headers: Map<String, String>,
     @Body form: RemovePost,
-  ): Call<PostResponse>
+  ): Call<GetPostResponse>
 
   /**
    * Search lemmy.
@@ -519,7 +524,7 @@ interface PieFedApiAlpha {
   fun createCommentReport(
     @HeaderMap headers: Map<String, String>,
     @Body form: CreateCommentReport,
-  ): Call<CommentReportResponse>
+  ): Call<GetCommentReportResponse>
 
   /**
    * Report a post.
@@ -537,7 +542,7 @@ interface PieFedApiAlpha {
   fun blockPerson(
     @HeaderMap headers: Map<String, String>,
     @Body form: BlockPerson,
-  ): Call<BlockPersonResponse>
+  ): Call<UserBlockResponse>
 
   /**
    * Block a community.
@@ -564,7 +569,7 @@ interface PieFedApiAlpha {
   fun saveUserSettings(
     @HeaderMap headers: Map<String, String>,
     @Body form: SaveUserSettings,
-  ): Call<LoginResponse>
+  ): Call<UserSaveSettingsResponse>
 
   /**
    * Upload an image.
@@ -575,7 +580,7 @@ interface PieFedApiAlpha {
     @HeaderMap headers: Map<String, String>,
     @Header("Cookie") token: String,
     @Part filePart: MultipartBody.Part,
-  ): Call<UploadResponse>
+  ): Call<ImageUploadResponse>
 
   @GET("resolve_object")
   fun resolveObject(
@@ -655,13 +660,13 @@ interface PieFedApiAlpha {
   fun getModLogs(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<GetModlogResponse>
+  ): Call<GetModLogResponse>
 
-  @POST("user/register")
-  fun register(
-    @HeaderMap headers: Map<String, String>,
-    @Body register: Register,
-  ): Call<LoginResponse>
+//  @POST("user/register")
+//  fun register(
+//    @HeaderMap headers: Map<String, String>,
+//    @Body register: Register,
+//  ): Call<LoginResponse>
 
   @GET("user/get_captcha")
   fun getCaptcha(@HeaderMap headers: Map<String, String>): Call<GetCaptchaResponse>
