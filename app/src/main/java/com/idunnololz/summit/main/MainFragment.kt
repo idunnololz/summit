@@ -401,24 +401,29 @@ class MainFragment :
         )
       }
       is PostRef -> {
-        currentNavController?.navigate(
-          resId = R.id.postFragment,
-          args = PostFragmentArgs(
-            instance = page.instance,
-            id = page.id,
-            currentCommunity = null,
-            isSinglePage = true,
-            switchToNativeInstance = switchToNativeInstance,
-          ).toBundle(),
-          navOptions = NavOptions.Builder()
-            .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
-            .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
-            .setPopEnterAnim(
-              androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
-            )
-            .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
-            .build(),
-        )
+        val communityFragment = getCurrentFragment() as? CommunityFragment
+        if (communityFragment != null) {
+          communityFragment.openPost(page)
+        } else {
+          currentNavController?.navigate(
+            resId = R.id.postFragment,
+            args = PostFragmentArgs(
+              instance = page.instance,
+              id = page.id,
+              currentCommunity = null,
+              isSinglePage = true,
+              switchToNativeInstance = switchToNativeInstance,
+            ).toBundle(),
+            navOptions = NavOptions.Builder()
+              .setEnterAnim(androidx.navigation.ui.R.animator.nav_default_enter_anim)
+              .setExitAnim(androidx.navigation.ui.R.animator.nav_default_exit_anim)
+              .setPopEnterAnim(
+                androidx.navigation.ui.R.animator.nav_default_pop_enter_anim,
+              )
+              .setPopExitAnim(androidx.navigation.ui.R.animator.nav_default_pop_exit_anim)
+              .build(),
+          )
+        }
       }
       is CommentRef -> {
         currentNavController?.navigate(
@@ -583,14 +588,14 @@ class MainFragment :
   }
 
   private fun getCurrentFragment(): Fragment? {
-    val currentFragment = binding.innerNavHostContainer.getFragment<Fragment>()
-    return if (currentFragment is NavHostFragment) {
-      try {
+    return try {
+      val currentFragment = binding.innerNavHostContainer.getFragment<Fragment>()
+      if (currentFragment is NavHostFragment) {
         currentFragment.childFragmentManager.fragments.getOrNull(0)
-      } catch (_: Exception) {
+      } else {
         null
       }
-    } else {
+    } catch (_: Exception) {
       null
     }
   }

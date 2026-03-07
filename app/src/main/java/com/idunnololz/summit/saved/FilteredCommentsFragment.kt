@@ -77,6 +77,7 @@ class FilteredCommentsFragment :
       postAndCommentViewBuilder = postAndCommentViewBuilder,
       lemmyTextHelper = lemmyTextHelper,
       linkResolver = linkResolver,
+      moreActionsHelper = moreActionsHelper,
       onSignInRequired = {
         PreAuthDialogFragment.newInstance()
           .show(childFragmentManager, "asdf")

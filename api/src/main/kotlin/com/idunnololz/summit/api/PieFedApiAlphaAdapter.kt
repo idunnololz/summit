@@ -951,14 +951,16 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: GetModlog,
     force: Boolean,
-  ): Result<GetModlogResponse> = retrofitErrorHandler {
-    api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
-  }.map {
-    TODO()
-//    GetModlogResponse(
-//      removed_posts = it.removedPosts.map { it.toModRemovePostView() }
-//    )
-  }
+  ): Result<GetModlogResponse> =
+    Result.failure(NotYetImplemented())
+//    retrofitErrorHandler {
+//      api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+//    }.map {
+//
+//  //    GetModlogResponse(
+//  //      removed_posts = it.removedPosts.map { it.toModRemovePostView() }
+//  //    )
+//    }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
     Result.failure(NotYetImplemented())

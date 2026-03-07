@@ -215,6 +215,9 @@ class MainActivity : SummitActivity() {
       is ImageViewerResult.ShareImage -> {
         moreActionsHelper.downloadAndShareImage(result.url)
       }
+      is ImageViewerResult.OpenPage -> {
+        launchPage(result.pageRef, switchToNativeInstance = false, preferMainFragment = true)
+      }
       ImageViewerResult.ErrorCustomDownloadLocation -> {
         lifecycleScope.launch {
           repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -1082,6 +1085,7 @@ class MainActivity : SummitActivity() {
     peek: Boolean,
     urlAlt: String?,
     mimeTypeAlt: String?,
+    pageRef: PageRef?,
   ) {
     val transitionName =
       if (peek) {
@@ -1101,6 +1105,7 @@ class MainActivity : SummitActivity() {
       transitionName = transitionName,
       downloadContext = downloadContext,
       peek = peek,
+      pageRef = pageRef,
     )
 
     if (peek) {

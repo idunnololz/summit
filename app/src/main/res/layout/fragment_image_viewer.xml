@@ -85,11 +85,11 @@
                         app:layout_constraintBottom_toBottomOf="@+id/share_button"/>
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/info_button"
+                        android:id="@+id/comments_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="?attr/materialIconButtonStyle"
-                        app:icon="@drawable/outline_info_24"
+                        app:icon="@drawable/outline_comment_24"
                         app:iconGravity="textStart"
 
                         app:layout_constraintStart_toEndOf="@+id/download_button"
@@ -143,12 +143,26 @@
                         android:layout_height="56dp"
                         android:padding="16dp"
                         android:src="@drawable/baseline_expand_content_24"
-                        android:background="@drawable/peek_action_background"
+                        android:background="?selectableItemBackgroundBorderless"
 
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/peek_share"
+                        app:layout_constraintEnd_toStartOf="@+id/peek_comments"
                         app:layout_constraintHorizontal_chainStyle="spread"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:tint="?colorControlNormal" />
+
+                    <ImageButton
+                        android:id="@+id/peek_comments"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="16dp"
+                        android:src="@drawable/outline_comment_24"
+                        android:background="?selectableItemBackgroundBorderless"
+
+                        app:layout_constraintStart_toEndOf="@+id/peek_expand"
+                        app:layout_constraintEnd_toStartOf="@+id/peek_share"
+                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"
+                        app:tint="?colorControlNormal"/>
 
                     <ImageButton
                         android:id="@+id/peek_share"
@@ -156,11 +170,12 @@
                         android:layout_height="56dp"
                         android:padding="16dp"
                         android:src="@drawable/baseline_share_24"
-                        android:background="@drawable/peek_action_background"
+                        android:background="?selectableItemBackgroundBorderless"
 
-                        app:layout_constraintStart_toEndOf="@+id/peek_expand"
+                        app:layout_constraintStart_toEndOf="@+id/peek_comments"
                         app:layout_constraintEnd_toStartOf="@+id/peek_copy"
-                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"/>
+                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"
+                        app:tint="?colorControlNormal"/>
 
                     <ImageButton
                         android:id="@+id/peek_copy"
@@ -168,11 +183,12 @@
                         android:layout_height="56dp"
                         android:padding="16dp"
                         android:src="@drawable/baseline_content_copy_24"
-                        android:background="@drawable/peek_action_background"
+                        android:background="?selectableItemBackgroundBorderless"
 
                         app:layout_constraintStart_toEndOf="@+id/peek_share"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"/>
+                        app:layout_constraintBottom_toBottomOf="@+id/peek_expand"
+                        app:tint="?colorControlNormal"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </FrameLayout>
 

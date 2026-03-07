@@ -394,6 +394,7 @@ class CommunityFragment :
             urlAlt = altUrl,
             downloadContext = postView.toFileDownloadContext(),
             peek = peek,
+            pageRef = PostRef(moreActionsHelper.apiInstance, postView.post.id),
           )
           moreActionsHelper.onPostRead(
             postView = postView,
@@ -898,6 +899,18 @@ class CommunityFragment :
     }
   }
 
+  fun openPost(postRef: PostRef) {
+    slidingPaneController?.openPost(
+      instance = moreActionsHelper.apiInstance,
+      id = postRef.id,
+      reveal = true, // reveal since we are looking at the image already?
+      post = null,
+      jumpToComments = false,
+      currentCommunity = null,
+      accountId = moreActionsHelper.currentAccount?.id,
+    )
+  }
+
   private fun getVisibleFeedViewPort(): Int = binding.recyclerView.height -
     (communityAppBarController?.appBarRoot?.height ?: 0) -
     (getMainActivity()?.getBottomNavHeight() ?: 0)
@@ -1385,6 +1398,10 @@ class CommunityFragment :
   override fun onSaveInstanceState(outState: Bundle) {
     viewModel.createState()?.writeToBundle(outState, json)
     super.onSaveInstanceState(outState)
+
+    outState.keySet()?.forEach {
+      Log.d("HAHA2", "key: $it")
+    }
   }
 
   override fun onPause() {

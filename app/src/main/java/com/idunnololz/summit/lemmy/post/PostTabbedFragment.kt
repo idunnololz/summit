@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.post
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,7 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
+import com.idunnololz.summit.util.ext.toByteArray
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -145,12 +147,6 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
 
   fun closePost(postFragment: PostFragment) {
     (parentFragment as? CommunityFragment)?.closePost(postFragment)
-  }
-
-  override fun onSaveInstanceState(outState: Bundle) {
-    super.onSaveInstanceState(outState)
-
-//    outState.remove("android:support:fragments")
   }
 
   fun getPost(postId: Int): PostView? = getViewModel()?.postListEngine?.getFetchedPost(postId)
@@ -278,5 +274,6 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
       @Suppress("NotifyDataSetChanged")
       notifyDataSetChanged()
     }
+
   }
 }

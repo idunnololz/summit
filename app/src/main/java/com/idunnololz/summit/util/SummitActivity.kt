@@ -166,6 +166,7 @@ abstract class SummitActivity :
     peek: Boolean,
     urlAlt: String? = null,
     mimeTypeAlt: String? = null,
+    pageRef: PageRef? = null,
   )
 
   abstract fun showCommunityInfo(communityRef: CommunityRef)

@@ -139,11 +139,11 @@ object AnimationUtils {
           return
         }
 
-        animatingIn = true
-        animatingOut = false
-
         view.animate().cancel()
         view.clearAnimation()
+
+        animatingIn = true
+        animatingOut = false
 
         if (view.visibility == View.VISIBLE && view.alpha == 1f) {
           return
@@ -176,24 +176,29 @@ object AnimationUtils {
           return
         }
 
-        animatingOut = true
-        animatingIn = false
-
         view.animate().cancel()
         view.clearAnimation()
 
         if (view.visibility == hideVisibility) {
+          cb?.invoke()
           return
         }
         if (view.visibility != View.VISIBLE) {
           view.visibility = hideVisibility
+          cb?.invoke()
           return
         }
+
+        animatingOut = true
+        animatingIn = false
 
         val animator = view
           .animate()
           .alpha(0f)
           .withEndAction {
+            animatingIn = false
+            animatingOut = false
+
             view.visibility = hideVisibility
             cb?.invoke()
           }
@@ -205,10 +210,13 @@ object AnimationUtils {
         animatingOut = false
 
         view.visibility = hideVisibility
+        cb?.invoke()
       }
     }
 
     fun cancelAnimations() {
+      animatingIn = false
+      animatingOut = false
       view.animate().cancel()
       view.clearAnimation()
     }

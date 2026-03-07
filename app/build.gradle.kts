@@ -22,8 +22,8 @@ android {
     applicationId = "com.idunnololz.summit"
     minSdk = 23
     targetSdk = 36
-    versionCode = 319
-    versionName = "1.79.2"
+    versionCode = 320
+    versionName = "1.79.3"
 
     buildConfigField(
       "String",
@@ -84,7 +84,7 @@ sentry {
     if (sentryProperties["auth.token"] == null) {
       autoUploadProguardMapping.set(false)
     }
-  } catch (e: Exception) {
+  } catch (_: Exception) {
     autoUploadProguardMapping.set(false)
   }
   tracingInstrumentation {
@@ -179,7 +179,6 @@ dependencies {
   implementation(libs.hilt.work)
   implementation(libs.core.splashscreen)
 
-  implementation(libs.transformations)
   implementation(libs.java.string.similarity)
   implementation(libs.viewpump)
 
@@ -187,7 +186,7 @@ dependencies {
   // Tried to switch to KSP + Dagger/Hilt but the build performance was terrible. Specifically
   // for incremental builds. Make sure to test this when switching to KSP again in the future.
   kapt(libs.hilt.android.compiler)
-  kapt("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0-Beta1")
+  kapt("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
 
   implementation(libs.process.phoenix)
 
@@ -202,6 +201,7 @@ dependencies {
   implementation(libs.commonmark)
   implementation(libs.asynclayoutinflater)
   implementation(libs.avif)
+  implementation("androidx.viewpager2:viewpager2:1.1.0")
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }

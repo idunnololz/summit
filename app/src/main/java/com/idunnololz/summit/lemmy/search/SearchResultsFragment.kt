@@ -146,6 +146,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
         postListViewBuilder = postListViewBuilder,
         avatarHelper = avatarHelper,
         linkResolver = linkResolver,
+        moreActionsHelper = moreActionsHelper,
         onLoadPage = {
           queryEngine?.performQuery(it, force = false)
         },
@@ -380,6 +381,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
     private val postListViewBuilder: PostListViewBuilder,
     private val avatarHelper: AvatarHelper,
     private val linkResolver: LinkResolver,
+    private val moreActionsHelper: MoreActionsHelper,
     private val onLoadPage: (Int) -> Unit,
     private val onImageClick: (CommentView, View?, String, peek: Boolean) -> Unit,
     private val onPostImageClick: OnImageClickCallback,
@@ -483,7 +485,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
           vh = viewHolder,
           root = viewHolder.root,
           isSaved = item.commentView.saved,
-          canEdit = false,
+          canEdit = item.commentView.creator.id == moreActionsHelper.currentAccount?.id,
         )
 
         b.postInfo.text = buildSpannedString {

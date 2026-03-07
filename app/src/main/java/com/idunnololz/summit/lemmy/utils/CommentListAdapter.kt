@@ -34,6 +34,7 @@ import com.idunnololz.summit.lemmy.VisibleCommentItem
 import com.idunnololz.summit.lemmy.appendSeparator
 import com.idunnololz.summit.lemmy.postAndCommentView.GeneralQuickActionsViewHolder
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
+import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.preview.VideoType
@@ -49,6 +50,7 @@ class CommentListAdapter(
   private val postAndCommentViewBuilder: PostAndCommentViewBuilder,
   private val lemmyTextHelper: LemmyTextHelper,
   private val linkResolver: LinkResolver,
+  private val moreActionsHelper: MoreActionsHelper,
   private val onLoadPage: (Int) -> Unit,
   private val onImageClick: (CommentView, View?, String, peek: Boolean) -> Unit,
   private val onVideoClick: (CommentView, String, VideoType, VideoState?) -> Unit,
@@ -141,7 +143,7 @@ class CommentListAdapter(
         vh = viewHolder,
         root = viewHolder.root,
         isSaved = item.commentView.saved,
-        canEdit = false,
+        canEdit = item.commentView.creator.id == moreActionsHelper.currentAccount?.id,
       )
 
       b.postInfo.text = buildSpannedString {

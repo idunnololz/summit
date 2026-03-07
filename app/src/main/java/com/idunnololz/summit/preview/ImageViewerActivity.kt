@@ -342,6 +342,10 @@ class ImageViewerActivity :
                   setResult(RESULT_OK, ImageViewerResult.CopyImage(args.url).toIntent())
                   finish()
                 }
+                R.id.peek_comments -> {
+                  setResult(RESULT_OK, ImageViewerResult.OpenPage(requireNotNull(args.pageRef)).toIntent())
+                  finish()
+                }
                 else -> {
                   finish()
                 }
@@ -354,8 +358,10 @@ class ImageViewerActivity :
                 if (peekStatus.x > tempArr[0] && peekStatus.x < (tempArr[0] + it.width) &&
                   peekStatus.y > tempArr[1] && peekStatus.y < (tempArr[1] + it.height)) {
 
+                  it.isPressed = true
                   it.isSelected = true
                 } else {
+                  it.isPressed = false
                   it.isSelected = false
                 }
               }
@@ -434,6 +440,14 @@ class ImageViewerActivity :
       binding.bottomBar.visibility = View.GONE
     } else {
       binding.bottomBar.visibility = View.VISIBLE
+    }
+
+    if (args.pageRef == null) {
+      binding.commentsButton.visibility = View.GONE
+      binding.peekComments.visibility = View.GONE
+    } else {
+      binding.commentsButton.visibility = View.VISIBLE
+      binding.peekComments.visibility = View.VISIBLE
     }
 
     moreActionsHelper.downloadResult.observe(this) {
@@ -535,9 +549,9 @@ class ImageViewerActivity :
         downloadContext = args.downloadContext,
       )(R.id.download)
     }
-    binding.infoButton.setOnClickListener {
-      val url = viewModel.url ?: return@setOnClickListener
-      ImageInfoDialogFragment.show(supportFragmentManager, url)
+    binding.commentsButton.setOnClickListener {
+      setResult(RESULT_OK, ImageViewerResult.OpenPage(requireNotNull(args.pageRef)).toIntent())
+      finish()
     }
     binding.moreButton.setOnClickListener {
       val url = viewModel.url ?: return@setOnClickListener

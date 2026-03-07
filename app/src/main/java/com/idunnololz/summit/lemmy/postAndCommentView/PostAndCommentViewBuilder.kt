@@ -2101,7 +2101,13 @@ class PostAndCommentViewBuilder @Inject constructor(
       if (it.parent != null && it.tag == actions && it.getTag(R.id.is_saved) == isSaved) {
 
         it.findViewById<View>(R.id.ca_edit_comment)?.apply {
-          isEnabled = canEdit
+          if (canEdit) {
+            (getTag(R.id.divider) as? View)?.visibility = View.VISIBLE
+            visibility = View.VISIBLE
+          } else {
+            (getTag(R.id.divider) as? View)?.visibility = View.GONE
+            visibility = View.GONE
+          }
         }
 
         return
@@ -2325,7 +2331,12 @@ class PostAndCommentViewBuilder @Inject constructor(
             setImageResource(R.drawable.baseline_edit_24)
             quickActionsBar.addView(this)
             actionButtons.add(this)
-            isEnabled = canEdit
+
+            if (canEdit) {
+              visibility = View.VISIBLE
+            } else {
+              visibility = View.GONE
+            }
           }
         }
         PostQuickActionIds.More -> {
@@ -2399,6 +2410,14 @@ class PostAndCommentViewBuilder @Inject constructor(
           ).apply {
             topMargin = paddingHalf
             bottomMargin = paddingHalf
+          }
+        }
+        if (quickActionsBar.isNotEmpty()) {
+          quickActionsBar.getChildAt(quickActionsBar.childCount - 1).apply {
+            setTag(R.id.divider, actionsDivider1)
+            if (visibility == View.GONE) {
+              actionsDivider1.visibility = View.GONE
+            }
           }
         }
         quickActionsBar.addView(actionsDivider1)

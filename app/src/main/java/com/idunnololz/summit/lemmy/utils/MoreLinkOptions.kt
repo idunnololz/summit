@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.account.info.isCommunityBlocked
 import com.idunnololz.summit.account.info.isPersonBlocked
+import com.idunnololz.summit.image.ImageInfoDialogFragment
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.lemmy.PersonRef
@@ -77,6 +78,11 @@ fun BottomMenuContainer.showAdvancedLinkOptions(
           R.id.share_image,
           R.string.share_image,
           R.drawable.baseline_share_24,
+        )
+        addItemWithIcon(
+          R.id.image_info,
+          R.string.image_info,
+          R.drawable.outline_info_24,
         )
 
         addDivider()
@@ -441,6 +447,9 @@ fun BottomMenuContainer.createImageOrLinkActionsHandler(
         mimeType = mimeType,
         downloadContext = downloadContext,
       )
+    }
+    R.id.image_info -> {
+      ImageInfoDialogFragment.show(fragmentManager, url)
     }
     R.id.copy_link -> {
       Utils.copyToClipboard(context, url)

@@ -390,6 +390,7 @@ class PreviewPresetActivity : SummitActivity() {
     peek: Boolean,
     urlAlt: String?,
     mimeTypeAlt: String?,
+    pageRef: PageRef?,
   ) {
     error("Unsupported operation")
   }

@@ -22,7 +22,7 @@ class SettingsLocalTrackingEventsViewModel @Inject constructor(
 
   data class Model(
     val totalEvents: Int,
-    val totalTableSize: Int,
+    val totalTableSize: Int?,
   )
 
   val data = StatefulLiveData<Model>()
@@ -48,7 +48,11 @@ class SettingsLocalTrackingEventsViewModel @Inject constructor(
       val model = withContext(Dispatchers.IO) {
         Model(
           totalEvents = trackingEventsDao.getCount(),
-          totalTableSize = trackingEventsDao.getTableSize().toInt(),
+          totalTableSize = try {
+            trackingEventsDao.getTableSize().toInt()
+          } catch (_: Exception) {
+            null
+          },
         )
       }
 

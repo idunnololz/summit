@@ -1,6 +1,7 @@
 package com.idunnololz.summit.lemmy.person
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,6 +75,7 @@ class PersonCommentsFragment :
       postAndCommentViewBuilder = postAndCommentViewBuilder,
       lemmyTextHelper = lemmyTextHelper,
       linkResolver = linkResolver,
+      moreActionsHelper = moreActionsHelper,
       onSignInRequired = {
         PreAuthDialogFragment.newInstance()
           .show(childFragmentManager, "asdf")
@@ -186,8 +188,8 @@ class PersonCommentsFragment :
       parentFragment.viewModel.commentsState.observe(viewLifecycleOwner) {
         when (it) {
           is StatefulData.Error -> {
-            binding.swipeRefreshLayout.isRefreshing = false
-            binding.loadingView.showDefaultErrorMessageFor(it.error)
+            swipeRefreshLayout.isRefreshing = false
+            loadingView.showDefaultErrorMessageFor(it.error)
           }
 
           is StatefulData.Loading ->
@@ -195,8 +197,8 @@ class PersonCommentsFragment :
 
           is StatefulData.NotStarted -> {}
           is StatefulData.Success -> {
-            binding.swipeRefreshLayout.isRefreshing = false
-            binding.loadingView.hideAll()
+            swipeRefreshLayout.isRefreshing = false
+            loadingView.hideAll()
 
             adapter?.setData(parentFragment.viewModel.commentListEngine.commentPages)
 

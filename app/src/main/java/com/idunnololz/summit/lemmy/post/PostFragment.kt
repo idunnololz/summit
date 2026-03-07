@@ -998,6 +998,7 @@ class PostFragment :
   }
 
   private fun goToNextComment() {
+    if (!isBindingAvailable()) return
     (binding.recyclerView.layoutManager as? LinearLayoutManager)?.let {
       val curPos = it.getFirstVisibleItem()
 

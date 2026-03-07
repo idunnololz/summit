@@ -1,3 +1,5 @@
 package com.idunnololz.summit.lemmy
 
-sealed interface PageRef
+import android.os.Parcelable
+
+sealed interface PageRef : Parcelable

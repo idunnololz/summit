@@ -58,7 +58,7 @@ class SettingsLocalTrackingEventsFragment : BaseSettingsFragment() {
       settings.sizeOnDiskRecorded.copy(
         description = data?.totalTableSize?.let {
           fileSizeToHumanReadableString(it.toDouble(), PrettyPrintUtils.defaultDecimalFormat)
-        } ?: "-",
+        } ?: requireContext().getString(R.string.unknown),
       ).asCustomItem(),
       settings.clearLocalTrackingEvents.asCustomItem {
         MaterialAlertDialogBuilder(requireContext())
