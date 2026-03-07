@@ -48,7 +48,7 @@ import com.idunnololz.summit.search.SuggestionProvider
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
@@ -57,11 +57,13 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.getParcelableCompat
 import com.idunnololz.summit.util.setupForFragment
+import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
+class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>(),
+  SlidingPaneControllerProvider {
 
   companion object {
     private const val TAG = "SearchTabbedFragment"
@@ -72,7 +74,7 @@ class SearchTabbedFragment : BaseFragment<FragmentSearchBinding>() {
   private val args by navArgs<SearchTabbedFragmentArgs>()
 
   val viewModel: SearchTabbedViewModel by viewModels()
-  var slidingPaneController: SlidingPaneController? = null
+  override var slidingPaneController: SlidingPaneController? = null
 
   private var searchSuggestionsAdapter: CustomSearchSuggestionsAdapter? = null
 

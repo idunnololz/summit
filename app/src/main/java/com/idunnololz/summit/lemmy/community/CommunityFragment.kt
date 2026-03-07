@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,7 +21,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
-import androidx.recyclerview.widget.LinearSmoothScroller.SNAP_TO_START
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
@@ -109,7 +107,7 @@ import com.idunnololz.summit.util.CustomFabWithBottomNavBehavior
 import com.idunnololz.summit.util.KeyPressRegistrationManager
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.util.SharedElementTransition
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.navigateSafe
@@ -120,8 +118,10 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
+import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import com.idunnololz.summit.util.toFileDownloadContext
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -133,6 +133,7 @@ import kotlinx.serialization.json.Json
 @AndroidEntryPoint
 class CommunityFragment :
   BaseFragment<FragmentCommunityBinding>(),
+  SlidingPaneControllerProvider,
   SignInNavigator {
 
   companion object {
@@ -199,7 +200,7 @@ class CommunityFragment :
 
   lateinit var preferences: Preferences
 
-  private var slidingPaneController: SlidingPaneController? = null
+  override var slidingPaneController: SlidingPaneController? = null
 
   private var isCustomAppBarExpandedPercent = 0f
 
@@ -349,6 +350,10 @@ class CommunityFragment :
     preferences = viewModel.preferences
 
     viewModel.setTag(parentFragment?.tag)
+
+    Sentry.configureScope {
+      it.setContexts("community", args.communityRef)
+    }
 
     val context = requireContext()
     if (adapter == null) {
@@ -851,7 +856,6 @@ class CommunityFragment :
           }
 
           override fun onPanelOpened(panel: View) {
-            lastOffset = 0
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.CLOSE,
@@ -860,7 +864,6 @@ class CommunityFragment :
           }
 
           override fun onPanelClosed(panel: View) {
-            lastOffset = 0
             if (isSlideable) {
               (parentFragment?.parentFragment as? MainFragment)?.setStartPanelLockState(
                 OverlappingPanelsLayout.LockState.UNLOCKED,
@@ -2369,25 +2372,4 @@ class CommunityFragment :
         perCommunityPreferences.getCommunityConfig(it)
       }?.layout ?: preferences.getPostsLayout()
     }
-
-  private var lastOffset = 0
-  fun setPanelOffset(offset: Float) {
-    if (!isBindingAvailable()) return
-//    if (binding.slidingPaneLayout.isSlideable) {
-//      val diff = offset - lastOffset
-//      (binding.postFragmentContainer.parent as? View)?.offsetLeftAndRight(diff)
-//
-//
-//      lastOffset = offset
-//    }
-    binding.slidingPaneLayout.smoothSlideTo(offset)
-  }
-
-  fun lockNavBar() {
-    slidingPaneController?.lockNavBar = true
-  }
-
-  fun unlockNavBar() {
-    slidingPaneController?.lockNavBar = false
-  }
 }

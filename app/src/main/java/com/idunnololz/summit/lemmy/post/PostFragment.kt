@@ -42,7 +42,6 @@ import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
-import com.idunnololz.summit.history.HistoryFragment
 import com.idunnololz.summit.history.HistoryManager
 import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.CommentRef
@@ -56,7 +55,6 @@ import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment
 import com.idunnololz.summit.lemmy.fastAccountSwitcher.FastAccountSwitcherDialogFragment
 import com.idunnololz.summit.lemmy.getLocalizedName
 import com.idunnololz.summit.lemmy.idToCommentsSortOrder
-import com.idunnololz.summit.lemmy.person.PersonTabbedFragment
 import com.idunnololz.summit.lemmy.post.PostViewModel.Companion.HIGHLIGHT_COMMENT_MS
 import com.idunnololz.summit.lemmy.postAndCommentView.FindMatchFn
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
@@ -65,7 +63,6 @@ import com.idunnololz.summit.lemmy.postAndCommentView.setupForPostAndComments
 import com.idunnololz.summit.lemmy.postListView.createPostActionHandler
 import com.idunnololz.summit.lemmy.postListView.showMorePostOptions
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeDialogFragment
-import com.idunnololz.summit.lemmy.search.SearchTabbedFragment
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
@@ -82,7 +79,6 @@ import com.idunnololz.summit.preferences.CommentGestureAction
 import com.idunnololz.summit.preferences.PostFabQuickActions
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
-import com.idunnololz.summit.saved.FilteredPostsAndCommentsTabbedFragment
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
@@ -103,9 +99,11 @@ import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.showMoreLinkOptions
 import com.idunnololz.summit.util.showProgressBarIfNeeded
+import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import com.idunnololz.summit.util.toErrorMessage
 import com.idunnololz.summit.util.toFileDownloadContext
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -206,6 +204,13 @@ class PostFragment :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    if (!args.isInViewPager) {
+      Sentry.configureScope {
+        it.setContexts("post_instance", args.instance)
+        it.setContexts("post_id", args.id)
+      }
+    }
 
     val parentFragment = parentFragment
     val accountId = accountId
@@ -311,29 +316,6 @@ class PostFragment :
     }
   }
 
-  private fun goBack() {
-    when (val fragment = requireParentFragment()) {
-      is CommunityFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is PersonTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is FilteredPostsAndCommentsTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is SearchTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is HistoryFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-      is PostTabbedFragment -> {
-        fragment.closePost(this@PostFragment)
-      }
-    }
-  }
-
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -357,16 +339,18 @@ class PostFragment :
           this,
           object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-              (parentFragment as? CommunityFragment)?.apply {
-                unlockNavBar()
-              }
+              getSlidingPaneProvider()?.slidingPaneController?.unlockNavBar()
               goBack()
             }
+
+            var slidingPaneFragment: SlidingPaneControllerProvider? = null
 
             override fun handleOnBackStarted(backEvent: BackEventCompat) {
               super.handleOnBackStarted(backEvent)
 
-              (parentFragment as? CommunityFragment)?.apply {
+              slidingPaneFragment = getSlidingPaneProvider()
+
+              slidingPaneFragment?.slidingPaneController?.apply {
                 lockNavBar()
                 setPanelOffset(0.25f)
               }
@@ -375,7 +359,7 @@ class PostFragment :
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {}
 
             override fun handleOnBackCancelled() {
-              (parentFragment as? CommunityFragment)?.apply {
+              slidingPaneFragment?.slidingPaneController?.apply {
                 setPanelOffset(0f)
                 binding.root.postDelayed(
                   {
@@ -384,6 +368,7 @@ class PostFragment :
                   200
                 )
               }
+              slidingPaneFragment = null
             }
           },
         )
@@ -1235,6 +1220,8 @@ class PostFragment :
     }
 
     initialPostView?.getUrl(getInstance())?.let { url ->
+      if (args.isInViewPager) return@let
+
       historyManager.recordVisit(
         jsonUrl = url,
         saveReason = HistorySaveReason.LOADING,
@@ -1475,6 +1462,8 @@ class PostFragment :
 
   private fun onMainListingItemRetrieved(post: PostView) {
     post.getUrl(getInstance()).let { url ->
+      if (args.isInViewPager) return@let
+
       historyManager.recordVisit(
         jsonUrl = url,
         saveReason = HistorySaveReason.LOADED,
@@ -1533,5 +1522,9 @@ class PostFragment :
         return null
       }
     }
+  }
+
+  private fun getSlidingPaneProvider(): SlidingPaneControllerProvider? {
+    return parentFragment as? SlidingPaneControllerProvider
   }
 }

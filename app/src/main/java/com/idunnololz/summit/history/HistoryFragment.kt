@@ -30,7 +30,7 @@ import com.idunnololz.summit.links.LinkResolver
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
@@ -39,6 +39,7 @@ import com.idunnololz.summit.util.insetViewStartAndEndByPadding
 import com.idunnololz.summit.util.recyclerView.AdapterHelper
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -48,7 +49,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
+class HistoryFragment : BaseFragment<FragmentHistoryBinding>(),
+  SlidingPaneControllerProvider {
 
   companion object {
     private const val TAG = "HistoryFragment"
@@ -73,7 +75,7 @@ class HistoryFragment : BaseFragment<FragmentHistoryBinding>() {
   @Inject
   lateinit var postReadManager: PostReadManager
 
-  private var slidingPaneController: SlidingPaneController? = null
+  override var slidingPaneController: SlidingPaneController? = null
 
   private val onHistoryChangedListener = object : HistoryManager.OnHistoryChangedListener {
     override fun onHistoryChanged() {

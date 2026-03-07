@@ -54,7 +54,7 @@ import com.idunnololz.summit.spans.RoundedBackgroundSpan
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.PrettyPrintUtils.defaultDecimalFormat
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ViewPagerAdapter

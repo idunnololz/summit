@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,10 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.TabbedFragmentPostBinding
+import com.idunnololz.summit.history.HistoryManager
+import com.idunnololz.summit.history.HistorySaveReason
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.lemmy.community.PostListEngineItem
@@ -26,26 +30,33 @@ import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.StatefulData
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.runPredrawDiscardingFrame
-import com.idunnololz.summit.util.ext.toByteArray
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import dagger.hilt.android.AndroidEntryPoint
+import io.sentry.Sentry
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
+class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>(), SlidingPaneControllerProvider {
 
   companion object {
     private const val TAG = "PostTabbedFragment"
   }
 
   private val args: PostTabbedFragmentArgs by navArgs()
+  private val viewModel: PostTabbedViewModel by viewModels()
 
   private var argumentsHandled = false
+  private var restoreHandled = true
 
   @Inject
   lateinit var nsfwModeManager: NsfwModeManager
 
   @Inject
   lateinit var moreActionsHelper: MoreActionsHelper
+
+  @Inject
+  lateinit var historyManager: HistoryManager
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -90,17 +101,29 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
             return
           }
 
+          viewModel.currentPageIndex = position
+
           val item = pagerAdapter.items[position]
 
           if (item is PostAdapter.Item.PostItem) {
+            val postView = item.fetchedPost.postView
             moreActionsHelper.onPostRead(
-              postView = item.fetchedPost.postView,
+              postView = postView,
               delayMs = 500,
               read = true,
             )
             parentFragment?.updateLastSelectedItem(
-              PostRef(parentFragment.viewModel.apiInstance, item.fetchedPost.postView.post.id),
+              PostRef(parentFragment.viewModel.apiInstance, postView.post.id),
             )
+            historyManager.recordVisit(
+              jsonUrl = postView.getUrl(item.instance),
+              saveReason = HistorySaveReason.LOADING,
+              post = postView,
+            )
+            Sentry.configureScope {
+              it.setContexts("post_instance", item.instance)
+              it.setContexts("post_id", item.id)
+            }
           }
 
           if (position + 1 == pagerAdapter.itemCount) {
@@ -121,6 +144,8 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
         if (index >= 0) {
           viewPager.setCurrentItem(index, false)
         }
+      } else if (savedInstanceState != null) {
+        restoreHandled = false
       }
 
       getViewModel()?.loadedPostsData?.observe(viewLifecycleOwner) {
@@ -133,7 +158,10 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
             val position = viewPager.currentItem
             pagerAdapter.setPages(getViewModel()?.postListEngine?.items ?: listOf())
 
-            if (position > 0) {
+            if (!restoreHandled) {
+              restoreHandled = true
+              viewPager.setCurrentItem(viewModel.currentPageIndex, false)
+            } else if (position > 0) {
               // Guard again activity recreate, don't scroll if this is an activity recreate
               viewPager.runPredrawDiscardingFrame {
                 viewPager.setCurrentItem(position, true)
@@ -145,13 +173,16 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
     }
   }
 
-  fun closePost(postFragment: PostFragment) {
-    (parentFragment as? CommunityFragment)?.closePost(postFragment)
+  fun closePost(fragment: Fragment) {
+    (parentFragment as? CommunityFragment)?.closePost(fragment)
   }
 
   fun getPost(postId: Int): PostView? = getViewModel()?.postListEngine?.getFetchedPost(postId)
 
   private fun getViewModel() = (parentFragment as? CommunityFragment)?.viewModel
+
+  override val slidingPaneController: SlidingPaneController?
+    get() = (parentFragment as? SlidingPaneControllerProvider)?.slidingPaneController
 
   class PostAdapter(
     fragment: Fragment,
@@ -176,9 +207,10 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>() {
       private set
     private var nsfwMode: Boolean = false
 
-    override fun getItemId(position: Int): Long = when (val item = items[position]) {
+    override fun getItemId(position: Int): Long = when (val item = items.getOrNull(position)) {
       is Item.PostItem -> item.id
       is Item.AutoLoadItem -> item.id
+      null -> 0
     }
 
     override fun containsItem(itemId: Long): Boolean = items.any { it.id == itemId }

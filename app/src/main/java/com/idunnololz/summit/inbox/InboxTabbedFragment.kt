@@ -36,7 +36,7 @@ import com.idunnololz.summit.lemmy.community.CommunityFragment
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.PageItem
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.TwoPaneOnBackPressedCallback
 import com.idunnololz.summit.util.ext.getColorCompat
 import com.idunnololz.summit.util.ext.getDrawableCompat

@@ -8,7 +8,7 @@ import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.PostRef
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

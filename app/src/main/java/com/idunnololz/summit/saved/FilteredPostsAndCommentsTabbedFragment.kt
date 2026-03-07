@@ -20,13 +20,14 @@ import com.idunnololz.summit.lemmy.utils.actions.installOnActionResultHandler
 import com.idunnololz.summit.lemmy.utils.setup
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.BaseFragment
-import com.idunnololz.summit.util.SlidingPaneController
+import com.idunnololz.summit.util.slidingPane.SlidingPaneController
 import com.idunnololz.summit.util.ViewPagerAdapter
 import com.idunnololz.summit.util.ext.attachWithAutoDetachUsingLifecycle
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.setupForFragment
 import com.idunnololz.summit.util.setupToolbar
+import com.idunnololz.summit.util.slidingPane.SlidingPaneControllerProvider
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -36,12 +37,13 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FilteredPostsAndCommentsTabbedFragment :
   BaseFragment<TabbedFragmentSavedBinding>(),
+  SlidingPaneControllerProvider,
   SignInNavigator {
 
   private val args: FilteredPostsAndCommentsTabbedFragmentArgs by navArgs()
 
   val viewModel: FilteredPostAndCommentsViewModel by viewModels()
-  var slidingPaneController: SlidingPaneController? = null
+  override var slidingPaneController: SlidingPaneController? = null
 
   @Inject
   lateinit var moreActionsHelper: MoreActionsHelper
