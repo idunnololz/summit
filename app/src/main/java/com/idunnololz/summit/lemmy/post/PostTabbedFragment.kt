@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
@@ -57,6 +58,18 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>(), SlidingPan
 
   @Inject
   lateinit var historyManager: HistoryManager
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+
+    childFragmentManager.commit {
+      childFragmentManager.fragments.forEach {
+        if (it is PostFragment) {
+          remove(it)
+        }
+      }
+    }
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -210,7 +223,7 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>(), SlidingPan
     override fun getItemId(position: Int): Long = when (val item = items.getOrNull(position)) {
       is Item.PostItem -> item.id
       is Item.AutoLoadItem -> item.id
-      null -> 0
+      null -> RecyclerView.NO_ID
     }
 
     override fun containsItem(itemId: Long): Boolean = items.any { it.id == itemId }
@@ -306,6 +319,5 @@ class PostTabbedFragment : BaseFragment<TabbedFragmentPostBinding>(), SlidingPan
       @Suppress("NotifyDataSetChanged")
       notifyDataSetChanged()
     }
-
   }
 }

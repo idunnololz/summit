@@ -52,7 +52,11 @@ jobs:
         with:
           name: release.apk
           path: release.apk
-      - name: Release
+      - name: Release on Summit
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release.apk
+      - name: Release on Summit with Lemmy
         uses: softprops/action-gh-release@v1
         with:
           repository: idunnololz/summit-for-lemmy

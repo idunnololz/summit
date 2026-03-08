@@ -1401,10 +1401,6 @@ class CommunityFragment :
   override fun onSaveInstanceState(outState: Bundle) {
     viewModel.createState()?.writeToBundle(outState, json)
     super.onSaveInstanceState(outState)
-
-    outState.keySet()?.forEach {
-      Log.d("HAHA2", "key: $it")
-    }
   }
 
   override fun onPause() {
