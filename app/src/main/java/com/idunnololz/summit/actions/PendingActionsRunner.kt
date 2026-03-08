@@ -71,7 +71,7 @@ class PendingActionsRunner @AssistedInject constructor(
     private const val TAG = "PendingActionsRunner"
   }
 
-  private val lock = Object()
+  private val lock = Any()
   private var isExecutingPendingActions = false
   private var connectionIssue = false
 

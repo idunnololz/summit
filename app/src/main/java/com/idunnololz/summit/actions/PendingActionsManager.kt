@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
 class PendingActionsManager @Inject constructor(
   coroutineScopeFactory: CoroutineScopeFactory,
@@ -52,7 +53,7 @@ class PendingActionsManager @Inject constructor(
 
   private val failedActions = LinkedList<LemmyAction>()
 
-  @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+  @OptIn(DelicateCoroutinesApi::class)
   private val actionsContext = newSingleThreadContext("CounterContext")
 
   private val onActionChangedListeners = arrayListOf<OnActionChangedListener>()

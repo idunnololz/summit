@@ -125,8 +125,7 @@ object AsyncDrawableSchedulerFixed {
         val cells = row.cells
 
         for (cell in cells) {
-          val cellText = (cell as? Cell)?.text()
-            ?: continue
+          val cellText = cell.text()
           val spannable = cellText as? Spannable
             ?: continue
 

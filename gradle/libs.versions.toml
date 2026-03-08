@@ -14,7 +14,6 @@ navigation = "2.9.7"
 room = "2.8.4"
 lifecycle = "2.10.0"
 media3 = "1.9.2"
-transformations = "3.0.7"
 viewpump = "2.1.1"
 work = "2.11.1"
 coil = "3.4.0"
@@ -101,6 +100,7 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 documentfile = { module = "androidx.documentfile:documentfile", version = "1.1.0" }
 annotation = { module = "androidx.annotation:annotation", version = "1.9.1"}
 asynclayoutinflater = { module = "androidx.asynclayoutinflater:asynclayoutinflater", version = "1.1.0" }
+viewpager2 = { module = "androidx.viewpager2:viewpager2", version = "1.1.0" }
 
 hilt-common = { module = "androidx.hilt:hilt-common", version = "1.3.0"}
 hilt-work = { module = "androidx.hilt:hilt-work", version = "1.3.0" }

@@ -128,7 +128,7 @@ class VideoInfoDialogFragment :
       addItemType(
         Item.InfoItem::class,
         ImageInfoInfoItemBinding::inflate,
-      ) { item, b, h ->
+      ) { item, b, _ ->
         b.title.text = item.title
         b.value.text = item.value
 
@@ -221,27 +221,27 @@ class VideoInfoDialogFragment :
           )
           addInfo(
             title = "format.selectionFlags",
-            value = format.selectionFlags.toString() ?: "",
+            value = format.selectionFlags.toString(),
           )
           addInfo(
             title = "format.roleFlags",
-            value = format.roleFlags.toString() ?: "",
+            value = format.roleFlags.toString(),
           )
           addInfo(
             title = "format.auxiliaryTrackType",
-            value = format.auxiliaryTrackType.toString() ?: "",
+            value = format.auxiliaryTrackType.toString(),
           )
           addInfo(
             title = "format.averageBitrate",
-            value = format.averageBitrate.toString() ?: "",
+            value = format.averageBitrate.toString(),
           )
           addInfo(
             title = "format.peakBitrate",
-            value = format.peakBitrate.toString() ?: "",
+            value = format.peakBitrate.toString(),
           )
           addInfo(
             title = "format.bitrate",
-            value = format.bitrate.toString() ?: "",
+            value = format.bitrate.toString(),
           )
           addInfo(
             title = "format.codecs",
@@ -257,95 +257,95 @@ class VideoInfoDialogFragment :
           )
           addInfo(
             title = "format.maxInputSize",
-            value = format.maxInputSize.toString() ?: "",
+            value = format.maxInputSize.toString(),
           )
           addInfo(
             title = "format.maxNumReorderSamples",
-            value = format.maxNumReorderSamples.toString() ?: "",
+            value = format.maxNumReorderSamples.toString(),
           )
           addInfo(
             title = "format.initializationData",
-            value = format.initializationData.toString() ?: "",
+            value = format.initializationData.toString(),
           )
           addInfo(
             title = "format.subsampleOffsetUs",
-            value = format.subsampleOffsetUs.toString() ?: "",
+            value = format.subsampleOffsetUs.toString(),
           )
           addInfo(
             title = "format.hasPrerollSamples",
-            value = format.hasPrerollSamples.toString() ?: "",
+            value = format.hasPrerollSamples.toString(),
           )
           addInfo(
             title = "format.width",
-            value = format.width.toString() ?: "",
+            value = format.width.toString(),
           )
           addInfo(
             title = "format.height",
-            value = format.height.toString() ?: "",
+            value = format.height.toString(),
           )
           addInfo(
             title = "format.frameRate",
-            value = format.frameRate.toString() ?: "",
+            value = format.frameRate.toString(),
           )
           addInfo(
             title = "format.rotationDegrees",
-            value = format.rotationDegrees.toString() ?: "",
+            value = format.rotationDegrees.toString(),
           )
           addInfo(
             title = "format.pixelWidthHeightRatio",
-            value = format.pixelWidthHeightRatio.toString() ?: "",
+            value = format.pixelWidthHeightRatio.toString(),
           )
           addInfo(
             title = "format.projectionData",
-            value = format.projectionData.toString() ?: "",
+            value = format.projectionData.toString(),
           )
           addInfo(
             title = "format.stereoMode",
-            value = format.stereoMode.toString() ?: "",
+            value = format.stereoMode.toString(),
           )
           addInfo(
             title = "format.maxSubLayers",
-            value = format.maxSubLayers.toString() ?: "",
+            value = format.maxSubLayers.toString(),
           )
           addInfo(
             title = "format.channelCount",
-            value = format.channelCount.toString() ?: "",
+            value = format.channelCount.toString(),
           )
           addInfo(
             title = "format.sampleRate",
-            value = format.sampleRate.toString() ?: "",
+            value = format.sampleRate.toString(),
           )
           addInfo(
             title = "format.pcmEncoding",
-            value = format.pcmEncoding.toString() ?: "",
+            value = format.pcmEncoding.toString(),
           )
           addInfo(
             title = "format.encoderDelay",
-            value = format.encoderDelay.toString() ?: "",
+            value = format.encoderDelay.toString(),
           )
           addInfo(
             title = "format.encoderPadding",
-            value = format.encoderPadding.toString() ?: "",
+            value = format.encoderPadding.toString(),
           )
           addInfo(
             title = "format.accessibilityChannel",
-            value = format.accessibilityChannel.toString() ?: "",
+            value = format.accessibilityChannel.toString(),
           )
           addInfo(
             title = "format.cueReplacementBehavior",
-            value = format.cueReplacementBehavior.toString() ?: "",
+            value = format.cueReplacementBehavior.toString(),
           )
           addInfo(
             title = "format.tileCountHorizontal",
-            value = format.tileCountHorizontal.toString() ?: "",
+            value = format.tileCountHorizontal.toString(),
           )
           addInfo(
             title = "format.tileCountVertical",
-            value = format.tileCountVertical.toString() ?: "",
+            value = format.tileCountVertical.toString(),
           )
           addInfo(
             title = "format.cryptoType",
-            value = format.cryptoType.toString() ?: "",
+            value = format.cryptoType.toString(),
           )
         }
       }

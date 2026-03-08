@@ -29,7 +29,7 @@ class LinkifyPlugin internal constructor(
   internal annotation class LinkifyMask
 
   override fun configure(registry: MarkwonPlugin.Registry) {
-    registry.require<CorePlugin?>(
+    registry.require(
       CorePlugin::class.java,
       object : MarkwonPlugin.Action<CorePlugin?> {
         override fun apply(corePlugin: CorePlugin) {
@@ -51,12 +51,10 @@ class LinkifyPlugin internal constructor(
   ) : OnTextAddedListener {
     override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
       // @since 4.2.0 obtain span factory for links
-      //  we will be using the link that is used by markdown (instead of directly applying URLSpan)
+      //  we will be using the link that is used by Markdown (instead of directly applying URLSpan)
 
-      val spanFactory = visitor.configuration().spansFactory().get<Link?>(Link::class.java)
-      if (spanFactory == null) {
-        return
-      }
+      val spanFactory = visitor.configuration().spansFactory().get(Link::class.java)
+        ?: return
 
       // @since 4.2.0 we no longer re-use builder (thread safety achieved for
       //  render calls from different threads and ... better performance)
@@ -64,7 +62,7 @@ class LinkifyPlugin internal constructor(
 
       if (addLinks(builder, mask)) {
         // target URL span specifically
-        val spans = builder.getSpans<URLSpan?>(0, builder.length, URLSpan::class.java)
+        val spans = builder.getSpans(0, builder.length, URLSpan::class.java)
         if (spans != null &&
           spans.size > 0
         ) {
@@ -72,7 +70,7 @@ class LinkifyPlugin internal constructor(
           val spannableBuilder = visitor.builder()
 
           for (span in spans) {
-            CoreProps.LINK_DESTINATION.set(renderProps, span.url)
+            CoreProps.LINK_DESTINATION.set(renderProps, span?.url)
             SpannableBuilder.setSpans(
               spannableBuilder,
               spanFactory.getSpans(visitor.configuration(), renderProps),

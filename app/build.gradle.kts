@@ -43,7 +43,6 @@ android {
       versionNameSuffix = "-DEBUG"
       applicationIdSuffix = ".debug"
 
-
 //      isMinifyEnabled = true
 //      isDebuggable = false
 //
@@ -201,7 +200,7 @@ dependencies {
   implementation(libs.commonmark)
   implementation(libs.asynclayoutinflater)
   implementation(libs.avif)
-  implementation("androidx.viewpager2:viewpager2:1.1.0")
+  implementation(libs.viewpager2)
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 }
