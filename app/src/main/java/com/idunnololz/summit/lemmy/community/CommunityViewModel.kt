@@ -24,7 +24,7 @@ import com.idunnololz.summit.account.toPersonRef
 import com.idunnololz.summit.actions.PostReadManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.hidePosts.HiddenPostEntry
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
 import com.idunnololz.summit.lemmy.CommentRef
@@ -534,6 +534,7 @@ class CommunityViewModel @Inject constructor(
     clearPagesOnSuccess: Boolean = false,
     scrollToTop: Boolean = false,
     includeHideReadCount: Boolean = false,
+    isRestoreOperation: Boolean = false,
   ) {
     if (fetchingPages.contains(pageToFetch)) {
       return
@@ -572,6 +573,8 @@ class CommunityViewModel @Inject constructor(
         force = force,
       )
 
+      Log.d("HAHA", "Getting page ${pageToFetch}. Got: ${result.getOrNull()?.posts?.size} items")
+
       result
         .onSuccess {
           val pageData =
@@ -591,18 +594,21 @@ class CommunityViewModel @Inject constructor(
           }
           postListEngine.setPersistentErrors(postsRepository.persistentErrors)
           postListEngine.addPage(pageData)
-          postListEngine.createItems()
 
-          loadedPostsData.postValue(
-            PostUpdateInfo(
-              scrollToTop = scrollToTop,
-              hideReadCount = if (includeHideReadCount) {
-                postsRepository.hideReadCount
-              } else {
-                null
-              },
-            ),
-          )
+          if (!isRestoreOperation) {
+            postListEngine.createItems()
+
+            loadedPostsData.postValue(
+              PostUpdateInfo(
+                scrollToTop = scrollToTop,
+                hideReadCount = if (includeHideReadCount) {
+                  postsRepository.hideReadCount
+                } else {
+                  null
+                },
+              ),
+            )
+          }
 
           withContext(Dispatchers.Main) {
             fetchingPages.remove(pageToFetch)
@@ -628,8 +634,10 @@ class CommunityViewModel @Inject constructor(
               feed = postsRepository.communityRef,
             ),
           )
-          postListEngine.createItems()
-          loadedPostsData.postError(it)
+          if (!isRestoreOperation) {
+            postListEngine.createItems()
+            loadedPostsData.postError(it)
+          }
 
           withContext(Dispatchers.Main) {
             fetchingPages.remove(pageToFetch)
@@ -637,32 +645,13 @@ class CommunityViewModel @Inject constructor(
         }
 
       result.onSuccess {
-        if (preferences.prefetchPosts) {
+        if (preferences.prefetchPosts && !isRestoreOperation) {
           postFeedPrefetcher.prefetchPage(
             pageIndex = pageToFetch + 1,
             postsRepository = postsRepository,
             coroutineScope = viewModelScope,
           )
         }
-
-//                postPrefetcher.prefetchPosts(
-//                    postOrCommentRefs =
-//                    it.posts.map {
-//                        Either.Left(
-//                            PostRef(
-//                        it.fetchedPost.source.instance ?: apiInstance,
-//                                it.fetchedPost.postView.post.id,
-//                            )
-//                        )
-//                    },
-//                    sortOrder = (preferences.defaultCommentsSortOrder ?:
-//                        CommentsSortOrder.Top).toApiSortOrder(),
-//                    maxDepth = if (preferences.collapseChildCommentsByDefault) {
-//                        1
-//                    } else {
-//                        null
-//                    }
-//                )
       }
     }
   }
@@ -700,7 +689,7 @@ class CommunityViewModel @Inject constructor(
     postListEngine.setSecondaryKey(communityRef.getKey())
 
     if (restore) {
-      restorePostListEngineIfNeeded()
+      // do nothing
     } else {
       postListEngine.isRestored = true
     }
@@ -724,13 +713,14 @@ class CommunityViewModel @Inject constructor(
     postsRepository.setCommunity(communityRef)
   }
 
-  private fun restorePostListEngineIfNeeded() {
-    if (postListEngine.isRestored) {
+  private suspend fun restorePostListEngineIfNeeded(restorePages: Int) {
+    Log.d("HAHA", "restorePostListEngineIfNeeded(). restored? ${postsRepository.isRestored} infinity? ${infinity} postListEngine cur page: ${postListEngine.currentPageIndex.value}")
+    if (postsRepository.isRestored) {
       return
     }
 
     if (!preferences.restoreBrowsingSessions) {
-      postListEngine.isRestored = true
+      postsRepository.isRestored = true
       return
     }
 
@@ -742,29 +732,27 @@ class CommunityViewModel @Inject constructor(
     // For communities with only a few posts, the post repository will incorrectly think
     // that there is no more posts since all posts have been "seen".
 
-    postListEngine.tryRestore()
+    postsRepository.tryRestore()
 
-    // After restoration, we need to sync seen posts
-    val allPosts = postListEngine.pages.asSequence()
-      .flatMap { it.posts }
-      .map { it.fetchedPost.postView }
-      .toList()
+    // Disable caching while we restore...
+    postsRepository.cacheState = false
 
-    viewModelScope.launch {
-      postsRepository.addSeenPosts(allPosts)
-
-      postListEngine.createItems()
-
-      loadedPostsData.postValue(
-        PostUpdateInfo(
-          scrollToTop = false,
-          hideReadCount = null,
-        ),
-      )
-
-      // restore read state
-      onPostReadChanged()
+    Log.d("HAHA", "fetching pages 0 to ${restorePages}")
+    for (i in 0..restorePages) {
+      fetchPageInternal(pageToFetch = i, force = false, isRestoreOperation = true)
+      fetchPageJob?.join()
     }
+
+    // Turn caching back on once we are done restoring
+    postsRepository.cacheState = true
+
+    postListEngine.createItems()
+    loadedPostsData.postValue(
+      PostUpdateInfo(
+        scrollToTop = false,
+        hideReadCount = null,
+      ),
+    )
   }
 
   private fun registerHiddenPostObserver() {
@@ -829,14 +817,18 @@ class CommunityViewModel @Inject constructor(
   }
 
   fun restoreFromState(state: CommunityViewState?) {
+    Log.d("HAHA", "restoreFromState: ${state}")
     state ?: return
-    if (currentCommunityRef.value != state.communityState.communityRef) {
-      currentCommunityRef.value = state.communityState.communityRef
-    }
-    postListEngine.setPageIndex(state.communityState.currentPageIndex)
-    pagePositions = ArrayList(state.pageScrollStates)
 
     viewModelScope.launch {
+      if (currentCommunityRef.value != state.communityState.communityRef) {
+        currentCommunityRef.value = state.communityState.communityRef
+      }
+      postListEngine.setPageIndex(state.communityState.currentPageIndex)
+      pagePositions = ArrayList(state.pageScrollStates)
+
+      restorePostListEngineIfNeeded(state.communityState.currentPageIndex)
+
       delay(1000)
 
       // "warm up" posts repository
@@ -934,7 +926,7 @@ class CommunityViewModel @Inject constructor(
       apiClient.setAccount(account, accountChanged = true)
       apiClient.fetchPostWithRetry(Either.Left(postId), true)
         .onSuccess {
-          postListEngine.updatePost(it.post_view)
+          postListEngine.updatePost(it.postView)
           postListEngine.createItems()
           loadedPostsData.postValue(PostUpdateInfo())
         }

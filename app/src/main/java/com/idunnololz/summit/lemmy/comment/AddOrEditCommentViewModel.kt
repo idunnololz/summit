@@ -20,7 +20,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.Language
 import com.idunnololz.summit.api.dto.lemmy.LanguageId
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.drafts.DraftEntry
 import com.idunnololz.summit.drafts.DraftsManager
@@ -212,7 +212,7 @@ class AddOrEditCommentViewModel @Inject constructor(
         .onSuccess {
           sendComment(
             account,
-            it.person_view.person.id,
+            it.personView.person.id,
             content,
           )
         }
@@ -322,7 +322,7 @@ class AddOrEditCommentViewModel @Inject constructor(
       contextModel.postValue(
         ContextModel(
           originalCommentView = postOrComment.getOrNull(),
-          post = requireNotNull(postResult.getOrNull()?.post_view),
+          post = requireNotNull(postResult.getOrNull()?.postView),
           commentTree = tree.firstOrNull(),
         ),
       )

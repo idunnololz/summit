@@ -2,10 +2,10 @@ package com.idunnololz.summit.lemmy
 
 import android.util.Log
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.models.GetPostsResponse
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -53,14 +53,14 @@ class SinglePostDataSourceWithCursor @AssistedInject constructor(
 
     return fetchPosts(cursor, force)
       .map {
-        cursor = it.next_page
+        cursor = it.nextPage
 
-        Log.d("VotedViewModel", "it.next_page ${it.next_page}")
+        Log.d("VotedViewModel", "it.next_page ${it.nextPage}")
 
         PageWithCursorResult(
           posts = it.posts.map { FetchedPost(it, Source.StandardSource()) },
           cursor = curCursor,
-          hasMore = curCursor != it.next_page,
+          hasMore = curCursor != it.nextPage,
         )
       }
   }

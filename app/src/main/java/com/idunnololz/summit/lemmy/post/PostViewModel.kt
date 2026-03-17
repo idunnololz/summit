@@ -26,8 +26,7 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.CommentNavControlsState
@@ -45,6 +44,7 @@ import com.idunnololz.summit.lemmy.toPostHeaderInfo
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.localTracking.LocalTracker
 import com.idunnololz.summit.localTracking.TrackedAction
+import com.idunnololz.summit.models.GetPostResponse
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
@@ -331,7 +331,7 @@ class PostViewModel @Inject constructor(
             unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
               .fold(
                 onSuccess = {
-                  Result.success(it.post_view.post.ap_id)
+                  Result.success(it.postView.post.ap_id)
                 },
                 onFailure = {
                   Result.failure(it)
@@ -443,7 +443,7 @@ class PostViewModel @Inject constructor(
             unauthedApiClient.fetchPost(null, Either.Left(it.id), force = false)
               .fold(
                 onSuccess = {
-                  Result.success(it.post_view.post.ap_id)
+                  Result.success(it.postView.post.ap_id)
                 },
                 onFailure = {
                   Result.failure(it)
@@ -692,7 +692,7 @@ class PostViewModel @Inject constructor(
     val context = ContextCompat.getContextForLanguage(context)
     val post = postView ?: return@withContext
     val comments = comments
-    val crossPosts = getPostResponse?.cross_posts
+    val crossPosts = getPostResponse?.crossPosts
     val pendingComments = pendingComments
     val supplementaryComments = supplementaryComments
     val postOrCommentRef = postOrCommentRef
@@ -1053,7 +1053,7 @@ class PostViewModel @Inject constructor(
           ?: this@PostViewModel.getPostResponse
       }
 
-      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.post_view ?: postView
+      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.postView ?: postView
 
       trackVisitIfNeeded()
 
@@ -1106,7 +1106,7 @@ class PostViewModel @Inject constructor(
 
       val post = postResult.getOrNull()
       val comments = commentsResult.getOrNull()
-      val postView = post?.post_view ?: postView
+      val postView = post?.postView ?: postView
 
       if (postView != null) {
         if (markPostAsRead) {

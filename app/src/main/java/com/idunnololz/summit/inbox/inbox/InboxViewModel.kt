@@ -15,6 +15,7 @@ import com.idunnololz.summit.account.asAccountLiveData
 import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.FullAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.inbox.InboxItem
 import com.idunnololz.summit.inbox.LiteInboxItem
 import com.idunnololz.summit.inbox.PageType
@@ -562,11 +563,11 @@ class InboxViewModel @Inject constructor(
   fun approveRegistrationApplication(applicationId: Int, approve: Boolean, denyReason: String?) {
     approveRegistrationApplicationResult.setIsLoading()
     viewModelScope.launch {
-      var originalDecision: RegistrationDecision? = null
+      var originalDecision: UserRegistrationApplication.Status? = null
 
       updateSingleItem<InboxListItem.RegistrationApplicationInboxItem>(applicationId.toLong()) {
         originalDecision = it.item.decision
-        it.copy(item = it.item.copy(decision = RegistrationDecision.Pending))
+        it.copy(item = it.item.copy(decision = UserRegistrationApplication.Status.NoDecision))
       }
       if (isLoaded) {
         publishInboxUpdate(scrollToTop = false)
@@ -578,9 +579,9 @@ class InboxViewModel @Inject constructor(
             it.copy(
               item = it.item.copy(
                 decision = if (approve) {
-                  RegistrationDecision.Approved
+                  UserRegistrationApplication.Status.Approved
                 } else {
-                  RegistrationDecision.Declined
+                  UserRegistrationApplication.Status.Declined
                 },
                 denyReason = if (approve) {
                   null

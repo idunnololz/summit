@@ -395,7 +395,7 @@ class InboxRepository @Inject constructor(
         Result.success(it.private_message_reports.map { InboxItem.ReportMessageInboxItem(it) })
       },
       onFailure = {
-        if (it is NotAModOrAdmin) {
+        if (it is NotAModOrAdmin || it is NotYetImplemented) {
           Result.success(listOf())
         } else {
           Result.failure(it)
@@ -416,7 +416,7 @@ class InboxRepository @Inject constructor(
     ).fold(
       onSuccess = {
         Result.success(
-          it.registration_applications.map { InboxItem.RegistrationApplicationInboxItem(it) },
+          it.map { InboxItem.RegistrationApplicationInboxItem(it) },
         )
       },
       onFailure = {

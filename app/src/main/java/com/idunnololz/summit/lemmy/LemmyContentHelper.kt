@@ -21,7 +21,6 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
 import arrow.core.Either
-import coil3.Image
 import coil3.asImage
 import coil3.dispose
 import coil3.load
@@ -29,11 +28,10 @@ import coil3.memory.MemoryCache
 import coil3.request.allowHardware
 import coil3.request.transformations
 import coil3.request.transitionFactory
-import coil3.result
 import coil3.transition.CrossfadeDrawable
 import com.google.android.material.card.MaterialCardView
 import com.idunnololz.summit.R
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getPreviewInfo
@@ -41,7 +39,8 @@ import com.idunnololz.summit.api.utils.getThumbnailPreviewInfo
 import com.idunnololz.summit.api.utils.getThumbnailUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.getVideoInfo
-import com.idunnololz.summit.api.utils.shouldHideItem
+import com.idunnololz.summit.api.utils.hideReasonMessage
+import com.idunnololz.summit.api.utils.shouldBlurItem
 import com.idunnololz.summit.lemmy.post.QueryMatchHelper.HighlightTextData
 import com.idunnololz.summit.lemmy.postListView.FullContentConfig
 import com.idunnololz.summit.lemmy.screenshotMode.ScreenshotModeViewModel
@@ -181,7 +180,7 @@ class LemmyContentHelper(
     fun <T : View> getAndEnsureView(@LayoutRes resId: Int): T =
       fullContentContainerView.getAndEnsureView(resId)
 
-    if (postView.shouldHideItem() && !reveal && !lazyUpdate) {
+    if (postView.shouldBlurItem() && !reveal && !lazyUpdate) {
       val fullContentHiddenView = if (fullBleedImage) {
         getAndEnsureView<View>(R.layout.full_content_hidden_view)
       } else {
@@ -239,17 +238,7 @@ class LemmyContentHelper(
         fullImageView.visibility = View.GONE
       }
 
-      when {
-        postView.post.nsfw -> {
-          textView.setText(R.string.reveal_warning_nsfw)
-        }
-//                listingItem.spoiler -> {
-//                    textView.setText(R.string.reveal_warning_spoiler)
-//                }
-        else -> {
-          textView.setText(R.string.reveal_warning_default)
-        }
-      }
+      textView.setText(postView.hideReasonMessage(context))
       button.setText(R.string.show_post)
       button.setOnClickListener {
         onRevealContentClickedFn()

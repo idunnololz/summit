@@ -162,18 +162,18 @@ class ModActionsViewModel @Inject constructor(
       if (postResult != null) {
         allModState +=
           ModState.PostModState(
-            isRemoved = postResult.post_view.post.removed,
-            isFeatured = postResult.post_view.post.featured_community,
-            isLocked = postResult.post_view.post.locked,
+            isRemoved = postResult.postView.post.removed,
+            isFeatured = postResult.postView.post.featured_community,
+            isLocked = postResult.postView.post.locked,
           )
         allModState +=
           ModState.UserModState(
-            isBannedFromCommunity = postResult.post_view.creator_banned_from_community,
-            isBannedFromSite = postResult.post_view.creator.banned,
+            isBannedFromCommunity = postResult.postView.creator_banned_from_community,
+            isBannedFromSite = postResult.postView.creator.banned,
           )
 
-        person = postResult.post_view.creator
-        community = postResult.community_view.community
+        person = postResult.postView.creator
+        community = postResult.communityView.community
       }
       if (commentResult != null) {
         val comment = commentResult.firstOrNull { it.comment.id == commentId }
@@ -216,8 +216,8 @@ class ModActionsViewModel @Inject constructor(
       if (personResult != null) {
         allModState +=
           ModState.SiteModState(
-            isAdmin = personResult.person_view.person.admin,
-            isBannedFromSite = personResult.person_view.person.banned,
+            isAdmin = personResult.personView.person.admin,
+            isBannedFromSite = personResult.personView.person.banned,
           )
       }
 

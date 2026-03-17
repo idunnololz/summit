@@ -9,6 +9,7 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -51,7 +52,8 @@ import com.idunnololz.summit.account.info.AccountInfoManager
 import com.idunnololz.summit.account.info.isMod
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.api.local.UserRegistrationApplication.Status
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.InboxListItemBinding
@@ -66,7 +68,6 @@ import com.idunnololz.summit.databinding.PostPendingCommentCollapsedItemBinding
 import com.idunnololz.summit.databinding.PostPendingCommentExpandedItemBinding
 import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.inbox.InboxItem
-import com.idunnololz.summit.inbox.RegistrationDecision
 import com.idunnololz.summit.inbox.ReportItem
 import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.LemmyContentHelper
@@ -964,6 +965,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         )
       }
     } else {
+      Log.d("HAHA", "q: ${highlightTextData?.query}")
       val spannable = lemmyTextHelper.bindText(
         textView = text,
         text = content,
@@ -1900,8 +1902,8 @@ class PostAndCommentViewBuilder @Inject constructor(
     )
     b.date.text = tsToConcise(context, item.lastUpdate)
 
-    if (item.decision == RegistrationDecision.Approved ||
-      item.decision == RegistrationDecision.Declined
+    if (item.decision == Status.Approved ||
+      item.decision == Status.Declined
     ) {
       b.author.setTextColor(faintTextColor)
       b.author.alpha = 0.5f
@@ -1912,7 +1914,7 @@ class PostAndCommentViewBuilder @Inject constructor(
       b.content.setTextColor(context.getColorCompat(R.color.colorText))
     }
 
-    if (item.denyReason.isNullOrBlank() || item.decision != RegistrationDecision.Declined) {
+    if (item.denyReason.isNullOrBlank() || item.decision != Status.Declined) {
       b.declineReason.visibility = View.GONE
     } else {
       b.declineReason.visibility = View.VISIBLE
@@ -1977,7 +1979,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     }
 
     when (item.decision) {
-      RegistrationDecision.Approved -> {
+      Status.Approved -> {
         val colorStateList = ColorStateList.valueOf(context.getColorCompat(R.color.style_green))
 
         b.decision.setText(R.string.approved)
@@ -1985,7 +1987,7 @@ class PostAndCommentViewBuilder @Inject constructor(
         b.decision.chipIconTint = colorStateList
         b.decision.chipIcon = context.getDrawableCompat(R.drawable.baseline_check_18)
       }
-      RegistrationDecision.Declined -> {
+      Status.Declined -> {
         val colorStateList = ColorStateList.valueOf(context.getColorCompat(R.color.style_red))
 
         b.decision.setText(R.string.declined)
@@ -1993,18 +1995,11 @@ class PostAndCommentViewBuilder @Inject constructor(
         b.decision.chipIconTint = colorStateList
         b.decision.chipIcon = context.getDrawableCompat(R.drawable.baseline_close_18)
       }
-      RegistrationDecision.NoDecision -> {
+      Status.NoDecision -> {
         val colorStateList = ColorStateList.valueOf(
           context.getColorFromAttribute(androidx.appcompat.R.attr.colorControlNormal),
         )
         b.decision.setText(R.string.make_a_decision)
-        b.decision.chipStrokeColor = colorStateList
-      }
-      RegistrationDecision.Pending -> {
-        val colorStateList = ColorStateList.valueOf(
-          context.getColorCompat(R.color.colorTextFaint),
-        )
-        b.decision.setText(R.string.pending)
         b.decision.chipStrokeColor = colorStateList
       }
     }

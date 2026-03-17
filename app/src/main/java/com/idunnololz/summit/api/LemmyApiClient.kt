@@ -52,12 +52,9 @@ import com.idunnololz.summit.api.dto.lemmy.GetCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetModlog
 import com.idunnololz.summit.api.dto.lemmy.GetModlogResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetails
-import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentions
 import com.idunnololz.summit.api.dto.lemmy.GetPost
-import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPosts
-import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPrivateMessages
 import com.idunnololz.summit.api.dto.lemmy.GetReplies
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
@@ -85,7 +82,6 @@ import com.idunnololz.summit.api.dto.lemmy.ListPostReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReports
 import com.idunnololz.summit.api.dto.lemmy.ListPrivateMessageReportsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplications
-import com.idunnololz.summit.api.dto.lemmy.ListRegistrationApplicationsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.LockPost
 import com.idunnololz.summit.api.dto.lemmy.Login
@@ -104,7 +100,7 @@ import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.api.dto.lemmy.PostReportId
 import com.idunnololz.summit.api.dto.lemmy.PostReportResponse
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageId
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportResponse
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
@@ -113,7 +109,6 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
 import com.idunnololz.summit.api.dto.lemmy.Register
-import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
 import com.idunnololz.summit.api.dto.lemmy.RemovePost
@@ -126,13 +121,18 @@ import com.idunnololz.summit.api.dto.lemmy.SaveComment
 import com.idunnololz.summit.api.dto.lemmy.SavePost
 import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
-import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.Consts
+import com.idunnololz.summit.models.processed.DtoConverter
+import com.idunnololz.summit.models.GetPostResponse
+import com.idunnololz.summit.models.GetPostsResponse
 import com.idunnololz.summit.links.SiteBackendHelper
+import com.idunnololz.summit.models.GetPersonDetailsResponse
+import com.idunnololz.summit.models.SearchResponse
 import com.idunnololz.summit.network.LemmyApi
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.util.StatefulData
@@ -157,6 +157,7 @@ class LemmyApiClient @Inject constructor(
   private val preferences: Preferences,
   @LemmyApi val okHttpClient: OkHttpClient,
   private val siteBackendHelper: SiteBackendHelper,
+  private val dtoConverter: DtoConverter,
   coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
@@ -173,6 +174,7 @@ class LemmyApiClient @Inject constructor(
     @LemmyApi private val okHttpClient: OkHttpClient,
     private val siteBackendHelper: SiteBackendHelper,
     private val coroutineScopeFactory: CoroutineScopeFactory,
+    private val dtoConverter: DtoConverter,
   ) {
     fun create() = LemmyApiClient(
       apiListenerManager = apiListenerManager,
@@ -180,6 +182,7 @@ class LemmyApiClient @Inject constructor(
       okHttpClient = okHttpClient,
       siteBackendHelper = siteBackendHelper,
       coroutineScopeFactory = coroutineScopeFactory,
+      dtoConverter = dtoConverter,
     )
   }
 
@@ -255,6 +258,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().getPosts(authorization = account?.bearer, args = form, force = force)
+        .map { dtoConverter.convertGetPostsResponse(it) }
     }
   }
 
@@ -271,6 +275,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().getPost(authorization = account?.bearer, args = postForm, force = force)
+        .map { dtoConverter.convertGetPostResponse(it) }
     }
   }
 
@@ -310,7 +315,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().getPosts(authorization = account?.bearer, args = form, force = force)
-    }.map { it.posts }
+    }.map { it.posts.map { dtoConverter.convertPostView(it) } }
   }
 
   suspend fun fetchSavedComments(
@@ -468,6 +473,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().search(authorization = account?.bearer, args = form, force = force)
+        .map { dtoConverter.convertSearchResponse(it) }
     }
   }
 
@@ -556,7 +562,7 @@ class LemmyApiClient @Inject constructor(
       )
 
       onApiClient { getApi().likePost(authorization = account.bearer, form) }
-        .map { it.post_view }
+        .map { dtoConverter.convertPostView(it.post_view) }
     }
 
   suspend fun likeCommentWithRetry(
@@ -769,7 +775,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().createPost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun editPost(
@@ -796,7 +802,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().editPost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun deletePost(account: Account, id: PostId, delete: Boolean): Result<PostView> {
@@ -807,7 +813,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().deletePost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun featurePost(
@@ -824,7 +830,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().featurePost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun lockPost(account: Account, id: PostId, locked: Boolean): Result<PostView> {
@@ -835,7 +841,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().lockPost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun removePost(
@@ -852,7 +858,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().removePost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun uploadImage(
@@ -955,6 +961,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().getPersonDetails(authorization = account?.bearer, form, force = force)
+        .map { dtoConverter.convertGetPersonDetailsResponse(it) }
     }
   }
 
@@ -1226,7 +1233,7 @@ class LemmyApiClient @Inject constructor(
 
     return onApiClient {
       getApi().savePost(authorization = account.bearer, form)
-    }.map { it.post_view }
+    }.map { dtoConverter.convertPostView(it.post_view) }
   }
 
   suspend fun saveComment(
@@ -1453,7 +1460,7 @@ class LemmyApiClient @Inject constructor(
     unreadOnly: Boolean? = null,
     account: Account,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> {
+  ): Result<List<UserRegistrationApplication>> {
     val form = ListRegistrationApplications(
       page = page,
       limit = limit,
@@ -1470,7 +1477,7 @@ class LemmyApiClient @Inject constructor(
     approve: Boolean,
     denyReason: String?,
     account: Account,
-  ): Result<RegistrationApplicationResponse> {
+  ): Result<Unit> {
     val form = ApproveRegistrationApplication(
       id = applicationId,
       approve = approve,

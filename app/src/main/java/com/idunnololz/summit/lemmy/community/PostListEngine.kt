@@ -8,7 +8,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.key
 import com.idunnololz.summit.api.CommunityBlockedError
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
@@ -95,7 +95,6 @@ sealed interface PostListEngineItem {
 class PostListEngine @AssistedInject constructor(
   @ApplicationContext private val context: Context,
   private val coroutineScopeFactory: CoroutineScopeFactory,
-  private val directoryHelper: DirectoryHelper,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val accountManager: AccountManager,
   private val accountActionsManager: AccountActionsManager,
@@ -194,35 +193,6 @@ class PostListEngine @AssistedInject constructor(
   val biggestPageIndex: Int?
     get() = pages.lastOrNull()?.pageIndex
 
-  fun tryRestore() {
-    if (isRestored) return
-
-    isRestored = true
-
-    val currentAccountKey = accountManager.currentAccount.value.key
-    Log.d(TAG, "Attempting to restore. Using keys $key, $secondaryKey, $currentAccountKey")
-    val cachedPages = directoryHelper.getPages(key, secondaryKey)
-
-    if (currentAccountKey != cachedPages?.firstOrNull()?.accountKey) {
-      return
-    }
-
-    cachedPages.let {
-      // We need to use let here because Google's lint rule doesn't support smart cast
-      Log.d(
-        TAG,
-        "Restoration successful! Restored ${cachedPages.size} page(s) totalling " +
-          "${it.sumOf { it.posts.size }} posts.",
-      )
-
-      if (!infinity) {
-        currentPageIndex.value = it.maxOf { it.pageIndex }
-      }
-
-      _pages = it
-    }
-  }
-
   fun setPersistentErrors(persistentErrors: List<Exception>) {
     this.persistentErrors = persistentErrors.map {
       PostListEngineItem.PersistentErrorItem(it)
@@ -240,14 +210,6 @@ class PostListEngine @AssistedInject constructor(
     }
     pages.sortBy { it.pageIndex }
     _pages = pages
-
-    coroutineScope.launch(Dispatchers.IO) {
-      directoryHelper.addPage(key, secondaryKey, data, pages.size)
-      Log.d(
-        TAG,
-        "Added pages to directory helper! ${pages.size}. Using keys $key, $secondaryKey, ${data.accountKey}",
-      )
-    }
   }
 
   fun getFetchedPost(postId: Int): PostView? {
@@ -268,10 +230,12 @@ class PostListEngine @AssistedInject constructor(
 
     Log.d(TAG, "createItems()")
 
+    Log.d("HAHA", "createItems()")
+
     val pages = if (infinity) {
       pages
     } else {
-      listOfNotNull(pages.getOrNull(currentPageIndex.value))
+      listOfNotNull(pages.firstOrNull { it.pageIndex == currentPageIndex.value })
     }
 
     if (pages.isEmpty()) {
@@ -372,6 +336,11 @@ class PostListEngine @AssistedInject constructor(
 
       items += PostListEngineItem.FooterSpacerItem
     }
+
+//    Log.d("HAHA", "createItems(): ")
+//    for (i in items) {
+//      Log.d("HAHA", "  ${i}")
+//    }
 
     _items = items
   }
@@ -496,9 +465,6 @@ class PostListEngine @AssistedInject constructor(
   fun clear() {
     _pages = listOf()
     isCommunityBlocked = false
-    coroutineScope.launch(Dispatchers.IO) {
-      directoryHelper.clearPages(key, secondaryKey)
-    }
     currentPageIndex.value = 0
   }
 

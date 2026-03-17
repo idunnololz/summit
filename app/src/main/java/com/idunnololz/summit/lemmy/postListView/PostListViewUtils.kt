@@ -6,7 +6,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.filterPostsHelper.FilterPostsHelperFragment
 import com.idunnololz.summit.lemmy.PostRef

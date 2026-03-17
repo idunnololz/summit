@@ -473,7 +473,7 @@ class YouFragment : BaseFragment<FragmentYouBinding>() {
           name = model.name,
           account = model.account,
           accountInfo = model.accountInfo,
-          person = model.personResult?.getOrNull()?.person_view,
+          person = model.personResult?.getOrNull()?.personView,
         )
 
         if (model.account == null) {

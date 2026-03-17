@@ -88,7 +88,7 @@ class YouViewModel @Inject constructor(
       withContext(Dispatchers.Main) {
         model.setValue(
           YouModel(
-            name = personResult.getOrNull()?.person_view?.person?.display_name
+            name = personResult.getOrNull()?.personView?.person?.display_name
               ?: account?.account?.name,
             account = account?.account,
             accountInfo = account?.accountInfo,

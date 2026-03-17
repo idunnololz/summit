@@ -26,7 +26,7 @@ import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.lemmy.LemmyUtils

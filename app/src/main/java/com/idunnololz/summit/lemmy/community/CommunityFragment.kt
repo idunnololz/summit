@@ -43,7 +43,7 @@ import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.FragmentCommunityBinding
@@ -493,10 +493,7 @@ class CommunityFragment :
     viewModel.changeCommunity(args.communityRef, restore = savedInstanceState != null)
 
     if (savedInstanceState != null) {
-      restoreState(
-        CommunityViewState.restoreFromBundle(savedInstanceState, json),
-        reload = false,
-      )
+      viewModel.restoreFromState(CommunityViewState.restoreFromBundle(savedInstanceState, json))
     }
 
     sharedElementEnterTransition = SharedElementTransition()
@@ -1115,6 +1112,8 @@ class CommunityFragment :
           is StatefulData.Success -> {
             loadingView.hideAll()
 
+            Log.d("HAHA", "loadedPostsData success!")
+
             val adapter = adapter ?: return@a
 
             if (it.data.hideReadCount != null) {
@@ -1450,13 +1449,6 @@ class CommunityFragment :
         state = viewState,
         shortDesc = viewState.getShortDesc(context),
       )
-    }
-  }
-
-  private fun restoreState(state: CommunityViewState?, reload: Boolean) {
-    viewModel.restoreFromState(state ?: return)
-    if (reload) {
-      viewModel.fetchCurrentPage()
     }
   }
 

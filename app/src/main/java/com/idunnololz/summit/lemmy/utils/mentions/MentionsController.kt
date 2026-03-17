@@ -16,12 +16,12 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PersonView
-import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.lemmy.toCommunityRef
 import com.idunnololz.summit.lemmy.toPersonRef
+import com.idunnololz.summit.models.SearchResponse
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.LinkUtils
 import com.idunnololz.summit.view.CustomTextInputEditText

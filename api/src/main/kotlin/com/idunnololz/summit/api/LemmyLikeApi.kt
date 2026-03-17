@@ -115,6 +115,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import java.io.InputStream
 
 interface LemmyLikeApi : ApiCompat {
@@ -537,12 +538,12 @@ interface LemmyLikeApi : ApiCompat {
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse>
+  ): Result<List<UserRegistrationApplication>>
 
   suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse>
+  ): Result<Unit>
 
   suspend fun getModLogs(
     authorization: String?,

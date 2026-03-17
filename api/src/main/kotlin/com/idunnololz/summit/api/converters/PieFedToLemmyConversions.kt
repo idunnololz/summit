@@ -1,5 +1,13 @@
 package com.idunnololz.summit.api.converters
 
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgeComment
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgeCommentView
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgeCommunity
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgeCommunityView
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgePerson
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgePersonView
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgePost
+import com.idunnololz.summit.api.dto.lemmy.AdminPurgePostView
 import com.idunnololz.summit.api.dto.lemmy.CommentReplyView
 import com.idunnololz.summit.api.dto.lemmy.CommentReport
 import com.idunnololz.summit.api.dto.lemmy.CommentReportView
@@ -11,7 +19,31 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonMentionsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetRepliesResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
+import com.idunnololz.summit.api.dto.lemmy.LocalUserId
 import com.idunnololz.summit.api.dto.lemmy.LoginResponse
+import com.idunnololz.summit.api.dto.lemmy.ModAdd
+import com.idunnololz.summit.api.dto.lemmy.ModAddCommunity
+import com.idunnololz.summit.api.dto.lemmy.ModAddCommunityView
+import com.idunnololz.summit.api.dto.lemmy.ModAddView
+import com.idunnololz.summit.api.dto.lemmy.ModBan
+import com.idunnololz.summit.api.dto.lemmy.ModBanFromCommunity
+import com.idunnololz.summit.api.dto.lemmy.ModBanFromCommunityView
+import com.idunnololz.summit.api.dto.lemmy.ModBanView
+import com.idunnololz.summit.api.dto.lemmy.ModFeaturePost
+import com.idunnololz.summit.api.dto.lemmy.ModFeaturePostView
+import com.idunnololz.summit.api.dto.lemmy.ModHideCommunity
+import com.idunnololz.summit.api.dto.lemmy.ModHideCommunityView
+import com.idunnololz.summit.api.dto.lemmy.ModLockPost
+import com.idunnololz.summit.api.dto.lemmy.ModLockPostView
+import com.idunnololz.summit.api.dto.lemmy.ModRemoveComment
+import com.idunnololz.summit.api.dto.lemmy.ModRemoveCommentView
+import com.idunnololz.summit.api.dto.lemmy.ModRemoveCommunity
+import com.idunnololz.summit.api.dto.lemmy.ModRemoveCommunityView
+import com.idunnololz.summit.api.dto.lemmy.ModRemovePost
+import com.idunnololz.summit.api.dto.lemmy.ModRemovePostView
+import com.idunnololz.summit.api.dto.lemmy.ModTransferCommunity
+import com.idunnololz.summit.api.dto.lemmy.ModTransferCommunityView
+import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PersonMention
 import com.idunnololz.summit.api.dto.lemmy.PersonMentionView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
@@ -21,6 +53,8 @@ import com.idunnololz.summit.api.dto.lemmy.PostResponse
 import com.idunnololz.summit.api.dto.lemmy.PostView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessage
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplication
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
@@ -43,6 +77,9 @@ import com.idunnololz.summit.api.dto.piefed.models.Post
 import com.idunnololz.summit.api.dto.piefed.models.PostAggregates
 import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
 import com.idunnololz.summit.api.dto.piefed.models.Site
+import com.idunnololz.summit.api.dto.piefed.models.UserRegistration
+import com.idunnololz.summit.api.local.UserRegistrationApplication
+import kotlin.Int
 
 internal fun com.idunnololz.summit.api.dto.piefed.models.PersonView.toPersonView(): PersonView =
   PersonView(
@@ -562,6 +599,343 @@ internal fun com.idunnololz.summit.api.dto.piefed.models.PostReport.toPostReport
     published = this.published!!,
     updated = null,
   )
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(
+): ModRemovePostView? {
+  return ModRemovePostView(
+    mod_remove_post = modRemovePost.toModRemovePost() ?: return null,
+    moderator = moderator?.toPerson(),
+    post = post?.toPost() ?: return null,
+    community = community?.toCommunity() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePost.toModRemovePost(): ModRemovePost? {
+  return ModRemovePost(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    post_id = postId ?: return null,
+    reason = reason,
+    removed = removed,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPostView.toModLockPostView(
+): ModLockPostView? {
+  return ModLockPostView(
+    mod_lock_post = modLockPost.toModLockPost() ?: return null,
+    moderator = moderator?.toPerson(),
+    post = post?.toPost() ?: return null,
+    community = community?.toCommunity() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModLockPost.toModLockPost(
+): ModLockPost? {
+  return ModLockPost(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    post_id = postId ?: return null,
+    locked = locked,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePostView.toModFeaturePostView(
+): ModFeaturePostView? {
+  return ModFeaturePostView(
+    mod_feature_post = modFeaturePost.toModFeaturePost() ?: return null,
+    moderator = moderator?.toPerson(),
+    post = post?.toPost() ?: return null,
+    community = community?.toCommunity() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModFeaturePost.toModFeaturePost(
+): ModFeaturePost? {
+  return ModFeaturePost(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    post_id = postId ?: return null,
+    featured = featured,
+    when_ = `when`,
+    is_featured_community = isFeaturedCommunity,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommentView.toModRemoveCommentView(
+): ModRemoveCommentView? {
+  return ModRemoveCommentView(
+    mod_remove_comment = modRemoveComment.toModRemoveComment() ?: return null,
+    moderator = moderator?.toPerson(),
+    comment = comment?.toComment() ?: return null,
+    commenter = commenter?.toPerson() ?: return null,
+    post = post?.toPost() ?: return null,
+    community = community?.toCommunity() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveComment.toModRemoveComment(
+): ModRemoveComment? {
+  return ModRemoveComment(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    comment_id = commentId ?: return null,
+    reason = reason,
+    removed = removed,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunityView.toModRemoveCommunityView(
+): ModRemoveCommunityView? {
+  return ModRemoveCommunityView(
+    mod_remove_community = modRemoveCommunity.toModRemoveCommunity() ?: return null,
+    moderator = moderator?.toPerson(),
+    community = community?.toCommunity() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemoveCommunity.toModRemoveCommunity(
+): ModRemoveCommunity? {
+  return ModRemoveCommunity(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    community_id = communityId ?: return null,
+    reason = reason,
+    removed = removed,
+    expires = null,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunityView.toModBanFromCommunityView(
+): ModBanFromCommunityView? {
+  return ModBanFromCommunityView(
+    mod_ban_from_community = modBanFromCommunity.toModBanFromCommunity() ?: return null,
+    moderator = moderator?.toPerson(),
+    community = community?.toCommunity() ?: return null,
+    banned_person = bannedPerson?.toPerson() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanFromCommunity.toModBanFromCommunity(
+): ModBanFromCommunity? {
+  return ModBanFromCommunity(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    other_person_id = otherPersonId?.toLong() ?: return null,
+    community_id = communityId ?: return null,
+    reason = reason,
+    banned = banned,
+    expires = expires,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBanView.toModBanView(
+): ModBanView? {
+  return ModBanView(
+    mod_ban = modBan.toModBan() ?: return null,
+    moderator = moderator?.toPerson(),
+    banned_person = bannedPerson?.toPerson() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModBan.toModBan(): ModBan? {
+  return ModBan(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    other_person_id = otherPersonId?.toLong() ?: return null,
+    reason = reason,
+    banned = banned,
+    expires = expires,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunityView.toModAddCommunityView(
+): ModAddCommunityView? {
+  return ModAddCommunityView(
+    mod_add_community = modAddCommunity.toModAddCommunity() ?: return null,
+    moderator = moderator?.toPerson(),
+    community = community?.toCommunity() ?: return null,
+    modded_person = moddedPerson?.toPerson() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddCommunity.toModAddCommunity(
+): ModAddCommunity? {
+  return ModAddCommunity(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    other_person_id = otherPersonId?.toLong() ?: return null,
+    community_id = communityId ?: return null,
+    removed = removed,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunityView.toModTransferCommunityView(
+): ModTransferCommunityView? {
+  return ModTransferCommunityView(
+    mod_transfer_community = modTransferCommunity.toModTransferCommunity() ?: return null,
+    moderator = moderator?.toPerson(),
+    community = community.toCommunity(),
+    modded_person = moddedPerson?.toPerson() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModTransferCommunity.toModTransferCommunity(
+): ModTransferCommunity? {
+  return ModTransferCommunity(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    other_person_id = otherPersonId?.toLong() ?: return null,
+    community_id = communityId ?: return null,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModAddView.toModAddView(): ModAddView? {
+  return ModAddView(
+    mod_add = modAdd.toModAdd() ?: return null,
+    moderator = moderator?.toPerson(),
+    modded_person = moddedPerson?.toPerson() ?: return null,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModAdd.toModAdd(): ModAdd? {
+  return ModAdd(
+    id = id,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    other_person_id = otherPersonId?.toLong() ?: return null,
+    removed = removed,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePersonView.toAdminPurgePersonView(
+): AdminPurgePersonView? {
+  return AdminPurgePersonView(
+    admin_purge_person = adminPurgePerson.toAdminPurgePerson() ?: return null,
+    admin = admin?.toPerson(),
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePerson.toAdminPurgePerson(
+): AdminPurgePerson? {
+  return AdminPurgePerson(
+    id = id,
+    admin_person_id = adminPersonId.toLong(),
+    reason = reason,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunityView.toAdminPurgeCommunityView(
+): AdminPurgeCommunityView {
+  return AdminPurgeCommunityView(
+    admin_purge_community = adminPurgeCommunity.toAdminPurgeCommunity(),
+    admin = admin?.toPerson(),
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommunity.toAdminPurgeCommunity() =
+  AdminPurgeCommunity(
+    id = id,
+    admin_person_id = adminPersonId.toLong(),
+    reason = reason,
+    when_ = `when`,
+  )
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePostView.toAdminPurgePostView(
+): AdminPurgePostView? {
+  return AdminPurgePostView(
+    admin_purge_post = adminPurgePost.toAdminPurgePost() ?: return null,
+    community = community.toCommunity(),
+    admin = admin?.toPerson(),
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgePost.toAdminPurgePost(
+): AdminPurgePost? {
+  return AdminPurgePost(
+    id = id,
+    admin_person_id = adminPersonId.toLong(),
+    community_id = communityId ?: return null,
+    reason = reason,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeCommentView.toAdminPurgeCommentView(
+): AdminPurgeCommentView? {
+  return AdminPurgeCommentView(
+    admin_purge_comment = adminPurgeComment.toAdminPurgeComment() ?: return null,
+    post = post.toPost(),
+    admin = admin?.toPerson(),
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.AdminPurgeComment.toAdminPurgeComment(
+): AdminPurgeComment? {
+  return AdminPurgeComment(
+    id = id,
+    admin_person_id = adminPersonId.toLong(),
+    post_id = postId,
+    reason = reason,
+    when_ = `when`,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunityView.toModHideCommunityView(
+): ModHideCommunityView? {
+  return ModHideCommunityView(
+    mod_hide_community = modHideCommunity.toModHideCommunity() ?: return null,
+    community = community.toCommunity(),
+    admin = admin?.toPerson(),
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.ModHideCommunity.toModHideCommunity(
+): ModHideCommunity? {
+  return ModHideCommunity(
+    id = id,
+    community_id = communityId ?: return null,
+    mod_person_id = modPersonId?.toLong() ?: return null,
+    hidden = hidden,
+    when_ = `when`,
+    reason = reason,
+  )
+}
+
+internal fun com.idunnololz.summit.api.dto.piefed.models.UserRegistration.toUserRegistration(
+  instance: String,
+) = UserRegistrationApplication(
+  id = userId,
+  answer = answer,
+  email = email,
+  ipAddress = ipAddress,
+  userId = userId.toLong(),
+  userName = userName,
+  appliedAt = appliedAt,
+  countryCode = countryCode,
+  throwawayEmail = throwawayEmail,
+  status = status?.toStatus() ?: UserRegistrationApplication.Status.NoDecision,
+  approvedBy = approvedBy?.toPerson(),
+  approvedAt = approvedAt,
+  referrer = referrer,
+  instance = instance,
+  isRead = false,
+)
+
+internal fun UserRegistration.Status.toStatus() =
+  when (this) {
+    UserRegistration.Status.approved -> UserRegistrationApplication.Status.Approved
+    UserRegistration.Status.awaiting_review -> UserRegistrationApplication.Status.NoDecision
+  }
 
 //internal fun com.idunnololz.summit.api.dto.piefed.models.ModRemovePostView.toModRemovePostView(): ModRemovePostView =
 //  ModRemovePostView(

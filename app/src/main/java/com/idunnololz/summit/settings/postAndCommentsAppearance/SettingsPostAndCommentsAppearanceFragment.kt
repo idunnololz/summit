@@ -14,7 +14,7 @@ import androidx.transition.TransitionManager
 import com.idunnololz.summit.R
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.databinding.PostAndCommentAppearanceDemoCardBinding
 import com.idunnololz.summit.databinding.PostCommentExpandedItemBinding
 import com.idunnololz.summit.databinding.PostHeaderItemBinding

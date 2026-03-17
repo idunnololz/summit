@@ -115,6 +115,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import java.io.InputStream
 
 class ErrorApiAdapter(
@@ -475,12 +476,12 @@ class ErrorApiAdapter(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> = Result.failure(error)
+  ): Result<List<UserRegistrationApplication>> = Result.failure(error)
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse> = Result.failure(error)
+  ): Result<Unit> = Result.failure(error)
 
   override suspend fun getModLogs(
     authorization: String?,

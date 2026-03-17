@@ -8,7 +8,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityView
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PersonView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SearchType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.fullName
@@ -276,7 +276,7 @@ class QueryEngine(
           force = force,
         )
         .onSuccess {
-          val result: QueryResultsPage = when (it.type_) {
+          val result: QueryResultsPage = when (it.type) {
             SearchType.All -> {
               val items = mutableListOf<SearchResultView>()
 

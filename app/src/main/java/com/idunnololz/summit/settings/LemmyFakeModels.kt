@@ -7,7 +7,7 @@ import com.idunnololz.summit.api.dto.lemmy.Community
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.api.dto.lemmy.Post
 import com.idunnololz.summit.api.dto.lemmy.PostAggregates
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SubscribedType
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
@@ -123,6 +123,7 @@ object LemmyFakeModels {
     creator_blocked = false,
     my_vote = null,
     unread_comments = 0,
+    tags = listOf(),
   )
 
   val fakeFetchedPost = FetchedPost(

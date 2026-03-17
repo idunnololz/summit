@@ -3,6 +3,10 @@ package com.idunnololz.summit.api
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.idunnololz.summit.api.converters.toAdminPurgeCommentView
+import com.idunnololz.summit.api.converters.toAdminPurgeCommunityView
+import com.idunnololz.summit.api.converters.toAdminPurgePersonView
+import com.idunnololz.summit.api.converters.toAdminPurgePostView
 import com.idunnololz.summit.api.converters.toCommentReportView
 import com.idunnololz.summit.api.converters.toCommentResponse
 import com.idunnololz.summit.api.converters.toCommentView
@@ -16,6 +20,17 @@ import com.idunnololz.summit.api.converters.toEditPost
 import com.idunnololz.summit.api.converters.toGetPersonMentionsResponse
 import com.idunnololz.summit.api.converters.toGetRepliesResponse
 import com.idunnololz.summit.api.converters.toLoginResponse
+import com.idunnololz.summit.api.converters.toModAddCommunityView
+import com.idunnololz.summit.api.converters.toModAddView
+import com.idunnololz.summit.api.converters.toModBanFromCommunityView
+import com.idunnololz.summit.api.converters.toModBanView
+import com.idunnololz.summit.api.converters.toModFeaturePostView
+import com.idunnololz.summit.api.converters.toModHideCommunityView
+import com.idunnololz.summit.api.converters.toModLockPostView
+import com.idunnololz.summit.api.converters.toModRemoveCommentView
+import com.idunnololz.summit.api.converters.toModRemoveCommunityView
+import com.idunnololz.summit.api.converters.toModRemovePostView
+import com.idunnololz.summit.api.converters.toModTransferCommunityView
 import com.idunnololz.summit.api.converters.toMyUserInfo
 import com.idunnololz.summit.api.converters.toPersonView
 import com.idunnololz.summit.api.converters.toPostReportView
@@ -25,6 +40,7 @@ import com.idunnololz.summit.api.converters.toPrivateMessageView
 import com.idunnololz.summit.api.converters.toSearchType
 import com.idunnololz.summit.api.converters.toSite
 import com.idunnololz.summit.api.converters.toSortType
+import com.idunnololz.summit.api.converters.toUserRegistration
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
@@ -126,6 +142,7 @@ import com.idunnololz.summit.api.dto.lemmy.PurgeCommunity
 import com.idunnololz.summit.api.dto.lemmy.PurgePerson
 import com.idunnololz.summit.api.dto.lemmy.PurgePost
 import com.idunnololz.summit.api.dto.lemmy.Register
+import com.idunnololz.summit.api.dto.lemmy.RegistrationApplication
 import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationResponse
 import com.idunnololz.summit.api.dto.lemmy.RemoveComment
 import com.idunnololz.summit.api.dto.lemmy.RemoveCommunity
@@ -147,11 +164,13 @@ import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
 import com.idunnololz.summit.api.dto.piefed.GetComment
 import com.idunnololz.summit.api.dto.piefed.models.CommentView
 import com.idunnololz.summit.api.dto.piefed.models.ListCommentsResponse
+import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.UserLoginRequest
-import java.io.InputStream
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.InputStream
 
 class PieFedApiAlphaAdapter(
   private val api: PieFedApiAlpha,
@@ -936,15 +955,23 @@ class PieFedApiAlphaAdapter(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> = retrofitErrorHandler {
+  ): Result<List<UserRegistrationApplication>> = retrofitErrorHandler {
     api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
+  }.map {
+    it.registrations.map { it.toUserRegistration(instance) }
   }
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse> = retrofitErrorHandler {
-    api.approveRegistrationApplication(generateHeaders(authorization, false), args)
+  ): Result<Unit> = retrofitErrorHandler {
+    api.approveRegistrationApplication(
+      headers = generateHeaders(authorization, false),
+      form = RegistrationApproveRequest(
+        args.approve,
+        args.id,
+      )
+    )
   }
 
   override suspend fun getModLogs(
@@ -952,15 +979,27 @@ class PieFedApiAlphaAdapter(
     args: GetModlog,
     force: Boolean,
   ): Result<GetModlogResponse> =
-    Result.failure(NotYetImplemented())
-//    retrofitErrorHandler {
-//      api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
-//    }.map {
-//
-//  //    GetModlogResponse(
-//  //      removed_posts = it.removedPosts.map { it.toModRemovePostView() }
-//  //    )
-//    }
+    retrofitErrorHandler {
+      api.getModLogs(generateHeaders(authorization, force), args.serializeToMap())
+    }.map {
+      GetModlogResponse(
+        removed_posts              = it.removedPosts.mapNotNull { it.toModRemovePostView() },
+        locked_posts               = it.lockedPosts.mapNotNull { it.toModLockPostView() },
+        featured_posts             = it.featuredPosts.mapNotNull { it.toModFeaturePostView() },
+        removed_comments           = it.removedComments.mapNotNull { it.toModRemoveCommentView() },
+        removed_communities        = it.removedCommunities.mapNotNull { it.toModRemoveCommunityView() },
+        banned_from_community      = it.bannedFromCommunity.mapNotNull { it.toModBanFromCommunityView() },
+        banned                     = it.banned.mapNotNull { it.toModBanView() },
+        added_to_community         = it.addedToCommunity.mapNotNull { it.toModAddCommunityView() },
+        transferred_to_community   = it.transferredToCommunity.mapNotNull { it.toModTransferCommunityView() },
+        added                      = it.added.mapNotNull { it.toModAddView() },
+        admin_purged_persons       = it.adminPurgedPersons.mapNotNull { it.toAdminPurgePersonView() },
+        admin_purged_communities   = it.adminPurgedCommunities.map { it.toAdminPurgeCommunityView() },
+        admin_purged_posts         = it.adminPurgedPosts.mapNotNull { it.toAdminPurgePostView() },
+        admin_purged_comments      = it.adminPurgedComments.mapNotNull { it.toAdminPurgeCommentView() },
+        hidden_communities         = it.hiddenCommunities.mapNotNull { it.toModHideCommunityView() },
+      )
+    }
 
   override suspend fun register(args: Register): Result<LoginResponse> =
     Result.failure(NotYetImplemented())

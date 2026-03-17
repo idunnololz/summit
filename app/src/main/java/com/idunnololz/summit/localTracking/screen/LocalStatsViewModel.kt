@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.dto.lemmy.Person
 import com.idunnololz.summit.lemmy.CommunityRef
 import com.idunnololz.summit.localTracking.TrackedAction
 import com.idunnololz.summit.localTracking.TrackingEvent
 import com.idunnololz.summit.localTracking.TrackingEventsDao
+import com.idunnololz.summit.models.GetPersonDetailsResponse
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -110,7 +110,7 @@ class LocalStatsViewModel @Inject constructor(
               if (key != null) {
                 val user = allPeopleData[key]
 
-                user?.getOrNull()?.person_view?.person to it.value
+                user?.getOrNull()?.personView?.person to it.value
               } else {
                 null to it.value
               }

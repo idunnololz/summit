@@ -102,7 +102,7 @@
             app:nullable="true" />
         <argument
             android:name="post"
-            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView"
+            app:argType="com.idunnololz.summit.models.PostView"
             app:nullable="true"
             android:defaultValue="@null"/>
         <argument
@@ -158,7 +158,7 @@
             app:nullable="true" />
         <argument
             android:name="postView"
-            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView"
+            app:argType="com.idunnololz.summit.models.PostView"
             app:nullable="true" />
         <argument
             android:name="draft"

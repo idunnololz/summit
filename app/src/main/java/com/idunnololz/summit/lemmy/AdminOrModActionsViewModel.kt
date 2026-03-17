@@ -14,7 +14,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PostFeatureType
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.StatefulLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

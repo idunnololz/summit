@@ -1,7 +1,10 @@
 package com.idunnololz.summit.api.utils
 
+import android.content.Context
 import androidx.core.net.toUri
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.R
+import com.idunnololz.summit.models.PostView
+import com.idunnololz.summit.models.processed.PostTag
 import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
 import com.idunnololz.summit.util.PreviewInfo
@@ -15,9 +18,25 @@ enum class PostType {
   Link,
 }
 
+val PostView.isSpoiler
+  get() = tags?.contains(PostTag.Spoiler) == true
+
 fun PostView.getUniqueKey(): String = "${post.community_id.toULong()}_${post.id.toULong()}"
 
-fun PostView.shouldHideItem(): Boolean = post.nsfw
+fun PostView.shouldBlurItem(): Boolean = post.nsfw || isSpoiler
+
+fun PostView.hideReasonMessage(context: Context): String =
+  when {
+    post.nsfw -> {
+      context.getString(R.string.reveal_warning_nsfw)
+    }
+    isSpoiler -> {
+      context.getString(R.string.reveal_warning_spoiler)
+    }
+    else -> {
+      context.getString(R.string.reveal_warning_default)
+    }
+  }
 
 fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
   return PreviewInfo(
@@ -27,7 +46,8 @@ fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
   )
 }
 
-fun PostView.getImageUrl(reveal: Boolean): String? = if (shouldHideItem()) {
+
+fun PostView.getImageUrl(reveal: Boolean): String? = if (shouldBlurItem()) {
   if (reveal) {
     post.url
       ?: getThumbnailUrl(reveal)
@@ -39,7 +59,7 @@ fun PostView.getImageUrl(reveal: Boolean): String? = if (shouldHideItem()) {
     ?: getThumbnailUrl(reveal)
 }
 
-fun PostView.getThumbnailUrl(reveal: Boolean): String? = if (shouldHideItem()) {
+fun PostView.getThumbnailUrl(reveal: Boolean): String? = if (shouldBlurItem()) {
   if (reveal) {
     post.thumbnail_url
   } else {

@@ -24,6 +24,8 @@ import com.google.gson.annotations.SerializedName
  *
  * @param actorId 
  * @param name 
+ * @param announcementMd The banner at the top of the home page
+ * @param announcement The banner at the top of the home page
  * @param allLanguages 
  * @param description 
  * @param enableDownvotes 
@@ -42,6 +44,14 @@ data class Site (
 
     @SerializedName("name")
     val name: kotlin.String,
+
+    /* The banner at the top of the home page */
+    @SerializedName("announcement_md")
+    val announcementMd: kotlin.String? = null,
+
+    /* The banner at the top of the home page */
+    @SerializedName("announcement")
+    val announcement: kotlin.String? = null,
 
     @SerializedName("all_languages")
     val allLanguages: kotlin.collections.List<LanguageView>? = null,

@@ -84,7 +84,7 @@ safeargs.
             android:defaultValue="false" />
         <argument
             android:name="postView"
-            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView"
+            app:argType="com.idunnololz.summit.models.PostView"
             app:nullable="true"
             android:defaultValue="@null" />
     </dialog>
@@ -237,7 +237,7 @@ safeargs.
             app:nullable="true"  />
         <argument
             android:name="postView"
-            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView"
+            app:argType="com.idunnololz.summit.models.PostView"
             app:nullable="true" />
     </dialog>
     <dialog
@@ -485,6 +485,6 @@ safeargs.
         android:label="FilterPostsHelperFragment" >
         <argument
             android:name="postView"
-            app:argType="com.idunnololz.summit.api.dto.lemmy.PostView" />
+            app:argType="com.idunnololz.summit.models.PostView" />
     </dialog>
 </navigation>

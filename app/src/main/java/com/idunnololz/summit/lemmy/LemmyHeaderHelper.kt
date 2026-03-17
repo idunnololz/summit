@@ -15,13 +15,15 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.api.utils.isSpoiler
 import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.upvotePercentage
 import com.idunnololz.summit.links.LinkContext
 import com.idunnololz.summit.links.LinkResolver
+import com.idunnololz.summit.models.processed.PostTag
 import com.idunnololz.summit.preferences.GlobalSettings
 import com.idunnololz.summit.preferences.OpTagStyleIds
 import com.idunnololz.summit.preferences.Preferences
@@ -36,6 +38,7 @@ import com.idunnololz.summit.util.PrettyPrintUtils
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.appendLink
 import com.idunnololz.summit.util.ext.getColorCompat
+import com.idunnololz.summit.util.ext.getColorFromAttribute
 import com.idunnololz.summit.util.ext.spToPx
 import com.idunnololz.summit.view.LemmyHeaderView
 import dagger.assisted.Assisted
@@ -78,6 +81,8 @@ class LemmyHeaderHelper @AssistedInject constructor(
   private val emphasisColor: Int = context.getColorCompat(R.color.colorTextTitle)
   private val whiteTextColor: Int = context.getColorCompat(R.color.white97)
   private val blackTextColor: Int = context.getColorCompat(R.color.black97)
+  private val colorSecondary: Int = context.getColorFromAttribute(com.google.android.material.R.attr.colorSecondary)
+  private val colorOnSecondary: Int = context.getColorFromAttribute(com.google.android.material.R.attr.colorOnSecondary)
 
   fun populateHeaderSpan(
     headerContainer: LemmyHeaderView,
@@ -129,6 +134,19 @@ class LemmyHeaderHelper @AssistedInject constructor(
       val e = sb.length
       sb.setSpan(
         RoundedBackgroundSpan(criticalWarningColor, emphasisColor),
+        s,
+        e,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+      )
+      sb.appendSeparator()
+    }
+
+    if (postView.isSpoiler) {
+      val s = sb.length
+      sb.append(context.getString(R.string.spoiler))
+      val e = sb.length
+      sb.setSpan(
+        RoundedBackgroundSpan(colorSecondary, colorOnSecondary),
         s,
         e,
         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,

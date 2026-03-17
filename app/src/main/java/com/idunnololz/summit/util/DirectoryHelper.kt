@@ -26,9 +26,9 @@ class DirectoryHelper @Inject constructor(
   val cacheDir = context.cacheDir
   val okHttpCacheDir = File(context.cacheDir, "okhttp_cache")
   val videoCacheDir = File(context.cacheDir, "videos")
-  val tabsCacheDir = File(context.cacheDir, "tabs")
   val miscCacheDir = File(context.cacheDir, "misc")
   val apiInfoCacheDir = File(context.cacheDir, "api_info")
+  val listsCacheDir = File(context.cacheDir, "lists")
 
   val settingBackupsDir = File(context.filesDir, "sb")
   val saveForLaterDir = File(context.filesDir, "sfl")
@@ -37,8 +37,8 @@ class DirectoryHelper @Inject constructor(
   val imagesDir = File(context.filesDir, "imgs")
   val videosDir = File(context.filesDir, "videos")
 
-  val tabsDiskCache = JsonDiskCache
-    .create(json, tabsCacheDir, 1, 10L * 1024L * 1024L /* 10MB */)
+  val listsDiskCache = JsonDiskCache
+    .create(json, listsCacheDir, 1, 25L * 1024L * 1024L /* 25MB */)
 
   fun cleanup() {
     var purgedFiles = 0
@@ -67,63 +67,5 @@ class DirectoryHelper @Inject constructor(
 
   fun deleteOfflineImages() {
     imagesDir.deleteRecursively()
-  }
-
-  @Serializable
-  data class PostListEngineCacheInfo(
-    val totalPages: Int,
-  )
-
-  fun addPage(key: String?, secondaryKey: String?, data: LoadedPostsData, totalPages: Int) {
-    key ?: return
-
-    tabsCacheDir.mkdirs()
-
-    val keyPrefix = "$key|$secondaryKey"
-    val infoKey = "$keyPrefix|info"
-
-    tabsDiskCache.cacheObject(infoKey, PostListEngineCacheInfo(totalPages))
-
-    val pageKey = "$keyPrefix|${data.pageIndex}"
-
-    tabsDiskCache.cacheObject(pageKey, data)
-
-    tabsDiskCache.printDebugInfo()
-  }
-
-  fun clearPages(key: String?, secondaryKey: String?) {
-    key ?: return
-
-    tabsCacheDir.mkdirs()
-
-    val keyPrefix = "$key|$secondaryKey"
-    val infoKey = "$keyPrefix|info"
-
-    tabsDiskCache.evict(infoKey)
-  }
-
-  fun getPages(key: String?, secondaryKey: String?): List<LoadedPostsData>? {
-    key ?: return null
-
-    tabsCacheDir.mkdirs()
-
-    val keyPrefix = "$key|$secondaryKey"
-    val infoKey = "$keyPrefix|info"
-
-    val pageCacheInfo = tabsDiskCache.getCachedObject<PostListEngineCacheInfo>(infoKey)
-
-    if (pageCacheInfo == null || pageCacheInfo.totalPages == 0) {
-      return null
-    }
-
-    val pages = mutableListOf<LoadedPostsData>()
-    for (i in 0 until pageCacheInfo.totalPages) {
-      val pageKey = "$keyPrefix|$i"
-      val postData = tabsDiskCache.getCachedObject<LoadedPostsData>(pageKey)
-        ?: return null
-      pages.add(postData)
-    }
-
-    return pages
   }
 }

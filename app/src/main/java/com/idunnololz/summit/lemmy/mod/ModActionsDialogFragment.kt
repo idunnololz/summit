@@ -13,7 +13,7 @@ import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.ClientApiException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.DialogFragmentModActionsBinding

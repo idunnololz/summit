@@ -9,7 +9,7 @@ import com.idunnololz.summit.actions.PendingCommentsManager
 import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.CommentsFetcher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.CommentNodeData
@@ -133,7 +133,7 @@ class ContextFetcher @Inject constructor(
 
     Result.success(
       CommentContext(
-        requireNotNull(postResult.getOrNull()?.post_view),
+        requireNotNull(postResult.getOrNull()?.postView),
         tree.firstOrNull(),
       ),
     )

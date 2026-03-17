@@ -3,6 +3,8 @@ package com.idunnololz.summit.cache
 import android.util.Log
 import java.io.File
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
+import java.lang.reflect.Type
 
 class JsonDiskCache(
   val json: Json,
@@ -35,6 +37,35 @@ class JsonDiskCache(
       cache.cacheData(key, json.encodeToString(obj))
     } catch (e: Exception) {
       Log.e(TAG, "cacheObject()", e)
+    }
+  }
+
+  fun <T> cacheObject(key: String, obj: T?, clazz: Type) {
+    try {
+      if (obj == null) {
+        cache.cacheData(key, null)
+      } else {
+        cache.cacheData(
+          key,
+          json.encodeToString(json.serializersModule.serializer(clazz), obj as Any)
+        )
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "cacheObject()", e)
+    }
+  }
+
+  fun <T> getCachedObject(key: String, clazz: Type): T? {
+    return try {
+      val value = cache.getCachedData(key)
+      if (value.isNullOrBlank()) {
+        null
+      } else {
+        json.decodeFromString(json.serializersModule.serializer(clazz), value) as? T
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "getCachedObject()", e)
+      null
     }
   }
 

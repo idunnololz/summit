@@ -1,10 +1,7 @@
 package com.idunnololz.summit.api.dto.lemmy
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class PostView(
   val post: Post,
@@ -20,4 +17,4 @@ data class PostView(
   val creator_blocked: Boolean,
   val my_vote: Int? = null,
   val unread_comments: Int,
-) : Parcelable
+)

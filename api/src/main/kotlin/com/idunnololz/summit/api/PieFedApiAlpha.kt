@@ -70,6 +70,7 @@ import com.idunnololz.summit.api.dto.piefed.models.GetCommentResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetCommunityResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetModLogResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetPostResponse
+import com.idunnololz.summit.api.dto.piefed.models.GetRegistrationListResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetSiteResponse
 import com.idunnololz.summit.api.dto.piefed.models.GetUserResponse
 import com.idunnololz.summit.api.dto.piefed.models.ImageUploadResponse
@@ -80,6 +81,7 @@ import com.idunnololz.summit.api.dto.piefed.models.ListPrivateMessagesResponse
 import com.idunnololz.summit.api.dto.piefed.models.ModCommunityResponse
 import com.idunnololz.summit.api.dto.piefed.models.PostReportResponse
 import com.idunnololz.summit.api.dto.piefed.models.PrivateMessageResponse
+import com.idunnololz.summit.api.dto.piefed.models.RegistrationApproveRequest
 import com.idunnololz.summit.api.dto.piefed.models.ResolveObjectResponse
 import com.idunnololz.summit.api.dto.piefed.models.SearchResponse
 import com.idunnololz.summit.api.dto.piefed.models.UserBlockResponse
@@ -648,13 +650,13 @@ interface PieFedApiAlpha {
   fun listRegistrationApplications(
     @HeaderMap headers: Map<String, String>,
     @QueryMap form: Map<String, String>,
-  ): Call<ListRegistrationApplicationsResponse>
+  ): Call<GetRegistrationListResponse>
 
   @PUT("admin/registration_application/approve")
   fun approveRegistrationApplication(
     @HeaderMap headers: Map<String, String>,
-    @Body form: ApproveRegistrationApplication,
-  ): Call<RegistrationApplicationResponse>
+    @Body form: RegistrationApproveRequest,
+  ): Call<Unit>
 
   @GET("modlog")
   fun getModLogs(

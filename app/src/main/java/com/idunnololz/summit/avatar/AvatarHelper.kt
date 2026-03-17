@@ -94,9 +94,9 @@ class AvatarHelper @Inject constructor(
           personInstance,
         )
 
-        onLoaded(d.bitmap)
-
         withContext(Dispatchers.Main) {
+          onLoaded(d.bitmap)
+
           imageView.dispose()
           imageView.setImageDrawable(d)
         }

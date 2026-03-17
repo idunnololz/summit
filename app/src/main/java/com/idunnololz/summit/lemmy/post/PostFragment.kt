@@ -38,7 +38,7 @@ import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUrl
 import com.idunnololz.summit.databinding.FragmentPostBinding
 import com.idunnololz.summit.databinding.ScreenshotModeAppBarBinding
@@ -93,6 +93,7 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
+import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -1075,6 +1076,11 @@ class PostFragment :
           view = binding.toolbar,
           applyBottomInset = false,
         )
+        insetViewAutomaticallyByMarginsAndNavUi(
+          lifecycleOwner = viewLifecycleOwner,
+          view = binding.findInPageToolbar,
+          applyBottomInset = false,
+        )
         insetViewAutomaticallyByPaddingAndNavUi(
           lifecycleOwner = viewLifecycleOwner,
           view = binding.fabSnackbarCoordinatorLayout,
@@ -1085,6 +1091,10 @@ class PostFragment :
           rootView = binding.recyclerView,
         )
         insetViewExceptBottomAutomaticallyByMargins(viewLifecycleOwner, binding.toolbar)
+        insetViewExceptBottomAutomaticallyByMargins(
+          lifecycleOwner = viewLifecycleOwner,
+          view = binding.findInPageToolbar,
+        )
         insetViewAutomaticallyByPadding(
           viewLifecycleOwner,
           binding.fabSnackbarCoordinatorLayout,

@@ -10,7 +10,7 @@ import com.idunnololz.summit.api.AccountAwareLemmyClient
 import com.idunnololz.summit.api.ApiFeature
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getDominantType
@@ -34,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 
 class PostsRepository @AssistedInject constructor(
   @Assisted private val savedStateHandle: SavedStateHandle,
@@ -48,6 +49,7 @@ class PostsRepository @AssistedInject constructor(
   private val preferences: Preferences,
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val accountActionsManager: AccountActionsManager,
+  private val dataBackedByCacheFactory: DataBackedByCache.Factory,
 ) {
   companion object {
     private val TAG = PostsRepository::class.simpleName
@@ -60,25 +62,54 @@ class PostsRepository @AssistedInject constructor(
     fun create(savedStateHandle: SavedStateHandle): PostsRepository
   }
 
-  private data class PostData(
+  @Serializable
+  data class PostData(
     val post: FetchedPost,
     val postPageIndexInternal: Int,
     val filterReason: FilterReason? = null,
     val isDuplicatePost: Boolean,
   )
 
+  @Serializable
+  data class AllPostData(
+    val allPosts: List<PostData> = listOf(),
+
+    /**
+     * Highest page included in [allPosts]
+     */
+    val currentPage: Int = 0,
+  )
+
   private var currentDataSource: PostsDataSource? = null
 
-  private var allPosts = listOf<PostData>()
+  private var allPostsData = dataBackedByCacheFactory.create<AllPostData>(
+    "all_posts_data",
+    AllPostData()
+  )
+  private val allPosts
+    get() = allPostsData.value.allPosts
+  private val currentPageInternal
+    get() = allPostsData.value.currentPage
   private var seenPosts = mutableSetOf<String>()
   var persistentErrors: List<Exception> = listOf()
+
+  var isRestored: Boolean
+    get() = allPostsData.restored
+    set(value) {
+      allPostsData.restored = value
+    }
+
+  var cacheState: Boolean
+    get() = allPostsData.commitChanges
+    set(value) {
+      allPostsData.commitChanges = value
+    }
 
   var communityRef: CommunityRef = CommunityRef.All()
     private set
 
   private var endReached = false
 
-  private var currentPageInternal = 0
   private var postsPerPage = DEFAULT_POSTS_PER_PAGE
 
   var hideRead = false
@@ -169,8 +200,8 @@ class PostsRepository @AssistedInject constructor(
       val endIndex = startIndex + postsPerPage
 
       // delete all cached data for the given page
-      val postsToInvalidate = allPosts
-        .slice(startIndex until min(endIndex, allPosts.size))
+      val postsToInvalidate = allPostsData.value.allPosts
+        .slice(startIndex until min(endIndex, allPostsData.value.allPosts.size))
 
       postsToInvalidate.minOfOrNull { it.postPageIndexInternal } ?: 0
     }
@@ -207,7 +238,7 @@ class PostsRepository @AssistedInject constructor(
 
           val hasMoreResult = retry {
             fetchPage(
-              pageIndex = currentPageInternal,
+              pageIndex = currentPageInternal + 1,
               sortType = sortOrder.value.toApiSortOrder(),
               force = force,
             )
@@ -219,7 +250,6 @@ class PostsRepository @AssistedInject constructor(
             )
           } else {
             hasMore = hasMoreResult.getOrThrow()
-            currentPageInternal++
           }
 
           if (!hasMore) {
@@ -269,6 +299,7 @@ class PostsRepository @AssistedInject constructor(
     get() = apiClient.instanceFlow
 
   suspend fun setCommunity(communityRef: CommunityRef?) {
+    Log.d("HAHA", "setCommunity()", RuntimeException())
     withContext(serialContext) {
       mutex.withLock {
         this@PostsRepository.communityRef = communityRef ?: CommunityRef.All()
@@ -403,25 +434,30 @@ class PostsRepository @AssistedInject constructor(
   }
 
   suspend fun reset() = withContext(serialContext) {
-    currentPageInternal = 0
+    Log.d("HAHA", "reset()", RuntimeException())
     endReached = false
 
-    allPosts = mutableListOf()
+    allPostsData = dataBackedByCacheFactory.create(
+      primaryKey = "${apiInstance}|${communityRef.getKey()}",
+      initialValue = AllPostData()
+    )
     seenPosts = mutableSetOf()
   }
 
   suspend fun onAccountChanged() = withContext(serialContext) {
-    reset()
-
     if (communityRef is CommunityRef.ModeratedCommunities) {
       // We need to reload the moderated community list on account switch
       setCommunity(communityRef)
+    } else {
+      reset()
     }
   }
 
   suspend fun onHiddenPostsChange() = withContext(serialContext) {
     val hiddenPosts = hiddenPostsManager.getHiddenPostEntries(apiInstance)
-    allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) }
+    allPostsData.value = allPostsData.value.copy(
+      allPosts = allPosts.filter { !hiddenPosts.contains(it.post.postView.post.id) }
+    )
   }
 
   suspend fun update(posts: List<LocalPostView>): List<LocalPostView> = withContext(serialContext) {
@@ -665,19 +701,23 @@ class PostsRepository @AssistedInject constructor(
       }
     }
 
-    allPosts = mutableAllPosts
+    allPostsData.value = AllPostData(
+      allPosts = mutableAllPosts,
+      currentPage = pageIndex
+    )
   }
 
   private suspend fun deleteFromPage(minPageInternal: Int) = withContext(serialContext) {
-    allPosts = allPosts.filter {
-      val keep = it.postPageIndexInternal < minPageInternal
-      if (!keep) {
-        seenPosts.remove(it.post.postView.getUniqueKey())
-      }
-      keep
-    }
-
-    currentPageInternal = minPageInternal
+    allPostsData.value = AllPostData(
+      allPosts = allPosts.filter {
+        val keep = it.postPageIndexInternal < minPageInternal
+        if (!keep) {
+          seenPosts.remove(it.post.postView.getUniqueKey())
+        }
+        keep
+      },
+      currentPage = minPageInternal,
+    )
 
     Log.d(TAG, "Deleted pages $minPageInternal and beyond. Posts left: ${allPosts.size}")
   }
@@ -693,6 +733,11 @@ class PostsRepository @AssistedInject constructor(
     } else {
       indexBackedSinglePostsDataSourceFactory.create(communityName, listingType)
     }
+
+  suspend fun tryRestore() {
+    allPostsData.tryRestore()
+    addSeenPosts(allPosts.map { it.post.postView })
+  }
 
   class PageResult(
     val posts: List<LocalPostView>,

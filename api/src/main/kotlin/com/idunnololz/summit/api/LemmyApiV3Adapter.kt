@@ -3,6 +3,7 @@ package com.idunnololz.summit.api
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.idunnololz.summit.api.converters.toUserRegistrationApplication
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunity
 import com.idunnololz.summit.api.dto.lemmy.AddModToCommunityResponse
 import com.idunnololz.summit.api.dto.lemmy.ApproveRegistrationApplication
@@ -118,6 +119,7 @@ import com.idunnololz.summit.api.dto.lemmy.SaveUserSettings
 import com.idunnololz.summit.api.dto.lemmy.Search
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
 import com.idunnololz.summit.api.dto.lemmy.SuccessResponse
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import java.io.InputStream
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -639,15 +641,19 @@ class LemmyApiV3Adapter(
     authorization: String?,
     args: ListRegistrationApplications,
     force: Boolean,
-  ): Result<ListRegistrationApplicationsResponse> = retrofitErrorHandler {
+  ): Result<List<UserRegistrationApplication>> = retrofitErrorHandler {
     api.listRegistrationApplications(generateHeaders(authorization, force), args.serializeToMap())
+  }.map {
+    it.registration_applications.map { it.toUserRegistrationApplication(instance) }
   }
 
   override suspend fun approveRegistrationApplication(
     authorization: String?,
     args: ApproveRegistrationApplication,
-  ): Result<RegistrationApplicationResponse> = retrofitErrorHandler {
+  ): Result<Unit> = retrofitErrorHandler {
     api.approveRegistrationApplication(generateHeaders(authorization, false), args)
+  }.map {
+    Unit
   }
 
   override suspend fun getModLogs(

@@ -2,7 +2,7 @@ package com.idunnololz.summit.lemmy.multicommunity
 
 import android.os.Parcelable
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -13,7 +13,7 @@ import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.api.AccountInstanceMismatchException
 import com.idunnololz.summit.api.NotAuthenticatedException
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.inbox.CommentBackedItem
 import com.idunnololz.summit.lemmy.LemmyUtils
 import com.idunnololz.summit.util.ext.imageTintListCompat

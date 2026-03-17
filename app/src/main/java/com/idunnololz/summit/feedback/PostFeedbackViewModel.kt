@@ -68,7 +68,7 @@ class PostFeedbackViewModel @Inject constructor(
         unauthedApiClient.fetchPost(null, Either.Left(changeLogPostRef.id), force = false)
           .fold(
             onSuccess = {
-              Result.success(it.post_view.post.ap_id)
+              Result.success(it.postView.post.ap_id)
             },
             onFailure = {
               Result.failure(it)

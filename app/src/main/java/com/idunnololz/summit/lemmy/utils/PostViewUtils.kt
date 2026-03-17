@@ -1,6 +1,6 @@
 package com.idunnololz.summit.lemmy.utils
 
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.util.dateStringToTs
 import kotlin.math.ln
 import kotlin.math.max

@@ -17,7 +17,7 @@ import com.idunnololz.summit.api.LemmyApiClient
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.CommunityModeratorView
 import com.idunnololz.summit.api.dto.lemmy.PersonView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.lemmy.CommentListEngine
@@ -195,8 +195,8 @@ class PersonTabbedViewModel @Inject constructor(
             r.fold(
               {
                 val fullName = PersonRef.PersonRefByName(
-                  it.person_view.person.name,
-                  it.person_view.person.instance,
+                  it.personView.person.name,
+                  it.personView.person.instance,
                 ).fullName
 
                 personIdToPersonName[personRef.fullName] = fullName
@@ -223,7 +223,7 @@ class PersonTabbedViewModel @Inject constructor(
           if (isPeronInfoFetch) {
             personData.postValue(
               PersonDetailsData(
-                result.person_view,
+                result.personView,
                 result.comments,
                 result.posts,
                 result.moderates,

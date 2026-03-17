@@ -10,6 +10,7 @@ import com.idunnololz.summit.api.dto.lemmy.PostReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageReportView
 import com.idunnololz.summit.api.dto.lemmy.PrivateMessageView
 import com.idunnololz.summit.api.dto.lemmy.RegistrationApplicationView
+import com.idunnololz.summit.api.local.UserRegistrationApplication
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.util.dateStringToTs
 import kotlinx.parcelize.IgnoredOnParcel
@@ -32,7 +33,6 @@ enum class RegistrationDecision {
   Approved,
   Declined,
   NoDecision,
-  Pending,
 }
 
 sealed interface ReportItem : InboxItem {
@@ -423,35 +423,40 @@ sealed interface InboxItem :
     override val isDeleted: Boolean,
     override val isRemoved: Boolean,
     override val isRead: Boolean,
-    val decision: RegistrationDecision,
+    val decision: UserRegistrationApplication.Status,
     val denyReason: String?,
   ) : InboxItem {
 
-    constructor(application: RegistrationApplicationView) : this(
-      id = application.registration_application.id,
-      authorId = application.creator.id,
-      authorName = application.creator.name,
-      authorInstance = application.creator.instance,
-      authorAvatar = application.creator.avatar,
+    constructor(application: UserRegistrationApplication) : this(
+      id = application.id,
+      authorId = application.userId,
+      authorName = application.userName,
+      authorInstance = application.instance,
+      authorAvatar = null,
       title = "",
-      content = application.registration_application.answer,
-      lastUpdate = application.registration_application.published,
-      lastUpdateTs = dateStringToTs(application.registration_application.published),
+      content = application.answer ?: "",
+      lastUpdate = application.appliedAt ?: "",
+      lastUpdateTs = dateStringToTs(application.appliedAt ?: ""),
       score = 0,
       isDeleted = false,
       isRemoved = false,
-      isRead = application.registration_application.deny_reason != null || application.admin != null,
-      decision = if (application.admin != null) {
-        if (application.creator_local_user.accepted_application) {
-          RegistrationDecision.Approved
-        } else {
-          RegistrationDecision.Declined
-        }
-      } else {
-        RegistrationDecision.NoDecision
-      },
-      denyReason = application.registration_application.deny_reason,
+      isRead = application.isRead,
+      decision = application.status,
+      denyReason = application.denyReason,
     )
+
+    /**
+     * isRead = application.deny_reason != null || application.admin != null,
+     *       decision = if (application.admin != null) {
+     *         if (application.creator_local_user.accepted_application) {
+     *           RegistrationDecision.Approved
+     *         } else {
+     *           RegistrationDecision.Declined
+     *         }
+     *       } else {
+     *         RegistrationDecision.NoDecision
+     *       },
+     */
 
     override fun toString(): String = "RegistrationApplicationInboxItem { content = $content }"
 

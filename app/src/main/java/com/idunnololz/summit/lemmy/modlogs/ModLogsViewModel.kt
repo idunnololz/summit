@@ -348,7 +348,7 @@ class ModLogsViewModel @Inject constructor(
             personRef.id,
             force = false,
           ).onSuccess {
-            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
+            setFilter(getFilter().copy(filterByMod = it.personView.person.toPersonRef()))
           }.onFailure {
             modLogData.setError(it)
           }
@@ -360,7 +360,7 @@ class ModLogsViewModel @Inject constructor(
             personRef.fullName,
             force = false,
           ).onSuccess {
-            setFilter(getFilter().copy(filterByMod = it.person_view.person.toPersonRef()))
+            setFilter(getFilter().copy(filterByMod = it.personView.person.toPersonRef()))
           }.onFailure {
             modLogData.setError(it)
           }
@@ -384,7 +384,7 @@ class ModLogsViewModel @Inject constructor(
             personRef.id,
             force = false,
           ).onSuccess {
-            setFilter(getFilter().copy(filterByPerson = it.person_view.person.toPersonRef()))
+            setFilter(getFilter().copy(filterByPerson = it.personView.person.toPersonRef()))
           }.onFailure {
             modLogData.setError(it)
           }
@@ -396,7 +396,7 @@ class ModLogsViewModel @Inject constructor(
             personRef.fullName,
             force = false,
           ).onSuccess {
-            setFilter(getFilter().copy(filterByPerson = it.person_view.person.toPersonRef()))
+            setFilter(getFilter().copy(filterByPerson = it.personView.person.toPersonRef()))
           }.onFailure {
             modLogData.setError(it)
           }

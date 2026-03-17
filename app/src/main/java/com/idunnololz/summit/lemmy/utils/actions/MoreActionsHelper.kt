@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.utils.actions
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
@@ -19,7 +18,7 @@ import com.idunnololz.summit.api.dto.lemmy.CommunityId
 import com.idunnololz.summit.api.dto.lemmy.InstanceId
 import com.idunnololz.summit.api.dto.lemmy.PersonId
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
 import com.idunnololz.summit.fileprovider.FileProviderHelper
 import com.idunnololz.summit.hidePosts.HiddenPostsManager
@@ -213,7 +212,7 @@ class MoreActionsHelper(
           blockPersonResult.postErrorAndClear(it)
         }
         .onSuccess {
-          blockPersonInternal(it.person_view.person.id, block)
+          blockPersonInternal(it.personView.person.id, block)
         }
     }
   }

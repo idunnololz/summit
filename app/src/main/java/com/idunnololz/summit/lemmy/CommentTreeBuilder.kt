@@ -6,7 +6,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.actions.PendingCommentView
 import com.idunnololz.summit.api.dto.lemmy.Comment
 import com.idunnololz.summit.api.dto.lemmy.CommentView
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.filterLists.ContentFiltersManager
 import com.idunnololz.summit.lemmy.post.PostViewModel

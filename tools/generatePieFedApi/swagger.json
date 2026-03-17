@@ -247,6 +247,16 @@
             "format": "url",
             "example": "https://piefed.social"
           },
+          "announcement_md": {
+            "type": "string",
+            "description": "The banner at the top of the home page",
+            "format": "markdown"
+          },
+          "announcement": {
+            "type": "string",
+            "description": "The banner at the top of the home page",
+            "format": "html"
+          },
           "name": {
             "type": "string"
           },
@@ -3859,6 +3869,161 @@
           "feeds"
         ]
       },
+      "FollowFeedRequest": {
+        "type": "object",
+        "properties": {
+          "feed_id": {
+            "type": "integer"
+          },
+          "follow": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "feed_id",
+          "follow"
+        ]
+      },
+      "CreateFeedRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "URL-safe name/slug for the feed"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "format": "markdown"
+          },
+          "icon_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "url"
+          },
+          "banner_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "url"
+          },
+          "nsfw": {
+            "type": "boolean"
+          },
+          "nsfl": {
+            "type": "boolean"
+          },
+          "public": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether the feed is publicly visible"
+          },
+          "communities": {
+            "type": "string",
+            "description": "Newline-separated list of community ap_ids to include in the feed"
+          },
+          "is_instance_feed": {
+            "type": "boolean",
+            "description": "Whether this is an instance-level feed (admin only)"
+          },
+          "show_child_posts": {
+            "type": "boolean",
+            "description": "Whether to show posts from child feeds"
+          },
+          "parent_feed_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID of parent feed, if any"
+          }
+        },
+        "required": [
+          "name",
+          "title"
+        ]
+      },
+      "EditFeedRequest": {
+        "type": "object",
+        "properties": {
+          "feed_id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL-safe name/slug for the feed"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "format": "markdown"
+          },
+          "icon_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "url"
+          },
+          "banner_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "url"
+          },
+          "nsfw": {
+            "type": "boolean"
+          },
+          "nsfl": {
+            "type": "boolean"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "communities": {
+            "type": "string",
+            "description": "Newline-separated list of community ap_ids; omit to keep existing communities"
+          },
+          "is_instance_feed": {
+            "type": "boolean"
+          },
+          "show_child_posts": {
+            "type": "boolean"
+          },
+          "parent_feed_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "feed_id"
+        ]
+      },
+      "DeleteFeedRequest": {
+        "type": "object",
+        "properties": {
+          "feed_id": {
+            "type": "integer"
+          },
+          "deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deleted",
+          "feed_id"
+        ]
+      },
       "TopicView": {
         "type": "object",
         "properties": {
@@ -6176,6 +6341,100 @@
           "private_message_id",
           "reason"
         ]
+      },
+      "UserRegistration": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "applied_at": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ip_address": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "throwaway_email": {
+            "type": "boolean"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "user_name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "awaiting review"
+            ]
+          },
+          "approved_by": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "approved_at": {
+            "type": "string",
+            "example": "2025-06-07T02:29:07.980084Z",
+            "format": "datetime"
+          },
+          "referrer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer",
+          "email",
+          "ip_address",
+          "user_id",
+          "user_name"
+        ]
+      },
+      "GetRegistrationListResponse": {
+        "type": "object",
+        "properties": {
+          "registrations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRegistration"
+            }
+          }
+        },
+        "required": [
+          "registrations"
+        ]
+      },
+      "RegistrationApproveRequest": {
+        "type": "object",
+        "properties": {
+          "approve": {
+            "type": "boolean"
+          },
+          "user_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "approve",
+          "user_id"
+        ]
       }
     },
     "responses": {
@@ -7005,8 +7264,13 @@
                 "Hot",
                 "Top",
                 "New",
+                "Old",
                 "Active",
-                "TopAll"
+                "TopAll",
+                "TopPosts",
+                "TopSubscribers",
+                "NewFederated",
+                "OldFederated"
               ]
             },
             "required": false
@@ -7669,6 +7933,98 @@
           "Feed"
         ],
         "summary": "Get a feed"
+      },
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedView"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFeedRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feed"
+        ],
+        "summary": "Create a new feed."
+      },
+      "put": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedView"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditFeedRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feed"
+        ],
+        "summary": "Edit feed."
       }
     },
     "/api/alpha/feed/list": {
@@ -7724,6 +8080,92 @@
           "Feed"
         ],
         "summary": "Get list of feeds"
+      }
+    },
+    "/api/alpha/feed/follow": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedView"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FollowFeedRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feed"
+        ],
+        "summary": "Follow / subscribe / leave / unsubscribe to a feed."
+      }
+    },
+    "/api/alpha/feed/delete": {
+      "post": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedView"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteFeedRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Feed"
+        ],
+        "summary": "Delete a feed."
       }
     },
     "/api/alpha/topic/list": {
@@ -11339,6 +11781,117 @@
         ],
         "summary": "Report a private message."
       }
+    },
+    "/api/alpha/admin/registration_application/list": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 30
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "pending_only",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "default": "New",
+              "enum": [
+                "Old",
+                "New"
+              ]
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetRegistrationListResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get the list of applications ready for admin review"
+      }
+    },
+    "/api/alpha/admin/registration_application/approve": {
+      "put": {
+        "responses": {
+          "422": {
+            "$ref": "#/components/responses/UNPROCESSABLE_CONTENT"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationApproveRequest"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Approve or deny a registration"
+      }
     }
   },
   "tags": [
@@ -11380,6 +11933,10 @@
     },
     {
       "name": "Private Message",
+      "description": ""
+    },
+    {
+      "name": "Admin",
       "description": ""
     }
   ],

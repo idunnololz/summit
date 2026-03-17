@@ -21,7 +21,6 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.isGuestAccount
 import com.idunnololz.summit.accountUi.PreAuthDialogFragment
 import com.idunnololz.summit.alert.launchAlertDialog
-import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
 import com.idunnololz.summit.api.utils.fullName
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.avatar.AvatarHelper
@@ -54,6 +53,7 @@ import com.idunnololz.summit.lemmy.userTags.UserTagsManager
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.showMoreVideoOptions
 import com.idunnololz.summit.links.onLinkClick
+import com.idunnololz.summit.models.GetPersonDetailsResponse
 import com.idunnololz.summit.offline.OfflineManager
 import com.idunnololz.summit.preferences.Preferences
 import com.idunnololz.summit.preview.VideoType
@@ -446,8 +446,8 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
         is StatefulData.Success -> {
           contextLoadingView.hideAll()
 
-          val personView = data.data.person_view
-          val person = data.data.person_view.person
+          val personView = data.data.personView
+          val person = data.data.personView.person
 
           if (person.banner == null) {
             banner.visibility = View.GONE

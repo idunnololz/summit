@@ -308,6 +308,10 @@ class SettingsMiscFragment :
         { preferences.peekImagesOnLongPress },
         { preferences.peekImagesOnLongPress = it },
       ),
+      settings.parseTagsFromPostTitles.asOnOffSwitch(
+        { preferences.parseTagsFromPostTitles },
+        { preferences.parseTagsFromPostTitles = it },
+      ),
       *if (BuildConfig.DEBUG) {
         arrayOf(
           settings.rotateInstanceOnUploadFail.asOnOffSwitch(

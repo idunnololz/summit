@@ -36,7 +36,7 @@ import com.idunnololz.summit.alert.launchAlertDialog
 import com.idunnololz.summit.alert.newAlertDialogLauncher
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PersonId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.databinding.ConfigureCommentBinding
 import com.idunnololz.summit.databinding.ErrorMessageOldReplyTargetBinding
 import com.idunnololz.summit.databinding.FragmentAddOrEditCommentBinding

@@ -31,10 +31,11 @@ import com.idunnololz.summit.account.Account
 import com.idunnololz.summit.account.AccountActionsManager
 import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.PostType
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.instance
+import com.idunnololz.summit.api.utils.shouldBlurItem
 import com.idunnololz.summit.avatar.AvatarHelper
 import com.idunnololz.summit.databinding.ListingItemCard2Binding
 import com.idunnololz.summit.databinding.ListingItemCard3Binding
@@ -1065,7 +1066,7 @@ class PostListViewBuilder @Inject constructor(
               imageUrl = urlToLoad,
               preferFullSizeImage = preferFullSizeImages,
               imageViewWidth = postImageWidth,
-              shouldBlur = !isRevealed && postView.post.nsfw,
+              shouldBlur = !isRevealed && postView.shouldBlurItem(),
               errorListener = {
                 if (!useBackupUrl && backupImageUrl != null) {
                   loadImage(true, force)

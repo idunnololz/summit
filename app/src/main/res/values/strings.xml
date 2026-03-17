@@ -2382,6 +2382,9 @@
     <string name="dim_content">Dim content</string>
     <string name="never_indicate_posts_as_read">Never indicate posts as read</string>
     <string name="peek_images_on_long_press">Peek images on long press</string>
+    <string name="parse_tags_from_post_titles">Parse tags from post titles</string>
+    <string name="parse_tags_from_post_titles_desc">Adds support for [Spoiler] tags.</string>
+    <string name="reveal_warning_spoiler">This post is marked as a spoiler</string>
 
 
     <!-- uCrop string resource end -->

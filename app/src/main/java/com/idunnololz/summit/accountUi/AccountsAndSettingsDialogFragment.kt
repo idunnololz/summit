@@ -92,6 +92,7 @@ class AccountsAndSettingsDialogFragment : BaseDialogFragment<DialogFragmentAccou
             dismiss()
           } else {
             viewModel.switchAccount(it)
+            dismiss()
           }
         },
         onAddAccountClick = {

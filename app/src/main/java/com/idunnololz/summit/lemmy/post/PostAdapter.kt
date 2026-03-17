@@ -2,7 +2,6 @@ package com.idunnololz.summit.lemmy.post
 
 import android.content.Context
 import android.text.Spanned
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
+import androidx.media3.common.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -19,7 +19,7 @@ import com.idunnololz.summit.R
 import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.PostId
-import com.idunnololz.summit.api.dto.lemmy.PostView
+import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getUniqueKey
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.databinding.GenericLoadingItemBinding
@@ -638,6 +638,8 @@ class PostAdapter(
             item.isHighlighted
           val k = "${item.comment.comment.id}:${item.comment.comment.updated
             ?: item.comment.comment.published}"
+
+          Log.d("HAHA", "q1: ${item.query}")
 
           postAndCommentViewBuilder.bindCommentViewExpanded(
             h = holder,
@@ -1714,6 +1716,8 @@ class PostAdapter(
 
     this.topLevelCommentIndices = topLevelCommentIndices
     this.absolutionPositionToTopLevelCommentPosition = absolutionPositionToTopLevelCommentPosition
+
+    refreshItems(animate = false)
 
     return occurrences
   }

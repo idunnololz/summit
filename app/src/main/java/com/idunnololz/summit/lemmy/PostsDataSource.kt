@@ -3,11 +3,11 @@ package com.idunnololz.summit.lemmy
 import android.util.Log
 import arrow.core.Either
 import com.idunnololz.summit.api.AccountAwareLemmyClient
-import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.ListingType
 import com.idunnololz.summit.api.dto.lemmy.SortType
 import com.idunnololz.summit.lemmy.multicommunity.FetchedPost
 import com.idunnololz.summit.lemmy.multicommunity.Source
+import com.idunnololz.summit.models.GetPostsResponse
 import com.idunnololz.summit.lemmy.utils.listSource.LemmyListSource.Companion.DEFAULT_PAGE_SIZE
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -100,13 +100,13 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
     )
       .onSuccess {
         if (page + 1 == cursorIds.size) {
-          cursorIds += it.next_page
+          cursorIds += it.nextPage
         } else {
-          if (cursorIds[page + 1] != it.next_page) {
+          if (cursorIds[page + 1] != it.nextPage) {
             Log.d(TAG, "inconsistency cursor ids... wiping cached cursor ids")
 
             cursorIds = cursorIds.take(page + 1)
-            cursorIds += it.next_page
+            cursorIds += it.nextPage
           }
         }
       }
@@ -135,7 +135,7 @@ class CursorBackedSinglePostsDataSource @AssistedInject constructor(
         showRead = showRead,
       ).fold(
         {
-          cursorIds += it.next_page
+          cursorIds += it.nextPage
         },
         {
           return Result.failure(it)
