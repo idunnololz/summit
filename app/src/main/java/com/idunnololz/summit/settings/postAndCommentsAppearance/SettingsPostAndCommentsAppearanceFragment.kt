@@ -320,7 +320,7 @@ class SettingsPostAndCommentsAppearanceFragment : BaseSettingsFragment() {
           crossPosts = 0,
           postHeaderInfo = item.toPostHeaderInfo(context),
           onRevealContentClickedFn = {},
-          onImageClick = { _, _, _, _ -> },
+          onImageClick = { _, _, _, _, _ -> },
           onVideoClick = { _, _, _, _ -> },
           onVideoLongClickListener = { _ -> },
           onPageClick = { _, _ -> },

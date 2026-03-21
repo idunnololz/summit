@@ -237,13 +237,6 @@ class ImageViewerActivity :
 
           override fun onTransitionEnd(p0: Transition?) {
             onSharedElementEnterTransitionEnd()
-
-            binding.imageView.postDelayed(
-              {
-                toggleImageQuality(useHd = true)
-              },
-              50,
-            )
           }
 
           override fun onTransitionCancel(p0: Transition?) {
@@ -260,13 +253,6 @@ class ImageViewerActivity :
       binding.imageView.post(
         {
           onSharedElementEnterTransitionEnd()
-
-          binding.imageView.postDelayed(
-            {
-              toggleImageQuality(useHd = true)
-            },
-            50,
-          )
         },
       )
     }
@@ -381,14 +367,14 @@ class ImageViewerActivity :
     super.onEnterAnimationComplete()
   }
 
-  private fun toggleImageQuality(useHd: Boolean = false) {
+  private fun toggleImageQuality() {
     val hasAltUrl = !urlAlt.isNullOrBlank()
-    if (hasAltUrl && (viewModel.url == args.url || useHd)) {
+    if (hasAltUrl && viewModel.url == args.url) {
       viewModel.url = urlAlt
-      binding.hdButton.setIconResource(R.drawable.baseline_hd_24)
+      binding.hdButton.setIconResource(R.drawable.outline_hd_24)
     } else {
       viewModel.url = args.url
-      binding.hdButton.setIconResource(R.drawable.outline_hd_24)
+      binding.hdButton.setIconResource(R.drawable.baseline_hd_24)
     }
 
     loadImage(viewModel.url)

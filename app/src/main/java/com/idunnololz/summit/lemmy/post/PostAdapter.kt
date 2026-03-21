@@ -9,7 +9,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.LifecycleOwner
-import androidx.media3.common.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -90,7 +89,7 @@ class PostAdapter(
   private val onSignInRequired: () -> Unit,
   private val onInstanceMismatch: (String, String) -> Unit,
   private val onAddCommentClick: (Either<PostView, CommentView>) -> Unit,
-  private val onImageClick: (Either<PostView, CommentView>?, View?, String, peek: Boolean) -> Unit,
+  private val onImageClick: (Either<PostView, CommentView>?, View?, url: String, altUrl: String?, peek: Boolean) -> Unit,
   private val onVideoClick: (
     Either<PostView, CommentView>?,
     String,
@@ -128,7 +127,7 @@ class PostAdapter(
       ScreenshotOptions
 
     data class HeaderItem(
-      val postView: PostView,
+      val postView: PostView?,
       var videoState: VideoState?,
       val showBottomDivider: Boolean,
       val query: String?,
@@ -136,8 +135,9 @@ class PostAdapter(
       val screenshotMode: Boolean,
       val crossPosts: Int,
       val highlight: Boolean,
-      val postHeaderInfo: PostHeaderInfo,
-    ) : Item(postView.getUniqueKey()),
+      val postHeaderInfo: PostHeaderInfo?,
+      val error: Throwable?,
+    ) : Item("header_item"),
       ScreenshotOptions
 
     data class VisibleCommentItem(
@@ -148,7 +148,7 @@ class PostAdapter(
       val baseDepth: Int,
       val isExpanded: Boolean,
       val isPending: Boolean,
-      val view: PostViewModel.ListView.CommentListView,
+      val view: PostListItem.CommentListView,
       val childrenCount: Int,
       val isPostLocked: Boolean,
       val isUpdating: Boolean,
@@ -173,7 +173,7 @@ class PostAdapter(
       val depth: Int,
       val baseDepth: Int,
       val isPending: Boolean,
-      val view: PostViewModel.ListView.CommentListView,
+      val view: PostListItem.CommentListView,
       val childrenCount: Int,
       val isPostLocked: Boolean,
       val isUpdating: Boolean,
@@ -198,7 +198,7 @@ class PostAdapter(
       val baseDepth: Int,
       val isExpanded: Boolean,
       val isPending: Boolean,
-      val view: PostViewModel.ListView.PendingCommentListView,
+      val view: PostListItem.PendingCommentListView,
       val childrenCount: Int,
       val query: String?,
       val screenshotMode: Boolean,
@@ -221,7 +221,7 @@ class PostAdapter(
       ScreenshotOptions
 
     data class MissingCommentItem(
-      val view: PostViewModel.ListView.MissingCommentItem,
+      val view: PostListItem.MissingCommentItem,
       val commentId: CommentId?,
       val depth: Int,
       val baseDepth: Int,
@@ -250,7 +250,7 @@ class PostAdapter(
       ScreenshotOptions
 
     data class NoCommentsItem(
-      val postView: PostView,
+      val postView: PostView?,
     ) : Item("no_comments")
 
     data object FooterItem : Item("footer")
@@ -268,7 +268,7 @@ class PostAdapter(
   private var actionExpandedComments = mutableSetOf<CommentId>()
   private var includedInScreenshot = mutableSetOf<String>()
 
-  private var rawData: PostViewModel.PostData? = null
+  private var rawData: PostModel? = null
 
   private var highlightedComment: CommentId = -1
   private var highlightedCommentForever: CommentId = -1
@@ -440,86 +440,96 @@ class PostAdapter(
           // content...
           val b = holder.getBinding<PostHeaderItemBinding>()
           val post = item.postView
-          val postKey = post.getUniqueKey()
-          val contentMaxWidth = if (isScreenshotting) {
-            screenshotMaxWidth
-          } else {
-            contentMaxWidth
-          }
-          val onImageClick = if (isScreenshotting) {
-            { _, _, _, _ -> }
-          } else {
-            onImageClick
-          }
-          val onVideoClick = if (isScreenshotting) {
-            { _, _, _, _ -> }
-          } else {
-            onVideoClick
-          }
-          val screenshotConfig = if (isScreenshotting) {
-            screenshotConfig
-          } else {
-            null
-          }
-          val k = "post:${item.postView.post.id}:${item.postView.post.updated
-            ?: item.postView.post.published}"
 
-          postAndCommentViewBuilder.bindPostView(
-            binding = b,
-            contentMaxHeight = contentMaxHeight,
-            postView = item.postView,
-            accountId = accountId,
-            instance = instance,
-            isRevealed = revealAll || revealedItems.contains(postKey),
-            contentMaxWidth = contentMaxWidth,
-            viewLifecycleOwner = lifecycleOwner,
-            videoState = item.videoState,
-            updateContent = false,
-            highlightTextData = if (item.query == null) {
-              null
+          if (post != null) {
+            val postKey = post.getUniqueKey()
+            val contentMaxWidth = if (isScreenshotting) {
+              screenshotMaxWidth
             } else {
-              HighlightTextData(
-                item.query,
-                item.currentMatch?.relativeMatchIndex,
-                item.currentMatch?.targetSubtype,
-              )
-            },
-            contentSpannable = contentCache[k],
-            crossPosts = item.crossPosts,
-            postHeaderInfo = item.postHeaderInfo,
-            onRevealContentClickedFn = {
-              revealedItems.add(postKey)
-              notifyItemChanged(holder.absoluteAdapterPosition)
-            },
-            onImageClick = onImageClick,
-            onVideoClick = onVideoClick,
-            onVideoLongClickListener = onVideoLongClickListener,
-            onPageClick = onPageClick,
-            onAddCommentClick = onAddCommentClick,
-            onPostActionClick = { postView, actionId ->
-              onPostActionClick(postView, item.id, actionId)
-            },
-            onSignInRequired = onSignInRequired,
-            onInstanceMismatch = onInstanceMismatch,
-            onLinkClick = onLinkClick,
-            onLinkLongClick = { url, text ->
-              onLinkLongClick(Either.Left(post), url, text)
-            },
-            screenshotConfig = screenshotConfig,
-            onTextBound = {
-              contentCache[k] = it
-            },
-            onCrossPostsClick = {
-              onCrossPostsClick()
-            },
-            highlight = item.highlight,
-            highlightTintColor = highlightTintColor,
-          )
+              contentMaxWidth
+            }
+            val onImageClick = if (isScreenshotting) {
+              { _, _, _, _, _ -> }
+            } else {
+              onImageClick
+            }
+            val onVideoClick = if (isScreenshotting) {
+              { _, _, _, _ -> }
+            } else {
+              onVideoClick
+            }
+            val screenshotConfig = if (isScreenshotting) {
+              screenshotConfig
+            } else {
+              null
+            }
+            val k = "post:${item.postView.post.id}:${
+              item.postView.post.updated
+                ?: item.postView.post.published
+            }"
 
-          if (item.showBottomDivider) {
-            b.bottomDivider.visibility = View.VISIBLE
+            postAndCommentViewBuilder.bindPostView(
+              binding = b,
+              contentMaxHeight = contentMaxHeight,
+              postView = item.postView,
+              accountId = accountId,
+              instance = instance,
+              isRevealed = revealAll || revealedItems.contains(postKey),
+              contentMaxWidth = contentMaxWidth,
+              viewLifecycleOwner = lifecycleOwner,
+              videoState = item.videoState,
+              updateContent = false,
+              highlightTextData = if (item.query == null) {
+                null
+              } else {
+                HighlightTextData(
+                  item.query,
+                  item.currentMatch?.relativeMatchIndex,
+                  item.currentMatch?.targetSubtype,
+                )
+              },
+              contentSpannable = contentCache[k],
+              crossPosts = item.crossPosts,
+              postHeaderInfo = item.postHeaderInfo!!,
+              onRevealContentClickedFn = {
+                revealedItems.add(postKey)
+                notifyItemChanged(holder.absoluteAdapterPosition)
+              },
+              onImageClick = onImageClick,
+              onVideoClick = onVideoClick,
+              onVideoLongClickListener = onVideoLongClickListener,
+              onPageClick = onPageClick,
+              onAddCommentClick = onAddCommentClick,
+              onPostActionClick = { postView, actionId ->
+                onPostActionClick(postView, item.id, actionId)
+              },
+              onSignInRequired = onSignInRequired,
+              onInstanceMismatch = onInstanceMismatch,
+              onLinkClick = onLinkClick,
+              onLinkLongClick = { url, text ->
+                onLinkLongClick(Either.Left(post), url, text)
+              },
+              screenshotConfig = screenshotConfig,
+              onTextBound = {
+                contentCache[k] = it
+              },
+              onCrossPostsClick = {
+                onCrossPostsClick()
+              },
+              highlight = item.highlight,
+              highlightTintColor = highlightTintColor,
+            )
+
+            if (item.showBottomDivider) {
+              b.bottomDivider.visibility = View.VISIBLE
+            } else {
+              b.bottomDivider.visibility = View.GONE
+            }
+            b.commentButton.visibility = View.VISIBLE
           } else {
-            b.bottomDivider.visibility = View.GONE
+            b.loadingView.showDefaultErrorMessageFor(requireNotNull(item.error))
+            b.loadingView.setOnRefreshClickListener { onRefreshClickCb() }
+            b.commentButton.visibility = View.INVISIBLE
           }
 
           updateScreenshotMode(
@@ -540,94 +550,104 @@ class PostAdapter(
       is HeaderItem -> {
         val b = holder.getBinding<PostHeaderItemBinding>()
         val post = item.postView
-        val postKey = post.getUniqueKey()
-        val contentMaxWidth = if (isScreenshotting) {
-          screenshotMaxWidth
-        } else {
-          contentMaxWidth
-        }
-        val onImageClick = if (isScreenshotting) {
-          { _, _, _, _ -> }
-        } else {
-          onImageClick
-        }
-        val onVideoClick = if (isScreenshotting) {
-          { _, _, _, _ -> }
-        } else {
-          onVideoClick
-        }
-        val screenshotConfig = if (isScreenshotting) {
-          screenshotConfig
-        } else {
-          null
-        }
-        val k = "post:${item.postView.post.id}:${item.postView.post.updated
-          ?: item.postView.post.published}"
 
-        holder.itemView.setTag(R.id.swipeable, true)
-
-        postAndCommentViewBuilder.bindPostView(
-          binding = b,
-          postView = item.postView,
-          accountId = accountId,
-          instance = instance,
-          isRevealed = revealAll || revealedItems.contains(postKey),
-          contentMaxWidth = contentMaxWidth,
-          contentMaxHeight = contentMaxHeight,
-          viewLifecycleOwner = lifecycleOwner,
-          videoState = item.videoState,
-          updateContent = true,
-          highlightTextData = if (item.query == null) {
-            null
+        if (post != null) {
+          val postKey = post.getUniqueKey()
+          val contentMaxWidth = if (isScreenshotting) {
+            screenshotMaxWidth
           } else {
-            HighlightTextData(
-              query = item.query,
-              matchIndex = item.currentMatch?.relativeMatchIndex,
-              targetSubtype = item.currentMatch?.targetSubtype,
-            )
-          },
-          contentSpannable = contentCache[k],
-          crossPosts = item.crossPosts,
-          postHeaderInfo = item.postHeaderInfo,
-          onRevealContentClickedFn = {
-            revealedItems.add(postKey)
-            notifyItemChanged(holder.absoluteAdapterPosition)
-          },
-          onImageClick = onImageClick,
-          onVideoClick = onVideoClick,
-          onVideoLongClickListener = onVideoLongClickListener,
-          onPageClick = onPageClick,
-          onAddCommentClick = onAddCommentClick,
-          onPostActionClick = { postView, actionId ->
-            onPostActionClick(postView, item.id, actionId)
-          },
-          onSignInRequired = onSignInRequired,
-          onInstanceMismatch = onInstanceMismatch,
-          onLinkClick = onLinkClick,
-          onLinkLongClick = { url, text ->
-            onLinkLongClick(Left(post), url, text)
-          },
-          screenshotConfig = screenshotConfig,
-          onTextBound = {
-            contentCache[k] = it
-          },
-          onCrossPostsClick = {
-            onCrossPostsClick()
-          },
-          highlight = item.highlight,
-          highlightTintColor = highlightTintColor,
-        )
+            contentMaxWidth
+          }
+          val onImageClick = if (isScreenshotting) {
+            { _, _, _, _, _ -> }
+          } else {
+            onImageClick
+          }
+          val onVideoClick = if (isScreenshotting) {
+            { _, _, _, _ -> }
+          } else {
+            onVideoClick
+          }
+          val screenshotConfig = if (isScreenshotting) {
+            screenshotConfig
+          } else {
+            null
+          }
+          val k = "post:${item.postView.post.id}:${
+            item.postView.post.updated
+              ?: item.postView.post.published
+          }"
 
-        if (item.showBottomDivider) {
-          b.bottomDivider.visibility = View.VISIBLE
+          b.loadingView.hideAll()
+          holder.itemView.setTag(R.id.swipeable, true)
+
+          postAndCommentViewBuilder.bindPostView(
+            binding = b,
+            postView = item.postView,
+            accountId = accountId,
+            instance = instance,
+            isRevealed = revealAll || revealedItems.contains(postKey),
+            contentMaxWidth = contentMaxWidth,
+            contentMaxHeight = contentMaxHeight,
+            viewLifecycleOwner = lifecycleOwner,
+            videoState = item.videoState,
+            updateContent = true,
+            highlightTextData = if (item.query == null) {
+              null
+            } else {
+              HighlightTextData(
+                query = item.query,
+                matchIndex = item.currentMatch?.relativeMatchIndex,
+                targetSubtype = item.currentMatch?.targetSubtype,
+              )
+            },
+            contentSpannable = contentCache[k],
+            crossPosts = item.crossPosts,
+            postHeaderInfo = item.postHeaderInfo!!,
+            onRevealContentClickedFn = {
+              revealedItems.add(postKey)
+              notifyItemChanged(holder.absoluteAdapterPosition)
+            },
+            onImageClick = onImageClick,
+            onVideoClick = onVideoClick,
+            onVideoLongClickListener = onVideoLongClickListener,
+            onPageClick = onPageClick,
+            onAddCommentClick = onAddCommentClick,
+            onPostActionClick = { postView, actionId ->
+              onPostActionClick(postView, item.id, actionId)
+            },
+            onSignInRequired = onSignInRequired,
+            onInstanceMismatch = onInstanceMismatch,
+            onLinkClick = onLinkClick,
+            onLinkLongClick = { url, text ->
+              onLinkLongClick(Left(post), url, text)
+            },
+            screenshotConfig = screenshotConfig,
+            onTextBound = {
+              contentCache[k] = it
+            },
+            onCrossPostsClick = {
+              onCrossPostsClick()
+            },
+            highlight = item.highlight,
+            highlightTintColor = highlightTintColor,
+          )
+
+          if (item.showBottomDivider) {
+            b.bottomDivider.visibility = View.VISIBLE
+          } else {
+            b.bottomDivider.visibility = View.GONE
+          }
+
+          if (isScreenshotting && screenshotConfig?.showPostDivider == false) {
+            b.bottomDivider.visibility = View.GONE
+          }
+          b.commentButton.visibility = View.VISIBLE
         } else {
-          b.bottomDivider.visibility = View.GONE
+          b.loadingView.showDefaultErrorMessageFor(requireNotNull(item.error))
+          b.loadingView.setOnRefreshClickListener { onRefreshClickCb() }
+          b.commentButton.visibility = View.INVISIBLE
         }
-
-        if (isScreenshotting && screenshotConfig?.showPostDivider == false) {
-          b.bottomDivider.visibility = View.GONE
-        }
-
         updateScreenshotMode(holder, item.screenshotMode, b.startGuideline, b.root, item)
       }
       is Item.VisibleCommentItem -> {
@@ -638,8 +658,6 @@ class PostAdapter(
             item.isHighlighted
           val k = "${item.comment.comment.id}:${item.comment.comment.updated
             ?: item.comment.comment.published}"
-
-          Log.d("HAHA", "q1: ${item.query}")
 
           postAndCommentViewBuilder.bindCommentViewExpanded(
             h = holder,
@@ -663,7 +681,9 @@ class PostAdapter(
             viewLifecycleOwner = lifecycleOwner,
             isActionsExpanded = item.isActionsExpanded,
             commentHeaderInfo = item.commentHeaderInfo,
-            onImageClick = onImageClick,
+            onImageClick = { postOrCommentView, view, url, peek ->
+              onImageClick(postOrCommentView, view, url, null, peek)
+            },
             onVideoClick = onVideoClick,
             onPageClick = onPageClick,
             highlightTextData = if (item.query == null) {
@@ -781,7 +801,9 @@ class PostAdapter(
             highlight = highlight,
             highlightForever = highlightForever,
             highlightTintColor = highlightTintColor,
-            onImageClick = onImageClick,
+            onImageClick = { postOrCommentView, view, url, peek ->
+              onImageClick(postOrCommentView, view, url, null, peek)
+            },
             onVideoClick = onVideoClick,
             onPageClick = onPageClick,
             onLinkClick = onLinkClick,
@@ -911,8 +933,13 @@ class PostAdapter(
       is Item.NoCommentsItem -> {
         val b = holder.getBinding<PostNoCommentsItemBinding>()
 
-        b.addCommentButton.setOnClickListener {
-          onAddCommentClick(Left(item.postView))
+        if (item.postView != null) {
+          b.addCommentButton.visibility = View.VISIBLE
+          b.addCommentButton.setOnClickListener {
+            onAddCommentClick(Left(item.postView))
+          }
+        } else {
+          b.addCommentButton.visibility = View.GONE
         }
       }
       is Item.ViewParentComments -> {
@@ -1050,7 +1077,7 @@ class PostAdapter(
           val newItem = newItems[newItemPosition]
           return when (oldItem) {
             is HeaderItem ->
-              oldItem.postView.post == (newItem as HeaderItem).postView.post
+              oldItem.postView?.post?.id == (newItem as HeaderItem).postView?.post?.id
             else -> oldItem == newItem
           }
         }
@@ -1101,7 +1128,7 @@ class PostAdapter(
     if (error != null) {
       val finalItems = mutableListOf<Item>()
       finalItems += Item.FirstItem
-      rawData?.postListView?.let {
+      rawData?.postListView?.asLoaded?.let {
         finalItems += HeaderItem(
           postView = it.post,
           videoState = videoState,
@@ -1116,6 +1143,7 @@ class PostAdapter(
           crossPosts = rawData.crossPosts.size,
           highlight = highlightPostForever,
           postHeaderInfo = it.postHeaderInfo,
+          error = null,
         )
       }
       finalItems += ProgressOrErrorItem(error)
@@ -1134,8 +1162,9 @@ class PostAdapter(
     } else {
       false
     }
+    var hasCommentItems = false
 
-    val postView = rawData.postListView
+    val postView = rawData.postListView.asLoaded?.post
     val highlightedComment =
       if (currentMatch == null) {
         null
@@ -1149,21 +1178,22 @@ class PostAdapter(
 
     if (!rawData.isNativePost &&
       !hideNonNativeInstanceWarning &&
-      rawData.accountInstance != null
+      rawData.accountInstance != null &&
+      postView != null
     ) {
       finalItems += Item.NotNativeInstanceItem(
         accountInstance = rawData.accountInstance,
-        postInstance = postView.post.instance,
+        postInstance = postView.instance,
       )
       absolutionPositionToTopLevelCommentPosition += -1
     }
 
     finalItems += HeaderItem(
-      postView = postView.post,
+      postView = postView,
       videoState = videoState,
       showBottomDivider = !isEmbedded || commentItems.isNotEmpty(),
       query = query,
-      currentMatch = if (currentMatch?.targetId == postView.post.post.id) {
+      currentMatch = if (currentMatch?.targetId == postView?.post?.id) {
         currentMatch
       } else {
         null
@@ -1171,17 +1201,19 @@ class PostAdapter(
       screenshotMode = screenshotMode,
       crossPosts = rawData.crossPosts.size,
       highlight = highlightPostForever,
-      postHeaderInfo = postView.postHeaderInfo,
+      postHeaderInfo = rawData.postListView.asLoaded?.postHeaderInfo,
+      error = rawData.postListView.asError?.error,
     )
     absolutionPositionToTopLevelCommentPosition += -1
 
-    if (rawData.isSingleCommentChain) {
-      finalItems += Item.ViewAllComments(postView.post.post.id, screenshotMode)
+    if (rawData.isSingleCommentChain && postView != null) {
+      finalItems += Item.ViewAllComments(postView.post.id, screenshotMode)
+      hasCommentItems = true
       absolutionPositionToTopLevelCommentPosition += -1
 
       if (rawData.commentPath != null && rawData.commentPath.count(".") > 1) {
         finalItems += Item.ViewParentComments(
-          postId = postView.post.post.id,
+          postId = postView.post.id,
           commentPath = rawData.commentPath,
           screenshotMode = screenshotMode,
         )
@@ -1201,7 +1233,7 @@ class PostAdapter(
       var depth = -1
 
       when (val commentView = commentItem.listView) {
-        is PostViewModel.ListView.CommentListView -> {
+        is PostListItem.CommentListView -> {
           val comment = commentView.commentView.comment
           val commentId = comment.id
           val isCurrentMatchThisCommentChain =
@@ -1210,8 +1242,8 @@ class PostAdapter(
           val isDeleting =
             commentView.pendingCommentView?.isActionDelete == true
           val show = when (commentView) {
-            is PostViewModel.ListView.FilteredCommentItem -> commentView.show
-            is PostViewModel.ListView.VisibleCommentListView -> true
+            is PostListItem.FilteredCommentItem -> commentView.show
+            is PostListItem.VisibleCommentListView -> true
           }
 
           depth = commentItem.depth
@@ -1284,8 +1316,10 @@ class PostAdapter(
               )
             }
           absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+
+          hasCommentItems = true
         }
-        is PostViewModel.ListView.PendingCommentListView -> {
+        is PostListItem.PendingCommentListView -> {
           depth = commentItem.depth
           if (depth == 0) {
             lastTopLevelCommentPosition++
@@ -1306,11 +1340,13 @@ class PostAdapter(
             actionId = commentView.pendingCommentView.actionId,
           )
           absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+
+          hasCommentItems = true
         }
-        is PostViewModel.ListView.PostListView -> {
+        is PostListItem.PostListView -> {
           // should never happen
         }
-        is PostViewModel.ListView.MoreCommentsItem -> {
+        is PostListItem.MoreCommentsItem -> {
           if (commentView.parentCommentId != null) {
             depth = commentItem.depth
             if (depth == 0) {
@@ -1324,10 +1360,12 @@ class PostAdapter(
               screenshotMode,
             )
             absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+
+            hasCommentItems = true
           }
         }
 
-        is PostViewModel.ListView.MissingCommentItem -> {
+        is PostListItem.MissingCommentItem -> {
           finalItems += Item.MissingCommentItem(
             view = commentView,
             commentId = commentView.commentId,
@@ -1337,6 +1375,8 @@ class PostAdapter(
             isExpanded = !collapsedItemIds.contains(commentView.id),
           )
           absolutionPositionToTopLevelCommentPosition += lastTopLevelCommentPosition
+
+          hasCommentItems = true
         }
       }
 
@@ -1348,8 +1388,8 @@ class PostAdapter(
     if (!isLoaded || !rawData.isCommentsLoaded) {
       finalItems += ProgressOrErrorItem(rawData.loadCommentError)
     } else {
-      if (commentItems.isEmpty() && !isEmbedded) {
-        finalItems += Item.NoCommentsItem(postView.post)
+      if (!hasCommentItems && !isEmbedded) {
+        finalItems += Item.NoCommentsItem(postView)
       }
     }
 
@@ -1370,7 +1410,7 @@ class PostAdapter(
       toVisit.addAll(node.children)
 
       when (val commentView = node.listView) {
-        is PostViewModel.ListView.VisibleCommentListView -> {
+        is PostListItem.VisibleCommentListView -> {
           val commentId = commentView.commentView.comment.id
           if (seenCommentIds.add(commentId)) {
             val upvotes = commentView.commentView.counts.upvotes
@@ -1388,16 +1428,15 @@ class PostAdapter(
             }
           }
         }
-        is PostViewModel.ListView.FilteredCommentItem -> {
+        is PostListItem.FilteredCommentItem -> {
         }
-        is PostViewModel.ListView.MissingCommentItem -> {
+        is PostListItem.MissingCommentItem -> {
         }
-        is PostViewModel.ListView.MoreCommentsItem -> {
+        is PostListItem.MoreCommentsItem -> {
         }
-        is PostViewModel.ListView.PendingCommentListView -> {
+        is PostListItem.PendingCommentListView -> {
         }
-        is PostViewModel.ListView.PostListView -> {
-        }
+        is PostListItem.PostListView -> {}
       }
     }
     return changed
@@ -1443,7 +1482,7 @@ class PostAdapter(
     return topLevelCommentIndices.getOrNull(topLevelPosition + 1)
   }
 
-  fun setStartingData(data: PostViewModel.PostData) {
+  fun setStartingData(data: PostModel) {
     rawData = data
 
     refreshItems()
@@ -1451,7 +1490,7 @@ class PostAdapter(
 
   fun hasStartingData(): Boolean = rawData?.postListView != null
 
-  fun setData(data: PostViewModel.PostData) {
+  fun setData(data: PostModel) {
     if (!isLoaded) {
       isLoaded = true
     }
@@ -1461,8 +1500,10 @@ class PostAdapter(
     val oldData = rawData
     rawData = data
 
-    if (oldData?.postListView?.post?.post?.id != data.postListView.post.post.id) {
-      hideNonNativeInstanceWarning = false
+    if (data.postListView is PostListItem.PostLoadedListView) {
+      if (oldData?.postListView?.asLoaded?.id != data.postListView.id) {
+        hideNonNativeInstanceWarning = false
+      }
     }
 
     refreshItems(forceRefresh = data.wasUpdateForced)
@@ -1551,7 +1592,7 @@ class PostAdapter(
   }
 
   private fun showFilteredComment(commentItem: Item.FilteredCommentItem) {
-    val filteredComment = commentItem.view as? PostViewModel.ListView.FilteredCommentItem
+    val filteredComment = commentItem.view as? PostListItem.FilteredCommentItem
       ?: return
     filteredComment.show = true
 
@@ -1680,27 +1721,29 @@ class PostAdapter(
         }
         FooterItem -> {}
         is HeaderItem -> {
-          count(item.postView.post.name, finalQuery) {
-            occurrences.add(
-              QueryResult(
-                targetId = item.postView.post.id,
-                targetSubtype = 0,
-                relativeMatchIndex = it,
-                itemIndex = index,
-                matchIndex = occurrences.size,
-              ),
-            )
-          }
-          count(item.postView.post.body, finalQuery) {
-            occurrences.add(
-              QueryResult(
-                targetId = item.postView.post.id,
-                targetSubtype = 1,
-                relativeMatchIndex = it,
-                itemIndex = index,
-                matchIndex = occurrences.size,
-              ),
-            )
+          if (item.postView != null) {
+            count(item.postView.post.name, finalQuery) {
+              occurrences.add(
+                QueryResult(
+                  targetId = item.postView.post.id,
+                  targetSubtype = 0,
+                  relativeMatchIndex = it,
+                  itemIndex = index,
+                  matchIndex = occurrences.size,
+                ),
+              )
+            }
+            count(item.postView.post.body, finalQuery) {
+              occurrences.add(
+                QueryResult(
+                  targetId = item.postView.post.id,
+                  targetSubtype = 1,
+                  relativeMatchIndex = it,
+                  itemIndex = index,
+                  matchIndex = occurrences.size,
+                ),
+              )
+            }
           }
         }
         is Item.MissingCommentItem -> {}

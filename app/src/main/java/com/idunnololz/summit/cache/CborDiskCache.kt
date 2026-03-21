@@ -1,31 +1,34 @@
 package com.idunnololz.summit.cache
 
 import android.util.Log
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.cbor.Cbor
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
 import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import java.lang.reflect.Type
 
-class JsonDiskCache(
-  val json: Json,
+@OptIn(ExperimentalSerializationApi::class)
+class CborDiskCache(
   val cache: SimpleDiskCache,
 ) {
 
   companion object {
     const val TAG = "JsonDiskCache"
 
-    fun create(json: Json, dir: File, appVersion: Int, maxSize: Long) = JsonDiskCache(
-      json,
+    fun create(dir: File, appVersion: Int, maxSize: Long) = CborDiskCache(
       SimpleDiskCache(dir, appVersion, maxSize),
     )
   }
 
   inline fun <reified T> getCachedObject(key: String): T? = try {
-    val value = cache.getCachedData(key)
-    if (value.isNullOrBlank()) {
+    val value = cache.getCachedDataAsByteArray(key)
+    if (value == null) {
       null
     } else {
-      json.decodeFromString(value)
+      Cbor.decodeFromByteArray(value)
     }
   } catch (e: Exception) {
     Log.e(TAG, "getCachedObject()", e)
@@ -34,7 +37,7 @@ class JsonDiskCache(
 
   inline fun <reified T> cacheObject(key: String, obj: T?) {
     try {
-      cache.cacheData(key, json.encodeToString(obj))
+      cache.put(key, Cbor.encodeToByteArray(obj), mapOf())
     } catch (e: Exception) {
       Log.e(TAG, "cacheObject()", e)
     }
@@ -45,9 +48,10 @@ class JsonDiskCache(
       if (obj == null) {
         cache.cacheData(key, null)
       } else {
-        cache.cacheData(
+        cache.put(
           key,
-          json.encodeToString(json.serializersModule.serializer(clazz), obj as Any)
+          Cbor.encodeToByteArray(Cbor.serializersModule.serializer(clazz), obj as Any),
+          mapOf()
         )
       }
     } catch (e: Exception) {
@@ -57,11 +61,11 @@ class JsonDiskCache(
 
   fun <T> getCachedObject(key: String, clazz: Type): T? {
     return try {
-      val value = cache.getCachedData(key)
-      if (value.isNullOrBlank()) {
+      val value = cache.getCachedDataAsByteArray(key)
+      if (value == null) {
         null
       } else {
-        json.decodeFromString(json.serializersModule.serializer(clazz), value) as? T
+        Cbor.decodeFromByteArray(Cbor.serializersModule.serializer(clazz), value) as? T
       }
     } catch (e: Exception) {
       Log.e(TAG, "getCachedObject()", e)

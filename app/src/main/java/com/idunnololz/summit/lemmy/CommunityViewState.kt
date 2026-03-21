@@ -3,33 +3,31 @@ package com.idunnololz.summit.lemmy
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.Log
 import com.idunnololz.summit.R
 import com.idunnololz.summit.lemmy.community.CommunityViewModel
 import com.idunnololz.summit.util.dagger.json
+import com.idunnololz.summit.util.getParcelableCompat
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
+@Parcelize
 data class CommunityViewState(
   val communityState: CommunityState,
   val pageScrollStates: List<CommunityViewModel.PageScrollState>,
-) {
+): Parcelable {
   companion object {
 
     private const val SIS_KEY = "LemmyViewState_pp"
 
-    fun restoreFromBundle(inState: Bundle, json: Json): CommunityViewState? {
-      val jsonStr = inState.getString(SIS_KEY, null) ?: return null
-      return try {
-        json.decodeFromString<CommunityViewState?>(jsonStr)
-      } catch (e: Exception) {
-        null
-      }
-    }
+    fun restoreFromBundle(inState: Bundle): CommunityViewState? =
+      inState.getParcelableCompat<CommunityViewState>(SIS_KEY)
   }
 
-  fun writeToBundle(outState: Bundle, json: Json) {
-    outState.putString(SIS_KEY, json.encodeToString<CommunityViewState?>(this))
+  fun writeToBundle(outState: Bundle) {
+    outState.putParcelable(SIS_KEY, this)
   }
 }
 
@@ -64,17 +62,19 @@ fun CommunityRef.toUri(apiInstance: String): Uri {
 }
 
 @Serializable
+@Parcelize
 data class CommunityState(
   val communityRef: CommunityRef,
   val pages: List<PageInfo>,
   val currentPageIndex: Int,
-)
+): Parcelable
 
 @Serializable
+@Parcelize
 data class PageInfo(
   val pageIndex: Int,
   var flags: Int,
-)
+): Parcelable
 
 fun CommunityViewState.getShortDesc(context: Context): String = context.getString(
   R.string.community_state_format,

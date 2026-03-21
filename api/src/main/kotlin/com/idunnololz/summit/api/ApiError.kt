@@ -74,6 +74,7 @@ class NotAModOrAdmin : ClientApiException("Not a mod or admin", 400)
 class NotYetImplemented : ServerApiException("Server has not implemented this API yet.", 400)
 
 class CouldntFindObjectError : ClientApiException("Couldn't find object", 400)
+class CouldntFindPostError : ClientApiException("Couldn't find post", 400)
 
 class FileTooLargeError : ClientApiException("File is over the size limit", 413)
 

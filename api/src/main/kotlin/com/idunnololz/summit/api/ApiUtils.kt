@@ -96,6 +96,9 @@ internal suspend inline fun <reified T> retrofitErrorHandler(
     if (errMsg == "not_a_mod_or_admin") {
       return Result.failure(NotAModOrAdmin())
     }
+    if (errMsg == "couldnt_find_post") {
+      return Result.failure(CouldntFindPostError())
+    }
     if (errMsg == "couldnt_find_object" || errMsg == "couldnt_find_community") {
       return Result.failure(CouldntFindObjectError())
     }

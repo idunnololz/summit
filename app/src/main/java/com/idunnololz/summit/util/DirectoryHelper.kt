@@ -2,21 +2,21 @@ package com.idunnololz.summit.util
 
 import android.content.Context
 import android.util.Log
-import com.idunnololz.summit.cache.JsonDiskCache
+import com.idunnololz.summit.cache.CborDiskCache
 import com.idunnololz.summit.fileprovider.FileProviderHelper
-import com.idunnololz.summit.lemmy.community.LoadedPostsData
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.cbor.Cbor
 import java.io.File
 import java.time.Duration
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
+@OptIn(ExperimentalSerializationApi::class)
 @Singleton
 class DirectoryHelper @Inject constructor(
   @ApplicationContext private val context: Context,
-  private val json: Json,
 ) {
 
   companion object {
@@ -37,8 +37,8 @@ class DirectoryHelper @Inject constructor(
   val imagesDir = File(context.filesDir, "imgs")
   val videosDir = File(context.filesDir, "videos")
 
-  val listsDiskCache = JsonDiskCache
-    .create(json, listsCacheDir, 1, 25L * 1024L * 1024L /* 25MB */)
+  val listsDiskCache = CborDiskCache
+    .create(listsCacheDir, 1, 25L * 1024L * 1024L /* 25MB */)
 
   fun cleanup() {
     var purgedFiles = 0

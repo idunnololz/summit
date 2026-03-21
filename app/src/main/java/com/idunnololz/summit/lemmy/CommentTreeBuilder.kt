@@ -9,15 +9,16 @@ import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.getDepth
 import com.idunnololz.summit.filterLists.ContentFiltersManager
+import com.idunnololz.summit.lemmy.post.PostListItem
 import com.idunnololz.summit.lemmy.post.PostViewModel
-import com.idunnololz.summit.lemmy.post.PostViewModel.ListView.CommentListView
+import com.idunnololz.summit.lemmy.post.PostListItem.CommentListView
 import java.util.LinkedHashMap
 import java.util.LinkedList
 
 private const val TAG = "CommentTreeBuilder"
 
 data class CommentNodeData(
-  var listView: PostViewModel.ListView,
+  var listView: PostListItem,
   var depth: Int,
   val children: MutableList<CommentNodeData> = mutableListOf(),
 )
@@ -54,14 +55,14 @@ class CommentTreeBuilder(
       val depth = comment.comment.getDepth()
 
       val commentView = if (contentFiltersManager.testCommentView(comment)) {
-        PostViewModel.ListView.FilteredCommentItem(
+        PostListItem.FilteredCommentItem(
           commentView = comment,
           pendingCommentView = idToPendingComments[comment.comment.id],
           isRemoved = removedCommentIds.contains(comment.comment.id),
           commentHeaderInfo = comment.toCommentHeaderInfo(context),
         )
       } else {
-        PostViewModel.ListView.VisibleCommentListView(
+        PostListItem.VisibleCommentListView(
           commentView = comment,
           pendingCommentView = idToPendingComments[comment.comment.id],
           isRemoved = removedCommentIds.contains(comment.comment.id),
@@ -172,7 +173,7 @@ class CommentTreeBuilder(
 
           // Let's make a dummy comment in this case!
           val parentNodeData = CommentNodeData(
-            PostViewModel.ListView.MissingCommentItem(
+            PostListItem.MissingCommentItem(
               cParentId,
               parentParentNodeId,
             ),
@@ -186,7 +187,7 @@ class CommentTreeBuilder(
     map.values.forEach { node ->
       val commentView = node.listView
       if (commentView !is CommentListView &&
-        commentView !is PostViewModel.ListView.MissingCommentItem
+        commentView !is PostListItem.MissingCommentItem
       ) {
         return@forEach
       }
@@ -208,7 +209,7 @@ class CommentTreeBuilder(
             topNodes.add(node)
           }
         }
-        is PostViewModel.ListView.MissingCommentItem -> {
+        is PostListItem.MissingCommentItem -> {
           val parentId = commentView.parentCommentId
 
           parentId?.let { cParentId ->
@@ -220,9 +221,10 @@ class CommentTreeBuilder(
             topNodes.add(node)
           }
         }
-        is PostViewModel.ListView.MoreCommentsItem,
-        is PostViewModel.ListView.PendingCommentListView,
-        is PostViewModel.ListView.PostListView,
+        is PostListItem.MoreCommentsItem,
+        is PostListItem.PendingCommentListView,
+        is PostListItem.PostLoadedListView,
+        is PostListItem.PostErrorListView,
         -> {}
       }
     }
@@ -239,11 +241,11 @@ class CommentTreeBuilder(
         val commentView = originalComment?.listView
         if (originalComment != null && commentView is CommentListView) {
           originalComment.listView = when (commentView) {
-            is PostViewModel.ListView.FilteredCommentItem ->
+            is PostListItem.FilteredCommentItem ->
               commentView.copy(
                 pendingCommentView = pendingComment,
               )
-            is PostViewModel.ListView.VisibleCommentListView ->
+            is PostListItem.VisibleCommentListView ->
               commentView.copy(
                 pendingCommentView = pendingComment,
               )
@@ -253,7 +255,7 @@ class CommentTreeBuilder(
         topNodes.add(
           0,
           CommentNodeData(
-            listView = PostViewModel.ListView.PendingCommentListView(
+            listView = PostListItem.PendingCommentListView(
               pendingComment,
               author = accountManager.getAccountById(pendingComment.accountId)?.name,
             ),
@@ -268,7 +270,7 @@ class CommentTreeBuilder(
           it.children.add(
             0,
             CommentNodeData(
-              listView = PostViewModel.ListView.PendingCommentListView(
+              listView = PostListItem.PendingCommentListView(
                 pendingComment,
                 author = accountManager.getAccountById(
                   pendingComment.accountId,
@@ -310,12 +312,13 @@ class CommentTreeBuilder(
             childrenCount += commentView.commentView.counts.child_count + 1 // + 1 for this comment
             toVisit.push(it)
           }
-          is PostViewModel.ListView.PendingCommentListView -> {
+          is PostListItem.PendingCommentListView -> {
             childrenCount += 1 // + 1 for this comment
           }
-          is PostViewModel.ListView.MoreCommentsItem,
-          is PostViewModel.ListView.PostListView,
-          is PostViewModel.ListView.MissingCommentItem,
+          is PostListItem.MoreCommentsItem,
+          is PostListItem.PostLoadedListView,
+          is PostListItem.PostErrorListView,
+          is PostListItem.MissingCommentItem,
           -> {}
         }
       }
@@ -335,7 +338,7 @@ class CommentTreeBuilder(
           repeat(missingCount) {
             node.children.add(
               CommentNodeData(
-                PostViewModel.ListView.MissingCommentItem(
+                PostListItem.MissingCommentItem(
                   commentView.commentView.comment.id,
                   parentParentNodeId,
                 ),
@@ -346,7 +349,7 @@ class CommentTreeBuilder(
         } else {
           node.children.add(
             CommentNodeData(
-              PostViewModel.ListView.MoreCommentsItem(
+              PostListItem.MoreCommentsItem(
                 commentView.commentView.comment.id,
                 node.depth + 1,
                 expectedCount - childrenCount,
@@ -366,12 +369,13 @@ class CommentTreeBuilder(
         is CommentListView -> {
           childrenCount += commentView.commentView.counts.child_count + 1 // + 1 for this comment
         }
-        is PostViewModel.ListView.PendingCommentListView -> {
+        is PostListItem.PendingCommentListView -> {
           childrenCount += 1 // + 1 for this comment
         }
-        is PostViewModel.ListView.MoreCommentsItem,
-        is PostViewModel.ListView.PostListView,
-        is PostViewModel.ListView.MissingCommentItem,
+        is PostListItem.MoreCommentsItem,
+        is PostListItem.PostLoadedListView,
+        is PostListItem.PostErrorListView,
+        is PostListItem.MissingCommentItem,
         -> {}
       }
     }
@@ -379,7 +383,7 @@ class CommentTreeBuilder(
     if (childrenCount < expectedCount) {
       topNodes.add(
         CommentNodeData(
-          PostViewModel.ListView.MoreCommentsItem(
+          PostListItem.MoreCommentsItem(
             null,
             0,
             expectedCount - childrenCount,
@@ -418,20 +422,21 @@ fun CommentNodeData.find(itemId: Long): CommentListView? {
     val currentNode = toVisit.pollLast() ?: continue
 
     when (val commentView = currentNode.listView) {
-      is PostViewModel.ListView.FilteredCommentItem -> {
+      is PostListItem.FilteredCommentItem -> {
         if (commentView.commentView.comment.id.toLong() == itemId) {
           return commentView
         }
       }
-      is PostViewModel.ListView.VisibleCommentListView -> {
+      is PostListItem.VisibleCommentListView -> {
         if (commentView.commentView.comment.id.toLong() == itemId) {
           return commentView
         }
       }
-      is PostViewModel.ListView.MissingCommentItem,
-      is PostViewModel.ListView.MoreCommentsItem,
-      is PostViewModel.ListView.PendingCommentListView,
-      is PostViewModel.ListView.PostListView,
+      is PostListItem.MissingCommentItem,
+      is PostListItem.MoreCommentsItem,
+      is PostListItem.PendingCommentListView,
+      is PostListItem.PostLoadedListView,
+      is PostListItem.PostErrorListView,
       -> {}
     }
 
@@ -470,7 +475,7 @@ fun List<CommentNodeData>.flatten(
       result.add(currentNode)
 
       when (val commentView = currentNode.listView) {
-        is CommentListView -> {
+        is PostListItem.CommentListView -> {
           if (highlightedComment?.isParent(commentView.commentView.comment) == true) {
             // do nothing
           } else if (highlightedComment != null &&
@@ -480,23 +485,27 @@ fun List<CommentNodeData>.flatten(
             continue
           }
         }
-        is PostViewModel.ListView.PendingCommentListView -> {
+        is PostListItem.PendingCommentListView -> {
           if (collapsedItemIds.contains(commentView.id)) {
             continue
           }
         }
-        is PostViewModel.ListView.PostListView -> {
+        is PostListItem.PostLoadedListView -> {
           // this should never happen
         }
 
-        is PostViewModel.ListView.MoreCommentsItem -> {
+        is PostListItem.MoreCommentsItem -> {
           // shouldnt happen
         }
 
-        is PostViewModel.ListView.MissingCommentItem -> {
+        is PostListItem.MissingCommentItem -> {
           if (collapsedItemIds.contains(commentView.id)) {
             continue
           }
+        }
+
+        is PostListItem.PostErrorListView -> {
+          // shouldn't happen
         }
       }
 

@@ -125,7 +125,6 @@ import io.sentry.Sentry
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 /**
  * This is really the "PostFeedFragment"...
@@ -185,9 +184,6 @@ class CommunityFragment :
 
   @Inject
   lateinit var avatarHelper: AvatarHelper
-
-  @Inject
-  lateinit var json: Json
 
   @Inject
   lateinit var accountImageGenerator: AccountImageGenerator
@@ -383,13 +379,7 @@ class CommunityFragment :
             neutralButtonResId = R.string.go_to_account_instance
           }
         },
-        onImageClick = { accountId, postView, sharedElementView, url, peek ->
-          val altUrl = if (url == postView.post.thumbnail_url) {
-            postView.post.url
-          } else {
-            null
-          }
-
+        onImageClick = { accountId, postView, sharedElementView, url, altUrl, peek ->
           getMainActivity()?.openImage(
             sharedElement = sharedElementView,
             appBar = communityAppBarController?.appBarRoot,
@@ -491,10 +481,6 @@ class CommunityFragment :
     }
 
     viewModel.changeCommunity(args.communityRef, restore = savedInstanceState != null)
-
-    if (savedInstanceState != null) {
-      viewModel.restoreFromState(CommunityViewState.restoreFromBundle(savedInstanceState, json))
-    }
 
     sharedElementEnterTransition = SharedElementTransition()
     sharedElementReturnTransition = SharedElementTransition()
@@ -730,7 +716,7 @@ class CommunityFragment :
       }
 
       runOnReady {
-        onReady()
+        onReady(savedInstanceState)
       }
 
       fab.setup(preferences)
@@ -978,7 +964,7 @@ class CommunityFragment :
     communityAppBarController?.setExpanded(true)
   }
 
-  private fun onReady() {
+  private fun onReady(savedInstanceState: Bundle?) {
     if (!isBindingAvailable()) return
 
     val view = binding.root
@@ -1192,7 +1178,9 @@ class CommunityFragment :
         }
       }
 
-      if (adapter?.items.isNullOrEmpty()) {
+      if (savedInstanceState != null && preferences.restoreBrowsingSessions) {
+        viewModel.restoreFromState(CommunityViewState.restoreFromBundle(savedInstanceState))
+      } else if (adapter?.items.isNullOrEmpty()) {
         viewModel.fetchInitialPage()
       }
     }
@@ -1398,7 +1386,7 @@ class CommunityFragment :
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
-    viewModel.createState()?.writeToBundle(outState, json)
+    viewModel.createState()?.writeToBundle(outState)
     super.onSaveInstanceState(outState)
   }
 

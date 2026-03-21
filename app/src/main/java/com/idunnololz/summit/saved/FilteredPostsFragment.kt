@@ -92,13 +92,7 @@ class FilteredPostsFragment :
           )
         }
       },
-      onImageClick = { _, postView, sharedElementView, url, peek ->
-        val altUrl = if (url == postView.post.thumbnail_url) {
-          postView.post.url
-        } else {
-          null
-        }
-
+      onImageClick = { _, postView, sharedElementView, url, altUrl, peek ->
         getMainActivity()?.openImage(
           sharedElement = sharedElementView,
           appBar = parentFragment.binding.appBar,

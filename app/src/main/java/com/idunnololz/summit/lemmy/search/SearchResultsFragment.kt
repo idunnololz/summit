@@ -161,7 +161,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             peek = peek,
           )
         },
-        onPostImageClick = { _, postView, view, url, peek ->
+        onPostImageClick = { _, postView, view, url, altUrl, peek ->
           getMainActivity()?.openImage(
             sharedElement = view,
             appBar = null,
@@ -170,6 +170,7 @@ class SearchResultsFragment : BaseFragment<FragmentSearchResultsBinding>() {
             mimeType = null,
             downloadContext = postView.toFileDownloadContext(),
             peek = peek,
+            urlAlt = altUrl,
           )
         },
         onVideoClick = { url, videoType, state ->

@@ -123,7 +123,7 @@ class LemmyContentHelper(
     highlight: HighlightTextData? = null,
     contentSpannable: Spanned? = null,
     screenshotConfig: ScreenshotModeViewModel.ScreenshotConfig? = null,
-    onFullImageViewClickListener: (imageView: View?, url: String) -> Unit,
+    onFullImageViewClickListener: (imageView: View?, url: String, altUrl: String?) -> Unit,
     onImageClickListener: (url: String, peek: Boolean) -> Unit,
     onVideoClickListener: (url: String, videoType: VideoType, videoState: VideoState?) -> Unit,
     onVideoLongClickListener: (url: String) -> Unit,
@@ -273,7 +273,7 @@ class LemmyContentHelper(
         if (attachClickHandler) {
           imageView.transitionName = fullImageViewTransitionName
           imageView.setOnClickListener {
-            onFullImageViewClickListener(it, previewInfo.getUrl())
+            onFullImageViewClickListener(it, previewInfo.getUrl(), thumbnailUrl)
           }
           imageView.setOnLongClickListener {
             if (preferences.peekImagesOnLongPress) {
@@ -395,7 +395,7 @@ class LemmyContentHelper(
 
       fullImageView.transitionName = fullImageViewTransitionName
       fullImageView.setOnClickListener {
-        onFullImageViewClickListener(it, imageUrl)
+        onFullImageViewClickListener(it, imageUrl, fallback)
       }
     }
 
@@ -865,7 +865,7 @@ class LemmyContentHelper(
         allowHardware(false)
 
         listener(
-          onError = { _, error ->
+          onError = { _, _ ->
             startLoadImage()
           },
           onSuccess = { _, result ->

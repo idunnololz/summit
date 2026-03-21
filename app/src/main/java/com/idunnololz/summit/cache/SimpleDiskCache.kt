@@ -126,6 +126,12 @@ class SimpleDiskCache(
   fun getCachedData(key: String): String? = getString(key)?.string
 
   @Throws(IOException::class)
+  fun getCachedDataAsByteArray(key: String): ByteArray? =
+    cache.get(toInternalKey(key))?.use { snapshot ->
+      snapshot.getInputStream(VALUE_IDX).readBytes()
+    }
+
+  @Throws(IOException::class)
   fun evict(key: String) {
     cache.remove(toInternalKey(key))
   }
@@ -169,6 +175,15 @@ class SimpleDiskCache(
   fun put(key: String, value: String?, annotations: Map<String, Serializable>) {
     openStream(key, annotations).use {
       it.write(value!!.toByteArray())
+    }
+  }
+
+
+  @Synchronized
+  @Throws(IOException::class)
+  fun put(key: String, value: ByteArray, annotations: Map<String, Serializable>) {
+    openStream(key, annotations).use {
+      it.write(value)
     }
   }
 

@@ -337,7 +337,7 @@ class PostAndCommentViewBuilder @Inject constructor(
     postHeaderInfo: PostHeaderInfo,
     onRevealContentClickedFn: () -> Unit,
     onPostActionClick: (PostView, actionId: Int) -> Unit,
-    onImageClick: (Either<PostView, CommentView>, View?, String, peek: Boolean) -> Unit,
+    onImageClick: (Either<PostView, CommentView>, View?, url: String, altUrl: String?, peek: Boolean) -> Unit,
     onVideoClick: (
       Either<PostView, CommentView>,
       url: String,
@@ -485,7 +485,7 @@ class PostAndCommentViewBuilder @Inject constructor(
           highlightTextData?.copy(matchIndex = null)
         },
         onImageClick = { url, peek ->
-          onImageClick(Either.Left(postView), null, url, peek)
+          onImageClick(Either.Left(postView), null, url, null, peek)
         },
         onVideoClick = { url ->
           onVideoClick(Either.Left(postView), url, VideoType.Unknown, null)
@@ -552,11 +552,11 @@ class PostAndCommentViewBuilder @Inject constructor(
       },
       screenshotConfig = screenshotConfig,
       contentSpannable = contentSpannable,
-      onFullImageViewClickListener = { view, url ->
-        onImageClick(Either.Left(postView), view, url, false)
+      onFullImageViewClickListener = { view, url, altUrl ->
+        onImageClick(Either.Left(postView), view, url, altUrl, false)
       },
       onImageClickListener = { url, peek ->
-        onImageClick(Either.Left(postView), null, url, peek)
+        onImageClick(Either.Left(postView), null, url, null, peek)
       },
       onVideoClickListener = { url, videoType, videoState ->
         onVideoClick(Either.Left(postView), url, videoType, videoState)

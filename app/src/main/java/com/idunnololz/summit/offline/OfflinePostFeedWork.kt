@@ -112,7 +112,7 @@ class OfflinePostFeedWork @AssistedInject constructor(
     ) ?: DefaultSortOrder
 
     postsRepository.setCommunity(communityRef)
-    postsRepository.setSortOrder(sortOrder)
+    postsRepository.sortOrder.value = sortOrder
 
     val allPosts = mutableListOf<LocalPostView>()
     val offlinePostCount = preferenceManager.currentPreferences.getOfflinePostCount()

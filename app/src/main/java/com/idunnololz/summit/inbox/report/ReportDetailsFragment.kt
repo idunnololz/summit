@@ -43,6 +43,8 @@ import com.idunnololz.summit.lemmy.getAccountAgeString
 import com.idunnololz.summit.lemmy.mod.ModActionsDialogFragment
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
+import com.idunnololz.summit.lemmy.post.PostListItem
+import com.idunnololz.summit.lemmy.post.PostModel
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.postAndCommentView.createCommentActionHandler
@@ -745,7 +747,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               accountId = null,
             )
           },
-          onImageClick = { _, view, url, peek ->
+          onImageClick = { _, view, url, altUrl, peek ->
             getMainActivity()?.openImage(
               sharedElement = view,
               appBar = binding.appBar,
@@ -754,6 +756,7 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
               mimeType = null,
               downloadContext = null,
               peek = peek,
+              urlAlt = altUrl,
             )
           },
           onVideoClick = { _, url, videoType, state ->
@@ -834,8 +837,8 @@ class ReportDetailsFragment : BaseFragment<FragmentReportDetailsBinding>() {
       }
 
       adapter.setData(
-        PostViewModel.PostData(
-          postListView = PostViewModel.ListView.PostListView(
+        PostModel(
+          postListView = PostListItem.PostLoadedListView(
             post = data.post,
             postHeaderInfo = data.post.toPostHeaderInfo(context),
           ),

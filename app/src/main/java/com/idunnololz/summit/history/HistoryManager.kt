@@ -43,7 +43,7 @@ class HistoryManager @Inject constructor(
 
   init {
     coroutineScope.launch {
-      Log.d("dbdb", "historyDao: ${historyDao.count()}")
+      Log.d(TAG, "historyDao: ${historyDao.count()}")
     }
   }
 

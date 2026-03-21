@@ -100,10 +100,6 @@ class MainApplication :
     Utils.defaultWebApp = preferences.defaultWebApp
     notificationsUpdaterFactory = hiltEntryPoint.notificationsUpdaterFactory()
 
-//    val barr = Cbor.encodeToByteArray(TrackingEvent(10, 20, 3000, 45534, TrackedAction.UPVOTE))
-//    Log.d("HAHA", "barr: ${barr.size} ${barr.toHexString()}")
-//    Log.d("HAHA", "back: ${Cbor.decodeFromByteArray<TrackingEvent>(barr)}")
-
     SingletonImageLoader.setSafe {
       ImageLoader.Builder(context)
         .transitionFactory(

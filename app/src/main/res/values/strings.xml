@@ -2385,6 +2385,7 @@
     <string name="parse_tags_from_post_titles">Parse tags from post titles</string>
     <string name="parse_tags_from_post_titles_desc">Adds support for [Spoiler] tags.</string>
     <string name="reveal_warning_spoiler">This post is marked as a spoiler</string>
+    <string name="error_couldnt_find_post">Could not find post on this instance.</string>
 
 
     <!-- uCrop string resource end -->

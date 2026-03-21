@@ -64,7 +64,7 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
 
       filterField.editText?.setText(currentFilter?.filter)
 
-      regexSwitch.setOnCheckedChangeListener { view, isChecked ->
+      regexSwitch.setOnCheckedChangeListener { _, isChecked ->
         if (isChecked) {
           matchWholeWordSwitch.isEnabled = false
         } else {
@@ -72,7 +72,7 @@ class AddOrEditFilterDialogFragment : BaseDialogFragment<DialogFragmentAddFilter
         }
       }
       regexSwitch.isChecked = currentFilter?.isRegex == true
-      matchWholeWordSwitch.isChecked = currentFilter?.options?.matchWholeWord == true
+      matchWholeWordSwitch.isChecked = currentFilter?.options?.matchWholeWord != false
 
       cancel.setOnClickListener {
         dismiss()

@@ -25,6 +25,7 @@ import com.idunnololz.summit.lemmy.multicommunity.instance
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds
 import com.idunnololz.summit.preferences.DisplayDeletedPostIds.ALWAYS_HIDE_DELETED_POSTS
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.retry
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -50,6 +51,7 @@ class PostsRepository @AssistedInject constructor(
   private val duplicatePostsDetector: DuplicatePostsDetector,
   private val accountActionsManager: AccountActionsManager,
   private val dataBackedByCacheFactory: DataBackedByCache.Factory,
+  private val directoryHelper: DirectoryHelper,
 ) {
   companion object {
     private val TAG = PostsRepository::class.simpleName
@@ -84,7 +86,8 @@ class PostsRepository @AssistedInject constructor(
 
   private var allPostsData = dataBackedByCacheFactory.create<AllPostData>(
     "all_posts_data",
-    AllPostData()
+    AllPostData(),
+    directoryHelper.listsDiskCache,
   )
   private val allPosts
     get() = allPostsData.value.allPosts
@@ -129,7 +132,7 @@ class PostsRepository @AssistedInject constructor(
   private var consecutiveFilteredPostsByFilter = 0
   private var consecutiveFilteredPostsByType = 0
 
-  var sortOrder = savedStateHandle.getStateFlow<CommunitySortOrder>(
+  var sortOrder = savedStateHandle.getMutableStateFlow<CommunitySortOrder>(
     "PostsRepository.sortOrder",
     DefaultSortOrder,
   )
@@ -141,10 +144,6 @@ class PostsRepository @AssistedInject constructor(
 
   init {
     applyPreferences()
-  }
-
-  fun setSortOrder(sortOrder: CommunitySortOrder) {
-    savedStateHandle["PostsRepository.sortOrder"] = sortOrder
   }
 
   suspend fun updateStateMaintainingPosition(
@@ -238,7 +237,7 @@ class PostsRepository @AssistedInject constructor(
 
           val hasMoreResult = retry {
             fetchPage(
-              pageIndex = currentPageInternal + 1,
+              pageIndex = currentPageInternal,
               sortType = sortOrder.value.toApiSortOrder(),
               force = force,
             )
@@ -250,6 +249,9 @@ class PostsRepository @AssistedInject constructor(
             )
           } else {
             hasMore = hasMoreResult.getOrThrow()
+            allPostsData.value = allPostsData.value.copy(
+              currentPage = currentPageInternal + 1
+            )
           }
 
           if (!hasMore) {
@@ -299,9 +301,13 @@ class PostsRepository @AssistedInject constructor(
     get() = apiClient.instanceFlow
 
   suspend fun setCommunity(communityRef: CommunityRef?) {
-    Log.d("HAHA", "setCommunity()", RuntimeException())
+    Log.d("HAHA", "setCommunity(): $communityRef")
     withContext(serialContext) {
       mutex.withLock {
+        if (this@PostsRepository.communityRef == communityRef && currentDataSource != null) {
+          return@withLock
+        }
+
         this@PostsRepository.communityRef = communityRef ?: CommunityRef.All()
 
         when (communityRef) {
@@ -434,12 +440,13 @@ class PostsRepository @AssistedInject constructor(
   }
 
   suspend fun reset() = withContext(serialContext) {
-    Log.d("HAHA", "reset()", RuntimeException())
+    Log.d(TAG, "reset()")
     endReached = false
 
     allPostsData = dataBackedByCacheFactory.create(
       primaryKey = "${apiInstance}|${communityRef.getKey()}",
-      initialValue = AllPostData()
+      initialValue = AllPostData(),
+      cborDiskCache = directoryHelper.listsDiskCache,
     )
     seenPosts = mutableSetOf()
   }
@@ -672,10 +679,14 @@ class PostsRepository @AssistedInject constructor(
       if (hiddenPosts.contains(post.post.id)) {
         continue
       }
-      if (contentFiltersManager.testPostView(post)) {
-        if (showFilteredPosts) {
+
+      if (showFilteredPosts) {
+        val patternTriggered = contentFiltersManager.testPostViewWithProof(post)
+        if (patternTriggered != null) {
           filterReason = FilterReason.Custom
-        } else {
+        }
+      } else {
+        if (contentFiltersManager.testPostView(post)) {
           consecutiveFilteredPostsByFilter++
           continue
         }
@@ -735,8 +746,13 @@ class PostsRepository @AssistedInject constructor(
     }
 
   suspend fun tryRestore() {
+    val start = System.currentTimeMillis()
+    Log.d("HAHA", "tryRestore()")
+
     allPostsData.tryRestore()
     addSeenPosts(allPosts.map { it.post.postView })
+
+    Log.d("HAHA", "restored ${allPosts.size} posts. time: ${System.currentTimeMillis() - start}")
   }
 
   class PageResult(

@@ -56,6 +56,8 @@ import com.idunnololz.summit.lemmy.UploadImageViewModel
 import com.idunnololz.summit.lemmy.createOrEditPost.AddOrEditPostFragment.LanguageOption
 import com.idunnololz.summit.lemmy.post.OldThreadLinesDecoration
 import com.idunnololz.summit.lemmy.post.PostAdapter
+import com.idunnololz.summit.lemmy.post.PostListItem
+import com.idunnololz.summit.lemmy.post.PostModel
 import com.idunnololz.summit.lemmy.post.PostViewModel
 import com.idunnololz.summit.lemmy.postAndCommentView.PostAndCommentViewBuilder
 import com.idunnololz.summit.lemmy.toPostHeaderInfo
@@ -1036,7 +1038,7 @@ class AddOrEditCommentFragment :
         onAddCommentClick = { postOrComment ->
           showError()
         },
-        onImageClick = { _, _, _, _ ->
+        onImageClick = { _, _, _, _, _ ->
           showError()
         },
         onVideoClick = { _, url, videoType, state ->
@@ -1090,8 +1092,8 @@ class AddOrEditCommentFragment :
       )
 
       adapter.setData(
-        PostViewModel.PostData(
-          postListView = PostViewModel.ListView.PostListView(
+        PostModel(
+          postListView = PostListItem.PostLoadedListView(
             post = data.post,
             postHeaderInfo = data.post.toPostHeaderInfo(context),
           ),

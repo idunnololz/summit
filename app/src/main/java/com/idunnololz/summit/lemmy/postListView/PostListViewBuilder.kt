@@ -111,7 +111,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 typealias OnImageClickCallback =
-    (accountId: Long?, PostView, sharedElementView: View?, imageUrl: String, peek: Boolean) -> Unit
+    (accountId: Long?, PostView, sharedElementView: View?, imageUrl: String, altUrl: String?, peek: Boolean) -> Unit
 
 @FragmentScoped
 class PostListViewBuilder @Inject constructor(
@@ -1087,7 +1087,7 @@ class PostListViewBuilder @Inject constructor(
             if (urlVideo) {
               onVideoClick(imageUrl, VideoType.Mp4, null)
             } else {
-              onImageClick(accountId, postView, imageView, imageUrl, peek)
+              onImageClick(accountId, postView, imageView, imageUrl, thumbnailUrl, peek)
             }
           }
 
@@ -1175,11 +1175,11 @@ class PostListViewBuilder @Inject constructor(
             contentMaxLines = contentMaxLines,
             contentMaxHeightDp = contentMaxHeightDp,
             autoPlayVideos = autoPlayVideos,
-            onFullImageViewClickListener = { v, url ->
-              onImageClick(accountId, postView, v, url, false)
+            onFullImageViewClickListener = { v, url, altUrl ->
+              onImageClick(accountId, postView, v, url, altUrl, false)
             },
             onImageClickListener = { url, peek ->
-              onImageClick(accountId, postView, null, url, peek)
+              onImageClick(accountId, postView, null, url, null, peek)
             },
             onVideoClickListener = onVideoClick,
             onVideoLongClickListener = onVideoLongClickListener,
@@ -1289,7 +1289,7 @@ class PostListViewBuilder @Inject constructor(
           instance,
           showMediaAsLinks = true,
           onImageClick = { url, peek ->
-            onImageClick(accountId, postView, null, url, peek)
+            onImageClick(accountId, postView, null, url, null, peek)
           },
           onVideoClick = {
             onVideoClick(it, VideoType.Unknown, null)

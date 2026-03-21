@@ -101,6 +101,39 @@ class ContentFiltersManager @Inject constructor(
       }
     }
 
+  fun testPostViewWithProof(postView: PostView): Pattern? =
+    postListFilters.patternByType.firstNotNullOfOrNull { (type, pattern) ->
+      val found = when (type) {
+        FilterTypeIds.KeywordFilter -> {
+          pattern.matcher(postView.post.name).find()
+        }
+        FilterTypeIds.InstanceFilter -> {
+          pattern.matcher(postView.community.instance).find()
+        }
+        FilterTypeIds.CommunityFilter -> {
+          pattern.matcher(postView.community.name).find()
+        }
+        FilterTypeIds.UserFilter -> {
+          pattern.matcher(postView.creator.name).find()
+        }
+        FilterTypeIds.UrlFilter -> {
+          val url = postView.post.url
+          if (url != null) {
+            pattern.matcher(url).find()
+          } else {
+            false
+          }
+        }
+        else -> false
+      }
+
+      if (found) {
+        pattern
+      } else {
+        null
+      }
+    }
+
   /**
    * Tests a [CommentView] to see if it matches any of the filters.
    * @return true if the [CommentView] matches at least one filter.

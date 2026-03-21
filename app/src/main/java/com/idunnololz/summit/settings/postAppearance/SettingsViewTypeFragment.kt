@@ -366,7 +366,7 @@ class SettingsViewTypeFragment : BaseSettingsFragment() {
         isDuplicatePost = false,
         postHeaderInfo = fetchedPost.postView.toPostHeaderInfo(context),
         onRevealContentClickedFn = {},
-        onImageClick = { _, _, _, _, _ -> },
+        onImageClick = { _, _, _, _, _, _ -> },
         onVideoClick = { _, _, _ -> },
         onVideoLongClickListener = { _ -> },
         onPageClick = { _, _, _ -> },

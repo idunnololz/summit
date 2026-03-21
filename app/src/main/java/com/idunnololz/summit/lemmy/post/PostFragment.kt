@@ -93,7 +93,6 @@ import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.setup
 import com.idunnololz.summit.util.ext.showAllowingStateLoss
 import com.idunnololz.summit.util.getParcelableCompat
-import com.idunnololz.summit.util.insetViewAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewAutomaticallyByPadding
 import com.idunnololz.summit.util.insetViewExceptBottomAutomaticallyByMargins
 import com.idunnololz.summit.util.insetViewExceptTopAutomaticallyByPadding
@@ -390,8 +389,8 @@ class PostFragment :
 
     with(binding) {
       fun onMoreClick() {
-        val data = viewModel.postData.valueOrNull
-        val postView = data?.postListView?.post ?: initialPost
+        val data = viewModel.postModel.valueOrNull
+        val postView = data?.postListView?.asLoaded?.post ?: initialPost
 
         if (postView != null) {
           showMorePostOptions(
@@ -444,7 +443,7 @@ class PostFragment :
           onAddCommentClick = { postOrComment ->
             onAddCommentClick(postOrComment)
           },
-          onImageClick = { postOrCommentView, imageView, url, peek ->
+          onImageClick = { postOrCommentView, imageView, url, altUrl, peek ->
             getMainActivity()?.openImage(
               sharedElement = imageView,
               appBar = binding.appBar,
@@ -460,6 +459,7 @@ class PostFragment :
               mimeType = null,
               downloadContext = postOrCommentView?.toFileDownloadContext(),
               peek = peek,
+              urlAlt = altUrl,
             )
           },
           onVideoClick = { postOrCommentView, url, videoType, state ->
@@ -534,7 +534,7 @@ class PostFragment :
           },
           onCrossPostsClick = a@{
             val activity = getSummitActivity() ?: return@a
-            val crossPosts = viewModel.postData.valueOrNull?.crossPosts ?: return@a
+            val crossPosts = viewModel.postModel.valueOrNull?.crossPosts ?: return@a
             val bottomMenu = BottomMenu(activity)
               .apply {
                 val idToChoice = mutableMapOf<Int, PostView>()
@@ -631,7 +631,7 @@ class PostFragment :
         PostFabQuickActions.NONE -> {}
         PostFabQuickActions.ADD_COMMENT -> {
           fab.setOnLongClickListener {
-            val postView = viewModel.postData.valueOrNull?.postListView?.post
+            val postView = viewModel.postModel.valueOrNull?.postListView?.asLoaded?.post
             if (postView != null) {
               onAddCommentClick(Either.Left(postView))
             }
@@ -691,8 +691,8 @@ class PostFragment :
               goToPreviousComment()
             },
             onMoreClick = {
-              val data = viewModel.postData.valueOrNull
-              val postView = data?.postListView?.post ?: initialPost
+              val data = viewModel.postModel.valueOrNull
+              val postView = data?.postListView?.asLoaded?.post ?: initialPost
 
               if (postView != null) {
                 onMoreClick()
@@ -745,6 +745,8 @@ class PostFragment :
       viewModel.switchAccountState.observe(viewLifecycleOwner) {
         when (it) {
           is StatefulData.Error -> {
+            Log.d(TAG, "switchAccountState: Error!")
+
             binding.loadingViewFullscreen.visibility = View.GONE
             binding.loadingView2.hideAll()
 
@@ -1138,8 +1140,8 @@ class PostFragment :
 
     initialPostView?.let { post ->
       adapter.setStartingData(
-        PostViewModel.PostData(
-          postListView = PostViewModel.ListView.PostListView(
+        PostModel(
+          postListView = PostListItem.PostLoadedListView(
             post = post,
             postHeaderInfo = post.toPostHeaderInfo(context),
           ),
@@ -1159,7 +1161,7 @@ class PostFragment :
       onMainListingItemRetrieved(post)
     } ?: binding.loadingView.showProgressBar()
 
-    viewModel.postData.observe(viewLifecycleOwner) {
+    viewModel.postModel.observe(viewLifecycleOwner) {
       when (it) {
         is StatefulData.Error -> {
           binding.swipeRefreshLayout.isRefreshing = false
@@ -1177,7 +1179,9 @@ class PostFragment :
           binding.swipeRefreshLayout.isRefreshing = false
           binding.loadingView.hideAll()
           adapter.setData(it.data)
-          onMainListingItemRetrieved(it.data.postListView.post)
+          it.data.postListView.asLoaded?.post?.let {
+            onMainListingItemRetrieved(it)
+          }
 
           val newlyPostedCommentId = it.data.newlyPostedCommentId
           if (newlyPostedCommentId != null) {
@@ -1214,7 +1218,7 @@ class PostFragment :
       }
     }
 
-    if (viewModel.postData.valueOrNull == null) {
+    if (viewModel.postModel.valueOrNull == null) {
       lifecycleScope.launch(Dispatchers.Default) {
         if (preferences.delayWhenLoadingData) {
           delay(400)
@@ -1444,7 +1448,7 @@ class PostFragment :
   override fun proceedAnyways(tag: Int) {
     when (tag) {
       R.id.action_add_comment -> {
-        val postView = viewModel.postData.valueOrNull?.postListView ?: return
+        val postView = viewModel.postModel.valueOrNull?.postListView?.asLoaded ?: return
 
         AddOrEditCommentFragment.showReplyDialog(
           instance = getInstance(),
@@ -1454,7 +1458,7 @@ class PostFragment :
         )
       }
       R.id.action_edit_comment -> {
-        val postView = viewModel.postData.valueOrNull?.postListView ?: return
+        val postView = viewModel.postModel.valueOrNull?.postListView?.asLoaded ?: return
 
         AddOrEditCommentFragment.showReplyDialog(
           instance = getInstance(),
@@ -1513,24 +1517,19 @@ class PostFragment :
 
   private var _initialPostView: PostView? = null
   private fun getInitialPostView(): PostView? {
-    if (args.post != null) {
-      return args.post
-    } else {
-      if (_initialPostView != null) {
-        return _initialPostView
-      }
+    if (_initialPostView != null) {
+      return _initialPostView
+    }
 
-      val parentFragment = parentFragment
-      // check if we can get the post some other way...
-      if (parentFragment is PostTabbedFragment) {
-        _initialPostView = parentFragment.getPost(args.id)
-        return _initialPostView
-      } else if (parentFragment is CommunityFragment) {
-        _initialPostView = parentFragment.getPost(args.id)
-        return _initialPostView
-      } else {
-        return null
-      }
+    val parentFragment = parentFragment
+    if (parentFragment is PostTabbedFragment) {
+      _initialPostView = parentFragment.getPost(args.id)
+      return _initialPostView
+    } else if (parentFragment is CommunityFragment) {
+      _initialPostView = parentFragment.getPost(args.id)
+      return _initialPostView
+    } else {
+      return null
     }
   }
 

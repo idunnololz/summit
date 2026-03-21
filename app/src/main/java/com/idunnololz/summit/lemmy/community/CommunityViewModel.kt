@@ -724,6 +724,8 @@ class CommunityViewModel @Inject constructor(
       return
     }
 
+    loadedPostsData.postIsLoading()
+
     // The below has an issue...
     // If there are posts cached, then loading it would result in possible duplicate posts
     // Since the posts repository will not know about the cached posts
@@ -817,7 +819,6 @@ class CommunityViewModel @Inject constructor(
   }
 
   fun restoreFromState(state: CommunityViewState?) {
-    Log.d("HAHA", "restoreFromState: ${state}")
     state ?: return
 
     viewModelScope.launch {
@@ -826,6 +827,7 @@ class CommunityViewModel @Inject constructor(
       }
       postListEngine.setPageIndex(state.communityState.currentPageIndex)
       pagePositions = ArrayList(state.pageScrollStates)
+      postsRepository.setCommunity(state.communityState.communityRef)
 
       restorePostListEngineIfNeeded(state.communityState.currentPageIndex)
 
@@ -879,7 +881,7 @@ class CommunityViewModel @Inject constructor(
 
     Log.d(TAG, "New sort order set: $newSortOrder")
 
-    postsRepository.setSortOrder(newSortOrder)
+    postsRepository.sortOrder.value = newSortOrder
 
     if (initialPageFetched.value == true) {
       fetchCurrentPage(

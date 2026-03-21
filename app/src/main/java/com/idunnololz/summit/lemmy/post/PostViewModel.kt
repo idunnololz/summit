@@ -28,14 +28,12 @@ import com.idunnololz.summit.api.dto.lemmy.CommentSortType
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.filterLists.ContentFiltersManager
-import com.idunnololz.summit.lemmy.CommentHeaderInfo
 import com.idunnololz.summit.lemmy.CommentNavControlsState
 import com.idunnololz.summit.lemmy.CommentNodeData
 import com.idunnololz.summit.lemmy.CommentRef
 import com.idunnololz.summit.lemmy.CommentTreeBuilder
 import com.idunnololz.summit.lemmy.CommentsSortOrder
 import com.idunnololz.summit.lemmy.Consts.DEFAULT_INSTANCE
-import com.idunnololz.summit.lemmy.PostHeaderInfo
 import com.idunnololz.summit.lemmy.PostRef
 import com.idunnololz.summit.lemmy.duplicatePostsDetector.DuplicatePostsDetector
 import com.idunnololz.summit.lemmy.toApiSortOrder
@@ -53,6 +51,7 @@ import com.idunnololz.summit.util.dateStringToTs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,6 +61,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class PostViewModel @Inject constructor(
   private val context: Application,
@@ -90,13 +90,7 @@ class PostViewModel @Inject constructor(
    */
   val lemmyApiClient = lemmyApiClientFactory.create()
 
-  var originalPostOrCommentRef: Either<PostRef, CommentRef>? = null
-    set(value) {
-      field = value
-
-      state["originalPostRef"] = value?.leftOrNull()
-      state["originalCommentRef"] = value?.getOrNull()
-    }
+  val selectedCommentId = state.getMutableStateFlow<Int?>("selected_comment_id", null)
   var postOrCommentRef: Either<PostRef, CommentRef>? = null
     set(value) {
       field = value
@@ -121,8 +115,8 @@ class PostViewModel @Inject constructor(
   private val findInPageQueryFlow = MutableStateFlow<String>("")
 
   private var getPostResponse: GetPostResponse? = null
-  private var postView: PostView? = null
-  private var comments: List<CommentView>? = null
+  private val postViewFlow = MutableStateFlow<Result<PostView>?>(null)
+  private val commentsFlow = MutableStateFlow<Result<List<CommentView>>?>(null)
   private var pendingComments: List<PendingCommentView>? = null
   private var newlyPostedCommentId: CommentId? = null
 
@@ -134,7 +128,7 @@ class PostViewModel @Inject constructor(
 
   /**
    * This is used for the edge case where a comment is fully loaded and some of it's direct
-   * descendants are missing. This is can be used to check if comments are missing or just not
+   * descendants are missing. This can be used to check if comments are missing or just not
    * loaded yet.
    */
   private val fullyLoadedCommentIds = mutableSetOf<CommentId>()
@@ -147,7 +141,6 @@ class PostViewModel @Inject constructor(
   private var supplementaryComments = mutableMapOf<Int, CommentView>()
 
   private val commentsFetcher = CommentsFetcher(lemmyApiClient)
-  private var lastLoadCommentError: Throwable? = null
 
   var preferences: Preferences = preferenceManager.currentPreferences
 
@@ -155,7 +148,7 @@ class PostViewModel @Inject constructor(
     preferences.defaultCommentsSortOrder ?: CommentsSortOrder.Top,
   )
 
-  val postData = StatefulLiveData<PostData>()
+  val postModel = StatefulLiveData<PostModel>()
   val commentNavControlsState = MutableLiveData<CommentNavControlsState?>()
 
   init {
@@ -163,12 +156,6 @@ class PostViewModel @Inject constructor(
       postOrCommentRef = Either.Left(it)
     }
     state.get<CommentRef>("commentRef")?.let {
-      postOrCommentRef = Either.Right(it)
-    }
-    state.get<PostRef>("originalPostRef")?.let {
-      postOrCommentRef = Either.Left(it)
-    }
-    state.get<CommentRef>("originalCommentRef")?.let {
       postOrCommentRef = Either.Right(it)
     }
 
@@ -230,7 +217,7 @@ class PostViewModel @Inject constructor(
   }
 
   fun updateOriginalPostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
-    originalPostOrCommentRef = postOrCommentRef
+    selectedCommentId.value = postOrCommentRef.getOrNull()?.id
   }
 
   fun updatePostOrCommentRef(postOrCommentRef: Either<PostRef, CommentRef>) {
@@ -291,7 +278,7 @@ class PostViewModel @Inject constructor(
 
     postOrCommentRef ?: return null
 
-    postData.setIsLoading()
+    postModel.setIsLoading()
 
     return viewModelScope.launch(Dispatchers.Default) {
       _fetchPostData(
@@ -368,11 +355,7 @@ class PostViewModel @Inject constructor(
       linkToResolve
         .fold(
           onSuccess = {
-            Log.d(
-              TAG,
-              "Attempting to resolve $linkToResolve " +
-                "on instance $apiInstance",
-            )
+            Log.d(TAG, "Attempting to resolve $linkToResolve on instance $apiInstance")
             lemmyApiClient.resolveObject(it)
           },
           onFailure = {
@@ -395,7 +378,7 @@ class PostViewModel @Inject constructor(
               updatePostOrCommentRef(newPostOrCommentRef)
 
               if (didInstanceChange) {
-                comments = null
+                commentsFlow.value = null
                 pendingComments = null
                 supplementaryComments.clear()
                 newlyPostedCommentId = null
@@ -433,7 +416,7 @@ class PostViewModel @Inject constructor(
 
     unauthedApiClient.changeInstance(instance)
 
-    val postView = postView
+    val postView = postViewFlow.value?.getOrNull()
     val linkToResolve = if (postView != null) {
       Result.success(postView.post.ap_id)
     } else {
@@ -505,7 +488,7 @@ class PostViewModel @Inject constructor(
           if (newPostOrCommentRef != null) {
             updatePostOrCommentRef(newPostOrCommentRef)
 
-            comments = null
+            commentsFlow.value = null
             pendingComments = null
             supplementaryComments.clear()
             newlyPostedCommentId = null
@@ -569,7 +552,7 @@ class PostViewModel @Inject constructor(
             force = true,
           )
 
-          val oldComments = this@PostViewModel.comments
+          val oldComments = commentsFlow.value?.getOrNull()
           val newComments = result.getOrNull()
 
           var allCommentsUpdated = true // tracks if all comments are updated on the server
@@ -616,8 +599,6 @@ class PostViewModel @Inject constructor(
         }
 
         requireNotNull(result)
-
-//        this@PostViewModel.comments = result.getOrNull()
 
         completedPendingComments.forEach { pendingComment ->
           val commentsResult = if (pendingComment.parentId == null) {
@@ -673,9 +654,7 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  private fun invalidateSupplementaryComments(newComments: List<CommentView>?) {
-    newComments ?: return
-
+  private fun invalidateSupplementaryComments(newComments: List<CommentView>) {
     for (comment in newComments) {
       val supComment = supplementaryComments[comment.comment.id] ?: continue
       val supTs = dateStringToTs(supComment.comment.updated ?: supComment.comment.published)
@@ -687,24 +666,30 @@ class PostViewModel @Inject constructor(
   }
 
   private suspend fun updateData(wasUpdateForced: Boolean) = withContext(Dispatchers.Default) {
-    Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0}")
+    Log.d(TAG, "updateData() - pendingComments: ${pendingComments?.size ?: 0} comments: ${commentsFlow.value}")
 
     val context = ContextCompat.getContextForLanguage(context)
-    val post = postView ?: return@withContext
-    val comments = comments
+    val postResult = postViewFlow.value ?: return@withContext
+    val post = postResult.getOrNull()
+    val postError = postResult.exceptionOrNull()
+    val commentsResult = commentsFlow.value
+    val comments = commentsResult?.getOrNull()
     val crossPosts = getPostResponse?.crossPosts
     val pendingComments = pendingComments
     val supplementaryComments = supplementaryComments
     val postOrCommentRef = postOrCommentRef
     val commentRef: CommentRef? = postOrCommentRef?.getOrNull()
-    val originalPostOrCommentRef = originalPostOrCommentRef
     val isSingleCommentChain = commentRef != null
 
-    val postDataValue = PostData(
-      postListView = ListView.PostListView(
-        post = post,
-        postHeaderInfo = post.toPostHeaderInfo(context),
-      ),
+    val postModelValue = PostModel(
+      postListView = if (post != null) {
+        PostListItem.PostLoadedListView(
+          post = post,
+          postHeaderInfo = post.toPostHeaderInfo(context),
+        )
+      } else {
+        PostListItem.PostErrorListView(requireNotNull(postError))
+      },
       commentTree = CommentTreeBuilder(
         context = context,
         accountManager = accountManager,
@@ -725,7 +710,7 @@ class PostViewModel @Inject constructor(
       ),
       crossPosts = crossPosts ?: listOf(),
       newlyPostedCommentId = newlyPostedCommentId,
-      selectedCommentId = originalPostOrCommentRef?.getOrNull()?.id
+      selectedCommentId = selectedCommentId.value
         ?: commentRef?.id,
       isSingleCommentChain = isSingleCommentChain,
       isNativePost = isNativePost(),
@@ -733,10 +718,10 @@ class PostViewModel @Inject constructor(
       isCommentsLoaded = comments != null,
       commentPath = comments?.firstOrNull()?.comment?.path,
       wasUpdateForced = wasUpdateForced,
-      loadCommentError = lastLoadCommentError,
+      loadCommentError = commentsResult?.exceptionOrNull(),
     )
 
-    postData.postValue(postDataValue)
+    postModel.postValue(postModelValue)
   }
 
   fun isNativePost(): Boolean {
@@ -845,89 +830,8 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  data class PostData(
-    val postListView: ListView.PostListView,
-    val commentTree: List<CommentNodeData>,
-    val crossPosts: List<PostView>,
-    val newlyPostedCommentId: CommentId?,
-    val selectedCommentId: CommentId?,
-    val isSingleCommentChain: Boolean,
-    val isNativePost: Boolean,
-    val accountInstance: String?,
-    val isCommentsLoaded: Boolean,
-    val commentPath: String?,
-    val wasUpdateForced: Boolean,
-    val loadCommentError: Throwable?,
-  )
-
-  sealed interface ListView {
-    val id: Long
-
-    companion object {
-      private const val POST_FLAG = 0x100000000L
-      private const val COMMENT_FLAG = 0x200000000L
-      private const val PENDING_COMMENT_FLAG = 0x300000000L
-      private const val MORE_COMMENTS_FLAG = 0x400000000L
-    }
-
-    data class PostListView(
-      val post: PostView,
-      override val id: Long = post.post.id.toLong() or POST_FLAG,
-      val postHeaderInfo: PostHeaderInfo,
-    ) : ListView
-
-    sealed interface CommentListView : ListView {
-      val commentView: CommentView
-      val pendingCommentView: PendingCommentView?
-      var isRemoved: Boolean
-      val commentHeaderInfo: CommentHeaderInfo
-    }
-
-    data class VisibleCommentListView(
-      override val commentView: CommentView,
-      override val pendingCommentView: PendingCommentView? = null,
-      override var isRemoved: Boolean = false,
-      override val id: Long = commentView.comment.id.toLong() or COMMENT_FLAG,
-      override val commentHeaderInfo: CommentHeaderInfo,
-    ) : CommentListView
-
-    data class FilteredCommentItem(
-      override val commentView: CommentView,
-      override val pendingCommentView: PendingCommentView? = null,
-      override var isRemoved: Boolean = false,
-      override val id: Long = commentView.comment.id.toLong() or COMMENT_FLAG,
-      override val commentHeaderInfo: CommentHeaderInfo,
-      var show: Boolean = false,
-    ) : CommentListView
-
-    data class PendingCommentListView(
-      val pendingCommentView: PendingCommentView,
-      var author: String?,
-      override val id: Long = pendingCommentView.id or PENDING_COMMENT_FLAG,
-    ) : ListView
-
-    data class MoreCommentsItem(
-      val parentCommentId: CommentId?,
-      val depth: Int,
-      val moreCount: Int,
-      override val id: Long = (parentCommentId?.toLong() ?: 0L) or MORE_COMMENTS_FLAG,
-    ) : ListView
-
-    data class MissingCommentItem(
-      val commentId: CommentId,
-      val parentCommentId: CommentId?,
-      override val id: Long = commentId.toLong() or COMMENT_FLAG,
-    ) : ListView
-  }
-
   fun setCommentsSortOrder(sortOrder: CommentsSortOrder) {
     commentsSortOrderLiveData.value = sortOrder
-  }
-
-  fun deleteComment(accountId: Long?, postRef: PostRef, commentId: Int) {
-    viewModelScope.launch {
-      accountActionsManager.deleteComment(postRef, commentId, accountId)
-    }
   }
 
   fun toggleCommentNavControls() {
@@ -947,14 +851,9 @@ class PostViewModel @Inject constructor(
     }
   }
 
-  override fun onCleared() {
-    Log.d(TAG, "onCleared()")
-    super.onCleared()
-  }
-
   fun updatePostViewIfNeeded(post: PostView?) {
     post ?: return
-    postView = post
+    postViewFlow.value = Result.success(post)
   }
 
   fun fetchCommentPath(instance: String, commentPath: String) {
@@ -972,7 +871,7 @@ class PostViewModel @Inject constructor(
   }
 
   private fun trackVisitIfNeeded() {
-    val postView = postView ?: return
+    val postView = postViewFlow.value?.getOrNull() ?: return
 
     if (!visitTracked.value) {
       visitTracked.value = true
@@ -1043,21 +942,28 @@ class PostViewModel @Inject constructor(
               },
             )
         } else {
-          Result.success(this@PostViewModel.getPostResponse)
+          Result.success(getPostResponse)
         }
 
-      this@PostViewModel.getPostResponse = if (force) {
+      getPostResponse = if (force) {
         postResult.getOrNull()
       } else {
         postResult.getOrNull()
-          ?: this@PostViewModel.getPostResponse
+          ?: getPostResponse
       }
+      val loadedPostView = getPostResponse?.postView
 
-      this@PostViewModel.postView = this@PostViewModel.getPostResponse?.postView ?: postView
+      if (loadedPostView != null) {
+        postViewFlow.value = Result.success(loadedPostView)
+      } else if (postViewFlow.value?.isSuccess == true) {
+        // do nothing
+      } else if (postResult.isFailure) {
+        postViewFlow.value = Result.failure(requireNotNull(postResult.exceptionOrNull()))
+      }
 
       trackVisitIfNeeded()
 
-      this@PostViewModel.postView?.let {
+      postViewFlow.value?.getOrNull()?.let {
         postRef = PostRef(instance = apiInstance, id = it.post.id)
       }
       updateData(wasUpdateForced = false)
@@ -1083,13 +989,14 @@ class PostViewModel @Inject constructor(
             },
           )
       } else {
-        Result.success(this@PostViewModel.comments)
+        commentsFlow.value
       }
-      val newComments = commentsResult.getOrNull()
-      lastLoadCommentError = commentsResult.exceptionOrNull()
-      this@PostViewModel.comments = newComments ?: this@PostViewModel.comments
+      val newComments = commentsResult?.getOrNull()
 
-      invalidateSupplementaryComments(newComments)
+      if (newComments != null) {
+        commentsFlow.value = Result.success(newComments)
+        invalidateSupplementaryComments(newComments)
+      }
 
       if (force) {
         additionalLoadedCommentIds.forEach {
@@ -1105,8 +1012,8 @@ class PostViewModel @Inject constructor(
       updatePendingCommentsInternal(postOrCommentRef, sortOrder, true)
 
       val post = postResult.getOrNull()
-      val comments = commentsResult.getOrNull()
-      val postView = post?.postView ?: postView
+      val comments = commentsResult?.getOrNull()
+      val postView = post?.postView ?: postViewFlow.value?.getOrNull()
 
       if (postView != null) {
         if (markPostAsRead) {
@@ -1128,28 +1035,7 @@ class PostViewModel @Inject constructor(
         }
       }
 
-      if (post == null || comments == null) {
-        // see if we can recover gracefully
-
-        if ((postView != null || comments != null) && !force) {
-          // lets recover!
-          updateData(wasUpdateForced = force)
-        } else {
-          postResult
-            .onFailure {
-              postData.postError(it)
-            }
-            .onSuccess {}
-
-          commentsResult
-            .onFailure {
-              postData.postError(it)
-            }
-            .onSuccess {}
-        }
-      } else {
-        updateData(wasUpdateForced = force)
-      }
+      updateData(wasUpdateForced = force)
 
       translatePostToCurrentInstanceResult
         ?.onSuccess {

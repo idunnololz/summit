@@ -1,9 +1,8 @@
 package com.idunnololz.summit.lemmy
 
 import android.util.Log
-import com.google.gson.reflect.TypeToken
+import com.idunnololz.summit.cache.CborDiskCache
 import com.idunnololz.summit.coroutine.CoroutineScopeFactory
-import com.idunnololz.summit.util.DirectoryHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +16,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @OptIn(FlowPreview::class)
-class DataBackedByCache<T> constructor(
+class DataBackedByCache<T>(
   private val primaryKey: String,
   private val initialValue: T,
   private val clazz: Class<T>,
-  private val directoryHelper: DirectoryHelper,
+  private val cborDiskCache: CborDiskCache,
+
   private val coroutineScopeFactory: CoroutineScopeFactory,
 ) {
 
@@ -31,26 +31,27 @@ class DataBackedByCache<T> constructor(
 
   @Singleton
   class Factory @Inject constructor(
-    private val directoryHelper: DirectoryHelper,
     private val coroutineScopeFactory: CoroutineScopeFactory,
   ) {
     inline fun <reified T> create(
       primaryKey: String,
       initialValue: T,
+      cborDiskCache: CborDiskCache,
     ): DataBackedByCache<T> =
-      create(primaryKey, initialValue, T::class.java)
+      create(primaryKey, initialValue, T::class.java, cborDiskCache)
 
     fun <T> create(
       primaryKey: String,
       initialValue: T,
       clazz: Class<T>,
+      cborDiskCache: CborDiskCache,
     ): DataBackedByCache<T> =
       DataBackedByCache(
         primaryKey = primaryKey,
         initialValue = initialValue,
         clazz = clazz,
-        directoryHelper = directoryHelper,
         coroutineScopeFactory = coroutineScopeFactory,
+        cborDiskCache = cborDiskCache,
       )
   }
 
@@ -70,6 +71,7 @@ class DataBackedByCache<T> constructor(
   var commitChanges: Boolean = true
 
   init {
+    Log.d("HAHA", "DataBackedByCache.init(): $primaryKey")
     coroutineScope.launch {
       source
         .drop(1)
@@ -94,7 +96,7 @@ class DataBackedByCache<T> constructor(
       restored = true
 
       val restored = runInterruptible {
-        directoryHelper.listsDiskCache.getCachedObject<T>(
+        cborDiskCache.getCachedObject<T>(
           primaryKey,
           clazz
         )
@@ -103,6 +105,7 @@ class DataBackedByCache<T> constructor(
       source.value = restored
 
       Log.d(TAG, "[${primaryKey}] Successfully restored!")
+      Log.d("HAHA", "[${primaryKey}] Successfully restored!")
     }
   }
 
@@ -114,9 +117,10 @@ class DataBackedByCache<T> constructor(
         }
 
         runInterruptible {
-          directoryHelper.listsDiskCache.cacheObject(primaryKey, value, clazz)
-          directoryHelper.listsDiskCache.printDebugInfo()
+          cborDiskCache.cacheObject(primaryKey, value, clazz)
         }
+
+        Log.d("HAHA", "[${primaryKey}] Successfully committed!")
       }
     }
   }

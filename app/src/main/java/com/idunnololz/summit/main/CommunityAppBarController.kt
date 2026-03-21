@@ -839,7 +839,8 @@ class CommunityAppBarController(
     vh.pageTextView.setOnClickListener {
       PopupMenu(context, it).apply {
         menu.apply {
-          for (i in 0..viewModel.postListEngine.pages.maxOf { it.pageIndex }) {
+          val maxPageIndex = viewModel.postListEngine.pages.maxOfOrNull { it.pageIndex } ?: 0
+          for (i in 0..maxPageIndex) {
             add(0, i, 0, context.getString(R.string.page_format, (i + 1).toString()))
           }
         }
