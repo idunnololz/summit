@@ -33,6 +33,7 @@ import com.idunnololz.summit.account.AccountManager
 import com.idunnololz.summit.account.asAccount
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.utils.PostType
+import com.idunnololz.summit.api.utils.getImageUrl
 import com.idunnololz.summit.api.utils.getType
 import com.idunnololz.summit.api.utils.instance
 import com.idunnololz.summit.api.utils.shouldBlurItem
@@ -1087,7 +1088,14 @@ class PostListViewBuilder @Inject constructor(
             if (urlVideo) {
               onVideoClick(imageUrl, VideoType.Mp4, null)
             } else {
-              onImageClick(accountId, postView, imageView, imageUrl, thumbnailUrl, peek)
+              onImageClick(
+                accountId,
+                postView,
+                imageView,
+                postView.getImageUrl(true) ?: imageUrl,
+                thumbnailUrl,
+                peek,
+              )
             }
           }
 
@@ -1715,11 +1723,6 @@ class PostListViewBuilder @Inject constructor(
             downvoteButton = button1
           }
 
-          quickActionViews = listOf(
-            button1,
-            button2,
-            upvoteCount,
-          )
           views.add(button1)
           views.add(upvoteCount)
           views.add(button2)
