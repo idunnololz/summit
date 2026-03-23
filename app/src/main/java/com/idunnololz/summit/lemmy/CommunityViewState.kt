@@ -27,6 +27,7 @@ data class CommunityViewState(
   }
 
   fun writeToBundle(outState: Bundle) {
+    Log.d("HAHA", "writeToBundle() ${communityState.communityRef}")
     outState.putParcelable(SIS_KEY, this)
   }
 }

@@ -18,6 +18,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import arrow.core.Either
 import com.discord.panels.OverlappingPanelsLayout
 import com.discord.panels.PanelState
 import com.discord.panels.PanelsChildGestureRegionObserver
@@ -44,10 +45,13 @@ import com.idunnololz.summit.tabs.communityRef
 import com.idunnololz.summit.tabs.isHomeTab
 import com.idunnololz.summit.tabs.toTab
 import com.idunnololz.summit.user.UserCommunitiesManager
+import com.idunnololz.summit.user.UserCommunityItem
 import com.idunnololz.summit.util.BaseFragment
 import com.idunnololz.summit.util.BottomMenu
 import com.idunnololz.summit.util.Utils
 import com.idunnololz.summit.util.ext.attachNavHostFragment
+import com.idunnololz.summit.util.ext.attachNavHostFragmentDetachLast
+import com.idunnololz.summit.util.ext.detachNavHostFragment
 import com.idunnololz.summit.util.ext.navigateSafe
 import com.idunnololz.summit.util.ext.obtainNavHostFragment
 import com.idunnololz.summit.util.getParcelableCompat
@@ -261,24 +265,7 @@ class MainFragment :
 
         binding.rootView.postDelayed(
           a@{
-            if (!isBindingAvailable()) return@a
-
-            val tab = tabsManager.getTab(tabRef)
-
-            val selectedTabFragment = childFragmentManager.findFragmentByTag(getTagForTab(tab))
-            if (selectedTabFragment?.findNavController() == currentNavController) {
-              if (resetTab) {
-                resetCurrentTab(tab)
-              }
-
-              // otherwise do nothing because we are already on the right tab
-            } else {
-              changeCommunity(tab)
-
-              if (resetTab) {
-                resetCurrentTab(tab)
-              }
-            }
+            openTab(tabRef, resetTab)
           },
           200,
         )
@@ -610,7 +597,6 @@ class MainFragment :
     selectedNavHostFragment.navController.addOnDestinationChangedListener(
       onDestinationChangedListener,
     )
-    attachNavHostFragment(childFragmentManager, selectedNavHostFragment, true)
     lastNavHostFragment = selectedNavHostFragment
 
     tabsManager.updateCurrentTab(tab)
@@ -620,6 +606,27 @@ class MainFragment :
     Log.d(TAG, "currentNavController: ${navController.currentDestination?.label}")
     currentNavController = navController
     sharedViewModel.currentNavController.value = currentNavController
+  }
+
+  private fun openTab(tabRef: Either<UserCommunityItem, CommunityRef>, resetTab: Boolean) {
+    if (!isBindingAvailable()) return
+
+    val tab = tabsManager.getTab(tabRef)
+
+    val selectedTabFragment = childFragmentManager.findFragmentByTag(getTagForTab(tab))
+    if (selectedTabFragment?.findNavController() == currentNavController) {
+      if (resetTab) {
+        resetCurrentTab(tab)
+      }
+
+      // otherwise do nothing because we are already on the right tab
+    } else {
+      changeCommunity(tab)
+
+      if (resetTab) {
+        resetCurrentTab(tab)
+      }
+    }
   }
 
   private fun updateAttachedFragment(currentTab: TabsManager.Tab): NavHostFragment {

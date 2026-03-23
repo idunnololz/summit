@@ -346,6 +346,9 @@ class CommunityFragment :
     preferences = viewModel.preferences
 
     viewModel.setTag(parentFragment?.tag)
+    if (savedInstanceState != null) {
+      viewModel.lastCommunityViewState = CommunityViewState.restoreFromBundle(savedInstanceState)
+    }
 
     Sentry.configureScope {
       it.setContexts("community", args.communityRef)
@@ -1179,7 +1182,7 @@ class CommunityFragment :
       }
 
       if (savedInstanceState != null && preferences.restoreBrowsingSessions) {
-        viewModel.restoreFromState(CommunityViewState.restoreFromBundle(savedInstanceState))
+        viewModel.restoreFromState(/* uses restored state set in onCreate() */)
       } else if (adapter?.items.isNullOrEmpty()) {
         viewModel.fetchInitialPage()
       }
@@ -1871,6 +1874,9 @@ class CommunityFragment :
     context: Context,
     currentCommunityRef: CommunityRef?,
   ): (Int) -> Unit = a@{ actionId ->
+
+    if (!isBindingAvailable()) return@a
+
     when (actionId) {
       R.id.create_post -> {
         val currentCommunity = currentCommunityRef
@@ -2314,6 +2320,8 @@ class CommunityFragment :
   }
 
   fun updateLastSelectedItem(postRef: PostRef) {
+    if (!isBindingAvailable()) return
+
     val newRef = Either.Left(postRef)
     if (viewModel.lastSelectedItem == newRef) {
       return

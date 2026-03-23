@@ -359,6 +359,8 @@ class PostFragment :
             override fun handleOnBackProgressed(backEvent: BackEventCompat) {}
 
             override fun handleOnBackCancelled() {
+              if (!isBindingAvailable()) return
+
               slidingPaneFragment?.slidingPaneController?.apply {
                 setPanelOffset(0f)
                 binding.root.postDelayed(

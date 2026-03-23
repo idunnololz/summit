@@ -5,6 +5,23 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commitNow
 import androidx.navigation.fragment.NavHostFragment
 
+fun attachNavHostFragmentDetachLast(
+  fragmentManager: FragmentManager,
+  navHostFragment: NavHostFragment,
+  lastNavHostFragment: NavHostFragment?,
+  isPrimaryNavFragment: Boolean,
+) {
+  fragmentManager.commitNow {
+    if (lastNavHostFragment != null) {
+      remove(lastNavHostFragment)
+    }
+    attach(navHostFragment)
+    if (isPrimaryNavFragment) {
+      setPrimaryNavigationFragment(navHostFragment)
+    }
+  }
+}
+
 fun detachNavHostFragment(fragmentManager: FragmentManager, navHostFragment: NavHostFragment) {
   fragmentManager.beginTransaction()
     .detach(navHostFragment)

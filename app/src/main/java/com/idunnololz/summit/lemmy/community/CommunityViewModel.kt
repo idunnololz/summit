@@ -124,6 +124,8 @@ class CommunityViewModel @Inject constructor(
     "accountIdOfLastAccountPreferencesLoaded",
   )
 
+  var lastCommunityViewState: CommunityViewState? = null
+
   val communityInstance: String
     get() = postsRepository.communityInstance
   val apiInstance: String
@@ -310,6 +312,7 @@ class CommunityViewModel @Inject constructor(
   }
 
   private suspend fun onPostReadChanged() {
+    Log.d("HAHA", "onPostReadChanged() ${currentCommunityRef.value}")
     if (duplicatePostsDetector.isEnabled) {
       postListEngine.markDuplicatePostsAsRead()
     }
@@ -562,9 +565,11 @@ class CommunityViewModel @Inject constructor(
     fetchPageJob = viewModelScope.launch(Dispatchers.Default) {
       if (pageToFetch < postListEngine.pages.size) {
         if (force) {
-          postsRepository.removeSeenPosts(
-            postListEngine.pages[pageToFetch].posts.map { it.fetchedPost.postView },
-          )
+          val posts = postListEngine.pages.getOrNull(pageToFetch)?.posts
+            ?.map { it.fetchedPost.postView }
+          if (posts != null) {
+            postsRepository.removeSeenPosts(posts)
+          }
         }
       }
 
@@ -724,8 +729,6 @@ class CommunityViewModel @Inject constructor(
       return
     }
 
-    loadedPostsData.postIsLoading()
-
     // The below has an issue...
     // If there are posts cached, then loading it would result in possible duplicate posts
     // Since the posts repository will not know about the cached posts
@@ -804,6 +807,7 @@ class CommunityViewModel @Inject constructor(
   }
 
   fun createState(): CommunityViewState? {
+    Log.d("HAHA", "createState(): ${postListEngine.biggestPageIndex}")
     return CommunityViewState(
       CommunityState(
         communityRef = currentCommunityRef.value ?: return null,
@@ -812,14 +816,20 @@ class CommunityViewModel @Inject constructor(
           postListEngine.biggestPageIndex
         } else {
           currentPageIndex.value
-        } ?: return null,
+        }
+        ?: lastCommunityViewState?.communityState?.currentPageIndex
+        ?: return null,
       ),
       pagePositions,
     )
   }
 
-  fun restoreFromState(state: CommunityViewState?) {
+  fun restoreFromState() {
+    val state = lastCommunityViewState
+    Log.d("HAHA", "restoreFromState() state: $state")
     state ?: return
+
+    loadedPostsData.setIsLoading()
 
     viewModelScope.launch {
       if (currentCommunityRef.value != state.communityState.communityRef) {
