@@ -97,6 +97,7 @@ import com.idunnololz.summit.offline.dialog.MakeOfflineDialogFragment
 import com.idunnololz.summit.preferences.HomeFabQuickActionIds
 import com.idunnololz.summit.preferences.PostGestureAction
 import com.idunnololz.summit.preferences.Preferences
+import com.idunnololz.summit.preferences.generateQuickActions
 import com.idunnololz.summit.preferences.perCommunity.PerCommunityPreferences
 import com.idunnololz.summit.settings.navigation.NavBarDestinations
 import com.idunnololz.summit.user.UserCommunitiesManager
@@ -2210,7 +2211,7 @@ class CommunityFragment :
     val didUiConfigChange = postListViewBuilder.postUiConfig != newPostUiConfig
     val didLayoutChange = adapter?.layout != currentLayout
     val didActionsChange =
-      postListViewBuilder.postsInFeedQuickActions != preferences.postsInFeedQuickActions
+      postListViewBuilder.postsInFeedQuickActions != preferences.generateQuickActions()
     val didLayoutRelatedSettingChange =
       postListViewBuilder.showUpAndDownVotes != preferences.postShowUpAndDownVotes
 

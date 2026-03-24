@@ -732,6 +732,8 @@ class LemmyContentHelper(
     val thumbnailCached = thumbnailUrl != null &&
       isUrlImage(thumbnailUrl) &&
       offlineManager.isUrlCached(thumbnailUrl)
+    val imageCached = isUrlImage(imageUrl) &&
+      offlineManager.isUrlCached(imageUrl)
 
     fun onImageLoaded(
       urlOrFile: Either<String, File>,

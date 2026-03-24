@@ -88,6 +88,7 @@ import com.idunnololz.summit.user.UserCommunitiesManager
 import com.idunnololz.summit.util.AnimationsHelper
 import com.idunnololz.summit.util.BaseActivity
 import com.idunnololz.summit.util.BottomMenu
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
 import com.idunnololz.summit.util.DirectoryHelper
 import com.idunnololz.summit.util.FileDownloadContext
 import com.idunnololz.summit.util.SharedElementNames

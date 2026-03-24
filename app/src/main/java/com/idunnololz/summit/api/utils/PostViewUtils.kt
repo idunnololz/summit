@@ -46,17 +46,22 @@ fun PostView.getLowestResHiddenPreviewInfo(): PreviewInfo? {
   )
 }
 
-
 fun PostView.getImageUrl(reveal: Boolean): String? = if (shouldBlurItem()) {
   if (reveal) {
-    post.url
-      ?: getThumbnailUrl(reveal)
+    getBestImageUrl()
   } else {
     getLowestResHiddenPreviewInfo()?.getUrl()
   }
 } else {
-  post.url
-    ?: getThumbnailUrl(reveal)
+  getBestImageUrl()
+}
+
+fun PostView.getBestImageUrl(): String? {
+  val postUrl = post.url
+  if (postUrl == null || !isUrlImage(postUrl)) {
+    return getThumbnailUrl(reveal = true)
+  }
+  return postUrl
 }
 
 fun PostView.getThumbnailUrl(reveal: Boolean): String? = if (shouldBlurItem()) {

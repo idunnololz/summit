@@ -24,6 +24,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import coil3.dispose
+import coil3.load
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.divider.MaterialDivider
 import com.idunnololz.summit.R
@@ -89,6 +90,7 @@ import com.idunnololz.summit.preferences.PostQuickActionIds.VotingWithUpAndDownS
 import com.idunnololz.summit.preferences.PostsInFeedQuickActionsSettings
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.preferences.ThemeManager
+import com.idunnololz.summit.preferences.generateQuickActions
 import com.idunnololz.summit.preview.VideoType
 import com.idunnololz.summit.util.ContentUtils
 import com.idunnololz.summit.util.ContentUtils.isUrlVideo
@@ -190,7 +192,7 @@ class PostListViewBuilder @Inject constructor(
   private var hapticsOnActions: Boolean = preferences.hapticsOnActions
   private var showTextPreviewIcon: Boolean = postUiConfig.showTextPreviewIcon ?: true
   private var showUrlDomain: Boolean = postUiConfig.showUrlDomain()
-  var postsInFeedQuickActions = generateQuickActions()
+  var postsInFeedQuickActions = preferences.generateQuickActions()
     private set
   private var openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
   private var showPostType = preferences.showPostType
@@ -220,35 +222,6 @@ class PostListViewBuilder @Inject constructor(
 
         onPostUiConfigUpdated()
       }
-    }
-  }
-
-  private fun generateQuickActions(): PostsInFeedQuickActionsSettings {
-    val postsInFeedQuickActions = preferences.postsInFeedQuickActions
-      ?: PostsInFeedQuickActionsSettings()
-
-    fun List<Int>.updateWithPreferences() = this.map {
-      if (it == Voting) {
-        if (preferences.postShowUpAndDownVotes) {
-          VotingWithUpAndDownScores
-        } else if (preferences.hidePostScores) {
-          VotingNoScores
-        } else {
-          VotingWithScores
-        }
-      } else {
-        it
-      }
-    }
-
-    if (postsInFeedQuickActions.enabled) {
-      return postsInFeedQuickActions.copy(
-        actions = postsInFeedQuickActions.actions.updateWithPreferences(),
-      )
-    } else {
-      return postsInFeedQuickActions.copy(
-        actions = listOf(Voting).updateWithPreferences(),
-      )
     }
   }
 
@@ -282,7 +255,7 @@ class PostListViewBuilder @Inject constructor(
     hapticsOnActions = preferences.hapticsOnActions
     upvoteColor = preferences.upvoteColor
     downvoteColor = preferences.downvoteColor
-    postsInFeedQuickActions = generateQuickActions()
+    postsInFeedQuickActions = preferences.generateQuickActions()
     openLinkWhenThumbnailTapped = preferences.openLinkWhenThumbnailTapped
     showPostType = preferences.showPostType
     peekImagesOnLongPress = preferences.peekImagesOnLongPress
