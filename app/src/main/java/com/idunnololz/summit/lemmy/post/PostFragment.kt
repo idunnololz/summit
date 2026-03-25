@@ -339,14 +339,22 @@ class PostFragment :
           this,
           object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-              getSlidingPaneProvider()?.slidingPaneController?.unlockNavBar()
-              goBack()
+              if (parentFragmentManager.backStackEntryCount > 1) {
+                parentFragmentManager.popBackStack()
+              } else {
+                getSlidingPaneProvider()?.slidingPaneController?.unlockNavBar()
+                goBack()
+              }
             }
 
             var slidingPaneFragment: SlidingPaneControllerProvider? = null
 
             override fun handleOnBackStarted(backEvent: BackEventCompat) {
               super.handleOnBackStarted(backEvent)
+
+              if (parentFragmentManager.backStackEntryCount > 1) {
+                return
+              }
 
               slidingPaneFragment = getSlidingPaneProvider()
 

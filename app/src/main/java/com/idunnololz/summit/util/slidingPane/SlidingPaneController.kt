@@ -263,10 +263,10 @@ class SlidingPaneController(
   }
 
   private fun openPostInternal(
-      args: PostFragmentArgs?,
-      removeLastPostFragment: Boolean,
-      itemRef: Either<PostRef, CommentRef>? = null,
-      postFragmentOverride: PostFragment? = null,
+    args: PostFragmentArgs?,
+    removeLastPostFragment: Boolean,
+    itemRef: Either<PostRef, CommentRef>? = null,
+    postFragmentOverride: PostFragment? = null,
   ) {
     if (activeOpenPostJob != null) {
       Log.d(TAG, "Ignoring openPost() because it occurred too fast.")
@@ -305,6 +305,7 @@ class SlidingPaneController(
           attach(fragment)
         }
         replace(R.id.post_fragment_container, fragment)
+        addToBackStack(null)
       }
 
       if (postFragmentOverride != null) {
