@@ -108,6 +108,14 @@ class AccountImageGenerator @Inject constructor(
     return bitmap.toDrawable(context.resources)
   }
 
+  fun getCachedDrawableForGeneric(
+    key: String,
+    circleClip: Boolean = false,
+  ): BitmapDrawable? {
+    val cacheKey = "$key|$circleClip"
+    return memoryCache?.get(cacheKey)?.toDrawable(context.resources)
+  }
+
   fun getColorForPerson(personName: String, personId: PersonId, personInstance: String): Int =
     getColorForKey(personKey(personName, personId, personInstance))
 

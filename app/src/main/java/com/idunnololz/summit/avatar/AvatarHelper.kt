@@ -157,18 +157,28 @@ class AvatarHelper @Inject constructor(
     (imageView.getTag(R.id.generate_community_icon_job) as Job?)?.cancel()
 
     if (iconUrl.isNullOrBlank()) {
-      val job = coroutineScope.launch {
-        val d = accountImageGenerator.generateDrawableForGeneric(
-          communityRef.getKey(),
-          context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
-        )
 
-        withContext(Dispatchers.Main) {
-          imageView.dispose()
-          imageView.setImageDrawable(d)
+      val cached = accountImageGenerator.getCachedDrawableForGeneric(communityRef.getKey())
+      if (cached != null) {
+        imageView.dispose()
+        imageView.setImageDrawable(cached)
+      } else {
+        imageView.dispose()
+        imageView.setImageDrawable(null)
+
+        val job = coroutineScope.launch {
+          val d = accountImageGenerator.generateDrawableForGeneric(
+            communityRef.getKey(),
+            context.getDrawableCompat(R.drawable.ic_lemmy_outline_community_icon_24),
+          )
+
+          withContext(Dispatchers.Main) {
+            imageView.dispose()
+            imageView.setImageDrawable(d)
+          }
         }
+        imageView.setTag(R.id.generate_profile_icon_job, job)
       }
-      imageView.setTag(R.id.generate_profile_icon_job, job)
     } else {
             /*
 

@@ -5,14 +5,12 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Transition
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.SystemBarStyle
@@ -37,7 +35,6 @@ import com.idunnololz.summit.MainApplication
 import com.idunnololz.summit.R
 import com.idunnololz.summit.databinding.FragmentImageViewerBinding
 import com.idunnololz.summit.error.ErrorDialogFragment
-import com.idunnololz.summit.image.ImageInfoDialogFragment
 import com.idunnololz.summit.lemmy.utils.actions.MoreActionsHelper
 import com.idunnololz.summit.lemmy.utils.createImageOrLinkActionsHandler
 import com.idunnololz.summit.lemmy.utils.showAdvancedLinkOptions
@@ -75,6 +72,7 @@ import kotlinx.coroutines.launch
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.net.toUri
 import com.idunnololz.summit.lemmy.utils.actions.DownloadAndShareFileListener
+import com.idunnololz.summit.util.ContentUtils.isUrlImage
 
 @AndroidEntryPoint
 class ImageViewerActivity :
@@ -228,33 +226,34 @@ class ImageViewerActivity :
     } else {
       binding.dummyImageView.visibility = View.VISIBLE
       binding.imageView.visibility = View.INVISIBLE
-    }
-    if (args.transitionName != null) {
-      window.sharedElementEnterTransition.addListener(
-        object : Transition.TransitionListener {
-          override fun onTransitionStart(p0: Transition?) {
-          }
 
-          override fun onTransitionEnd(p0: Transition?) {
+      if (args.transitionName != null) {
+        window.sharedElementEnterTransition.addListener(
+          object : Transition.TransitionListener {
+            override fun onTransitionStart(p0: Transition?) {
+            }
+
+            override fun onTransitionEnd(p0: Transition?) {
+              onSharedElementEnterTransitionEnd()
+            }
+
+            override fun onTransitionCancel(p0: Transition?) {
+            }
+
+            override fun onTransitionPause(p0: Transition?) {
+            }
+
+            override fun onTransitionResume(p0: Transition?) {
+            }
+          },
+        )
+      } else {
+        binding.imageView.post(
+          {
             onSharedElementEnterTransitionEnd()
-          }
-
-          override fun onTransitionCancel(p0: Transition?) {
-          }
-
-          override fun onTransitionPause(p0: Transition?) {
-          }
-
-          override fun onTransitionResume(p0: Transition?) {
-          }
-        },
-      )
-    } else {
-      binding.imageView.post(
-        {
-          onSharedElementEnterTransitionEnd()
-        },
-      )
+          },
+        )
+      }
     }
     window.sharedElementExitTransition.addListener(
       object : Transition.TransitionListener {
@@ -380,7 +379,10 @@ class ImageViewerActivity :
     loadImage(viewModel.url)
   }
 
+  private var isSharedElementEnterTransitionComplete = false
+  private var sharedElementEnterTransitionCompleteCb: (() -> Unit)? = null
   private fun onSharedElementEnterTransitionEnd() {
+    isSharedElementEnterTransitionComplete = true
     binding.dummyImageView.post {
       binding.dummyImageView.transitionName = null
       binding.imageView.transitionName = args.transitionName
@@ -388,6 +390,7 @@ class ImageViewerActivity :
       binding.dummyImageView.visibility = View.GONE
       binding.imageView.visibility = View.VISIBLE
     }
+    sharedElementEnterTransitionCompleteCb?.invoke()
   }
 
   fun onViewCreated() {
@@ -413,7 +416,7 @@ class ImageViewerActivity :
       loadImage(url)
     }
 
-    loadImage(viewModel.url)
+    loadImageForFirstTime()
 
     binding.imageView.postDelayed(
       {
@@ -561,6 +564,57 @@ class ImageViewerActivity :
     showSystemUI()
     moreActionsHelper.removeDownloadAndShareFileListener(downloadAndShareFileListener)
     super.onDestroy()
+  }
+
+  private fun loadImageForFirstTime() {
+    val currentUrl = viewModel.url ?: return
+    val otherUrl = args.urlAlt
+
+    if (otherUrl == null) {
+      loadImage(currentUrl)
+      return
+    }
+
+    if (offlineManager.isUrlCached(currentUrl)) {
+      loadImage(currentUrl)
+      return
+    }
+
+    if (!offlineManager.isUrlCached(otherUrl)) {
+      loadImage(currentUrl)
+      return
+    }
+
+    // If we made it here it means:
+    // - Other url is not null
+    // - Primary url is not cached
+    // - Other url is cached
+    //
+    // What this like means is:
+    // - We are loading an original image that has never been cached
+    // - We have a thumbnail image that has been cached.
+    //
+    // For the best user experience here, we want to load the other url first and load the
+    // primary url passively
+
+    loadImage(otherUrl)
+
+    runAfterTransitionAnimation {
+      binding.imageView.postDelayed(
+        {
+          loadImage(currentUrl)
+        },
+        50,
+      )
+    }
+  }
+
+  private fun runAfterTransitionAnimation(fn: () -> Unit) {
+    if (isSharedElementEnterTransitionComplete) {
+      fn()
+    } else {
+      sharedElementEnterTransitionCompleteCb = fn
+    }
   }
 
   /**
@@ -748,8 +802,8 @@ class ImageViewerActivity :
       startPostponedEnterTransition()
       binding.loadingView.hideAll()
 
-      binding.dummyImageView.load(Uri.parse(url))
-      binding.imageView.load(Uri.parse(url))
+      binding.dummyImageView.load(url.toUri())
+      binding.imageView.load(url.toUri())
       return
     }
 

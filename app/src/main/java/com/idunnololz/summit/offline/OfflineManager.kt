@@ -113,6 +113,11 @@ class OfflineManager @Inject constructor(
     Log.d(TAG, "fetchImageWithError(): $url")
     url ?: return
 
+    if (!force && isUrlCached(url)) {
+      listener(getCachedImageFile(url))
+      return
+    }
+
     val registration = fetchImage(
       url = url,
       listener = listener,

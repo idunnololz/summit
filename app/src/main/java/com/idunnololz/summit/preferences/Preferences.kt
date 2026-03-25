@@ -110,6 +110,7 @@ import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PARSE_MARKDOWN_IN_PO
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PARSE_TAGS_FROM_POST_TITLES
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PEEK_IMAGES_ON_LONG_PRESS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_PERF_DELAY_WHEN_LOADING_DATA
+import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POSTS_FEED_HEADER_VERSION
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POSTS_IN_FEED_QUICK_ACTIONS
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_AND_COMMENTS_UI_CONFIG
 import com.idunnololz.summit.preferences.PreferenceKeys.KEY_POST_FAB_QUICK_ACTION
@@ -659,6 +660,8 @@ class Preferences(
     by booleanPreference(KEY_HIDE_DUPLICATE_POSTS_ON_READ, false)
   var usePostsFeedHeader: Boolean
     by booleanPreference(KEY_USE_POSTS_FEED_HEADER, false)
+  var postsFeedHeaderVersion: Int
+    by intPreference(KEY_POSTS_FEED_HEADER_VERSION, PostsFeedHeaderVersions.V2)
   var inlineVideoDefaultVolume: Float
     by floatPreference(KEY_INLINE_VIDEO_DEFAULT_VOLUME, 0f)
   var swipeBetweenPosts: Boolean
@@ -675,8 +678,6 @@ class Preferences(
     by intPreference(KEY_GESTURE_SWIPE_DIRECTION, GestureSwipeDirectionIds.LEFT)
   var defaultWebApp: DefaultAppPreference?
     by jsonPreference(KEY_DEFAULT_APP_WEB_BROWSER) { null }
-  var preferredLocale: String?
-    by stringPreference(KEY_PREFERRED_LOCALE)
   var communitySelectorShowCommunitySuggestions: Boolean
     by booleanPreference(KEY_COMMUNITY_SELECTOR_SHOW_COMMUNITY_SUGGESTIONS, true)
   var postFullBleedImage: Boolean
