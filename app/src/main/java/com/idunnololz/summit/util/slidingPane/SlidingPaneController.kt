@@ -305,7 +305,6 @@ class SlidingPaneController(
           attach(fragment)
         }
         replace(R.id.post_fragment_container, fragment)
-        addToBackStack(null)
       }
 
       if (postFragmentOverride != null) {
