@@ -23,8 +23,6 @@ import com.idunnololz.summit.api.dto.lemmy.CommentId
 import com.idunnololz.summit.api.dto.lemmy.CommentView
 import com.idunnololz.summit.api.dto.lemmy.GetCommentsResponse
 import com.idunnololz.summit.api.dto.lemmy.GetPersonDetailsResponse
-import com.idunnololz.summit.api.dto.lemmy.GetPostResponse
-import com.idunnololz.summit.api.dto.lemmy.GetPostsResponse
 import com.idunnololz.summit.api.dto.lemmy.PostId
 import com.idunnololz.summit.models.PostView
 import com.idunnololz.summit.api.dto.lemmy.SearchResponse
@@ -41,6 +39,8 @@ import com.idunnololz.summit.lemmy.utils.VoteUiHandler
 import com.idunnololz.summit.lemmy.utils.toVotableRef
 import com.idunnololz.summit.links.ApiFeatureHelper
 import com.idunnololz.summit.links.supportsDownvotes
+import com.idunnololz.summit.models.GetPostResponse
+import com.idunnololz.summit.models.GetPostsResponse
 import com.idunnololz.summit.preferences.PreferenceManager
 import com.idunnololz.summit.util.color.ColorManager
 import com.idunnololz.summit.util.ext.performHapticFeedbackCompat
@@ -617,7 +617,7 @@ class AccountActionsManager @Inject constructor(
         }
       }
       is GetPostResponse -> {
-        updateScore(result.post_view)
+        updateScore(result.postView)
       }
       is GetPostsResponse -> {
         for (post in result.posts) {

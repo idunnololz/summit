@@ -106,11 +106,11 @@ class ClientFactory @Inject constructor(
           return@a chain.proceed(request)
         }
 
-                /*
-                 *  Leveraging the advantage of using Kotlin,
-                 *  we initialize the request and change its header depending on whether
-                 *  the device is connected to Internet or not.
-                 */
+        /*
+         *  Leveraging the advantage of using Kotlin,
+         *  we initialize the request and change its header depending on whether
+         *  the device is connected to Internet or not.
+         */
         val cachePolicy = cachePolicyManager.cachePolicy
 
         request = if (cachePolicy == CachePolicy.Minimum) {
@@ -132,12 +132,12 @@ class ClientFactory @Inject constructor(
               }
             }
             .build()
-                    /*
-                     *  If there is Internet, get the cache that was stored 5 seconds ago.
-                     *  If the cache is older than 5 seconds, then discard it,
-                     *  and indicate an error in fetching the response.
-                     *  The 'max-age' attribute is responsible for this behavior.
-                     */
+          /*
+           *  If there is Internet, get the cache that was stored 5 seconds ago.
+           *  If the cache is older than 5 seconds, then discard it,
+           *  and indicate an error in fetching the response.
+           *  The 'max-age' attribute is responsible for this behavior.
+           */
           request.newBuilder()
             .header(
               CACHE_CONTROL_HEADER,
@@ -146,14 +146,14 @@ class ClientFactory @Inject constructor(
             .removeHeader("Pragma")
             .build()
         } else {
-                    /*
-                     *  If there is no Internet, get the cache that was stored 7 days ago.
-                     *  If the cache is older than 7 days, then discard it,
-                     *  and indicate an error in fetching the response.
-                     *  The 'max-stale' attribute is responsible for this behavior.
-                     *  The 'only-if-cached' attribute indicates to not retrieve new data;
-                     *  fetch the cache only instead.
-                     */
+          /*
+           *  If there is no Internet, get the cache that was stored 7 days ago.
+           *  If the cache is older than 7 days, then discard it,
+           *  and indicate an error in fetching the response.
+           *  The 'max-stale' attribute is responsible for this behavior.
+           *  The 'only-if-cached' attribute indicates to not retrieve new data;
+           *  fetch the cache only instead.
+           */
           request.newBuilder()
             .cacheControl(CacheControl.FORCE_CACHE)
             .removeHeader("Pragma")
